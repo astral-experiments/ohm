@@ -65,6 +65,51 @@ def see_rustcs(seen,records,identity):
             records.append({'pid':int(entry.name),'identity':list(identity),'cwd':str(cwd),'argv':args,
                             'kind':crate_arg(args,'--crate-type'),'out':crate_arg(args,'--out-dir'),'consumer_inputs':selected})
         except (FileNotFoundError,ProcessLookupError,PermissionError):continue
+def read_kernel_rustcs(directory,identity):
+    records=[]
+    for line in (directory/'epochs.tsv').read_text().splitlines():
+        fields=line.split()
+        if fields[0]!='I' or fields[5]!='exec':continue
+        image,pid=int(fields[1]),int(fields[2]);raw=(directory/f'{image:05}.nul').read_bytes().split(b'\0')
+        need(raw.pop()==b'' and int(raw[0])==pid,'incomplete kernel argv')
+        if tuple(map(int,raw[1:3]))!=identity:continue
+        args=list(map(os.fsdecode,raw[4:]))
+        if crate_arg(args,'--crate-name')!='ruff':continue
+        inputs=[]
+        for i,arg in enumerate(args):
+            ext=args[i+1] if arg=='--extern'and i+1<len(args)else arg.removeprefix('--extern=')if arg.startswith('--extern=')else ''
+            name,eq,path=ext.partition('=')
+            if eq and name.split(':')[-1]=='ruff':
+                need(Path(path).is_absolute(),'kernel input must be absolute')
+                inputs.append(path)
+        output=crate_arg(args,'--out-dir')
+        need(output and Path(output).is_absolute(),'kernel rustc output directory must be absolute')
+        records.append({'pid':pid,'identity':list(identity),'kind':crate_arg(args,'--crate-type'),
+                        'cwd':None,'out':output,'consumer_inputs':inputs,'argv':args,'kernel_image':image})
+    need(sorted(r['kind']for r in records)==['bin','lib'],'independent cold command did not really run both rustcs')
+    need(any({Path(p).suffix for p in row['consumer_inputs']}=={'.rlib','.rmeta'} for row in records if row['kind']=='bin'),'cold bin missing the actual native and metadata producer')
+    return records
+
+def snapshot_work_products(directory):
+    # Never use this optional diagnostic in the product/verdict admission.
+    rows=json.loads((directory/'real-ruff-rustcs.json').read_bytes());marker=ROOT/'ruff-incremental-roots.json'
+    paths={Path(v.split('=',1)[1]) for r in rows for v in r['argv']if v.startswith('incremental=')}
+    if paths:put(marker,sorted(map(str,paths)))
+    elif marker.is_file():paths={Path(v)for v in json.loads(marker.read_bytes())}
+    sessions={}
+    for root in sorted(paths):
+        need(root.is_absolute() and root.resolve().is_relative_to(TARGET.resolve()),'uncertified workspace incremental root')
+        for unit in sorted(root.glob('ruff-*')):
+            if not unit.is_dir():continue
+            for state in sorted(unit.glob('s-*')):
+                if not state.is_dir() or not (state/'dep-graph.bin').is_file()or not (state/'work-products.bin').is_file():continue
+                objects=[]
+                for path in sorted(state.glob('*.o')):
+                    st=path.stat()
+                    need(st.st_size<128*2**20 and len(objects)<1000,'bounded native inventory')
+                    objects.append([path.name,st.st_dev,st.st_ino,st.st_mtime_ns,st.st_size,hf(path)])
+                if objects:sessions[str(state.relative_to(TARGET))]=objects
+    put(directory/'incremental-native-sessions.json',sessions)
 def source_files(directory):
     observations=json.loads((directory/'real-ruff-rustcs.json').read_bytes())
     selected={Path(s)for row in observations if row['kind']=='bin'for s in row['consumer_inputs']}
@@ -160,14 +205,22 @@ def same_artifacts(a,b):
     # All ELF member bytes, stable names, ranlib symbol mapping, physical metadata,
     # original user-visible outputs and the entire CLI executable still compare exactly.
     return {k:v for k,v in a.items()if k!='rlib'}=={k:v for k,v in b.items()if k!='rlib'}
-def command(directory,actual,expected=0):
+def command(directory,actual,expected=0,trace_cold=False):
     directory.mkdir()
     physical=(SDK/'bin/rustc').stat();identity=(physical.st_dev,physical.st_ino)
     seen=set();records=[]
+    if trace_cold:
+        kernel=directory/'kernel-execs';kernel.mkdir()
+        actual=[ROOT/'exec_count',kernel,*actual]
     with (directory/'stdout').open('xb')as out,(directory/'stderr').open('xb')as err:
         p=sp.Popen(actual,env=env(),cwd=WORK,stdout=out,stderr=err)
-        while p.poll()is None:
-            see_rustcs(seen,records,identity)
-            time.sleep(.012)
+        if trace_cold:p.wait()
+        else:
+            while p.poll()is None:
+                see_rustcs(seen,records,identity)
+                time.sleep(.012)
+    if trace_cold:
+        need(p.returncode==0,'cold child exited unsuccessfully')
+        records=read_kernel_rustcs(kernel,identity)
     put(directory/'real-ruff-rustcs.json',records)
     need(p.returncode==expected,(directory.name,p.returncode,(directory/'stderr').read_text(errors='replace')[-800:]))

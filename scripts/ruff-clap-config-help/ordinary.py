@@ -3,9 +3,10 @@ from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parent));from common import *
 whole=ROOT/'whole_count'
 def run(tag,state):
-    guard();td=PUB/tag;command(td,[whole,td/'hardware.json',shutil.which('cargo',path=env()['PATH']),*CMD])
+    guard();td=PUB/tag;command(td,[whole,td/'hardware.json',shutil.which('cargo',path=env()['PATH']),*CMD],trace_cold=MODE=='build'and tag in ('old','independent-clean-new'))
     hw=json.loads((td/'hardware.json').read_bytes());need(hw['status']==0 and hw['instructions']>0 and hw['enabled']==hw['running']>0,(tag,'whole counter'))
     out=observe_products(td,state)
+    if MODE=='build':snapshot_work_products(td)
     put(td/'products.json',out)
     return out
 select(OLD);prepare();ref=run('old',OLD)
