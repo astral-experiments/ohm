@@ -112,9 +112,17 @@ def run(tag,state,stop,stock,llvm,old_ready):
                 else:assert not output,(name,output[:600])
                 if mode=='private' and n>1 and diag!='override':assert levels and min(levels)==0,(name,n,levels[:20])
                 post=occupancy(inherited[0])if inherited else None
-                if mode=='private':assert pre==post==n-1,(name,pre,post)
+                at_driver_return=post;repay_start=time.monotonic_ns()
+                if mode=='private':
+                    # The Unix fork parent exits on output notification. The child then closes
+                    # its stdio while still holding tokens and destroys its heap in the background.
+                    limit_for_cleanup=time.monotonic()+45
+                    while post!=pre and time.monotonic()<limit_for_cleanup:
+                        time.sleep(.002);post=occupancy(inherited[0])
+                    b.write(P/(tag+'-'+name+'-token-return.json'),{'before':pre,'at_parent_return':at_driver_return,'after_cleanup':post,'additional_wait_ns':time.monotonic_ns()-repay_start})
+                    assert pre==post==n-1,(name,pre,at_driver_return,post)
                 container=elf_container.inspect(Path(argv[19]),llvm);sec=next(s for s in container['sections']if s['section']=='.rodata')
-                value={'sha256':container['sha256'],'argv_sha256':hashlib.sha256(b'\0'.join(os.fsencode(v)for v in x)).hexdigest(),'source':kind,'mode':mode,'token_pre':pre,'token_post':post,'minimum_observed_tokens':min(levels)if levels else None,'maximum_observed_tokens':max(levels)if levels else None,'signed_trace_token_count':signed_token_read,'affinity':cpus,'delivered':json.loads(inside.read_bytes()),'controlled_threads':n,'requested_diagnostic':diag,'elapsed_ns':time.monotonic_ns()-begin,'entsize':sec['header'][9],'rodata_bytes':sec['header'][5],'libelf':libelf_data.inspect(argv[19],sec['index']),'trace':output.decode()if diag=='trace'else None}
+                value={'sha256':container['sha256'],'argv_sha256':hashlib.sha256(b'\0'.join(os.fsencode(v)for v in x)).hexdigest(),'source':kind,'mode':mode,'token_pre':pre,'token_at_driver_return':at_driver_return,'token_post':post,'minimum_observed_tokens':min(levels)if levels else None,'maximum_observed_tokens':max(levels)if levels else None,'signed_trace_token_count':signed_token_read,'affinity':cpus,'delivered':json.loads(inside.read_bytes()),'controlled_threads':n,'requested_diagnostic':diag,'elapsed_ns':time.monotonic_ns()-begin,'entsize':sec['header'][9],'rodata_bytes':sec['header'][5],'libelf':libelf_data.inspect(argv[19],sec['index']),'trace':output.decode()if diag=='trace'else None}
                 if name in ('tokens-0-1','tokens-1-2'):
                     strip=subprocess.run(['eu-strip','-o','/dev/null',argv[19]],cwd=cwd,capture_output=True,timeout=30)
                     value['elfutils_strip']={'exit':strip.returncode,'stderr':strip.stderr.decode(errors='replace'),'stdout':strip.stdout.decode(errors='replace'),

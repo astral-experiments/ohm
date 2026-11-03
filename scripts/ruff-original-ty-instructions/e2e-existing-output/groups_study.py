@@ -15,6 +15,8 @@ def warm_calibration(stock,env,state):
             e=dict(env,CARGO_MAKEFLAGS=f'-j --jobserver-fds={r},{wr} --jobserver-auth={r},{wr}',WILD_LOG='libwild::args=trace,wild::args=trace')
             p=subprocess.run(arg,cwd=tiny,env=e,pass_fds=(r,wr),capture_output=True,timeout=5);log=p.stderr+p.stdout
             facts.append([p.returncode,log.decode()]);b.write(P/'signed-jobserver-accounting.json',facts)
+            deadline=time.monotonic()+5
+            while group_matrix.occupancy(r)!=n-1 and time.monotonic()<deadline:time.sleep(.002)
             assert p.returncode==0 and group_matrix.occupancy(r)==n-1
             if b'Acquired jobserver tokens'in log:assert (b'count='+str(n-1).encode())in group_matrix.re.sub(rb'\x1b\[[0-9;]*m',b'',log),(n,log)
         finally:os.close(r);os.close(wr)
