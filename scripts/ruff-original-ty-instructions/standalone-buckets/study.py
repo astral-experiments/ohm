@@ -1,8 +1,9 @@
 """First independently admitted normal ty_ide library build pair for Ruff #29697."""
-import hashlib,json,os,shutil,subprocess as sp,sys
+import hashlib,json,os,shutil,subprocess as sp,sys,time
 from pathlib import Path
 HERE=Path(__file__).resolve().parent;B=HERE.parent/"owner-buckets";sys.path.insert(0,str(B));sys.path.insert(0,str(HERE))
 from member_names import read_names, native_identity
+from public_states import inspect as inspect_metadata
 import pilot as old
 from kit import acquire
 sys.path.insert(0,str(HERE.parent/"source-pcs/verified-29697"))
@@ -83,7 +84,10 @@ def main():
     qa=Path(os.environ["GITHUB_WORKSPACE"])/"qa";need(sp.check_output(["git","-C",qa,"rev-parse","HEAD"],text=True).strip()==os.environ["GITHUB_SHA"],"unregistered local sources")
     need(w.git("rev-parse","HEAD")==old.new and w.git("rev-parse","HEAD^")==old.old and not w.git("diff","--name-only",old.old,old.new,"--","crates/ty_ide"),"different historical edit")
     cfg=json.loads((B/"binding.json").read_bytes());w.guard()
-    put(w.proof/"registration.json",{"command":COMMAND,"order":"PC","old":old.old,"new":old.new,"lock":old.lock,"factory":cfg,"kernel_boot":Path("/proc/sys/kernel/random/boot_id").read_text().strip(),"client":w.hf(HERE/"client.rs")})
+    slot=int(os.environ["OHM_29697_LIB_SLOT"]);order=os.environ["OHM_29697_LIB_ORDER"]
+    need(0<=slot<6 and order==("PC","CP","CP","PC","PC","CP")[slot],"unregistered physical order")
+    timeline=[]
+    put(w.proof/"registration.json",{"command":COMMAND,"slot":slot,"order":order,"runner":os.environ["RUNNER_NAME"],"run_id":int(os.environ["GITHUB_RUN_ID"]),"old":old.old,"new":old.new,"lock":old.lock,"factory":cfg,"kernel_boot":Path("/proc/sys/kernel/random/boot_id").read_text().strip(),"client":w.hf(HERE/"client.rs")})
     tok=os.environ["OHM_SDK_READ_TOKEN"];env=w.install();roots=acquire(w,cfg,tok);del tok;w.sdk.rename(w.root/"original-signed-reference")
     whole=w.root/"whole_count";trace=w.root/"exec_count"
     for tool in (whole,trace):sp.run(["cc","-O2","-Wall","-Wextra","-Werror",HERE.parent/(tool.name+".c"),"-o",tool],check=True)
@@ -93,7 +97,8 @@ def main():
     for n in (1000000,4000000):
         td=w.proof/("calibration-"+str(n));td.mkdir();controls.append(old.count(whole,td,[exe,str(n)],env,w.work))
     need(3.8<controls[1]/controls[0]<4.2,"calibration");roster=graph=None;records=[]
-    for idx,role in enumerate("PC"):
+    for idx,role in enumerate(order):
+        start=time.monotonic_ns()
         w.guard();old.remove_outputs();old.state(old.old);roots[role].rename(w.sdk)
         hist=w.proof/role;hist.mkdir()
         try:
@@ -138,6 +143,19 @@ def main():
             need(updated["oracle"]["elf"]==repair["oracle"]["elf"]==fresh["oracle"]["elf"] and initial["oracle"]["elf"]!=updated["oracle"]["elf"],"complete standalone client differs from empty or repair")
             report={"role":role,"primary":updated["instructions"],"cold":initial["instructions"],"noop":noop["instructions"],"old":initial["oracle"]["elf"],"new":updated["oracle"]["elf"],"retained":len(contact["retained"]),"objects":len(ae),"units":len(roster),"same_observed_retention":contact==confirmed,"observed":oc["observed"]};put(hist/"qualified.json",report);records.append(report)
         finally:w.sdk.rename(roots[role])
-    p,c=records;need(p["old"]==c["old"] and p["new"]==c["new"],"complete native consumer differs across source compilers")
+        timeline.append({"role":role,"begin_ns":start,"end_ns":time.monotonic_ns()})
+    put(w.proof/"sequence.json",timeline)
+    by_role={r["role"]:r for r in records};p,c=by_role["P"],by_role["C"];need(p["old"]==c["old"] and p["new"]==c["new"],"complete native consumer differs across source compilers")
+    need(p["old"]["sha256"]=="2407856bb255264e0dca8dbd9ef31ccfbaffeb1c2bfe800543d98b899db2ca6a" and p["new"]["sha256"]=="3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f","mismatch with the calibrated actual clients")
+    class Directory:
+        def read(self, name):
+            return (w.proof/name).read_bytes()
+    public=inspect_metadata(Directory());put(w.proof/"public-transitions.json",public)
+    need(public["equal_stable_identities_and_edit_key_sets"],"different logical edit in source-matched roles")
+    for role in order:
+        for phase in ("edit","independent-clean"):
+            named=json.loads((w.proof/role/phase/"native.json").read_bytes())["members"]
+            for crate,expected in (("ty_ide",(171,4199)),("ty_project",(245,7276))):
+                m=named[crate]["bijection"];need((len(m["members"]),m["symbols"])==expected,"different native archive/codegen unit closure")
     put(w.proof/"terminal.json",{"roles":records,"reduction":1-c["primary"]/p["primary"],"additional_objects":c["retained"]-p["retained"]})
 if __name__=="__main__":main()

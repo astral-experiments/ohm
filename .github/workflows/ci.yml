@@ -1,4 +1,4 @@
-name: Qualify the normal Ruff ty_ide library build
+name: Confirm the normal Ruff ty_ide library build on six fresh hosts
 run-name: Ruff 29697 direct ty_ide build P/C ${{ inputs.reviewed_head }}
 permissions:
   contents: read
@@ -42,11 +42,30 @@ jobs:
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: matched-ty-ide-library-first-${{ github.run_id }}
+        name: matched-ty-ide-library-confirm-${{ github.run_id }}-${{ matrix.slot }}
         path: ${{ runner.temp }}/ohm-foreign-join/published/
         retention-days: 21
         if-no-files-found: error
-    name: First ordinary ty_ide P/C pair
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - slot: 0
+          order: PC
+        - slot: 1
+          order: CP
+        - slot: 2
+          order: CP
+        - slot: 3
+          order: PC
+        - slot: 4
+          order: PC
+        - slot: 5
+          order: CP
+    name: 'Ruff #29697 library ${{ matrix.slot }} ${{ matrix.order }}'
+    env:
+      OHM_29697_LIB_SLOT: ${{ matrix.slot }}
+      OHM_29697_LIB_ORDER: ${{ matrix.order }}
 'on':
   workflow_dispatch:
     inputs:

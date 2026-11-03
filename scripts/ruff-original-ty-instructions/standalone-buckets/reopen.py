@@ -38,9 +38,12 @@ def read(archive,sha,work,report):
                     idx,_,_,inst,enabled,running=map(int,row[1:7]);must(inst>=0 and enabled==running,"process clock");cost[images[idx]]+=inst
                     if inst and not enabled:bad[images[idx]]+=inst
             return {"real_execs":called,"process_instructions":dict(cost),"positive_instructions_without_clock":dict(bad)}
-        public=inspect_public_states(z);reg=j("registration.json");factory=j("factory-consumed.json");must(reg["old"]==e2e.OLD and reg["new"]==e2e.NEW and reg["order"]=="PC" and reg["factory"]==factory["binding"] and hashlib.sha256((BASE/"client.rs").read_bytes()).hexdigest()==reg["client"],"source/actor binding")
+        public=inspect_public_states(z);reg=j("registration.json");factory=j("factory-consumed.json");must(reg["old"]==e2e.OLD and reg["new"]==e2e.NEW and reg["order"]==(("PC","CP","CP","PC","PC","CP")[reg["slot"]] if "slot"in reg else "PC") and reg["factory"]==factory["binding"] and hashlib.sha256((BASE/"client.rs").read_bytes()).hexdigest()==reg["client"],"source/actor binding")
         must(reg["command"]==["cargo","+ohm","build","-p","ty_ide","--lib","--locked","--offline","-j4","--message-format=json"],"different entry")
         must(3.8<pmu("calibration-4000000")/pmu("calibration-1000000")<4.2,"hardware calibration");terminal=j("terminal.json")
+        if "slot"in reg:
+            must(0<=reg["slot"]<6 and public==j("public-transitions.json") and public["equal_stable_identities_and_edit_key_sets"],"native worker metadata transition")
+            timing=j("sequence.json");must("".join(v["role"]for v in timing)==reg["order"] and timing[0]["begin_ns"]<timing[0]["end_ns"]<=timing[1]["begin_ns"]<timing[1]["end_ns"],"physical arm order")
         for ix,role in enumerate("PC"):
             tool=j(role+"/tools.json");must(tool["driver"]["sha256"]==reg["factory"]["driver"][role],"different compiler")
             gbuf=z.read(role+"/unit-graph.json");g=json.loads(gbuf);must(graph is None or graph==gbuf,"resolution changed");graph=gbuf
@@ -51,7 +54,7 @@ def read(archive,sha,work,report):
             for n in ("old","edit","unchanged","repair","observed-old","observed-edit","observed-unchanged","independent-clean"):
                 p=role+"/"+n;d=j(p+"/result.json");data=lines(p+"/stdout.jsonl")
                 must(data[-1]=={"reason":"build-finished","success":True}and d["source"]==(e2e.OLD if n in ("old","observed-old")else e2e.NEW),"Cargo/source verdict "+p)
-                units=[r for r in data if r["reason"]=="compiler-artifact"];roster=sorted((r["package_id"],r["target"]["name"],r["target"]["kind"],sorted(r["features"]),r["profile"])for r in units)
+                units=[r for r in data if r["reason"]=="compiler-artifact"];roster=sorted((r["package_id"],r["target"]["name"],r["target"]["kind"],sorted(r["features"]),json.dumps(r["profile"],sort_keys=True))for r in units)
                 if sealed_roster is None:sealed_roster=roster
                 must(roster==sealed_roster and len(units)==259 and sorted(r["target"]["name"]for r in units if not r["fresh"])==d["dirty"],p+" typed roster")
                 if n in ("old","independent-clean"):must(len(d["dirty"])==259,p+" fully empty")
@@ -96,7 +99,7 @@ def read(archive,sha,work,report):
             for crate,m in member_sets["edit"].items():
                 other=member_sets["independent-clean"][crate]
                 must(m["native_content"]==other["native_content"] and native_identity(m["bijection"])==native_identity(other["bijection"]),"wrong warm/fresh native association")
-            q=j(role+"/qualified.json");must(q==terminal["roles"][ix]and q["retained"]==len(base["retained"])and q["primary"]==phase["edit"]and q["cold"]==phase["old"]and q["noop"]==phase["unchanged"],"sealed phase did not reproduce")
+            q=j(role+"/qualified.json");must(q==next(v for v in terminal["roles"]if v["role"]==role)and q["retained"]==len(base["retained"])and q["primary"]==phase["edit"]and q["cold"]==phase["old"]and q["noop"]==phase["unchanged"],"sealed phase did not reproduce")
             summary.append({"role":role,"primary":phase["edit"],"cold":phase["old"],"noop":phase["unchanged"],"CGUs":len(objects["edit"]),"retained":len(base["retained"]),"observed_matches_primary":base==again,"observed":observed["observed-edit"],"oracle_elf":oracles,"rlib_edit":arts["edit"],"rlib_independent":arts["independent-clean"],"footprint":j(role+"/footprint.json")})
         must(reg["kernel_boot"] and len({r["oracle_elf"]["old"]for r in summary})==len({r["oracle_elf"]["edit"]for r in summary})==1,"cross-role executables")
         must({f for f in z.namelist()if f.startswith("native/")and not f.endswith("/")}=={"native/"+s+".zst"for s in sizes},"native original coverage")
@@ -116,6 +119,6 @@ def read(archive,sha,work,report):
                 must(out.stdout==WANT[executables[s]],"actual independently executed emitter changed")
             path.unlink()
     p,c=summary;gain=1-c["primary"]/p["primary"];must(gain==terminal["reduction"]and c["retained"]-p["retained"]==terminal["additional_objects"],"independently priced result")
-    result={"metadata":public,"archive_sha256":sha,"hardware_boot":reg["kernel_boot"],"source_pair":[reg["old"],reg["new"]],"unit_graph_sha256":hashlib.sha256(graph).hexdigest(),"units":len(sealed_roster),"unit_graph_nodes":283,"native_bodies":len(sizes),"native_bytes":sum(sizes.values()),"physical_native_clients_executed":len(executables),"histories":summary,"reduction":gain,"speedup":p["primary"]/c["primary"]};report.write_text(json.dumps(result,sort_keys=True,indent=2)+"\n")
+    result={"slot":reg.get("slot"),"order":reg["order"],"runner":reg.get("runner"),"metadata":public,"archive_sha256":sha,"hardware_boot":reg["kernel_boot"],"source_pair":[reg["old"],reg["new"]],"unit_graph_sha256":hashlib.sha256(graph).hexdigest(),"units":len(sealed_roster),"unit_graph_nodes":283,"native_bodies":len(sizes),"native_bytes":sum(sizes.values()),"physical_native_clients_executed":len(executables),"histories":summary,"reduction":gain,"speedup":p["primary"]/c["primary"]};report.write_text(json.dumps(result,sort_keys=True,indent=2)+"\n")
 if __name__=="__main__":
     parser=argparse.ArgumentParser();parser.add_argument("archive",type=Path);parser.add_argument("--sha256",required=True);parser.add_argument("--work",type=Path,required=True);parser.add_argument("--output",type=Path,required=True);args=parser.parse_args();read(args.archive,args.sha256,args.work,args.output)
