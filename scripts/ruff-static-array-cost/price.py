@@ -76,18 +76,22 @@ def enroll():
     return cases
 def seed():
     e=standard();e.pop("CARGO_NET_OFFLINE")
-    switch(new)
-    sp.run(["cargo","+ohm","fetch","--locked"],env=e,cwd=gitroot,check=True)
-    cache,=(home/"registry/cache").iterdir()
-    packages=[p for p in tomllib.loads((gitroot/"Cargo.lock").read_text())["package"] if "source" in p]
-    for pkg in packages:
-        assert pkg["source"]=="registry+https://github.com/rust-lang/crates.io-index"
-        archive=cache/(pkg["name"]+"-"+pkg["version"]+".crate")
-        if not archive.is_file():
-            with urllib.request.urlopen("https://static.crates.io/crates/"+pkg["name"]+"/"+archive.name,timeout=80)as src,archive.open("xb")as out:
-                shutil.copyfileobj(src,out)
+    for rev in (old,new):
+        switch(rev)
+        assert sha(gitroot/"Cargo.lock")==reg["locks"][rev]
+        sp.run(["cargo","+ohm","fetch","--locked"],env=e,cwd=gitroot,check=True)
+        cache,=(home/"registry/cache").iterdir()
+        packages=[p for p in tomllib.loads((gitroot/"Cargo.lock").read_text())["package"] if "source" in p]
+        assert len(packages)==(502 if rev==old else 498)
+        for pkg in packages:
+            assert pkg["source"]=="registry+https://github.com/rust-lang/crates.io-index"
+            archive=cache/(pkg["name"]+"-"+pkg["version"]+".crate")
+            assert reg["archives"][archive.name]==pkg["checksum"]
+            if not archive.is_file():
+                with urllib.request.urlopen("https://static.crates.io/crates/"+pkg["name"]+"/"+archive.name,timeout=80)as src,archive.open("xb")as out:
+                    shutil.copyfileobj(src,out)
     hashes={p.name:sha(p) for p in cache.glob("*.crate")}
-    assert hashes==reg["archives"] and len(hashes)==505
+    assert hashes==reg["archives"] and len(hashes)==502
     home.rename(work/"enrolled-cargo-home")
     for p in (target,shared):
         if p.exists():p.rename(work/("fetch-"+p.name))
@@ -140,13 +144,21 @@ def reader(at,artifacts,lib,commit):
     dirs={str(Path(f).parent) for a in artifacts for f in a["filenames"] if f.endswith((".rlib",".rmeta",".so"))}
     reader_source=kit/fixture["reader"]
     assert sha(reader_source)==fixture["reader_sha256"]
-    argv=["rustc","+ohm","--edition=2024",reader_source,"--extern","unicode_names2="+str(lib)]
+    argv=["rustc","+ohm","--edition=2024","-Copt-level=2",reader_source,"--extern","unicode_names2="+str(lib)]
     for path in sorted(dirs):argv+=["-L","dependency="+path]
     argv+=["-o",at/"reader"]
     sp.run(argv,cwd=gitroot,env=standard(),check=True,stdout=sp.DEVNULL)
-    output=sp.check_output([at/"reader"],cwd=gitroot,env=standard(),text=True)
-    assert output==fixture["old_stdout" if commit==old else "new_stdout"]
-    return {"stdout":output,"elf":sha(at/"reader")}
+    aliases=gitroot/"crates/ruff_unicode_names2/data/NameAliases.txt"
+    assert sha(aliases)==fixture["name_aliases_sha"]
+    names=[row.split(";")[1] for row in aliases.read_text().splitlines() if row and not row.startswith("#")]
+    assert len(names)==481
+    names+=["carriage_return","Black_Star","NO SUCH CODE POINT"]
+    stream=at/"native.bin"
+    with stream.open("xb")as out:
+        sp.run([at/"reader"],cwd=gitroot,env=standard(),input=("\n".join(names)+"\n").encode(),stdout=out,check=True)
+    digest=sha(stream)
+    assert stream.stat().st_size==fixture["native_bytes"] and digest==fixture["old_stdout" if commit==old else "new_stdout"]
+    return {"stdout":digest,"elf":sha(at/"reader")}
 def visit(role,mode,label,commit,trace=False,invalid_at=None):
     at=proof/role/mode/label
     at.mkdir(parents=True)
@@ -202,7 +214,7 @@ def trial(role,mode):
     shutil.rmtree(moved)
     for path in (home,target,shared):(donor/path.name).rename(path)
     actual=visit(role,mode,"observed-edit",new,trace=True)
-    assert cold["unit_count"]==20 and len(cold["dirty"])==20 and edit["dirty"]==actual["dirty"]==["build-script-build","unicode_names2","unicode_names2_generator"]
+    assert cold["unit_count"]==len(cold["dirty"])==fixture["old_units"] and edit["dirty"]==actual["dirty"]==fixture["edit_dirty"]
     assert not warm["dirty"] and cold["generated"]!=edit["generated"]==actual["generated"]==warm["generated"]
     matches=[edit,warm,actual]
     if mode=="build":
@@ -218,7 +230,7 @@ def trial(role,mode):
     stash(role+"-"+mode+"-observed")
     shutil.copytree(work/"enrolled-cargo-home",home)
     clean=visit(role,mode,"empty-new",new)
-    assert len(clean["dirty"])==20 and clean["generated"]==edit["generated"]
+    assert len(clean["dirty"])==clean["unit_count"]==fixture["new_units"] and clean["generated"]==edit["generated"]
     matches.append(clean)
     stash(role+"-"+mode+"-empty")
     shutil.copytree(work/"enrolled-cargo-home",home)
@@ -226,6 +238,7 @@ def trial(role,mode):
     assert clean_trace["dirty"]==clean["dirty"] and clean_trace["generated"]==clean["generated"]
     matches.append(clean_trace)
     if mode=="build":
+        assert cold["native"]["elf"]!=edit["native"]["elf"]
         for r in matches:
             assert r["native"]==clean["native"] and r["members"]["verified_renames"]==clean["members"]["verified_renames"]
     else:assert all(r["product_sha256"]==clean["product_sha256"] for r in matches)

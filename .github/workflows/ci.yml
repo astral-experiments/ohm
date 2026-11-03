@@ -7,7 +7,7 @@ jobs:
   price:
     name: Ruff Unicode ${{ matrix.fixture }} edit ${{ matrix.block }}
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
-      && github.ref_name == 'charlie/qa-rc24-static-cost-20261103'
+      && github.ref_name == 'charlie/qa-rc24-static-rand-cost-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 100
     strategy:
@@ -15,9 +15,9 @@ jobs:
       matrix:
         include:
         - block: PC
-          fixture: loose
+          fixture: rand
         - block: CP
-          fixture: loose
+          fixture: rand
     steps:
     - name: Read this immutable measurement
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -30,7 +30,7 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         repository: astral-sh/ruff
-        ref: 88a50d695c1142294bb4c780fad47d3306173885
+        ref: bfedc614b7670b8766576b64afd426c292f8c2ce
         fetch-depth: 3
         path: ruff
         persist-credentials: false
