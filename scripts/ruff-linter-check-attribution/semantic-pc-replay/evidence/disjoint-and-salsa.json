@@ -1,0 +1,2849 @@
+{
+  "driver_function_name_groups": {
+    "AST lowering": 776,
+    "dependency graph, including index-specific generics": 2290,
+    "macro expansion and bridge": 833,
+    "name resolution": 1136,
+    "other driver": 1889,
+    "other metadata": 450,
+    "other named query infrastructure": 735,
+    "other named stable hashing": 1026,
+    "parsing and lexing": 1296,
+    "public API hashing and reachability": 791,
+    "unresolved or ambiguous driver symbol": 75
+  },
+  "kernel_mapping_groups": [
+    {
+      "dso": "librustc_driver-b03bf00bec23bb9a.so",
+      "independent_buildid": "13d77347e7b9583b23105b596b85d283cd70af08",
+      "original_id_prefix_matches": true,
+      "perf_buildid": "13d77347e7b9583b23105b596b85d283cd70af08",
+      "post_clean_sha256": "53aecb7726b1863849a89c4260c169132f98d0d33ba62e0892a06739b6e32e52",
+      "samples": 11297
+    },
+    {
+      "dso": "libsalsa_macros-1490b2847bcc7d8e.so",
+      "independent_buildid": "6aa564f2863239fab2868eaf13622458794d8c9b56c63595324714035f679ea3",
+      "original_id_prefix_matches": true,
+      "perf_buildid": "6aa564f2863239fab2868eaf13622458794d8c9b",
+      "post_clean_sha256": "95ea8231d1af6b737c629d97761bb23a33e582478779f856f4e1af1e4d4f63b3",
+      "samples": 2014
+    },
+    {
+      "dso": "libc.so.6",
+      "independent_buildid": "a4a7992a8e66555c8141ab2a08a8465ff6e0ea65",
+      "original_id_prefix_matches": true,
+      "perf_buildid": "a4a7992a8e66555c8141ab2a08a8465ff6e0ea65",
+      "post_clean_sha256": "3a15d66867d83762c7f2f1e37359cb8f6c5743edb369c65285cb0b1c4f7498bf",
+      "samples": 426
+    },
+    {
+      "dso": "rustc",
+      "independent_buildid": "b54227b29094887060ad19a350aa021c733f008b",
+      "original_id_prefix_matches": true,
+      "perf_buildid": "b54227b29094887060ad19a350aa021c733f008b",
+      "post_clean_sha256": "6842898bafad7cf932fea14bd8915a0adff0eecdc03bee91f589ac95a89743dd",
+      "samples": 409
+    },
+    {
+      "dso": "libget_size_derive2-48117db4cd625113.so",
+      "independent_buildid": "81c2904cab36fbaa9c0cb1ae7eb23eb93b2e6a3188c4b43f5ac8c0d8f97238b2",
+      "original_id_prefix_matches": false,
+      "perf_buildid": "86496e9cd85215a8398dcd03b8a2d41eb299613a",
+      "post_clean_sha256": "bc10756f89ccb6eceeadf923d089790234119d2c904718d348223d19b4ee5f6f",
+      "samples": 180
+    },
+    {
+      "dso": "[kernel skid]",
+      "independent_buildid": null,
+      "original_id_prefix_matches": false,
+      "perf_buildid": null,
+      "post_clean_sha256": null,
+      "samples": 84
+    },
+    {
+      "dso": "ld-linux-x86-64.so.2",
+      "independent_buildid": "0d77dbd4379bf0b5af3e05be7fb6af1e4cea7c96",
+      "original_id_prefix_matches": true,
+      "perf_buildid": "0d77dbd4379bf0b5af3e05be7fb6af1e4cea7c96",
+      "post_clean_sha256": "c20a2dc8917c755f02b94049356320fe1f62ac7d9f8994731f807d9df39302da",
+      "samples": 37
+    },
+    {
+      "dso": "libtracing_attributes-f6a68e66296828c3.so",
+      "independent_buildid": "a88592975db318e5852627d3d6e16c83a82b192df4f0c9adda2b36548e6a7450",
+      "original_id_prefix_matches": true,
+      "perf_buildid": "a88592975db318e5852627d3d6e16c83a82b192d",
+      "post_clean_sha256": "2e11bdceb40df94c48de56da85ab52f367561e791fead694cb3885f1534106e5",
+      "samples": 14
+    },
+    {
+      "dso": "libstrum_macros-c4149827244c344c.so",
+      "independent_buildid": "341ddb1c29e895ebe88c50d73004b521e91c7c5363e93bfaf8a69e94afb4f241",
+      "original_id_prefix_matches": true,
+      "perf_buildid": "341ddb1c29e895ebe88c50d73004b521e91c7c53",
+      "post_clean_sha256": "eb98a63295db8bd8154fddc6ad697de43c5cb53f58e62cdcc4dfe50ef03cea22",
+      "samples": 11
+    },
+    {
+      "dso": "libruff_macros-097fffb7c04dc319.so",
+      "independent_buildid": "9e1f432af8fc6254ac3f9c364afb776dd4a9d8c220dd4d382ae5f67255a761c9",
+      "original_id_prefix_matches": true,
+      "perf_buildid": "9e1f432af8fc6254ac3f9c364afb776dd4a9d8c2",
+      "post_clean_sha256": "97259d14db08204dc47cf05b894bd4162ac8f6086b95e1156a8de5524008d0bb",
+      "samples": 6
+    },
+    {
+      "dso": "libserde_derive-d7cc3bd3a2d6f269.so",
+      "independent_buildid": "799410e2832a6015c362caba8dc4206b1e95cf3cf6ba2d9d2a3e0aad4d94d529",
+      "original_id_prefix_matches": true,
+      "perf_buildid": "799410e2832a6015c362caba8dc4206b1e95cf3c",
+      "post_clean_sha256": "42f9709a22ae9e10d6b701f59f94f785cadb9f82197e10f82d5691b5f2dcf455",
+      "samples": 4
+    },
+    {
+      "dso": "libthiserror_impl-d5b574b8efbc32aa.so",
+      "independent_buildid": "a3f97fbb586d3a402cac126267b19857ca623f661b91934ba775aa382aed5d3c",
+      "original_id_prefix_matches": true,
+      "perf_buildid": "a3f97fbb586d3a402cac126267b19857ca623f66",
+      "post_clean_sha256": "869dbcec5548b0272aa0a8b2e4642c5c49b8a9b89d3e8b1821b301e7da8e9c15",
+      "samples": 3
+    },
+    {
+      "dso": "libLLVM.so.23.1-rust-1.99.0-beta",
+      "independent_buildid": null,
+      "original_id_prefix_matches": false,
+      "perf_buildid": null,
+      "post_clean_sha256": "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51",
+      "samples": 2
+    },
+    {
+      "dso": "[vdso]",
+      "independent_buildid": null,
+      "original_id_prefix_matches": false,
+      "perf_buildid": "045576006b1526fc11f585cc089466d7ab88443d",
+      "post_clean_sha256": null,
+      "samples": 1
+    }
+  ],
+  "salsa": {
+    "first_named_crate": {
+      "__rustc": 39,
+      "alloc": 280,
+      "core": 658,
+      "hashbrown": 14,
+      "other or unknown": 36,
+      "proc_macro": 263,
+      "proc_macro2": 236,
+      "quote": 1,
+      "salsa_macros": 7,
+      "std": 6,
+      "syn": 474
+    },
+    "independent_buildid_32b": "6aa564f2863239fab2868eaf13622458794d8c9b56c63595324714035f679ea3",
+    "independent_file_sha256": "95ea8231d1af6b737c629d97761bb23a33e582478779f856f4e1af1e4d4f63b3",
+    "independent_replacement_inode": 7749236,
+    "mapping_samples": 2014,
+    "original_full_elf_sha256": null,
+    "original_full_symbol_ranges_reopened": false,
+    "original_inode": 7744069,
+    "original_perf_buildid_20b": "6aa564f2863239fab2868eaf13622458794d8c9b",
+    "perf_reported_symbols": [
+      [
+        79,
+        "proc_macro",
+        "<proc_macro::Ident as alloc::string::SpecToString>::spec_to_string",
+        "_RNvXsC_NtCsinnh2goo3YA_5alloc6stringNtCs6ySpPs5mHD7_10proc_macro5IdentNtB5_12SpecToString14spec_to_stringCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        59,
+        "syn",
+        "<syn::buffer::Cursor>::peek_punct",
+        "_RNvMs_NtCslyqR0aq4yxA_3syn6bufferNtB4_6Cursor10peek_punct"
+      ],
+      [
+        50,
+        "core",
+        "<str as core::cmp::PartialEq>::eq",
+        "_RNvXs_NtNtCs9pfriLqNw2j_4core3str6traitseNtNtB8_3cmp9PartialEq2eqCslyqR0aq4yxA_3syn"
+      ],
+      [
+        47,
+        "core",
+        "<core::slice::iter::Iter<u8> as core::iter::traits::iterator::Iterator>::next",
+        "_RNvXs2J_NtNtCs9pfriLqNw2j_4core5slice4iterINtB6_4IterhENtNtNtNtBa_4iter6traits8iterator8Iterator4nextCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        46,
+        "core",
+        "<core::iter::adapters::enumerate::Enumerate<core::str::iter::Chars> as core::iter::traits::iterator::Iterator>::next",
+        "_RNvXs_NtNtNtCs9pfriLqNw2j_4core4iter8adapters9enumerateINtB4_9EnumerateNtNtNtBa_3str4iter5CharsENtNtNtB8_6traits8iterator8Iterator4nextCslyqR0aq4yxA_3syn"
+      ],
+      [
+        42,
+        "alloc",
+        "<alloc::raw_vec::RawVecInner>::finish_grow",
+        "_RNvMs5_NtCsinnh2goo3YA_5alloc7raw_vecNtB5_11RawVecInner11finish_growCs3RnjG7HlVUX_5gimli"
+      ],
+      [
+        40,
+        "core",
+        "<core::iter::sources::once::Once<proc_macro2::TokenTree> as core::iter::traits::iterator::Iterator>::next",
+        "_RNvXNtNtNtCs9pfriLqNw2j_4core4iter7sources4onceINtB2_4OnceNtCs13gI3OE3fdS_11proc_macro29TokenTreeENtNtNtB6_6traits8iterator8Iterator4nextCsd4ioDgIhpn4_5quote"
+      ],
+      [
+        38,
+        "alloc",
+        "<alloc::vec::drain::Drain<proc_macro::TokenTree> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<proc_macro::TokenTree, <proc_macro::TokenStream as core::iter::traits::collect::Extend<proc_macro::TokenTree>>::extend<alloc::vec::drain::Drain<proc_macro::TokenTree>>::{closure#0}>::{closure#0}>",
+        "_RINvYINtNtNtCsinnh2goo3YA_5alloc3vec5drain5DrainNtCs6ySpPs5mHD7_10proc_macro9TokenTreeENtNtNtNtCs9pfriLqNw2j_4core4iter6traits8iterator8Iterator4folduNCINvNvB1n_8for_each4callBK_NCINvXsl_BM_NtBM_11TokenStreamINtNtB1r_7collect6ExtendBK_E6extendB3_E0E0ECs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        35,
+        "syn",
+        "<syn::parse::ParseBuffer>::cursor",
+        "_RNvMs9_NtCslyqR0aq4yxA_3syn5parseNtB5_11ParseBuffer6cursor"
+      ],
+      [
+        34,
+        "proc_macro2",
+        "<proc_macro2::imp::Span>::call_site",
+        "_RNvMsh_NtCs13gI3OE3fdS_11proc_macro23impNtB5_4Span9call_site"
+      ],
+      [
+        34,
+        "core",
+        "core::str::validations::next_code_point::<core::slice::iter::Iter<u8>>",
+        "_RINvNtNtCs9pfriLqNw2j_4core3str11validations15next_code_pointINtNtNtB6_5slice4iter4IterhEECs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        31,
+        "proc_macro",
+        "<proc_macro::TokenStream as core::iter::traits::collect::IntoIterator>::into_iter",
+        "_RNvXs_NtCs6ySpPs5mHD7_10proc_macro12token_streamNtB6_11TokenStreamNtNtNtNtCs9pfriLqNw2j_4core4iter6traits7collect12IntoIterator9into_iter"
+      ],
+      [
+        30,
+        "alloc",
+        "<alloc::raw_vec::RawVecInner>::deallocate",
+        "_RNvMs3_NtCsinnh2goo3YA_5alloc7raw_vecNtB5_11RawVecInner10deallocateCs3RnjG7HlVUX_5gimli"
+      ],
+      [
+        28,
+        "proc_macro",
+        "<proc_macro::bridge::symbol::Symbol>::new",
+        "_RNvMs0_NtNtCs6ySpPs5mHD7_10proc_macro6bridge6symbolNtB5_6Symbol3new"
+      ],
+      [
+        26,
+        "syn",
+        "<syn::buffer::Cursor>::ignore_none",
+        "_RNvMs_NtCslyqR0aq4yxA_3syn6bufferNtB4_6Cursor11ignore_none"
+      ],
+      [
+        26,
+        "core",
+        "core::ptr::drop_glue::<alloc::vec::Vec<u8>>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueINtNtCsinnh2goo3YA_5alloc3vec3VechEECs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        25,
+        "other or unknown",
+        "<*const ()>::is_aligned_to",
+        "_RNvMNtNtCs9pfriLqNw2j_4core3ptr9const_ptrPu13is_aligned_toCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        24,
+        "__rustc",
+        "__rustc::__rust_no_alloc_shim_is_unstable_v2",
+        "_RNvCseU4mLtNj5Gn_7___rustc35___rust_no_alloc_shim_is_unstable_v2"
+      ],
+      [
+        23,
+        "proc_macro2",
+        "<proc_macro2::imp::TokenTreeIter as core::iter::traits::iterator::Iterator>::next",
+        "_RNvXsg_NtCs13gI3OE3fdS_11proc_macro23impNtB5_13TokenTreeIterNtNtNtNtCs9pfriLqNw2j_4core4iter6traits8iterator8Iterator4next"
+      ],
+      [
+        23,
+        "core",
+        "<core::option::Option<proc_macro::TokenTree> as core::ops::try_trait::Try>::branch",
+        "_RNvXsJ_NtCs9pfriLqNw2j_4core6optionINtB5_6OptionNtCs6ySpPs5mHD7_10proc_macro9TokenTreeENtNtNtB7_3ops9try_trait3Try6branchCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        22,
+        "proc_macro",
+        "<proc_macro::Ident as core::clone::Clone>::clone",
+        "_RNvXs1s_Cs6ySpPs5mHD7_10proc_macroNtB6_5IdentNtNtCs9pfriLqNw2j_4core5clone5Clone5cloneCslyqR0aq4yxA_3syn"
+      ],
+      [
+        20,
+        "proc_macro2",
+        "<proc_macro2::imp::Ident as core::cmp::PartialEq<&str>>::eq",
+        "_RNvXss_NtCs13gI3OE3fdS_11proc_macro23impNtB5_5IdentINtNtCs9pfriLqNw2j_4core3cmp9PartialEqReE2eqCslyqR0aq4yxA_3syn"
+      ],
+      [
+        20,
+        "proc_macro",
+        "<proc_macro::bridge::TokenTree<proc_macro::bridge::client::TokenStream, proc_macro::bridge::client::Span, proc_macro::bridge::symbol::Symbol> as proc_macro::bridge::rpc::Encode<()>>::encode",
+        "_RNvXNvNtCs6ySpPs5mHD7_10proc_macro6bridges5_1__INtB4_9TokenTreeNtNtB4_6client11TokenStreamNtB11_4SpanNtNtB4_6symbol6SymbolEINtNtB4_3rpc6EncodeuE6encodeB6_"
+      ],
+      [
+        20,
+        "core",
+        "<core::hash::sip::Sip13Rounds as core::hash::sip::Sip>::d_rounds",
+        "_RNvXs6_NtNtCs9pfriLqNw2j_4core4hash3sipNtB5_11Sip13RoundsNtB5_3Sip8d_roundsCsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        19,
+        "syn",
+        "<syn::buffer::Cursor>::entry",
+        "_RNvMs_NtCslyqR0aq4yxA_3syn6bufferNtB4_6Cursor5entry"
+      ],
+      [
+        18,
+        "syn",
+        "<syn::buffer::Cursor>::peek_keyword",
+        "_RNvMs_NtCslyqR0aq4yxA_3syn6bufferNtB4_6Cursor12peek_keyword"
+      ],
+      [
+        18,
+        "core",
+        "core::ptr::copy_nonoverlapping::precondition_check",
+        "_RNvNvNtCs9pfriLqNw2j_4core3ptr19copy_nonoverlapping18precondition_checkCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        18,
+        "alloc",
+        "<alloc::vec::Vec<u8>>::append_elements",
+        "_RNvMs_NtCsinnh2goo3YA_5alloc3vecINtB4_3VechE15append_elementsCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        17,
+        "syn",
+        "syn::lit::value::parse_lit_str_cooked",
+        "_RNvNtNtCslyqR0aq4yxA_3syn3lit5value20parse_lit_str_cooked"
+      ],
+      [
+        17,
+        "core",
+        "core::core_arch::x86::sse2::_mm_loadu_si128",
+        "_RNvNtNtNtCs9pfriLqNw2j_4core9core_arch3x864sse215__mm_loadu_si128Csf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        14,
+        "core",
+        "core::iter::sources::once::once::<proc_macro2::TokenTree>",
+        "_RINvNtNtNtCs9pfriLqNw2j_4core4iter7sources4once4onceNtCs13gI3OE3fdS_11proc_macro29TokenTreeECsd4ioDgIhpn4_5quote"
+      ],
+      [
+        14,
+        "alloc",
+        "<alloc::string::String>::push",
+        "_RNvMNtCsinnh2goo3YA_5alloc6stringNtB2_6String4pushCslyqR0aq4yxA_3syn"
+      ],
+      [
+        14,
+        "alloc",
+        "<alloc::string::String as core::cmp::PartialEq<&str>>::eq",
+        "_RNvXs1y_NtCsinnh2goo3YA_5alloc6stringNtB6_6StringINtNtCs9pfriLqNw2j_4core3cmp9PartialEqReE2eqCslyqR0aq4yxA_3syn"
+      ],
+      [
+        13,
+        "syn",
+        "<syn::buffer::Cursor>::punct",
+        "_RNvMs_NtCslyqR0aq4yxA_3syn6bufferNtB4_6Cursor5punct"
+      ],
+      [
+        13,
+        "core",
+        "<core::hash::sip::Sip13Rounds as core::hash::sip::Sip>::c_rounds",
+        "_RNvXs6_NtNtCs9pfriLqNw2j_4core4hash3sipNtB5_11Sip13RoundsNtB5_3Sip8c_roundsCsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        12,
+        "syn",
+        "syn::ident::parsing::accept_as_ident",
+        "_RNvNtNtCslyqR0aq4yxA_3syn5ident7parsing15accept_as_ident"
+      ],
+      [
+        12,
+        "proc_macro2",
+        "<proc_macro2::Ident as alloc::string::SpecToString>::spec_to_string",
+        "_RNvXsC_NtCsinnh2goo3YA_5alloc6stringNtCs13gI3OE3fdS_11proc_macro25IdentNtB5_12SpecToString14spec_to_stringBA_"
+      ],
+      [
+        12,
+        "core",
+        "<core::str::iter::Chars as core::iter::traits::iterator::Iterator>::next",
+        "_RNvXNtNtCs9pfriLqNw2j_4core3str4iterNtB2_5CharsNtNtNtNtB6_4iter6traits8iterator8Iterator4nextCslyqR0aq4yxA_3syn"
+      ],
+      [
+        12,
+        "alloc",
+        "<alloc::vec::Vec<u8>>::reserve",
+        "_RNvMs_NtCsinnh2goo3YA_5alloc3vecINtB4_3VechE7reserveCs10i41Z7Aixh_9addr2line"
+      ],
+      [
+        12,
+        "alloc",
+        "<alloc::raw_vec::RawVecInner>::grow_amortized",
+        "_RNvMs5_NtCsinnh2goo3YA_5alloc7raw_vecNtB5_11RawVecInner14grow_amortizedCs3RnjG7HlVUX_5gimli"
+      ],
+      [
+        10,
+        "syn",
+        "<syn::parse::ParseBuffer>::step::<syn::token::parsing::punct_helper::{closure#0}, ()>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4stepNCNvNtNtB8_5token7parsing12punct_helper0uEB8_"
+      ],
+      [
+        10,
+        "syn",
+        "<syn::buffer::Cursor>::span",
+        "_RNvMs_NtCslyqR0aq4yxA_3syn6bufferNtB4_6Cursor4span"
+      ],
+      [
+        10,
+        "proc_macro2",
+        "<proc_macro2::imp::Span>::unwrap_nightly",
+        "_RNvMsh_NtCs13gI3OE3fdS_11proc_macro23impNtB5_4Span14unwrap_nightly"
+      ],
+      [
+        10,
+        "proc_macro",
+        "<proc_macro::bridge::symbol::Symbol as core::fmt::Display>::fmt",
+        "_RNvXs2_NtNtCs6ySpPs5mHD7_10proc_macro6bridge6symbolNtB5_6SymbolNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt"
+      ],
+      [
+        10,
+        "hashbrown",
+        "<hashbrown::raw::RawTableInner>::find_or_find_insert_index_inner",
+        "_RNvMsa_NtCsiL5HTBa2gsh_9hashbrown3rawNtB5_13RawTableInner31find_or_find_insert_index_innerCsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        10,
+        "core",
+        "core::str::converts::from_utf8",
+        "_RNvNtNtCs9pfriLqNw2j_4core3str8converts9from_utf8"
+      ],
+      [
+        10,
+        "core",
+        "core::ptr::drop_glue::<alloc::string::String>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueNtNtCsinnh2goo3YA_5alloc6string6StringECs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        10,
+        "core",
+        "<core::cell::Cell<syn::parse::Unexpected>>::take",
+        "_RNvMsa_NtCs9pfriLqNw2j_4core4cellINtB5_4CellNtNtCslyqR0aq4yxA_3syn5parse10UnexpectedE4takeBK_"
+      ],
+      [
+        10,
+        "alloc",
+        "<alloc::vec::Vec<proc_macro::TokenTree>>::push_mut",
+        "_RNvMsG_NtCsinnh2goo3YA_5alloc3vecINtB5_3VecNtCs6ySpPs5mHD7_10proc_macro9TokenTreeE8push_mutCsd4ioDgIhpn4_5quote"
+      ],
+      [
+        10,
+        "__rustc",
+        "__rustc::__rust_alloc",
+        "_RNvCseU4mLtNj5Gn_7___rustc12___rust_alloc"
+      ],
+      [
+        9,
+        "proc_macro2",
+        "<proc_macro2::imp::Group>::stream",
+        "_RNvMsl_NtCs13gI3OE3fdS_11proc_macro23impNtB5_5Group6stream"
+      ],
+      [
+        9,
+        "proc_macro2",
+        "<&proc_macro2::Ident as core::cmp::PartialEq<&str>>::eq",
+        "_RNvXs7_NtNtCs9pfriLqNw2j_4core3cmp5implsRNtCs13gI3OE3fdS_11proc_macro25IdentINtB7_9PartialEqReE2eqCslyqR0aq4yxA_3syn"
+      ],
+      [
+        9,
+        "proc_macro",
+        "<proc_macro::Ident as core::clone::Clone>::clone",
+        "_RNvXs1s_Cs6ySpPs5mHD7_10proc_macroNtB6_5IdentNtNtCs9pfriLqNw2j_4core5clone5Clone5cloneCsd4ioDgIhpn4_5quote"
+      ],
+      [
+        9,
+        "core",
+        "core::ptr::drop_glue::<proc_macro2::imp::Ident>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueNtNtCs13gI3OE3fdS_11proc_macro23imp5IdentEBF_"
+      ],
+      [
+        9,
+        "core",
+        "<core::ops::range::RangeFrom<usize> as core::slice::index::SliceIndex<str>>::get",
+        "_RNvXs9_NtNtCs9pfriLqNw2j_4core3str6traitsINtNtNtB9_3ops5range9RangeFromjEINtNtNtB9_5slice5index10SliceIndexeE3getCslyqR0aq4yxA_3syn"
+      ],
+      [
+        9,
+        "alloc",
+        "<alloc::string::String>::push_str",
+        "_RNvMNtCsinnh2goo3YA_5alloc6stringNtB2_6String8push_strCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        8,
+        "syn",
+        "<syn::precedence::Precedence as core::cmp::PartialOrd>::partial_cmp",
+        "_RNvXs2_NtCslyqR0aq4yxA_3syn10precedenceNtB5_10PrecedenceNtNtCs9pfriLqNw2j_4core3cmp10PartialOrd11partial_cmp"
+      ],
+      [
+        8,
+        "proc_macro2",
+        "<proc_macro2::imp::Group>::delimiter",
+        "_RNvMsl_NtCs13gI3OE3fdS_11proc_macro23impNtB5_5Group9delimiter"
+      ],
+      [
+        8,
+        "proc_macro",
+        "<proc_macro::bridge::client::TokenStream as core::clone::Clone>::clone",
+        "_RNvXsa_NtNtCs6ySpPs5mHD7_10proc_macro6bridge6clientNtB5_11TokenStreamNtNtCs9pfriLqNw2j_4core5clone5Clone5clone"
+      ],
+      [
+        7,
+        "proc_macro2",
+        "<proc_macro2::imp::TokenStream as core::iter::traits::collect::Extend<proc_macro2::TokenTree>>::extend::<core::iter::sources::once::Once<proc_macro2::TokenTree>>",
+        "_RINvXs7_NtCs13gI3OE3fdS_11proc_macro23impNtB6_11TokenStreamINtNtNtNtCs9pfriLqNw2j_4core4iter6traits7collect6ExtendNtB8_9TokenTreeE6extendINtNtNtB12_7sources4once4OnceB1O_EECsd4ioDgIhpn4_5quote"
+      ],
+      [
+        7,
+        "proc_macro2",
+        "<proc_macro2::Ident as syn::parse::Parse>::parse::{closure#0}",
+        "_RNCNvXNtNtCslyqR0aq4yxA_3syn5ident7parsingNtCs13gI3OE3fdS_11proc_macro25IdentNtNtB8_5parse5Parse5parse0B8_"
+      ],
+      [
+        7,
+        "proc_macro",
+        "<proc_macro::token_stream::IntoIter as core::iter::traits::iterator::Iterator>::next",
+        "_RNvXNtCs6ySpPs5mHD7_10proc_macro12token_streamNtB2_8IntoIterNtNtNtNtCs9pfriLqNw2j_4core4iter6traits8iterator8Iterator4next"
+      ],
+      [
+        7,
+        "core",
+        "core::ub_checks::maybe_is_nonoverlapping::runtime",
+        "_RNvNvNtCs9pfriLqNw2j_4core9ub_checks23maybe_is_nonoverlapping7runtimeCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        7,
+        "core",
+        "core::ptr::drop_glue::<syn::parse::Unexpected>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueNtNtCslyqR0aq4yxA_3syn5parse10UnexpectedEBF_"
+      ],
+      [
+        7,
+        "core",
+        "<core::slice::iter::Iter<proc_macro2::Span> as core::iter::traits::double_ended::DoubleEndedIterator>::next_back",
+        "_RNvXs2K_NtNtCs9pfriLqNw2j_4core5slice4iterINtB6_4IterNtCs13gI3OE3fdS_11proc_macro24SpanENtNtNtNtBa_4iter6traits12double_ended19DoubleEndedIterator9next_backCslyqR0aq4yxA_3syn"
+      ],
+      [
+        7,
+        "core",
+        "<core::option::Option<syn::token::PathSep> as syn::parse::Parse>::parse",
+        "_RNvXsb_NtCslyqR0aq4yxA_3syn5parseINtNtCs9pfriLqNw2j_4core6option6OptionNtNtB7_5token7PathSepENtB5_5Parse5parseB7_"
+      ],
+      [
+        7,
+        "core",
+        "<core::iter::adapters::enumerate::Enumerate<core::str::iter::Chars> as core::iter::traits::collect::IntoIterator>::into_iter",
+        "_RNvXNtNtNtCs9pfriLqNw2j_4core4iter6traits7collectINtNtNtB6_8adapters9enumerate9EnumerateNtNtNtB8_3str4iter5CharsENtB2_12IntoIterator9into_iterCslyqR0aq4yxA_3syn"
+      ],
+      [
+        7,
+        "core",
+        "<core::fmt::Formatter>::pad",
+        "_RNvMsa_NtCs9pfriLqNw2j_4core3fmtNtB5_9Formatter3pad"
+      ],
+      [
+        7,
+        "alloc",
+        "<alloc::sync::Arc<std::thread::thread::Inner, std::alloc::System> as core::ops::drop::Drop>::drop",
+        "_RNvXsE_NtCsinnh2goo3YA_5alloc4syncINtB5_3ArcNtNtNtCs8K97yU1lfbJ_3std6thread6thread5InnerNtNtBM_5alloc6SystemENtNtNtCs9pfriLqNw2j_4core3ops4drop4Drop4dropCslyqR0aq4yxA_3syn"
+      ],
+      [
+        6,
+        "syn",
+        "<syn::buffer::TokenBuffer>::recursive_new",
+        "_RNvMNtCslyqR0aq4yxA_3syn6bufferNtB2_11TokenBuffer13recursive_new"
+      ],
+      [
+        6,
+        "syn",
+        "<syn::buffer::Cursor>::group",
+        "_RNvMs_NtCslyqR0aq4yxA_3syn6bufferNtB4_6Cursor5group"
+      ],
+      [
+        6,
+        "proc_macro2",
+        "<proc_macro2::imp::TokenStream>::new",
+        "_RNvMs_NtCs13gI3OE3fdS_11proc_macro23impNtB4_11TokenStream3new"
+      ],
+      [
+        6,
+        "proc_macro2",
+        "<proc_macro2::extra::DelimSpan>::new",
+        "_RNvMNtCs13gI3OE3fdS_11proc_macro25extraNtB2_9DelimSpan3new"
+      ],
+      [
+        6,
+        "proc_macro2",
+        "<proc_macro2::Punct>::as_char",
+        "_RNvMsu_Cs13gI3OE3fdS_11proc_macro2NtB5_5Punct7as_char"
+      ],
+      [
+        6,
+        "core",
+        "core::slice::raw::from_raw_parts::precondition_check",
+        "_RNvNvNtNtCs9pfriLqNw2j_4core5slice3raw14from_raw_parts18precondition_checkCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        6,
+        "core",
+        "<core::option::Option<&syn::path::PathSegment>>::map::<syn::punctuated::Pair<&syn::path::PathSegment, &syn::token::PathSep>, syn::punctuated::Pair<&syn::path::PathSegment, &syn::token::PathSep>::End>",
+        "_RINvMNtCs9pfriLqNw2j_4core6optionINtB3_6OptionRNtNtCslyqR0aq4yxA_3syn4path11PathSegmentE3mapINtNtBN_10punctuated4PairBI_RNtNtBN_5token7PathSepENcNtB1s_3End0EBN_"
+      ],
+      [
+        6,
+        "core",
+        "<core::ops::range::Range<usize> as core::slice::index::SliceIndex<str>>::get_unchecked::precondition_check",
+        "_RNvNvXs5_NtNtCs9pfriLqNw2j_4core3str6traitsINtNtNtBb_3ops5range5RangejEINtNtNtBb_5slice5index10SliceIndexeE13get_unchecked18precondition_checkCslyqR0aq4yxA_3syn"
+      ],
+      [
+        6,
+        "core",
+        "<core::hash::sip::Hasher<core::hash::sip::Sip13Rounds> as core::hash::Hasher>::write",
+        "_RNvXs3_NtNtCs9pfriLqNw2j_4core4hash3sipINtB5_6HasherNtB5_11Sip13RoundsENtB7_6Hasher5writeCsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        6,
+        "alloc",
+        "<alloc::vec::drain::Drain<proc_macro::TokenTree> as core::iter::traits::iterator::Iterator>::next",
+        "_RNvXs3_NtNtCsinnh2goo3YA_5alloc3vec5drainINtB5_5DrainNtCs6ySpPs5mHD7_10proc_macro9TokenTreeENtNtNtNtCs9pfriLqNw2j_4core4iter6traits8iterator8Iterator4nextCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        5,
+        "syn",
+        "syn::token::printing::punct",
+        "_RNvNtNtCslyqR0aq4yxA_3syn5token8printing5punct"
+      ],
+      [
+        5,
+        "syn",
+        "syn::token::parsing::punct::<1>",
+        "_RINvNtNtCslyqR0aq4yxA_3syn5token7parsing5punctKj1_EB6_"
+      ],
+      [
+        5,
+        "syn",
+        "syn::stmt::parsing::parse_stmt",
+        "_RNvNtNtCslyqR0aq4yxA_3syn4stmt7parsing10parse_stmt"
+      ],
+      [
+        5,
+        "syn",
+        "syn::lookahead::peek_impl",
+        "_RNvNtCslyqR0aq4yxA_3syn9lookahead9peek_impl"
+      ],
+      [
+        5,
+        "syn",
+        "<syn::parse::ParseBuffer>::step::<syn::token::parsing::keyword::{closure#0}, proc_macro2::Span>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4stepNCNvNtNtB8_5token7parsing7keyword0NtCs13gI3OE3fdS_11proc_macro24SpanEB8_"
+      ],
+      [
+        5,
+        "syn",
+        "<syn::parse::ParseBuffer>::step::<<syn::lit::Lit as syn::parse::Parse>::parse::{closure#0}, syn::lit::Lit>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4stepNCNvXNtNtB8_3lit7parsingNtB10_3LitNtB6_5Parse5parse0B1h_EB8_"
+      ],
+      [
+        5,
+        "syn",
+        "<syn::lit::Lit as syn::parse::Parse>::parse::{closure#0}",
+        "_RNCNvXNtNtCslyqR0aq4yxA_3syn3lit7parsingNtB6_3LitNtNtB8_5parse5Parse5parse0B8_"
+      ],
+      [
+        5,
+        "proc_macro2",
+        "<proc_macro2::Group>::delimiter",
+        "_RNvMsr_Cs13gI3OE3fdS_11proc_macro2NtB5_5Group9delimiter"
+      ],
+      [
+        5,
+        "proc_macro",
+        "<proc_macro::bridge::client::Bridge>::with::<(), <proc_macro::bridge::Methods>::ts_drop::{closure#0}>::{closure#0}",
+        "_RNCINvMsf_NtNtCs6ySpPs5mHD7_10proc_macro6bridge6clientNtB8_6Bridge4withuNCNvMso_B8_NtBa_7Methods7ts_drop0E0Bc_"
+      ],
+      [
+        5,
+        "proc_macro",
+        "<proc_macro::bridge::Methods>::ts_concat_trees",
+        "_RNvMso_NtNtCs6ySpPs5mHD7_10proc_macro6bridge6clientNtB7_7Methods15ts_concat_trees"
+      ],
+      [
+        5,
+        "proc_macro",
+        "<proc_macro::bridge::Ident<proc_macro::bridge::client::Span, proc_macro::bridge::symbol::Symbol> as core::clone::Clone>::clone",
+        "_RNvXsI_NtCs6ySpPs5mHD7_10proc_macro6bridgeINtB5_5IdentNtNtB5_6client4SpanNtNtB5_6symbol6SymbolENtNtCs9pfriLqNw2j_4core5clone5Clone5cloneCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        5,
+        "proc_macro",
+        "<proc_macro::TokenTree as core::clone::Clone>::clone",
+        "_RNvXs1b_Cs6ySpPs5mHD7_10proc_macroNtB6_9TokenTreeNtNtCs9pfriLqNw2j_4core5clone5Clone5cloneCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        5,
+        "core",
+        "core::intrinsics::rotate_left::<u64>",
+        "_RINvNtCs9pfriLqNw2j_4core10intrinsics11rotate_leftyECsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        5,
+        "core",
+        "core::hash::sip::u8to64_le",
+        "_RNvNtNtCs9pfriLqNw2j_4core4hash3sip9u8to64_leCsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        5,
+        "core",
+        "core::char::convert::from_u32_unchecked::precondition_check",
+        "_RNvNvNtNtCs9pfriLqNw2j_4core4char7convert18from_u32_unchecked18precondition_checkCslyqR0aq4yxA_3syn"
+      ],
+      [
+        5,
+        "core",
+        "<core::option::Option<syn::punctuated::Pair<&syn::path::PathSegment, &syn::token::PathSep>>>::or_else::<<syn::punctuated::Pairs<syn::path::PathSegment, syn::token::PathSep> as core::iter::traits::iterator::Iterator>::next::{closure#1}>",
+        "_RINvMNtCs9pfriLqNw2j_4core6optionINtB3_6OptionINtNtCslyqR0aq4yxA_3syn10punctuated4PairRNtNtBN_4path11PathSegmentRNtNtBN_5token7PathSepEE7or_elseNCNvXsc_BL_INtBL_5PairsB1n_B1N_ENtNtNtNtB5_4iter6traits8iterator8Iterator4nexts_0EBN_"
+      ],
+      [
+        5,
+        "core",
+        "<core::cell::Cell<syn::parse::Unexpected>>::set",
+        "_RNvMs7_NtCs9pfriLqNw2j_4core4cellINtB5_4CellNtNtCslyqR0aq4yxA_3syn5parse10UnexpectedE3setBK_"
+      ],
+      [
+        4,
+        "syn",
+        "syn::path::printing::print_path",
+        "_RNvNtNtCslyqR0aq4yxA_3syn4path8printing10print_path"
+      ],
+      [
+        4,
+        "syn",
+        "syn::lit::value::next_chr",
+        "_RNvNtNtCslyqR0aq4yxA_3syn3lit5value8next_chr"
+      ],
+      [
+        4,
+        "syn",
+        "syn::expr::parsing::atom_expr",
+        "_RNvNtNtCslyqR0aq4yxA_3syn4expr7parsing9atom_expr"
+      ],
+      [
+        4,
+        "syn",
+        "<syn::punctuated::Punctuated<syn::path::PathSegment, syn::token::PathSep>>::pairs",
+        "_RNvMNtCslyqR0aq4yxA_3syn10punctuatedINtB2_10PunctuatedNtNtB4_4path11PathSegmentNtNtB4_5token7PathSepE5pairsB4_"
+      ],
+      [
+        4,
+        "syn",
+        "<syn::path::Path>::parse_helper",
+        "_RNvMs5_NtNtCslyqR0aq4yxA_3syn4path7parsingNtB7_4Path12parse_helper"
+      ],
+      [
+        4,
+        "syn",
+        "<syn::parse::ParseBuffer>::step::<<proc_macro2::Ident as syn::parse::Parse>::parse::{closure#0}, proc_macro2::Ident>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4stepNCNvXNtNtB8_5ident7parsingNtCs13gI3OE3fdS_11proc_macro25IdentNtB6_5Parse5parse0B1j_EB8_"
+      ],
+      [
+        4,
+        "salsa_macros",
+        "salsa_macros::hygiene::push_idents2::{closure#0}",
+        "_RNCNvNtCsf9kgMdJkaQv_12salsa_macros7hygiene12push_idents20B5_"
+      ],
+      [
+        4,
+        "proc_macro2",
+        "proc_macro2::detection::inside_proc_macro",
+        "_RNvNtCs13gI3OE3fdS_11proc_macro29detection17inside_proc_macro"
+      ],
+      [
+        4,
+        "proc_macro2",
+        "<proc_macro2::token_stream::IntoIter as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<proc_macro2::TokenTree, salsa_macros::hygiene::push_idents2::{closure#0}>::{closure#0}>",
+        "_RINvYNtNtCs13gI3OE3fdS_11proc_macro212token_stream8IntoIterNtNtNtNtCs9pfriLqNw2j_4core4iter6traits8iterator8Iterator4folduNCINvNvBV_8for_each4callNtB7_9TokenTreeNCNvNtCsf9kgMdJkaQv_12salsa_macros7hygiene12push_idents20E0EB2F_"
+      ],
+      [
+        4,
+        "proc_macro2",
+        "<proc_macro2::imp::Ident as core::cmp::PartialEq<&&str>>::eq",
+        "_RNvXss_NtCs13gI3OE3fdS_11proc_macro23impNtB5_5IdentINtNtCs9pfriLqNw2j_4core3cmp9PartialEqRReE2eqCslyqR0aq4yxA_3syn"
+      ],
+      [
+        4,
+        "proc_macro2",
+        "<proc_macro2::TokenStream as quote::ext::TokenStreamExt>::append::<proc_macro2::Ident>",
+        "_RINvXNtCsd4ioDgIhpn4_5quote3extNtCs13gI3OE3fdS_11proc_macro211TokenStreamNtB3_14TokenStreamExt6appendNtBv_5IdentEB5_"
+      ],
+      [
+        4,
+        "proc_macro2",
+        "<proc_macro2::Punct>::new",
+        "_RNvMsu_Cs13gI3OE3fdS_11proc_macro2NtB5_5Punct3new"
+      ],
+      [
+        4,
+        "proc_macro2",
+        "<proc_macro2::Ident as core::cmp::PartialEq<str>>::eq",
+        "_RNvXsz_Cs13gI3OE3fdS_11proc_macro2NtB5_5IdentINtNtCs9pfriLqNw2j_4core3cmp9PartialEqeE2eqCslyqR0aq4yxA_3syn"
+      ],
+      [
+        4,
+        "proc_macro",
+        "<proc_macro::Span>::call_site",
+        "_RNvMsp_Cs6ySpPs5mHD7_10proc_macroNtB5_4Span9call_site"
+      ],
+      [
+        4,
+        "proc_macro",
+        "<proc_macro::Ident as alloc::string::ToString>::to_string",
+        "_RNvXsB_NtCsinnh2goo3YA_5alloc6stringNtCs6ySpPs5mHD7_10proc_macro5IdentNtB5_8ToString9to_stringCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        4,
+        "core",
+        "<core::result::Result<(), core::fmt::Error>>::expect",
+        "_RNvMNtCs9pfriLqNw2j_4core6resultINtB2_6ResultuNtNtB4_3fmt5ErrorE6expectCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        4,
+        "alloc",
+        "<alloc::string::String as core::fmt::Write>::write_str",
+        "_RNvXsZ_NtCsinnh2goo3YA_5alloc6stringNtB5_6StringNtNtCs9pfriLqNw2j_4core3fmt5Write9write_strCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        4,
+        "alloc",
+        "<alloc::raw_vec::RawVec<u8> as core::ops::drop::Drop>::drop",
+        "_RNvXs1_NtCsinnh2goo3YA_5alloc7raw_vecINtB5_6RawVechENtNtNtCs9pfriLqNw2j_4core3ops4drop4Drop4dropCs3RnjG7HlVUX_5gimli"
+      ],
+      [
+        3,
+        "syn",
+        "syn::parse::get_unexpected",
+        "_RNvNtCslyqR0aq4yxA_3syn5parse14get_unexpected"
+      ],
+      [
+        3,
+        "syn",
+        "syn::expr::printing::print_expr_method_call",
+        "_RNvNtNtCslyqR0aq4yxA_3syn4expr8printing22print_expr_method_call"
+      ],
+      [
+        3,
+        "syn",
+        "syn::expr::printing::print_expr::{closure#0}",
+        "_RNCNvNtNtCslyqR0aq4yxA_3syn4expr8printing10print_expr0B7_"
+      ],
+      [
+        3,
+        "syn",
+        "syn::error::new_at::<&str>",
+        "_RINvNtCslyqR0aq4yxA_3syn5error6new_atReEB4_"
+      ],
+      [
+        3,
+        "syn",
+        "<syn::precedence::Precedence as core::cmp::PartialOrd>::ge",
+        "_RNvYNtNtCslyqR0aq4yxA_3syn10precedence10PrecedenceNtNtCs9pfriLqNw2j_4core3cmp10PartialOrd2geB6_"
+      ],
+      [
+        3,
+        "syn",
+        "<syn::parse::ParseBuffer>::error::<&str>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer5errorReEB8_"
+      ],
+      [
+        3,
+        "syn",
+        "<syn::buffer::Cursor>::scope_delimiter",
+        "_RNvMs_NtCslyqR0aq4yxA_3syn6bufferNtB4_6Cursor15scope_delimiter"
+      ],
+      [
+        3,
+        "proc_macro2",
+        "proc_macro2::imp::into_compiler_token",
+        "_RNvNtCs13gI3OE3fdS_11proc_macro23imp19into_compiler_token"
+      ],
+      [
+        3,
+        "proc_macro2",
+        "<proc_macro2::TokenStream as quote::ext::TokenStreamExt>::append::<proc_macro2::Punct>",
+        "_RINvXNtCsd4ioDgIhpn4_5quote3extNtCs13gI3OE3fdS_11proc_macro211TokenStreamNtB3_14TokenStreamExt6appendNtBv_5PunctEB5_"
+      ],
+      [
+        3,
+        "proc_macro2",
+        "<proc_macro2::Span>::_new",
+        "_RNvMsi_Cs13gI3OE3fdS_11proc_macro2NtB5_4Span4__new"
+      ],
+      [
+        3,
+        "proc_macro2",
+        "<proc_macro2::Punct>::span",
+        "_RNvMsu_Cs13gI3OE3fdS_11proc_macro2NtB5_5Punct4span"
+      ],
+      [
+        3,
+        "proc_macro2",
+        "<proc_macro2::Punct as syn::ext::PunctExt>::new_spanned",
+        "_RNvXs3_NtCslyqR0aq4yxA_3syn3extNtCs13gI3OE3fdS_11proc_macro25PunctNtB5_8PunctExt11new_spanned"
+      ],
+      [
+        3,
+        "proc_macro2",
+        "<proc_macro2::Ident>::span",
+        "_RNvMsx_Cs13gI3OE3fdS_11proc_macro2NtB5_5Ident4span"
+      ],
+      [
+        3,
+        "proc_macro2",
+        "<proc_macro2::Delimiter as core::cmp::PartialEq>::eq",
+        "_RNvXsW_Cs13gI3OE3fdS_11proc_macro2NtB5_9DelimiterNtNtCs9pfriLqNw2j_4core3cmp9PartialEq2eqCslyqR0aq4yxA_3syn"
+      ],
+      [
+        3,
+        "proc_macro",
+        "<proc_macro::bridge::symbol::Symbol as proc_macro::bridge::rpc::Encode<()>>::encode",
+        "_RNvXs3_NtNtCs6ySpPs5mHD7_10proc_macro6bridge6symbolNtB5_6SymbolINtNtB7_3rpc6EncodeuE6encodeB9_"
+      ],
+      [
+        3,
+        "proc_macro",
+        "<proc_macro::bridge::symbol::Symbol as proc_macro::bridge::rpc::Decode<()>>::decode",
+        "_RNvXs6_NtNtCs6ySpPs5mHD7_10proc_macro6bridge6symbolNtB5_6SymbolINtNtB7_3rpc6DecodeuE6decodeB9_"
+      ],
+      [
+        3,
+        "proc_macro",
+        "<proc_macro::ConcatTreesHelper>::push",
+        "_RNvMsh_Cs6ySpPs5mHD7_10proc_macroNtB5_17ConcatTreesHelper4push"
+      ],
+      [
+        3,
+        "other or unknown",
+        "__FRAME_END__",
+        "__FRAME_END__"
+      ],
+      [
+        3,
+        "other or unknown",
+        "<str>::get::<core::ops::range::RangeFrom<usize>>",
+        "_RINvMNtCs9pfriLqNw2j_4core3stre3getINtNtNtB5_3ops5range9RangeFromjEECslyqR0aq4yxA_3syn"
+      ],
+      [
+        3,
+        "core",
+        "core::ub_checks::maybe_is_nonoverlapping::runtime",
+        "_RNvNvNtCs9pfriLqNw2j_4core9ub_checks23maybe_is_nonoverlapping7runtimeCsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        3,
+        "core",
+        "core::ptr::drop_glue::<alloc::raw_vec::RawVec<u8>>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueINtNtCsinnh2goo3YA_5alloc7raw_vec6RawVechEECs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        3,
+        "core",
+        "<core::str::iter::Chars as core::iter::traits::iterator::Iterator>::enumerate",
+        "_RNvYNtNtNtCs9pfriLqNw2j_4core3str4iter5CharsNtNtNtNtB8_4iter6traits8iterator8Iterator9enumerateCslyqR0aq4yxA_3syn"
+      ],
+      [
+        3,
+        "core",
+        "<core::slice::iter::Iter<u8> as core::iter::traits::double_ended::DoubleEndedIterator>::next_back",
+        "_RNvXs2K_NtNtCs9pfriLqNw2j_4core5slice4iterINtB6_4IterhENtNtNtNtBa_4iter6traits12double_ended19DoubleEndedIterator9next_backCslyqR0aq4yxA_3syn"
+      ],
+      [
+        3,
+        "core",
+        "<core::result::Result<((), syn::buffer::Cursor), syn::error::Error> as core::ops::try_trait::Try>::branch",
+        "_RNvXsp_NtCs9pfriLqNw2j_4core6resultINtB5_6ResultTuNtNtCslyqR0aq4yxA_3syn6buffer6CursorENtNtBQ_5error5ErrorENtNtNtB7_3ops9try_trait3Try6branchBQ_"
+      ],
+      [
+        3,
+        "core",
+        "<core::option::Option<char>>::unwrap_or",
+        "_RNvMNtCs9pfriLqNw2j_4core6optionINtB2_6OptioncE9unwrap_orCslyqR0aq4yxA_3syn"
+      ],
+      [
+        3,
+        "core",
+        "<core::option::IntoIter<&syn::path::PathSegment> as core::iter::traits::iterator::Iterator>::next",
+        "_RNvXsy_NtCs9pfriLqNw2j_4core6optionINtB5_8IntoIterRNtNtCslyqR0aq4yxA_3syn4path11PathSegmentENtNtNtNtB7_4iter6traits8iterator8Iterator4nextBR_"
+      ],
+      [
+        3,
+        "core",
+        "<core::iter::adapters::zip::Zip<core::str::iter::Chars, core::slice::iter::Iter<proc_macro2::Span>> as core::iter::traits::collect::IntoIterator>::into_iter",
+        "_RNvXNtNtNtCs9pfriLqNw2j_4core4iter6traits7collectINtNtNtB6_8adapters3zip3ZipNtNtNtB8_3str4iter5CharsINtNtNtB8_5slice4iter4IterNtCs13gI3OE3fdS_11proc_macro24SpanEENtB2_12IntoIterator9into_iterCslyqR0aq4yxA_3syn"
+      ],
+      [
+        3,
+        "core",
+        "<core::iter::adapters::filter::Filter<core::slice::iter::Iter<syn::attr::Attribute>, for<'a, 'b> fn(&'a &'b syn::attr::Attribute) -> bool> as core::iter::traits::collect::IntoIterator>::into_iter",
+        "_RNvXNtNtNtCs9pfriLqNw2j_4core4iter6traits7collectINtNtNtB6_8adapters6filter6FilterINtNtNtB8_5slice4iter4IterNtNtCslyqR0aq4yxA_3syn4attr9AttributeEFG0_RL1_RL0_B1I_EbENtB2_12IntoIterator9into_iterB1M_"
+      ],
+      [
+        3,
+        "core",
+        "<core::hash::sip::Hasher<core::hash::sip::Sip13Rounds>>::reset",
+        "_RNvMs0_NtNtCs9pfriLqNw2j_4core4hash3sipINtB5_6HasherNtB5_11Sip13RoundsE5resetCsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        3,
+        "core",
+        "<core::cell::Cell<syn::parse::Unexpected>>::new",
+        "_RNvMs7_NtCs9pfriLqNw2j_4core4cellINtB5_4CellNtNtCslyqR0aq4yxA_3syn5parse10UnexpectedE3newBK_"
+      ],
+      [
+        3,
+        "core",
+        "<core::cell::Cell<core::option::Option<alloc::rc::Rc<core::cell::Cell<syn::parse::Unexpected>>>>>::take",
+        "_RNvMsa_NtCs9pfriLqNw2j_4core4cellINtB5_4CellINtNtB7_6option6OptionINtNtCsinnh2goo3YA_5alloc2rc2RcIBw_NtNtCslyqR0aq4yxA_3syn5parse10UnexpectedEEEE4takeB1F_"
+      ],
+      [
+        3,
+        "core",
+        "<&str as core::convert::AsRef<str>>::as_ref",
+        "_RNvXNtCs9pfriLqNw2j_4core7convertReINtB2_5AsRefeE6as_refCslyqR0aq4yxA_3syn"
+      ],
+      [
+        3,
+        "alloc",
+        "alloc::fmt::format::format_inner",
+        "_RNvNvNtCsinnh2goo3YA_5alloc3fmt6format12format_inner"
+      ],
+      [
+        3,
+        "alloc",
+        "<alloc::rc::Rc<core::cell::Cell<syn::parse::Unexpected>>>::new",
+        "_RNvMs7_NtCsinnh2goo3YA_5alloc2rcINtB5_2RcINtNtCs9pfriLqNw2j_4core4cell4CellNtNtCslyqR0aq4yxA_3syn5parse10UnexpectedEE3newB1f_"
+      ],
+      [
+        3,
+        "alloc",
+        "<alloc::raw_vec::RawVecInner>::with_capacity_in",
+        "_RNvMs5_NtCsinnh2goo3YA_5alloc7raw_vecNtB5_11RawVecInner16with_capacity_inCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        3,
+        "alloc",
+        "<alloc::raw_vec::RawVecInner>::try_allocate_in",
+        "_RNvMs5_NtCsinnh2goo3YA_5alloc7raw_vecNtB5_11RawVecInner15try_allocate_inCs3RnjG7HlVUX_5gimli"
+      ],
+      [
+        3,
+        "alloc",
+        "<alloc::raw_vec::RawVecInner>::finish_grow",
+        "_RNvMs5_NtCsinnh2goo3YA_5alloc7raw_vecNtB5_11RawVecInner11finish_growCs6ySpPs5mHD7_10proc_macro"
+      ],
+      [
+        3,
+        "alloc",
+        "<alloc::alloc::Global as core::alloc::Allocator>::deallocate",
+        "_RNvXs1_NtCsinnh2goo3YA_5alloc5allocNtB5_6GlobalNtNtCs9pfriLqNw2j_4core5alloc9Allocator10deallocateCslyqR0aq4yxA_3syn"
+      ],
+      [
+        3,
+        "alloc",
+        "<alloc::alloc::Global as core::alloc::Allocator>::deallocate",
+        "_RNvXs1_NtCsinnh2goo3YA_5alloc5allocNtB5_6GlobalNtNtCs9pfriLqNw2j_4core5alloc9Allocator10deallocateCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        3,
+        "alloc",
+        "<<alloc::boxed::Box<syn::path::PathSegment> as core::convert::AsRef<syn::path::PathSegment>>::as_ref as core::ops::function::FnOnce<(&alloc::boxed::Box<syn::path::PathSegment>,)>>::call_once",
+        "_RNvYNvYINtNtCsinnh2goo3YA_5alloc5boxed3BoxNtNtCslyqR0aq4yxA_3syn4path11PathSegmentEINtNtCs9pfriLqNw2j_4core7convert5AsRefBE_E6as_refINtNtNtB1o_3ops8function6FnOnceTRB5_EE9call_onceBI_"
+      ],
+      [
+        3,
+        "alloc",
+        "<&str as alloc::string::ToString>::to_string",
+        "_RNvXsB_NtCsinnh2goo3YA_5alloc6stringReNtB5_8ToString9to_stringCslyqR0aq4yxA_3syn"
+      ],
+      [
+        2,
+        "syn",
+        "syn::token::parsing::punct_helper::{closure#0}",
+        "_RNCNvNtNtCslyqR0aq4yxA_3syn5token7parsing12punct_helper0B7_"
+      ],
+      [
+        2,
+        "syn",
+        "syn::punctuated::Pair::<&syn::path::PathSegment, &syn::token::PathSep>::End",
+        "_RNcNtINtNtCslyqR0aq4yxA_3syn10punctuated4PairRNtNtB8_4path11PathSegmentRNtNtB8_5token7PathSepE3End0B8_"
+      ],
+      [
+        2,
+        "syn",
+        "syn::path::printing::print_qpath",
+        "_RNvNtNtCslyqR0aq4yxA_3syn4path8printing11print_qpath"
+      ],
+      [
+        2,
+        "syn",
+        "syn::pat::parsing::pat_ident",
+        "_RNvNtNtCslyqR0aq4yxA_3syn3pat7parsing9pat_ident"
+      ],
+      [
+        2,
+        "syn",
+        "syn::item::parsing::parse_fn_args",
+        "_RNvNtNtCslyqR0aq4yxA_3syn4item7parsing13parse_fn_args"
+      ],
+      [
+        2,
+        "syn",
+        "syn::expr::parsing::trailer_helper",
+        "_RNvNtNtCslyqR0aq4yxA_3syn4expr7parsing14trailer_helper"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::ty::Type as quote::to_tokens::ToTokens>::to_tokens",
+        "_RNvXNtCslyqR0aq4yxA_3syn2tyNtB2_4TypeNtNtCsd4ioDgIhpn4_5quote9to_tokens8ToTokens9to_tokens"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::token::Pound as syn::token::Token>::peek",
+        "_RNvXscl_NtCslyqR0aq4yxA_3syn5tokenNtB6_5PoundNtB6_5Token4peek"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::token::Group as syn::token::Token>::peek",
+        "_RNvXsh_NtCslyqR0aq4yxA_3syn5tokenNtB5_5GroupNtB5_5Token4peek"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::punctuated::Pair<&mut syn::path::PathSegment, &mut syn::token::PathSep>>::value_mut",
+        "_RNvMsJ_NtCslyqR0aq4yxA_3syn10punctuatedINtB5_4PairQNtNtB7_4path11PathSegmentQNtNtB7_5token7PathSepE9value_mutCsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::precedence::Precedence>::of",
+        "_RNvMNtCslyqR0aq4yxA_3syn10precedenceNtB2_10Precedence2of"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::pat::Pat>::parse_single",
+        "_RNvMNtNtCslyqR0aq4yxA_3syn3pat7parsingNtB4_3Pat12parse_single"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::parse::ParseBuffer>::step::<syn::group::parse_delimited::{closure#0}, (proc_macro2::extra::DelimSpan, syn::parse::ParseBuffer)>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4stepNCNvNtB8_5group15parse_delimited0TNtNtCs13gI3OE3fdS_11proc_macro25extra9DelimSpanBw_EEB8_"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::parse::ParseBuffer>::step::<<proc_macro2::Ident as syn::ext::IdentExt>::parse_any::{closure#0}, proc_macro2::Ident>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4stepNCNvXNtB8_3extNtCs13gI3OE3fdS_11proc_macro25IdentNtBY_8IdentExt9parse_any0B17_EB8_"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek::<syn::token::SlashEq<syn::lookahead::TokenMarker>>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4peekINvNtB8_5token7SlashEqNtNtB8_9lookahead11TokenMarkerEEB8_"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek::<syn::token::PathSep<syn::lookahead::TokenMarker>>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4peekINvNtB8_5token7PathSepNtNtB8_9lookahead11TokenMarkerEEB8_"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek::<syn::token::Or<syn::lookahead::TokenMarker>>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4peekINvNtB8_5token2OrNtNtB8_9lookahead11TokenMarkerEEB8_"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek::<syn::token::Ne<syn::lookahead::TokenMarker>>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4peekINvNtB8_5token2NeNtNtB8_9lookahead11TokenMarkerEEB8_"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek::<syn::token::Const<syn::lookahead::TokenMarker>>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4peekINvNtB8_5token5ConstNtNtB8_9lookahead11TokenMarkerEEB8_"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek::<syn::ident::Ident>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4peekNvNtB8_5ident5IdentEB8_"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::parse::ParseBuffer as core::ops::drop::Drop>::drop",
+        "_RNvXNtCslyqR0aq4yxA_3syn5parseNtB2_11ParseBufferNtNtNtCs9pfriLqNw2j_4core3ops4drop4Drop4drop"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::op::BinOp as syn::parse::Parse>::parse",
+        "_RNvXNtNtCslyqR0aq4yxA_3syn2op7parsingNtB4_5BinOpNtNtB6_5parse5Parse5parse"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::expr::ExprIf as syn::parse::Parse>::parse",
+        "_RNvXs7_NtNtCslyqR0aq4yxA_3syn4expr7parsingNtB7_6ExprIfNtNtB9_5parse5Parse5parse"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::expr::Expr as quote::to_tokens::ToTokens>::to_tokens",
+        "_RNvXsg_NtCslyqR0aq4yxA_3syn4exprNtB5_4ExprNtNtCsd4ioDgIhpn4_5quote9to_tokens8ToTokens9to_tokens"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::error::Error>::new::new",
+        "_RNvNvMNtCslyqR0aq4yxA_3syn5errorNtB4_5Error3new3new"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::error::Error>::new::<&str>",
+        "_RINvMNtCslyqR0aq4yxA_3syn5errorNtB3_5Error3newReEB5_"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::buffer::Cursor>::eof",
+        "_RNvMs_NtCslyqR0aq4yxA_3syn6bufferNtB4_6Cursor3eof"
+      ],
+      [
+        2,
+        "syn",
+        "<syn::buffer::Cursor>::create",
+        "_RNvMs_NtCslyqR0aq4yxA_3syn6bufferNtB4_6Cursor6create"
+      ],
+      [
+        2,
+        "std",
+        "<std::hash::random::RandomState as core::hash::BuildHasher>::hash_one::<&alloc::string::String>",
+        "_RINvYNtNtNtCs8K97yU1lfbJ_3std4hash6random11RandomStateNtNtCs9pfriLqNw2j_4core4hash11BuildHasher8hash_oneRNtNtCsinnh2goo3YA_5alloc6string6StringECsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        2,
+        "std",
+        "<std::hash::random::RandomState as core::hash::BuildHasher>::build_hasher",
+        "_RNvXs_NtNtCs8K97yU1lfbJ_3std4hash6randomNtB4_11RandomStateNtNtCs9pfriLqNw2j_4core4hash11BuildHasher12build_hasherCsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        2,
+        "proc_macro2",
+        "<proc_macro2::imp::Ident>::unwrap_nightly",
+        "_RNvMsp_NtCs13gI3OE3fdS_11proc_macro23impNtB5_5Ident14unwrap_nightly"
+      ],
+      [
+        2,
+        "proc_macro2",
+        "<proc_macro2::imp::Ident as core::fmt::Display>::fmt",
+        "_RNvXst_NtCs13gI3OE3fdS_11proc_macro23impNtB5_5IdentNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt"
+      ],
+      [
+        2,
+        "proc_macro2",
+        "<proc_macro2::imp::Group>::unwrap_nightly",
+        "_RNvMsl_NtCs13gI3OE3fdS_11proc_macro23impNtB5_5Group14unwrap_nightly"
+      ],
+      [
+        2,
+        "proc_macro2",
+        "<proc_macro2::imp::DeferredTokenStream>::evaluate_now",
+        "_RNvMNtCs13gI3OE3fdS_11proc_macro23impNtB2_19DeferredTokenStream12evaluate_now"
+      ],
+      [
+        2,
+        "proc_macro2",
+        "<proc_macro2::TokenStream as quote::ext::TokenStreamExt>::append_all::<core::iter::adapters::filter::Filter<core::slice::iter::Iter<syn::attr::Attribute>, for<'a, 'b> fn(&'a &'b syn::attr::Attribute) -> bool>>",
+        "_RINvXNtCsd4ioDgIhpn4_5quote3extNtCs13gI3OE3fdS_11proc_macro211TokenStreamNtB3_14TokenStreamExt10append_allINtNtNtNtCs9pfriLqNw2j_4core4iter8adapters6filter6FilterINtNtNtB1P_5slice4iter4IterNtNtCslyqR0aq4yxA_3syn4attr9AttributeEFG0_RL1_RL0_B31_EbEEB35_"
+      ],
+      [
+        2,
+        "proc_macro2",
+        "<proc_macro2::Punct>::set_span",
+        "_RNvMsu_Cs13gI3OE3fdS_11proc_macro2NtB5_5Punct8set_span"
+      ],
+      [
+        2,
+        "proc_macro2",
+        "<proc_macro2::Ident as syn::token::Token>::peek",
+        "_RNvXs_NtNtCslyqR0aq4yxA_3syn5ident7parsingNtCs13gI3OE3fdS_11proc_macro25IdentNtNtB8_5token5Token4peek"
+      ],
+      [
+        2,
+        "proc_macro2",
+        "<proc_macro2::Group>::new",
+        "_RNvMsr_Cs13gI3OE3fdS_11proc_macro2NtB5_5Group3new"
+      ],
+      [
+        2,
+        "proc_macro",
+        "<proc_macro::token_stream::IntoIter as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<proc_macro::TokenTree, salsa_macros::hygiene::push_idents1::{closure#0}>::{closure#0}>",
+        "_RINvYNtNtCs6ySpPs5mHD7_10proc_macro12token_stream8IntoIterNtNtNtNtCs9pfriLqNw2j_4core4iter6traits8iterator8Iterator4folduNCINvNvBU_8for_each4callNtB7_9TokenTreeNCNvNtCsf9kgMdJkaQv_12salsa_macros7hygiene12push_idents10E0EB2E_"
+      ],
+      [
+        2,
+        "proc_macro",
+        "<proc_macro::bridge::ApiTags as proc_macro::bridge::rpc::Encode<()>>::encode",
+        "_RNvXNvNtCs6ySpPs5mHD7_10proc_macro6bridge1__NtB4_7ApiTagsINtNtB4_3rpc6EncodeuE6encodeB6_"
+      ],
+      [
+        2,
+        "proc_macro",
+        "<proc_macro::Punct>::spacing",
+        "_RNvMsH_Cs6ySpPs5mHD7_10proc_macroNtB5_5Punct7spacingCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        2,
+        "proc_macro",
+        "<proc_macro::Literal as core::clone::Clone>::clone",
+        "_RNvXs1t_Cs6ySpPs5mHD7_10proc_macroNtB6_7LiteralNtNtCs9pfriLqNw2j_4core5clone5Clone5cloneCslyqR0aq4yxA_3syn"
+      ],
+      [
+        2,
+        "core",
+        "core::sync::atomic::atomic_load::<usize>",
+        "_RINvNtNtCs9pfriLqNw2j_4core4sync6atomic11atomic_loadjECs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        2,
+        "core",
+        "core::ptr::drop_glue::<syn::ty::Type>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueNtNtCslyqR0aq4yxA_3syn2ty4TypeEBF_"
+      ],
+      [
+        2,
+        "core",
+        "core::ptr::drop_glue::<syn::buffer::Entry>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueNtNtCslyqR0aq4yxA_3syn6buffer5EntryEBF_"
+      ],
+      [
+        2,
+        "core",
+        "core::ptr::drop_glue::<proc_macro2::Group>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueNtCs13gI3OE3fdS_11proc_macro25GroupEBD_"
+      ],
+      [
+        2,
+        "core",
+        "core::ptr::drop_glue::<core::option::Option<alloc::rc::Rc<core::cell::Cell<syn::parse::Unexpected>>>>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueINtNtB4_6option6OptionINtNtCsinnh2goo3YA_5alloc2rc2RcINtNtB4_4cell4CellNtNtCslyqR0aq4yxA_3syn5parse10UnexpectedEEEEB1O_"
+      ],
+      [
+        2,
+        "core",
+        "core::ptr::drop_glue::<[syn::expr::Arm]>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueSNtNtCslyqR0aq4yxA_3syn4expr3ArmEBG_"
+      ],
+      [
+        2,
+        "core",
+        "core::ptr::drop_glue::<[syn::buffer::Entry]>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueSNtNtCslyqR0aq4yxA_3syn6buffer5EntryEBG_"
+      ],
+      [
+        2,
+        "core",
+        "core::core_arch::x86::sse2::_mm_cmpeq_epi8",
+        "_RNvNtNtNtCs9pfriLqNw2j_4core9core_arch3x864sse214__mm_cmpeq_epi8Csf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        2,
+        "core",
+        "<u8 as core::cmp::Ord>::cmp",
+        "_RNvXsX_NtNtCs9pfriLqNw2j_4core3cmp5implshNtB7_3Ord3cmpCslyqR0aq4yxA_3syn"
+      ],
+      [
+        2,
+        "core",
+        "<core::str::iter::Chars as core::iter::traits::double_ended::DoubleEndedIterator>::next_back",
+        "_RNvXs0_NtNtCs9pfriLqNw2j_4core3str4iterNtB5_5CharsNtNtNtNtB9_4iter6traits12double_ended19DoubleEndedIterator9next_backCslyqR0aq4yxA_3syn"
+      ],
+      [
+        2,
+        "core",
+        "<core::slice::iter::Iter<proc_macro2::Span> as core::iter::traits::collect::IntoIterator>::into_iter",
+        "_RNvXNtNtNtCs9pfriLqNw2j_4core4iter6traits7collectINtNtNtB8_5slice4iter4IterNtCs13gI3OE3fdS_11proc_macro24SpanENtB2_12IntoIterator9into_iterCslyqR0aq4yxA_3syn"
+      ],
+      [
+        2,
+        "core",
+        "<core::slice::iter::Iter<(syn::path::PathSegment, syn::token::PathSep)>>::new",
+        "_RNvMs4_NtNtCs9pfriLqNw2j_4core5slice4iterINtB5_4IterTNtNtCslyqR0aq4yxA_3syn4path11PathSegmentNtNtBT_5token7PathSepEE3newBT_"
+      ],
+      [
+        2,
+        "core",
+        "<core::result::Result<(proc_macro2::Ident, syn::buffer::Cursor), syn::error::Error> as core::ops::try_trait::Try>::branch",
+        "_RNvXsp_NtCs9pfriLqNw2j_4core6resultINtB5_6ResultTNtCs13gI3OE3fdS_11proc_macro25IdentNtNtCslyqR0aq4yxA_3syn6buffer6CursorENtNtB1o_5error5ErrorENtNtNtB7_3ops9try_trait3Try6branchB1o_"
+      ],
+      [
+        2,
+        "core",
+        "<core::result::Result<(), syn::error::Error> as core::ops::try_trait::Try>::branch",
+        "_RNvXsp_NtCs9pfriLqNw2j_4core6resultINtB5_6ResultuNtNtCslyqR0aq4yxA_3syn5error5ErrorENtNtNtB7_3ops9try_trait3Try6branchBP_"
+      ],
+      [
+        2,
+        "core",
+        "<core::ptr::non_null::NonNull<_>>::new_unchecked::precondition_check",
+        "_RNvNvMs1_NtNtCs9pfriLqNw2j_4core3ptr8non_nullINtB7_7NonNullpE13new_unchecked18precondition_checkCslyqR0aq4yxA_3syn"
+      ],
+      [
+        2,
+        "core",
+        "<core::option::Option<syn::token::Or> as syn::parse::Parse>::parse",
+        "_RNvXsb_NtCslyqR0aq4yxA_3syn5parseINtNtCs9pfriLqNw2j_4core6option6OptionNtNtB7_5token2OrENtB5_5Parse5parseB7_"
+      ],
+      [
+        2,
+        "core",
+        "<core::option::Option<&(syn::path::GenericArgument, syn::token::Comma)>>::map::<syn::punctuated::Pair<&syn::path::GenericArgument, &syn::token::Comma>, <syn::punctuated::Pairs<syn::path::GenericArgument, syn::token::Comma> as core::iter::traits::iterator::Iterator>::next::{closure#0}>",
+        "_RINvMNtCs9pfriLqNw2j_4core6optionINtB3_6OptionRTNtNtCslyqR0aq4yxA_3syn4path15GenericArgumentNtNtBO_5token5CommaEE3mapINtNtBO_10punctuated4PairRBK_RB1s_ENCNvXsc_B1U_INtB1U_5PairsBK_B1s_ENtNtNtNtB5_4iter6traits8iterator8Iterator4next0EBO_"
+      ],
+      [
+        2,
+        "core",
+        "<core::option::Option<&(syn::expr::Expr, syn::token::Comma)>>::map::<syn::punctuated::Pair<&syn::expr::Expr, &syn::token::Comma>, <syn::punctuated::Pairs<syn::expr::Expr, syn::token::Comma> as core::iter::traits::iterator::Iterator>::next::{closure#0}>",
+        "_RINvMNtCs9pfriLqNw2j_4core6optionINtB3_6OptionRTNtNtCslyqR0aq4yxA_3syn4expr4ExprNtNtBO_5token5CommaEE3mapINtNtBO_10punctuated4PairRBK_RB1g_ENCNvXsc_B1I_INtB1I_5PairsBK_B1g_ENtNtNtNtB5_4iter6traits8iterator8Iterator4next0EBO_"
+      ],
+      [
+        2,
+        "core",
+        "<core::ops::range::RangeFull as core::ops::range::RangeBounds<usize>>::end_bound",
+        "_RNvXse_NtNtCs9pfriLqNw2j_4core3ops5rangeNtB5_9RangeFullINtB5_11RangeBoundsjE9end_boundCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        2,
+        "core",
+        "<core::iter::adapters::zip::Zip<core::str::iter::Chars, core::slice::iter::Iter<proc_macro2::Span>> as core::iter::adapters::zip::ZipImpl<core::str::iter::Chars, core::slice::iter::Iter<proc_macro2::Span>>>::new",
+        "_RNvXs1_NtNtNtCs9pfriLqNw2j_4core4iter8adapters3zipINtB5_3ZipNtNtNtBb_3str4iter5CharsINtNtNtBb_5slice4iter4IterNtCs13gI3OE3fdS_11proc_macro24SpanEEINtB5_7ZipImplBW_B1k_E3newCslyqR0aq4yxA_3syn"
+      ],
+      [
+        2,
+        "core",
+        "<core::hash::sip::Hasher<core::hash::sip::Sip13Rounds> as core::hash::Hasher>::finish",
+        "_RNvXs3_NtNtCs9pfriLqNw2j_4core4hash3sipINtB5_6HasherNtB5_11Sip13RoundsENtB7_6Hasher6finishCsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        2,
+        "core",
+        "<core::core_arch::x86::__m128i>::as_i8x16",
+        "_RNvMs1K_NtNtCs9pfriLqNw2j_4core9core_arch3x86NtB6_7___m128i8as_i8x16Csf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        2,
+        "core",
+        "<core::cell::BorrowRefMut as core::ops::drop::Drop>::drop",
+        "_RNvXsO_NtCs9pfriLqNw2j_4core4cellNtB5_12BorrowRefMutNtNtNtB7_3ops4drop4Drop4dropCslyqR0aq4yxA_3syn"
+      ],
+      [
+        2,
+        "alloc",
+        "<alloc::vec::into_iter::IntoIter<proc_macro::bridge::TokenTree<proc_macro::bridge::client::TokenStream, proc_macro::bridge::client::Span, proc_macro::bridge::symbol::Symbol>> as core::iter::traits::iterator::Iterator>::size_hint",
+        "_RNvXs4_NtNtCsinnh2goo3YA_5alloc3vec9into_iterINtB5_8IntoIterINtNtCs6ySpPs5mHD7_10proc_macro6bridge9TokenTreeNtNtBZ_6client11TokenStreamNtB1K_4SpanNtNtBZ_6symbol6SymbolEENtNtNtNtCs9pfriLqNw2j_4core4iter6traits8iterator8Iterator9size_hintCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        2,
+        "alloc",
+        "<alloc::vec::Vec<u8>>::into_boxed_slice",
+        "_RNvMs_NtCsinnh2goo3YA_5alloc3vecINtB4_3VechE16into_boxed_sliceCslyqR0aq4yxA_3syn"
+      ],
+      [
+        2,
+        "alloc",
+        "<alloc::vec::Vec<u8> as core::cmp::PartialEq>::eq",
+        "_RNvXNtNtCsinnh2goo3YA_5alloc3vec10partial_eqINtB4_3VechENtNtCs9pfriLqNw2j_4core3cmp9PartialEq2eqCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        2,
+        "alloc",
+        "<alloc::vec::Vec<syn::buffer::Entry>>::push_mut",
+        "_RNvMsG_NtCsinnh2goo3YA_5alloc3vecINtB5_3VecNtNtCslyqR0aq4yxA_3syn6buffer5EntryE8push_mutBJ_"
+      ],
+      [
+        2,
+        "alloc",
+        "<alloc::string::String>::push_str",
+        "_RNvMNtCsinnh2goo3YA_5alloc6stringNtB2_6String8push_strCslyqR0aq4yxA_3syn"
+      ],
+      [
+        2,
+        "alloc",
+        "<alloc::raw_vec::RawVecInner<_>>::reserve::do_reserve_and_handle::<alloc::alloc::Global>",
+        "_RINvNvMs2_NtCsinnh2goo3YA_5alloc7raw_vecINtB8_11RawVecInnerpE7reserve21do_reserve_and_handleNtNtBa_5alloc6GlobalECs10i41Z7Aixh_9addr2line"
+      ],
+      [
+        2,
+        "alloc",
+        "<alloc::alloc::Global>::alloc_impl_runtime",
+        "_RNvMs0_NtCsinnh2goo3YA_5alloc5allocNtB5_6Global18alloc_impl_runtimeCslyqR0aq4yxA_3syn"
+      ],
+      [
+        2,
+        "alloc",
+        "<<alloc::vec::into_iter::IntoIter<_, _> as core::ops::drop::Drop>::drop::DropGuard<proc_macro::bridge::TokenTree<proc_macro::bridge::client::TokenStream, proc_macro::bridge::client::Span, proc_macro::bridge::symbol::Symbol>, alloc::alloc::Global> as core::ops::drop::Drop>::drop",
+        "_RNvXNvXse_NtNtCsinnh2goo3YA_5alloc3vec9into_iterINtB8_8IntoIterppENtNtNtCs9pfriLqNw2j_4core3ops4drop4Drop4dropINtB2_9DropGuardINtNtCs6ySpPs5mHD7_10proc_macro6bridge9TokenTreeNtNtB23_6client11TokenStreamNtB2O_4SpanNtNtB23_6symbol6SymbolENtNtBc_5alloc6GlobalEB12_4dropCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        2,
+        "__rustc",
+        "__rustc::__rdl_dealloc",
+        "_RNvCseU4mLtNj5Gn_7___rustc13___rdl_dealloc"
+      ],
+      [
+        2,
+        "__rustc",
+        "__rustc::__rdl_alloc",
+        "_RNvCseU4mLtNj5Gn_7___rustc11___rdl_alloc"
+      ],
+      [
+        1,
+        "syn",
+        "syn::ty::parsing::ambig_ty",
+        "_RNvNtNtCslyqR0aq4yxA_3syn2ty7parsing8ambig_ty"
+      ],
+      [
+        1,
+        "syn",
+        "syn::token::parsing::punct_helper",
+        "_RNvNtNtCslyqR0aq4yxA_3syn5token7parsing12punct_helper"
+      ],
+      [
+        1,
+        "syn",
+        "syn::token::parsing::punct::<2>",
+        "_RINvNtNtCslyqR0aq4yxA_3syn5token7parsing5punctKj2_EB6_"
+      ],
+      [
+        1,
+        "syn",
+        "syn::path::printing::print_angle_bracketed_generic_arguments",
+        "_RNvNtNtCslyqR0aq4yxA_3syn4path8printing39print_angle_bracketed_generic_arguments"
+      ],
+      [
+        1,
+        "syn",
+        "syn::path::parsing::qpath",
+        "_RNvNtNtCslyqR0aq4yxA_3syn4path7parsing5qpath"
+      ],
+      [
+        1,
+        "syn",
+        "syn::pat::parsing::pat_wild",
+        "_RNvNtNtCslyqR0aq4yxA_3syn3pat7parsing8pat_wild"
+      ],
+      [
+        1,
+        "syn",
+        "syn::pat::parsing::multi_pat_impl",
+        "_RNvNtNtCslyqR0aq4yxA_3syn3pat7parsing14multi_pat_impl"
+      ],
+      [
+        1,
+        "syn",
+        "syn::parse::span_of_unexpected_ignoring_nones",
+        "_RNvNtCslyqR0aq4yxA_3syn5parse33span_of_unexpected_ignoring_nones"
+      ],
+      [
+        1,
+        "syn",
+        "syn::parse::new_parse_buffer",
+        "_RNvNtCslyqR0aq4yxA_3syn5parse16new_parse_buffer"
+      ],
+      [
+        1,
+        "syn",
+        "syn::parse::inner_unexpected",
+        "_RNvNtCslyqR0aq4yxA_3syn5parse16inner_unexpected"
+      ],
+      [
+        1,
+        "syn",
+        "syn::lit::value::byte::<str>",
+        "_RINvNtNtCslyqR0aq4yxA_3syn3lit5value4byteeEB6_"
+      ],
+      [
+        1,
+        "syn",
+        "syn::item::parsing::parse_signature",
+        "_RNvNtNtCslyqR0aq4yxA_3syn4item7parsing15parse_signature"
+      ],
+      [
+        1,
+        "syn",
+        "syn::item::parsing::parse_impl_item_fn",
+        "_RNvNtNtCslyqR0aq4yxA_3syn4item7parsing18parse_impl_item_fn"
+      ],
+      [
+        1,
+        "syn",
+        "syn::ident::xid_ok",
+        "_RNvNtCslyqR0aq4yxA_3syn5ident6xid_ok"
+      ],
+      [
+        1,
+        "syn",
+        "syn::group::parse_delimited::{closure#0}",
+        "_RNCNvNtCslyqR0aq4yxA_3syn5group15parse_delimited0B5_"
+      ],
+      [
+        1,
+        "syn",
+        "syn::gen::visit_mut::visit_path_segment_mut::<salsa_macros::xform::ChangeSelfPath>",
+        "_RINvNtNtCslyqR0aq4yxA_3syn3gen9visit_mut22visit_path_segment_mutNtNtCsf9kgMdJkaQv_12salsa_macros5xform14ChangeSelfPathEB14_"
+      ],
+      [
+        1,
+        "syn",
+        "syn::gen::visit::visit_type_slice::<salsa_macros::xform::LifetimeFinder>",
+        "_RINvNtNtCslyqR0aq4yxA_3syn3gen5visit16visit_type_sliceNtNtCsf9kgMdJkaQv_12salsa_macros5xform14LifetimeFinderEBU_"
+      ],
+      [
+        1,
+        "syn",
+        "syn::gen::visit::visit_type::<salsa_macros::xform::LifetimeFinder>",
+        "_RINvNtNtCslyqR0aq4yxA_3syn3gen5visit10visit_typeNtNtCsf9kgMdJkaQv_12salsa_macros5xform14LifetimeFinderEBO_"
+      ],
+      [
+        1,
+        "syn",
+        "syn::fixup::scan_right",
+        "_RNvNtCslyqR0aq4yxA_3syn5fixup10scan_right"
+      ],
+      [
+        1,
+        "syn",
+        "syn::expr::printing::print_expr_unary",
+        "_RNvNtNtCslyqR0aq4yxA_3syn4expr8printing16print_expr_unary"
+      ],
+      [
+        1,
+        "syn",
+        "syn::expr::printing::print_expr_method_call::{closure#0}",
+        "_RNCNvNtNtCslyqR0aq4yxA_3syn4expr8printing22print_expr_method_call0B7_"
+      ],
+      [
+        1,
+        "syn",
+        "syn::expr::printing::print_expr",
+        "_RNvNtNtCslyqR0aq4yxA_3syn4expr8printing10print_expr"
+      ],
+      [
+        1,
+        "syn",
+        "syn::expr::parsing::unary_expr",
+        "_RNvNtNtCslyqR0aq4yxA_3syn4expr7parsing10unary_expr"
+      ],
+      [
+        1,
+        "syn",
+        "syn::expr::parsing::rest_of_path_or_macro_or_struct",
+        "_RNvNtNtCslyqR0aq4yxA_3syn4expr7parsing31rest_of_path_or_macro_or_struct"
+      ],
+      [
+        1,
+        "syn",
+        "syn::expr::parsing::parse_expr",
+        "_RNvNtNtCslyqR0aq4yxA_3syn4expr7parsing10parse_expr"
+      ],
+      [
+        1,
+        "syn",
+        "syn::expr::parsing::ambiguous_expr",
+        "_RNvNtNtCslyqR0aq4yxA_3syn4expr7parsing14ambiguous_expr"
+      ],
+      [
+        1,
+        "syn",
+        "syn::attr::parsing::single_parse_outer",
+        "_RNvNtNtCslyqR0aq4yxA_3syn4attr7parsing18single_parse_outer"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::ty::TypeReference as syn::parse::Parse>::parse",
+        "_RNvXs3_NtNtCslyqR0aq4yxA_3syn2ty7parsingNtB7_13TypeReferenceNtNtB9_5parse5Parse5parse"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::token::Underscore as syn::token::Token>::peek",
+        "_RNvXs3_NtCslyqR0aq4yxA_3syn5tokenNtB5_10UnderscoreNtB5_5Token4peek"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::token::StarEq as syn::token::Token>::peek",
+        "_RNvXsd3_NtCslyqR0aq4yxA_3syn5tokenNtB6_6StarEqNtB6_5Token4peek"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::token::Star as syn::token::Token>::peek",
+        "_RNvXscZ_NtCslyqR0aq4yxA_3syn5tokenNtB6_4StarNtB6_5Token4peek"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::token::SlashEq as syn::token::Token>::peek",
+        "_RNvXscV_NtCslyqR0aq4yxA_3syn5tokenNtB6_7SlashEqNtB6_5Token4peek"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::token::Slash as syn::token::Token>::peek",
+        "_RNvXscR_NtCslyqR0aq4yxA_3syn5tokenNtB6_5SlashNtB6_5Token4peek"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::token::SelfType as syn::token::Token>::peek",
+        "_RNvXs7j_NtCslyqR0aq4yxA_3syn5tokenNtB6_8SelfTypeNtB6_5Token4peek"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::token::PercentEq as syn::token::Token>::peek",
+        "_RNvXsc9_NtCslyqR0aq4yxA_3syn5tokenNtB6_9PercentEqNtB6_5Token4peek"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::token::PathSep as syn::token::Token>::display",
+        "_RNvXsc1_NtCslyqR0aq4yxA_3syn5tokenNtB6_7PathSepNtB6_5Token7display"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::token::Or as syn::parse::Parse>::parse",
+        "_RNvXsbO_NtCslyqR0aq4yxA_3syn5tokenNtB6_2OrNtNtB8_5parse5Parse5parse"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::token::Impl as syn::token::Token>::peek",
+        "_RNvXs4t_NtCslyqR0aq4yxA_3syn5tokenNtB6_4ImplNtB6_5Token4peek"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::token::For as syn::token::Token>::peek",
+        "_RNvXs47_NtCslyqR0aq4yxA_3syn5tokenNtB6_3ForNtB6_5Token4peek"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::token::Dot as syn::parse::Parse>::parse",
+        "_RNvXsaM_NtCslyqR0aq4yxA_3syn5tokenNtB6_3DotNtNtB8_5parse5Parse5parse"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::token::Break as syn::token::Token>::peek",
+        "_RNvXs1Z_NtCslyqR0aq4yxA_3syn5tokenNtB6_5BreakNtB6_5Token4peek"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::token::Bracket as syn::token::Token>::peek",
+        "_RNvXsg_NtCslyqR0aq4yxA_3syn5tokenNtB5_7BracketNtB5_5Token4peek"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::token::Box as syn::token::Token>::peek",
+        "_RNvXs1O_NtCslyqR0aq4yxA_3syn5tokenNtB6_3BoxNtB6_5Token4peek"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::token::At as syn::token::Token>::peek",
+        "_RNvXsap_NtCslyqR0aq4yxA_3syn5tokenNtB6_2AtNtB6_5Token4peek"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::stmt::Stmt as quote::to_tokens::ToTokens>::to_tokens",
+        "_RNvXs_NtNtCslyqR0aq4yxA_3syn4stmt8printingNtB6_4StmtNtNtCsd4ioDgIhpn4_5quote9to_tokens8ToTokens9to_tokens"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::stmt::Block as quote::to_tokens::ToTokens>::to_tokens::{closure#0}",
+        "_RNCNvXNtNtCslyqR0aq4yxA_3syn4stmt8printingNtB6_5BlockNtNtCsd4ioDgIhpn4_5quote9to_tokens8ToTokens9to_tokens0B8_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::restriction::Visibility as syn::parse::Parse>::parse",
+        "_RNvXNtNtCslyqR0aq4yxA_3syn11restriction7parsingNtB4_10VisibilityNtNtB6_5parse5Parse5parse"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::punctuated::Punctuated<syn::path::PathSegment, syn::token::PathSep>>::push_value",
+        "_RNvMNtCslyqR0aq4yxA_3syn10punctuatedINtB2_10PunctuatedNtNtB4_4path11PathSegmentNtNtB4_5token7PathSepE10push_valueB4_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::punctuated::Punctuated<syn::path::PathSegment, syn::token::PathSep>>::pairs_mut",
+        "_RNvMNtCslyqR0aq4yxA_3syn10punctuatedINtB2_10PunctuatedNtNtB4_4path11PathSegmentNtNtB4_5token7PathSepE9pairs_mutCsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::punctuated::Punctuated<syn::generics::GenericParam, syn::token::Comma>>::pairs",
+        "_RNvMNtCslyqR0aq4yxA_3syn10punctuatedINtB2_10PunctuatedNtNtB4_8generics12GenericParamNtNtB4_5token5CommaE5pairsB4_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::punctuated::Pairs<syn::path::PathSegment, syn::token::PathSep> as core::iter::traits::iterator::Iterator>::next::{closure#1}",
+        "_RNCNvXsc_NtCslyqR0aq4yxA_3syn10punctuatedINtB7_5PairsNtNtB9_4path11PathSegmentNtNtB9_5token7PathSepENtNtNtNtCs9pfriLqNw2j_4core4iter6traits8iterator8Iterator4nexts_0B9_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::punctuated::Pairs<syn::expr::Expr, syn::token::Comma> as core::iter::traits::iterator::Iterator>::next::{closure#1}",
+        "_RNCNvXsc_NtCslyqR0aq4yxA_3syn10punctuatedINtB7_5PairsNtNtB9_4expr4ExprNtNtB9_5token5CommaENtNtNtNtCs9pfriLqNw2j_4core4iter6traits8iterator8Iterator4nexts_0B9_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::punctuated::Pair<&syn::path::PathSegment, &syn::token::PathSep>::End as core::ops::function::FnOnce<(&syn::path::PathSegment,)>>::call_once",
+        "_RNvYNcNtINtNtCslyqR0aq4yxA_3syn10punctuated4PairRNtNtBb_4path11PathSegmentRNtNtBb_5token7PathSepE3End0INtNtNtCs9pfriLqNw2j_4core3ops8function6FnOnceTBK_EE9call_onceBb_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::punctuated::Pair<&syn::path::GenericArgument, &syn::token::Comma>::End as core::ops::function::FnOnce<(&syn::path::GenericArgument,)>>::call_once",
+        "_RNvYNcNtINtNtCslyqR0aq4yxA_3syn10punctuated4PairRNtNtBb_4path15GenericArgumentRNtNtBb_5token5CommaE3End0INtNtNtCs9pfriLqNw2j_4core3ops8function6FnOnceTBK_EE9call_onceBb_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::punctuated::Pair<&syn::expr::Expr, &syn::token::Comma>::End as core::ops::function::FnOnce<(&syn::expr::Expr,)>>::call_once",
+        "_RNvYNcNtINtNtCslyqR0aq4yxA_3syn10punctuated4PairRNtNtBb_4expr4ExprRNtNtBb_5token5CommaE3End0INtNtNtCs9pfriLqNw2j_4core3ops8function6FnOnceTBK_EE9call_onceBb_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::path::PathSegment>::parse_helper",
+        "_RNvMs4_NtNtCslyqR0aq4yxA_3syn4path7parsingNtB7_11PathSegment12parse_helper"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::path::Path>::parse_mod_style",
+        "_RNvMs5_NtNtCslyqR0aq4yxA_3syn4path7parsingNtB7_4Path15parse_mod_style"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::pat::PatWild as quote::to_tokens::ToTokens>::to_tokens",
+        "_RNvXs9_NtNtCslyqR0aq4yxA_3syn3pat8printingNtB7_7PatWildNtNtCsd4ioDgIhpn4_5quote9to_tokens8ToTokens9to_tokens"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::parse::Unexpected as core::default::Default>::default",
+        "_RNvXs7_NtCslyqR0aq4yxA_3syn5parseNtB5_10UnexpectedNtNtCs9pfriLqNw2j_4core7default7Default7default"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::parse::StepCursor>::error::<&str>",
+        "_RINvMs6_NtCslyqR0aq4yxA_3syn5parseNtB6_10StepCursor5errorReEB8_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::parse::StepCursor as core::ops::deref::Deref>::deref",
+        "_RNvXs3_NtCslyqR0aq4yxA_3syn5parseNtB5_10StepCursorNtNtNtCs9pfriLqNw2j_4core3ops5deref5Deref5deref"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek::<syn::token::Slash<syn::lookahead::TokenMarker>>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4peekINvNtB8_5token5SlashNtNtB8_9lookahead11TokenMarkerEEB8_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek::<syn::token::ShlEq<syn::lookahead::TokenMarker>>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4peekINvNtB8_5token5ShlEqNtNtB8_9lookahead11TokenMarkerEEB8_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek::<syn::token::SelfValue<syn::lookahead::TokenMarker>>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4peekINvNtB8_5token9SelfValueNtNtB8_9lookahead11TokenMarkerEEB8_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek::<syn::token::Percent<syn::lookahead::TokenMarker>>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4peekINvNtB8_5token7PercentNtNtB8_9lookahead11TokenMarkerEEB8_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek::<syn::token::Minus<syn::lookahead::TokenMarker>>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4peekINvNtB8_5token5MinusNtNtB8_9lookahead11TokenMarkerEEB8_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek::<syn::token::Gt<syn::lookahead::TokenMarker>>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4peekINvNtB8_5token2GtNtNtB8_9lookahead11TokenMarkerEEB8_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek::<syn::token::EqEq<syn::lookahead::TokenMarker>>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4peekINvNtB8_5token4EqEqNtNtB8_9lookahead11TokenMarkerEEB8_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek::<syn::token::Crate<syn::lookahead::TokenMarker>>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4peekINvNtB8_5token5CrateNtNtB8_9lookahead11TokenMarkerEEB8_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek::<syn::token::Caret<syn::lookahead::TokenMarker>>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4peekINvNtB8_5token5CaretNtNtB8_9lookahead11TokenMarkerEEB8_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek::<syn::token::Async<syn::lookahead::TokenMarker>>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4peekINvNtB8_5token5AsyncNtNtB8_9lookahead11TokenMarkerEEB8_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek::<syn::token::AndEq<syn::lookahead::TokenMarker>>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4peekINvNtB8_5token5AndEqNtNtB8_9lookahead11TokenMarkerEEB8_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek::<syn::token::AndAnd<syn::lookahead::TokenMarker>>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4peekINvNtB8_5token6AndAndNtNtB8_9lookahead11TokenMarkerEEB8_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek::<syn::token::And<syn::lookahead::TokenMarker>>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer4peekINvNtB8_5token3AndNtNtB8_9lookahead11TokenMarkerEEB8_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek3::<syn::token::Paren<syn::lookahead::TokenMarker>>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer5peek3INvNtB8_5token5ParenNtNtB8_9lookahead11TokenMarkerEEB8_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek2::peek2",
+        "_RNvNvMs9_NtCslyqR0aq4yxA_3syn5parseNtB7_11ParseBuffer5peek25peek2"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::parse::ParseBuffer>::peek2::<syn::token::Lt<syn::lookahead::TokenMarker>>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer5peek2INvNtB8_5token2LtNtNtB8_9lookahead11TokenMarkerEEB8_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::parse::ParseBuffer>::parse::<syn::ty::Type>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer5parseNtNtB8_2ty4TypeEB8_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::parse::ParseBuffer>::parse::<core::option::Option<syn::token::PathSep>>",
+        "_RINvMs9_NtCslyqR0aq4yxA_3syn5parseNtB6_11ParseBuffer5parseINtNtCs9pfriLqNw2j_4core6option6OptionNtNtB8_5token7PathSepEEB8_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::lit::Lit>::from_str",
+        "_RNvMNtNtCslyqR0aq4yxA_3syn3lit5valueNtB4_3Lit8from_str"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::lit::Lit as syn::token::Token>::peek",
+        "_RNvXs7_NtNtCslyqR0aq4yxA_3syn3lit7parsingNtB7_3LitNtNtB9_5token5Token4peek"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::item::ItemStruct as syn::parse::Parse>::parse",
+        "_RNvXsj_NtNtCslyqR0aq4yxA_3syn4item7parsingNtB7_10ItemStructNtNtB9_5parse5Parse5parse"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::generics::TypeParamBound>::parse_single",
+        "_RNvMs5_NtNtCslyqR0aq4yxA_3syn8generics7parsingNtB7_14TypeParamBound12parse_single"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::fixup::FixupContext>::new_match_arm",
+        "_RNvMNtCslyqR0aq4yxA_3syn5fixupNtB2_12FixupContext13new_match_arm"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::fixup::FixupContext>::leftmost_subexpression_with_operator",
+        "_RNvMNtCslyqR0aq4yxA_3syn5fixupNtB2_12FixupContext36leftmost_subexpression_with_operator"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::fixup::FixupContext>::leftmost_subexpression_with_dot",
+        "_RNvMNtCslyqR0aq4yxA_3syn5fixupNtB2_12FixupContext31leftmost_subexpression_with_dot"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::expr::ExprMatch as quote::to_tokens::ToTokens>::to_tokens::{closure#0}",
+        "_RNCNvXsk_NtNtCslyqR0aq4yxA_3syn4expr8printingNtB9_9ExprMatchNtNtCsd4ioDgIhpn4_5quote9to_tokens8ToTokens9to_tokens0Bb_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::expr::Expr as syn::parse::Parse>::parse",
+        "_RNvXNtNtCslyqR0aq4yxA_3syn4expr7parsingNtB4_4ExprNtNtB6_5parse5Parse5parse"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::expr::Expr as core::clone::Clone>::clone",
+        "_RNvXsl_NtNtCslyqR0aq4yxA_3syn3gen5cloneNtNtB9_4expr4ExprNtNtCs9pfriLqNw2j_4core5clone5Clone5clone"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::expr::Arm as syn::parse::Parse>::parse",
+        "_RNvXsz_NtNtCslyqR0aq4yxA_3syn4expr7parsingNtB7_3ArmNtNtB9_5parse5Parse5parse"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::drops::NoDrop<dyn syn::punctuated::IterTrait<syn::generics::GenericParam, Item = &syn::generics::GenericParam>> as core::ops::deref::DerefMut>::deref_mut",
+        "_RNvXs0_NtCslyqR0aq4yxA_3syn5dropsINtB5_6NoDropDINtNtB7_10punctuated9IterTraitNtNtB7_8generics12GenericParamEp4ItemRB1d_EL_ENtNtNtCs9pfriLqNw2j_4core3ops5deref8DerefMut9deref_mutB7_"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::buffer::Cursor>::lifetime",
+        "_RNvMs_NtCslyqR0aq4yxA_3syn6bufferNtB4_6Cursor8lifetime"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::buffer::Cursor>::ident",
+        "_RNvMs_NtCslyqR0aq4yxA_3syn6bufferNtB4_6Cursor5ident"
+      ],
+      [
+        1,
+        "syn",
+        "<syn::attr::Attribute>::parse_outer",
+        "_RNvMNtCslyqR0aq4yxA_3syn4attrNtB2_9Attribute11parse_outer"
+      ],
+      [
+        1,
+        "syn",
+        "<<syn::ty::Type as syn::parse_quote::ParseQuote>::parse as syn::parse::Parser>::parse2",
+        "_RNvXsh_NtCslyqR0aq4yxA_3syn5parseNvYNtNtB7_2ty4TypeNtNtB7_11parse_quote10ParseQuote5parseNtB5_6Parser6parse2Csf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        1,
+        "syn",
+        "<(syn::path::PathSegment, syn::token::PathSep) as <[_]>::to_vec_in::ConvertVec>::to_vec::<alloc::alloc::Global>",
+        "_RINvXNvMNtCsinnh2goo3YA_5alloc5sliceSp9to_vec_inTNtNtCslyqR0aq4yxA_3syn4path11PathSegmentNtNtBP_5token7PathSepENtB3_10ConvertVec6to_vecNtNtB8_5alloc6GlobalEBP_"
+      ],
+      [
+        1,
+        "syn",
+        "<(syn::lifetime::Lifetime, syn::token::Plus) as <[_]>::to_vec_in::ConvertVec>::to_vec::<alloc::alloc::Global>",
+        "_RINvXNvMNtCsinnh2goo3YA_5alloc5sliceSp9to_vec_inTNtNtCslyqR0aq4yxA_3syn8lifetime8LifetimeNtNtBP_5token4PlusENtB3_10ConvertVec6to_vecNtNtB8_5alloc6GlobalEBP_"
+      ],
+      [
+        1,
+        "syn",
+        "<&syn::ty::Type as quote::to_tokens::ToTokens>::into_token_stream",
+        "_RNvYRNtNtCslyqR0aq4yxA_3syn2ty4TypeNtNtCsd4ioDgIhpn4_5quote9to_tokens8ToTokens17into_token_streamB7_"
+      ],
+      [
+        1,
+        "syn",
+        "<&syn::pat::Pat as quote::to_tokens::ToTokens>::to_tokens",
+        "_RNvXNtCsd4ioDgIhpn4_5quote9to_tokensRNtNtCslyqR0aq4yxA_3syn3pat3PatNtB2_8ToTokens9to_tokensBD_"
+      ],
+      [
+        1,
+        "std",
+        "std::thread::current::current",
+        "_RNvNtNtCs8K97yU1lfbJ_3std6thread7current7current"
+      ],
+      [
+        1,
+        "std",
+        "<std::thread::thread::Thread>::id",
+        "_RNvMs_NtNtCs8K97yU1lfbJ_3std6thread6threadNtB4_6Thread2idCslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "salsa_macros",
+        "<salsa_macros::tracked_fn::Macro>::validity_check",
+        "_RNvMs_NtCsf9kgMdJkaQv_12salsa_macros10tracked_fnNtB4_5Macro14validity_check"
+      ],
+      [
+        1,
+        "salsa_macros",
+        "<salsa_macros::tracked_fn::Macro>::try_fn::{closure#3}",
+        "_RNCNvMs_NtCsf9kgMdJkaQv_12salsa_macros10tracked_fnNtB6_5Macro6try_fns1_0B8_"
+      ],
+      [
+        1,
+        "salsa_macros",
+        "<salsa_macros::options::Options<salsa_macros::tracked_fn::TrackedFn> as syn::parse::Parse>::parse",
+        "_RNvXs1_NtCsf9kgMdJkaQv_12salsa_macros7optionsINtB5_7OptionsNtNtB7_10tracked_fn9TrackedFnENtNtCslyqR0aq4yxA_3syn5parse5Parse5parseB7_"
+      ],
+      [
+        1,
+        "quote",
+        "quote::__private::push_group_spanned",
+        "_RNvNtCsd4ioDgIhpn4_5quote9___private18push_group_spanned"
+      ],
+      [
+        1,
+        "proc_macro2",
+        "<proc_macro2::imp::TokenStream as core::clone::Clone>::clone",
+        "_RNvXsz_NtCs13gI3OE3fdS_11proc_macro23impNtB5_11TokenStreamNtNtCs9pfriLqNw2j_4core5clone5Clone5cloneCsd4ioDgIhpn4_5quote"
+      ],
+      [
+        1,
+        "proc_macro2",
+        "<proc_macro2::imp::Ident>::new_checked",
+        "_RNvMsp_NtCs13gI3OE3fdS_11proc_macro23impNtB5_5Ident11new_checked"
+      ],
+      [
+        1,
+        "proc_macro2",
+        "<proc_macro2::imp::Ident as core::clone::Clone>::clone",
+        "_RNvXsG_NtCs13gI3OE3fdS_11proc_macro23impNtB5_5IdentNtNtCs9pfriLqNw2j_4core5clone5Clone5cloneCsd4ioDgIhpn4_5quote"
+      ],
+      [
+        1,
+        "proc_macro2",
+        "<proc_macro2::imp::Group>::new",
+        "_RNvMsl_NtCs13gI3OE3fdS_11proc_macro23impNtB5_5Group3new"
+      ],
+      [
+        1,
+        "proc_macro2",
+        "<proc_macro2::imp::DeferredTokenStream>::new",
+        "_RNvMNtCs13gI3OE3fdS_11proc_macro23impNtB2_19DeferredTokenStream3new"
+      ],
+      [
+        1,
+        "proc_macro2",
+        "<proc_macro2::TokenStream>::_new",
+        "_RNvMCs13gI3OE3fdS_11proc_macro2NtB2_11TokenStream4__new"
+      ],
+      [
+        1,
+        "proc_macro2",
+        "<proc_macro2::TokenStream as quote::ext::TokenStreamExt>::append_all::do_append_all::<core::iter::adapters::filter::Filter<core::slice::iter::Iter<syn::attr::Attribute>, for<'a, 'b> fn(&'a &'b syn::attr::Attribute) -> bool>>",
+        "_RINvNvXNtCsd4ioDgIhpn4_5quote3extNtCs13gI3OE3fdS_11proc_macro211TokenStreamNtB5_14TokenStreamExt10append_all13do_append_allINtNtNtNtCs9pfriLqNw2j_4core4iter8adapters6filter6FilterINtNtNtB26_5slice4iter4IterNtNtCslyqR0aq4yxA_3syn4attr9AttributeEFG0_RL1_RL0_B3i_EbEEB3m_"
+      ],
+      [
+        1,
+        "proc_macro2",
+        "<proc_macro2::Span>::call_site",
+        "_RNvMsi_Cs13gI3OE3fdS_11proc_macro2NtB5_4Span9call_site"
+      ],
+      [
+        1,
+        "proc_macro2",
+        "<proc_macro2::Spacing as core::cmp::PartialEq>::eq",
+        "_RNvXs14_Cs13gI3OE3fdS_11proc_macro2NtB6_7SpacingNtNtCs9pfriLqNw2j_4core3cmp9PartialEq2eqCslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "proc_macro2",
+        "<proc_macro2::Punct as core::clone::Clone>::clone",
+        "_RNvXsX_Cs13gI3OE3fdS_11proc_macro2NtB5_5PunctNtNtCs9pfriLqNw2j_4core5clone5Clone5cloneCslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "proc_macro2",
+        "<proc_macro2::Ident as core::clone::Clone>::clone",
+        "_RNvXs15_Cs13gI3OE3fdS_11proc_macro2NtB6_5IdentNtNtCs9pfriLqNw2j_4core5clone5Clone5cloneCslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "proc_macro2",
+        "<proc_macro2::Ident as core::clone::Clone>::clone",
+        "_RNvXs15_Cs13gI3OE3fdS_11proc_macro2NtB6_5IdentNtNtCs9pfriLqNw2j_4core5clone5Clone5cloneCsd4ioDgIhpn4_5quote"
+      ],
+      [
+        1,
+        "proc_macro2",
+        "<proc_macro2::Ident as alloc::string::ToString>::to_string",
+        "_RNvXsB_NtCsinnh2goo3YA_5alloc6stringNtCs13gI3OE3fdS_11proc_macro25IdentNtB5_8ToString9to_stringBA_"
+      ],
+      [
+        1,
+        "proc_macro",
+        "<proc_macro::bridge::Group<proc_macro::bridge::client::TokenStream, proc_macro::bridge::client::Span> as core::clone::Clone>::clone",
+        "_RNvXsz_NtCs6ySpPs5mHD7_10proc_macro6bridgeINtB5_5GroupNtNtB5_6client11TokenStreamNtBS_4SpanENtNtCs9pfriLqNw2j_4core5clone5Clone5cloneCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        1,
+        "proc_macro",
+        "<proc_macro::TokenStream as core::iter::traits::collect::Extend<proc_macro::TokenTree>>::extend::<alloc::vec::drain::Drain<proc_macro::TokenTree>>",
+        "_RINvXsl_Cs6ySpPs5mHD7_10proc_macroNtB6_11TokenStreamINtNtNtNtCs9pfriLqNw2j_4core4iter6traits7collect6ExtendNtB6_9TokenTreeE6extendINtNtNtCsinnh2goo3YA_5alloc3vec5drain5DrainB1H_EECs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        1,
+        "proc_macro",
+        "<proc_macro::Literal as core::clone::Clone>::clone",
+        "_RNvXs1t_Cs6ySpPs5mHD7_10proc_macroNtB6_7LiteralNtNtCs9pfriLqNw2j_4core5clone5Clone5cloneCsd4ioDgIhpn4_5quote"
+      ],
+      [
+        1,
+        "proc_macro",
+        "<proc_macro::ConcatStreamsHelper>::append_to",
+        "_RNvMsi_Cs6ySpPs5mHD7_10proc_macroNtB5_19ConcatStreamsHelper9append_to"
+      ],
+      [
+        1,
+        "other or unknown",
+        "<str>::len",
+        "_RNvMNtCs9pfriLqNw2j_4core3stre3lenCslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "other or unknown",
+        "<isize>::unchecked_neg::precondition_check",
+        "_RNvNvMs3_NtCs9pfriLqNw2j_4core3numi13unchecked_neg18precondition_checkCslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "other or unknown",
+        "<[&str]>::iter",
+        "_RNvMNtCs9pfriLqNw2j_4core5sliceSRe4iterCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        1,
+        "other or unknown",
+        "<*const _>::offset_from_unsigned::precondition_check",
+        "_RNvNvMNtNtCs9pfriLqNw2j_4core3ptr9const_ptrPp20offset_from_unsigned18precondition_checkCslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "other or unknown",
+        "<*const _>::offset_from_unsigned::precondition_check",
+        "_RNvNvMNtNtCs9pfriLqNw2j_4core3ptr9const_ptrPp20offset_from_unsigned18precondition_checkCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        1,
+        "hashbrown",
+        "<hashbrown::raw::RawTableInner>::find_insert_index_in_group",
+        "_RNvMsa_NtCsiL5HTBa2gsh_9hashbrown3rawNtB5_13RawTableInner26find_insert_index_in_groupCsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        1,
+        "hashbrown",
+        "<hashbrown::raw::RawTableInner>::drop_elements::<(alloc::string::String, ())>",
+        "_RINvMsa_NtCsiL5HTBa2gsh_9hashbrown3rawNtB6_13RawTableInner13drop_elementsTNtNtCsinnh2goo3YA_5alloc6string6StringuEECsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        1,
+        "hashbrown",
+        "<hashbrown::raw::RawIterRange<(alloc::string::String, ())>>::next_impl::<false>",
+        "_RINvMsi_NtCsiL5HTBa2gsh_9hashbrown3rawINtB6_12RawIterRangeTNtNtCsinnh2goo3YA_5alloc6string6StringuEE9next_implKb0_ECsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        1,
+        "hashbrown",
+        "<hashbrown::map::HashMap<alloc::string::String, (), std::hash::random::RandomState>>::insert",
+        "_RNvMs1_NtCsiL5HTBa2gsh_9hashbrown3mapINtB5_7HashMapNtNtCsinnh2goo3YA_5alloc6string6StringuNtNtNtCs8K97yU1lfbJ_3std4hash6random11RandomStateE6insertCsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        1,
+        "core",
+        "core::slice::raw::from_raw_parts_mut::precondition_check",
+        "_RNvNvNtNtCs9pfriLqNw2j_4core5slice3raw18from_raw_parts_mut18precondition_checkCslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "core",
+        "core::slice::raw::from_raw_parts::precondition_check",
+        "_RNvNvNtNtCs9pfriLqNw2j_4core5slice3raw14from_raw_parts18precondition_checkCslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "core",
+        "core::slice::index::range::<core::ops::range::RangeFull>",
+        "_RINvNtNtCs9pfriLqNw2j_4core5slice5index5rangeNtNtNtB6_3ops5range9RangeFullECs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        1,
+        "core",
+        "core::slice::copy_from_slice_impl::<u8>",
+        "_RINvNtCs9pfriLqNw2j_4core5slice20copy_from_slice_implhECskBAY9qwrMms_11miniz_oxide"
+      ],
+      [
+        1,
+        "core",
+        "core::ptr::drop_glue::<syn::stmt::Stmt>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueNtNtCslyqR0aq4yxA_3syn4stmt4StmtEBF_"
+      ],
+      [
+        1,
+        "core",
+        "core::ptr::drop_glue::<syn::punctuated::Punctuated<syn::path::PathSegment, syn::token::PathSep>>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueINtNtCslyqR0aq4yxA_3syn10punctuated10PunctuatedNtNtBG_4path11PathSegmentNtNtBG_5token7PathSepEEBG_"
+      ],
+      [
+        1,
+        "core",
+        "core::ptr::drop_glue::<syn::path::Path>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueNtNtCslyqR0aq4yxA_3syn4path4PathEBF_"
+      ],
+      [
+        1,
+        "core",
+        "core::ptr::drop_glue::<syn::pat::Pat>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueNtNtCslyqR0aq4yxA_3syn3pat3PatEBF_"
+      ],
+      [
+        1,
+        "core",
+        "core::ptr::drop_glue::<syn::expr::Expr>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueNtNtCslyqR0aq4yxA_3syn4expr4ExprEBF_"
+      ],
+      [
+        1,
+        "core",
+        "core::ptr::drop_glue::<syn::error::ErrorMessage>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueNtNtCslyqR0aq4yxA_3syn5error12ErrorMessageEBF_"
+      ],
+      [
+        1,
+        "core",
+        "core::ptr::drop_glue::<proc_macro2::imp::Literal>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueNtNtCs13gI3OE3fdS_11proc_macro23imp7LiteralEBF_"
+      ],
+      [
+        1,
+        "core",
+        "core::ptr::drop_glue::<proc_macro2::imp::Group>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueNtNtCs13gI3OE3fdS_11proc_macro23imp5GroupEBF_"
+      ],
+      [
+        1,
+        "core",
+        "core::ptr::drop_glue::<proc_macro2::Ident>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueNtCs13gI3OE3fdS_11proc_macro25IdentEBD_"
+      ],
+      [
+        1,
+        "core",
+        "core::ptr::drop_glue::<core::option::Option<alloc::boxed::Box<syn::path::PathSegment>>>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueINtNtB4_6option6OptionINtNtCsinnh2goo3YA_5alloc5boxed3BoxNtNtCslyqR0aq4yxA_3syn4path11PathSegmentEEEB1A_"
+      ],
+      [
+        1,
+        "core",
+        "core::ptr::drop_glue::<core::option::Item<proc_macro2::TokenTree>>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueINtNtB4_6option4ItemNtCs13gI3OE3fdS_11proc_macro29TokenTreeEECsd4ioDgIhpn4_5quote"
+      ],
+      [
+        1,
+        "core",
+        "core::ptr::drop_glue::<core::cell::RefMut<alloc::vec::Vec<&str>>>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueINtNtB4_4cell6RefMutINtNtCsinnh2goo3YA_5alloc3vec3VecReEEECslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "core",
+        "core::ptr::drop_glue::<core::cell::BorrowRefMut>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueNtNtB4_4cell12BorrowRefMutECslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "core",
+        "core::ptr::drop_glue::<alloc::sync::Arc<std::thread::thread::Inner, std::alloc::System>>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueINtNtCsinnh2goo3YA_5alloc4sync3ArcNtNtNtCs8K97yU1lfbJ_3std6thread6thread5InnerNtNtB1f_5alloc6SystemEECslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "core",
+        "core::ptr::drop_glue::<alloc::raw_vec::RawVec<syn::attr::Attribute>>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueINtNtCsinnh2goo3YA_5alloc7raw_vec6RawVecNtNtCslyqR0aq4yxA_3syn4attr9AttributeEEB1j_"
+      ],
+      [
+        1,
+        "core",
+        "core::ptr::drop_glue::<alloc::raw_vec::RawVec<proc_macro::TokenTree>>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueINtNtCsinnh2goo3YA_5alloc7raw_vec6RawVecNtCs6ySpPs5mHD7_10proc_macro9TokenTreeEECs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        1,
+        "core",
+        "core::ptr::drop_glue::<[syn::attr::Attribute]>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueSNtNtCslyqR0aq4yxA_3syn4attr9AttributeEBG_"
+      ],
+      [
+        1,
+        "core",
+        "core::ptr::drop_glue::<[(syn::item::FnArg, syn::token::Comma)]>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueSTNtNtCslyqR0aq4yxA_3syn4item5FnArgNtNtBH_5token5CommaEEBH_"
+      ],
+      [
+        1,
+        "core",
+        "core::ptr::drop_glue::<[(syn::expr::Expr, syn::token::Comma)]>",
+        "_RINvNtCs9pfriLqNw2j_4core3ptr9drop_glueSTNtNtCslyqR0aq4yxA_3syn4expr4ExprNtNtBH_5token5CommaEEBH_"
+      ],
+      [
+        1,
+        "core",
+        "core::ptr::copy_nonoverlapping::precondition_check",
+        "_RNvNvNtCs9pfriLqNw2j_4core3ptr19copy_nonoverlapping18precondition_checkCsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        1,
+        "core",
+        "core::hint::assert_unchecked::precondition_check",
+        "_RNvNvNtCs9pfriLqNw2j_4core4hint16assert_unchecked18precondition_checkCslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "core",
+        "core::fmt::write",
+        "_RNvNtCs9pfriLqNw2j_4core3fmt5write"
+      ],
+      [
+        1,
+        "core",
+        "core::core_arch::x86::sse2::_mm_movemask_epi8",
+        "_RNvNtNtNtCs9pfriLqNw2j_4core9core_arch3x864sse217__mm_movemask_epi8Csf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        1,
+        "core",
+        "core::char::methods::len_utf8",
+        "_RNvNtNtCs9pfriLqNw2j_4core4char7methods8len_utf8CslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "core",
+        "core::char::methods::encode_utf8_raw_unchecked",
+        "_RNvNtNtCs9pfriLqNw2j_4core4char7methods25encode_utf8_raw_uncheckedCslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "core",
+        "<usize as core::cmp::Ord>::min",
+        "_RNvYjNtNtCs9pfriLqNw2j_4core3cmp3Ord3minCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        1,
+        "core",
+        "<u8 as core::slice::cmp::SlicePartialEq<u8>>::equal_same_length",
+        "_RNvXs3_NtNtCs9pfriLqNw2j_4core5slice3cmphINtB5_14SlicePartialEqhE17equal_same_lengthCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        1,
+        "core",
+        "<str as core::fmt::Display>::fmt",
+        "_RNvXsi_NtCs9pfriLqNw2j_4core3fmteNtB5_7Display3fmt"
+      ],
+      [
+        1,
+        "core",
+        "<i32 as core::iter::range::Step>::forward",
+        "_RNvXsI_NtNtCs9pfriLqNw2j_4core4iter5rangelNtB5_4Step7forwardCsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        1,
+        "core",
+        "<core::sync::atomic::Atomic<usize>>::load",
+        "_RNvMs16_NtNtCs9pfriLqNw2j_4core4sync6atomicINtB6_6AtomicjE4loadCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        1,
+        "core",
+        "<core::str::iter::Chars as core::iter::traits::iterator::Iterator>::zip::<core::slice::iter::Iter<proc_macro2::Span>>",
+        "_RINvYNtNtNtCs9pfriLqNw2j_4core3str4iter5CharsNtNtNtNtB9_4iter6traits8iterator8Iterator3zipINtNtNtB9_5slice4iter4IterNtCs13gI3OE3fdS_11proc_macro24SpanEECslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "core",
+        "<core::slice::iter::Iter<syn::stmt::Stmt> as core::iter::traits::iterator::Iterator>::next",
+        "_RNvXs2J_NtNtCs9pfriLqNw2j_4core5slice4iterINtB6_4IterNtNtCslyqR0aq4yxA_3syn4stmt4StmtENtNtNtNtBa_4iter6traits8iterator8Iterator4nextBT_"
+      ],
+      [
+        1,
+        "core",
+        "<core::slice::iter::Iter<syn::attr::Attribute>>::new",
+        "_RNvMs4_NtNtCs9pfriLqNw2j_4core5slice4iterINtB5_4IterNtNtCslyqR0aq4yxA_3syn4attr9AttributeE3newBS_"
+      ],
+      [
+        1,
+        "core",
+        "<core::slice::iter::Iter<syn::attr::Attribute> as core::iter::traits::iterator::Iterator>::find::<&mut for<'a, 'b> fn(&'a &'b syn::attr::Attribute) -> bool>",
+        "_RINvXs2J_NtNtCs9pfriLqNw2j_4core5slice4iterINtB7_4IterNtNtCslyqR0aq4yxA_3syn4attr9AttributeENtNtNtNtBb_4iter6traits8iterator8Iterator4findQFG0_RL1_RL0_BQ_EbEBU_"
+      ],
+      [
+        1,
+        "core",
+        "<core::result::Result<syn::ty::ReturnType, syn::error::Error> as core::ops::try_trait::Try>::branch",
+        "_RNvXsp_NtCs9pfriLqNw2j_4core6resultINtB5_6ResultNtNtCslyqR0aq4yxA_3syn2ty10ReturnTypeNtNtBO_5error5ErrorENtNtNtB7_3ops9try_trait3Try6branchBO_"
+      ],
+      [
+        1,
+        "core",
+        "<core::result::Result<syn::token::Pound, syn::error::Error> as core::ops::try_trait::Try>::branch",
+        "_RNvXsp_NtCs9pfriLqNw2j_4core6resultINtB5_6ResultNtNtCslyqR0aq4yxA_3syn5token5PoundNtNtBO_5error5ErrorENtNtNtB7_3ops9try_trait3Try6branchBO_"
+      ],
+      [
+        1,
+        "core",
+        "<core::result::Result<syn::path::Path, syn::error::Error> as core::ops::try_trait::Try>::branch",
+        "_RNvXsp_NtCs9pfriLqNw2j_4core6resultINtB5_6ResultNtNtCslyqR0aq4yxA_3syn4path4PathNtNtBO_5error5ErrorENtNtNtB7_3ops9try_trait3Try6branchBO_"
+      ],
+      [
+        1,
+        "core",
+        "<core::result::Result<syn::expr::Expr, syn::error::Error> as core::ops::try_trait::Try>::branch",
+        "_RNvXsp_NtCs9pfriLqNw2j_4core6resultINtB5_6ResultNtNtCslyqR0aq4yxA_3syn4expr4ExprNtNtBO_5error5ErrorENtNtNtB7_3ops9try_trait3Try6branchBO_"
+      ],
+      [
+        1,
+        "core",
+        "<core::result::Result<proc_macro2::Span, syn::error::Error> as core::ops::try_trait::Try>::branch",
+        "_RNvXsp_NtCs9pfriLqNw2j_4core6resultINtB5_6ResultNtCs13gI3OE3fdS_11proc_macro24SpanNtNtCslyqR0aq4yxA_3syn5error5ErrorENtNtNtB7_3ops9try_trait3Try6branchB1m_"
+      ],
+      [
+        1,
+        "core",
+        "<core::result::Result<[proc_macro2::Span; 2], syn::error::Error> as core::ops::try_trait::Try>::branch",
+        "_RNvXsp_NtCs9pfriLqNw2j_4core6resultINtB5_6ResultANtCs13gI3OE3fdS_11proc_macro24Spanj2_NtNtCslyqR0aq4yxA_3syn5error5ErrorENtNtNtB7_3ops9try_trait3Try6branchB1q_"
+      ],
+      [
+        1,
+        "core",
+        "<core::result::Result<(core::option::Option<syn::path::QSelf>, syn::path::Path), syn::error::Error> as core::ops::try_trait::Try>::branch",
+        "_RNvXsp_NtCs9pfriLqNw2j_4core6resultINtB5_6ResultTINtNtB7_6option6OptionNtNtCslyqR0aq4yxA_3syn4path5QSelfENtB19_4PathENtNtB1b_5error5ErrorENtNtNtB7_3ops9try_trait3Try6branchB1b_"
+      ],
+      [
+        1,
+        "core",
+        "<core::option::Option<syn::token::Ref> as syn::parse::Parse>::parse",
+        "_RNvXsb_NtCslyqR0aq4yxA_3syn5parseINtNtCs9pfriLqNw2j_4core6option6OptionNtNtB7_5token3RefENtB5_5Parse5parseB7_"
+      ],
+      [
+        1,
+        "core",
+        "<core::option::Option<syn::token::PathSep> as quote::to_tokens::ToTokens>::to_tokens",
+        "_RNvXs4_NtCsd4ioDgIhpn4_5quote9to_tokensINtNtCs9pfriLqNw2j_4core6option6OptionNtNtCslyqR0aq4yxA_3syn5token7PathSepENtB5_8ToTokens9to_tokensB1h_"
+      ],
+      [
+        1,
+        "core",
+        "<core::option::Option<syn::token::Comma> as quote::to_tokens::ToTokens>::to_tokens",
+        "_RNvXs4_NtCsd4ioDgIhpn4_5quote9to_tokensINtNtCs9pfriLqNw2j_4core6option6OptionNtNtCslyqR0aq4yxA_3syn5token5CommaENtB5_8ToTokens9to_tokensB1h_"
+      ],
+      [
+        1,
+        "core",
+        "<core::option::Option<syn::stmt::LocalInit> as core::clone::Clone>::clone",
+        "_RNvXs4_NtCs9pfriLqNw2j_4core6optionINtB5_6OptionNtNtCslyqR0aq4yxA_3syn4stmt9LocalInitENtNtB7_5clone5Clone5cloneBO_"
+      ],
+      [
+        1,
+        "core",
+        "<core::option::Option<syn::punctuated::Pair<&syn::expr::Expr, &syn::token::Comma>>>::or_else::<<syn::punctuated::Pairs<syn::expr::Expr, syn::token::Comma> as core::iter::traits::iterator::Iterator>::next::{closure#1}>",
+        "_RINvMNtCs9pfriLqNw2j_4core6optionINtB3_6OptionINtNtCslyqR0aq4yxA_3syn10punctuated4PairRNtNtBN_4expr4ExprRNtNtBN_5token5CommaEE7or_elseNCNvXsc_BL_INtBL_5PairsB1n_B1F_ENtNtNtNtB5_4iter6traits8iterator8Iterator4nexts_0EBN_"
+      ],
+      [
+        1,
+        "core",
+        "<core::option::Option<syn::buffer::Cursor>>::and_then::<syn::buffer::Cursor, <syn::buffer::Cursor>::skip>",
+        "_RINvMNtCs9pfriLqNw2j_4core6optionINtB3_6OptionNtNtCslyqR0aq4yxA_3syn6buffer6CursorE8and_thenBI_NvMs_BK_BI_4skipEBM_"
+      ],
+      [
+        1,
+        "core",
+        "<core::option::Option<alloc::rc::Rc<core::cell::Cell<syn::parse::Unexpected>>> as core::default::Default>::default",
+        "_RNvXs7_NtCs9pfriLqNw2j_4core6optionINtB5_6OptionINtNtCsinnh2goo3YA_5alloc2rc2RcINtNtB7_4cell4CellNtNtCslyqR0aq4yxA_3syn5parse10UnexpectedEEENtNtB7_7default7Default7defaultB1B_"
+      ],
+      [
+        1,
+        "core",
+        "<core::option::Option<alloc::boxed::Box<syn::expr::Expr>>>::as_mut",
+        "_RNvMNtCs9pfriLqNw2j_4core6optionINtB2_6OptionINtNtCsinnh2goo3YA_5alloc5boxed3BoxNtNtCslyqR0aq4yxA_3syn4expr4ExprEE6as_mutCsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        1,
+        "core",
+        "<core::option::Option<(syn::buffer::Cursor, proc_macro2::extra::DelimSpan, syn::buffer::Cursor)>>::is_some",
+        "_RNvMNtCs9pfriLqNw2j_4core6optionINtB2_6OptionTNtNtCslyqR0aq4yxA_3syn6buffer6CursorNtNtCs13gI3OE3fdS_11proc_macro25extra9DelimSpanBI_EE7is_someBM_"
+      ],
+      [
+        1,
+        "core",
+        "<core::option::Option<&syn::expr::Expr>>::map::<syn::punctuated::Pair<&syn::expr::Expr, &syn::token::Comma>, syn::punctuated::Pair<&syn::expr::Expr, &syn::token::Comma>::End>",
+        "_RINvMNtCs9pfriLqNw2j_4core6optionINtB3_6OptionRNtNtCslyqR0aq4yxA_3syn4expr4ExprE3mapINtNtBN_10punctuated4PairBI_RNtNtBN_5token5CommaENcNtB1k_3End0EBN_"
+      ],
+      [
+        1,
+        "core",
+        "<core::option::Option<&str> as core::ops::try_trait::Try>::branch",
+        "_RNvXsJ_NtCs9pfriLqNw2j_4core6optionINtB5_6OptionReENtNtNtB7_3ops9try_trait3Try6branchCslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "core",
+        "<core::option::Option<&alloc::boxed::Box<syn::expr::Expr>>>::map::<&syn::expr::Expr, <alloc::boxed::Box<syn::expr::Expr> as core::convert::AsRef<syn::expr::Expr>>::as_ref>",
+        "_RINvMNtCs9pfriLqNw2j_4core6optionINtB3_6OptionRINtNtCsinnh2goo3YA_5alloc5boxed3BoxNtNtCslyqR0aq4yxA_3syn4expr4ExprEE3mapRB1i_NvYBJ_INtNtB5_7convert5AsRefB1i_E6as_refEB1m_"
+      ],
+      [
+        1,
+        "core",
+        "<core::option::Option<&(syn::path::PathSegment, syn::token::PathSep)>>::map::<syn::punctuated::Pair<&syn::path::PathSegment, &syn::token::PathSep>, <syn::punctuated::Pairs<syn::path::PathSegment, syn::token::PathSep> as core::iter::traits::iterator::Iterator>::next::{closure#0}>",
+        "_RINvMNtCs9pfriLqNw2j_4core6optionINtB3_6OptionRTNtNtCslyqR0aq4yxA_3syn4path11PathSegmentNtNtBO_5token7PathSepEE3mapINtNtBO_10punctuated4PairRBK_RB1o_ENCNvXsc_B1S_INtB1S_5PairsBK_B1o_ENtNtNtNtB5_4iter6traits8iterator8Iterator4next0EBO_"
+      ],
+      [
+        1,
+        "core",
+        "<core::option::IntoIter<&syn::path::GenericArgument> as core::iter::traits::iterator::Iterator>::next",
+        "_RNvXsy_NtCs9pfriLqNw2j_4core6optionINtB5_8IntoIterRNtNtCslyqR0aq4yxA_3syn4path15GenericArgumentENtNtNtNtB7_4iter6traits8iterator8Iterator4nextBR_"
+      ],
+      [
+        1,
+        "core",
+        "<core::ops::range::RangeFull as core::ops::range::RangeBounds<usize>>::start_bound",
+        "_RNvXse_NtNtCs9pfriLqNw2j_4core3ops5rangeNtB5_9RangeFullINtB5_11RangeBoundsjE11start_boundCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        1,
+        "core",
+        "<core::ops::range::RangeFrom<usize> as core::slice::index::SliceIndex<str>>::get",
+        "_RNvXs9_NtNtCs9pfriLqNw2j_4core3str6traitsINtNtNtB9_3ops5range9RangeFromjEINtNtNtB9_5slice5index10SliceIndexeE3getCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        1,
+        "core",
+        "<core::mem::alignment::Alignment>::new_unchecked::precondition_check",
+        "_RNvNvMNtNtCs9pfriLqNw2j_4core3mem9alignmentNtB4_9Alignment13new_unchecked18precondition_checkCslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "core",
+        "<core::mem::alignment::Alignment>::new_unchecked::precondition_check",
+        "_RNvNvMNtNtCs9pfriLqNw2j_4core3mem9alignmentNtB4_9Alignment13new_unchecked18precondition_checkCsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        1,
+        "core",
+        "<core::mem::alignment::Alignment>::new_unchecked::precondition_check",
+        "_RNvNvMNtNtCs9pfriLqNw2j_4core3mem9alignmentNtB4_9Alignment13new_unchecked18precondition_checkCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        1,
+        "core",
+        "<core::iter::sources::once::Once<proc_macro2::TokenTree> as core::iter::traits::collect::IntoIterator>::into_iter",
+        "_RNvXNtNtNtCs9pfriLqNw2j_4core4iter6traits7collectINtNtNtB6_7sources4once4OnceNtCs13gI3OE3fdS_11proc_macro29TokenTreeENtB2_12IntoIterator9into_iterCsd4ioDgIhpn4_5quote"
+      ],
+      [
+        1,
+        "core",
+        "<core::iter::sources::once::Once<proc_macro2::TokenStream> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::adapters::map::map_fold<proc_macro2::TokenStream, proc_macro2::imp::TokenStream, (), <proc_macro2::TokenStream as core::iter::traits::collect::Extend<proc_macro2::TokenStream>>::extend<core::iter::sources::once::Once<proc_macro2::TokenStream>>::{closure#0}, core::iter::adapters::map::map_fold<proc_macro2::imp::TokenStream, proc_macro::TokenStream, (), <proc_macro2::imp::TokenStream>::unwrap_nightly, core::iter::traits::iterator::Iterator::for_each::call<proc_macro::TokenStream, <proc_macro::TokenStream as core::iter::traits::collect::Extend<proc_macro::TokenStream>>::extend<core::iter::adapters::map::Map<core::iter::adapters::map::Map<core::iter::sources::once::Once<proc_macro2::TokenStream>, <proc_macro2::TokenStream as core::iter::traits::collect::Extend<proc_macro2::TokenStream>>::extend<core::iter::sources::once::Once<proc_macro2::TokenStream>>::{closure#0}>, <proc_macro2::imp::TokenStream>::unwrap_nightly>>::{closure#0}>::{closure#0}>::{closure#0}>::{closure#0}>",
+        "_RINvYINtNtNtNtCs9pfriLqNw2j_4core4iter7sources4once4OnceNtCs13gI3OE3fdS_11proc_macro211TokenStreamENtNtNtBa_6traits8iterator8Iterator4folduNCINvNtNtBa_8adapters3map8map_foldBS_NtNtBU_3imp11TokenStreamuNCINvXs5_BU_BS_INtNtB1D_7collect6ExtendBS_E6extendB3_E0NCIB2g_B2O_NtCs6ySpPs5mHD7_10proc_macro11TokenStreamuNvMs_B2Q_B2O_14unwrap_nightlyNCINvNvB1z_8for_each4callB4h_NCINvXsm_B4j_B4h_IB3t_B4h_E6extendINtB2i_3MapIB6s_B3_B3d_EB4X_EE0E0E0E0ECsd4ioDgIhpn4_5quote"
+      ],
+      [
+        1,
+        "core",
+        "<core::iter::adapters::zip::Zip<core::str::iter::Chars, core::slice::iter::Iter<proc_macro2::Span>> as core::iter::traits::iterator::Iterator>::next",
+        "_RNvXs_NtNtNtCs9pfriLqNw2j_4core4iter8adapters3zipINtB4_3ZipNtNtNtBa_3str4iter5CharsINtNtNtBa_5slice4iter4IterNtCs13gI3OE3fdS_11proc_macro24SpanEENtNtNtB8_6traits8iterator8Iterator4nextCslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "core",
+        "<core::iter::adapters::zip::Zip<core::str::iter::Chars, core::slice::iter::Iter<proc_macro2::Span>> as core::iter::adapters::zip::ZipImpl<core::str::iter::Chars, core::slice::iter::Iter<proc_macro2::Span>>>::next",
+        "_RNvXs1_NtNtNtCs9pfriLqNw2j_4core4iter8adapters3zipINtB5_3ZipNtNtNtBb_3str4iter5CharsINtNtNtBb_5slice4iter4IterNtCs13gI3OE3fdS_11proc_macro24SpanEEINtB5_7ZipImplBW_B1k_E4nextCslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "core",
+        "<core::core_arch::simd::Simd<i8, 16>>::as_m128i",
+        "_RNvMs1P_NtNtCs9pfriLqNw2j_4core9core_arch3x86INtNtB8_4simd4SimdaKj10_E8as_m128iCsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        1,
+        "core",
+        "<core::cell::Cell<syn::buffer::Cursor>>::get",
+        "_RNvMs8_NtCs9pfriLqNw2j_4core4cellINtB5_4CellNtNtCslyqR0aq4yxA_3syn6buffer6CursorE3getBK_"
+      ],
+      [
+        1,
+        "alloc",
+        "alloc::boxed::box_new_uninit",
+        "_RNvNtCsinnh2goo3YA_5alloc5boxed14box_new_uninitCslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "alloc",
+        "<alloc::vec::drain::Drain<proc_macro::TokenTree> as core::ops::drop::Drop>::drop",
+        "_RNvXs5_NtNtCsinnh2goo3YA_5alloc3vec5drainINtB5_5DrainNtCs6ySpPs5mHD7_10proc_macro9TokenTreeENtNtNtCs9pfriLqNw2j_4core3ops4drop4Drop4dropCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        1,
+        "alloc",
+        "<alloc::vec::Vec<proc_macro::TokenTree>>::is_empty",
+        "_RNvMs_NtCsinnh2goo3YA_5alloc3vecINtB4_3VecNtCs6ySpPs5mHD7_10proc_macro9TokenTreeE8is_emptyCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        1,
+        "alloc",
+        "<alloc::vec::Vec<proc_macro::TokenTree> as core::ops::drop::Drop>::drop",
+        "_RNvXsp_NtCsinnh2goo3YA_5alloc3vecINtB5_3VecNtCs6ySpPs5mHD7_10proc_macro9TokenTreeENtNtNtCs9pfriLqNw2j_4core3ops4drop4Drop4dropCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        1,
+        "alloc",
+        "<alloc::vec::Vec<_, _>>::set_len::precondition_check",
+        "_RNvNvMs_NtCsinnh2goo3YA_5alloc3vecINtB6_3VecppE7set_len18precondition_checkCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        1,
+        "alloc",
+        "<alloc::vec::Vec<&str>>::push_mut",
+        "_RNvMsG_NtCsinnh2goo3YA_5alloc3vecINtB5_3VecReE8push_mutCslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "alloc",
+        "<alloc::string::String as core::fmt::Write>::write_str",
+        "_RNvXsZ_NtCsinnh2goo3YA_5alloc6stringNtB5_6StringNtNtCs9pfriLqNw2j_4core3fmt5Write9write_str"
+      ],
+      [
+        1,
+        "alloc",
+        "<alloc::rc::Rc<core::cell::Cell<syn::parse::Unexpected>>>::drop_slow",
+        "_RNvMs6_NtCsinnh2goo3YA_5alloc2rcINtB5_2RcINtNtCs9pfriLqNw2j_4core4cell4CellNtNtCslyqR0aq4yxA_3syn5parse10UnexpectedEE9drop_slowB1f_"
+      ],
+      [
+        1,
+        "alloc",
+        "<alloc::raw_vec::RawVec<syn::error::ErrorMessage> as core::ops::drop::Drop>::drop",
+        "_RNvXs1_NtCsinnh2goo3YA_5alloc7raw_vecINtB5_6RawVecNtNtCslyqR0aq4yxA_3syn5error12ErrorMessageENtNtNtCs9pfriLqNw2j_4core3ops4drop4Drop4dropBQ_"
+      ],
+      [
+        1,
+        "alloc",
+        "<alloc::raw_vec::RawVec<proc_macro::bridge::TokenTree<proc_macro::bridge::client::TokenStream, proc_macro::bridge::client::Span, proc_macro::bridge::symbol::Symbol>> as core::ops::drop::Drop>::drop",
+        "_RNvXs1_NtCsinnh2goo3YA_5alloc7raw_vecINtB5_6RawVecINtNtCs6ySpPs5mHD7_10proc_macro6bridge9TokenTreeNtNtBP_6client11TokenStreamNtB1A_4SpanNtNtBP_6symbol6SymbolEENtNtNtCs9pfriLqNw2j_4core3ops4drop4Drop4dropCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        1,
+        "alloc",
+        "<alloc::raw_vec::RawVec<proc_macro::TokenTree> as core::ops::drop::Drop>::drop",
+        "_RNvXs1_NtCsinnh2goo3YA_5alloc7raw_vecINtB5_6RawVecNtCs6ySpPs5mHD7_10proc_macro9TokenTreeENtNtNtCs9pfriLqNw2j_4core3ops4drop4Drop4dropCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        1,
+        "alloc",
+        "<alloc::boxed::Box<syn::path::PathSegment>>::new_uninit_in",
+        "_RNvMs_NtCsinnh2goo3YA_5alloc5boxedINtB4_3BoxNtNtCslyqR0aq4yxA_3syn4path11PathSegmentE13new_uninit_inBK_"
+      ],
+      [
+        1,
+        "alloc",
+        "<alloc::boxed::Box<syn::path::PathSegment> as core::ops::drop::Drop>::drop",
+        "_RNvXs8_NtCsinnh2goo3YA_5alloc5boxedINtB5_3BoxNtNtCslyqR0aq4yxA_3syn4path11PathSegmentENtNtNtCs9pfriLqNw2j_4core3ops4drop4Drop4dropBL_"
+      ],
+      [
+        1,
+        "alloc",
+        "<alloc::alloc::Global>::shrink_impl_runtime",
+        "_RNvMs0_NtCsinnh2goo3YA_5alloc5allocNtB5_6Global19shrink_impl_runtimeCslyqR0aq4yxA_3syn"
+      ],
+      [
+        1,
+        "alloc",
+        "<&alloc::vec::Vec<syn::attr::Attribute> as core::iter::traits::collect::IntoIterator>::into_iter",
+        "_RNvXsh_NtCsinnh2goo3YA_5alloc3vecRINtB5_3VecNtNtCslyqR0aq4yxA_3syn4attr9AttributeENtNtNtNtCs9pfriLqNw2j_4core4iter6traits7collect12IntoIterator9into_iterBK_"
+      ],
+      [
+        1,
+        "alloc",
+        "<&alloc::string::String as core::hash::Hash>::hash::<std::hash::random::DefaultHasher>",
+        "_RINvXs3_NtNtCs9pfriLqNw2j_4core4hash5implsRNtNtCsinnh2goo3YA_5alloc6string6StringNtB8_4Hash4hashNtNtNtCs8K97yU1lfbJ_3std4hash6random13DefaultHasherECsf9kgMdJkaQv_12salsa_macros"
+      ],
+      [
+        1,
+        "alloc",
+        "<&alloc::alloc::Global as core::alloc::Allocator>::deallocate",
+        "_RNvXs0_NtCs9pfriLqNw2j_4core5allocRNtNtCsinnh2goo3YA_5alloc5alloc6GlobalNtB5_9Allocator10deallocateCs13gI3OE3fdS_11proc_macro2"
+      ],
+      [
+        1,
+        "__rustc",
+        "__rustc::__rust_realloc",
+        "_RNvCseU4mLtNj5Gn_7___rustc14___rust_realloc"
+      ]
+    ],
+    "typed_package": "registry+https://github.com/rust-lang/crates.io-index#salsa-macros@0.28.2"
+  }
+}

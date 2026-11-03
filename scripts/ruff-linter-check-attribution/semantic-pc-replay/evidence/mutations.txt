@@ -1,0 +1,8 @@
+Rejected an actual sampled IP shifted one byte: raw IP/PID/TID/time/event submultiset
+Rejected wrong compiler argv on the actual observed PID: owned rustc exact argv/epoch
+Rejected claimed symbol range excludes actual PC even after recomputing its transport hash: bounded physical symbol
+Rejected independently rebuilt macro ID contradicts the native PERF_HEADER_BUILD_ID: Salsa build-ID prefix
+Rejected different real type-checking diagnostic: native source error
+14,488 literal samples, 14,498,548,985 exclusive rustc instructions, 25,243 whole-history samples. PID 7002.
+Driver coverage: {'bounded ELF symbol': 11721, 'unresolved symbol': 448} outside original body-qualified ranges: {'unbound or ambiguous executable mapping': 2235, 'kernel skid': 84}
+All seven native histories, the signed compiler metadata and disjoint leaf results match.
