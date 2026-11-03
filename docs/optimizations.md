@@ -1068,7 +1068,7 @@ up changes to native archives. An edit to an example or its included Markdown in
 Rustdoc handles libraries with `compile_fail` examples, custom rustdoc flags, or unsupported
 test arguments. Use `-Zohm-cached-doctests=no` to run eligible examples through rustdoc as well.
 
-On 16 Ruff crates, caching reduced median warm doctest time from 19.171 s to 1.425 s across
-five alternating pairs. Both modes passed 207 examples and ignored nine. This comparison used
-the patched Cargo with the released Ohm 1.99.0-22 compiler.
+On 16 Ruff crates, the median warm `cargo test --doc` took 1.643 s with the Linux build of Ohm
+1.99.0-23 and 13.562 s with stock Rust 1.99.0. Both toolchains passed the same 207 examples
+and ignored the same nine in all five pairs. [Ruff doctest benchmark](https://github.com/astral-experiments/ohm/pull/254)
 [Cargo #429](https://github.com/astral-experiments/ohm-cargo/pull/429)
