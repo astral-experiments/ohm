@@ -77,6 +77,11 @@ int main(int argc,char **argv) {
     for(;;){pid_t pid=waitpid(-1,&status,__WALL);if(pid<0){if(errno==EINTR)continue;require(errno==ECHILD,"process tree");break;}
         if(WIFEXITED(status)||WIFSIGNALED(status)){struct task *t=lookup(pid,0);require(t!=NULL,"final task");require(close(t->counter)==0,"counter close");memset(t,0,sizeof(*t));if(pid==root)code=WIFEXITED(status)?WEXITSTATUS(status):128+WTERMSIG(status);continue;}
         require(WIFSTOPPED(status),"task stop");struct task *t=lookup(pid,1);int event=status>>16,sig=WSTOPSIG(status);
+        if(event==PTRACE_EVENT_FORK || event==PTRACE_EVENT_VFORK || event==PTRACE_EVENT_CLONE){
+            unsigned long child=0;
+            require(ptrace(PTRACE_GETEVENTMSG,pid,0,&child)==0 && child>0,"fork event");
+            require(fprintf(journal,"F %d %d %lu %d\n",t->group,pid,child,event)>0,"fork journal");
+        }
         if(event==PTRACE_EVENT_EXEC){checkpoint(t);record_image(t,"exec");}
         if(event==PTRACE_EVENT_EXIT)checkpoint(t);
         resume(pid,event||sig==SIGSTOP||sig==SIGTRAP?0:sig);

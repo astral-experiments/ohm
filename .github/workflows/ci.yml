@@ -1,5 +1,5 @@
-name: Census signed Ohm on a recent ty_server edit
-run-name: Signed Ruff e2e build census ${{ inputs.reviewed_head }}
+name: Census signed Ohm on the recent Ruff workspace test build
+run-name: Signed Ruff workspace default-member test-build census ${{ inputs.reviewed_head }}
 permissions:
   contents: read
   actions: read
@@ -7,9 +7,9 @@ jobs:
   inspect:
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1'
       && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head
-      && github.ref_name == 'charlie/qa-ruff-ty-server-script-environments-20261103'
+      && github.ref_name == 'charlie/qa-current-ruff-workspace-test-29697-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 55
+    timeout-minutes: 120
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
@@ -32,11 +32,11 @@ jobs:
       env:
         REVIEWED_HEAD: ${{ inputs.reviewed_head }}
         OHM_SDK_READ_TOKEN: ${{ github.token }}
-      run: python3 -IB qa/scripts/ruff-original-ty-instructions/recent_ty.py
+      run: python3 -IB qa/scripts/ruff-original-ty-instructions/workspace29697.py
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: signed-ty-server-debug-command-${{ github.run_id }}
+        name: signed-workspace-test-29697-${{ github.run_id }}
         path: ${{ runner.temp }}/ohm-foreign-join/published/
         retention-days: 10
         if-no-files-found: error
