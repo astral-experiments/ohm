@@ -8,7 +8,7 @@ from pathlib import Path
 import re
 import subprocess
 
-ROOT = Path(os.environ['RUNNER_TEMP']).resolve(strict=True) / 'ohm-ruff28444'
+ROOT = Path(os.environ['RUNNER_TEMP']).resolve(strict=True) / 'ohm-ruff-visibility'
 B = ROOT / 'receipt'
 KITS = Path(__file__).resolve().parents[1] / 'ruff-heldout-mono-fold/residual'
 PERIOD = 1000003

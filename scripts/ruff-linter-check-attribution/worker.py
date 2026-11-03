@@ -20,18 +20,18 @@ ROOT, OUT, KITS = perf.ROOT, perf.B, perf.KITS
 need, sha, save = perf.need, perf.sha, perf.save
 WS = Path(os.environ['GITHUB_WORKSPACE']).resolve(strict=True)
 SRC, SDK, STATE = WS/'ruff', ROOT/'sdk', ROOT/'state'
-OLD = '64730be0c713bbc642c88e6824a386fa58452962'
-NEW = '04ae7c402b2a7f1c49a9a1dd264629c00e38f61b'
-TREES = {OLD:'cd0fb52b09bb7e01cf2a9df11eb3fff87bf806a7', NEW:'89182922383277972639715413f90a2ca0d96511'}
-SOURCE = 'crates/ruff_linter/src/registry.rs'
-FILES = ['crates/ruff/tests/cli/format.rs', 'crates/ruff/tests/integration_test.rs', SOURCE]
-SOURCE_HASH = {OLD:'6d16483958ce6a84b3027e570bad35b227324ae7b5cd8187731c78b44c4d8c38', NEW:'1054472a203b7668b3de7cdbd896b203e3585ca8d854a498c19767123d0cecaa'}
-LOCK = '1cffd1e540f896e58b709024319f181cc198aba7f21e8c12c39d5dbf32aa7657'
+OLD = 'c6c4d38bbeeae91fe59d9c277a78169db8306561'
+NEW = '97065696c0e4dbe6ff43a89c73f923bf60ee231a'
+TREES = {OLD:'73d8d9bec571b0d054371b2de8eb2dae1389a901', NEW:'9de45dbaa6d3f0f018d62acae836e65716013172'}
+SOURCE = 'crates/ruff_annotate_snippets/src/snippet.rs'
+FILES = ['crates/ruff_annotate_snippets/src/renderer/render.rs', SOURCE]
+SOURCE_HASH = {OLD:'cef48ab7234b39d4c15ad512de6496ce65e45b981fe85a4fbbb3737c73e6568f', NEW:'272e25a6d121c3c57112e53e6ad9de3abc7ff88658008dbf4a9299b3399a7943'}
+LOCK = '26d7be8317b0e44be0d60b31f6660dd4e07ed4c19be4e6748124d07068fd7fa7'
 RUST = '008a21ac0d750dc9a1c18b7959d7e7984c03d887'
-BRANCH = 'charlie/qa-ruff-linter-check-28444-source-pcs-20261102'
+BRANCH = 'charlie/qa-ruff-visibility-heldout-20261103'
 DONOR = 'bd7b58765ae44b21a1c9273b3ff0be8e923adc47'
 REPO = 'astral-experiments/ohm'
-CMD = ['cargo','+ohm','check','-p','ruff_linter','--lib','--locked','--offline','--message-format=json']
+CMD = ['cargo','+ohm','check','-p','ty_server','--lib','--locked','--offline','--message-format=json']
 FIRST = '`incorrect-blank-line-before-class` (D203) and `{}` (D211) are incompatible. Ignoring `incorrect-blank-line-before-class`.'
 SECOND = '`multi-line-summary-first-line` (D212) and `multi-line-summary-second-line` (D213) are incompatible. Ignoring `multi-line-summary-second-line`.'
 NATIVE = {OLD:[FIRST.format('no-blank-line-before-class'), SECOND], NEW:[FIRST.format('blank-line-before-class'), SECOND]}
@@ -76,7 +76,7 @@ def acquire():
     info = json.loads(subprocess.check_output(gh(f'actions/runs/{run}')))
     jobs = json.loads(subprocess.check_output(gh(f'actions/runs/{run}/attempts/1/jobs?per_page=100')))
     need(info['head_sha'] == os.environ['REVIEWED_HEAD'] and info['head_branch'] == BRANCH and info['run_attempt'] == 1 and info['event'] == 'workflow_dispatch' and jobs['total_count'] == len(jobs['jobs']) == 1, 'hosted run identity')
-    job, = jobs['jobs']; need(job['name'] == 'Profile the Ruff linter check' and job['runner_name'] == os.environ['RUNNER_NAME'] and job['runner_id'] > 0, 'worker identity')
+    job, = jobs['jobs']; need(job['name'] == 'Check the held-out ty_server edit' and job['runner_name'] == os.environ['RUNNER_NAME'] and job['runner_id'] > 0, 'worker identity')
     save(OUT/'worker.json',dict(run=run,job=job['id'],head=info['head_sha'],runner=job['runner_name'],runner_id=job['runner_id'],boot=Path('/proc/sys/kernel/random/boot_id').read_text().strip(),source=TREES,lock=LOCK,resources=resources()))
     sys.path.insert(0,str(WS/'donor/scripts/ruff-default-owner-pmu'))
     import acquire as signed
@@ -111,10 +111,10 @@ def prefetch():
     with (OUT/'unit-graph.json').open('xb') as out:
         subprocess.run(argv,cwd=SRC,env=env,stdout=out,check=True,timeout=900)
     graph=json.loads((OUT/'unit-graph.json').read_bytes()); roots=[graph['units'][i] for i in graph['roots']]
-    need(len(roots)==1 and roots[0]['target']['name']=='ruff_linter' and roots[0]['target']['kind']==['lib'] and roots[0]['mode']=='check','incorrect ordinary unit graph')
+    need(len(roots)==1 and roots[0]['target']['name']=='ty_server' and roots[0]['target']['kind']==['lib'] and roots[0]['mode']=='check','incorrect ordinary unit graph')
     wanted={p['name']+'-'+p['version']+'.crate':p['checksum'] for p in tomllib.loads((SRC/'Cargo.lock').read_text())['package'] if p.get('source','').startswith('registry+')}
     archives=sorted((ROOT/'cargo/registry/cache').glob('*/*.crate')); actual={p.name:sha(p)for p in archives}
-    need(100 < len(archives)==len(actual) < 450 and all(wanted.get(k)==v for k,v in actual.items()),'registry custody')
+    need(100 < len(archives)==len(actual) <= len(wanted) and all(wanted.get(k)==v for k,v in actual.items()),'registry custody')
     save(OUT/'registry.json',actual)
     (ROOT/'cargo').rename(ROOT/'prefetched-cargo')
     print('Frozen normal unit graph and authenticated',len(actual),'crate archives.',flush=True)
