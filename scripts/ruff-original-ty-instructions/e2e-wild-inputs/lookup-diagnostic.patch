@@ -38,7 +38,7 @@
 -        let ty = std::fs::metadata(path)?.file_type();
 +        let metadata = std::fs::metadata(path);
 +        let errno = metadata.as_ref().err().and_then(std::io::Error::raw_os_error).unwrap_or(0);
-+        eprintln!("OHMLOOK\tP\t{}\t{:?}\t{:?}\t{}\t{}", std::process::id(), std::thread::current().id(), path, errno, metadata.as_ref().map_or(0, |m| m.mode()));
++        eprintln!("OHMLOOK\tP\t{}\t{:?}\t{:?}\t{}\t{}", std::process::id(), std::thread::current().id(), path, errno, metadata.as_ref().map_or(0, std::os::unix::fs::MetadataExt::mode));
 +        let ty = metadata?.file_type();
          Ok(if ty.is_file() {
              FileType::File
