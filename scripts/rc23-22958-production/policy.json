@@ -1,0 +1,154 @@
+{
+  "branch": "refs/heads/charlie/codex-22958-split-production23-r2",
+  "coordinator_parent": "dd1135def2413a18eb5894ca11d5f1f8d842b1fd",
+  "default_stock": [
+    "full_without_ctfe"
+  ],
+  "gnulinux_build_command": "./scripts/build-optimized-dist.sh \\\n  \"$OHM_TARGET\" \\\n  \"$OHM_TOOLCHAIN\" \\\n  \"$GITHUB_WORKSPACE/source/rust\" \\\n  \"$GITHUB_WORKSPACE/official-release/release/bootstrap.toml\" 2>&1 | tee \"$GITHUB_WORKSPACE/trait-evidence/build.log\"\n",
+  "input_layers_sha256": "93abb67ce4bdca645ba33d66dfeeb99368fca5bd0af75f9c946de925e2690812",
+  "matched_recorded_ctfe": [
+    "ctfe_control",
+    "full_with_ctfe"
+  ],
+  "official_release": "9c2397d36f033900a0864484714d526788d1dc77",
+  "previous_source_reports": {
+    "manifest_oid": "06df51d0d0fa1c517e9d15b9e01cc5cb174c2b46",
+    "manifest_sha256": "44fc4cb1789ae8f1639d05a1b45b549ae6b400c8abf8d05e8f598a88151df490",
+    "native_source_reports": {
+      "aarch64-apple-darwin": {
+        "archive_sha256": "f2290a477a938dcb08574719a0bd0dfd3e331209f1d2d4e7c1e76a0db108b410",
+        "source_json_sha256": "b96d2d3021ae958e140bd7c6e32cebbd8a2a7104f2c7023fa860144c6dbf6a8a"
+      },
+      "x86_64-unknown-linux-gnu": {
+        "archive_sha256": "2dbc771beb57366e3a359448a8f0c4a9882228c58b8c121c5047149b07e972c6",
+        "source_json_sha256": "733b255b9d25d7545abf30854c3dda30bcd1349d6a28accfcfccda4d5f260cb7"
+      }
+    },
+    "ohm_merge": "9c2397d36f033900a0864484714d526788d1dc77",
+    "source_qualification_coordinator": "dd1135def2413a18eb5894ca11d5f1f8d842b1fd",
+    "source_qualification_run": 41532204125,
+    "sources": {
+      "cargo": {
+        "revision": "7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed",
+        "tree": "130a1314aa1be0441988781e8e2b52bd11d3e4a9"
+      },
+      "clippy": {
+        "revision": "6ca9ddc53c5a39e911e6c93637c093bd1d2eba05",
+        "tree": "42035145f0cb1536205ca0d0ea9353387a9bede9"
+      },
+      "rust": {
+        "revision": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+        "tree": "f5bf03d73f71243fb88e34ecb0b155ef11e99a47"
+      },
+      "rustfmt": {
+        "revision": "e5feafbfd640fe7326971cf7721ca7de38a86e40",
+        "tree": "13cde549b75899fa11b34de587b89b188edfcae5"
+      }
+    }
+  },
+  "prior_capacity_coordinator": "731d81a4cb3498cf4221d53a267bbf4a76ca250f",
+  "prior_capacity_files": {
+    "capacity-admission.json": {
+      "oid": "a1dad25f5e520b97fac9f0a33b3a1dfdbc75efb2",
+      "sha256": "52779265edb1486bceb9f6abf0c7a24dfc0f234caea4a067653b0eceb514772b"
+    },
+    "capacity-audit.py": {
+      "oid": "7ab61ce9f51289de10bf8f4f1154a7c2d6b8cab2",
+      "sha256": "4b4290755011e5c56f5f77456dc21f12e63d87b0ecfc412ed58eaf4efa20da6b"
+    },
+    "capacity-selector.py": {
+      "oid": "169c3089db0cb9edbf6667cf0e36ae806ba69662",
+      "sha256": "aa2f7c16ae424672bac26fcd2131f4b4c46a7babf7364f6acb255b46b3722453"
+    },
+    "sdk.py": {
+      "oid": "9b510e23e406f2eb737395cd0ed986bbd5759bba",
+      "sha256": "a366706dd379ec613734c125023000b80cfd9d4892e07dfba6e2cb168d0a6249"
+    },
+    "standard-capacity.py": {
+      "oid": "8104f1c4cbefa7a7fc6f7ad88558dd8928a3d32f",
+      "sha256": "3f12017c2f15fb4df991b0d33f234310e35279d24ad6145a6f3ea4c4bc1a3ce1"
+    }
+  },
+  "qualification_source_blobs": {
+    ".github/workflows/ci.yml": "347a478f53b9bf3adb32c94f88cb64064804c6a1",
+    "scripts/dep-graph-slots/qualify.py": "088866a75a1c18cf66adbac0084a51efef50b159",
+    "scripts/integrated-dist-qa/sources.py": "b0a0c4d7aada420df4b23aaf17b03dd959461dfc",
+    "scripts/rc23-cross-qualification/cargo-cached-doctests.pack": "fe06f4bcb2612ef5bc1eb0b05566924135eee0ac",
+    "scripts/rc23-cross-qualification/cargo-fork-only.pack": "779ff31d56d5a73401d1a1736990dce42b5ea460",
+    "scripts/rc23-cross-qualification/clippy-fork-only.pack": "f13fa5f299417637596856c9182784a53b5261e7",
+    "scripts/rc23-cross-qualification/materialize-final.py": "d02ceca5cc0ef36fc1673f4ece78bbe03e304a78",
+    "scripts/rc23-cross-qualification/protocol.json": "6e7585e94ff00f22cdc2db3e54f523592dc3e06d",
+    "scripts/rc23-cross-qualification/rust-cached-doctests.pack": "eeeb1798ceada7167895d16d6680771f9aea8a2b",
+    "scripts/rc23-cross-qualification/rust-fork-only.pack": "464057d1eec5b78f4cdfa21f14b1efe5bfc4f75a",
+    "scripts/rc23-cross-qualification/rustfmt-fork-only.pack": "b6cf95bac2c8adcdb700b6c0379a1eef4e83364a"
+  },
+  "release_files": {
+    ".github/workflows/release.yml": {
+      "oid": "c4c3a80613cd2279042084d5848d95019e5aca8a",
+      "previous_oid": "c4c3a80613cd2279042084d5848d95019e5aca8a",
+      "sha256": "6ddc1aa07458ae94b9d673a0c3a9c62a7b7b5b5e1f7e27511109a018f2bb5938"
+    },
+    "release/bootstrap.toml": {
+      "oid": "4ff31bcc8a1ffe8a3875f25a5cd7d253f6288ca5",
+      "previous_oid": "4ff31bcc8a1ffe8a3875f25a5cd7d253f6288ca5",
+      "sha256": "5822d2ae682a27193ef413f013281b0849797c88c78545607ab563ea48f87684"
+    },
+    "release/rustc-perf-relocated-dependencies.patch": {
+      "oid": "4e3627ebe0d56449e523fc4005041647b0678034",
+      "previous_oid": null,
+      "sha256": "e9bf8ac4b08fbdb731f9944689d33d0fc7478b75cce39b0883743ac627872bed"
+    },
+    "scripts/build-optimized-dist.sh": {
+      "oid": "c5e690b7569c3f1ace17bfb3f2fb0ff6fa1ca414",
+      "previous_oid": "9b8d3c98624e8b05fda480f8a9612d3b05cdfdff",
+      "sha256": "88c1655898536f1e1a0ee232afffd0dfb33f0025e6546c7dc8a5d6d353a99591"
+    },
+    "scripts/prepare-wild.py": {
+      "oid": "b1a713dd407b7bd7de2bf2128274894ece0d0d5f",
+      "previous_oid": "b1a713dd407b7bd7de2bf2128274894ece0d0d5f",
+      "sha256": "aa0fa93dab4166ef425abb4ec2f623b7d44cc3367bf1e2051551d5ddb0321189"
+    },
+    "scripts/verify-release-sources.sh": {
+      "oid": "47836c375805a6959236d00f1d356f1af4aa84d9",
+      "previous_oid": "6d2652796e16b3152e181eedb772d725a42975dd",
+      "sha256": "710685b2a484d41bcedf4e38343d8479fd1fc9c7342a822a66f5937cd446c7be"
+    },
+    "toolchains/1.99.0/23.json": {
+      "oid": "06df51d0d0fa1c517e9d15b9e01cc5cb174c2b46",
+      "previous_oid": null,
+      "sha256": "44fc4cb1789ae8f1639d05a1b45b549ae6b400c8abf8d05e8f598a88151df490"
+    }
+  },
+  "repo": "astral-experiments/ohm",
+  "schema": 1,
+  "semantic_source_receiver_sha256": "751cec237ee8ed634b08ce8549b6aa69ca74af612c973ea9f12b8daf4b1fe1a0",
+  "source_checkouts": {
+    "cargo-seed": "46d28e8bff1c6b52f3e7b7bc13192019e964a7da",
+    "public-seed": "85c467e1190d80fa8607fb0f9ef0824b4271266a",
+    "release-candidate": "ce64a5de6f8c9f404fc57598c5a2a2ab869276bf",
+    "release-reference": "90575c9fc302c2af0858c711726b2d211e7d3114",
+    "signed-rust": "d1e77f9acf1bb19ceb72274b89a5aaa119fb8bf1",
+    "source-carrier": "0c9c558ce24212e5da6fb66150790b0af3cee90b",
+    "transport": "7bc72b798b019a9ec0de6eeea3bc22b783917b27"
+  },
+  "sources": {
+    "cargo": {
+      "revision": "7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed",
+      "tree": "130a1314aa1be0441988781e8e2b52bd11d3e4a9"
+    },
+    "clippy": {
+      "revision": "6ca9ddc53c5a39e911e6c93637c093bd1d2eba05",
+      "tree": "42035145f0cb1536205ca0d0ea9353387a9bede9"
+    },
+    "rust": {
+      "revision": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+      "tree": "f5bf03d73f71243fb88e34ecb0b155ef11e99a47"
+    },
+    "rustfmt": {
+      "revision": "e5feafbfd640fe7326971cf7721ca7de38a86e40",
+      "tree": "13cde549b75899fa11b34de587b89b188edfcae5"
+    }
+  },
+  "tag": "ohm-1.99.0-23",
+  "target": "x86_64-unknown-linux-gnu"
+}

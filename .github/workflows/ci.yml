@@ -1,73 +1,55 @@
-name: Qualify the final Ohm 1.99.0-23 distributions
+name: Build the two corrected Ohm −23 compilers for the uv check
 'on':
   workflow_dispatch:
     inputs:
       reviewed_head:
         type: string
         required: true
-        description: Exact qualification commit
+        description: Exact reviewed build coordinator
 permissions: {}
 jobs:
   plan:
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22958-split-production23-r2' && github.sha == inputs.reviewed_head && github.run_attempt
+      == 1
     runs-on: ubuntu-24.04
     permissions:
       contents: read
+    timeout-minutes: 5
     outputs:
-      rust-revision: ${{ steps.manifest.outputs.rust-revision }}
-      cargo-revision: ${{ steps.manifest.outputs.cargo-revision }}
-      clippy-revision: ${{ steps.manifest.outputs.clippy-revision }}
-      rustfmt-revision: ${{ steps.manifest.outputs.rustfmt-revision }}
-      manifest: ${{ steps.manifest.outputs.manifest }}
-      toolchain: ${{ steps.manifest.outputs.toolchain }}
+      roles: ${{ steps.admission.outputs.roles }}
+    env:
+      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      OHM_TARGET: x86_64-unknown-linux-gnu
+      OHM_TOOLCHAIN: ohm-1.99.0-23
+      PYTHONDONTWRITEBYTECODE: '1'
     steps:
-    - name: Check out release coordinator
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         persist-credentials: false
-        ref: ce64a5de6f8c9f404fc57598c5a2a2ab869276bf
-    - name: Verify the published candidate and manifest
-      run: |
-        test "$(git rev-parse HEAD)" = ce64a5de6f8c9f404fc57598c5a2a2ab869276bf
-        printf '%s  %s\n' 44fc4cb1789ae8f1639d05a1b45b549ae6b400c8abf8d05e8f598a88151df490 toolchains/1.99.0/23.json | sha256sum --check --strict
-    - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
-      with:
-        enable-cache: true
-    - name: Read and validate manifest
-      id: manifest
-      env:
-        MANIFEST_PATH: toolchains/1.99.0/23.json
-      run: |
-        if [[ ! "$MANIFEST_PATH" =~ ^toolchains/[0-9]+\.[0-9]+\.[0-9]+/[1-9][0-9]*\.json$ ]]; then
-          echo "invalid versioned manifest path: $MANIFEST_PATH" >&2
-          exit 1
-        fi
-        ./scripts/validate-release-manifest.sh --require-pinned "$MANIFEST_PATH"
-        {
-          echo "rust-revision=$(jq -er '.sources.rust.revision' "$MANIFEST_PATH")"
-          echo "cargo-revision=$(jq -er '.sources.cargo.revision' "$MANIFEST_PATH")"
-          echo "clippy-revision=$(jq -er '.sources.clippy.revision' "$MANIFEST_PATH")"
-          echo "rustfmt-revision=$(jq -er '.sources.rustfmt.revision' "$MANIFEST_PATH")"
-          echo "manifest=$MANIFEST_PATH"
-          echo "toolchain=$(jq -er '.release.toolchain_name' "$MANIFEST_PATH")"
-        } >> "$GITHUB_OUTPUT"
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-rc23-qualify-cached-doctests-v2' && github.sha == inputs.reviewed_head
+        ref: ${{ github.sha }}
+        fetch-depth: 2
+    - id: admission
+      name: Open the externally qualified role matrix
+      run: python3 -ISB scripts/rc23-22958-production/gate.py plan >> "$GITHUB_OUTPUT"
   build:
+    name: Private GNU SDK (${{ matrix.role }})
     needs: plan
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22958-split-production23-r2' && github.sha == inputs.reviewed_head && github.run_attempt
+      == 1
+    runs-on: namespace-profile-ubuntu-24-04-16
+    permissions:
+      contents: read
     timeout-minutes: 360
     strategy:
       fail-fast: false
       matrix:
-        include:
-        - target: aarch64-apple-darwin
-          runner: ${{ vars.OHM_RELEASE_MACOS_RUNNER || 'macos-15' }}
-        - target: x86_64-unknown-linux-gnu
-          runner: ${{ vars.OHM_RELEASE_LINUX_RUNNER || 'namespace-profile-ubuntu-24-04-16' }}
-    runs-on: ${{ matrix.runner }}
-    permissions:
-      contents: read
+        role: ${{ fromJSON(needs.plan.outputs.roles) }}
     env:
-      OHM_TARGET: ${{ matrix.target }}
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      OHM_TARGET: x86_64-unknown-linux-gnu
+      OHM_TOOLCHAIN: ohm-1.99.0-23
+      PYTHONDONTWRITEBYTECODE: '1'
+      BENCH_ARM: ${{ matrix.role }}
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
@@ -132,16 +114,34 @@ jobs:
           scripts
           release
           toolchains
-    - name: Make room for macOS profile training
-      if: matrix.runner == 'macos-15' && runner.environment == 'github-hosted'
-      run: ./scripts/prepare-hosted-macos-release.sh
-      working-directory: release-candidate
-    - name: Verify the published manifest and all four source pins
-      run: python3 -IB scripts/rc23-cross-qualification/materialize-final.py
+    - name: Check out merged Ohm production scripts and source manifest
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        ref: 9c2397d36f033900a0864484714d526788d1dc77
+        path: official-release
+        persist-credentials: false
+        sparse-checkout: |-
+          scripts
+          release
+          toolchains
+          .github/workflows
+    - name: Require the signed source decision and approved role transport
+      run: python3 -ISB scripts/rc23-22958-production/gate.py build
+    - name: Admit actual workspace and reserve physical capacity
+      run: python3 -ISB scripts/rc23-22958-production/standard-capacity.py init
+    - name: Reopen the same four qualified sources and the precise compiler change
+      run: |
+        python3 -IB scripts/rc23-cross-qualification/materialize-final.py
+        python3 -ISB scripts/rc23-22958-production/materialize.py
+      shell: python3 -ISB scripts/rc23-22958-production/standard-capacity.py watch materialize {0}
+    - name: Install native GNU bootstrap prerequisites
+      shell: python3 -ISB scripts/rc23-22958-production/standard-capacity.py watch prerequisites {0}
+      run: |
+        sudo apt-get -qq update
+        sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build pkg-config perl libssl-dev zstd clang lld curl
     - name: Install pinned LLVM BOLT tools
-      if: matrix.target == 'x86_64-unknown-linux-gnu'
       env:
-        MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
+        MANIFEST_PATH: toolchains/1.99.0/23.json
       run: |
         if [[ "$(dpkg --print-architecture)" != amd64 ]]; then
           echo 'LLVM BOLT tools require an amd64 Linux runner' >&2
@@ -210,261 +210,45 @@ jobs:
         fi
 
         printf 'OHM_BOLT_LLVM_DIR=%s\n' "$bolt_llvm_dir" >> "$GITHUB_ENV"
-      working-directory: release-candidate
-    - name: Install matching LLVM tools for native PGO
-      if: matrix.target == 'aarch64-apple-darwin'
-      env:
-        MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
-      run: |
-        case "$(jq -er '.release.upstream_rust_version' "$MANIFEST_PATH")" in
-          1.97.* | 1.98.*) exit 0 ;;
-          1.99.*)
-            clang_version=23.1.2
-            clang_sha256=d7c26fc6177e42842e2d1ffaad31aec057c56a924392b1a23d830abe2c5d53b1
-            ;;
-          *)
-            echo 'Pin matching Clang for this Rust version' >&2
-            exit 1
-            ;;
-        esac
-
-        # Native PGO and ThinLTO require matching LLVM formats.
-        clang_root="$(mktemp -d "${RUNNER_TEMP:?}/ohm-clang.XXXXXX")"
-        clang_archive="$clang_root/clang.tar.xz"
-        curl --proto '=https' --proto-redir '=https' --tlsv1.2 \
-          --fail --location --retry 3 --show-error --silent \
-          --output "$clang_archive" \
-          "https://github.com/llvm/llvm-project/releases/download/llvmorg-$clang_version/LLVM-$clang_version-macOS-ARM64.tar.xz"
-        printf '%s  %s\n' "$clang_sha256" "$clang_archive" | shasum -a 256 --check
-        tar -xf "$clang_archive" -C "$clang_root" --strip-components=1
-        rm "$clang_archive"
-        "$clang_root/bin/clang" --version
-        "$clang_root/bin/clang++" --version
-        ln -s clang "$clang_root/bin/cc"
-        ln -s llvm-ar "$clang_root/bin/ar"
-        ln -s llvm-ranlib "$clang_root/bin/ranlib"
-        ln -s llvm-nm "$clang_root/bin/nm"
-        printf '%s\n' "$clang_root/bin" >> "$GITHUB_PATH"
-        {
-          printf 'CC=%s\n' "$clang_root/bin/clang"
-          printf 'CXX=%s\n' "$clang_root/bin/clang++"
-          printf 'AR=%s\n' "$clang_root/bin/llvm-ar"
-          printf 'RANLIB=%s\n' "$clang_root/bin/llvm-ranlib"
-          printf 'SDKROOT=%s\n' "$(xcrun --sdk macosx --show-sdk-path)"
-        } >> "$GITHUB_ENV"
-      working-directory: release-candidate
+      shell: python3 -ISB ../scripts/rc23-22958-production/standard-capacity.py watch bolt-tools {0}
+      working-directory: official-release
     - name: Prepare pinned Wild linker
       env:
-        MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
+        MANIFEST_PATH: toolchains/1.99.0/23.json
       run: |
         wild_directory="$(python3 scripts/prepare-wild.py \
           "$MANIFEST_PATH" "$OHM_TARGET" "$RUNNER_TEMP/ohm-wild")"
         printf 'OHM_WILD_LINKER_DIR=%s\n' "$wild_directory" >> "$GITHUB_ENV"
-      working-directory: release-candidate
-    - name: Build optimized extended Rust distribution
-      id: distribution
-      env:
-        OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
+      shell: python3 -ISB ../scripts/rc23-22958-production/standard-capacity.py watch wild {0}
+      working-directory: official-release
+    - name: Build the official GNU extended stage-2 PGO, ThinLTO and BOLT distribution
       run: |
         ./scripts/build-optimized-dist.sh \
           "$OHM_TARGET" \
           "$OHM_TOOLCHAIN" \
           "$GITHUB_WORKSPACE/source/rust" \
-          "$GITHUB_WORKSPACE/release-candidate/release/bootstrap.toml"
-      working-directory: release-candidate
-    - name: Capture macOS compiler crash
-      if: failure() && steps.distribution.outcome == 'failure' && runner.os == 'macOS'
-      continue-on-error: true
-      timeout-minutes: 3
-      run: |
-        build_dir="$GITHUB_WORKSPACE/source/rust/build"
-        rustc="$build_dir/$OHM_TARGET/stage2/bin/rustc"
-        if [[ ! -x "$rustc" ]]; then
-          exit 0
-        fi
-
-        env -i \
-          "HOME=$HOME" \
-          "PATH=$PATH" \
-          "TMPDIR=$RUNNER_TEMP" \
-          "LLVM_PROFILE_FILE=$build_dir/opt-artifacts/rustc-pgo/default_%m_%p.profraw" \
-          xcrun lldb --batch \
-            --one-line 'run' \
-            --one-line-on-crash 'thread backtrace all' \
-            --one-line-on-crash 'register read' \
-            --one-line-on-crash 'disassemble --pc' \
-            --one-line-on-crash 'image list' \
-            -- "$rustc" -vV
-      working-directory: release-candidate
-    - name: Write build provenance
-      env:
-        CARGO_REVISION: ${{ needs.plan.outputs.cargo-revision }}
-        CLIPPY_REVISION: ${{ needs.plan.outputs.clippy-revision }}
-        COORDINATOR_REPOSITORY: ${{ github.repository }}
-        COORDINATOR_REVISION: ce64a5de6f8c9f404fc57598c5a2a2ab869276bf
-        MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
-        OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
-        RUST_REVISION: ${{ needs.plan.outputs.rust-revision }}
-        RUSTFMT_REVISION: ${{ needs.plan.outputs.rustfmt-revision }}
-      run: |
-        manifest_sha256="$(shasum -a 256 "$MANIFEST_PATH" | awk '{print $1}')"
-        jq -n \
-          --arg toolchain "$OHM_TOOLCHAIN" \
-          --arg target "$OHM_TARGET" \
-          --arg coordinator_repository "$COORDINATOR_REPOSITORY" \
-          --arg coordinator_revision "$COORDINATOR_REVISION" \
-          --arg manifest_path "$MANIFEST_PATH" \
-          --arg manifest_sha256 "$manifest_sha256" \
-          --arg rust_revision "$RUST_REVISION" \
-          --arg cargo_revision "$CARGO_REVISION" \
-          --arg clippy_revision "$CLIPPY_REVISION" \
-          --arg rustfmt_revision "$RUSTFMT_REVISION" \
-          --argjson bundled_tools "$(jq --arg target "$OHM_TARGET" \
-            'if $target == "x86_64-unknown-linux-gnu" then .bundled_tools // {} else {} end' "$MANIFEST_PATH")" \
-          '{
-            schema_version: 1,
-            toolchain: $toolchain,
-            target: $target,
-            bundled_tools: $bundled_tools,
-            coordinator: {
-              repository: $coordinator_repository,
-              revision: $coordinator_revision
-            },
-            manifest: {
-              path: $manifest_path,
-              sha256: $manifest_sha256
-            },
-            sources: {
-              rust: { revision: $rust_revision },
-              cargo: { revision: $cargo_revision },
-              clippy: { revision: $clippy_revision },
-              rustfmt: { revision: $rustfmt_revision }
-            }
-          }' > "$GITHUB_WORKSPACE/source/rust/build/dist/ohm-provenance.json"
-      working-directory: release-candidate
-    - name: Stage versioned distribution assets
-      id: assets
-      env:
-        OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
-      run: |
-        rust_version="$(tr -d '\r\n' < "$GITHUB_WORKSPACE/source/rust/src/version")"
-        combined_archive="$GITHUB_WORKSPACE/source/rust/build/dist/rust-$rust_version-dev-$OHM_TARGET.tar.gz"
-        if [[ ! -f "$combined_archive" ]]; then
-          echo "combined Ohm archive not found: $combined_archive" >&2
-          exit 1
-        fi
-
-        release_directory="$(mktemp -d "${RUNNER_TEMP:?}/ohm-release.XXXXXX")"
-        archive_name="$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz"
-        provenance_name="$OHM_TOOLCHAIN-$OHM_TARGET-provenance.json"
-        cp "$combined_archive" "$release_directory/$archive_name"
-        cp "$GITHUB_WORKSPACE/source/rust/build/dist/ohm-provenance.json" \
-          "$release_directory/$provenance_name"
-
-        (
-          cd "$release_directory"
-          shasum -a 256 "$archive_name" > "$archive_name.sha256"
-          shasum -a 256 "$provenance_name" > "$provenance_name.sha256"
-        )
-
-        echo "directory=$release_directory" >> "$GITHUB_OUTPUT"
-      working-directory: release-candidate
-    - name: Retain distribution artifacts
+          "$GITHUB_WORKSPACE/official-release/release/bootstrap.toml" 2>&1 | tee "$GITHUB_WORKSPACE/trait-evidence/build.log"
+      shell: python3 -ISB ../scripts/rc23-22958-production/standard-capacity.py watch production {0}
+      working-directory: official-release
+    - name: Verify installed components, ELF and native regression suites
+      run: python3 -ISB scripts/rc23-22958-production/native.py
+      shell: python3 -ISB scripts/rc23-22958-production/standard-capacity.py watch native-qa {0}
+    - name: Reopen role, native and capacity evidence
+      run: python3 -ISB scripts/rc23-22958-production/standard-capacity.py summarize
+      if: always()
+    - name: Upload qualified private SDK
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: ${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}
-        path: |
-          ${{ steps.assets.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}.tar.gz
-          ${{ steps.assets.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}.tar.gz.sha256
-          ${{ steps.assets.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}-provenance.json
-          ${{ steps.assets.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}-provenance.json.sha256
+        name: rc23-22958-sdk-${{ matrix.role }}
+        path: trait-sdk/
         if-no-files-found: error
-        retention-days: 7
-    - name: Retain exact source verification
+        compression-level: 0
+        retention-days: 14
+    - name: Retain source, training, native and capacity records
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: rc23-final-source-${{ matrix.target }}
-        path: |
-          cross-evidence/
-          source/reports/slot-source.json
+        name: rc23-22958-qa-${{ matrix.role }}-attempt-${{ github.run_attempt }}
+        path: trait-evidence/
         if-no-files-found: warn
         retention-days: 14
-  assemble:
-    needs:
-    - plan
-    - build
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-    env:
-      MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
-      OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
-    steps:
-    - name: Check out release coordinator
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        persist-credentials: false
-        ref: ce64a5de6f8c9f404fc57598c5a2a2ab869276bf
-    - name: Download verified distribution assets
-      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-      with:
-        pattern: ${{ needs.plan.outputs.toolchain }}-*
-        path: release
-        merge-multiple: true
-    - name: Verify and assemble release assets
-      run: bash scripts/assemble-release.sh "$MANIFEST_PATH" release "$OHM_TOOLCHAIN"
-    - name: Retain global release assets
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-      with:
-        name: ${{ needs.plan.outputs.toolchain }}-global
-        path: |
-          release/ohm-installer.sh
-          release/${{ needs.plan.outputs.toolchain }}.json
-          release/SHA256SUMS
-        if-no-files-found: error
-        retention-days: 7
-  smoke-test:
-    needs:
-    - plan
-    - assemble
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-        - target: aarch64-apple-darwin
-          runner: namespace-profile-macos-15
-        - target: x86_64-unknown-linux-gnu
-          runner: ubuntu-24.04
-    runs-on: ${{ matrix.runner }}
-    permissions:
-      contents: read
-    env:
-      CLIPPY_REVISION: ${{ needs.plan.outputs.clippy-revision }}
-      OHM_TARGET: ${{ matrix.target }}
-      OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
-    steps:
-    - name: Check out release coordinator
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        persist-credentials: false
-        ref: ce64a5de6f8c9f404fc57598c5a2a2ab869276bf
-    - name: Download platform distribution assets
-      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-      with:
-        name: ${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}
-        path: release
-    - name: Download universal release installer
-      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-      with:
-        name: ${{ needs.plan.outputs.toolchain }}-global
-        path: release
-    - name: Install rust-analyzer
-      run: |
-        upstream_version="$(jq -r '.release.upstream_rust_version' "release/$OHM_TOOLCHAIN.json")"
-        rustup toolchain install "$upstream_version" --profile minimal --component rust-analyzer
-        printf 'RUST_ANALYZER=%s\n' "$(rustup which --toolchain "$upstream_version" rust-analyzer)" >> "$GITHUB_ENV"
-    - name: Smoke test Ohm toolchain
-      run: |
-        bash scripts/smoke-test-release.sh release \
-          "$OHM_TOOLCHAIN" "$OHM_TARGET" "$CLIPPY_REVISION"
