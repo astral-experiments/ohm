@@ -7,7 +7,7 @@ on:
       experiment:
         description: Registered experiment to execute
         type: choice
-        options: [baseline, macro-host-o1]
+        options: [baseline, macro-host-o1, visibility-scope]
         default: baseline
       reviewed_head:
         description: Exact independently reviewed nonrelease QA commit
@@ -60,6 +60,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: python3 -IB qa/scripts/ruff-linter-check-attribution/worker.py acquire
       - name: Fetch the exact registry closure without compiling
+        if: inputs.experiment != 'visibility-scope'
         run: python3 -IB qa/scripts/ruff-linter-check-attribution/worker.py prefetch
       - name: Compare the ordinary and sampled edit with the independent clean result
         if: inputs.experiment == 'baseline'
@@ -67,6 +68,11 @@ jobs:
       - name: Compare the fixed ordinary check with one recompiled native macro
         if: inputs.experiment == 'macro-host-o1'
         run: python3 -IB qa/scripts/ruff-linter-check-attribution/macro_host.py
+      - name: Check the actual downstream closure and run Ruff's native diagnostic
+        if: inputs.experiment == 'visibility-scope'
+        run: |
+          python3 -IB qa/scripts/ruff-linter-check-attribution/scope_inventory.py prefetch
+          python3 -IB qa/scripts/ruff-linter-check-attribution/scope_inventory.py study
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
