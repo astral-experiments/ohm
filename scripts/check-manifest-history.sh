@@ -30,7 +30,7 @@ if ! git cat-file -e "$base_revision^{commit}" 2>/dev/null; then
   exit 1
 fi
 
-while IFS= read -r manifest; do
+git ls-tree -r --name-only "$base_revision" -- toolchains | while IFS= read -r manifest; do
   case "$manifest" in
     toolchains/*/*.json) ;;
     *) continue ;;
@@ -101,6 +101,6 @@ while IFS= read -r manifest; do
       exit 1
       ;;
   esac
-done < <(git ls-tree -r --name-only "$base_revision" -- toolchains)
+done
 
 echo "verified toolchain manifest history against $base_revision"

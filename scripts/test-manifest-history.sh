@@ -104,4 +104,13 @@ mv -- "$test_root/toolchains/1.97.1" "$test_root/version"
 ln -s ../version "$test_root/toolchains/1.97.1"
 expect_history_failure 'a symlink replacing the manifest directory'
 
+# The base commit can be available while its tree still needs to be fetched.
+partial_checkout="$test_root/partial"
+git -C "$test_root" config uploadpack.allowFilter true
+git clone --quiet --filter=tree:0 --no-checkout "file://$test_root" "$partial_checkout"
+git -C "$partial_checkout" checkout --quiet HEAD
+git -C "$partial_checkout" remote set-url origin "$test_root/missing-remote"
+base_revision="$(git -C "$partial_checkout" rev-parse HEAD^)"
+expect_history_failure 'an unavailable base tree' "$partial_checkout"
+
 echo 'manifest history tests passed'
