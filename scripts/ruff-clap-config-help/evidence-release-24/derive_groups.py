@@ -38,7 +38,9 @@ def main(archive,digest,out):
             owner=m[1] if m else 'other'
             group[owner].append({'method':n,'bytes':len(left),'binding':i[1]>>4})
             delta=[[j,x,y]for j,(x,y)in enumerate(zip(left,right))if x!=y]
-            if delta:changes.append({'method':n,'bytes':len(left),'different_bytes':delta})
+            if delta:
+                need(left[647:652]==bytes.fromhex('ba e1 01 00 00') and right[647:652]==bytes.fromhex('ba dc 01 00 00'),'actual x86-64 mov $481/$476,%edx')
+                changes.append({'method':n,'bytes':len(left),'different_bytes':delta})
         need(len(changes)==2 and all(len(v['different_bytes'])==1 and 'GlobalConfigArgs' in v['method']for v in changes),'typed real changed methods')
         rokeys=[i for i,s in enumerate(a.secs)if s[2]&2 and b'--config "lint.line-length = 100"'in a.blob(s)]
         need(len(rokeys)==1,'unique OLD literal section');i=rokeys[0];key=a.keys[i];j=b.keys.index(key)

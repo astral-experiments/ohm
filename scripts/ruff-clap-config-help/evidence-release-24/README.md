@@ -2,7 +2,7 @@
 
 Changing one help example costs **1.884 billion retired user instructions for cargo check and 17.38 billion for cargo build** on the signed Linux x86_64 release. One ordinary Ruff library module costs **9.03 billion** during codegen. Its 125 functions have the same names, sizes, placement and resolved relocations before and after the edit. Two generated Clap methods each change one instruction. The separate version module also has a genuine observable change.
 
-This is a stock measurement for selecting a compiler experiment. The two builds used the same released compiler. [Genuine Ruff change](https://github.com/astral-sh/ruff/pull/28392) · [Signed release](https://github.com/astral-experiments/ohm/releases/tag/1.99.0-24) · [Ordinary check worker](https://github.com/astral-experiments/ohm/actions/runs/41718614781) · [Ordinary build and unthrottled attribution](https://github.com/astral-experiments/ohm/actions/runs/41722911354)
+This is a stock measurement for selecting a compiler experiment. The two builds used the same released compiler. [Genuine Ruff change](https://github.com/astral-sh/ruff/pull/28392) · [Signed release](https://github.com/astral-experiments/ohm/releases/tag/ohm-1.99.0-24) · [Ordinary check worker](https://github.com/astral-experiments/ohm/actions/runs/41718614781) · [Ordinary build and unthrottled attribution](https://github.com/astral-experiments/ohm/actions/runs/41722911354)
 
 ## Complete Cargo commands
 
