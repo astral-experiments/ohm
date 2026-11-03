@@ -1,0 +1,245 @@
+{
+ "archive_sha256": "bbad7bd93996ca2b1485456a23e2ecb19024f99b8e85117c2ac485885bc29248",
+ "cross_role_different_sections": {
+  "native-buggy": {
+   ".debug_info": [
+    {
+     "bytes": 15488893,
+     "flags": 0,
+     "sha256": "48413ca12150e00f06c19e66bb33123f90489dc5dea7d0a2d243accee7ce46ff",
+     "type": 1
+    },
+    {
+     "bytes": 15488893,
+     "flags": 0,
+     "sha256": "60702fd81a91bb8346d3ba8c91cf331f04c3044c0206abebf72f945b97f13787",
+     "type": 1
+    }
+   ],
+   ".debug_macro": [
+    {
+     "bytes": 261866,
+     "flags": 0,
+     "sha256": "3279ab9c114d2e60699f5d5ce920864dc9f5cfd84fae6e8cc84712e17e583877",
+     "type": 1
+    },
+    {
+     "bytes": 261866,
+     "flags": 0,
+     "sha256": "e92eed729bb9712cd143456d2865341c1b768c8f059948a194232773711515e0",
+     "type": 1
+    }
+   ],
+   ".debug_str": [
+    {
+     "bytes": 21371652,
+     "flags": 48,
+     "sha256": "a8fd4054e5e7437be3531ec469dfcb3761a7eaeee4f0ecb08180ac5e1ff26a8a",
+     "type": 1
+    },
+    {
+     "bytes": 21371652,
+     "flags": 48,
+     "sha256": "18800a78f7e9e5934df556ad7984a1c5e196af5f223f6bba422542f1fd607a31",
+     "type": 1
+    }
+   ],
+   ".note.gnu.build-id": [
+    {
+     "bytes": 48,
+     "flags": 2,
+     "sha256": "0df359ed3ea0326aeaa258b0f5382268d95433f0cf1416c742ea084e8327561d",
+     "type": 7
+    },
+    {
+     "bytes": 48,
+     "flags": 2,
+     "sha256": "ac04bb552c41f4861684290df3ece8410db19aeeaae8fc64541fb29889af014d",
+     "type": 7
+    }
+   ]
+  },
+  "native-edited": {
+   ".debug_info": [
+    {
+     "bytes": 15488893,
+     "flags": 0,
+     "sha256": "49afdb138049313d367b591113dc096ffd29dad9b0754e5055b9a091fdaab237",
+     "type": 1
+    },
+    {
+     "bytes": 15488893,
+     "flags": 0,
+     "sha256": "2c854f267d8c0ebdc53dc124a0128be989fb5c1d817f20f13d0fc5c239bbb40d",
+     "type": 1
+    }
+   ],
+   ".debug_macro": [
+    {
+     "bytes": 261866,
+     "flags": 0,
+     "sha256": "3279ab9c114d2e60699f5d5ce920864dc9f5cfd84fae6e8cc84712e17e583877",
+     "type": 1
+    },
+    {
+     "bytes": 261866,
+     "flags": 0,
+     "sha256": "e92eed729bb9712cd143456d2865341c1b768c8f059948a194232773711515e0",
+     "type": 1
+    }
+   ],
+   ".debug_str": [
+    {
+     "bytes": 21371652,
+     "flags": 48,
+     "sha256": "a8fd4054e5e7437be3531ec469dfcb3761a7eaeee4f0ecb08180ac5e1ff26a8a",
+     "type": 1
+    },
+    {
+     "bytes": 21371652,
+     "flags": 48,
+     "sha256": "18800a78f7e9e5934df556ad7984a1c5e196af5f223f6bba422542f1fd607a31",
+     "type": 1
+    }
+   ],
+   ".note.gnu.build-id": [
+    {
+     "bytes": 48,
+     "flags": 2,
+     "sha256": "8334ecb9f31a926e0c6e26eb46cb4001939f61f4a888f119bddefa5c2f4a25b4",
+     "type": 7
+    },
+    {
+     "bytes": 48,
+     "flags": 2,
+     "sha256": "d92a4d7094d6b148657ff9ab23d84d1ef51b4d5cef6c1c732acd1f674ec0b2e7",
+     "type": 7
+    }
+   ]
+  }
+ },
+ "independent_local_native_probes": {
+  "6176412d8d75c00ef515f0edee365bec2b0f681808b42aec57f3e734f994c319": [
+   {
+    "case": "attr-attributes",
+    "exit": 1,
+    "input_sha256": "6b8bcea05ecde57a10b01a2de24a6535ddb4b1cd14df13c1555bcc6f33aeb5c3",
+    "original_stdout_sha256": "5747b62ab1445c75e3ea35e43227e4e920afa8b5cda9b6605b0e953ec2526b0f"
+   },
+   {
+    "case": "attr-field",
+    "exit": 0,
+    "input_sha256": "e4f9ca963d709e0d4f881fd1c5e22e109be6d9f6c548ad53c1d644a3a5e70f40",
+    "original_stdout_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+   },
+   {
+    "case": "both-clean",
+    "exit": 0,
+    "input_sha256": "9260b7a02c0cb830927b1ec32def6470e7db80ee2203f8e09a93330934c31e46",
+    "original_stdout_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+   },
+   {
+    "case": "both-warn",
+    "exit": 1,
+    "input_sha256": "ba54d38788a1315613441a26dc5c2de7e3c7055d69440c5cfdbfb7a75d35353d",
+    "original_stdout_sha256": "5747b62ab1445c75e3ea35e43227e4e920afa8b5cda9b6605b0e953ec2526b0f"
+   }
+  ],
+  "830f09794042ca357079806f7a92f867a42c650663953487121b73d6d874696f": [
+   {
+    "case": "attr-attributes",
+    "exit": 0,
+    "input_sha256": "6b8bcea05ecde57a10b01a2de24a6535ddb4b1cd14df13c1555bcc6f33aeb5c3",
+    "original_stdout_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+   },
+   {
+    "case": "attr-field",
+    "exit": 1,
+    "input_sha256": "e4f9ca963d709e0d4f881fd1c5e22e109be6d9f6c548ad53c1d644a3a5e70f40",
+    "original_stdout_sha256": "7cf9e699259d2473cac734f27e5da2fe48d2434574b4d565fa7038099042885f"
+   },
+   {
+    "case": "both-clean",
+    "exit": 0,
+    "input_sha256": "9260b7a02c0cb830927b1ec32def6470e7db80ee2203f8e09a93330934c31e46",
+    "original_stdout_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+   },
+   {
+    "case": "both-warn",
+    "exit": 1,
+    "input_sha256": "ba54d38788a1315613441a26dc5c2de7e3c7055d69440c5cfdbfb7a75d35353d",
+    "original_stdout_sha256": "5747b62ab1445c75e3ea35e43227e4e920afa8b5cda9b6605b0e953ec2526b0f"
+   }
+  ],
+  "9c1f7c6a85964aae4131e7dabb902741255cb813fc62a2c549e15b05ebfeab0d": [
+   {
+    "case": "attr-attributes",
+    "exit": 1,
+    "input_sha256": "6b8bcea05ecde57a10b01a2de24a6535ddb4b1cd14df13c1555bcc6f33aeb5c3",
+    "original_stdout_sha256": "5747b62ab1445c75e3ea35e43227e4e920afa8b5cda9b6605b0e953ec2526b0f"
+   },
+   {
+    "case": "attr-field",
+    "exit": 0,
+    "input_sha256": "e4f9ca963d709e0d4f881fd1c5e22e109be6d9f6c548ad53c1d644a3a5e70f40",
+    "original_stdout_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+   },
+   {
+    "case": "both-clean",
+    "exit": 0,
+    "input_sha256": "9260b7a02c0cb830927b1ec32def6470e7db80ee2203f8e09a93330934c31e46",
+    "original_stdout_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+   },
+   {
+    "case": "both-warn",
+    "exit": 1,
+    "input_sha256": "ba54d38788a1315613441a26dc5c2de7e3c7055d69440c5cfdbfb7a75d35353d",
+    "original_stdout_sha256": "5747b62ab1445c75e3ea35e43227e4e920afa8b5cda9b6605b0e953ec2526b0f"
+   }
+  ],
+  "ab8c06e5fbdabab6b6c5d953e46f62c2ddbf90145f268c42a042c16d79374ea9": [
+   {
+    "case": "attr-attributes",
+    "exit": 0,
+    "input_sha256": "6b8bcea05ecde57a10b01a2de24a6535ddb4b1cd14df13c1555bcc6f33aeb5c3",
+    "original_stdout_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+   },
+   {
+    "case": "attr-field",
+    "exit": 1,
+    "input_sha256": "e4f9ca963d709e0d4f881fd1c5e22e109be6d9f6c548ad53c1d644a3a5e70f40",
+    "original_stdout_sha256": "7cf9e699259d2473cac734f27e5da2fe48d2434574b4d565fa7038099042885f"
+   },
+   {
+    "case": "both-clean",
+    "exit": 0,
+    "input_sha256": "9260b7a02c0cb830927b1ec32def6470e7db80ee2203f8e09a93330934c31e46",
+    "original_stdout_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+   },
+   {
+    "case": "both-warn",
+    "exit": 1,
+    "input_sha256": "ba54d38788a1315613441a26dc5c2de7e3c7055d69440c5cfdbfb7a75d35353d",
+    "original_stdout_sha256": "5747b62ab1445c75e3ea35e43227e4e920afa8b5cda9b6605b0e953ec2526b0f"
+   }
+  ]
+ },
+ "local_filename_substitution": "Only the verified original absolute runner prefix vs current temporary working directory changed in diagnostic JSON. All codes, messages, source ranges and other bytes agreed.",
+ "roles": {
+  "C": {
+   "native-buggy": "ab8c06e5fbdabab6b6c5d953e46f62c2ddbf90145f268c42a042c16d79374ea9",
+   "native-edited": "9c1f7c6a85964aae4131e7dabb902741255cb813fc62a2c549e15b05ebfeab0d",
+   "native-empty-edit": "9c1f7c6a85964aae4131e7dabb902741255cb813fc62a2c549e15b05ebfeab0d",
+   "native-repair": "9c1f7c6a85964aae4131e7dabb902741255cb813fc62a2c549e15b05ebfeab0d",
+   "native-reverse": "ab8c06e5fbdabab6b6c5d953e46f62c2ddbf90145f268c42a042c16d79374ea9"
+  },
+  "P": {
+   "native-buggy": "830f09794042ca357079806f7a92f867a42c650663953487121b73d6d874696f",
+   "native-edited": "6176412d8d75c00ef515f0edee365bec2b0f681808b42aec57f3e734f994c319",
+   "native-empty-edit": "6176412d8d75c00ef515f0edee365bec2b0f681808b42aec57f3e734f994c319",
+   "native-repair": "6176412d8d75c00ef515f0edee365bec2b0f681808b42aec57f3e734f994c319",
+   "native-reverse": "830f09794042ca357079806f7a92f867a42c650663953487121b73d6d874696f"
+  }
+ },
+ "within_role_edited_equals_repaired_and_empty": true
+}
