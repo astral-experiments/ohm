@@ -1,0 +1,41 @@
+{
+ "actual_local_proof": {
+  "defer": {
+   "candidate": {
+    "bin/cargo": "1d4c93cd725a06b9a31704dc05a67a5d418c4cf97a3d3680ce8fb522ccee404f",
+    "bin/rustc": "8bfdc9779937e9cd2c9ef5db9f50cee9aab03ddec5672b37a3a3c9278cf1f5d0"
+   },
+   "donor": {
+    "bin/cargo": "f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee",
+    "bin/rustc": "8bfdc9779937e9cd2c9ef5db9f50cee9aab03ddec5672b37a3a3c9278cf1f5d0"
+   },
+   "donor_ctime_and_hash_unchanged": true,
+   "final_installed_mode": 365,
+   "initial_donor_mode": 365
+  },
+  "normal": {
+   "candidate": {
+    "bin/cargo": "1d4c93cd725a06b9a31704dc05a67a5d418c4cf97a3d3680ce8fb522ccee404f",
+    "bin/rustc": "8bfdc9779937e9cd2c9ef5db9f50cee9aab03ddec5672b37a3a3c9278cf1f5d0"
+   },
+   "donor": {
+    "bin/cargo": "f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee",
+    "bin/rustc": "8bfdc9779937e9cd2c9ef5db9f50cee9aab03ddec5672b37a3a3c9278cf1f5d0"
+   },
+   "donor_ctime_and_hash_unchanged": true,
+   "final_installed_mode": 365,
+   "initial_donor_mode": 365
+  }
+ },
+ "correction": "Change only the already confirmed distinct private inode to be temporarily owner writable while installing the registered Cargo. Restore and check its original mode and complete bytes before the first use.",
+ "earlier_run": 41606457603,
+ "enrollment": "Owned private SDK copy preserved mode 0555, and the original destination could not be opened for writing before any Cargo phase. The candidate Rust, Cargo, argv, freshness, metadata, native, statistical and resource requirements stay fixed.",
+ "proof_sha256": "ce3415d18c81e3a194dc9fb9deb162dfd2063cb54fdadc2087c8f3b794a63657",
+ "raw": {
+  "bytes": 20515,
+  "files": 6,
+  "id": 13216123200,
+  "measured_commands": 0,
+  "sha256": "70abe2a32bc028b9744164af22488fd61a48e54b8c357e83c946115797648678"
+ }
+}

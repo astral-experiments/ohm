@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import stat
 
 HERE = Path(__file__).resolve().parent
 PORT = json.loads((HERE / "historical-source.json").read_bytes())
@@ -108,9 +109,17 @@ def with_client(sdk, root, name, client, original_files):
     view = root / ("capability-sdk-" + name)
     subprocess.run(["cp", "-a", "--reflink=auto", sdk, view], check=True)
     assert sha(view / "bin/cargo") == original_files["bin/cargo"]
-    assert not (view / "bin/cargo").samefile(sdk / "bin/cargo")
-    shutil.copyfile(client, view / "bin/cargo")
-    (view / "bin/cargo").chmod(0o755)
+    installed = view / "bin/cargo"
+    donor = sdk / "bin/cargo"
+    assert not installed.is_symlink() and not installed.samefile(donor)
+    mode = stat.S_IMODE(donor.stat().st_mode)
+    assert stat.S_IMODE(installed.stat().st_mode) == mode and mode & stat.S_IXUSR
+    installed.chmod(mode | stat.S_IWUSR)
+    try:
+        shutil.copyfile(client, installed)
+    finally:
+        installed.chmod(mode)
+    assert stat.S_IMODE(installed.stat().st_mode) == stat.S_IMODE(donor.stat().st_mode) == mode
     actual = {rel:sha(view / rel) for rel in original_files}
     assert [k for k in actual if actual[k] != original_files[k]] == ["bin/cargo"]
     assert actual["bin/cargo"] == sha(client) and sha(sdk / "bin/cargo") == original_files["bin/cargo"]
