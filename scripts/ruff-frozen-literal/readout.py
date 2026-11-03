@@ -43,7 +43,7 @@ def mapping(file, identity):
         if "x" not in cols[1] or "librustc_driver-" not in cols[5]:continue
         maj,minor=(int(x,16)for x in cols[3].split(":"))
         matches.append([os.makedev(maj,minor),int(cols[4]),cols[5]])
-    need(matches and all(x[:2]==identity["driver_inode"] and x[2]==identity["driver_path"] for x in matches),"another or missing live rustc_driver")
+    need(matches and all(x[:2]==identity["mapped_driver_inode"] and x[2]==identity["driver_path"] for x in matches),"another or missing live rustc_driver")
     return matches
 
 

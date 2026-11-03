@@ -1,5 +1,7 @@
 """Single-boot PC/CP discovery on the complete, locked, unchanged Ruff checkout."""
+import ctypes
 import hashlib
+import mmap
 import io
 import json
 import os
@@ -110,7 +112,33 @@ def physical(role):
     actual=p.activate(role); d,=(w.SDK/"lib").glob("librustc_driver-*.so")
     def inode(path):
         st=path.stat();return [st.st_dev,st.st_ino]
-    return dict(role=role,driver=actual["driver"],driver_path=str(d),driver_inode=inode(d),rustc=actual["rustc"],rustc_inode=inode(w.SDK/"bin/rustc"),cargo=actual["cargo"],cargo_inode=inode(w.SDK/"bin/cargo"),source=actual["config"]["source"],active=actual["active"],versions=[actual["rustc_version"],actual["cargo_version"]])
+    # Overlayfs can report the overlay device for stat(2) and the backing device for
+    # /proc/TID/maps. Map this exact authenticated descriptor in this namespace once.
+    with d.open("rb") as f:
+        st=os.fstat(f.fileno())
+        need(hashlib.file_digest(f,"sha256").hexdigest()==actual["driver"],"different opened compiler library")
+        with mmap.mmap(f.fileno(),1,access=mmap.ACCESS_COPY) as mm:
+            addr=ctypes.addressof(ctypes.c_char.from_buffer(mm))
+            rows=[r for r in Path("/proc/self/maps").read_text().splitlines() if int(r.split("-")[0],16)<=addr<int(r.split()[0].split("-")[1],16)]
+            need(len(rows)==1,"ambiguous authenticated mapping")
+            row=rows[0].split(None,5);major,minor=map(lambda x:int(x,16),row[3].split(":"))
+            need(len(row)==6 and row[5]==str(d) and int(row[4])>0 and int(row[2],16)==0,"different compiler file actually mapped")
+            mapped=[os.makedev(major,minor),int(row[4])]
+    return dict(role=role,driver=actual["driver"],driver_path=str(d),driver_inode=[st.st_dev,st.st_ino],mapped_driver_inode=mapped,mapped_driver_row=rows[0],rustc=actual["rustc"],rustc_inode=inode(w.SDK/"bin/rustc"),cargo=actual["cargo"],cargo_inode=inode(w.SDK/"bin/cargo"),source=actual["config"]["source"],active=actual["active"],versions=[actual["rustc_version"],actual["cargo_version"]])
+
+
+def driver_guard(dest,ident):
+    input_file=ROOT/"physical-compiler-guard.rs"
+    input_file.write_text("pub fn native_guard(x: u64) -> u64 { x.rotate_left(15) }\n")
+    trace=dest/"mapping.epochs";trace.mkdir()
+    out=ROOT/"physical-compiler-guard.rmeta"
+    cmd=[w.SDK/"bin/rustc","--crate-name","physical_compiler_guard","--crate-type=lib","--emit=metadata",input_file,"-o",out]
+    w.run([ROOT/"exec-count",trace,*cmd],env(),dest/"mapping")
+    ims,counters,_=readout.counted(trace)
+    selected=[n for n,im in ims.items() if im["trigger"]=="exec" and [im["dev"],im["ino"]]==ident["rustc_inode"] and im["argv"]==list(map(str,cmd))]
+    need(len(selected)==1 and counters[selected[0]][0]>0 and out.stat().st_size>0,"real compiler mapping calibration")
+    rows=readout.mapping(trace/f"{selected[0]:05}.maps",ident)
+    save(dest/"mapping/verified.json",dict(output=p.sha(out),image=selected[0],rows=rows))
 
 
 def measure(method, dest, argv, crate, identity, required):
@@ -197,7 +225,7 @@ def main():
     p.acquire();primary_inputs();fresh();calibration()
     seen=set()
     for i,role in enumerate(REG["order"]):
-        dest=BASE/("visit-"+str(i+1)+"-"+role);dest.mkdir();identity=physical(role);save(dest/"identity.json",identity)
+        dest=BASE/("visit-"+str(i+1)+"-"+role);dest.mkdir();identity=physical(role);save(dest/"identity.json",identity);driver_guard(dest,identity)
         for method in ("whole","exec"):check_history(dest/method,method,identity)
         safeguards(dest/"safety")
         for method in ("whole","exec"):

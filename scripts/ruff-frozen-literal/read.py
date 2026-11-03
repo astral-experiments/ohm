@@ -12,7 +12,7 @@ import zipfile
 
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
-from readout import counted, need, owner
+from readout import counted, mapping, need, owner
 
 REG=json.loads((HERE/"registration.json").read_bytes())
 BIND=json.loads((HERE/"factory.json").read_bytes())
@@ -102,12 +102,15 @@ def complete(root):
     for i,role in enumerate(REG["order"],1):
         base=root/f"visit-{i}-{role}";ident=load(base/"identity.json");binding=meta["inline-"+role]
         need(ident["source"]==binding["source"] and all(ident[k]==binding[k]for k in ("rustc","driver","cargo")),"selected wrong real compiler")
+        observed=load(base/"mapping/verified.json");row=ident["mapped_driver_row"].split(None,5)
+        need(row[5]==ident["driver_path"] and int(row[4])==ident["mapped_driver_inode"][1],"different enrolled map")
+        need(mapping(base/"mapping.epochs"/f"{observed['image']:05}.maps",ident)==observed["rows"],"separate actual compiler calibration")
         cargo=load(base/"whole/edit/command.json")["argv"];need(cargo[3:]==REG["target"],"changed metered whole command")
         # The compiler argv and original command/stat records disclose the hosted Ruff pathname.
         root_hint=next((p for p in load(root/"source-inputs.json")[A]["files"] if p=="crates/ty_vendored/src/lib.rs"),None);need(root_hint,"source registration")
         # Since each commands' CWD is the independently enrolled workspace checkout, recover it
         # from the actual historical checked package on Cargo's ordinary stdout/stderr.
-        ms=re.findall(r"(?m)^\s*Checking ty_vendored [^\n]*?\(([^)]+/crates/ty_vendored)\)",(base/"exec/cold/stderr").read_text())
+        ms=re.findall(r"(?m)^\s*(?:Checking|Compiling) ty_vendored [^\n]*?\(([^)]+/crates/ty_vendored)\)",(base/"exec/cold/stderr").read_text())
         need(len(ms)==1,"genuine package not found in Cargo human output");repo=Path(ms[0]).parent.parent
         prices={};delivered={"old":[],"new":[]}
         for name,state,dirty in (("cold","old",1),("old-idle","old",0),("edit","new",1),("new-idle","new",0)):
