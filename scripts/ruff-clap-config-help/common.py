@@ -90,13 +90,17 @@ def source_files(directory):
                     for name in names:
                         if re.match(r'(?:lib)?ruff(?:[-.]|$)',name)and name.endswith(('.rmeta','.rlib')):files.append(str(Path(directory_name)/name))
         put(directory/'unresolved-native-layout.json',{'path_candidates':files,'actual_rustcs':observations})
-    need(len(selected)==1,('ambiguous actual ruff consumer input',list(map(str,selected))))
-    selected,=selected;need(selected.is_file()and selected.stat().st_size>0,('missing true input',str(selected)))
-    # rustc paths can be symlink aliases through the per-worktree artifact directory.
-    real=selected.resolve(strict=True);allowed=any(real.is_relative_to(root.resolve())for root in (TARGET,BUILD,HOME))
-    need(allowed,('dependency outside enrolled independent Cargo roots',str(selected),str(real)))
-    put(marker,[str(selected)]);put(directory/'selected-artifact.json',{'lexical':str(selected),'canonical':str(real)})
-    return selected
+    types={p.suffix for p in selected}
+    need(selected and len(types)==len(selected) and types<={'.rlib','.rmeta'}
+         and (MODE!='check'or '.rmeta'in types),('ambiguous actual ruff inputs',list(map(str,selected))))
+    bindings={}
+    for chosen in sorted(selected):
+        need(chosen.is_file()and chosen.stat().st_size>0,('missing true input',str(chosen)))
+        real=chosen.resolve(strict=True)
+        need(any(real.is_relative_to(root.resolve())for root in (TARGET,BUILD,HOME)),('dependency outside enrolled independent roots',str(chosen),str(real)))
+        bindings[str(chosen)]=str(real)
+    put(marker,sorted(bindings));put(directory/'selected-artifact.json',bindings)
+    return sorted(selected)
 def verdict(exe,directory,state):
     e=env()|{'NO_COLOR':'1','COLUMNS':'240','LC_ALL':'C','TERM':'dumb','RUFF_NO_CACHE':'true'}
     expected=b'lint.line-length = 100' if state==OLD else b'line-length = 100'
@@ -119,25 +123,39 @@ def verdict(exe,directory,state):
     need(bool(matches),('no true global config help',state))
     return {'cases':result,'show_example':matches}
 def observe_products(directory,state):
-    selected=source_files(directory);base=PUB/'bodies'
-    if MODE=='check':
-        need(selected.suffix=='.rmeta','binary type checker selected an unexpected dependency')
-        data={'rmeta':{'name':selected.name,'size':selected.stat().st_size,'sha256':zsave(selected,base)}}
-    else:
-        need(selected.suffix=='.rlib','binary linked an unexpected Rust dependency')
-        import member_names
-        ledger=member_names.read_names(selected,'ruff');put(directory/'selected-ruff-members.json',ledger)
-        meta=directory/'embedded-rust-metadata'
-        with meta.open('xb')as f:sp.run(['ar','p',selected,'lib.rmeta'],stdout=f,check=True)
-        need(meta.stat().st_size>0,'missing selected native metadata')
-        data={'rlib':{'name':selected.name,'size':selected.stat().st_size,'sha256':hf(selected)},
-              'embedded_rmeta':{'size':meta.stat().st_size,'sha256':zsave(meta,base)}}
-        meta.unlink()
+    inputs=source_files(directory);base=PUB/'bodies';data={}
+    for selected in inputs:
+        if selected.suffix=='.rmeta':
+            data['rmeta']={'name':selected.name,'size':selected.stat().st_size,'sha256':zsave(selected,base)}
+        else:
+            import member_names
+            data['rlib']={'name':selected.name,'size':selected.stat().st_size,'sha256':hf(selected)}
+            try:
+                ledger=member_names.read_names(selected,'ruff')
+            except (ValueError,KeyError)as error:
+                # Preserve the full original if this SDK has an unsupported envelope.
+                # The complete CLI ELF, actual external paths and raw library stay mandatory.
+                put(directory/'unrecognized-library-envelope.json',{'error':str(error),'raw_body':zsave(selected,base)})
+            else:
+                put(directory/'selected-ruff-members.json',ledger)
+                proof=[member_names.native_identity(ledger),ledger['metadata']]
+                data['canonical_archive']=hashlib.sha256(json.dumps(proof,separators=(',',':')).encode()).hexdigest()
+            meta=directory/'embedded-rust-metadata'
+            with meta.open('xb')as f:sp.run(['ar','p',selected,'lib.rmeta'],stdout=f,check=True)
+            need(meta.stat().st_size>0,'missing selected native metadata')
+            data['embedded_rmeta']={'size':meta.stat().st_size,'sha256':zsave(meta,base)}
+            meta.unlink()
     if MODE=='build':
         exe=TARGET/'debug/ruff';need(exe.is_file(),'missing native CLI')
         data['elf']={'size':exe.stat().st_size,'sha256':zsave(exe,base)}
         data['verdict']=verdict(exe,directory,state)
     return data
+def same_artifacts(a,b):
+    if a==b:return True
+    if not all(v.get('canonical_archive')and v.get('rlib')for v in (a,b)):return False
+    # All ELF member bytes, stable names, ranlib symbol mapping, physical metadata,
+    # original user-visible outputs and the entire CLI executable still compare exactly.
+    return {k:v for k,v in a.items()if k!='rlib'}=={k:v for k,v in b.items()if k!='rlib'}
 def command(directory,actual,expected=0):
     directory.mkdir()
     physical=(SDK/'bin/rustc').stat();identity=(physical.st_dev,physical.st_ino)

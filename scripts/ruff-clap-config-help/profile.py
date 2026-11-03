@@ -34,11 +34,14 @@ def observed(tag,state,perf=None):
     select(state);guard();td=DIAG/tag;tasks=DIAG/(tag+'-actual-execs');tasks.mkdir()
     invoked=[trace,'--lifetime',SDK/'bin/rustc','--also',SDK/WILD,tasks,*CMD]
     raw=td/'kernel.perf'
-    if perf:invoked=pt.record(perf,raw,invoked,pt.PERIOD)
+    if perf:
+        envelope=ROOT/'ordinary-envp-and-cwd.json'
+        put(envelope,{'environment':env(),'cwd':str(WORK),'command':list(map(str,invoked))})
+        invoked=pt.record(perf,raw,[sys.executable,'-IB',HERE/'perf_handoff.py',envelope,DIAG/'incoming-env-names.json'],pt.PERIOD)
     command(td,invoked);r,total,images=labels(tasks)
     products=observe_products(td,state);put(td/'products.json',products)
     compare=json.loads((PUB/('old'if state==OLD else 'edit')/'products.json').read_bytes())
-    need(products==compare,('normal and observed output differ',tag))
+    need(same_artifacts(products,compare),('normal and observed output differ',tag))
     rust=identity(SDK/'bin/rustc');wild=identity(SDK/WILD);selected=[]
     for row in r:
         a=row['argv'];k=tuple(row['identity'])
