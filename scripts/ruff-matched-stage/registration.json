@@ -17,247 +17,85 @@
   ],
   "bundle": {
     "baseline_commits": [],
-    "branch": "refs/heads/charlie/frozen-literal-byte-identities-v3",
-    "bytes": 7962,
+    "branch": "refs/heads/charlie/qa-ty-ide-mono-buckets-29697-20261103",
+    "bytes": 5305,
     "prerequisite": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
-    "sha256": "8e35c6733aaebc3b49d0904e4bf2a9523db46f651f79418c48d425f23ed341c3"
+    "sha256": "9697d3d3b831f89ef932e79a53b33827faf39a3eada9fbb25d0667a93cd29af4"
   },
   "changed_sources": {
+    "compiler/rustc_codegen_ssa/src/back/symbol_export.rs": {
+      "C": "01c312eaffebd2a0a327d5644ddc7d3616849295",
+      "P": "6af2626bab17fa20c1f0cf4bc7a98e886896f345"
+    },
     "compiler/rustc_incremental/src/persist/file_format.rs": {
-      "C": "9c39e6cad025a5c7d4c628feb87d6ab985030ce8",
+      "C": "f1cc605908e55162469ad0dfd0c0efb0b2c8c238",
       "P": "f96e27d853eaf23289d72479b990780eda43eacc"
     },
-    "compiler/rustc_middle/src/mir/interpret/allocation.rs": {
-      "C": "56baa498a50dddd780dc362fa7a71efbf149231c",
-      "P": "726c2892b9536382ff9fe6ae8cf9a8086bfa96d2"
+    "compiler/rustc_middle/src/dep_graph/dep_node.rs": {
+      "C": "9cb8b625a6c8ca6775851f1d0bb5875536ec053c",
+      "P": "8b4564c2ed0260bc1a644ebc8c40f2ac1004cbf3"
     },
-    "compiler/rustc_middle/src/mir/interpret/mod.rs": {
-      "C": "964e8d3e7afde35346b384911279ce66f7d2402d",
-      "P": "a89617d794b30f2f66756594b3de272499a00ace"
+    "compiler/rustc_middle/src/dep_graph/dep_node_key.rs": {
+      "C": "49515352b6a70647a0e086e74008891567684467",
+      "P": "9d03057235279f2ae21cd363554fd82d2fded34e"
     },
-    "compiler/rustc_middle/src/ty/impls_ty.rs": {
-      "C": "0d1fdd24b72108a790cd928979cae36137366a47",
-      "P": "b48693a3023ed4c922cec3f291b84d1df11ede0c"
+    "compiler/rustc_middle/src/dep_graph/mod.rs": {
+      "C": "49567c61e0d340ae47cad3c2e91c2004998540a4",
+      "P": "60c4b55ec6d348a3489cc6b06e50a5638b360147"
     },
-    "compiler/rustc_mir_build/src/builder/expr/as_constant.rs": {
-      "C": "5be489c5147f0b3c880bb7a9e0117ee3a33ebd6f",
-      "P": "91dab197b59fb6dcafb3ab1864d3d93e6ab061d7"
+    "compiler/rustc_middle/src/mono.rs": {
+      "C": "8e74b07bc8bcf630f6805eded2875d9182b14f12",
+      "P": "6ab4725289c190fa8743ac0b69c544572df5af93"
     },
-    "compiler/rustc_span/src/symbol.rs": {
-      "C": "6c3f8d77f23f36043c02681376ab9ba25d58a653",
-      "P": "9eef28c6e4ca342a368e3f45ce5fc98c462a749c"
+    "compiler/rustc_middle/src/queries.rs": {
+      "C": "bd94799143ac12d72291a53457e8d618e7701d86",
+      "P": "b3dbd5b04f80a33909f190a5cef829d904523c37"
     },
-    "compiler/rustc_span/src/symbol/tests.rs": {
-      "C": "0f2cf53b8d32047c6c435fbd1558093e29cdefab",
-      "P": "40602821615f5d6ee5a5d68878877a19efdf404b"
+    "compiler/rustc_middle/src/query/keys.rs": {
+      "C": "4b261517443a0ca79204bb493e977d98dc88514d",
+      "P": "7e18b765fd54901860a14f2583a5a2800f8355c5"
     },
-    "tests/run-make/incremental-large-byte-literal/lib.rs": {
-      "C": "b7e3d446d98da8adafcb5fd2f3cb2bb45629f0e7",
+    "compiler/rustc_middle/src/ty/instance.rs": {
+      "C": "223ff96515c56401b621a8d39fa4f288631647c9",
+      "P": "dcd0ee601aa9da5a91c35048bfdddb86e31199ea"
+    },
+    "tests/incremental/upstream-monomorphization-buckets/auxiliary/provider.rs": {
+      "C": "0ff015b7c0a98c4426d6d127d8b10a071d974baf",
       "P": null
     },
-    "tests/run-make/incremental-large-byte-literal/main.rs": {
-      "C": "79d5f3bb9908f8ec461795dc776308f835c395f6",
-      "P": null
-    },
-    "tests/run-make/incremental-large-byte-literal/rmake.rs": {
-      "C": "18bc0142b3207685a8d1d3615f09144eaf77740e",
+    "tests/incremental/upstream-monomorphization-buckets/main.rs": {
+      "C": "209a7f32dcf4ba1d76d47a1904a4ff36a4a99862",
       "P": null
     }
   },
   "follow_on_screen": {
-    "content_edit": {
-      "caveat": "Running the authentic typeshed generator costs independent work; no whole-command gain or performance enrollment.",
-      "command": "cargo +ohm check -p ty_vendored --lib --locked --offline",
-      "files": [
-        "crates/ty_python_semantic/resources/mdtest/snapshots/deprecated.md_-_Tests_for_the_`@depr\u2026_-_Syntax_(142fa2948c3c6cf1).snap",
-        "crates/ty_vendored/vendor/typeshed/source_commit.txt",
-        "crates/ty_vendored/vendor/typeshed/stdlib/typing.pyi",
-        "crates/ty_vendored/vendor/typeshed/stdlib/typing_extensions.pyi"
-      ],
-      "heads": [
-        "ccba26cc3af909b7f19060f48f53daeab5070f9d",
-        "d8dac4cb576bd091a8b6cdc60a65c770ea75a96e"
-      ],
-      "origin": "Ruff #29042, source-only held-out candidate not yet measured",
-      "physical_oracle": "ordinary ty_vendored::file_system reads stdlib/typing.pyi and stdlib/typing_extensions.pyi and reports presence/absence of exact Protocol docs; SOURCE_COMMIT changes; source and direct build.rs unchanged",
-      "rows": {
-        "97065696c0e4dbe6ff43a89c73f923bf60ee231a": {
-          "Cargo.lock": {
-            "git_oid": "a5956f32d427dba642d1c34e861a93ebf3a89f3a",
-            "raw_bytes": 138839,
-            "sha256": "26d7be8317b0e44be0d60b31f6660dd4e07ed4c19be4e6748124d07068fd7fa7",
-            "zip_crates": {
-              "path-slash": "0.2.1",
-              "walkdir": "2.5.0",
-              "zip": "8.6.0"
-            }
-          },
-          "crates/ty_vendored/Cargo.toml": {
-            "git_oid": "f07231912268f85005dea23a07ee4a65f5bac961",
-            "raw_bytes": 743,
-            "sha256": "915c05c7d706dd68b2324e52a3a1ed570e3a7bdb41a179f28c8780fcb79bc9cb"
-          },
-          "crates/ty_vendored/build.rs": {
-            "git_oid": "1dec35d2fd7acccc8c186587f01d782423407f1d",
-            "raw_bytes": 4653,
-            "sha256": "a6a9fea3ec428f2798631f0de49f9626bb16a74bd038489ddadc6d4aee39ab82"
-          },
-          "crates/ty_vendored/src/lib.rs": {
-            "git_oid": "c2251efd725d96e880d62a00c85138ed79cdcddb",
-            "raw_bytes": 3784,
-            "sha256": "5ba4674e6826f6c10edda325cca7d567d6fe9f936e716b5d01b8e985cd5d5f56"
-          },
-          "crates/ty_vendored/vendor/typeshed/source_commit.txt": {
-            "git_oid": "5ba2971442c4a8b680b9903367164cd21bd915f1",
-            "raw_bytes": 41,
-            "sha256": "f63f3e86c1dd1e7b6308c13aebb947a903979e6b02e4bb6eeb86a39ac26fb0e9",
-            "upstream_typeshed": "1b116673774d062a4af7b0a0b3d05533a6be55d0"
-          },
-          "crates/ty_vendored/vendor/typeshed/stdlib/typing.pyi": {
-            "doc_hits": 1,
-            "git_oid": "6c4746be1705b73b4b8d3faf697bb53bae2a6cd2",
-            "raw_bytes": 96796,
-            "sha256": "ec0e80b08841c8b14a6c9a8f41614622161fd4d8c0407ae8a3fc066c2ca5f90c"
-          },
-          "crates/ty_vendored/vendor/typeshed/stdlib/typing_extensions.pyi": {
-            "doc_hits": 1,
-            "git_oid": "579c487db4aab76871a56011a62814aa9261c12e",
-            "raw_bytes": 57122,
-            "sha256": "23b33ae1c7b9826068b85eb3a25f49d18dae10bfca156870d7fd2cff2c8b8950"
-          }
-        },
-        "ccba26cc3af909b7f19060f48f53daeab5070f9d": {
-          "Cargo.lock": {
-            "git_oid": "6490b30f0fa5b1e7036718188cbe15e61a63ce11",
-            "raw_bytes": 140452,
-            "sha256": "583d2c16902903b32c016859c12131cb80fd8bdc4121440f359ef743675fc1c5",
-            "zip_crates": {
-              "path-slash": "0.2.1",
-              "walkdir": "2.5.0",
-              "zip": "8.6.0"
-            }
-          },
-          "crates/ty_vendored/Cargo.toml": {
-            "git_oid": "3fa11830a3963626d6421fa782364ba1aee6e6a3",
-            "raw_bytes": 744,
-            "sha256": "e503dfd5075c707587debf56cdfeacfc57569a33d5e1dc2b37a63ac2cf48361b"
-          },
-          "crates/ty_vendored/build.rs": {
-            "git_oid": "e1ad1ece5a8ce3369c24a0a1fb021227e7d396b2",
-            "raw_bytes": 4711,
-            "sha256": "3c80316582e75bcaeed42bba3133e0872dec22068e071e68978c599d346afce2"
-          },
-          "crates/ty_vendored/src/lib.rs": {
-            "git_oid": "c2251efd725d96e880d62a00c85138ed79cdcddb",
-            "raw_bytes": 3784,
-            "sha256": "5ba4674e6826f6c10edda325cca7d567d6fe9f936e716b5d01b8e985cd5d5f56"
-          },
-          "crates/ty_vendored/vendor/typeshed/source_commit.txt": {
-            "git_oid": "49e328911d6c629cb156d2787672ca2a50d6a14b",
-            "raw_bytes": 41,
-            "sha256": "5e82a142736cd49cf8682b19fb2c6b1211e37c7a163341625f3ea3fd7370b6d1",
-            "upstream_typeshed": "c981c922a32f74c0f4717b038d4dbb1ac11170ad"
-          },
-          "crates/ty_vendored/vendor/typeshed/stdlib/typing.pyi": {
-            "doc_hits": 0,
-            "git_oid": "4658b51127f2e98ce7961fdf71ac538f89770c16",
-            "raw_bytes": 96446,
-            "sha256": "ed76d8e2ff10f2f6fc7faca26d70c34f67ca6603dd491d1e56de68ca71b0b237"
-          },
-          "crates/ty_vendored/vendor/typeshed/stdlib/typing_extensions.pyi": {
-            "doc_hits": 0,
-            "git_oid": "188dad756d348156ac4e27f5314bb30163f83537",
-            "raw_bytes": 56453,
-            "sha256": "0d904c693549d92f98f328a7f6599ff9fda377b0efd44f2d4f107bec98d97d1a"
-          }
-        },
-        "d8dac4cb576bd091a8b6cdc60a65c770ea75a96e": {
-          "Cargo.lock": {
-            "git_oid": "6490b30f0fa5b1e7036718188cbe15e61a63ce11",
-            "raw_bytes": 140452,
-            "sha256": "583d2c16902903b32c016859c12131cb80fd8bdc4121440f359ef743675fc1c5",
-            "zip_crates": {
-              "path-slash": "0.2.1",
-              "walkdir": "2.5.0",
-              "zip": "8.6.0"
-            }
-          },
-          "crates/ty_vendored/Cargo.toml": {
-            "git_oid": "3fa11830a3963626d6421fa782364ba1aee6e6a3",
-            "raw_bytes": 744,
-            "sha256": "e503dfd5075c707587debf56cdfeacfc57569a33d5e1dc2b37a63ac2cf48361b"
-          },
-          "crates/ty_vendored/build.rs": {
-            "git_oid": "e1ad1ece5a8ce3369c24a0a1fb021227e7d396b2",
-            "raw_bytes": 4711,
-            "sha256": "3c80316582e75bcaeed42bba3133e0872dec22068e071e68978c599d346afce2"
-          },
-          "crates/ty_vendored/src/lib.rs": {
-            "git_oid": "c2251efd725d96e880d62a00c85138ed79cdcddb",
-            "raw_bytes": 3784,
-            "sha256": "5ba4674e6826f6c10edda325cca7d567d6fe9f936e716b5d01b8e985cd5d5f56"
-          },
-          "crates/ty_vendored/vendor/typeshed/source_commit.txt": {
-            "git_oid": "c68a63382cfaff6bb53d6f5f82ba55c2eb868238",
-            "raw_bytes": 41,
-            "sha256": "80e0076b56bd9a8abf490a79a7797a95244e610c1ca1de5baedaf1022a655892",
-            "upstream_typeshed": "b932d8ce0f893d7d9ef167f0379dcaf9f48bf70b"
-          },
-          "crates/ty_vendored/vendor/typeshed/stdlib/typing.pyi": {
-            "doc_hits": 1,
-            "git_oid": "8259a612e8bddfca52456b6470c79ecdca4e4934",
-            "raw_bytes": 97232,
-            "sha256": "79561cd7552fb71ce47ea74c76654c7cf017ab837b2eaae333ec906f2cc65ed5"
-          },
-          "crates/ty_vendored/vendor/typeshed/stdlib/typing_extensions.pyi": {
-            "doc_hits": 1,
-            "git_oid": "4667538cb91df1bafc3e0e83f65670f90e150466",
-            "raw_bytes": 57239,
-            "sha256": "bbe67922a1d753b9cd2fcfe13336f2dfde581c236401bc8072af6518d08ccf26"
-          }
-        }
-      }
-    },
-    "status": "preselected; no Ruff optimization estimate is made by this factory",
-    "symbol_heavy_control": {
-      "command": "cargo +ohm check -p ruff_python_parser --lib --locked --offline -j4",
-      "package": "ruff_python_parser",
-      "source": "same independent Ruff #29042 history",
-      "why": "ordinary Symbol resolution goes through the common symbol interner"
-    }
+    "command": "cargo +ohm test -p ty_server --test e2e --no-run --locked --offline -j4 --message-format=json",
+    "source": [
+      "157caa55a51ebae4fa541d31697e3af9a6c32ccf",
+      "bfa2407e98ee1343caeefd02b4b69043509baa8c"
+    ],
+    "status": "Prospective held-out Ruff #29697. No source-built instruction counts examined."
   },
   "kit": {
     "commit": "bc0e3e18ccf825c4eeaece4727b9ac3b4ecd8a89",
     "prepare.sh": "de6653dc519f7bc22d8115b87fe8fc9a21bacac9843690f4651a7fc24afe54ec",
     "runtime.py": "abc0a05c278f83688f2e0b4901d3760528aa3212cb14c04bf6a4a67ce931cb35"
   },
-  "literal_controls": {
-    "common_lookups": 2048,
+  "owner_buckets": {
     "epoch": {
-      "C": 26734,
+      "C": 24450,
       "P": 26655
     },
-    "expected_runtime": {
-      "edit": "98 83 0",
-      "invalid": "E0080",
-      "old": "97 19 0"
-    },
-    "fixture": {
-      "lib.rs": "6bc783c6261956684010a984eb4964654c43eb5c7e7a743d46a12f7daa8af74d",
-      "main.rs": "6393586b42a6b319c1438feb517a6ef98ac250e8a918fa389e5895ff517f7a88"
-    },
-    "lengths": [
-      31,
-      65535,
-      65536,
-      65537
-    ]
+    "identical_stable_patch_id": "30c8ceaa86486b1fc7d77ca44845ba577eee4dcd",
+    "review_base": "a3fc6da13921586bc374586dee00883e9210aecd",
+    "review_head": "6f0191753a5058a8cd2be8ca8ced980e968c7c92",
+    "source_pr": 329
   },
   "roles": {
     "C": {
-      "compiler": "4c514d636f929d07e4acb43215c835b4c4f6ce3b",
-      "revision": "7a4e5b8dbf109e1d11bceb29c63fdefb08492f7e",
-      "tree": "1e8e19e4624991953d4af278f6ff54188e14e320"
+      "compiler": "4db171a8fb5c14ad8cb16ceec49e385ca018c094",
+      "revision": "5c5af1a053326e6ce5df048c4dcb30b53e01a069",
+      "tree": "7331fc8bd148ba6ca7459751548b82a4b1f0bb50"
     },
     "P": {
       "compiler": "01614e1dbcdedca33c620ad320c07b30207e256e",

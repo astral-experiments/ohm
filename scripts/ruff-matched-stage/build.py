@@ -357,8 +357,8 @@ def build(workspace, root):
     from epoch_guard import check as check_epochs
 
     compiler_roots = {role: Path(manifest["arms"][name]["root"]) for role, name in (("P","normal"),("C","defer"))}
-    save(root / "logs" / "literal-epochs.json", check_epochs(root/"literal-epochs", compiler_roots, env,
-                                                           REG["literal_controls"]["epoch"]))
+    save(root / "logs" / "bucket-epochs.json", check_epochs(root/"bucket-epochs", compiler_roots, env,
+                                                           REG["owner_buckets"]["epoch"]))
     for role in ("P", "C"):
         shutil.copy2(capsule / (role + ".json"), root / "logs" / (role + ".json"))
     for name in ("rustcs.json", "storage.json"):
