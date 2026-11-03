@@ -116,12 +116,18 @@ def source():
     manifest=json.loads((coordinator/"toolchains/1.99.0/23.json").read_bytes())
     manifest["sources"]["rust"]["revision"]=git_sha(src,"HEAD")
     manifest["sources"]["cargo"]["revision"]=git_sha(cargo,"HEAD")
-    proof=logs/"source-manifest-for-qa.json"
+    manifest["release"].update(ohm_revision=24,toolchain_name="ohm-1.99.0-24")
+    canonical=root/"source-proof/toolchains"
+    proof=canonical/"1.99.0/24.json"
+    proof.parent.mkdir(parents=True)
+    (canonical/"manifest.schema.json").write_bytes(sp.check_output(["git","-C",coordinator,"show","HEAD:toolchains/manifest.schema.json"]))
     smoke.save(proof,manifest)
+    shutil.copyfile(proof,logs/"source-manifest-for-qa.json")
     verifier=coordinator/"scripts/verify-release-sources.sh"
-    verified=sp.check_output(["bash",verifier,proof,src,nested,src/"src/tools/clippy",src/"src/tools/rustfmt"],stderr=sp.STDOUT)
-    assert git_sha(src,"HEAD").encode() in verified and git_sha(cargo,"HEAD").encode() in verified
-    (logs/"release-source-verifier.stdout").write_bytes(verified)
+    verified=sp.run(["bash",verifier,proof,src,nested,src/"src/tools/clippy",src/"src/tools/rustfmt"],stdout=sp.PIPE,stderr=sp.STDOUT)
+    (logs/"release-source-verifier.stdout").write_bytes(verified.stdout)
+    print(verified.stdout.decode(),flush=True)
+    assert verified.returncode==0 and git_sha(src,"HEAD").encode() in verified.stdout and git_sha(cargo,"HEAD").encode() in verified.stdout
     smoke.save(logs/"sources.json",{"rust":git_sha(src,"HEAD"),"cargo":git_sha(cargo,"HEAD"),"packet":smoke.sha(packet)})
 
 def clean_env():
