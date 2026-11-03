@@ -15,8 +15,8 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from capsule import HOST, REG, need, reopen, save, seal, sha
 
-BRANCH = "charlie/qa-matched-check-derive-rc23-20261103"
-BASE = "3a830cdc9f00b01c7110fac3653d8cd0b305c355"
+BRANCH = "charlie/qa-consumed-input-stage1-20261103"
+BASE = "34e78f19c0d0c58c86e42d83e05a4dc6db6b0f6d"
 
 
 def git(repo, *args):
@@ -305,10 +305,10 @@ def build(workspace, root):
 
         if role == "C":
             run_make = argv[:argv.index("build")] + ["test", "--stage", "1", "-j8",
-                                                      "tests/run-make/rdr-public-hash-private-native-derive"]
+                                                      "tests/run-make/dep-info-consumed-input", "tests/run-make/checksum-freshness"]
             run_make_log = root / "logs/run-make-C.log"
             guarded(run_make, rust, env, run_make_log, root)
-            need("1 passed; 0 failed; 0 ignored" in run_make_log.read_text(), "candidate regression did not run")
+            need("2 passed; 0 failed; 0 ignored" in run_make_log.read_text(), "candidate regression did not run")
 
         need(
             json.loads(json.dumps(layout.checked(rust, rev, desc["tree"], substitutions))) == full,
