@@ -1,4 +1,4 @@
-name: Measure Ruff Unicode compiler instructions
+name: Confirm complete rustc instruction savings on six independent Ruff workers
 run-name: Count the full Ruff Unicode compiler and command ${{ inputs.reviewed_head }}
 permissions:
   contents: read
@@ -14,9 +14,17 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - block: PC
+        - block: B1
           fixture: loose
-        - block: CP
+        - block: B2
+          fixture: loose
+        - block: B3
+          fixture: loose
+        - block: B4
+          fixture: loose
+        - block: B5
+          fixture: loose
+        - block: B6
           fixture: loose
     steps:
     - name: Read this immutable measurement
