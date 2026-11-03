@@ -1,0 +1,40 @@
+{
+  "bundle": "ddef03150431193ce4444b5f8142778a2d48020951856dee3ccc9903a953ca4c",
+  "candidate": "a60f4f4476d4819b62730e92ea07c1343f8e6dac",
+  "candidate_tree": "090d5a6e4bf0059354bb0aee1a0371651fa8d2dc",
+  "cargo": "abc70d60a6fd89c10d5f65cf85820d9b78d5affe",
+  "criterion": "20% fewer instructions in a full affected compiler or 2x across a real ordinary command; no PR from the factory alone.",
+  "parent": "f5a51d8cc3e76236c2d0f17d495d59ebb03306e4",
+  "parent_tree": "b4f0ad237b667d5227e63b44f6e8d3ba885bf7a1",
+  "paths": [
+    "compiler/rustc_middle/src/thir.rs",
+    "compiler/rustc_middle/src/thir/visit.rs",
+    "compiler/rustc_mir_build/src/builder/expr/as_constant.rs",
+    "compiler/rustc_mir_build/src/builder/expr/as_place.rs",
+    "compiler/rustc_mir_build/src/builder/expr/as_rvalue.rs",
+    "compiler/rustc_mir_build/src/builder/expr/category.rs",
+    "compiler/rustc_mir_build/src/builder/expr/into.rs",
+    "compiler/rustc_mir_build/src/builder/scope.rs",
+    "compiler/rustc_mir_build/src/check_unsafety.rs",
+    "compiler/rustc_mir_build/src/thir/cx/expr.rs",
+    "compiler/rustc_mir_build/src/thir/print.rs",
+    "compiler/rustc_ty_utils/src/consts.rs"
+  ],
+  "ref": "refs/heads/charlie/qa-compact-integer-arrays-20261103",
+  "release_members": {
+    "bin/cargo": {
+      "bytes": 39249096,
+      "sha256": "a4faa288657042d02767a38812c7498218dfcafc945abfe3b4a44c07323a1a24",
+      "source": "rust-1.99.0-dev-x86_64-unknown-linux-gnu/cargo/bin/cargo"
+    },
+    "lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd": {
+      "bytes": 10319072,
+      "sha256": "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5",
+      "source": "rust-1.99.0-dev-x86_64-unknown-linux-gnu/rustc/lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd"
+    }
+  },
+  "release_sha256": "ecde6809d7f1fc1966798198479867c4a49bdf7a51f3873336d23a40fabce453",
+  "ruff_new": "88a50d695c1142294bb4c780fad47d3306173885",
+  "ruff_old": "276832aa91f2086a6ec880884fcdd987991cddf2",
+  "source_recovery": "5ad861aa628d029d91d80c888b40d9908989ede2"
+}
