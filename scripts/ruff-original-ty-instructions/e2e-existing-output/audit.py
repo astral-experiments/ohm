@@ -25,9 +25,9 @@ import witness
 import prepare_reuse
 b=donor.b;w=donor.w;P=donor.P;contact=donor.contact
 STAGES=[('old',None),('edit',None),('warm1',None),('warm2',None),('capability',None),('corrupt',None),('replace','replace'),('earlier','earlier'),('four','four'),('malformed','malformed'),('native-repair',None),('save','mid-read'),('save-repair',None),('final',None)]
-def build(env):
-    src=Path(os.environ['GITHUB_WORKSPACE'])/'wild-source';files=prepare_reuse.apply(src)
-    stage=json.loads((H/'source-preflight.json').read_bytes());assert stage['pin']==donor.prepare_source.BASE and stage['after']=={x:w.hf(src/x)for x in files}
+def build(env,source=prepare_reuse.apply,registration=H/'source-preflight.json'):
+    src=Path(os.environ['GITHUB_WORKSPACE'])/'wild-source';files=source(src)
+    stage=json.loads(registration.read_bytes());assert stage['pin']==donor.prepare_source.BASE and stage['after']=={x:w.hf(src/x)for x in files}
     build=w.root/'qa-diagnostic-build';build.mkdir()
     base=dict(env,WILD_QA_ROOT=str(w.root),CARGO_HOME=str(build/'home'),CARGO_TARGET_DIR=str(build/'target'),CARGO_BUILD_BUILD_DIR=str(build/'shared'))
     online=dict(base);online.pop('CARGO_NET_OFFLINE',None)
