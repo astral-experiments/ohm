@@ -50,6 +50,7 @@
   "clients": {
     "current": {
       "binary": "0617e34321cf33fcce38904d066f0d4981b79f752896d37b97d1aed1fbddc48f",
+      "binary_bytes": 42866488,
       "bytes": 16688884,
       "head": "dfc102c99ce18da1b3bc48b8d607e3ca75ee7759",
       "id": 13218130947,
@@ -61,6 +62,7 @@
     },
     "early": {
       "binary": "1d4c93cd725a06b9a31704dc05a67a5d418c4cf97a3d3680ce8fb522ccee404f",
+      "binary_bytes": 42858216,
       "bytes": 16686003,
       "head": "506173f916bbf2d9946b0eb326ad6a800e6e43a5",
       "id": 13215562626,
@@ -71,14 +73,15 @@
       "source": "7c5f8b2d570b66f2125a8683bc2ce0cb98af88a6"
     },
     "fixed": {
-      "binary": "f97b6020c860e05eb3b4a20f0d2ae0d0e1b10953bc2a2d2205b77df9565cb13d",
-      "bytes": 191509985,
-      "head": "1f536b597882c66470c8ea0d38c300283c8dbda6",
-      "id": 13217478384,
-      "name": "ruf009-join-proof-41606683189",
-      "product": "cargo-release-child",
-      "run": 41606683189,
-      "sha256": "a5a390f0f430c15209d44794cbb8358e6a540992822c3d9dbea26eb54a200172",
+      "binary": "9d81d7fc7747e6202d79c1daaa5e5420ed69af7fc1799fc253f134634d4a7b60",
+      "binary_bytes": 118950168,
+      "bytes": 29099874,
+      "head": "83c077cd71d0fff7142632edc019b053c5f81cdd",
+      "id": 13215818006,
+      "name": "ruf009-join-proof-41604084199",
+      "product": "candidate-cargo",
+      "run": 41604084199,
+      "sha256": "887c5c8c781dc7b944584955d38f1156b2fccb5b6a895ec63e07fec8a82f8717",
       "source": "4a6de7858c60e579fc30e01f5b60ddcaa84c2e30"
     }
   },
@@ -148,6 +151,25 @@
     "aware",
     "aware-registry"
   ],
+  "pretrial_correction": {
+    "artifact": 13218474553,
+    "head": "0d4981bedf57972a273fa9d4b1b6c61b08a0c049",
+    "original": {
+      "binary": "f97b6020c860e05eb3b4a20f0d2ae0d0e1b10953bc2a2d2205b77df9565cb13d",
+      "bytes": 191509985,
+      "head": "1f536b597882c66470c8ea0d38c300283c8dbda6",
+      "id": 13217478384,
+      "name": "ruf009-join-proof-41606683189",
+      "product": "cargo-release-child",
+      "run": 41606683189,
+      "sha256": "a5a390f0f430c15209d44794cbb8358e6a540992822c3d9dbea26eb54a200172",
+      "source": "4a6de7858c60e579fc30e01f5b60ddcaa84c2e30"
+    },
+    "reason": "The standalone no-flag Cargo release build belonged to an encompassing refused historical experiment. Keep the successful-constructor guard and substitute its same-source independently successful diagnostic build only for the inactive unscored control.",
+    "run": 41611476135,
+    "sha256": "7a06c41cfcf2daca628c3fbf54b8ed4bb5dd0193f8f4f866b3a41e448f9eff1b",
+    "typed": 0
+  },
   "previous_case_receiver": "ddfeceeb6fd33fdea233a39a3d59ab523f5ab170",
   "purpose": "Unscored Linux ABI, input validation and parked same-path upgrades; the historical Ruff performance refusal contributes no samples.",
   "raw_witnesses": "Real include_bytes of actual emitted selected rmeta, raw BLAKE3, first edited E0308 and independent empty + repair. Both true corrected rustcs also consume conflicting reads of one input at identical mtime. Every counterexample refuses qualification.",

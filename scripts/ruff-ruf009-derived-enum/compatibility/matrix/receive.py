@@ -43,7 +43,7 @@ for role, binding in m.REG["clients"].items():
     assert zpath.stat().st_size == binding["bytes"] and m.sha(zpath) == binding["sha256"]
     product = root/("cargo-"+role)
     with zipfile.ZipFile(zpath) as z:
-        assert z.namelist().count(binding["product"])==1 and 20_000_000 < z.getinfo(binding["product"]).file_size < 100_000_000
+        assert z.namelist().count(binding["product"])==1 and z.getinfo(binding["product"]).file_size == binding["binary_bytes"]
         with z.open(binding["product"]) as src, product.open("xb") as out:
             shutil.copyfileobj(src,out)
     assert m.sha(product) == binding["binary"]
