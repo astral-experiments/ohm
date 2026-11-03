@@ -1,43 +1,44 @@
-name: Measure a registered signed or marginal Ohm -23 contrast on uv 22958
+name: 'Measure the registered #21134 handwritten impl production candidate'
 'on':
   workflow_dispatch:
     inputs:
       reviewed_head:
         required: true
         type: string
-        description: Reviewed full SHA of this benchmark
-      release_lock:
+        description: Reviewed same source across all four placements
+      G_lock:
         required: true
         type: string
-        description: SHA-256 of the common three-role signed -23 release and private builds
-      contrast:
+        description: Final verified production G receipt SHA-256
+      series:
         required: true
         type: choice
-        description: Registered comparison
         options:
-        - marginal
-        - signed
-      prior_marginal:
+        - marginal.initial
+        - signed.initial
+        - marginal.repeat
+        - signed.repeat
+      prior_boots:
         required: true
         type: string
-        default: none
-        description: Marginal uses none. Signed requires the marginal run:job:artifact:ZIP_SHA256
+        default: '[]'
+        description: JSON list of each previously calibrated run, job, label, boot artifact ID and SHA-256. Use [] only on the first
+          allocation.
 permissions:
   contents: read
   actions: read
   attestations: read
 jobs:
   root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22958-release23-split-check'
-      && github.sha == inputs.reviewed_head && github.run_attempt == 1
-      && ((inputs.contrast == 'marginal' && inputs.prior_marginal == 'none') || (inputs.contrast == 'signed' && inputs.prior_marginal != 'none'))
+    if: false && (github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21134-handwritten-check'
+      && github.sha == inputs.reviewed_head && github.run_attempt == 1 && startsWith(inputs.series, 'marginal.'))
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 120
+    timeout-minutes: 180
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      RELEASE_LOCK: ${{ inputs.release_lock }}
-      UV_22958_CONTRAST: ${{ inputs.contrast }}
-      UV_22958_PRIOR_MARGINAL: ${{ inputs.prior_marginal }}
+      G_LOCK: ${{ inputs.G_lock }}
+      SERIES: ${{ inputs.series }}
+      PRIOR_BOOTS: ${{ inputs.prior_boots }}
     steps:
     - name: Check out coordinator
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -45,10 +46,13 @@ jobs:
         path: coordinator
         ref: ${{ github.sha }}
         persist-credentials: 'false'
-        sparse-checkout: |-
-          scripts/handwritten-panel
+        sparse-checkout: 'scripts/handwritten-panel
+
           scripts/uv-callables-21041
+
           scripts/uv-client-22958
+
+          scripts/uv-check-21134'
         fetch-depth: '2'
     - name: Check out opening
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -56,107 +60,103 @@ jobs:
         path: opening
         ref: 341cd92e5d381a50bd380467075f31e780ee6296
         persist-credentials: 'false'
-        sparse-checkout: |
-          scripts/uv-root-20991-opening
+        sparse-checkout: 'scripts/uv-root-20991-opening
+
+          '
     - name: Check out previous
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: previous
         ref: 8bf1d2c61fa3bb23ccf44a329e74e0359d98848c
         persist-credentials: 'false'
-        sparse-checkout: |
-          scripts/uv-resolver-whole-pmu
+        sparse-checkout: 'scripts/uv-resolver-whole-pmu
+
+          '
     - name: Check out qualified
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: qualified
         ref: 1286210a06dcc353a4f03dcf8c7bb15f99a56cad
         persist-credentials: 'false'
-        sparse-checkout: |
-          scripts/rc23-trait-qualification
+        sparse-checkout: 'scripts/rc23-trait-qualification
+
+          '
     - name: Check out pilot
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: pilot
         ref: 5c651f1d38c629da2a75d5cac3588db0be8104d7
         persist-credentials: 'false'
-        sparse-checkout: |
-          scripts/ctfe-crossover-pilot
+        sparse-checkout: 'scripts/ctfe-crossover-pilot
+
           scripts/branch-return-pmu
+
+          '
     - name: Check out calibrator
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: calibrator
         ref: 2f413ca94b84af2dbd6d6231bcf8d860c97ebee8
         persist-credentials: 'false'
-        sparse-checkout: |
-          scripts/gnu-renderer-pfc-hardware
+        sparse-checkout: 'scripts/gnu-renderer-pfc-hardware
+
+          '
     - name: Check out observers
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         path: observers
         ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
         persist-credentials: 'false'
-        sparse-checkout: |
-          scripts/gnu-example-ceiling
+        sparse-checkout: 'scripts/gnu-example-ceiling
+
           scripts/gnu-renderer-library-workers
+
+          '
     - name: Check out uv at the actual landed edit
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         repository: astral-sh/uv
-        ref: 362613dbf38f60fe285cdd6bca53641149a23c04
-        fetch-depth: '64'
+        ref: a6904bbdabd3c6ac42b1051896ff597c8bd1895a
+        fetch-depth: '3'
         fetch-tags: 'false'
         persist-credentials: 'false'
         path: uv-source
-    - name: Fetch and verify the historical release tag for the real uv build script
-      run: |
-        git -C uv-source fetch --no-tags --depth=1 https://github.com/astral-sh/uv.git refs/tags/0.13.6:refs/tags/0.13.6
-        test "$(git -C uv-source rev-parse 'refs/tags/0.13.6^{}')" = 329bf9448afd9f9088d14a4d57fbc61eb454f117
-    - name: Check the private payload and host prerequisites
-      run: |
-        set -euo pipefail
-        mkdir trait-results
-        /usr/bin/python3.12 -ISB coordinator/scripts/uv-client-22958/manifest.py
-        /usr/bin/bash opening/scripts/uv-root-20991-opening/host-prerequisites.sh 2>&1 | tee trait-results/host-prerequisites.log
-    - name: Authenticate this assignment and the previous marginal calibration on the signed contrast
+    - name: Require the originally locked signed release, admitted G and an unused physical host
       env:
         GH_TOKEN: ${{ github.token }}
-      run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py placement
-    - name: Calibrate inherited userspace instructions for real fork, exec and threads
-      run: |
-        set -euo pipefail
-        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py calibrate 2>&1 | tee trait-results/calibration.log
+      run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-check-21134/host.py start
+    - name: Check the original host prerequisites
+      run: 'set -euo pipefail
+
+        /usr/bin/bash opening/scripts/uv-root-20991-opening/host-prerequisites.sh 2>&1 | tee trait-results/host-prerequisites.log'
+    - name: Calibrate original retired-instruction counters, subprocess instrumentation and blocking clock
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-check-21134/host.py calibrate
     - name: Seal the fresh physical runner and its blocking wall calibration
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-22958-release23-${{ inputs.contrast }}-runner-boot
+        name: uv-21134-${{ inputs.series }}-boot
         path: trait-results/boot-attestation.json
         if-no-files-found: error
         retention-days: 14
-    - name: Admit the two original optimized GNU packages and the released Cargo binary
+    - name: Install the original authenticated SDKs and genuine signed Cargo
       env:
         GH_TOKEN: ${{ github.token }}
-      run: |
-        set -euo pipefail
-        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py admit 2>&1 | tee trait-results/intake.log
-    - name: Isolate both release formats and exercise a linked program across both compiler transitions
-      run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py migration
-    - name: Compare original cold and warm identities before any of sixteen ordinary histories can be timed
-      run: |
-        set -euo pipefail
-        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py study 2>&1 | tee trait-results/experiment.log
-    - name: Independently reduce the eight blocking wall pairs and their hardware declarations
+      run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-check-21134/host.py assets
+    - name: Verify native controls and measure eight independently restored first-edit pairs
       env:
         GH_TOKEN: ${{ github.token }}
-      run: |
-        set -euo pipefail
-        /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py reduce 2>&1 | tee trait-results/reduction.log
-    - name: Preserve raw clocks, source qualification and any incomplete attempt
+      run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-check-21134/host.py study
+    - name: Reopen the release, clocks, raw rustc counters and whole-process results
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-check-21134/host.py finish
+    - name: Preserve the full native, timing and counter original, including any refusal
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-22958-release23-${{ inputs.contrast }}-wall-eight-pairs
+        name: uv-21134-${{ inputs.series }}-original
         path: trait-results/
         if-no-files-found: error
         compression-level: '1'
