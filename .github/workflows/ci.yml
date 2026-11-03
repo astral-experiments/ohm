@@ -1,12 +1,5 @@
 name: Qualify Cargo and rustc checksum fixes together on macOS
 run-name: Combined nonpublishing checksum QA ${{ inputs.reviewed_head }}
-on:
-  workflow_dispatch:
-    inputs:
-      reviewed_head:
-        required: true
-        type: string
-        description: Exact QA source commit
 permissions:
   contents: read
 jobs:
@@ -15,52 +8,161 @@ jobs:
     runs-on: namespace-profile-macos-15
     timeout-minutes: 115
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: ${{ inputs.reviewed_head }}
-          path: qa
-          persist-credentials: false
-          sparse-checkout: scripts/ruff-combined-apple
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          repository: astral-experiments/ohm-rust
-          ref: d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2
-          fetch-depth: 0
-          path: rust
-          persist-credentials: false
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          repository: astral-experiments/ohm-cargo
-          ref: 4a6de7858c60e579fc30e01f5b60ddcaa84c2e30
-          path: cargo-src
-          persist-credentials: false
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: 5b47d5755bd515e61a98b9f85eca3af0aaf7c137
-          path: fixtures
-          persist-credentials: false
-          sparse-checkout: scripts/ruff-matched-stage
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
-        with:
-          python-version: '3.13'
-      - name: Install the signed parent distribution
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          mkdir "$RUNNER_TEMP/combined"
-          gh release download ohm-1.99.0-23 -R astral-experiments/ohm -p ohm-1.99.0-23-aarch64-apple-darwin.tar.gz --dir "$RUNNER_TEMP/combined"
-          python3 -IB qa/scripts/ruff-combined-apple/qualify.py install
-      - name: Build the two precise product heads
-        run: |
-          git -C rust submodule update --init library/backtrace
-          command -v ninja || brew install ninja
-          python3 -IB qa/scripts/ruff-combined-apple/qualify.py build
-      - name: Exercise signed, upgraded and clean Cargo verdicts
-        run: python3 -IB qa/scripts/ruff-combined-apple/qualify.py exercise
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        if: always()
-        with:
-          name: combined-checksums-apple-${{ github.run_id }}
-          path: ${{ runner.temp }}/combined/logs/
-          if-no-files-found: warn
-          retention-days: 15
+    - name: Check out release coordinator
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        persist-credentials: false
+        ref: 634d090f0f565936996a817bcb884c64cbe7e6cc
+    - name: Check out the signed -23 source manifest
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 9c2397d36f033900a0864484714d526788d1dc77
+        path: signed-coordinator
+        sparse-checkout: 'scripts
+
+          toolchains/1.99.0'
+        persist-credentials: false
+    - name: Check out qa-code
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: ${{ github.sha }}
+        path: qa-code
+        sparse-checkout: '.github/workflows
+
+          scripts/rc23-expanded-inputs
+
+          scripts/ruff-matched-stage
+
+          scripts/ruff-combined-apple'
+        persist-credentials: false
+        fetch-depth: 16
+    - name: Check out legacy
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 46258d8b9b6ae5f7b443fab3115799466a3b5ff4
+        path: legacy
+        sparse-checkout: 'scripts/integrated-dist-qa
+
+          scripts/dep-graph-slots
+
+          toolchains/1.99.0
+
+          scripts/darwin-pgo-diesel'
+        persist-credentials: false
+    - name: Check out legacy/source-carrier
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 0c9c558ce24212e5da6fb66150790b0af3cee90b
+        path: legacy/source-carrier
+        sparse-checkout: scripts/rc22-private-export-ice
+        persist-credentials: false
+    - name: Check out legacy/transport
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 7bc72b798b019a9ec0de6eeea3bc22b783917b27
+        path: legacy/transport
+        sparse-checkout: scripts/rc22-native
+        persist-credentials: false
+    - name: Check out legacy/public-seed
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 85c467e1190d80fa8607fb0f9ef0824b4271266a
+        path: legacy/public-seed
+        sparse-checkout: scripts/ohm-apple-zmij/source-transport
+        persist-credentials: false
+    - name: Check out legacy/signed-rust
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: d1e77f9acf1bb19ceb72274b89a5aaa119fb8bf1
+        path: legacy/signed-rust
+        sparse-checkout: scripts/strict-mixed-generics
+        persist-credentials: false
+    - name: Check out legacy/cargo-seed
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 46d28e8bff1c6b52f3e7b7bc13192019e964a7da
+        path: legacy/cargo-seed
+        sparse-checkout: 'scripts/cargo-diagnostic-fix
+
+          scripts/ohm-apple-zmij/cargo293'
+        persist-credentials: false
+    - name: Check out qa-cross
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: e6ff148b647d3033244eb979eb6384963e351db2
+        path: qa-cross
+        sparse-checkout: scripts/rc23-cross-qualification
+        persist-credentials: false
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 5b47d5755bd515e61a98b9f85eca3af0aaf7c137
+        path: fixtures
+        persist-credentials: false
+        sparse-checkout: scripts/ruff-matched-stage
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: d47e72f8dc7cbc296d25992287998bea7e0f5520
+        path: reader-source
+        persist-credentials: false
+        sparse-checkout: scripts/ruff-join-proof/fix
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 0ba92bc43183bd548243fedea51e2762f27c05dc
+        path: accepted-source
+        persist-credentials: false
+        sparse-checkout: scripts/ohm-apple-zmij/cargo293
+    - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+      with:
+        python-version: '3.13'
+    - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+      with:
+        enable-cache: false
+    - name: Recover both exact source trees from the private packaging repository
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: 'set -euo pipefail
+
+        mkdir -p "$RUNNER_TEMP/ohm-branch-object-qa/logs" "$RUNNER_TEMP/combined/logs"
+
+        python3 -IB qa-code/scripts/rc23-expanded-inputs/materialize.py --workspace "$GITHUB_WORKSPACE" --rust "$GITHUB_WORKSPACE/source/rust" --out "$RUNNER_TEMP/ohm-branch-object-qa/logs/source-precursor.json"
+
+        python3 -IB qa-code/scripts/ruff-matched-stage/signed_source.py
+
+        python3 -IB reader-source/scripts/ruff-join-proof/fix/materialize.py --prior-pack accepted-source/scripts/ohm-apple-zmij/cargo293/source.pack --dest "$GITHUB_WORKSPACE/cargo-src"
+
+        python3 -IB qa-code/scripts/ruff-combined-apple/qualify.py source'
+    - name: Install the signed parent distribution
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: 'gh release download ohm-1.99.0-23 -R astral-experiments/ohm -p ohm-1.99.0-23-aarch64-apple-darwin.tar.gz --dir "$RUNNER_TEMP/combined"
+
+        python3 -IB qa-code/scripts/ruff-combined-apple/qualify.py install
+
+        '
+    - name: Build the two precise product heads
+      run: 'test -f source/rust/library/backtrace/Cargo.toml || git -C source/rust submodule update --init library/backtrace
+
+        command -v ninja || brew install ninja
+
+        python3 -IB qa-code/scripts/ruff-combined-apple/qualify.py build
+
+        '
+    - name: Exercise signed, upgraded and clean Cargo verdicts
+      run: python3 -IB qa-code/scripts/ruff-combined-apple/qualify.py exercise
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      if: always()
+      with:
+        name: combined-checksums-apple-${{ github.run_id }}
+        path: ${{ runner.temp }}/combined/logs/
+        if-no-files-found: warn
+        retention-days: 15
+    env:
+      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      PYTHONDONTWRITEBYTECODE: '1'
+'on':
+  workflow_dispatch:
+    inputs:
+      reviewed_head:
+        required: true
+        type: string
+        description: Exact QA source commit

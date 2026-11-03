@@ -19,7 +19,7 @@ logs = root / "logs"
 logs.mkdir(exist_ok=True)
 assert platform.system() == "Darwin" and platform.machine() == "arm64"
 assert os.environ["GITHUB_RUN_ATTEMPT"] == "1"
-src = workspace / "rust"
+src = workspace / "source/rust"
 cargo = workspace / "cargo-src"
 sys.path.insert(0, str(workspace / "fixtures/scripts/ruff-matched-stage"))
 import smoke
@@ -30,7 +30,27 @@ def git_sha(path, expr):
 def check_sources():
     for repo, ref, tree in ((src, "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2", "d9d8d190d49a742d7b990d46420bace16f9fd2db"), (cargo, "4a6de7858c60e579fc30e01f5b60ddcaa84c2e30", "1a128e47d068ee91f33ba94e416ee0c0e014de5a"), (workspace/"fixtures", "5b47d5755bd515e61a98b9f85eca3af0aaf7c137", "d22f09981bdd81fc892fd47d894233639d0f3dab")):
         assert git_sha(repo, "HEAD") == ref and git_sha(repo, "HEAD^{tree}") == tree
-        sp.run(["git", "-C", repo, "diff", "--exit-code", "HEAD", "--"], check=True)
+        if repo!=src:
+            sp.run(["git", "-C", repo, "diff", "--exit-code", "HEAD", "--"], check=True)
+    import importlib.util
+    spec=importlib.util.spec_from_file_location("verified_layout",workspace/"legacy/scripts/dep-graph-slots/layout.py")
+    layout=importlib.util.module_from_spec(spec);spec.loader.exec_module(layout)
+    pins=json.loads((workspace/"qa-code/scripts/ruff-matched-stage/canonical-pins/pins.json").read_bytes())
+    replacements={"src/tools/"+k:(pins[k]["after"],pins[k]["tree"]) for k in ("clippy","rustfmt")}
+    previous=json.loads((Path(os.environ["RUNNER_TEMP"])/"ohm-branch-object-qa/logs/source.json").read_bytes())
+    checked=layout.checked(src,git_sha(src,"HEAD"),git_sha(src,"HEAD^{tree}"),replacements)
+    for field in ("gitlinks","authorized_differences"):
+        assert json.loads(json.dumps(checked[field]))==previous["layout"][field],field
+
+def source():
+    assert git_sha(src,"HEAD")=="d57fd1515986dccecdcece8da85e651bfb4b81f9"
+    packet=Path(__file__).resolve().with_name("parent.bundle");assert smoke.sha(packet)=="00cf7f98b1f31f484580a86dca0ed2696ed9e4545025110bfc7c3ca4f5fccb9f"
+    sp.run(["git","-C",src,"bundle","verify",packet],check=True)
+    sp.run(["git","-C",src,"fetch","--no-tags","--no-recurse-submodules",packet,"refs/heads/charlie/record-included-bytes-at-read"],check=True)
+    assert git_sha(src,"FETCH_HEAD")=="d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2"
+    sp.run(["git","-C",src,"checkout","--quiet","--detach","--no-recurse-submodules",git_sha(src,"FETCH_HEAD")],check=True)
+    check_sources()
+    smoke.save(logs/"sources.json",{"rust":git_sha(src,"HEAD"),"cargo":git_sha(cargo,"HEAD"),"packet":smoke.sha(packet)})
 
 def clean_env():
     keys = ("PATH", "HOME", "USER", "LANG", "TMPDIR", "DEVELOPER_DIR", "SDKROOT")
@@ -141,4 +161,4 @@ def exercise():
     smoke.save(logs/"accepted-combined.json", {"rust":git_sha(src,"HEAD"),"cargo":git_sha(cargo,"HEAD"),"summaries":smoke.sha(logs/"smoke.json"),"tools":before,"prerequisite_commands":14})
 
 if __name__=="__main__":
-    {"install":install,"build":build,"exercise":exercise}[sys.argv[1]]()
+    {"source":source,"install":install,"build":build,"exercise":exercise}[sys.argv[1]]()
