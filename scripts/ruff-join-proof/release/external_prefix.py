@@ -10,6 +10,8 @@ import shutil
 import stat
 import subprocess
 from urllib.parse import urlsplit, unquote
+import locked_git
+import tomllib
 
 
 def need(cond, reason):
@@ -37,7 +39,7 @@ def parcel(state, source, home, lock, phases, physical=True):
         for r in rows:
             if r['reason'] not in ('build-script-executed','compiler-artifact'):continue
             pid=r['package_id']
-            if not pid.startswith('registry+'):
+            if not locked_git.external(pid):
                 need(pid.startswith('path+file://'),'foreign local dependency')
                 url=urlsplit(pid.removeprefix('path+'))
                 need(not url.netloc and Path(unquote(url.path)).is_relative_to(source),'foreign local source URL')
@@ -45,12 +47,17 @@ def parcel(state, source, home, lock, phases, physical=True):
                     need(Path(r['target']['src_path']).is_relative_to(source) and Path(r['manifest_path']).is_relative_to(source),'unregistered local Cargo source')
                 if r['reason']=='compiler-artifact':local.append([pid,r['target']['name'],r['target']['kind']])
                 continue
-            key=pid.rsplit('#',1)[1]
-            name,version=key.rsplit('@',1)
-            need((name,version)in packages and '#' not in name,'unlocked prefix package')
+            vcs=pid.startswith('git+')
+            if vcs:name,version,revision=locked_git.owner(pid,lock)
+            else:
+                key=pid.rsplit('#',1)[1];name,version=key.rsplit('@',1)
+                need((name,version)in packages and '#' not in name,'unlocked prefix package')
             if r['reason']=='compiler-artifact':
                 manifest=Path(r['manifest_path'])
-                need(manifest.name=='Cargo.toml' and manifest.parent.name==name+'-'+version and manifest.parent.parent.parent==registered,'wrong external source')
+                if vcs:
+                    need(manifest.name=='Cargo.toml'and manifest.is_file()and not manifest.is_symlink()and tomllib.loads(manifest.read_text())['package']['name']==name,'wrong Git package')
+                    locked_git.root(home,manifest.parent,revision)
+                else:need(manifest.name=='Cargo.toml' and manifest.parent.name==name+'-'+version and manifest.parent.parent.parent==registered,'wrong external source')
                 sources[pid]=str(manifest.parent)
                 parts=r['filenames'];reg.append([pid,r['target']['name'],r['target']['kind']])
                 if name=='get-size-derive2' and r['target']['kind']==['proc-macro']:
@@ -93,7 +100,7 @@ def census(state,roots,home):
 
 class Prefix:
     def __init__(self,state,source,home,work,lock,phases):
-        self.state=state;self.home=home;self.work=work;work.mkdir()
+        self.state=state;self.home=home;self.work=work;self.lock=lock;work.mkdir()
         self.roots,self.units,self.macro,self.sources=parcel(state,source,home,lock,phases)
         record(work/'owners.json',self.roots);record(work/'registered-units.json',self.units)
         (work/'Cargo.lock').write_bytes((source/'Cargo.lock').read_bytes())
@@ -112,8 +119,12 @@ class Prefix:
         need(len(paths)==len(table),'duplicate registry input pathname')
         return table
     def source_digest(self):
-        result={}
+        result={};git_trees={}
         for pid,dirname in self.sources.items():
+            if pid.startswith('git+'):
+                _,_,rev=locked_git.owner(pid,self.lock);src=locked_git.root(self.home,Path(dirname),rev)
+                if src not in git_trees:git_trees[src]=locked_git.verify(src,rev)
+                result[pid]=[str(Path(dirname).relative_to(src)),git_trees[src]];continue
             root=Path(dirname)
             h=hashlib.sha256();count=0
             for f in sorted(root.rglob('*')):
@@ -152,12 +163,16 @@ class Prefix:
         keep=self.state.parent/'ruf009-registry-inputs-in-flight';keep.mkdir()
         for kind in ('cache','index','src'):
             (self.home/'registry'/kind).rename(keep/kind)
+        pinned=self.home/'git'
+        need(pinned.is_dir()and not pinned.is_symlink(),'locked Git input cache missing')
+        pinned.rename(keep/'git')
         config=self.home/'config.toml';has_config=config.is_file()
         if has_config:
             need(not config.is_symlink(),'unexpected Cargo config');config.rename(keep/'config.toml')
         need(self.home.is_dir() and not self.home.is_symlink(),'unsafe Cargo input directory')
         shutil.rmtree(self.home);(self.home/'registry').mkdir(parents=True)
         for kind in ('cache','index','src'):(keep/kind).rename(self.home/'registry'/kind)
+        (keep/'git').rename(self.home/'git')
         if has_config:(keep/'config.toml').rename(self.home/'config.toml')
         keep.rmdir()
         if self.fixed is not None:self.verify(label)
@@ -165,7 +180,7 @@ class Prefix:
         rows=events(path);ext=[];local=[]
         for r in rows:
             if r.get('reason')!='compiler-artifact':continue
-            external=r['package_id'].startswith('registry+')
+            external=locked_git.external(r['package_id'])
             need(r['fresh'] is external,('independent Ruff cold/registered external proof',r['package_id'],r['target']['name'],r['fresh']))
             (ext if external else local).append([r['package_id'],r['target']['name'],r['target']['kind']])
         need({'external':sorted(ext),'local':sorted(local)}==self.units[phase],'different cold graph')

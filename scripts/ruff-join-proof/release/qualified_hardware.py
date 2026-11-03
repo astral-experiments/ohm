@@ -4,7 +4,7 @@ import collections, gzip, hashlib, json, os, re, shutil, signal, subprocess, sys
 HERE=Path(__file__).resolve().parent
 sys.path[:0]=[str(HERE),str(HERE.parent.parent/'ruff-foreign-span-observer'),str(HERE.parent/'evidence/reader/upgrade')]
 import worker as sdk
-import bundle, counter_argv, external_prefix
+import bundle, counter_argv, external_prefix, locked_git
 ORIGINAL='13217478384';BOOT_PLAN='45f061e7e3fc6e082ae3505e63c2d234c7370ded4377182391602f02f8e66cce'
 ROOTS=('ruff_linter','ruff_graph','ruff_workspace','ty_python_semantic')
 def check(c,why):
@@ -19,7 +19,7 @@ def admit():
     check(sdk.hf(HERE/'hardware-plan.json')==BOOT_PLAN,'changed original plan')
     p=json.loads((HERE/'hardware-plan.json').read_bytes());plan=json.loads((HERE/'plan.json').read_bytes());ids=p['sources']
     check(git('rev-parse','HEAD')==ids['Ruff_edit']and git('rev-parse','HEAD^')==ids['Ruff_old']and sdk.hf(sdk.work/'Cargo.lock')==ids['Ruff_lock']and not git('status','--porcelain'),'Ruff source or lock')
-    check(sdk.hf(HERE/'whole_count.c')==p['counter_sha256']and sdk.hf(HERE/'counter_argv.py')==p['exec_boundary_source_sha256']and sdk.hf(HERE/'external_prefix.py')=='6f505eb21c5a16bb0808c3db36223fc0cfdecddd5ea9d84f0d9489012a730646','counter or registry receiver')
+    check(sdk.hf(HERE/'whole_count.c')==p['counter_sha256']and sdk.hf(HERE/'counter_argv.py')==p['exec_boundary_source_sha256']and sdk.hf(HERE/'external_prefix.py')=='3893ab09b216967b53727b9faea7bcebd64fe610e808ddba8297c6873368ad75' and sdk.hf(HERE/'locked_git.py')=='4bf244c9d6010e0d35ee1f3da720a47c936a0c6c3dedf62ec5b7f0cda20d87e3','counter or registry receiver')
     check(p['argv']==plan['primary']and p['order']==list('PCCP')and all(ids[k]==bundle.SOURCES[v][0]for k,v in [('P','release-parent'),('C','release-child')]),'Cargo command/source')
     return p,plan
 def rcards(archive):
@@ -72,7 +72,7 @@ def external_products(d):
         v=[f.stat().st_size,sdk.hf(f)];check(data.setdefault(k,v)==v,'two bodies for one path')
     for x in external_prefix.events(d):
         pid=x.get('package_id','')
-        if not pid.startswith('registry+'):continue
+        if not locked_git.external(pid):continue
         if x['reason']=='compiler-artifact':
             for name in x['filenames']:
                 f=Path(name);keep(pid+' '+str(f.relative_to(state)),f)
