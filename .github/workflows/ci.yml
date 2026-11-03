@@ -12,7 +12,7 @@ permissions:
   actions: read
 jobs:
   verify:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruf009-consumed-native-20261103' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruf009-sete-consumer-safety-20261103' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 45
     env:
@@ -37,14 +37,8 @@ jobs:
           sparse-checkout: scripts/ruff-default-owner-pmu
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: 95b405a443e75f1e08daefb0dbd86d29581a5bde
+          ref: 6250ceba040bc15c2a296ae7ee1e5c6897f3ff06
           path: scope-current
-          persist-credentials: false
-          sparse-checkout: scripts/ruff-matched-stage
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: cf380559123e1144ac83f03d2fc1c4a2e89a9286
-          path: scope-early
           persist-credentials: false
           sparse-checkout: scripts/ruff-matched-stage
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -72,8 +66,8 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: ruf009-v5-native-${{ github.run_id }}
-          path: ${{ runner.temp }}/ruf009-v5-native/artifact
+          name: ruf009-v5-sete-native-${{ github.run_id }}
+          path: ${{ runner.temp }}/ruf009-v5-sete-native/artifact
           retention-days: 7
           if-no-files-found: error
           compression-level: 0

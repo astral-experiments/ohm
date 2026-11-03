@@ -14,9 +14,9 @@ sys.path.insert(0, str(HERE.parents[2]/"ruff-linter-check-attribution"))
 import scope_matched as scope
 
 w = scope.w
-root = Path(os.environ["RUNNER_TEMP"])/"ruf009-v5-native"
+root = Path(os.environ["RUNNER_TEMP"])/"ruf009-v5-sete-native"
 root.mkdir()
-w.BRANCH = "charlie/qa-ruf009-consumed-native-20261103"
+w.BRANCH = "charlie/qa-ruf009-sete-consumer-safety-20261103"
 w.ROOT = root
 w.OUT = root / "source-receipts"
 w.OUT.mkdir()
@@ -56,7 +56,6 @@ for role, binding in m.REG["clients"].items():
 alias=w.WS/"alias/scripts/ruff-join-proof/evidence/reader"
 assert w.git(alias,"rev-parse","HEAD")==m.REG["reader"] and not w.git(alias,"status","--porcelain","--untracked-files=all")
 current=root/"scope-kit-current/reopened"
-early=root/"scope-kit-early/reopened"
-subprocess.run([sys.executable,"-IB",HERE/"run.py","--root",root/"matrix","--p2",current/"normal","--q2",current/"defer",
-                "--q1",early/"defer","--early",clients["early"],"--current",clients["current"],"--fixed",clients["fixed"],
+subprocess.run([sys.executable,"-IB",HERE/"run.py","--root",root/"matrix","--p3",current/"normal","--q3",current/"defer",
+                "--current",clients["current"],"--fixed",clients["fixed"],
                 "--b3sum",shutil.which("b3sum"),"--alias-source",alias],check=True)

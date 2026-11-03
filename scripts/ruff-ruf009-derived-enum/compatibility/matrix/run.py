@@ -83,7 +83,7 @@ def aliases(root, sdk, cargo, source, role):
 
 def main():
     p = argparse.ArgumentParser()
-    for name in ("root", "p2", "q2", "q1", "current", "early", "fixed", "b3sum", "alias-source"):
+    for name in ("root", "p3", "q3", "current", "fixed", "b3sum", "alias-source"):
         p.add_argument("--" + name, type=Path, required=True)
     a = p.parse_args()
     root = a.root.resolve()
@@ -119,10 +119,10 @@ def main():
             completed.append({"label":label, "commands":40, "independent":sha(report), "original_acquisition":REG["prior_literal_source"]})
             continue
         contract = logs / (label+"-registration.json")
-        write(contract, spec("literal", "P2", "Q2", "current"))
+        write(contract, spec("literal", "P3", "Q3", "current"))
         expect = "legacy" if mode == "legacy" else "aware"
         argv = [*py, CASE/"reproduce.py", "--registration", contract, "--work", root/label,
-                "--parent-sdk", sdk["P2"], "--candidate-sdk", sdk["Q2"], "--b3sum", a.b3sum, "--expect", expect]
+                "--parent-sdk", sdk["P3"], "--candidate-sdk", sdk["Q3"], "--b3sum", a.b3sum, "--expect", expect]
         if expect == "aware":
             argv += ["--cargo", clients["current"], "--cargo-sha256", REG["clients"]["current"]["binary"]]
         if mode == "aware-registry":

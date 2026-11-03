@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 import subprocess
 
-root=Path(os.environ["RUNNER_TEMP"])/"ruf009-v5-native"
+root=Path(os.environ["RUNNER_TEMP"])/"ruf009-v5-sete-native"
 out=root/"artifact";out.mkdir(exist_ok=True,parents=True)
 m=root/"matrix"
 files=[]
