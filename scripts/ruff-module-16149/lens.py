@@ -20,10 +20,10 @@ FIELDS={'sequence_name','index_name','value_name','accesses','modified'}
 TBL=('type_of','mut_restriction','optimized_mir','mir_for_ctfe')
 
 
-def decode(raw,owner):
+def decode(raw,owner,edition):
     typed={} if owner=='ruff_linter' else None
-    root,defs,rows,_,deps=scope_rdr.decode(raw,SCHEMA['symbols'],SCHEMA['tables'],owner,VERSION,typed=typed,selected_tables=TBL if typed is not None else ())
-    result=dict(header=root,required=deps,definitions=len(defs),published=len(rows))
+    root,defs,rows,_,deps=scope_rdr.decode(raw,SCHEMA['symbols'],SCHEMA['tables'],owner,VERSION,typed=typed,selected_tables=TBL if typed is not None else (),edition=edition)
+    result=dict(header=root,edition=edition,required=deps,definitions=len(defs),published=len(rows))
     if typed is None:return result
     ids=typed['path_by_index'];lookup={val[1]:idx for idx,val in ids.items()}
     tables=typed['selected_tables']

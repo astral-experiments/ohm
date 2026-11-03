@@ -32,16 +32,22 @@ def records(directory, successful=True):
     return [r for r in rows if r['reason']=='compiler-artifact']
 
 
-def original(file,owner):
-    raw=file.read_bytes();h=hashlib.sha256(raw).hexdigest();MEMBERS.mkdir(exist_ok=True)
-    d=MEMBERS/(h+'.rmeta.zst'); report=MEMBERS/(h+'.json')
+def capture(file):
+    h=sha(file);MEMBERS.mkdir(exist_ok=True);d=MEMBERS/(h+'.rmeta.zst')
+    if not d.exists():
+        with d.open('xb')as dst:subprocess.run(['zstd','-q','-3','-c',file],stdout=dst,check=True)
+    return dict(sha256=h,bytes=file.stat().st_size,archive=sha(d))
+
+
+def original(file,owner,edition,binding):
+    h=binding['sha256'];report=MEMBERS/(h+'.json')
     if not report.exists():
-        q=lens.decode(raw,owner)
+        raw=file.read_bytes();need(hashlib.sha256(raw).hexdigest()==h,'file changed during capture')
+        q=lens.decode(raw,owner,edition)
         need(q['header']['full']==h,'raw metadata digest')
-        if not d.exists():
-            with d.open('xb')as dst:subprocess.run(['zstd','-q','-3','-c'],input=raw,stdout=dst,check=True)
-        q.update(bytes=len(raw),archive=sha(d));save(report,q)
-    q=json.loads(report.read_text());need(q['header']['full']==h and q['header']['crate']==owner,'metadata collision or wrong owner')
+        q.update(bytes=len(raw),archive=binding['archive']);save(report,q)
+    q=json.loads(report.read_text())
+    need(q['header']['full']==h and q['header']['crate']==owner and q['edition']==edition,'metadata collision or wrong role')
     return q
 
 
@@ -58,6 +64,8 @@ def traced(dir,expected):
             if exe.is_file() and exe.samefile(w.ROOT/'proxies/rustup'):continue
             need(exe.is_absolute() and exe.is_file() and exe.samefile(w.SDK/'bin/rustc'),'unexpected compiler image: '+str(exe))
             name=name[1].decode();need(tid not in actual,'multiple physical compiler images in same task')
+            if name in set(REG['expected_root_roster'])|{'ruff'}:
+                need(f'"--edition={REG["edition"]}"'.encode()in line,'physical historical rustc edition')
             stat=exe.stat()
             actual[tid]=dict(crate=name,program=str(exe),dev=stat.st_dev,inode=stat.st_ino,argv=line.decode(errors='strict'))
         raw_count+=len(lines)
@@ -76,11 +84,15 @@ def check(label,rev,environment,trace=False):
         trace_dir=w.OUT/(label+'-observer');trace_dir.mkdir()
         argv=['/usr/bin/strace','-ff','-qq','-s','260000','-e','trace=execve','-o',str(trace_dir/'trace'),*CHECK]
     w.run(argv,environment,out,timeout=2400)
-    arts=records(out);wanted=REG['expected_root_roster']; selected={}
+    arts=records(out);wanted=REG['expected_root_roster']; selected={};inputs={}
     for name in wanted:
         row,=[r for r in arts if r['target']['name']==name and r['target']['kind']==['lib']]
         file,=[Path(f)for f in row['filenames']if f.endswith('.rmeta')]
-        q=original(file,name);selected[name]=dict(sha256=q['header']['full'],public=q['header']['public'],private=q['header']['private'],global_hash=q['header']['global_hash'],stable=q['header']['stable'],fresh=row['fresh'],file=file.name)
+        need(Path(row['manifest_path']).samefile(w.SRC/'crates'/name/'Cargo.toml') and row['target']['edition']==REG['edition'],'physical target or manifest edition')
+        inputs[name]=(file,row,capture(file))
+    save(out/'original-metadata.json',{n:dict(**q,edition=row['target']['edition'],file=f.name)for n,(f,row,q)in inputs.items()})
+    for name,(file,row,binding) in inputs.items():
+        q=original(file,name,row['target']['edition'],binding);selected[name]=dict(sha256=q['header']['full'],public=q['header']['public'],private=q['header']['private'],global_hash=q['header']['global_hash'],stable=q['header']['stable'],fresh=row['fresh'],file=file.name)
     q=json.loads((MEMBERS/(selected['ruff_linter']['sha256']+'.json')).read_bytes())
     need(q['witness']['scope']==(OLD_SCOPE if rev==OLD else NEW_SCOPE),'historical module visibility')
     need(all(not p['ctfe'] and not p['optimised'] for p in q['witness']['functions'].values()),'body export on actual metadata-only check')

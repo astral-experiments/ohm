@@ -99,6 +99,7 @@ def decode(
     *,
     typed=None,
     selected_tables=(),
+    edition="2024",
 ):
     r = Reader(raw, symbols)
     assert r.take(8) == b"rust\0\0\0\n"
@@ -128,7 +129,12 @@ def decode(
     assert r.symbol() == expected_crate and r.byte() == 0 and r.byte() == 0
     suffix, stable = r.string(), r.take(8).hex()
     assert re.fullmatch(r"-[0-9a-f]{16}", suffix)
-    assert [r.var() for _ in range(7)] == [0, 0, 3, 0, 0, 0, 0]
+    # CrateRoot declares two panic-policy fields, the rustc_span::Edition,
+    # and four allocation/panic-handler flags in this order in both source kits.
+    required_panic, panic_in_drop, wire_edition = r.var(), r.var(), r.var()
+    assert (required_panic, panic_in_drop) == (0, 0)  # None, Unwind
+    assert wire_edition == {"2021": 2, "2024": 3}[edition], (wire_edition, edition)
+    assert [r.var() for _ in range(4)] == [0, 0, 0, 0]
     arrays = [array() for _ in range(13)]
     assert r.byte() == 1  # EncodedTraitImpls::DefPathHash
     for _ in range(3):

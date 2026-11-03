@@ -130,7 +130,11 @@ def prefetch():
         need(root['target']['name']=='ruff' and root['target']['kind']==['bin'] and root['mode']==mode,'ordinary graph root')
         selected={u['target']['name']:u for u in units if u['target']['kind']==['lib'] and u['target']['name'] in REG['expected_root_roster'] and u['mode']==mode}
         need(set(selected)==set(REG['expected_root_roster']),'missing declared dependent packages')
+        workspace=tomllib.loads((w.SRC/'Cargo.toml').read_text())['workspace']['package']
         for pkg,u in {'ruff':root, **selected}.items():
+            manifest=tomllib.loads((w.SRC/'crates'/pkg/'Cargo.toml').read_text())['package']
+            declared=workspace['edition'] if manifest['edition']=={'workspace':True} else manifest['edition']
+            need(declared==REG['edition']==u['target']['edition'],'declared and selected Cargo editions for '+pkg)
             if pkg!='ruff_linter':
                 deps={units[d['index']]['target']['name']for d in u['dependencies']}
                 need('ruff_linter' in deps,'missing actual direct linter dependency for '+pkg)
