@@ -32,7 +32,7 @@ def prepare(w, env, observer):
     burn = w.root / "pc-burn"
     sp.run(["cc", "-O1", source, "-o", burn], check=True)
     raw = w.root / "calibration.perf"
-    sp.run(record(path, raw, env, [observer, case, burn]), env=env, check=True, timeout=90)
+    sp.run(record(path, raw, env, [observer, case, burn, "calibrate"]), env=env, check=True, timeout=90)
     assert perf.decode(path, raw, case) >= 10
     w.put(case / "complete.json", {"period": PERIOD, "raw": w.hf(raw), "observer": w.hf(observer)})
     return path
