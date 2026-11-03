@@ -36,3 +36,5 @@ cmp raw-controls.tar.xz raw-repeat.tar.xz
 python3 -IB reopen.py original.zip 8474cc422216800f8a7fd467827f8afbe874cc1488f38aa1c97717b6eebc447f repeated.json --rust-source /path/to/matched/rust
 cmp report.json repeated.json
 ```
+
+Three native downstream correctness controls and two complete previous Ruff check graphs bound the separate proposal to rebind an indirectly invalidated check. [Constant and glob native loads](indirect-check/README.md), [whole-graph and native macro evidence](preflight/README.md)
