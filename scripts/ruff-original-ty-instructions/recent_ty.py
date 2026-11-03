@@ -63,14 +63,19 @@ def receipt(tag,kind="whole"):
     data=dict(commit=w.git("rev-parse","HEAD"),units=sorted([v["package_id"],v["target"]["name"],v["target"]["kind"],sorted(v["features"])]for v in arts),
               dirty=sorted([v["package_id"],v["target"]["name"]]for v in arts if not v["fresh"]),elf=preserve(exe),executable=str(exe))
     if kind=="census":
+        def identity(path):
+            stat=path.stat()
+            return stat.st_dev,stat.st_ino
+        rustc=identity(w.sdk/"bin/rustc");wild=identity(w.sdk/"lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd")
         rows=(td/"tasks/epochs.tsv").read_text().splitlines(); epochs={}; totals=collections.Counter(); roster=[]
         for line in rows:
             f=line.split()
             if f[0]=="I":
                 args=(td/"tasks"/f"{int(f[1]):05}.nul").read_bytes().split(b"\0");path=Path(os.fsdecode(args[3]))
-                crate=args[args.index(b"--crate-name")+1].decode() if path.samefile(w.sdk/"bin/rustc") and b"--crate-name" in args[4:-1] else None
+                key=tuple(map(int,args[1:3]))
+                crate=args[args.index(b"--crate-name")+1].decode() if key==rustc and b"--crate-name" in args[4:-1] else None
                 owner="rustc:"+crate if crate else path.name
-                if crate or path.samefile(w.sdk/"lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd"):roster.append(owner)
+                if crate or key==wild:roster.append(owner)
                 epochs[f[1]]=owner
             if f[0]=="C":
                 assert int(f[4])>=0 and int(f[5])==int(f[6]);totals[epochs[f[1]]]+=int(f[4])
