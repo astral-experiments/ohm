@@ -14,6 +14,8 @@ from case import BASE, BUILD, CHECK, ERROR, PORT, REG, ROOT, env, fresh_state, n
 import metadata
 
 import output_binding
+import negotiation
+import dependencies
 
 MEMBERS=BASE/'members'
 outputs={}
@@ -87,6 +89,10 @@ def check(label,state,environment,version,method='ordinary',invalid=False):
     if method=='trace':
         observer.traced(trace,expected=None)
         native=json.loads((trace/'native-execs.json').read_bytes())
+        expected_driver,=(w.SDK/'lib').glob('librustc_driver-*.so')
+        capability=negotiation.read(trace,expected_driver,w.OUT.name)
+        need({row[0]for row in capability['compilers']}==set(map(int,native['actual'])),'different literal typed rustc set in negotiation')
+        save(trace/'negotiation.json',capability)
         kernel=[]
         for tid,v in native['actual'].items():
             line=v['argv']
@@ -113,6 +119,7 @@ def check(label,state,environment,version,method='ordinary',invalid=False):
         bindings=snap(arts,version,environment,method!='pmu')
     else:bindings={}
     roster=sorted([[r['package_id'],r['target']['name'],r['target']['kind'],sorted(r['features']),r['profile']['test']]for r in arts])
+    if not invalid:save(dest / "external-products.json", dependencies.capture(arts, MEMBERS))
     data=dict(state=state,dirty=dirty,source=hashlib.sha256(original+(ERROR if invalid else b'')).hexdigest(),units=roster,metadata=bindings,method=method,physical=observed,invalid=invalid,instructions=instructions)
     save(dest/'check.json',data)
     return data
@@ -125,7 +132,7 @@ def core(prefix,mode,e,v):
     for label,state in labels:
         method='ordinary' if mode=='trace' and label=='buggy-cold' else mode
         c=check(prefix+'-'+label,state,e,v,method)
-        if 'idle' in label:need(c['dirty']==[],('settled ordinary control',label,c['dirty']))
+        if 'idle' in label:need(c['dirty']==REG['settled_nominal'],('registered historical settled control',label,c['dirty']))
         if label=='edited':need(['ruff_linter','lib'] in c['dirty'],'no actual producer')
         changes[label]=c
     return changes

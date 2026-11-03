@@ -14,12 +14,13 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / 'ruff-module-16149'))
 import artifacts
+import historical
 import setup as old
 import study as observer
 
 w, need, sha, save = old.w, old.need, old.sha, old.save
 REG = json.loads((HERE / 'registration.json').read_bytes())
-PORT = json.loads((HERE / 'port.json').read_bytes())
+PORT = historical.PORT
 require_bytes = lambda data: hashlib.sha256(data).hexdigest()
 ROOT = Path(os.environ['RUNNER_TEMP']).resolve(strict=True) / 'ohm-ruf009'
 BASE = ROOT / 'receipt'
@@ -35,22 +36,7 @@ env = old.env
 
 
 def source(state=None):
-    f = w.SRC / REG['path']
-    need(w.git(w.SRC,'rev-parse','HEAD') == REG['base'] and w.git(w.SRC,'rev-parse','HEAD^{tree}') == REG['tree'], 'different Ruff checkout')
-    need(sha(w.SRC/'Cargo.lock') == REG['lock']['sha256'] and not w.git(w.SRC,'ls-files','--others','--exclude-standard'), 'changed lock or unexpected source')
-    raw = subprocess.check_output(['git','-C',w.SRC,'diff','--binary','--no-ext-diff','--no-color','--abbrev=10','HEAD','--'])
-    cur = 'fixed' if not raw else 'buggy'
-    need(sha(f) == PORT[cur] and (cur == 'fixed' or require_bytes(raw) == REG['buggy_patch']), 'unregistered working source')
-    if state and cur != state:
-        if state == 'buggy':
-            subprocess.run(['git','apply','--whitespace=nowarn',HERE/'buggy.patch'],cwd=w.SRC,check=True)
-        elif state == 'fixed':
-            f.write_bytes(subprocess.check_output(['git','-C',w.SRC,'show','HEAD:'+REG['path']]))
-        else:
-            raise ValueError(state)
-        need(source() == state, 'source transition failed')
-        return state
-    return cur
+    return historical.state(w.SRC, state)
 
 
 def fresh_state():
@@ -69,7 +55,8 @@ def enroll(phase, block):
     BASE.mkdir()
     observer.MEMBERS.mkdir()
     need(w.resources()[1] > 75*(1<<30), 'entry disk reserve')
-    need(sha(HERE/'port.json')==REG['port_sha256'] and sha(HERE/'buggy.patch')==PORT['git_diff']==REG['buggy_patch'] and sha(HERE/'historical.patch')==PORT['historical_patch_sha256'],'source evidence')
+    need(sha(HERE/'historical-source.json') == REG['source_sha256'], 'historical source registration')
+    historical.enter(w.SRC)
     (BASE/'source').mkdir()
     for tag in ('fixed','buggy','fixed'):
         source(tag)
@@ -99,17 +86,19 @@ def enroll(phase, block):
         for k,label in [('P','parent'),('C','candidate')]:
             g=json.loads(z.read('scope-guard-'+label+'.json'));ph=g['phases']
             need(g['role']==label and len(ph)==12 and sorted(ph['private-edit']['dirty']) in ([['dep'],['app','dep']] if k=='C' else [['app','dep']]) and
-                 g['kernel']['old']['kernel']==['app','dep'] and g['kernel']['unchanged']['kernel']==[] and g['kernel']['edit']['kernel']==(['dep'] if k=='C' else ['app','dep']) and
+                 g['kernel']['old']['kernel']==['app','dep'] and g['kernel']['unchanged']['kernel']==[] and g['kernel']['edit']['kernel']==['app','dep'] and
                  require_bytes(z.read('scope-evidence-'+label+'.tar.gz'))==bind['guard_archives'][k] and
                  ph['generated-edit']['dirty']==['dep','app'] and ph['opaque-raw-pointer']['errors']==['E0277'] and not ph['opaque-repair-unchanged']['dirty'] and
                  ph['empty-private-edit']['provider_public']==ph['private-edit']['provider_public'],'missing provider, generated trait, error/repair or cold gate')
             guards[k]=g
+    client=historical.cargo_client(ROOT,BASE,artifacts)
     roles={}
     for role,name in [('P','normal'),('C','defer')]:
         sdk=Path(kit['arms'][name]['root'])
         driver,=(sdk/'lib').glob('librustc_driver-*.so')
         need(guards[role]['driver_sha256']==sha(driver),'safety ran a different driver')
-        roles['inline-'+role]=dict(source=bind['source'][role],sdk=str(sdk),driver=sha(driver),rustc=sha(sdk/'bin/rustc'),cargo=sha(sdk/'bin/cargo'),files=kit['arms'][name]['files'])
+        view, files=historical.with_client(sdk,ROOT,name,client,kit['arms'][name]['files'])
+        roles['inline-'+role]=dict(source=bind['source'][role],sdk=str(view),driver=sha(driver),rustc=sha(sdk/'bin/rustc'),cargo=sha(client),files=files)
     need(roles['inline-P']['driver']!=roles['inline-C']['driver'] and roles['inline-P']['cargo']==roles['inline-C']['cargo'],'not a matched Rust-only capsule')
     save(BASE/'scope-sdks.json',roles)
     save(BASE/'factory-safety.json',guards)
@@ -122,14 +111,14 @@ def enroll(phase, block):
     (ROOT/'rustup/toolchains/ohm').symlink_to(w.SDK)
     (ROOT/'rustup/settings.toml').write_text('version = "12"\nprofile = "minimal"\n')
     old.activate('P')
-    # This source has solely crates.io dependencies and a complete independent 505-archive lock.
+    # Only locked source archives and verified Git checkouts enter a fresh history.
     state=env();state.pop('CARGO_NET_OFFLINE')
     w.run(['cargo','+ohm','fetch','--locked'],state,BASE/'fetch')
     pkgs=tomllib.loads((w.SRC/'Cargo.lock').read_text())['package']
-    want={p['name']+'-'+p['version']+'.crate':p['checksum'] for p in pkgs if 'source' in p}
+    want={p['name']+'-'+p['version']+'.crate':p['checksum'] for p in pkgs if p.get('source','').startswith('registry+')}
     cache,=[p for p in (ROOT/'cargo/registry/cache').iterdir() if p.is_dir()]
     for pkg in pkgs:
-        if 'source' not in pkg:continue
+        if not pkg.get('source','').startswith('registry+'):continue
         name,ver=pkg['name'],pkg['version'];file=name+'-'+ver+'.crate'
         if (cache/file).exists():continue
         need(re.fullmatch(r'[a-zA-Z0-9_-]+',name) and re.fullmatch(r'[0-9A-Za-z.+-]+',ver),'unexpected lock path')
@@ -138,7 +127,12 @@ def enroll(phase, block):
         need(0<len(raw)<=64*2**20 and require_bytes(raw)==want[file],'invalid supplemental locked crate')
         with (cache/file).open('xb')as out:out.write(raw)
     paths=list((ROOT/'cargo/registry/cache').glob('*/*.crate'));actual={p.name:sha(p) for p in paths}
-    need(all('source' not in p or p['source'].startswith('registry+') for p in pkgs) and len(paths)==len(want)==REG['lock']['registry_archives'] and want==actual,'locked archive custody')
+    need(len(paths)==len(want)==REG['lock']['registry_archives'] and want==actual,'locked archive custody')
+    locked_git={p['name']:p['source'] for p in pkgs if p.get('source','').startswith('git+')}
+    need(locked_git==REG['lock']['git'],'unregistered Git inputs')
+    git_inputs=historical.git_sources(ROOT/'cargo',locked_git)
+    need(git_inputs==REG['git_checkouts'],'different physically checked-out locked Git inputs')
+    save(BASE/'git-inputs.json',git_inputs)
     save(BASE/'registry.json',actual)
     (ROOT/'cargo').rename(ROOT/'prefetched-cargo')
     need(sha(HERE/'whole_count.c')==REG['counter_sha256'],'unregistered whole counter')

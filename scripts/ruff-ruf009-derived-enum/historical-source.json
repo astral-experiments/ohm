@@ -1,0 +1,45 @@
+{
+ "buggy": "0f09a385d22bce626cf1e6c19e217917020e3e6dbc40c4fcc30c569c1617d525",
+ "fixed": "cd0dea4fc382d445b69fe3057dc5e393fe87519c995a0410e3ba77faeacd1d67",
+ "path": "crates/ruff_linter/src/rules/ruff/helpers.rs",
+ "revisions": {
+  "buggy": {
+   "commit": "710c60f7135879b05f6c05a34085cd7af5c19e7f",
+   "files": {
+    "crates/ruff_linter/resources/test/fixtures/ruff/RUF009_attrs.py": {
+     "blob": "8f2a5c9fdd73f5ce6ab2cd1524b65b4f79121c61",
+     "sha256": "51acbda839a1e746021df479bd9c643b9833d09cf84815d8bf4e4b8c079c93dc"
+    },
+    "crates/ruff_linter/src/rules/ruff/helpers.rs": {
+     "blob": "c1426de616f7ea2997f5522ceab6c989cd780172",
+     "sha256": "0f09a385d22bce626cf1e6c19e217917020e3e6dbc40c4fcc30c569c1617d525"
+    },
+    "crates/ruff_linter/src/rules/ruff/snapshots/ruff_linter__rules__ruff__tests__RUF009_RUF009_attrs.py.snap": {
+     "blob": "58cadaeeb2130c9a198445d917112cc9bddad096",
+     "sha256": "fec7a8e38321b61c120c6cb9647cb45f71e64ab8ae383c2f328a2c24b1f2889f"
+    }
+   },
+   "tree": "80168786b1a6e114b0ef8f25c8e4a80b5adf05e7"
+  },
+  "fixed": {
+   "commit": "b00f68a23cedbd3a38fc25bac63638f0f11fc3f0",
+   "files": {
+    "crates/ruff_linter/resources/test/fixtures/ruff/RUF009_attrs.py": {
+     "blob": "526c12ab88e994b38567ab3dd635341111e54119",
+     "sha256": "2807da974586f4815069423e2f7394d8ac5ec3b72f80ba85bf808508200486e4"
+    },
+    "crates/ruff_linter/src/rules/ruff/helpers.rs": {
+     "blob": "535492816bb4adb5edde0113f8255c8788bc1bce",
+     "sha256": "cd0dea4fc382d445b69fe3057dc5e393fe87519c995a0410e3ba77faeacd1d67"
+    },
+    "crates/ruff_linter/src/rules/ruff/snapshots/ruff_linter__rules__ruff__tests__RUF009_RUF009_attrs.py.snap": {
+     "blob": "08faee3866e7336a80fe5238c6d7fd5671d211fb",
+     "sha256": "77652cfb5068c5633d22239a6eed09379bb891467dd35e79d1a7e7603858ec0c"
+    }
+   },
+   "tree": "340e19d75043166840a7b9f61807d9d5606299d2"
+  }
+ },
+ "schema": 2,
+ "source": "Unmodified Ruff #19021: actual three complete committed blobs restored together under the unchanged original OLD checkout, the ordinary precommit source edit."
+}

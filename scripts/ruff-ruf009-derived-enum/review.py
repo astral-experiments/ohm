@@ -14,18 +14,22 @@ import sys
 
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
+import tempfile
+import elf_gate
 import metadata
 import output_binding
+import negotiation
+import dependencies
 
 REG=json.loads((HERE/'registration.json').read_bytes())
-PORT=json.loads((HERE/'port.json').read_bytes())
+PORT=json.loads((HERE/'historical-source.json').read_bytes())
 def need(ok,reason):
     if not ok:raise ValueError(reason)
 def read(p):return json.loads(p.read_bytes())
 def digest(value):return hashlib.sha256(value).hexdigest()
 def file_sha(p):
     with p.open('rb')as f:return hashlib.file_digest(f,'sha256').hexdigest()
-def semantic(d):return (d['public'],d['stable'],d['global_hash'],d['rows'])
+def semantic(d):return (d['public'],d['stable'],d['global_hash'],d['rows'],d['requires'])
 
 
 def block(base):
@@ -38,6 +42,11 @@ def block(base):
     for how in ('thread','child'):
         records=[read(base/(f'pmu-{how}-{mode}.json')) for mode in (0,1)]
         need(all(a['status']==0 and a['enabled']==a['running']>0 for a in records) and records[1]['instructions']>records[0]['instructions']+10_000_000,'hardware inheritance control')
+    need(read(base/'git-inputs.json')==REG['git_checkouts'],'unregistered physical Git inputs')
+    bound_client=read(HERE/'client.json')
+    client=read(base/'client-native.json')
+    need(client['binding']==bound_client and client['archive']['sha256']==bound_client['artifact']['sha256'] and client['constructor']['binary_sha256']==REG['checked_client']==bound_client['binary_sha256'], 'registered physical Cargo mismatch')
+    external_verified={}
     members=base/'members'
     @lru_cache(maxsize=None)
     def reopen_meta(key,name,version):
@@ -46,12 +55,13 @@ def block(base):
         actual=metadata.table(raw,name,version,REG['edition'])
         frozen=members/(key+'.rows.json.gz')
         need(json.loads(gzip.decompress(frozen.read_bytes()))==actual,'different physical RDR/definition/dependency table')
-        return dict(**actual['header'],rows=digest(json.dumps(actual['rows'],sort_keys=True).encode()),definitions=len(actual['rows']),compressed=file_sha(fn),decoded=file_sha(frozen))
+        return dict(**actual['header'],requires=actual['requires'],rows=digest(json.dumps(actual['rows'],sort_keys=True).encode()),definitions=len(actual['rows']),compressed=file_sha(fn),decoded=file_sha(frozen))
     def orig_folder(folder):return read(folder/'check.json')
     role_data={}
     for role in worker['order']:
         folder=base/role;kit=read(folder/'kit.json')
         need(kit['config']['source']==worker['factory']['source'][role]==REG['matched_sources'][role]['revision'] and kit['driver']==kit['config']['driver']==read(base/'factory-safety.json')[role]['driver_sha256'],'different role')
+        need(kit['config']['cargo']==kit['cargo']==bound_client['binary_sha256'], 'physical process used a different Cargo')
         version=kit['rustc_version'].splitlines()[0]+' (Ohm metadata 3)'
         data={}
         phases=['buggy-cold','buggy-idle1','buggy-idle2','edited','fixed-idle1','fixed-idle2']
@@ -87,6 +97,9 @@ def block(base):
                             if Path(exe).name=='rustc' and (('toolchains/ohm/bin/rustc' in exe) or exe==kit['physical']['frontend']['path']):
                                 need(tid not in found,'duplicate native exec');found.add(tid)
                 need(found==set(table['actual']),'unreported actual rustc exec')
+                driver=kit['physical']['driver']['path']
+                capability=negotiation.read(tr,driver,role)
+                need(capability==read(tr/'negotiation.json') and {pid for pid,*_ in capability['compilers']}==set(map(int,table['actual'])),'different negotiated PID, compiler or driver')
                 for tid,item in table['actual'].items():
                     raw=gzip.decompress((tr/('trace.'+tid+'.gz')).read_bytes()).decode().splitlines()
                     need(item['argv'] in raw and int(tid)>0 and item['inode']==kit['physical']['frontend']['ino'] and item['dev']==kit['physical']['frontend']['dev'] and Path(item['program']).name=='rustc','unbound compiler PID')
@@ -107,7 +120,7 @@ def block(base):
                     if valid and kind=='lib':need(witness['rmeta']['sha256']==got['metadata'][crate]['sha256'],'retained library metadata differs from raw snapshot')
                     output_binding.check_stored(members,{k:before[k]})
                 need(got['physical']==physical and read(tr/'nominal-and-physical.json')==dict(cargo_dirty=dirty,rustc=physical,dirty_without_rustc=different),'different physical compiler membership')
-                if 'idle' in stage:need(not physical,'unchanged invocation of rustc')
+                if 'idle' in stage:need(physical==REG['settled'],'registered historical settled owner roster')
             if not valid:
                 errors=[r['message'] for r in rows if r['reason']=='compiler-message' and r['message']['level']=='error']
                 need(len(errors)==1 and (errors[0].get('code') or {}).get('code')=='E0308' and any(s['is_primary'] and REG['path']==s['file_name'] and 'OHM_INVALID_CHECK_SENTINEL' in str(s['text']) for s in errors[0]['spans']),'different physical invalid verdict')
@@ -119,20 +132,30 @@ def block(base):
                     show=read(folder/(q['sha256']+'.display.json'))
                     need(show=={'body':q['sha256'],'raw_public':m['public'],'native':'Public hash: '+bytes.fromhex(m['public'])[::-1].hex()},'different native public hash display')
             need(set(snapshots)==(set(REG['observed_targets']) if valid else set()),'missing snapshots')
-            data[stage]=dict(dirty=dirty,physical=physical,instructions=count,meta=snapshots)
+            external=dependencies.verify(read(d/'external-products.json'),arts,members,external_verified) if valid else []
+            data[stage]=dict(external=external,dirty=dirty,physical=physical,instructions=count,meta=snapshots)
         for state,labels in [('buggy',['buggy-cold','buggy-idle1','buggy-idle2']),('fixed',['edited','fixed-idle1','fixed-idle2'])]:
             ref=data['ordinary-'+labels[0]]
             for name in ('ordinary-','kernel-'):
                 for label in labels:
                     obj=data[name+label]
                     need(all(semantic(v)==semantic(ref['meta'][n]) for n,v in obj['meta'].items()),'ordinary/traced metadata disagreement')
-                    need(obj['dirty']==(ref['dirty'] if label==labels[0] else []),'two clean no-op or observer discrepancy')
+                    need(obj['dirty']==(ref['dirty'] if label==labels[0] else REG['settled_nominal']),'two clean no-op or observer discrepancy')
                 # Source-generated metadata remains identical between repeated unchanged commands.
                 same=[{n:v['full'] for n,v in data[name+label]['meta'].items()}for label in labels]
                 need(same[0]==same[1]==same[2],'settled bytes changed')
         for label,ref in [('empty-edit','ordinary-edited'),('repair','ordinary-edited'),('restore-fixed','ordinary-edited'),('reverse','ordinary-buggy-cold')]:
             need(all(semantic(v)==semantic(data[ref]['meta'][k]) for k,v in data[label]['meta'].items()),'semantic reference mismatch '+label)
             need(data[label]['meta']['ruff_linter']['full']==data[ref]['meta']['ruff_linter']['full'],'different same-source producer rmeta '+label)
+        for stage, observed in data.items():
+            if stage=='invalid':continue
+            reference = data['ordinary-buggy-cold']['external']
+            if observed['external'] != reference:
+                keyed=lambda media:{(v[0],v[1],tuple(v[2]),v[3]):v[4:] for v in media}
+                a,b=keyed(reference),keyed(observed['external']); keys=sorted(k for k in set(a)|set(b) if a.get(k)!=b.get(k))
+                raise ValueError(('independent external product bytes differ', role, stage, len(keys), [(k,a.get(k),b.get(k)) for k in keys[:6]]))
+        for state,labels,ref in [('buggy',('kernel-buggy-cold','kernel-buggy-idle1','kernel-buggy-idle2'),'ordinary-buggy-cold'),('fixed',('kernel-edited','kernel-fixed-idle1','kernel-fixed-idle2'),'ordinary-edited')]:
+            for stage in labels:need(data[stage]['meta']['ruff_linter']['full']==data[ref]['meta']['ruff_linter']['full'], ('same-source producer bytes differ',role,stage,ref))
         native={}
         for key,state in [('native-buggy','buggy'),('native-edited','fixed'),('native-reverse','buggy'),('native-repair','fixed'),('native-empty-edit','fixed')]:
             n=read(folder/key/'native.json');f=members/(n['sha256']+'.elf.zst');need(file_sha(f)==n['compressed'] and n['state']==state,'wrong stored ELF')
@@ -156,17 +179,36 @@ def block(base):
         need(baseline['private']!=edited['private'],'source body was not compiled')
         tables=[json.loads(gzip.decompress((members/(v['full']+'.rows.json.gz')).read_bytes()))for v in (baseline,edited)]
         diff=metadata.compare(*tables)
+        need((baseline['public']==edited['public'])==(role=='C'),'genuine producer public hash truth table')
+        need((len(diff)==0)==(role=='C'),'wrong changed per-item public rows')
+        need(baseline['full']!=edited['full'],'real producer metadata did not change')
+        read_client=read(base/'client-native.json')['binding']
+        need(kit['cargo']==kit['config']['cargo']==read_client['binary_sha256'] and read_client['revision'] in kit['cargo_version'],'different executed Cargo client')
         role_data[role]=dict(source=kit['config']['source'],driver=kit['driver'],dirty=data['ordinary-edited']['dirty'],physical=data['kernel-edited']['physical'],cost={s:data['ordinary-'+s]['instructions'] for s in phases},
-            public=[baseline['public'],edited['public']],row_count=[baseline['definitions'],edited['definitions']],changed_rows=len(diff),row_changes_sha256=digest(json.dumps(diff,sort_keys=True).encode()),native={k:v['sha256']for k,v in native.items()},
+            public=[baseline['public'],edited['public']],row_count=[baseline['definitions'],edited['definitions']],changed_rows=len(diff),row_changes_sha256=digest(json.dumps(diff,sort_keys=True).encode()),negotiation=read(folder/'kernel-edited-observer/negotiation.json'),native={k:v['sha256']for k,v in native.items()},
             equivalence={label:{n:v['full']==data['ordinary-edited']['meta'][n]['full']for n,v in data[label]['meta'].items()} for label in ('repair','empty-edit')})
     p,c=role_data['P'],role_data['C']
     need(p['source']==REG['rust_parent'] and p['driver']!=c['driver'],'unmatched compiler pair')
-    need(p['native']==c['native'],'cross-role complete native products differ; require independent classification')
+    cross={}
+    with tempfile.TemporaryDirectory() as temp:
+        for label in ('native-buggy','native-edited'):
+            if p['native'][label]==c['native'][label]:
+                cross[label]={'full_raw_sha256':[p['native'][label],c['native'][label]],'all_bytes_equal':True}
+                continue
+            binaries=[]; dirs=[]
+            for k,info in [('P',p),('C',c)]:
+                subject=Path(temp)/(k+'-'+label); key=info['native'][label]
+                with subject.open('xb')as out:subprocess.run(['zstd','-dcq',members/(key+'.elf.zst')],check=True,stdout=out)
+                observations=[json.loads(l)for l in (base/k/label/'stdout').read_bytes().splitlines()]
+                provider,=[r for r in observations if r.get('reason')=='build-script-executed' and '#tikv-jemalloc-sys@' in r['package_id']]
+                binaries.append(subject); dirs.append(provider['out_dir']+'/build')
+            cross[label]=elf_gate.compare(*binaries,*dirs)
+            need(cross[label]['full_raw_sha256']==[p['native'][label],c['native'][label]],'different complete native ELF in the jemalloc directory check')
     ds=lambda data:set(map(tuple,data['physical']))
     skipped=sorted(ds(p)-ds(c))
     shape=(p['dirty']==p['physical']==REG['observed_terminal_targets'] and set(map(tuple,c['dirty']))<=set(map(tuple,p['dirty'])) and ds(c)<=ds(p) and ('ruff_linter','lib')in ds(c) and any(tuple(s)!=('ruff_linter','lib') for s in skipped))
     reduction=1-c['cost']['edited']/p['cost']['edited']
-    return dict(worker=worker,roles=role_data,physical_skipped=skipped,eligible_shape=shape,reduction=reduction,pilot_admits=shape and reduction>=REG['gates']['pilot_edited_reduction_min'])
+    return dict(worker=worker,roles=role_data,cross_native=cross,physical_skipped=skipped,eligible_shape=shape,reduction=reduction,pilot_admits=shape and reduction>=REG['gates']['pilot_edited_reduction_min'])
 
 
 def aggregate(rows):

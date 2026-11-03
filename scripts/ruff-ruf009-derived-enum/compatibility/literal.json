@@ -1,0 +1,139 @@
+{
+ "C": "800fcd497d67c2e0926f26ecbfe12b8837013637",
+ "P": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+ "argv": [
+  "cargo",
+  "+ohm",
+  "check",
+  "-p",
+  "app",
+  "--locked",
+  "--offline",
+  "-j1",
+  "--message-format=json"
+ ],
+ "artifacts": {
+  "receipts": [
+   13212899992,
+   "852c31949bcc5372e424c50d0edbf2016a04ea68cadd841a567bcbeee123a4f2"
+  ],
+  "sdk": [
+   13212974771,
+   "0c557125bead8be231305132cc86dc8eece7a45de2bc8efa261ec7814b81d5d2"
+  ]
+ },
+ "aware_cargo_factory": {
+  "artifact": 13215562626,
+  "attempt": 1,
+  "qa": "506173f916bbf2d9946b0eb326ad6a800e6e43a5",
+  "run": 41602805652,
+  "source": "7c5f8b2d570b66f2125a8683bc2ce0cb98af88a6",
+  "zip": "633ea94f876fc16e0a6ecdae7971f84f3df75c840b51f1f135461ba8925c4da4"
+ },
+ "aware_cargo_sha256": "1d4c93cd725a06b9a31704dc05a67a5d418c4cf97a3d3680ce8fb522ccee404f",
+ "bounds": "Fresh dedicated local root, checked donors read-only, zero dependency fetches, 8 GiB active and 8.25 GiB pre-command + 15 GiB disk gates.",
+ "cargo": "f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee",
+ "cargo_child": "7c5f8b2d570b66f2125a8683bc2ce0cb98af88a6",
+ "cargo_fix": "9f2bf0359b8186e059bd853e2ce89ceef9fc5087",
+ "cell_requirement": "Aware Cargo sends its real once-per-command probe against the selected compiler. Only the new local library on C receives the flag; C producer public remains stable, P producer public changes; both literal consumers actually execute and the first edited, next and independent empty reject E0308 under both physical output layouts; both repairs succeed. The separate stable same-frontend, same-mtime driver-only switch matrix must distinguish output namespaces and real skip versus honest recompilation; real build and empty ELF agree, defaults-off and a workspace wrapper issue zero new probes.",
+ "current_parent": "ba07041c4b41686b0f80ad89985b8881046cb48e",
+ "driver": {
+  "C": "6e9431a3850b72fe6512d8c9082fd7776f0008d693ff7f9cf70c2ba3b546f8e9",
+  "P": "b0c7882fb84d8924b99896dfe214c7dfb19bdfede83850a769956234c29a45fc"
+ },
+ "factory": 41598619513,
+ "fixed_cargo_sha256": "5c053ef9e38322558eac8e0f82056b4e2e958d42ccee477c30c18ad16aa6af7a",
+ "histories": [
+  "ordinary",
+  "kernel"
+ ],
+ "input": "Exact original factory dep::hidden and exported macro/opaque-Send app control. Consumer additionally checks a constant FNV-1a64 of include_bytes!(r#\"<actual Cargo-emitted .rmeta physical path>\"#), compared to the genuine old value.",
+ "mechanism": "aware",
+ "phases": [
+  "discover",
+  "old-literal",
+  "old-unchanged",
+  "first-edited",
+  "next-unchanged",
+  "repair",
+  "repaired-unchanged",
+  "independent-empty-edited",
+  "independent-repair",
+  "independent-repaired-unchanged"
+ ],
+ "planned_cells": [
+  [
+   "legacy",
+   "ordinary-targets",
+   "signed"
+  ],
+  [
+   "aware",
+   "ordinary-targets",
+   "release-profile-e97c67"
+  ],
+  [
+   "aware",
+   "inside-cargo-home-registry",
+   "release-profile-e97c67"
+  ]
+ ],
+ "purpose": "Unscored compatibility qualification of old Cargo, content-aware Cargo, old compiler and a default-off private-derive compiler on a real metadata-file consumer.",
+ "qa": "cf380559123e1144ac83f03d2fc1c4a2e89a9286",
+ "qualification": "Fresh independent continued registration on the current green #436 Cargo base. All input, prior driver/kernel, first E0308, real native/upgrade/no-probe gates unchanged. Version-specific SHA must be rechecked. This is a correctness experiment, not PMU.",
+ "receiver": {
+  "reopen.py": "cc350c992101237a21fdd8d90ba7cf6e62a10c2c1b2e19058a555576f9172e8d",
+  "reproduce.py": "17b5173b333ddf60ab0767f820a49905248eb8c469a7b0c075b64e2dada6e7d1",
+  "switch.py": "058ba5328b472d150ef6ed8a8e408a89bcfe2e4af876fdac0f39893a34d6f24f"
+ },
+ "requires": "Every first edit and next repeat must return the same E0308 as independent empty; both repairs and their repeats must succeed. Only an aware Cargo calling the new compiler can enable the checked private-derived producer cutoff, and it must still invoke the literal-file consumer on the first edit. Each kernel trace must prove the expected flag per actual process and the selected physical driver.",
+ "roles": [
+  "P",
+  "C"
+ ],
+ "same_policy_earlier_registration": "eae7c6e32552dc0bd3c80ff7f9f8b9f1df79cd09ce79faf9829abdec7819fcf2",
+ "switch_order": [
+  [
+   "signed",
+   "P"
+  ],
+  [
+   "signed",
+   "C"
+  ],
+  [
+   "aware",
+   "C"
+  ],
+  [
+   "aware",
+   "P"
+  ],
+  [
+   "aware",
+   "C"
+  ],
+  [
+   "signed",
+   "C"
+  ],
+  [
+   "fixed",
+   "C"
+  ],
+  [
+   "aware",
+   "C"
+  ],
+  [
+   "fixed",
+   "C"
+  ],
+  [
+   "aware",
+   "C"
+  ]
+ ],
+ "upstream_fixture_integrity": "5cf3e9729b26e63e100bd9c8e94317b5aab65a88285d7576a32302b184d1823e",
+ "wild": "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
+}
