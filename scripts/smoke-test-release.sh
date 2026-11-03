@@ -229,6 +229,32 @@ env -u RUST_SRC_PATH RUSTUP_TOOLCHAIN="$OHM_TOOLCHAIN" \
   "${RUST_ANALYZER:?set RUST_ANALYZER to the stock rust-analyzer executable}" \
   diagnostics "$smoke_crate"
 
+if jq -e '.release | ((.upstream_rust_version | split(".") | map(tonumber)) + [.ohm_revision]) >= [1, 99, 0, 23]' \
+    "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN.json" >/dev/null; then
+  cat > "$smoke_crate/src/lib.rs" <<'EOF'
+/// ```
+/// assert_eq!(ohm_smoke::answer(), 42);
+/// ```
+pub fn answer() -> u32 {
+    42
+}
+EOF
+  for pass in cold warm; do
+    log="$smoke_root/doctests-$pass.log"
+    cargo +"$OHM_TOOLCHAIN" test --doc --offline --manifest-path "$smoke_crate/Cargo.toml" -v \
+      2>&1 | tee "$log"
+    grep -F 'test result: ok. 1 passed' "$log" >/dev/null
+  done
+  grep -F -- '--output-format=doctest' "$smoke_root/doctests-cold.log" >/dev/null
+  if grep -E -- '--output-format=doctest|--test-run-directory' "$smoke_root/doctests-warm.log"; then
+    echo 'warm doctest did not use the cached harness' >&2
+    exit 1
+  fi
+  cargo +"$OHM_TOOLCHAIN" -Zohm-cached-doctests=no test --doc --offline \
+    --manifest-path "$smoke_crate/Cargo.toml" -v 2>&1 | tee "$smoke_root/doctests-disabled.log"
+  grep -F -- '--test-run-directory' "$smoke_root/doctests-disabled.log" >/dev/null
+fi
+
 # Exercise cache admission with the installed compiler, without a wrapper.
 registry_crate="$smoke_root/registry-crate"
 mkdir -p "$registry_crate/src"
