@@ -8,7 +8,7 @@ import re
 import struct
 from pathlib import Path
 
-def scan(path, output):
+def scan(path, output, pools=None):
     with path.open("rb") as handle, mmap.mmap(handle.fileno(), 0, access=mmap.ACCESS_READ) as image:
         def read(fmt, offset): return struct.unpack_from("<" + fmt, image, offset)
         assert image[:7] == b"\x7fELF\x02\x01\x01" and read("HH", 16) == (3, 62)
@@ -30,7 +30,7 @@ def scan(path, output):
             idx, info, other, section, val, size=read("IBBHQQ",off)
             syms.append((string(st,idx),info>>4,info&15,other&3,section!=0,val))
         assert len([s[0] for s in syms])==len(set(s[0] for s in syms)), "duplicate dynamic ELF name"
-        pools=json.loads((Path(__file__).resolve().parent/"probes.json").read_bytes())
+        if pools is None:pools=json.loads((Path(__file__).resolve().parent/"probes.json").read_bytes())
         wanted={n:label for label,names in pools.items() for n in names}
         values=collections.Counter(s[5] for s in syms if s[4] and s[2]==2)
         probes={s[0]:{"pool":wanted[s[0]],"value":s[5],"slots":[]} for s in syms if s[0] in wanted and s[1:5]==(1,2,0,True) and values[s[5]]==1}

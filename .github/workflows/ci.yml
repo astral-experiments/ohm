@@ -1,4 +1,4 @@
-name: Build private stage-2 GNU driver-link pair
+name: Build private stage-2 GNU driver-link treatment
 'on':
   workflow_dispatch:
     inputs:
@@ -9,8 +9,8 @@ name: Build private stage-2 GNU driver-link pair
 permissions: {}
 jobs:
   plan:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21577-driver-link-production23' && github.sha == inputs.reviewed_head && github.run_attempt
-      == 1
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21577-driver-link-production23-t' && github.sha == inputs.reviewed_head
+      && github.run_attempt == 1
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -51,8 +51,8 @@ jobs:
       matrix:
         arm: ${{ fromJSON(needs.plan.outputs.roles) }}
     needs: plan
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21577-driver-link-production23' && github.sha == inputs.reviewed_head && github.run_attempt
-      == 1
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21577-driver-link-production23-t' && github.sha == inputs.reviewed_head
+      && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
     permissions:
       contents: read
@@ -75,10 +75,11 @@ jobs:
         persist-credentials: false
         ref: 90575c9fc302c2af0858c711726b2d211e7d3114
         path: release-reference
-        sparse-checkout: |-
-          scripts
+        sparse-checkout: 'scripts
+
           release
-          toolchains
+
+          toolchains'
     - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
       with:
         enable-cache: false
@@ -114,135 +115,101 @@ jobs:
         ref: 46d28e8bff1c6b52f3e7b7bc13192019e964a7da
         path: cargo-seed
         persist-credentials: false
-        sparse-checkout: |-
-          scripts/cargo-diagnostic-fix
-          scripts/ohm-apple-zmij/cargo293
+        sparse-checkout: 'scripts/cargo-diagnostic-fix
+
+          scripts/ohm-apple-zmij/cargo293'
     - name: Check out the published candidate manifest and release driver
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         ref: ce64a5de6f8c9f404fc57598c5a2a2ab869276bf
         path: release-candidate
         persist-credentials: false
-        sparse-checkout: |-
-          scripts
+        sparse-checkout: 'scripts
+
           release
-          toolchains
+
+          toolchains'
     - name: Check out merged Ohm production scripts and source manifest
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         ref: 9c2397d36f033900a0864484714d526788d1dc77
         path: official-release
         persist-credentials: false
-        sparse-checkout: |-
-          scripts
+        sparse-checkout: 'scripts
+
           release
+
           toolchains
-          .github/workflows
+
+          .github/workflows'
     - name: Require the signed source decision and approved role transport
       run: python3 -ISB scripts/rc23-driver-link/gate.py build
     - name: Admit actual workspace and reserve physical capacity
       run: python3 -ISB scripts/rc23-22958-production/standard-capacity.py init
     - name: Reopen the same four qualified sources and the precise compiler change
-      run: |
-        python3 -IB scripts/rc23-cross-qualification/materialize-final.py
+      run: 'python3 -IB scripts/rc23-cross-qualification/materialize-final.py
+
         python3 -ISB scripts/rc23-driver-link/source.py
+
+        '
       shell: python3 -ISB scripts/rc23-22958-production/standard-capacity.py watch materialize {0}
     - name: Install native GNU bootstrap prerequisites
       shell: python3 -ISB scripts/rc23-22958-production/standard-capacity.py watch prerequisites {0}
-      run: |
-        sudo apt-get -qq update
+      run: 'sudo apt-get -qq update
+
         sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build pkg-config perl libssl-dev zstd clang lld curl
+
+        '
     - name: Install pinned LLVM BOLT tools
       env:
         MANIFEST_PATH: toolchains/1.99.0/23.json
-      run: |
-        if [[ "$(dpkg --print-architecture)" != amd64 ]]; then
-          echo 'LLVM BOLT tools require an amd64 Linux runner' >&2
-          exit 1
-        fi
-
-        case "$(jq -er '.release.upstream_rust_version' "$MANIFEST_PATH")" in
-          1.97.* | 1.98.*)
-            bolt_major=22
-            bolt_version='22.1.8~++20260714014902+ca7933e47d3a-1~exp1~20260714135019.80'
-            bolt_sha256='97a9e4e8d2b2219757c38abef93e913793ebc64580aa51207bd23941c44ec070'
-            runtime_sha256='48639dafeb45892eec58f5d8a2d0d612ce791a2f713f06c794b71d6a72fa582d'
-            ;;
-          1.99.*)
-            bolt_major=23
-            bolt_version='23.1.2'
-            bolt_sha256='b5ed9675149cc837c282e9b6962c276c9fa62863d5b2f91537b60848552995b7'
-            ;;
-          *)
-            echo 'Pin matching LLVM BOLT tools for this Rust version' >&2
-            exit 1
-            ;;
-        esac
-        bolt_root="$(mktemp -d "${RUNNER_TEMP:?}/ohm-bolt.XXXXXX")"
-        if [[ "$bolt_major" == 23 ]]; then
-          bolt_archive="$bolt_root/llvm.tar.xz"
-          bolt_directory="LLVM-$bolt_version-Linux-X64"
-          curl --proto '=https' --proto-redir '=https' --tlsv1.2 \
-            --fail --location --retry 3 --show-error --silent \
-            --output "$bolt_archive" \
-            "https://github.com/llvm/llvm-project/releases/download/llvmorg-$bolt_version/$bolt_directory.tar.xz"
-          printf '%s  %s\n' "$bolt_sha256" "$bolt_archive" | sha256sum --check --strict
-          # Leave llvm-profdata for the build to link from Rust's matching LLVM.
-          tar -xJf "$bolt_archive" -C "$bolt_root" --strip-components=1 --occurrence=1 \
-            "$bolt_directory/bin/llvm-bolt" \
-            "$bolt_directory/bin/merge-fdata" \
-            "$bolt_directory/lib/libbolt_rt_hugify.a" \
-            "$bolt_directory/lib/libbolt_rt_instr.a"
-          rm "$bolt_archive"
-          bolt_llvm_dir="$bolt_root"
-        else
-          bolt_base_url="https://apt.llvm.org/noble/pool/main/l/llvm-toolchain-$bolt_major"
-          for package in "bolt-$bolt_major" "libbolt-$bolt_major-dev"; do
-            curl --proto '=https' --proto-redir '=https' --tlsv1.2 \
-              --fail --location --retry 3 --show-error --silent \
-              --output "$bolt_root/$package.deb" \
-              "$bolt_base_url/${package}_${bolt_version}_amd64.deb"
-          done
-
-          printf '%s  %s\n' \
-            "$bolt_sha256" \
-            "$bolt_root/bolt-$bolt_major.deb" \
-            "$runtime_sha256" \
-            "$bolt_root/libbolt-$bolt_major-dev.deb" \
-            | sha256sum --check --strict
-
-          dpkg-deb --extract "$bolt_root/bolt-$bolt_major.deb" "$bolt_root"
-          dpkg-deb --extract "$bolt_root/libbolt-$bolt_major-dev.deb" "$bolt_root"
-          bolt_llvm_dir="$bolt_root/usr/lib/llvm-$bolt_major"
-        fi
-        "$bolt_llvm_dir/bin/llvm-bolt" --version
-        "$bolt_llvm_dir/bin/merge-fdata" --version
-        if [[ ! -f "$bolt_llvm_dir/lib/libbolt_rt_instr.a" ]]; then
-          echo 'LLVM BOLT instrumentation runtime is missing' >&2
-          exit 1
-        fi
-
-        printf 'OHM_BOLT_LLVM_DIR=%s\n' "$bolt_llvm_dir" >> "$GITHUB_ENV"
+      run: "if [[ \"$(dpkg --print-architecture)\" != amd64 ]]; then\n  echo 'LLVM BOLT tools require an amd64 Linux runner' >&2\n  exit 1\nfi\n\ncase \"\
+        $(jq -er '.release.upstream_rust_version' \"$MANIFEST_PATH\")\" in\n  1.97.* | 1.98.*)\n    bolt_major=22\n    bolt_version='22.1.8~++20260714014902+ca7933e47d3a-1~exp1~20260714135019.80'\n\
+        \    bolt_sha256='97a9e4e8d2b2219757c38abef93e913793ebc64580aa51207bd23941c44ec070'\n    runtime_sha256='48639dafeb45892eec58f5d8a2d0d612ce791a2f713f06c794b71d6a72fa582d'\n\
+        \    ;;\n  1.99.*)\n    bolt_major=23\n    bolt_version='23.1.2'\n    bolt_sha256='b5ed9675149cc837c282e9b6962c276c9fa62863d5b2f91537b60848552995b7'\n\
+        \    ;;\n  *)\n    echo 'Pin matching LLVM BOLT tools for this Rust version' >&2\n    exit 1\n    ;;\nesac\nbolt_root=\"$(mktemp -d \"${RUNNER_TEMP:?}/ohm-bolt.XXXXXX\"\
+        )\"\nif [[ \"$bolt_major\" == 23 ]]; then\n  bolt_archive=\"$bolt_root/llvm.tar.xz\"\n  bolt_directory=\"LLVM-$bolt_version-Linux-X64\"\n  curl\
+        \ --proto '=https' --proto-redir '=https' --tlsv1.2 \\\n    --fail --location --retry 3 --show-error --silent \\\n    --output \"$bolt_archive\"\
+        \ \\\n    \"https://github.com/llvm/llvm-project/releases/download/llvmorg-$bolt_version/$bolt_directory.tar.xz\"\n  printf '%s  %s\\n' \"$bolt_sha256\"\
+        \ \"$bolt_archive\" | sha256sum --check --strict\n  # Leave llvm-profdata for the build to link from Rust's matching LLVM.\n  tar -xJf \"$bolt_archive\"\
+        \ -C \"$bolt_root\" --strip-components=1 --occurrence=1 \\\n    \"$bolt_directory/bin/llvm-bolt\" \\\n    \"$bolt_directory/bin/merge-fdata\" \\\
+        \n    \"$bolt_directory/lib/libbolt_rt_hugify.a\" \\\n    \"$bolt_directory/lib/libbolt_rt_instr.a\"\n  rm \"$bolt_archive\"\n  bolt_llvm_dir=\"\
+        $bolt_root\"\nelse\n  bolt_base_url=\"https://apt.llvm.org/noble/pool/main/l/llvm-toolchain-$bolt_major\"\n  for package in \"bolt-$bolt_major\"\
+        \ \"libbolt-$bolt_major-dev\"; do\n    curl --proto '=https' --proto-redir '=https' --tlsv1.2 \\\n      --fail --location --retry 3 --show-error\
+        \ --silent \\\n      --output \"$bolt_root/$package.deb\" \\\n      \"$bolt_base_url/${package}_${bolt_version}_amd64.deb\"\n  done\n\n  printf\
+        \ '%s  %s\\n' \\\n    \"$bolt_sha256\" \\\n    \"$bolt_root/bolt-$bolt_major.deb\" \\\n    \"$runtime_sha256\" \\\n    \"$bolt_root/libbolt-$bolt_major-dev.deb\"\
+        \ \\\n    | sha256sum --check --strict\n\n  dpkg-deb --extract \"$bolt_root/bolt-$bolt_major.deb\" \"$bolt_root\"\n  dpkg-deb --extract \"$bolt_root/libbolt-$bolt_major-dev.deb\"\
+        \ \"$bolt_root\"\n  bolt_llvm_dir=\"$bolt_root/usr/lib/llvm-$bolt_major\"\nfi\n\"$bolt_llvm_dir/bin/llvm-bolt\" --version\n\"$bolt_llvm_dir/bin/merge-fdata\"\
+        \ --version\nif [[ ! -f \"$bolt_llvm_dir/lib/libbolt_rt_instr.a\" ]]; then\n  echo 'LLVM BOLT instrumentation runtime is missing' >&2\n  exit 1\n\
+        fi\n\nprintf 'OHM_BOLT_LLVM_DIR=%s\\n' \"$bolt_llvm_dir\" >> \"$GITHUB_ENV\"\n"
       shell: python3 -ISB ../scripts/rc23-22958-production/standard-capacity.py watch bolt-tools {0}
       working-directory: official-release
     - name: Prepare pinned Wild linker
       env:
         MANIFEST_PATH: toolchains/1.99.0/23.json
-      run: |
-        wild_directory="$(python3 scripts/prepare-wild.py \
-          "$MANIFEST_PATH" "$OHM_TARGET" "$RUNNER_TEMP/ohm-wild")"
-        printf 'OHM_WILD_LINKER_DIR=%s\n' "$wild_directory" >> "$GITHUB_ENV"
+      run: "wild_directory=\"$(python3 scripts/prepare-wild.py \\\n  \"$MANIFEST_PATH\" \"$OHM_TARGET\" \"$RUNNER_TEMP/ohm-wild\")\"\nprintf 'OHM_WILD_LINKER_DIR=%s\\\
+        n' \"$wild_directory\" >> \"$GITHUB_ENV\"\n"
       shell: python3 -ISB ../scripts/rc23-22958-production/standard-capacity.py watch wild {0}
       working-directory: official-release
     - name: Build the official GNU extended stage-2 PGO, ThinLTO and BOLT distribution
-      run: |
-        ./scripts/build-optimized-dist.sh \
-          "$OHM_TARGET" \
-          "$OHM_TOOLCHAIN" \
-          "$GITHUB_WORKSPACE/source/rust" \
-          "$GITHUB_WORKSPACE/official-release/release/bootstrap.toml" 2>&1 | tee "$GITHUB_WORKSPACE/trait-evidence/build.log"
+      run: "./scripts/build-optimized-dist.sh \\\n  \"$OHM_TARGET\" \\\n  \"$OHM_TOOLCHAIN\" \\\n  \"$GITHUB_WORKSPACE/source/rust\" \\\n  \"$GITHUB_WORKSPACE/official-release/release/bootstrap.toml\"\
+        \ 2>&1 | tee \"$GITHUB_WORKSPACE/trait-evidence/build.log\"\n"
       shell: python3 -ISB ../scripts/rc23-22958-production/standard-capacity.py watch production {0}
       working-directory: official-release
+      id: distribution
+    - name: Quarantine any produced GNU distribution before native acceptance
+      id: custody
+      if: always() && steps.distribution.outcome != 'skipped'
+      run: python3 -ISB scripts/rc23-driver-link/custody.py
+    - name: Upload original GNU distribution independently of native eligibility
+      if: always() && steps.custody.outputs.available == 'true'
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: rc23-21577-source-dist-T
+        path: driver-source-dist/
+        if-no-files-found: error
+        compression-level: 0
+        retention-days: 14
     - name: Receive the common signed Cargo from this exact plan
       uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
       with:
@@ -255,50 +222,11 @@ jobs:
     - name: Reopen role, native and capacity evidence
       run: python3 -ISB scripts/rc23-22958-production/standard-capacity.py summarize
       if: always()
-    - name: Upload qualified private SDK
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-      with:
-        name: rc23-21577-sdk-${{ matrix.arm }}
-        path: trait-sdk/
-        if-no-files-found: error
-        compression-level: 0
-        retention-days: 14
     - name: Retain source, training, native and capacity records
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: rc23-21577-qa-${{ matrix.arm }}-attempt-${{ github.run_attempt }}
+        name: rc23-21577-source-qa-T-attempt-1
         path: trait-evidence/
         if-no-files-found: warn
-        retention-days: 14
-  pair:
-    name: Compare actual GNU driver policy evidence
-    needs: build
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21577-driver-link-production23' && github.sha == inputs.reviewed_head && github.run_attempt == 1
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-    timeout-minutes: 10
-    env:
-      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-    steps:
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        persist-credentials: false
-        ref: ${{ github.sha }}
-        fetch-depth: 2
-    - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-      with:
-        name: rc23-21577-qa-R-attempt-1
-        path: incoming/R
-    - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-      with:
-        name: rc23-21577-qa-T-attempt-1
-        path: incoming/T
-    - run: python3 -ISB scripts/rc23-driver-link/pair.py
-    - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-      with:
-        name: rc23-21577-pair
-        path: pair-evidence/
-        if-no-files-found: error
         retention-days: 14

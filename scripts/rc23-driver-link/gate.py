@@ -75,5 +75,5 @@ def verify_sdk_receipts(w,src,role,proofs):
     assert sums==[sha(out/x)+"  "+x for x in expect] and sha(out/"role.json")==proofs["role.json"]["sha256"]
 if __name__=="__main__":
     stage=sys.argv[1];checkout(stage)
-    if stage=="plan": print('roles=["R","T"]')
-    else: assert stage=="build" and os.environ["BENCH_ARM"] in ("R","T")
+    if stage=="plan": print('roles=["T"]')
+    else: assert stage=="build" and os.environ["BENCH_ARM"]=="T"

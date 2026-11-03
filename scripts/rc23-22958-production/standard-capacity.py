@@ -23,7 +23,7 @@ FLOOR = 32 * GIB
 INTERVAL = 0.25
 MAX_GAP = 2.0
 CHILD_GRACE_NS = 5_000_000_000
-BRANCH = "refs/heads/charlie/codex-21577-driver-link-production23"
+BRANCH = "refs/heads/charlie/codex-21577-driver-link-production23-t"
 STAGES = ("materialize", "prerequisites", "bolt-tools", "wild", "production", "native-qa")
 SENTINEL = ".ctfe22-physical-emergency-reserve"
 
@@ -116,14 +116,14 @@ def release(path, held):
 def context():
     e = os.environ
     assert e["GITHUB_REPOSITORY"] == "astral-experiments/ohm" and e["GITHUB_EVENT_NAME"] == "workflow_dispatch"
-    assert e["GITHUB_REF"] == BRANCH and e["BENCH_ARM"] in ("R","T")
+    assert e["GITHUB_REF"] == BRANCH and e["BENCH_ARM"]=="T"
     assert e["GITHUB_ACTIONS"]=="true" and e["GITHUB_JOB"]=="build" and e["GITHUB_RUN_ATTEMPT"]=="1" and e["GITHUB_WORKFLOW_SHA"]==e["GITHUB_SHA"] and e["GITHUB_WORKFLOW_REF"]==e["GITHUB_REPOSITORY"]+"/.github/workflows/ci.yml@"+BRANCH
     assert e["RUNNER_OS"]=="Linux" and e["RUNNER_ARCH"]=="X64" and e["RUNNER_NAME"].startswith("nsc-runner-")
     assert re.fullmatch(r"/home/runner/work/ohm/ohm/?",e["GITHUB_WORKSPACE"])
     assert e["GITHUB_SHA"] == e["REVIEWED_HEAD"] and re.fullmatch("[0-9a-f]{40}",e["GITHUB_SHA"])
     w = Path(e["GITHUB_WORKSPACE"]).resolve()
     head=subprocess.check_output(["git","-C",w,"rev-parse","HEAD","HEAD^"],text=True).splitlines()
-    assert head==[e["GITHUB_SHA"],'aecbf860cfee7523292d41c38a5e397567895074']
+    assert head==[e["GITHUB_SHA"],'6aa4ca42185a20df40680c5ee62d349d875e20a4']
     assert e["GITHUB_RUN_ATTEMPT"]=="1"
     return w, w/"capacity-evidence"
 

@@ -12,6 +12,7 @@ import gate as g
 import elf
 import live
 import policy
+import domain
 sys.path.append(str(g.PREVIOUS))
 import sdk
 
@@ -59,9 +60,21 @@ def main():
     # and an explicitly opted-in compiler-driver link, including actual override calls.
     exp=qa/"driver-witness";before=w/"driver-audit-private/pre-bolt.so";image=installed/driver
     def census(img,label):
-        gz=exp/(label+".json.gz");v=elf.scan(img,gz);g.save(exp/(label+".json"),v);return v,json.loads(gzip.decompress(gz.read_bytes()))
+        gz=exp/(label+".json.gz");v=elf.scan(img,gz);return v,json.loads(gzip.decompress(gz.read_bytes()))
     pre,pre_rows=census(before,"pre-bolt");post,post_rows=census(image,"installed")
     assert post["sha256"]==db[driver]["sha256"]
+    signed_rows=json.loads(gzip.decompress((w/"official-cargo/signed-driver.json.gz").read_bytes()))
+    signed_elf=g.read(w/"official-cargo/signed-driver.json")
+    assert signed_elf["sha256"]==g.SIGNED["driver"]["sha256"] and signed_elf["census_uncompressed_sha256"]==domain.rows_hash(signed_rows)
+    probe_names,projection=domain.resolve(signed_rows,post_rows,rustc,tmp/"version-grammar")
+    g.save(exp/"probe-domain.json",projection)
+    post_with_probes=elf.scan(image,None,probe_names)
+    assert {k:v for k,v in post.items() if k!="probes"}=={k:v for k,v in post_with_probes.items() if k!="probes"}
+    post=post_with_probes
+    pre_with_probes=elf.scan(before,None,probe_names)
+    assert {k:v for k,v in pre.items() if k!="probes"}=={k:v for k,v in pre_with_probes.items() if k!="probes"}
+    pre=pre_with_probes
+    g.save(exp/"pre-bolt.json",pre);g.save(exp/"installed.json",post)
     policy_record,exceptions=policy.prove(w,arm,pre,post,pre_rows,post_rows)
     final_stage=Path(policy_record["pre_bolt"]["live"])
     # Dist can strip debug data after copying the stage2 driver. Verify the
@@ -85,4 +98,5 @@ def main():
     g.save(dest/"role.json",product);shutil.copyfile(dest/"role.json",qa/"role.json")
     names=("ohm.tar.gz","source.json","role.json","sdk-inventory.json","component-inventory.json")
     (dest/"SHA256SUMS").write_text("".join(g.sha(dest/n)+"  "+n+"\n" for n in names))
+    for name in ("sdk-inventory.json","component-inventory.json","SHA256SUMS"):shutil.copyfile(dest/name,qa/name)
 if __name__=="__main__":main()
