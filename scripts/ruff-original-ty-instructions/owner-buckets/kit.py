@@ -10,10 +10,10 @@ import zipfile
 from pathlib import Path
 
 REPO = "astral-experiments/ohm"
-def acquire(w, binding):
+def acquire(w, binding, read_token):
     code=Path(os.environ["GITHUB_WORKSPACE"])/"factory-src/scripts/ruff-matched-stage"
     root=w.root/"owner-kit";root.mkdir()
-    env=dict(os.environ,GH_TOKEN=os.environ["OHM_SDK_READ_TOKEN"])
+    env=dict(os.environ,GH_TOKEN=read_token)
     def gh(*args, **kw):
         return subprocess.run(["gh","api",f"repos/{REPO}/"+args[0]],check=True,env=env,**kw)
     def api(path):return json.loads(gh(path,capture_output=True).stdout)

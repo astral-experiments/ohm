@@ -139,7 +139,10 @@ def main():
     require(sp.check_output(["git","-C",qa,"rev-parse","HEAD"],text=True).strip()==os.environ["GITHUB_SHA"] and os.environ["GITHUB_REF_NAME"]=="charlie/qa-ruff-ty-ide-profile-29697-20261103","unregistered exact receiver")
     require(w.git("rev-parse","HEAD")==new and w.git("rev-parse","HEAD^")==old and not w.git("diff","--name-only",old,new,"--","crates/ty_ide"),"different real Ruff edit")
     w.put(w.proof/"registration.json",dict(old=old,new=new,lock=lock,command=command,order=list("PCCP"),factory=cfg,source_sha256=w.hf(Path(__file__)),gate="Both mirrored primary edit pairs must save at least 2%, increase physically retained byte-identical ty_ide objects, retain the real native/metadata verdict and exact within-role clean ELF."))
-    env=w.install();roots=acquire(w,cfg);w.sdk.rename(w.root/"original-signed-reference")
+    # install removes its one-use GitHub credential from os.environ before returning the Cargo environment.
+    read_token=os.environ["OHM_SDK_READ_TOKEN"]
+    env=w.install();roots=acquire(w,cfg,read_token);del read_token
+    w.sdk.rename(w.root/"original-signed-reference")
     whole=w.root/"whole_count";trace=w.root/"exec_count"
     for tool in (whole,trace):sp.run(["cc","-O2","-Wall","-Wextra","-Werror",here.parent/(tool.name+".c"),"-o",tool],check=True)
     source=w.root/"counter.c";source.write_text('#include <stdint.h>\n#include <stdlib.h>\nint main(int c,char **v){uint64_t n=strtoull(v[1],0,10);volatile uint64_t x=1;for(uint64_t i=0;i<n;i++)x=x*3+i;return c!=2;}\n')
