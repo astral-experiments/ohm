@@ -94,6 +94,21 @@ fi
 
 verify_sources=("$script_dir/verify-release-sources.sh" "$release_manifest" "$rust_checkout"
   "$cargo_checkout" "$clippy_checkout" "$rustfmt_checkout")
+readme="$cargo_checkout/README.md"
+git -C "$cargo_checkout" config core.trustctime false
+touch -t 200001010000 "$readme"
+git -C "$cargo_checkout" update-index --refresh -- README.md
+cp -p "$readme" "$test_root/original-readme"
+printf 'altered cargo\n' >"$readme"
+touch -r "$test_root/original-readme" "$readme"
+if "${verify_sources[@]}" >/dev/null 2>&1; then
+  echo 'source verification accepted changed contents with a preserved size and mtime' >&2
+  exit 1
+fi
+cp -p "$test_root/original-readme" "$readme"
+"${verify_sources[@]}" >/dev/null
+git -C "$cargo_checkout" config --unset core.trustctime
+
 embedded_cargo="$rust_checkout/src/tools/cargo"
 nested_dependency="$embedded_cargo/vendor/fixture code"
 git -C "$rust_checkout" config submodule.src/tools/cargo.ignore all
