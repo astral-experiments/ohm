@@ -4,8 +4,8 @@ from pathlib import Path
 
 def read(p):return json.loads(p.read_bytes())
 def h(blob):return hashlib.sha256(blob).hexdigest()
-def decode_fingerprint(b):
-    assert b[:6]==bytes.fromhex('01000000ff04');off=6
+def decode_fingerprint(b, epoch):
+    assert epoch in (4,5) and b[:6]==bytes.fromhex('01000000ff')+bytes([epoch]);off=6
     def take(n):
         nonlocal off
         data=b[off:off+n];assert len(data)==n;off+=n;return data
@@ -22,7 +22,9 @@ def fnv(b):
     for c in b:x=((x^c)*1099511628211)%(1<<64)
     return x
 def all_records(root, b3, mode):
-    plan=read(root/'registration.json');n=0;kcount=0;out={};source={}
+    plan=read(root/'registration.json')
+    epoch={'f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee':4, '0617e34321cf33fcce38904d066f0d4981b79f752896d37b97d1aed1fbddc48f':5, '1d4c93cd725a06b9a31704dc05a67a5d418c4cf97a3d3680ce8fb522ccee404f':4}[plan['actual_native_cargo']]
+    n=0;kcount=0;out={};source={}
     for role in plan['roles']:
         out[role]={};source[role]={}
         for history in plan['histories']:
@@ -86,7 +88,7 @@ def all_records(root, b3, mode):
                 if stage in ('old-literal','old-unchanged','first-edited','next-unchanged'):
                     text,=[v for name,v in data.items()if name.endswith('.d')and '/app/'in name];assert f.encode() in text
                     name,=[name for name in data if name.endswith('/fingerprint/dep-bin-app')];raw=data[name]
-                    saved=decode_fingerprint(raw)[f];assert saved=={'bytes':old['length'],'blake3':old['blake3']}
+                    saved=decode_fingerprint(raw,epoch)[f];assert saved=={'bytes':old['length'],'blake3':old['blake3']}
                     if stage=='old-literal':old_file=inventory[name]
                     if stage=='first-edited' and role=='C' and ex==0:
                         assert saved['blake3']!=b3got and saved['bytes']!=len(native_bytes)
@@ -106,7 +108,7 @@ def all_records(root, b3, mode):
         r=source[role]['kernel'];expected=['app','dep']
         assert r['first-edited']['physical_rustcs']==expected and r['old-unchanged']['physical_rustcs']==[] and r['next-unchanged']['physical_rustcs']==['app'] and r['independent-empty-edited']['physical_rustcs']==['app','dep']and r['repaired-unchanged']['physical_rustcs']==[]
         out[role]=r
-    return {'report':'First-check source-matched derived-enum / literal metadata dependency','outcome':mode,'commands':n,'kernel_typed_rustcs':kcount,'terminal_sha256':h((root/'out/terminal.json').read_bytes()),'registration_sha256':h((root/'registration.json').read_bytes()),'roles':out}
+    return {'report':'First-check source-matched derived-enum / literal metadata dependency','outcome':mode,'commands':n,'binary_fingerprint_epoch':epoch,'kernel_typed_rustcs':kcount,'terminal_sha256':h((root/'out/terminal.json').read_bytes()),'registration_sha256':h((root/'registration.json').read_bytes()),'roles':out}
 
 if __name__=='__main__':
     ap=argparse.ArgumentParser();ap.add_argument('--root',type=Path,required=True);ap.add_argument('--b3sum',required=True);ap.add_argument('--expect',choices=('legacy','aware'),required=True);ap.add_argument('--output',type=Path,required=True);a=ap.parse_args()

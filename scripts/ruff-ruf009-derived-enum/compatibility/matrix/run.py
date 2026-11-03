@@ -110,6 +110,14 @@ def main():
     completed = []
     for mode in REG["literal"]:
         label = "literal-" + mode
+        if mode in REG["prior_literal_cells"]:
+            frozen = REG["prior_literal_cells"][mode]
+            report = HERE/"prior"/(mode+".json")
+            proof = read(report)
+            assert sha(report) == frozen["digest"] and proof["terminal_sha256"] == frozen["native_terminal"]
+            assert proof["commands"] == 40 and proof["kernel_typed_rustcs"] == 24 and proof["binary_fingerprint_epoch"] == frozen["epoch"]
+            completed.append({"label":label, "commands":40, "independent":sha(report), "original_acquisition":REG["prior_literal_source"]})
+            continue
         contract = logs / (label+"-registration.json")
         write(contract, spec("literal", "P2", "Q2", "current"))
         expect = "legacy" if mode == "legacy" else "aware"

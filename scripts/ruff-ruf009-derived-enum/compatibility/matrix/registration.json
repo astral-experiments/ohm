@@ -171,6 +171,25 @@
     "typed": 0
   },
   "previous_case_receiver": "ddfeceeb6fd33fdea233a39a3d59ab523f5ab170",
+  "prior_literal_cells": {
+    "aware": {
+      "digest": "70a92a1959dabff9f5b762d59f604e27e7125977856520ce856994cac7b80147",
+      "epoch": 5,
+      "native_terminal": "4a3e5b4b4fdab30117035cff8885b095f91b05aba95b2e1a5ef94ded570e9c57"
+    },
+    "legacy": {
+      "digest": "41c7ab85ecd6266018dae169551134dbcc0356d0eccf31d35eb6261f3f56e1a4",
+      "epoch": 4,
+      "native_terminal": "daebff54dce90bb9920c0e8ef54abf2e9e027390c88b37127bff47b00e58e51f"
+    }
+  },
+  "prior_literal_source": {
+    "artifact": 13219437054,
+    "commit": "7bbab22a",
+    "reason": "Two complete cells recovered from original raw files. The independent receiver enforced v4 even for the actual v5 Cargo. Require the exact compiler/client digest to select its single registered binary schema, plus all original saved-input bytes and checksums. Only the remaining native scenarios are newly acquired.",
+    "run": 41612088857,
+    "zip_sha256": "2afe9a562a76bfd0c6a7be4810047faa26b44dea0c395d64f1dd8c3933cd6759"
+  },
   "purpose": "Unscored Linux ABI, input validation and parked same-path upgrades; the historical Ruff performance refusal contributes no samples.",
   "raw_witnesses": "Real include_bytes of actual emitted selected rmeta, raw BLAKE3, first edited E0308 and independent empty + repair. Both true corrected rustcs also consume conflicting reads of one input at identical mtime. Every counterexample refuses qualification.",
   "reader": "08ca9605d18606a16a1b178f1c5d11efb3c8c65d",
