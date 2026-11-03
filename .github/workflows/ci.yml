@@ -10,14 +10,14 @@ permissions:
   actions: read
   contents: read
 jobs:
-  native-gate:
-    name: native-gate-0
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruf009-sete-native-gate-20261103' && github.event_name == 'workflow_dispatch' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+  native-cold:
+    name: native-cold-0
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruf009-empty-native-20261103' && github.event_name == 'workflow_dispatch' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 60
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      PHASE: native-gate
+      PHASE: native-cold
       BLOCK: '0'
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
@@ -55,7 +55,7 @@ jobs:
         with:
           python-version: '3.13'
       - name: Install the independent process observer
-        run: sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends strace zstd llvm-18
+        run: sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends strace zstd llvm-18 b3sum
       - name: Verify the historical factory, registry, Cargo client and real Rust targets
         env:
           GH_TOKEN: ${{ github.token }}
@@ -65,6 +65,6 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: ruf009-native-gate-${{ github.run_id }}
+          name: ruf009-native-cold-${{ github.run_id }}
           path: ${{ runner.temp }}/ohm-ruf009/receipt
           retention-days: 7

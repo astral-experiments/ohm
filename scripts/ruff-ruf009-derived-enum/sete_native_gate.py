@@ -8,7 +8,6 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
-import tomllib
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -19,13 +18,10 @@ import prefix
 import qualification as q
 
 STATES = {
-    "seed-buggy": "buggy",
-    "local-buggy": "buggy",
-    "settled-buggy": "buggy",
+    "settled-fixed": "fixed",
     "edited": "fixed",
     "reverse": "buggy",
     "repaired": "fixed",
-    "local-empty-fixed": "fixed",
     "fully-empty-fixed": "fixed",
     "fully-empty-buggy": "buggy",
 }
@@ -126,7 +122,7 @@ def capture(label, role, env, traced=False):
             o["crate"] for o in original["rustcs"] if o["crate"] in ("portable_atomic", "salsa")
         ]
         paths = [sh for sh in original["rustcs"] if sh["crate"] == "ruff_linter"]
-        if label == "local-buggy":
+        if label in ("edited", "reverse"):
             assert paths and all(x["driver"] == case.sha(native_owner.DRIVER) for x in paths)
     body["true_empty"] = all(not x["fresh"] for x in rows)
     case.save(out / "snapshot.json", body)
@@ -146,9 +142,9 @@ def compare_all(snapshots):
         for name in ("fully-empty-fixed", "fully-empty-buggy"):
             if not data[name]["true_empty"]:
                 failures.append([role, name, "reused compiled units"])
-        for name in ("local-buggy", "settled-buggy", "local-empty-fixed"):
+        for name in ("edited", "settled-fixed", "reverse"):
             row = data[name]
-            if name in ("local-buggy", "settled-buggy") and row["physical_selected"]:
+            if row["physical_selected"]:
                 failures.append([role, name, "real external native owner", row["physical_selected"]])
             if row["external_nonfresh"]:
                 failures.append([role, name, "external nonfresh", row["external_nonfresh"]])
@@ -173,7 +169,7 @@ def compare_all(snapshots):
                     assert case.sha(dst) == k["sha256"]
                     files.append(dst)
                 cross[name] = elf_gate.compare(*files, a["native_out_dir"], b["native_out_dir"])
-        except (ValueError, AssertionError, subprocess.SubprocessError) as err:
+        except (ValueError, AssertionError, TypeError, OSError, subprocess.SubprocessError) as err:
             failures.append([name, "cross-role ELF", str(err)])
     return failures, cross
 
@@ -186,30 +182,22 @@ def role_history(role):
     case.w.OUT.mkdir()
     case.save(case.w.OUT / "sdk.json", kit)
     case.fresh_state()
-    case.source("buggy")
     data = {}
-    check = case.w.OUT / "dependency-seed-check"
-    case.w.run(case.CHECK, env, check, timeout=3600)
-    q.typed_rows(check, True)
 
     def run(label, trace=False):
         data[label] = capture(label, role, env, trace)
 
-    run("seed-buggy")
-    lock = tomllib.loads((case.w.SRC / "Cargo.lock").read_text())
-    ext = prefix.Prefix(
-        case.w.STATE,
-        case.w.SRC,
-        case.ROOT / "cargo",
-        case.w.OUT / "external-prefix",
-        lock,
-        {"check": check, "build": case.w.OUT / "seed-buggy"},
-    )
-    ext.fresh("start-native")
-    run("local-buggy", True)
-    run("settled-buggy", True)
-    run("edited")
-    run("reverse")
+    def empty(label):
+        assert not list(case.w.STATE.iterdir())
+        assert not Path(env["CARGO_TARGET_DIR"]).exists() and not Path(env["CARGO_BUILD_BUILD_DIR"]).exists()
+        case.save(case.w.OUT / (label+"-entry.json"), {"entries": [], "state": str(case.w.STATE),
+                  "target": env["CARGO_TARGET_DIR"], "build": env["CARGO_BUILD_BUILD_DIR"]})
+        run(label)
+
+    empty("fully-empty-buggy")
+    run("edited", True)
+    run("settled-fixed", True)
+    run("reverse", True)
     case.source("fixed")
     src = case.w.SRC / case.REG["path"]
     good = src.read_bytes()
@@ -221,28 +209,8 @@ def role_history(role):
     finally:
         src.write_bytes(good)
     run("repaired")
-    stable = True
-    try:
-        ext.verify("after-repaired")
-    except ValueError as err:
-        stable = False
-        case.save(case.w.OUT / "external-refusal.json", {"reason": str(err)})
-    if stable:
-        ext.fresh("independent-local-fixed")
-        run("local-empty-fixed")
-    for label in ("fully-empty-fixed", "fully-empty-buggy"):
-        case.fresh_state()
-        assert not list(case.w.STATE.iterdir())
-        case.save(
-            case.w.OUT / (label + "-entry.json"),
-            {
-                "entries": [],
-                "state": str(case.w.STATE),
-                "target": env["CARGO_TARGET_DIR"],
-                "build": env["CARGO_BUILD_BUILD_DIR"],
-            },
-        )
-        run(label)
+    case.fresh_state()
+    empty("fully-empty-fixed")
     return data
 
 

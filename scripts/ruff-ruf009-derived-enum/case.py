@@ -62,7 +62,7 @@ def enroll(phase, block):
         source(tag)
         (BASE/'source'/(tag+'.rs')).write_bytes((w.SRC/REG['path']).read_bytes())
     (BASE/'source'/'invalid.rs').write_bytes((w.SRC/REG['path']).read_bytes()+ERROR)
-    need(phase=='native-gate' and block==0,'unregistered native control')
+    need(phase=='native-cold' and block==0,'unregistered native control')
     order='CP'
     bind=json.loads((HERE/'factory.json').read_bytes())
     need(bind['source']=={k:v['revision']for k,v in REG['matched_sources'].items()} and bind['branch']==REG['factory_branch'],'wrong experimental Rust versions')

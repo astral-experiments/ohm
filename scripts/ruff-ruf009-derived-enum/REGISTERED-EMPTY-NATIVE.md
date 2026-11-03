@@ -1,0 +1,13 @@
+# Native control from an empty historical Ruff source build
+
+This is a new unscored qualification of the original Ruff #19021 transition. Run 41623337781 remains refused under its independent seed-versus-empty byte criterion. Its first native invocation followed a check. This experiment begins each compiler's first native invocation with zero contents in its own Cargo target and build directories. It never installs another compiler’s products, copies dependency build outputs or restores a snapshot. Only the lock-verified registry and Git sources enter.
+
+The historical tree changes from `710c60f7135879b05f6c05a34085cd7af5c19e7f` to `b00f68a23cedbd3a38fc25bac63638f0f11fc3f0`. The actual command is `cargo +ohm build -p ruff --bin ruff --locked --offline -j4 --message-format=json` with the registered job count and environment. The acquisition runs Q then P at identical logical paths. Both roles use Rust #347 and #349 and negotiated v5 consumer validation. The factory is 41621745224. Every driver, archive and source hash is pinned in factory.json and registration.json.
+
+1. Build the buggy historical checkout from a fully empty target and shared build directory.
+2. Apply the real edit, build, then repeat the fixed checkout unchanged. Rebuild the original checkout. Keep every real rustc and executing driver mapping on these three commands. Require zero `portable_atomic` and `salsa` compiles and zero nominally dirty external units. The original hard portable-atomic dep-info name must be absent.
+3. Introduce the registered Rust type error, require its exact E0308, and repair to the fixed checkout.
+4. Empty both private build directories and independently build the fixed checkout. All 350 Cargo units must be nonfresh in each fully empty build. Both roles must give four correct native RUF009 probe verdicts per successful visit. Require exact complete ELF equality for all same-option visits of each source, including the original to its reverse and the first edited return to independently empty NEW.
+5. Across roles require the registered complete reversible equivalence only: the actual sole Cargo jemalloc output path in three debug sections, the derived Wild build ID, all loadable bytes, and the complete decoded DWARF. Every original ELF is retained. A new `.strtab` difference fails; this cohort has no symbol-name normalization.
+
+No performance counters run here. A separate check-only pilot can run after this native readback and the 182 consumed-input/alias/parked checks pass. Both mixed and corresponding empty states preserve the exact same release-profile Cargo binary. No earlier count joins a new sample.
