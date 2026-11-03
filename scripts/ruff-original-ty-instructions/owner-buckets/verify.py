@@ -20,7 +20,7 @@ OLD="157caa55a51ebae4fa541d31697e3af9a6c32ccf"
 NEW="bfa2407e98ee1343caeefd02b4b69043509baa8c"
 NAMES="34acb828168117d5f9e50edf4baa07e4153bd2f86d3e48514c1ae8cb21cc1f2f"
 DIRTY={"ty_project","ty_ide","ty_server","e2e"}
-ARM=("0P","1C","2C","3P")
+
 PHASE=("old","edit","unchanged","repair","observed-old","observed-edit","observed-unchanged","independent-clean")
 
 def must(value,message):
@@ -31,7 +31,8 @@ def digest(path):
 
 def reader(archive,temp):
     with zipfile.ZipFile(archive) as z:
-        names=set(z.namelist());must(len(names)==len(z.namelist()),"duplicate source member")
+        must(len(set(z.namelist()))==len(z.namelist()),"duplicate source member")
+        names={i.filename for i in z.infolist()if not i.is_dir()}
         def j(n):return json.loads(z.read(n))
         def docs(n):return [json.loads(line) for line in z.open(n+"/stdout.jsonl")]
         def pmu(n):
@@ -39,9 +40,15 @@ def reader(archive,temp):
             must(p["status"]==0 and p["instructions"]>0 and p["enabled"]==p["running"]>0,n)
             return p["instructions"]
         reg=j("registration.json");factory=j("factory-consumed.json")
-        must(reg["old"]==OLD and reg["new"]==NEW and reg["order"]==list("PCCP") and reg["factory"]==factory["binding"],"source and role registration")
+        if "slot"in reg:
+            slot=reg["slot"];orders=("PC","CP","CP","PC","PC","CP")
+            must(isinstance(slot,int) and 0<=slot<6 and re.fullmatch("[0-9a-f-]{36}",reg["boot_id"]), "independent boot registration")
+            order=orders[slot]
+        else:order="PCCP"
+        must(reg["old"]==OLD and reg["new"]==NEW and reg["order"]==list(order) and reg["factory"]==factory["binding"],"source and role registration")
+        arms=[str(i)+r for i,r in enumerate(order)]
         sealed=j("terminal.json");histories=[];body_specs={};rlibs=collections.defaultdict(list);roster=None
-        for idx,arm in enumerate(ARM):
+        for idx,arm in enumerate(arms):
             role=j(arm+"/role.json");must(role["role"]==arm[1] and role["driver"]==reg["factory"]["driver"][arm[1]],"selected physical compiler")
             proof={};elf={}
             def body(item):
@@ -116,7 +123,9 @@ def reader(archive,temp):
             before=classify(proof["old"],proof["edit"])
             must(before==j(arm+"/old-to-new-objects.json"),arm+" primary donors")
             must(classify(proof["observed-old"],proof["observed-edit"])==j(arm+"/observed-old-to-new-objects.json"),arm+" replay donors")
-            classify(proof["edit"],proof["independent-clean"])
+            # A newly allocated empty target can reuse a numeric inode after the old target was removed.
+            canon=lambda o:{name:(v["sha256"],v["bytes"]) for name,v in o.items()}
+            must(canon(proof["edit"])==canon(proof["independent-clean"]),arm+" independent physical CGUs")
             rep=j(arm+"/qualified.json");must(rep==sealed["roles"][idx] and rep["retained"]==len(before["retained"]) and rep["primary"]==pmu(arm+"/edit") and rep["cold"]==pmu(arm+"/old") and rep["noop"]==pmu(arm+"/unchanged"),arm+" primary summary")
             histories.append({"role":arm,"primary":rep["primary"],"cold":rep["cold"],"noop":rep["noop"],"objects":len(proof["edit"]),"retained":rep["retained"],"old":elf["old"],"new":elf["edit"],"storage":rep["storage"]})
         must(len({r["old"]for r in histories})==len({r["new"]for r in histories})==1,"cross-role ELF")
@@ -132,10 +141,10 @@ def reader(archive,temp):
             if sha in rlibs:
                 actual=ar(path);must(all(actual==registered for registered in rlibs[sha]),"rlib members differ from CGU session")
             path.unlink()
-        pairs=[{"reduction":1-histories[c]["primary"]/histories[p]["primary"],"additional_objects":histories[c]["retained"]-histories[p]["retained"]}for p,c in ((0,1),(3,2))]
+        pairs=[{"reduction":1-histories[c]["primary"]/histories[p]["primary"],"additional_objects":histories[c]["retained"]-histories[p]["retained"]}for p,c in (((0,1),(3,2)) if order=="PCCP" else ((order.index("P"),order.index("C")),))]
         gate=all(p["reduction"]>=.02 and p["additional_objects"]>0 for p in pairs)
         must(pairs==sealed["pairs"] and gate==sealed["gate"],"registered decision")
-        return {"histories":histories,"pairs":pairs,"gate":gate,"native_bodies":len(body_specs),"rlibs":len(rlibs),"unique_raw_bytes":sum(body_specs.values()),"signed_sampled_discovery_reopened":"signed-discovery-reopened.json" in names}
+        return {"boot_id":reg.get("boot_id"),"slot":reg.get("slot"),"runner":reg.get("runner"),"histories":histories,"pairs":pairs,"gate":gate,"native_bodies":len(body_specs),"rlibs":len(rlibs),"unique_raw_bytes":sum(body_specs.values()),"signed_sampled_discovery_reopened":"signed-discovery-reopened.json" in names}
 if __name__=="__main__":
     p=argparse.ArgumentParser();p.add_argument("archive",type=Path);p.add_argument("--sha256",required=True);p.add_argument("--output",type=Path,required=True);args=p.parse_args()
     must(digest(args.archive)==args.sha256 and shutil.disk_usage(args.archive.parent).free>16*2**30,"input identity or headroom")

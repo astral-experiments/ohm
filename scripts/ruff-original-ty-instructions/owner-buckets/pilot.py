@@ -82,7 +82,7 @@ def objects(artifacts,td,before):
     row,=(r for r in artifacts if r["target"]["name"]=="ty_ide" and "lib"in r["target"]["kind"])
     outputs={p.suffix:keep(p)for n in row["filenames"]if (p:=Path(n)).suffix in (".rmeta",".rlib")};require(set(outputs)=={".rmeta",".rlib"},"actual ty_ide output set")
     st={p.name:record_file(p)for p in sorted(directory.glob("*.bin"))}
-    if td.parent.name in ("0P","1C") and td.name in ("old","edit"):
+    if td.parent.name in ("0P","0C","1P","1C") and td.name in ("old","edit"):
         for n in ("dep-graph.bin","work-products.bin"):
             require(keep(directory/n)["sha256"]==st[n]["sha256"],"changed graph during acquisition")
             st[n]["body"]=st[n]["sha256"]+".zst"
@@ -141,7 +141,13 @@ def main():
     qa=Path(os.environ["GITHUB_WORKSPACE"])/"qa"
     require(sp.check_output(["git","-C",qa,"rev-parse","HEAD"],text=True).strip()==os.environ["GITHUB_SHA"] and os.environ["GITHUB_REF_NAME"]=="charlie/qa-ruff-ty-ide-profile-29697-20261103","unregistered exact receiver")
     require(w.git("rev-parse","HEAD")==new and w.git("rev-parse","HEAD^")==old and not w.git("diff","--name-only",old,new,"--","crates/ty_ide"),"different real Ruff edit")
-    w.put(w.proof/"registration.json",dict(old=old,new=new,lock=lock,command=command,order=list("PCCP"),factory=cfg,source_sha256=w.hf(Path(__file__)),gate="Both mirrored primary edit pairs must save at least 2%, increase physically retained byte-identical ty_ide objects, retain the real native/metadata verdict and exact within-role clean ELF."))
+    slot=int(os.environ["OHM_29697_SLOT"])
+    orders=("PC","CP","CP","PC","PC","CP")
+    order=os.environ["OHM_29697_ORDER"]
+    require(0<=slot<len(orders) and order==orders[slot],"unregistered held-out assignment")
+    boot=Path("/proc/sys/kernel/random/boot_id").read_text().strip()
+    require(re.fullmatch(r"[0-9a-f-]{36}",boot),"missing kernel boot identity")
+    w.put(w.proof/"registration.json",dict(slot=slot,boot_id=boot,runner=os.environ["RUNNER_NAME"],old=old,new=new,lock=lock,command=command,order=list(order),factory=cfg,source_sha256=w.hf(Path(__file__)),gate="Both mirrored primary edit pairs must save at least 2%, increase physically retained byte-identical ty_ide objects, retain the real native/metadata verdict and exact within-role clean ELF."))
     # install removes its one-use GitHub credential from os.environ before returning the Cargo environment.
     read_token=os.environ["OHM_SDK_READ_TOKEN"]
     env=w.install();roots=acquire(w,cfg,read_token);del read_token
@@ -155,7 +161,7 @@ def main():
         td=w.proof/("calibration-"+str(n));td.mkdir();preflight[n]=count(whole,td,[actor,str(n)],env,w.work)
     require(3.8<preflight[4000000]/preflight[1000000]<4.2,"nonlinear whole-command counter calibration")
     reports=[];master=None
-    for idx,role in enumerate("PCCP"):
+    for idx,role in enumerate(order):
         w.guard();remove_outputs();state(old);roots[role].rename(w.sdk)
         hist=w.proof/(str(idx)+role);hist.mkdir()
         try:
@@ -212,7 +218,8 @@ def main():
         finally:w.sdk.rename(roots[role])
     require(len({r["old"]["sha256"]for r in reports})==len({r["new"]["sha256"]for r in reports})==1,"complete native ELFs differ across roles or order")
     reductions=[]
-    for p,c in ((reports[0],reports[1]),(reports[3],reports[2])):
+    by_role={r["role"]:r for r in reports}
+    for p,c in ((by_role["P"],by_role["C"]),):
         reductions.append(dict(reduction=1-c["primary"]/p["primary"],additional_objects=c["retained"]-p["retained"]))
     w.put(w.proof/"terminal.json",dict(roles=reports,pairs=reductions,gate=all(r["reduction"]>=.02 and r["additional_objects"]>0 for r in reductions)))
 if __name__=="__main__":main()
