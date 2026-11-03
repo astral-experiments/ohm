@@ -1,0 +1,317 @@
+{
+  "complete_frontiers": {
+    "boot": "c0d319b8-fad3-44bb-bc79-09f5781117aa",
+    "calibration": [
+      8009438,
+      32009358
+    ],
+    "derive_entries": 16,
+    "direct_whole": {
+      "enabled": 1458502883,
+      "instructions": 9324758943,
+      "pid": 1504,
+      "running": 1458502883,
+      "status": 0
+    },
+    "frontiers": [
+      [
+        "full",
+        9301853677
+      ],
+      [
+        "analysis_complete",
+        2091359610
+      ],
+      [
+        "backend_entry",
+        2410867560
+      ],
+      [
+        "backend_entry",
+        2410361839
+      ],
+      [
+        "analysis_complete",
+        2091191571
+      ],
+      [
+        "full",
+        9303630765
+      ]
+    ]
+  },
+  "native": {
+    "actual_stub_syscalls": {
+      "split-fresh": [
+        "1333  openat(AT_FDCWD, \"/home/runner/work/_temp/ohm-foreign-join/ron-replay/private-out/rmeta4OhJaH/stub.rmeta\", O_RDWR|O_CREAT|O_TRUNC|O_CLOEXEC, 0666) = 9",
+        "1333  openat(AT_FDCWD, \"/home/runner/work/_temp/ohm-foreign-join/ron-replay/private-out/rmeta4OhJaH/stub.rmeta\", O_RDONLY|O_CLOEXEC) = 9"
+      ],
+      "split-independent-cold-repair": [
+        "1459  openat(AT_FDCWD, \"/home/runner/work/_temp/ohm-foreign-join/ron-replay/private-out/rmeta7xdN2l/stub.rmeta\", O_RDWR|O_CREAT|O_TRUNC|O_CLOEXEC, 0666) = 9",
+        "1459  openat(AT_FDCWD, \"/home/runner/work/_temp/ohm-foreign-join/ron-replay/private-out/rmeta7xdN2l/stub.rmeta\", O_RDONLY|O_CLOEXEC) = 9"
+      ],
+      "split-warm-prior-products-present": [
+        "1444  openat(AT_FDCWD, \"/home/runner/work/_temp/ohm-foreign-join/ron-replay/private-out/rmeta7ZQGJb/stub.rmeta\", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)"
+      ]
+    },
+    "boot": "31a79098-ecd2-4685-b8b4-83cc48dd33d7",
+    "counted_roles": {
+      "embedded-independent-clean-edit": {
+        "allocated_files": 75,
+        "enabled": 1657837664,
+        "instructions": 10293520803,
+        "native": "1 1",
+        "rlib": {
+          "bytes": 3757266,
+          "sha256": "d519d5f9db46320f02b188c42fe76f553c179349e6805be2762d1e6545cd507b"
+        },
+        "rmeta": {
+          "bytes": 1428885,
+          "sha256": "8536aca3f880a358f467b40f6f457b1c7b790cab9bbc57bc7c5b81a1d058a497"
+        },
+        "running": 1657837664,
+        "session_bytes": 20561920
+      },
+      "embedded-invalid-rust": {
+        "allocated_files": 86,
+        "enabled": 234574037,
+        "instructions": 1068835342,
+        "native": null,
+        "rlib": {
+          "bytes": 3757266,
+          "sha256": "d005c9c0d176af513e3b41c2a25ff2cb4537a220f9fde5750060d5898145f239"
+        },
+        "rmeta": {
+          "bytes": 1428885,
+          "sha256": "d5c59800a28143a558a5a39026d0103170a0d0d781e97ab18fc284d9a93bd196"
+        },
+        "running": 234574037,
+        "session_bytes": 54276096
+      },
+      "embedded-malformed-native": {
+        "allocated_files": 77,
+        "enabled": 119648421,
+        "instructions": 668861266,
+        "native": null,
+        "rlib": {
+          "bytes": 3757298,
+          "sha256": "cc8ecd616ca55035227bfcaff231d58b2f055d05a310f5f9fbea55bd3e74edb1"
+        },
+        "rmeta": {
+          "bytes": 1428885,
+          "sha256": "937a234b5e06efb9fb4806b9b3fb54df1a4ec9e7826e87dd784fda7cfcc6cdc3"
+        },
+        "running": 119648421,
+        "session_bytes": 28323840
+      },
+      "embedded-original-repair": {
+        "allocated_files": 75,
+        "enabled": 284261534,
+        "instructions": 1262373507,
+        "native": "2 2",
+        "rlib": {
+          "bytes": 3757298,
+          "sha256": "cab26afb012e363f1d1aee61303d2caae5d95ff273adad8fbcab6d55a407e833"
+        },
+        "rmeta": {
+          "bytes": 1428885,
+          "sha256": "164547c3121c60bd301afb64e05dad9fe46c4a6e63811ccd44c79cf866ec1d34"
+        },
+        "running": 284261534,
+        "session_bytes": 21078016
+      },
+      "embedded-repaired-native": {
+        "allocated_files": 81,
+        "enabled": 144054715,
+        "instructions": 868834169,
+        "native": "2 2",
+        "rlib": {
+          "bytes": 3757298,
+          "sha256": "90d7b4850538f31078387cba7195e3557250563ef7a59f4bcec97ac5f1e861b4"
+        },
+        "rmeta": {
+          "bytes": 1428885,
+          "sha256": "937a234b5e06efb9fb4806b9b3fb54df1a4ec9e7826e87dd784fda7cfcc6cdc3"
+        },
+        "running": 144054715,
+        "session_bytes": 43876352
+      },
+      "embedded-source-edit": {
+        "allocated_files": 84,
+        "enabled": 273256159,
+        "instructions": 1409710386,
+        "native": "1 1",
+        "rlib": {
+          "bytes": 3757266,
+          "sha256": "d005c9c0d176af513e3b41c2a25ff2cb4537a220f9fde5750060d5898145f239"
+        },
+        "rmeta": {
+          "bytes": 1428885,
+          "sha256": "d5c59800a28143a558a5a39026d0103170a0d0d781e97ab18fc284d9a93bd196"
+        },
+        "running": 273256159,
+        "session_bytes": 46919680
+      },
+      "embedded-source-repair": {
+        "allocated_files": 90,
+        "enabled": 161478111,
+        "instructions": 767664602,
+        "native": "1 1",
+        "rlib": {
+          "bytes": 3757266,
+          "sha256": "a3781a9c919b98d0e39fe97705e86c86ea84990bfefa7d912e7adfb05e825317"
+        },
+        "rmeta": {
+          "bytes": 1428885,
+          "sha256": "d5c59800a28143a558a5a39026d0103170a0d0d781e97ab18fc284d9a93bd196"
+        },
+        "running": 161478111,
+        "session_bytes": 71127040
+      },
+      "embedded-training": {
+        "allocated_files": 75,
+        "enabled": 1726068671,
+        "instructions": 10293049632,
+        "native": "2 2",
+        "rlib": {
+          "bytes": 3757298,
+          "sha256": "c2d6cd2a194447dcf3e66d170fe8c9c944677997ebb4dce62ab498f9670a3626"
+        },
+        "rmeta": {
+          "bytes": 1428885,
+          "sha256": "937a234b5e06efb9fb4806b9b3fb54df1a4ec9e7826e87dd784fda7cfcc6cdc3"
+        },
+        "running": 1726068671,
+        "session_bytes": 20561920
+      },
+      "embedded-warm-1": {
+        "allocated_files": 75,
+        "enabled": 135452793,
+        "instructions": 760279605,
+        "native": "2 2",
+        "new_session_prior_native_inode_and_digest_matches": 68,
+        "rlib": {
+          "bytes": 3757298,
+          "sha256": "4ee2feab648f149e6f1a8ccc7a753b792371babc5ec3be9d805f766383a26f33"
+        },
+        "rmeta": {
+          "bytes": 1428885,
+          "sha256": "937a234b5e06efb9fb4806b9b3fb54df1a4ec9e7826e87dd784fda7cfcc6cdc3"
+        },
+        "running": 135452793,
+        "session_bytes": 20873216
+      },
+      "embedded-warm-2": {
+        "allocated_files": 75,
+        "enabled": 136096747,
+        "instructions": 769878713,
+        "native": "2 2",
+        "new_session_prior_native_inode_and_digest_matches": 68,
+        "rlib": {
+          "bytes": 3757298,
+          "sha256": "cc8ecd616ca55035227bfcaff231d58b2f055d05a310f5f9fbea55bd3e74edb1"
+        },
+        "rmeta": {
+          "bytes": 1428885,
+          "sha256": "937a234b5e06efb9fb4806b9b3fb54df1a4ec9e7826e87dd784fda7cfcc6cdc3"
+        },
+        "running": 136096747,
+        "session_bytes": 21172224
+      },
+      "original-native": {
+        "allocated_files": 0,
+        "enabled": 1487974720,
+        "instructions": 9328306806,
+        "native": "2 2",
+        "rlib": {
+          "bytes": 2105782,
+          "sha256": "da159c2ae58df1a78438e7afb316ae9e4659ce0a9fabccba7e83a3a1de8b70b3"
+        },
+        "rmeta": {
+          "bytes": 1439645,
+          "sha256": "a9f3750354c877a4f7d0b48c81823d7a36386638b270d2ec1124bd33e009f778"
+        },
+        "running": 1487974720,
+        "session_bytes": 0
+      }
+    },
+    "source_errors": [
+      [
+        "embedded-invalid-rust",
+        [
+          [
+            "E0308",
+            "extensions.rs",
+            60,
+            15,
+            31
+          ]
+        ]
+      ],
+      [
+        "embedded-malformed-native",
+        [
+          [
+            "E0782",
+            "extensions.rs",
+            5,
+            83,
+            94
+          ],
+          [
+            "E0782",
+            "public.rs",
+            17,
+            37,
+            98
+          ]
+        ]
+      ]
+    ]
+  },
+  "originals": [
+    {
+      "artifact": 13227000801,
+      "bytes": 16473,
+      "head": "7a7c03e6a296c212da3107b9a676dc406024f8a3",
+      "run": 41627244884,
+      "sha256": "e2087843eac1f6cc61407897d1a45f1656c697ef0d42ae65e5efa89624ea54d8"
+    },
+    {
+      "artifact": 13227275399,
+      "bytes": 33640,
+      "head": "b0e72506cbe9c0784d87bdbdda61fc7c1471070d",
+      "run": 41627562321,
+      "sha256": "5978bc1ac4c0f8afa51db130105f317147bc90a1203732f1f71bcc97ac28cb32"
+    },
+    {
+      "artifact": 13225974689,
+      "bytes": 82650,
+      "head": "f6f60accb8892ccb8f05fed0036126bc2896d0b1",
+      "run": 41628218885,
+      "sha256": "b2e13b426ab0969f97fdc913247bb9098274690685e0b1cbbc2fdcf9df4c731c"
+    }
+  ],
+  "partial_frontiers": {
+    "boot": "d605f8ad-33f7-4d6e-8ae9-39e087cc99cb",
+    "calibration": [
+      8009440,
+      32009454
+    ],
+    "derive_entries": 16,
+    "frontiers": [
+      [
+        "full",
+        9305239959
+      ],
+      [
+        "analysis_complete",
+        2090665787
+      ],
+      [
+        "backend_entry",
+        2409861056
+      ]
+    ]
+  }
+}
