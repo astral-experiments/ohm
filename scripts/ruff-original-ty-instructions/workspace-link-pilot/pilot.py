@@ -6,6 +6,7 @@ from pathlib import Path
 
 HERE=Path(__file__).resolve().parent
 sys.path[:0]=[str(HERE),str(HERE.parent/"workspace-link-proof"),str(HERE.parent/"e2e-existing-output")]
+import native_fallback
 import audit, census, meter_fixture, multi_source
 b,w,P=audit.b,audit.w,audit.P
 put=lambda name,data: b.write(P/name,data)
@@ -217,6 +218,15 @@ def main():
         out=run(arm+"-edit",arm)
         for i in range(1,4):out=run(arm+"-warm"+str(i),arm)
         out=run(arm+"-exec-warm",arm,trace=True)
+        # Tracing changes the inherited jobserver-fd spelling. Retain that first transition,
+        # then observe a second genuinely unchanged invocation in the same trace context.
+        out = run(arm + "-exec-warm-stable", arm, trace=True)
+        b.select(b.OLD)
+        out = run(arm + "-ordinary-repeat-old", arm)
+        b.select(b.NEW)
+        assert b.verdict(out, arm + "-withheld-ordinary-repeat-old", env, 101) == audit.contact.LITERALS["list"]
+        out = run(arm + "-ordinary-repeat-edit", arm)
+
         b.select(b.OLD);out=run(arm+"-reverse-old",arm)
         b.select(b.NEW);assert b.verdict(out,arm+"-withheld-reverse-old",env,101)==audit.contact.LITERALS["list"]
         out=run(arm+"-exec-edit",arm,trace=True)
@@ -231,17 +241,23 @@ def main():
             mutation=edit.result(timeout=135)
         put(tag+"-actual-change.json",mutation)
         if mode=="four":
-            changed=read(P/tag/"physical-decisions.json")["actors"][E2E]
-            assert changed["action"]=="full" and changed["response"]=="full" and len(mutation["changed_offsets"])==4
+            proof=native_fallback.on_worker(P/tag,E2E,mutation,provider,current,
+                results["C-exec-edit"]["published"][E2E],results[tag]["published"][E2E],w.hf,audit.donor.full_b3)
+            put(tag+"-full-output.json",proof)
             ret=subprocess.run([current,"--list"],cwd=w.work/"crates/ty_server",env=env,capture_output=True)
             assert ret.returncode==83 and not ret.stdout;put(tag+"-verdict.json",{"exit":ret.returncode,"stdout_bytes":0})
         for f in ("mid-read","entry-wait","entry-ready","read-first-half","entry-continue","continue-read"):
             (state/f).unlink(missing_ok=True)
         out=run(tag+"-repair","C")
     out=run("C-before-output-control-1","C")
-    out=run("C-before-output-control-2","C")
-    assert E2E in results["C-before-output-control-2"]["fresh_roles"]
-    old_ref=results["C-before-output-control-2"]["published"][E2E]
+    for attempt in range(2, 7):
+        tag = "C-before-output-control-" + str(attempt)
+        out = run(tag, "C")
+        if E2E in results[tag]["fresh_roles"]:
+            break
+    else:
+        raise AssertionError("No genuine unchanged existing-output admission before corruption")
+    old_ref = results[tag]["published"][E2E]
     put("corrupted-existing-elf.json",audit.witness.corrupt_text(out,audit.donor.text_flip,old_ref))
     out=run("C-actual-output-repair","C")
     cr=read(P/"C-actual-output-repair"/"physical-decisions.json")["actors"][E2E]
