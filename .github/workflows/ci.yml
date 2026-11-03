@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         rank: [0, 1, 2, 3, 4, 5]
-    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-historical-ruff-sete-test-20261103'
+    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-historical-ruff-sete-test-v2-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 85
     steps:
@@ -42,6 +42,12 @@ jobs:
           path: factory
           persist-credentials: false
           sparse-checkout: scripts/ruff-matched-stage
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: dba43a0fb9e924785ec8196f166b780c73564589
+          path: decoder
+          persist-credentials: false
+          sparse-checkout: scripts/ruff-module-16149
       - name: Measure ordinary Ruff test builds on matched compilers
         env:
           CONFIRM_RANK: ${{ matrix.rank }}

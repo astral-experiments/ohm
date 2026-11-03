@@ -81,6 +81,40 @@ def artifacts(destination):
     return dict(out)
 
 
+def salsa_identity(data):
+    import scope_rdr
+    schema = json.loads(gzip.decompress((DECODER/'schema.json.gz').read_bytes()))
+    principal, defs, rdr, expansions, deps = scope_rdr.decode(
+        data, schema['symbols'], schema['tables'], 'salsa',
+        'rustc 1.99.0-dev (Ohm metadata 3)', edition='2021',
+    )
+    assert principal.pop('full') == sha(data) and principal['crate'] == 'salsa'
+    tables = dict(definitions=defs, RDR=rdr, expansions=expansions, dependencies=deps)
+    typed = {k:sha(json.dumps(v,sort_keys=True,separators=(',',':')).encode()) for k,v in tables.items()}
+    return principal, typed
+
+
+def salsa_storage(dest):
+    wire = CONFIRM['storage']
+    ledger = json.loads(gzip.decompress((dest/'stored-files.json.gz').read_bytes()))
+    metadata = [row for row in ledger if row[0].endswith('.rmeta')]
+    candidate, = [row for row in metadata if Path(row[0]).name == wire['name']]
+    name, dev, ino, size, allocated = candidate
+    sidecar = w.root/name
+    with sidecar.open('rb') as f:
+        st = os.fstat(f.fileno())
+        assert [st.st_dev, st.st_ino, st.st_size, st.st_blocks*512] == [dev, ino, size, allocated]
+        data = f.read()
+    assert len(data) == size
+    raw = sha(data)
+    payload = w.proof/(raw+'.salsa-rmeta.gz')
+    if not payload.exists():
+        payload.write_bytes(gzip.compress(data, compresslevel=2, mtime=0))
+    principal, typed = salsa_identity(data)
+    other = sorted([Path(f).name,s] for f,d,i,s,blocks in metadata if f!=name)
+    return dict(path=name,root=principal,tables=typed,raw=raw,bytes=size,allocated=allocated,other_metadata=other)
+
+
 def sources():
     return {p: w.hf(w.work / p) for p in (FIXTURE, SNAP, EDIT, 'Cargo.lock')}
 
@@ -233,6 +267,7 @@ def phase(role, name, env, mode, negative=False):
         result['portable'] = marker()
         if name in ('old', 'warm2', 'clean'):
             result['stored_native'] = artifacts(dest)
+            result['salsa_storage'] = salsa_storage(dest)
     write(dest / 'result.json', result)
     print(role, name, 'verdict', result['harness']['code'], 'elf', result['elf'], 'nominal', len(result['nominal']), 'hardware', 'saved' if mode == 'whole' else mode, flush=True)
     return result
@@ -248,6 +283,10 @@ def stale(role, env, old):
 
 
 def main():
+    global DECODER
+    DECODER = Path(os.environ['GITHUB_WORKSPACE'])/'decoder/scripts/ruff-module-16149'
+    assert w.hf(DECODER/'scope_rdr.py') == CONFIRM['storage']['decoder_sha256'] and w.hf(DECODER/'schema.json.gz') == CONFIRM['storage']['schema_sha256']
+    sys.path.insert(0,str(DECODER))
     assert os.environ['GITHUB_SHA'] == os.environ['REVIEWED_HEAD'] and os.environ['GITHUB_RUN_ATTEMPT'] == '1'
     assert os.uname().machine == 'x86_64' and w.git('rev-parse', 'HEAD') == w.NEW and w.git('rev-parse', 'HEAD^') == w.OLD
     assert set(w.git('diff', '--name-only', w.OLD, w.NEW).splitlines()) == {FIXTURE, SNAP, EDIT}
@@ -330,7 +369,19 @@ def main():
             gates[role+'/'+label+'/selected-processes'] = actual == expected[selection] and sum(x['role'] == 'wild' for x in census) == int(selection != 'zero')
     gates['genuine-edit-improves'] = data['edit']['C'] < data['edit']['P']
     gates['cold-guards'] = all(data[tag]['C'] <= 1.02 * data[tag]['P'] for tag in ('old','clean'))
-    gates['stored-native-products'] = all(histories['P']['warm2']['stored_native'][ext] == histories['C']['warm2']['stored_native'][ext] for ext in ('.o','.rlib','.rmeta')) and all(histories[r]['warm2']['stored_native']['.rlink'][0] == 1 for r in ('P','C'))
+    wire = CONFIRM['storage']
+    gates['stored-native-products'] = all(histories['P']['warm2']['stored_native'][ext] == histories['C']['warm2']['stored_native'][ext] for ext in ('.o','.rlib')) and all(histories[r]['warm2']['stored_native']['.rlink'][0] == 1 for r in ('P','C'))
+    gates['stored-link-operand-size'] = histories['C']['warm2']['stored_native']['.rlink'][1] <= histories['P']['warm2']['stored_native']['.rlink'][1]
+    for role, hist in histories.items():
+        base = hist['old']['salsa_storage']
+        for label in ('old','warm2','clean'):
+            seen = hist[label]['salsa_storage']
+            valid_sizes = wire['parent_warm_sizes'] if (role,label) == ('P','warm2') else [wire['cold_size']]
+            gates[role+'/'+label+'/salsa-physical'] = seen['bytes'] in valid_sizes and seen['allocated'] == wire['allocated']
+            gates[role+'/'+label+'/salsa-typed'] = (seen['root'], seen['tables']) == (base['root'],base['tables'])
+    gates['candidate-unrebuilt-salsa-file'] = histories['C']['old']['salsa_storage']['raw'] == histories['C']['warm2']['salsa_storage']['raw']
+    gates['other-stored-metadata'] = histories['P']['warm2']['salsa_storage']['other_metadata'] == histories['C']['warm2']['salsa_storage']['other_metadata']
+
     write(w.proof / 'decision.json', {'gates':gates, 'counts':data, 'admitted':all(gates.values())})
     assert all(gates.values()), [k for k,v in gates.items() if not v]
 
