@@ -1,5 +1,5 @@
 name: Exercise source-owned compiler partitions on two real Ruff edits
-run-name: Independently verify both closed Rust layout experiments
+run-name: Bound repeated private codegen in two native Ruff libraries
 permissions:
   contents: read
   actions: read
@@ -16,18 +16,22 @@ jobs:
         path: qa
         persist-credentials: false
         sparse-checkout: scripts/ruff-original-ty-instructions
-    - name: Authenticate all four raw packets and replay both clients and each full query partition
+    - name: Check the physical ELF controls and census both signed original archives
       env:
         GH_TOKEN: ${{ github.token }}
-      run: python3 -IB qa/scripts/ruff-original-ty-instructions/standalone-buckets/owner-lanes/evidence-two-edits/review_originals.py
+      run: 'set -eu
+
+        python3 -IB qa/scripts/ruff-original-ty-instructions/standalone-buckets/baseline-inline-copies/control.py
+
+        python3 -IB qa/scripts/ruff-original-ty-instructions/standalone-buckets/baseline-inline-copies/census.py'
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: physical-owner-lanes-both-${{ github.run_id }}
-        path: ${{ runner.temp }}/owner-reopen/verified/
+        name: baseline-native-inline-census-${{ github.run_id }}
+        path: ${{ runner.temp }}/inline-baseline/results/
         retention-days: 21
         if-no-files-found: error
-    name: Independently reopen both paired originals, native programs, partitions and task counters
+    name: Count emitted function copies and their actual native definitions
 'on':
   workflow_dispatch:
     inputs:
