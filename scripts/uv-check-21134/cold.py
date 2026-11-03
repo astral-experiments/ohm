@@ -5,6 +5,7 @@ import os, sys, time
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import CHECK, ENV, SRC, TARGET, CARGO, RUSTC, EV, read, save, require, sha
+from cold_events import capture as capture_cold_events
 
 
 def validate(tree, compiler_id):
@@ -61,12 +62,15 @@ def capture(d):
     d.mkdir()
     fid = EV["file_id"](RUSTC)
     t = time.monotonic_ns()
-    EV["capture"](d, CHECK, ENV, str(SRC), fid)
+    capture_cold_events(d, CHECK, ENV, str(SRC), fid)
     end = time.monotonic_ns()
     ev = d / "kernel-events.json"
-    proof = validate(EV["decode"](read(ev)), fid)
+    original = read(ev)
+    count = len(original["events"])
+    require(0 < count <= 120000, "cold event count outside the recorded bound")
+    proof = validate(EV["decode"](original), fid)
     save(
         d / "cold-processes.json",
-        proof | {"start_ns": t, "end_ns": end, "events": sha(ev), "command": CHECK, "target_absent": True},
+        proof | {"start_ns": t, "end_ns": end, "events": sha(ev), "event_count": count, "command": CHECK, "target_absent": True},
     )
     return proof

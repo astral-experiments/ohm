@@ -210,9 +210,11 @@ def replay(src):
             seed = f.get(d + "seed.json")
             cold = f.get(d + "new-cold-A/cold-processes.json")
             cev = d + "new-cold-A/kernel-events.json"
-            check = cold_validate(EV["decode"](f.get(cev)), cold["compiler_id"])
+            original_events = f.get(cev)
+            check = cold_validate(EV["decode"](original_events), cold["compiler_id"])
             require(
                 all(cold[k] == v for k, v in check.items())
+                and 0 < cold["event_count"] == len(original_events["events"]) <= 120000
                 and cold["events"] == f.sha(cev)
                 and cold["target_absent"] is True
                 and cold["command"] == CHECK
