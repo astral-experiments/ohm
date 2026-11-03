@@ -1,0 +1,539 @@
+{
+  "arm": "T",
+  "captured_linkers": 3,
+  "linker": "Linker: LLD 23.1.1 (/checkout/src/llvm-project/llvm 1b9c0d5ff9bbe7634aead059efe6b11a7eeba145)",
+  "live_preload": {
+    "arm": "T",
+    "driver_sha256": "99baba753ab3d4e39e13b1fc5ff7541ada19206e74d5e8e52153db9081411e56",
+    "normal": {
+      "compiler": {
+        "driver_dlsym": true,
+        "external_override": false,
+        "overridden": false,
+        "slots": 11
+      },
+      "foreign": {
+        "driver_dlsym": true,
+        "external_override": false,
+        "overridden": false,
+        "slots": 1
+      }
+    },
+    "preloaded": {
+      "compiler": {
+        "driver_dlsym": true,
+        "external_override": true,
+        "overridden": false,
+        "slots": 11
+      },
+      "foreign": {
+        "driver_dlsym": true,
+        "external_override": true,
+        "overridden": true,
+        "slots": 1
+      }
+    },
+    "selection": {
+      "compiler": {
+        "locally_bound": true,
+        "name": "_RNvXsb_Cs5FqzcsxCuie_9rustc_abiNtB5_4SizeNtNtCsemNJ5nmwGWV_4core3fmt5Debug3fmt",
+        "pool": "compiler",
+        "slots": [
+          [
+            89632808,
+            8,
+            ".data.rel.ro"
+          ],
+          [
+            89883744,
+            8,
+            ".data.rel.ro"
+          ],
+          [
+            89954328,
+            8,
+            ".data.rel.ro"
+          ],
+          [
+            90597048,
+            8,
+            ".data.rel.ro"
+          ],
+          [
+            90730752,
+            8,
+            ".data.rel.ro"
+          ],
+          [
+            90836656,
+            8,
+            ".data.rel.ro"
+          ],
+          [
+            90891312,
+            8,
+            ".data.rel.ro"
+          ],
+          [
+            90961672,
+            8,
+            ".data.rel.ro"
+          ],
+          [
+            91267344,
+            8,
+            ".data.rel.ro"
+          ],
+          [
+            91293064,
+            8,
+            ".data.rel.ro"
+          ],
+          [
+            91545464,
+            8,
+            ".got"
+          ]
+        ],
+        "value": 64133296
+      },
+      "foreign": {
+        "locally_bound": false,
+        "name": "_RNvMNtCsavVfeRFLHNu_17rustc_stable_hash6sip128NtB2_12SipHasher12826slice_write_process_buffer",
+        "pool": "foreign",
+        "slots": [
+          [
+            91547720,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 98898816
+      }
+    },
+    "shim_sha256": "20827b1c11e6c71070d4127a692df7cb8acdd0a306e7855450f9fd66aca6d89a"
+  },
+  "packaged_stage2": {
+    "bytes": 162657248,
+    "sha256": "99baba753ab3d4e39e13b1fc5ff7541ada19206e74d5e8e52153db9081411e56",
+    "text_and_dynamic_sha256": "59038fa5c608221aa317702252d28c53ab9cba6ec2986c3cee6897518e172757"
+  },
+  "policies": {
+    "/home/runner/work/ohm/ohm/source/rust/build/tmp/rustc-driver-link-BNSaH7/91203.exports": {
+      "driver": {
+        "bytes": 59,
+        "path": "/home/runner/work/ohm/ohm/source/rust/build/tmp/rustc-driver-link-BNSaH7/driver",
+        "raw": "driver-manifest-dir-f5ec2fd1c68d06d102608f48846359e3217d9b39856d828d16d06c7ac7089222.gz",
+        "sha256": "f5ec2fd1c68d06d102608f48846359e3217d9b39856d828d16d06c7ac7089222"
+      },
+      "dynamic_complement": 11357,
+      "exceptions": {
+        "bytes": 904619,
+        "path": "/home/runner/work/ohm/ohm/source/rust/build/tmp/rustc-driver-link-BNSaH7/91203.exports",
+        "raw": "exceptions-8868bbd0ae200996a83a9c894e376a286d363ff6421899cd5a93e947204143dc.gz",
+        "sha256": "8868bbd0ae200996a83a9c894e376a286d363ff6421899cd5a93e947204143dc"
+      },
+      "manifests": {
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_abi/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_abi/src/lib.rs",
+          "name": "rustc_abi",
+          "sha256": "0da762a5efb6709e219373fd27ef698cadf46c5bb9407480eaa9b09e2d77aa80"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_arena/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_arena/src/lib.rs",
+          "name": "rustc_arena",
+          "sha256": "c821e96e504c233a02df47793978ba0563c80f2020137eb5e53c97f3ed01c702"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_ast/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_ast/src/lib.rs",
+          "name": "rustc_ast",
+          "sha256": "3b2169ffae977610dd68d38bce5ba295a568a2a0ccaa01c531995e956f09613b"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_ast_ir/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_ast_ir/src/lib.rs",
+          "name": "rustc_ast_ir",
+          "sha256": "5899f7abe6f2cd0a9f54fb1a019ba8ff6ebb019b178046c678f170880a439295"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_ast_lowering/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_ast_lowering/src/lib.rs",
+          "name": "rustc_ast_lowering",
+          "sha256": "e4488623bba5ad0629b64e6990d997203509556d560dd3cc8c6c276a6490a070"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_ast_passes/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_ast_passes/src/lib.rs",
+          "name": "rustc_ast_passes",
+          "sha256": "e59d360048a61f42e26914b80532862b274a1b09b1b3ac75797f88cb5caf0c1f"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_ast_pretty/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_ast_pretty/src/lib.rs",
+          "name": "rustc_ast_pretty",
+          "sha256": "4aadf63c0b0d908a992758d6187ca409c04ad6791a80609abb363e80a1bfbb6f"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_attr_ir/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_attr_ir/src/lib.rs",
+          "name": "rustc_attr_ir",
+          "sha256": "213db7b1760f03538febe2b6f7417ab9ab8b7479cd7309dc44e2eca6198a7377"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_attr_parsing/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_attr_parsing/src/lib.rs",
+          "name": "rustc_attr_parsing",
+          "sha256": "039fb2c51f0e623d3e47c94826ed3182613e7dbee2158935fdbadfe6d5e73991"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_baked_icu_data/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_baked_icu_data/src/lib.rs",
+          "name": "rustc_baked_icu_data",
+          "sha256": "61f7cebb52fa8b24232914ba9930bff20d8235b6f5c0a399edd877c93dd910a7"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_borrowck/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_borrowck/src/lib.rs",
+          "name": "rustc_borrowck",
+          "sha256": "bdc39d9cef3cf2f34566417f2804647803291ffaba8b3fd0a832fb53e1712b89"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_builtin_macros/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_builtin_macros/src/lib.rs",
+          "name": "rustc_builtin_macros",
+          "sha256": "dbf82fe26641209f76bcc70d58c4a592fafd631749ffc7ba12cd38f1f4113537"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_codegen_llvm/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_codegen_llvm/src/lib.rs",
+          "name": "rustc_codegen_llvm",
+          "sha256": "0db4bbe65f57a01c749046eb10a9fda1ea890a764d3d3a3c2c4f5138b0c14498"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_codegen_ssa/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_codegen_ssa/src/lib.rs",
+          "name": "rustc_codegen_ssa",
+          "sha256": "52fada0b5ba3bac1134f1a28d55a9763713902365ef22a788c3e6275b78976c7"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_const_eval/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_const_eval/src/lib.rs",
+          "name": "rustc_const_eval",
+          "sha256": "31205c0c24b2d80355d3768250db2b667ccb9bb89ab11b6d3d33829029caffb6"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_crate_store/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_crate_store/src/lib.rs",
+          "name": "rustc_crate_store",
+          "sha256": "09b4eec4aab567e4d2796dddf650bc693c11d879c07d23d49de64c0a9dded468"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_data_structures/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_data_structures/src/lib.rs",
+          "name": "rustc_data_structures",
+          "sha256": "bebaab856eab541afaecbfe76eeacac1e8c95d6dfb6b20fd36d8b14dfc62fc6f"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_driver/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_driver/src/lib.rs",
+          "name": "rustc_driver",
+          "sha256": "0c96042c5217436d66af922d8fdf4d468159f22638c9199659f32ae8b8b1aab1"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_driver_impl/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_driver_impl/src/lib.rs",
+          "name": "rustc_driver_impl",
+          "sha256": "bc980d1c453e709de1ae5f40dec83a1ec3cdb43c94a63bb775b38b106fd3ecc1"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_error_codes/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_error_codes/src/lib.rs",
+          "name": "rustc_error_codes",
+          "sha256": "32bb0a3201140379fb320edb371fa9e458cf88d0fdd55a69dda3acad5a203402"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_error_messages/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_error_messages/src/lib.rs",
+          "name": "rustc_error_messages",
+          "sha256": "5ee40414e507bdcabc3bb4e88150d753c30bbebbcc4a71b3021f409caeafeed8"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_errors/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_errors/src/lib.rs",
+          "name": "rustc_errors",
+          "sha256": "c20dfdcdb36e1ffa261fd7b380dec74092c31d910081e6b7f5930818b12b4609"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_expand/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_expand/src/lib.rs",
+          "name": "rustc_expand",
+          "sha256": "ff3ce9182b20651fd902623caa7c6bea93a7bc92f2fa53c1e2182ed06117a8af"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_feature/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_feature/src/lib.rs",
+          "name": "rustc_feature",
+          "sha256": "e71d19664f4e8e0c8a19c71fcb75b7e3295ca316c49283f589aedfebbec23667"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_fs_util/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_fs_util/src/lib.rs",
+          "name": "rustc_fs_util",
+          "sha256": "d842bb671689dd977c2c961de3b15b4171745e366603b66b4a56c10f4cd11820"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_graphviz/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_graphviz/src/lib.rs",
+          "name": "rustc_graphviz",
+          "sha256": "51848b2d1542a91a0b0faf8e52fd388e0e71cb332823bd00880335a660aad5e8"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_hashes/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_hashes/src/lib.rs",
+          "name": "rustc_hashes",
+          "sha256": "08bcaff62f67ba9680009ea889aee456c6e77af67df9004df5875d7e1890d45c"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_hir/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_hir/src/lib.rs",
+          "name": "rustc_hir",
+          "sha256": "49c0a5e27d6be960c93b5fb27e8b28276c07619657513a2794616acc143be828"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_hir_analysis/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_hir_analysis/src/lib.rs",
+          "name": "rustc_hir_analysis",
+          "sha256": "3e0126baf6a2abb338141f98e987d8988aa5d7cf64150837b3d6c4cb7753ffcf"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_hir_id/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_hir_id/src/lib.rs",
+          "name": "rustc_hir_id",
+          "sha256": "9a5ef4f708da284eaca9b95d823d349de324fa904aaaa49b0147278f10cb8cf9"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_hir_pretty/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_hir_pretty/src/lib.rs",
+          "name": "rustc_hir_pretty",
+          "sha256": "06a4b0b67b32f22576c3e3c659b8997c83a4c4d67aa9577b0cf8979f0157bbb4"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_hir_typeck/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_hir_typeck/src/lib.rs",
+          "name": "rustc_hir_typeck",
+          "sha256": "8ede4c63e9eb71e51dd20199d69b3822eb456cb6aa1a4306334cddfb74e8ae15"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_incremental/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_incremental/src/lib.rs",
+          "name": "rustc_incremental",
+          "sha256": "fda6cf99b4d14947bdd5c3e3fb94418ad301bea187065669f0ed9abe2c19dead"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_index/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_index/src/lib.rs",
+          "name": "rustc_index",
+          "sha256": "c75c3e0429a8ae12a507db0f374344a3ec0bc854bda90d7db7e0ab5082932df9"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_index_macros/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_index_macros/src/lib.rs",
+          "name": "rustc_index_macros",
+          "sha256": "03540eee714e13159e40207ebe2232b191557604c17e47a33782887891663c48"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_infer/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_infer/src/lib.rs",
+          "name": "rustc_infer",
+          "sha256": "d10b3fb76727a6dabb983113f12e1bc93d4e987bdf76ede18fc3ea4f73c70668"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_interface/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_interface/src/lib.rs",
+          "name": "rustc_interface",
+          "sha256": "24c62110ac1bc7010dc21afc0efd60e9e4c0dad0e9dd049474be710b5b8fca71"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_lexer/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_lexer/src/lib.rs",
+          "name": "rustc_lexer",
+          "sha256": "7fcae51d3103efb518e66da7d3de7e7c3fcbb15a6fd8dbcf4b6386bc78ea7eac"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_lint/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_lint/src/lib.rs",
+          "name": "rustc_lint",
+          "sha256": "4e8841f8d72fd14046b6f28824d9f9003bf6c34aed1edd78636ffe15b2e6a6a6"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_lint_defs/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_lint_defs/src/lib.rs",
+          "name": "rustc_lint_defs",
+          "sha256": "a01bc09ddae1aefc9e2c4bdcbd8db948c1b0d772e6141697708658cbbc54974c"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_llvm/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_llvm/src/lib.rs",
+          "name": "rustc_llvm",
+          "sha256": "2ae8fd59bbd658cc8dda4aeae8a23ad0befe6069276778d08f7dfad78ff1af8c"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_log/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_log/src/lib.rs",
+          "name": "rustc_log",
+          "sha256": "22912603942995776a579f0f025720addfe122c0edbc5f6aab18e0f669de50ca"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_macros/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_macros/src/lib.rs",
+          "name": "rustc_macros",
+          "sha256": "568c0b96ca13c7dffeb32ea63f23af94b165824dd19dac429446608b50980417"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_metadata/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_metadata/src/lib.rs",
+          "name": "rustc_metadata",
+          "sha256": "9967acd7a57e6d0aca927417434eb119c03dc1258317db0f189b920044b9aee7"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_middle/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_middle/src/lib.rs",
+          "name": "rustc_middle",
+          "sha256": "fdf0f51645cb60ae26dc3b4b0b29242549e3b98b2d9b8e449549e43f6b32ff35"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_mir_build/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_mir_build/src/lib.rs",
+          "name": "rustc_mir_build",
+          "sha256": "95a3569ee2dc2fe4e9b8e298a6e29588642d0ea08e23ca064cd3823361ad1004"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_mir_dataflow/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_mir_dataflow/src/lib.rs",
+          "name": "rustc_mir_dataflow",
+          "sha256": "23186d9d3ea5a817abf2ee208c3a9062e69e5db41261baa09944931b5c0f684c"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_mir_transform/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_mir_transform/src/lib.rs",
+          "name": "rustc_mir_transform",
+          "sha256": "ec6f443551cbea3e0a0b2b38f19ac9539f0469c306bf0564d2db02456f0a6354"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_monomorphize/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_monomorphize/src/lib.rs",
+          "name": "rustc_monomorphize",
+          "sha256": "9e420afce768e334f11be8fb17ed32765727938311616bf1443bb7dfee93ab8d"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_next_trait_solver/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_next_trait_solver/src/lib.rs",
+          "name": "rustc_next_trait_solver",
+          "sha256": "aba61746a19ed8c372db7e630944e0936a1ec4adc4c9c21b13e307454eb19314"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_parse/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_parse/src/lib.rs",
+          "name": "rustc_parse",
+          "sha256": "f00bdd77ddb1913fa132c44ec97a052887ede11ad89caa5bccf1cdb9b297c4d3"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_parse_format/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_parse_format/src/lib.rs",
+          "name": "rustc_parse_format",
+          "sha256": "6b6b8d3548638d5a60851186857f449b8a2190c6dec24b2acc6c7fb625fe8570"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_passes/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_passes/src/lib.rs",
+          "name": "rustc_passes",
+          "sha256": "6777831381f19d490b3d5d9cf1cc4eb044fde01c057d4749d497a9aa5652fa5d"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_pattern_analysis/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_pattern_analysis/src/lib.rs",
+          "name": "rustc_pattern_analysis",
+          "sha256": "ac8b085a30d6b17e0d3886498eefb3cf7bd23fdd6e0a1589fe971f534d716b3e"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_privacy/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_privacy/src/lib.rs",
+          "name": "rustc_privacy",
+          "sha256": "e1da51187a60cc41839a46ca637f0db09477bbeb93ad6c3a734daea9afae0e4e"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_proc_macro/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/library/proc_macro/src/lib.rs",
+          "name": "rustc_proc_macro",
+          "sha256": "19cc449e6402762e320fe04604d045b7018854f43405c25a25afbfcd9894ee79"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_public/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_public/src/lib.rs",
+          "name": "rustc_public",
+          "sha256": "e6ee254ff423796e708f3e63d2c4ff83d60c50f9bf95f350ac4b1a3a409d5ec0"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_public_bridge/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_public_bridge/src/lib.rs",
+          "name": "rustc_public_bridge",
+          "sha256": "cf5db1a1fd4e0641e3615117c1f7c91f7015a17c435171b11d4298cbcff7a46e"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_query_impl/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_query_impl/src/lib.rs",
+          "name": "rustc_query_impl",
+          "sha256": "bdcd277c49ab8b6f914268ba081b90ba00b04c847e4cea950de6a4478c7cf4a9"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_resolve/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_resolve/src/lib.rs",
+          "name": "rustc_resolve",
+          "sha256": "a21e428171840057d655a85e312ecf705168928a36f17d4d5062040c1f1ea24e"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_sanitizers/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_sanitizers/src/lib.rs",
+          "name": "rustc_sanitizers",
+          "sha256": "26fc0a2ee685dc4575142e5c2bbea2dbfbbf7f2eca194dc163e19de85c8b382c"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_serialize/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_serialize/src/lib.rs",
+          "name": "rustc_serialize",
+          "sha256": "0c97f0e8466d38a101ca661a7f389fcca15cbf88307fc9d2dab3510a62d55ac4"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_session/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_session/src/lib.rs",
+          "name": "rustc_session",
+          "sha256": "865d440a877b5329c1a810515a7554ed13dbbfc481250056f484ffa36c6f5786"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_span/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_span/src/lib.rs",
+          "name": "rustc_span",
+          "sha256": "a8dc37117ad0a544be6b278f361d3b10f7d081eb27c8bbb6a27dc2cdedccb406"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_symbol_mangling/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_symbol_mangling/src/lib.rs",
+          "name": "rustc_symbol_mangling",
+          "sha256": "3261be00bfaf08418ffae9e186f8628d4099bf45f50dddddcb58757b23e44041"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_target/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_target/src/lib.rs",
+          "name": "rustc_target",
+          "sha256": "16a840e5c61d6a2550a2b6e0867b401769a01f3b21f1c6083ad9f7a6292fb14d"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_thread_pool/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_thread_pool/src/lib.rs",
+          "name": "rustc_thread_pool",
+          "sha256": "e5821b6516ca0e33e6638a4a8274076cc0bcb2cf2810115e07f479c7ad41491a"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_trait_selection/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_trait_selection/src/lib.rs",
+          "name": "rustc_trait_selection",
+          "sha256": "360c23dc7fa3083840103f5be983d2f58c5c381ce8d30c713b04fbd9bdedfa57"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_traits/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_traits/src/lib.rs",
+          "name": "rustc_traits",
+          "sha256": "0312e05a36683525e202c0dcc2bd6d5381b967d62d911df6073c7f08a28086f0"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_transmute/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_transmute/src/lib.rs",
+          "name": "rustc_transmute",
+          "sha256": "8d547584c18eac5f056fc5f776b66c702f31e32d651d2d1f1f6defdf826601f6"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_ty_utils/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_ty_utils/src/lib.rs",
+          "name": "rustc_ty_utils",
+          "sha256": "49c80be2ecf76ce4658e73e0f22192c1d88e5f158602c0dc9b49c3fe0c101b90"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_ty_walk/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_ty_walk/src/lib.rs",
+          "name": "rustc_ty_walk",
+          "sha256": "7bdf0368ac7b02d8b83476f1332654af98ad9362472b91d4b6dda65552102c60"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_type_ir/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_type_ir/src/lib.rs",
+          "name": "rustc_type_ir",
+          "sha256": "0c63fa6a4a851dddab428b630b5405ad8c725446208b869864279477d7223747"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_type_ir_macros/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_type_ir_macros/src/lib.rs",
+          "name": "rustc_type_ir_macros",
+          "sha256": "de6ab870be12df9e694590683cf373da1933a230c129aea77d7a58e00b1576bc"
+        },
+        "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_windows_rc/Cargo.toml": {
+          "lib": "/home/runner/work/ohm/ohm/source/rust/compiler/rustc_windows_rc/src/lib.rs",
+          "name": "rustc_windows_rc",
+          "sha256": "bf7da4f716b2c2a74bf3be32e0a6c237354d7a49b7f09b73b3af0f72e5c799c1"
+        }
+      },
+      "owners": {
+        "bytes": 5692,
+        "path": "/home/runner/work/ohm/ohm/source/rust/build/tmp/rustc-driver-link-BNSaH7/owners",
+        "raw": "owners-093f36e3ed31e0d6648cac1f1cedba10019d2b7ba555be1ed20f6b5336cf3909.gz",
+        "sha256": "093f36e3ed31e0d6648cac1f1cedba10019d2b7ba555be1ed20f6b5336cf3909"
+      },
+      "retained_dynamic_exports": 8690,
+      "supplier_evidence": {
+        "bytes": 96487,
+        "raw": "in-tree-cargo-artifacts-df13f1c7ba1aa5b6edd963d2c68786076f13dd2361f9565a25b8ac8b06a702f8.gz",
+        "sha256": "df13f1c7ba1aa5b6edd963d2c68786076f13dd2361f9565a25b8ac8b06a702f8"
+      },
+      "supplier_inodes": 70,
+      "total_exceptions": 8690
+    }
+  },
+  "pre_bolt": {
+    "backup_inode": 7635712,
+    "bytes": 155098240,
+    "copy_line": "[2026-11-03T13:32:20.877Z INFO  opt_dist::utils::io] Copying file /home/runner/work/ohm/ohm/source/rust/build/x86_64-unknown-linux-gnu/stage2/lib/librustc_driver-b03bf00bec23bb9a.so to /tmp/.tmpae0UHI",
+    "instrument_line": "[2026-11-03T13:32:20.925Z INFO  opt_dist::exec] Executing `/home/runner/work/_temp/ohm-bolt.sCABZ1/bin/llvm-bolt -instrument /home/runner/work/ohm/ohm/source/rust/build/x86_64-unknown-linux-gnu/stage2/lib/librustc_driver-b03bf00bec23bb9a.so --instrumentation-file=/tmp/.tmptAw4FE/prof.fdata --instrumentation-file-append-pid -o /tmp/.tmpaOIlFP [at /home/runner/work/ohm/ohm/source/rust]`",
+    "live": "/home/runner/work/ohm/ohm/source/rust/build/x86_64-unknown-linux-gnu/stage2/lib/librustc_driver-b03bf00bec23bb9a.so",
+    "sha256": "ce51e585ad89e2f9d8b8789c5c1995455e5b275505f3189ecdfe2f42afe954dc",
+    "source": "/tmp/.tmpae0UHI"
+  },
+  "source": "/home/runner/work/ohm/ohm/source/rust/build/tmp/rustc-driver-link-BNSaH7/91203.exports"
+}

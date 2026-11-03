@@ -1,0 +1,189 @@
+{
+  "actual_foreign_and_compiler_interposition": {
+    "arm": "T",
+    "driver_sha256": "874390474211837f6252c75549b0b75142e6a126f26a3df873a424b1239397df",
+    "normal": {
+      "compiler": {
+        "driver_dlsym": true,
+        "external_override": false,
+        "overridden": false,
+        "slots": 11
+      },
+      "foreign": {
+        "driver_dlsym": true,
+        "external_override": false,
+        "overridden": false,
+        "slots": 1
+      }
+    },
+    "preloaded": {
+      "compiler": {
+        "driver_dlsym": true,
+        "external_override": true,
+        "overridden": false,
+        "slots": 11
+      },
+      "foreign": {
+        "driver_dlsym": true,
+        "external_override": true,
+        "overridden": true,
+        "slots": 1
+      }
+    },
+    "selection": {
+      "compiler": {
+        "locally_bound": true,
+        "name": "_RNvXsb_Cs5FqzcsxCuie_9rustc_abiNtB5_4SizeNtNtCsemNJ5nmwGWV_4core3fmt5Debug3fmt",
+        "pool": "compiler",
+        "slots": [
+          [
+            89634088,
+            8,
+            ".data.rel.ro"
+          ],
+          [
+            89885024,
+            8,
+            ".data.rel.ro"
+          ],
+          [
+            89955608,
+            8,
+            ".data.rel.ro"
+          ],
+          [
+            90598328,
+            8,
+            ".data.rel.ro"
+          ],
+          [
+            90732032,
+            8,
+            ".data.rel.ro"
+          ],
+          [
+            90837936,
+            8,
+            ".data.rel.ro"
+          ],
+          [
+            90892592,
+            8,
+            ".data.rel.ro"
+          ],
+          [
+            90962952,
+            8,
+            ".data.rel.ro"
+          ],
+          [
+            91268624,
+            8,
+            ".data.rel.ro"
+          ],
+          [
+            91294344,
+            8,
+            ".data.rel.ro"
+          ],
+          [
+            91546744,
+            8,
+            ".got"
+          ]
+        ],
+        "value": 64133072
+      },
+      "foreign": {
+        "locally_bound": false,
+        "name": "_RNvMNtCsavVfeRFLHNu_17rustc_stable_hash6sip128NtB2_12SipHasher12826slice_write_process_buffer",
+        "pool": "foreign",
+        "slots": [
+          [
+            91549000,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 98898368
+      }
+    },
+    "shim_sha256": "20827b1c11e6c71070d4127a692df7cb8acdd0a306e7855450f9fd66aca6d89a"
+  },
+  "actual_newly_run_linker_cases": {
+    "bfd": "21 22",
+    "bfd-user": "11 12",
+    "emit": "21 22",
+    "fallback": "21 22",
+    "fallback-user": "11 12",
+    "genuine-old-cc": "21 22",
+    "genuine-old-cc-user": "11 12",
+    "normal": "11 22",
+    "replay": "21 22",
+    "untreated": "21 22"
+  },
+  "eligible_for_performance": false,
+  "installed_sdk_sha256": "ad2d5a36225f1622925c5f1de63a496247aab8d93b5beb88957bb9db5d7ec1a9",
+  "measurement_samples": 0,
+  "original_QA": {
+    "bytes": 4069503,
+    "id": 13230695291,
+    "name": "rc23-21577-fixed-source-qa-T-attempt-1",
+    "path": "/home/dev-user/Documents/Codex/2026-10-28/i-want-you-to-hillclimb-on/work/check-root-20261101/remainder/loader-small-edits/production-source/product-amendment/run-41629356922/rc23-21577-fixed-source-qa-T-attempt-1.zip",
+    "sha256": "688b86d0824f2a38d09d0761b2668e44c6b52d683f20222aba759bae48dc72a4"
+  },
+  "original_sdk": {
+    "bytes": 413664916,
+    "id": 13230436087,
+    "name": "rc23-21577-fixed-source-dist-T",
+    "path": "/home/dev-user/Documents/Codex/2026-10-28/i-want-you-to-hillclimb-on/work/check-root-20261101/remainder/loader-small-edits/production-source/product-amendment/run-41629356922/rc23-21577-fixed-source-dist-T.zip",
+    "sha256": "83561c74ceb3a882ac19e3df3fb29832dcda9ad3384e5f3bac05576429a9e521"
+  },
+  "outcomes": {
+    "actual-driver-preload.json": "a6d1ee57a38e8e93dbfeaed74605d17a5851fef9be7c515213d656809b2bdb42",
+    "eii.exec.gz": "d5d321c568cc3e4aa9165c59c5f04a9e671d31efa83cf1977fad9213f8345083",
+    "eii.json": "8b4f1069d0501a1f752830713d0b7fc306b87083c90d90bfffd5fdaf3ab3d8b5",
+    "integration.json": "552c319753fc3532a1a1f84e2685d7fbb717f8ecc201a18b6ab64c65c97f7a5d",
+    "link-modes.json": "362fee2dbd9785c88cfabc14d1b4941fb5dc0dd952f3dc69cb9486fad4dfcdc5",
+    "link-modes/1599afbaac0f9367f77d0c936a19a80f913340a47f30e383edfaf0650ce220ba.gz": "65180af2dd8604846e70e7f97de14ef734a783f9d9c3ca05c4bddd2e8e6c9f99",
+    "link-modes/accepted.json": "78b7dc0314b46a8535f92399945e4f3811ce56b81756eb90ceca71ad3a92ca4e",
+    "link-modes/bfd-user/exec.trace.gz": "b2082bd084b971eac342ae88e78857d4c9c7e1a34247d7c1fbc23480dec717b4",
+    "link-modes/bfd-user/linkers.json.gz": "1469b0cd8f7753366dc2fabeeb3b90b5cc474a9c10bd1c6f037375bc1882f4bf",
+    "link-modes/bfd-user/stderr.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "link-modes/bfd/exec.trace.gz": "9e2721df86abfb61315f0905820c8e0870f3f3a8eabc534e6d62c1be479dd2fe",
+    "link-modes/bfd/linkers.json.gz": "6d7a46e167415387b0ab8e6b7446249863ac36cead113225299bd1e0435a3400",
+    "link-modes/bfd/stderr.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "link-modes/emit/exec.trace.gz": "f8c76d63adc7c50713c1dbf5ac4adb6415ec6042e37bc9a604a78df88eecbeb8",
+    "link-modes/emit/linkers.json.gz": "4076b2e2e6658fb67bb4ad165ac3f8d2160848de8222d15242d1f7612eb87a90",
+    "link-modes/emit/stderr.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "link-modes/fallback-user/exec.trace.gz": "2dc0549424d4048047379ff6a2f0819478343fd188cbd0d3e03c83263ab3b5ae",
+    "link-modes/fallback-user/linkers.json.gz": "95a12166ec514cd21f0c6ad84469207eac85caef80036426a814e40a062c832e",
+    "link-modes/fallback-user/stderr.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "link-modes/fallback/exec.trace.gz": "644d3aa47daad19fbb050e55c01f089b3db30655ce99bc2f7e47a6ad9b362437",
+    "link-modes/fallback/linkers.json.gz": "324b91d60312d7b39d360a709b01a988fe807e114dcb78e4b00c0f8112698d97",
+    "link-modes/fallback/stderr.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "link-modes/genuine-old-cc-user/exec.trace.gz": "a42a084b3758df2af48ad63259e04e5aad5099dab59df8a5bfe914d4962f00f3",
+    "link-modes/genuine-old-cc-user/linkers.json.gz": "263b2fe2390ad26270e9f51a165602094cd5ff06fd8b227f712a11f91bdaa3ec",
+    "link-modes/genuine-old-cc-user/stderr.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "link-modes/genuine-old-cc/exec.trace.gz": "d2f9f25497e111c6cf3b5e9fd0edcf3b8c35525f94f38843905adb5db3476ef3",
+    "link-modes/genuine-old-cc/linkers.json.gz": "8ffc72f3dfae0f257ca695a22a02d11168d72f62eb7546cc4a1d89eedf908578",
+    "link-modes/genuine-old-cc/stderr.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "link-modes/normal/exec.trace.gz": "f9feee9f6a25a0d7fa352b6c47fb07a2982cab6cd38d5877aacbac1f9ad364d9",
+    "link-modes/normal/linkers.json.gz": "2fa9ffa9bd7119d3202d5c6af8c3675155a64298cc175b820ac45dd82613586b",
+    "link-modes/normal/stderr.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "link-modes/progress.json": "78b7dc0314b46a8535f92399945e4f3811ce56b81756eb90ceca71ad3a92ca4e",
+    "link-modes/replay/exec.trace.gz": "ca9975931ea8efaace28150f613f55b6ae793ee86dac73cf904f17a9606822ae",
+    "link-modes/replay/linkers.json.gz": "3a4933e53782114053347712005306bc0c5e5fbdf4f5fbcf9fee969ff255547a",
+    "link-modes/replay/stderr.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "link-modes/untreated/exec.trace.gz": "bb81f563085563aaab4e086f204b94d584687fd022af37d45c3018d7ca706da8",
+    "link-modes/untreated/linkers.json.gz": "81e75de7949809fb9ac05a1e2304e1158337fa21328c430ee3ec822afcb338fd",
+    "link-modes/untreated/stderr.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "old-cc-inputs.json": "5ad1e62985a2f1ec999e5b350a002d475ee2f63c5e4a9d02de5de7e5f360b3ff",
+    "ordinary-signed-cargo.json": "1c52859e4fad3c1b9b71f3602bc8536da926d628bbbdb83ebd237ac4f50cdeb5",
+    "source.json": "45483b901d0d8f71a5724e4bba7ebf34e44464b03f16bcab6a33b112f5976f88"
+  },
+  "role": "T",
+  "service_conclusion": "failure",
+  "source": "9b63803c29b00106e2eeb544b2387a6e8a8cba1f",
+  "source_production": "5618e375ae70d01e1ccc49cbf994e1c7c4bae0a3f67b138634a0e70d2c42b6b1"
+}

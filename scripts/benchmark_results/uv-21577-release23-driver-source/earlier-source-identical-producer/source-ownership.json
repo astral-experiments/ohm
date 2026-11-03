@@ -1,0 +1,136 @@
+{
+  "covering_observation_of_used_crate_source_inodes": false,
+  "declared_manifests": 75,
+  "final_rlibs": {
+    "libblake3-0c707ad82c45cfa5.rlib": {
+      "physical": "21-856bda",
+      "same_named_mark": null,
+      "size": 73406
+    },
+    "libcompiler_builtins-2c8a5c6ff1eaecd1.rlib": {
+      "physical": "21-7fa581",
+      "same_named_mark": null,
+      "size": 1689032
+    },
+    "librustc_codegen_llvm-e7e878f90e852df6.rlib": {
+      "physical": "21-856b3d",
+      "same_named_mark": {
+        "object_name_evidence": 1,
+        "physical": "21-856b23",
+        "size": 24852762
+      },
+      "size": 499868
+    },
+    "librustc_llvm-04d879737fc5c52a.rlib": {
+      "physical": "21-856b3f",
+      "same_named_mark": {
+        "object_name_evidence": 1,
+        "physical": "21-8395ee",
+        "size": 562442
+      },
+      "size": 499868
+    }
+  },
+  "links": [
+    {
+      "direct_marked": 0,
+      "objects": 8,
+      "output": "/home/runner/work/ohm/ohm/source/rust/build/x86_64-unknown-linux-gnu/stage1-rustc/x86_64-unknown-linux-gnu/release/build/rustc_driver/dd8317bbc9bafd2c/out/librustc_driver-dd8317bbc9bafd2c.so",
+      "pid": 23479,
+      "rlibs": 253
+    },
+    {
+      "direct_marked": 0,
+      "objects": 259,
+      "output": "/home/runner/work/ohm/ohm/source/rust/build/x86_64-unknown-linux-gnu/stage2-rustc/x86_64-unknown-linux-gnu/release/build/rustc_driver/2390de9d83963740/out/librustc_driver-2390de9d83963740.so",
+      "pid": 33929,
+      "rlibs": 5
+    },
+    {
+      "direct_marked": 0,
+      "objects": 259,
+      "output": "/home/runner/work/ohm/ohm/source/rust/build/x86_64-unknown-linux-gnu/stage2-rustc/x86_64-unknown-linux-gnu/release/build/rustc_driver/b03bf00bec23bb9a/out/librustc_driver-b03bf00bec23bb9a.so",
+      "pid": 91454,
+      "rlibs": 4
+    }
+  ],
+  "mark_with_no_matching_final_object_name": [
+    "librustc_windows_rc-fc0ac56461ae7a60.rlib"
+  ],
+  "service": {
+    "id": 13230695291,
+    "run": 41629356922,
+    "sha256": "688b86d0824f2a38d09d0761b2668e44c6b52d683f20222aba759bae48dc72a4",
+    "size": 4069503
+  },
+  "source": "9b63803c29b00106e2eeb544b2387a6e8a8cba1f",
+  "source_cargo_marks": 70,
+  "source_scoped_output": {
+    "elf": {
+      "installed": {
+        "defined_strong_v0_functions": 18074,
+        "raw": "ee6974a16b887d482c3436ca302ac9ba5a15c37bd29ef2c4998ee6c4e50ab1d8",
+        "source_grounded_examples": {
+          "_RNvCs6il74Dmsh7H_17rustc_driver_impl4main": {
+            "dynamic_symbol": [
+              1,
+              2,
+              0,
+              true
+            ],
+            "protected_by_exception": false
+          },
+          "_RNvCsbnzNw8HuIZv_6blake34hash": {
+            "dynamic_symbol": [
+              1,
+              2,
+              0,
+              true
+            ],
+            "protected_by_exception": true
+          }
+        },
+        "symbols": 20941
+      },
+      "pre-bolt": {
+        "defined_strong_v0_functions": 18074,
+        "raw": "6b06770ec3f4fc30051264e8c9fdc0be0106474eaa00f19d32455a62f3696b9e",
+        "source_grounded_examples": {
+          "_RNvCs6il74Dmsh7H_17rustc_driver_impl4main": {
+            "dynamic_symbol": [
+              1,
+              2,
+              0,
+              true
+            ],
+            "protected_by_exception": false
+          },
+          "_RNvCsbnzNw8HuIZv_6blake34hash": {
+            "dynamic_symbol": [
+              1,
+              2,
+              0,
+              true
+            ],
+            "protected_by_exception": true
+          }
+        },
+        "symbols": 20941
+      }
+    },
+    "exceptions": 8690,
+    "lld": 91454,
+    "metadata_object": "rust_metadata_rustc_driver_dd570c26aa69d205",
+    "remaining_v0": 11356,
+    "rustc": 91188,
+    "version_symbols": 20047
+  },
+  "source_sha256": {
+    "compiler/rustc_codegen_ssa/src/back/link.rs": "793fbf7ab62a43ee4109328d3f49b5fce2983f864ff02d4829368efbf7c65551",
+    "compiler/rustc_codegen_ssa/src/back/linker.rs": "93674065522f41b77dbd9c64f35f40fd652dce10509b9304d6c893e7654b0a55",
+    "compiler/rustc_driver/Cargo.toml": "0c96042c5217436d66af922d8fdf4d468159f22638c9199659f32ae8b8b1aab1",
+    "compiler/rustc_driver_impl/src/lib.rs": "27740c12d0a4714f506eca78e1785d61582829281c449a628ff3f627a28fa8ad",
+    "src/bootstrap/src/core/build_steps/compile.rs": "7494f027ee85f736200f93dbe9de907c4201a6bbeea7ad387ff4e77d3736cd83"
+  },
+  "with_matching_object_name": 69
+}

@@ -1,0 +1,408 @@
+diff --git a/compiler/rustc_codegen_ssa/src/back/linker.rs b/compiler/rustc_codegen_ssa/src/back/linker.rs
+index a4aefc2a02b33a453c922cb5eea963a26eab8f87..c7f58f5cb0fb7685d5686a0be710b4cb907637e4 100644
+--- a/compiler/rustc_codegen_ssa/src/back/linker.rs
++++ b/compiler/rustc_codegen_ssa/src/back/linker.rs
+@@ -787,6 +787,18 @@ fn no_default_libraries(&mut self) {
+     }
+ 
+     fn export_symbols(&mut self, tmpdir: &Path, crate_type: CrateType, symbols: &[SymbolExport]) {
++        // Only the bundled GNU LLD wrapper applies this policy. A C driver can select
++        // a different linker, including when rustc retries without -fuse-ld=lld.
++        const EXPORTS: &str = "OHM_RUSTC_DRIVER_LINK_EXPORTS";
++        if self.uses_lld
++            && !self.is_ld
++            && let Some(path) = driver_preemption_list(self.sess, crate_type)
++        {
++            self.cmd.env(EXPORTS, path);
++        } else if env::var_os(EXPORTS).is_some() {
++            self.cmd.env_remove(EXPORTS);
++        }
++
+         // Symbol visibility in object files typically takes care of this.
+         if crate_type == CrateType::Executable {
+             let should_export_executable_symbols =
+@@ -1705,18 +1717,76 @@ pub(crate) fn exported_symbols(tcx: TyCtxt<'_>, crate_type: CrateType) -> Vec<Sy
+     symbols
+ }
+ 
++fn driver_preemption_list(sess: &Session, crate_type: CrateType) -> Option<PathBuf> {
++    if crate_type != CrateType::Dylib
++        || sess.opts.crate_name.as_deref() != Some("rustc_driver")
++        || sess.opts.target_triple.tuple() != "x86_64-unknown-linux-gnu"
++        // A .rlink must replay the original link without this ephemeral bootstrap input.
++        || sess.opts.unstable_opts.emit_rlink
++        || sess.opts.unstable_opts.no_link
++        || sess.opts.unstable_opts.link_only
++        || sess.target.override_export_symbols.is_some()
++        || !sess.target.limit_rdylib_exports
++    {
++        return None;
++    }
++    let dir = PathBuf::from(env::var_os("OHM_RUSTC_DRIVER_LINK_DIR")?);
++    let driver = fs::read_to_string(dir.join("driver")).ok()?;
++    let manifest_dir = PathBuf::from(env::var_os("CARGO_MANIFEST_DIR")?).canonicalize().ok()?;
++    let config::Input::File(input) = &sess.io.input else { return None };
++    if manifest_dir != Path::new(&driver)
++        || input.canonicalize().ok()? != manifest_dir.join("src/lib.rs")
++    {
++        return None;
++    }
++    Some(dir.join(format!("{}.exports", std::process::id())))
++}
++
+ fn exported_symbols_for_non_proc_macro(
+     tcx: TyCtxt<'_>,
+     crate_type: CrateType,
+ ) -> Vec<SymbolExport> {
+     let mut symbols = Vec::new();
+     let export_threshold = symbol_export::crates_export_threshold(&[crate_type]);
++    let target = driver_preemption_list(tcx.sess, crate_type);
++    let mut owners = Vec::new();
++    let mut locals = Vec::new();
++    if let Some(path) = &target {
++        let crates = tcx.crates(());
++        owners.resize(1 + crates.iter().map(|c| c.index()).max().unwrap_or(0), false);
++        owners[LOCAL_CRATE.index()] = true;
++        #[cfg(target_os = "linux")]
++        for &cnum in crates {
++            use std::os::unix::fs::MetadataExt;
++            if let Some(rlib) = &tcx.used_crate_source(cnum).rlib
++                && let Ok(meta) = rlib.metadata()
++                && let Ok(receipt) = path
++                    .with_file_name(format!("{:x}-{:x}.rlib", meta.dev(), meta.ino()))
++                    .metadata()
++            {
++                owners[cnum.index()] =
++                    meta.is_file() && (meta.dev(), meta.ino()) == (receipt.dev(), receipt.ino());
++            }
++        }
++    }
+     for_each_exported_symbols_include_dep(tcx, crate_type, |symbol, info, cnum| {
+         // Do not export mangled symbols from cdylibs and don't attempt to export compiler-builtins
+         // from any dylib. The latter doesn't work anyway as we use hidden visibility for
+         // compiler-builtins. Most linkers silently ignore it, but ld64 gives a warning.
+         if info.level.is_below_threshold(export_threshold) && !tcx.is_compiler_builtins(cnum) {
+-            symbols.push(symbol_export_from_exported_symbol(tcx, symbol, info.kind, cnum));
++            let export = symbol_export_from_exported_symbol(tcx, symbol, info.kind, cnum);
++            if owners.get(cnum.index()) == Some(&true)
++                && info.kind == SymbolExportKind::Text
++                && !info.is_relevant_for_c_linker()
++                && !matches!(
++                    symbol,
++                    ExportedSymbol::NoDefId(_) | ExportedSymbol::ThreadLocalShim(_)
++                )
++                && export.name.starts_with("_R")
++            {
++                locals.push(symbols.len());
++            }
++            symbols.push(export);
+             symbol_export::extend_exported_symbols(&mut symbols, tcx, symbol, cnum);
+         }
+     });
+@@ -1732,6 +1802,24 @@ fn exported_symbols_for_non_proc_macro(
+         );
+     }
+ 
++    if let Some(path) = target {
++        let res = try {
++            let mut file = File::create_buffered(path)?;
++            let mut locals = locals.into_iter().peekable();
++            writeln!(file, "{{")?;
++            for (i, sym) in symbols.iter().enumerate() {
++                if locals.next_if_eq(&i).is_none() {
++                    writeln!(file, "  {};", sym.name)?;
++                }
++            }
++            writeln!(file, "}};")?;
++            file.flush()?;
++        };
++        if let Err(error) = res {
++            tcx.sess.dcx().emit_fatal(diagnostics::VersionScriptWriteFailure { error });
++        }
++    }
++
+     symbols
+ }
+ 
+diff --git a/src/bootstrap/src/core/build_steps/compile.rs b/src/bootstrap/src/core/build_steps/compile.rs
+index e58d418a1717e7ec6e47770d19bedf22948ac679..dcb2c6171888e6bb59a99b45d201bf68b13be9eb 100644
+--- a/src/bootstrap/src/core/build_steps/compile.rs
++++ b/src/bootstrap/src/core/build_steps/compile.rs
+@@ -1142,10 +1142,37 @@ fn run(self, builder: &Builder<'_>) -> Self::Output {
+             cargo.arg("-p").arg(krate);
+         }
+ 
+-        if builder.build.config.enable_bolt_settings && build_compiler.stage == 1 {
++        let bolt_driver = builder.build.config.enable_bolt_settings && build_compiler.stage == 1;
++        if bolt_driver {
+             // Relocations are required for BOLT to work.
+             cargo.env("RUSTC_BOLT_LINK_FLAGS", "1");
+         }
++        let _driver_link_dir = if bolt_driver
++            && cfg!(all(target_os = "linux", target_arch = "x86_64"))
++            && target == "x86_64-unknown-linux-gnu"
++            && builder.config.is_host_target(target)
++            && !builder.config.dry_run()
++        {
++            let dir = tempfile::Builder::new()
++                .prefix("rustc-driver-link-")
++                .tempdir_in(builder.config.tempdir())
++                .unwrap();
++            let root = builder.src.join("compiler");
++            let owners: Vec<_> = builder
++                .in_tree_crates("rustc_driver", Some(target))
++                .into_iter()
++                .filter(|krate| krate.path.starts_with(&root))
++                .filter_map(|krate| krate.path.join("Cargo.toml").canonicalize().ok())
++                .filter(|path| path.to_str().is_some())
++                .collect();
++            fs::write(dir.path().join("owners"), serde_json::to_vec(&owners).unwrap()).unwrap();
++            let driver = builder.src.join("compiler/rustc_driver").canonicalize().unwrap();
++            fs::write(dir.path().join("driver"), driver.as_os_str().as_encoded_bytes()).unwrap();
++            cargo.env("OHM_RUSTC_DRIVER_LINK_DIR", dir.path());
++            Some(dir)
++        } else {
++            None
++        };
+ 
+         let _guard = builder.msg(
+             Kind::Build,
+@@ -2660,7 +2687,7 @@ pub fn run_cargo(
+         let (filenames_vec, crate_types) = match msg {
+             CargoMessage::CompilerArtifact {
+                 filenames,
+-                target: CargoTarget { crate_types },
++                target: CargoTarget { crate_types, .. },
+                 ..
+             } => {
+                 let mut f: Vec<String> = filenames.into_iter().map(|s| s.into_owned()).collect();
+@@ -2810,6 +2837,13 @@ pub fn stream_cargo(
+     cb: &mut dyn FnMut(CargoMessage<'_>),
+ ) -> bool {
+     let mut cmd = cargo.into_cmd();
++    #[cfg(target_os = "linux")]
++    let driver = cmd.get_envs().find_map(|(key, value)| {
++        let dir = Path::new(value.filter(|_| key == "OHM_RUSTC_DRIVER_LINK_DIR")?);
++        let owners =
++            serde_json::from_slice::<HashSet<PathBuf>>(&fs::read(dir.join("owners")).ok()?).ok()?;
++        Some((dir.to_path_buf(), owners))
++    });
+ 
+     // Instruct Cargo to give us json messages on stdout, critically leaving
+     // stderr as piped so we can get those pretty colors.
+@@ -2844,6 +2878,10 @@ pub fn stream_cargo(
+         let line = t!(line);
+         match serde_json::from_str::<CargoMessage<'_>>(&line) {
+             Ok(msg) => {
++                #[cfg(target_os = "linux")]
++                if let Some((dir, owners)) = &driver {
++                    record_driver_artifact(dir, owners, &msg);
++                }
+                 if builder.config.json_output {
+                     // Forward JSON to stdout.
+                     println!("{line}");
+@@ -2867,15 +2905,58 @@ pub fn stream_cargo(
+     status.success()
+ }
+ 
++/// Keep the actual rlib inode alive for the driver link. A late Cargo message or an
++/// artifact on another filesystem simply leaves that supplier preemptible.
++#[cfg(target_os = "linux")]
++fn record_driver_artifact(dir: &Path, owners: &HashSet<PathBuf>, msg: &CargoMessage<'_>) {
++    use std::os::unix::fs::MetadataExt;
++
++    let CargoMessage::CompilerArtifact { filenames, manifest_path: Some(manifest), target } = msg
++    else {
++        return;
++    };
++    let Ok(manifest) = Path::new(manifest.as_ref()).canonicalize() else { return };
++    if !owners.contains(&manifest)
++        || !target.kind.iter().any(|k| matches!(k.as_ref(), "lib" | "rlib"))
++        || !target
++            .src_path
++            .as_deref()
++            .and_then(|src| Path::new(src).canonicalize().ok())
++            .is_some_and(|src| manifest.parent().is_some_and(|pkg| src.starts_with(pkg)))
++    {
++        return;
++    }
++    for file in filenames {
++        let path = Path::new(file.as_ref());
++        if path.extension() == Some(OsStr::new("rlib"))
++            && let Ok(meta) = path.metadata()
++            && meta.is_file()
++        {
++            let receipt = dir.join(format!("{:x}-{:x}.rlib", meta.dev(), meta.ino()));
++            let _ = fs::hard_link(path, receipt);
++        }
++    }
++}
++
+ #[derive(Deserialize)]
+ pub struct CargoTarget<'a> {
+     crate_types: Vec<Cow<'a, str>>,
++    #[cfg(target_os = "linux")]
++    #[serde(default)]
++    kind: Vec<Cow<'a, str>>,
++    #[cfg(target_os = "linux")]
++    src_path: Option<Cow<'a, str>>,
+ }
+ 
+ #[derive(Deserialize)]
+ #[serde(tag = "reason", rename_all = "kebab-case")]
+ pub enum CargoMessage<'a> {
+-    CompilerArtifact { filenames: Vec<Cow<'a, str>>, target: CargoTarget<'a> },
++    CompilerArtifact {
++        filenames: Vec<Cow<'a, str>>,
++        target: CargoTarget<'a>,
++        #[cfg(target_os = "linux")]
++        manifest_path: Option<Cow<'a, str>>,
++    },
+     BuildScriptExecuted,
+     BuildFinished,
+ }
+diff --git a/src/tools/lld-wrapper/src/main.rs b/src/tools/lld-wrapper/src/main.rs
+index 299f0329b940ee2e56821bb129b602772e5c20f5..ddb273584c7c477b56b5fd77f92425bed52e46eb 100644
+--- a/src/tools/lld-wrapper/src/main.rs
++++ b/src/tools/lld-wrapper/src/main.rs
+@@ -80,6 +80,14 @@ fn get_rust_lld_command(current_exe_path: &Path) -> process::Command {
+ 
+     command.arg("-flavor");
+     command.arg(flavor);
++    if flavor == "gnu" {
++        if let Some(path) = env::var_os("OHM_RUSTC_DRIVER_LINK_EXPORTS") {
++            let mut list = std::ffi::OsString::from("--export-dynamic-symbol-list=");
++            list.push(path);
++            command.arg("-Bsymbolic-non-weak-functions").arg(list);
++            command.env_remove("OHM_RUSTC_DRIVER_LINK_EXPORTS");
++        }
++    }
+     command.args(env::args_os().skip(1));
+     command
+ }
+diff --git a/tests/run-make/ohm-driver-preemption-link-modes/driver.rs b/tests/run-make/ohm-driver-preemption-link-modes/driver.rs
+new file mode 100644
+index 0000000000000000000000000000000000000000..c36ea741c7807d456967a58d79b60a1924e51858
+--- /dev/null
++++ b/tests/run-make/ohm-driver-preemption-link-modes/driver.rs
+@@ -0,0 +1,22 @@
++#[inline(never)]
++pub extern "C" fn compiler_value() -> usize {
++    11
++}
++
++#[unsafe(no_mangle)]
++pub extern "C" fn exported_hook() -> usize {
++    12
++}
++
++#[unsafe(no_mangle)]
++pub static COMPILER_SLOT: extern "C" fn() -> usize = compiler_value;
++
++#[unsafe(no_mangle)]
++pub static HOOK_SLOT: extern "C" fn() -> usize = exported_hook;
++
++#[cfg(supplier)]
++extern crate rustc_fixture;
++
++#[cfg(supplier)]
++#[unsafe(no_mangle)]
++pub static SUPPLIER_SLOT: fn() -> usize = rustc_fixture::supplier_value;
+diff --git a/tests/run-make/ohm-driver-preemption-link-modes/rmake.rs b/tests/run-make/ohm-driver-preemption-link-modes/rmake.rs
+new file mode 100644
+index 0000000000000000000000000000000000000000..c2a4a51d13c78839b8661fc2e45cd1b0d95606dc
+--- /dev/null
++++ b/tests/run-make/ohm-driver-preemption-link-modes/rmake.rs
+@@ -0,0 +1,82 @@
++//@ needs-rust-lld
++//@ only-x86_64-unknown-linux-gnu
++//@ ignore-cross-compile
++
++use run_make_support::{cwd, llvm_readobj, rfs, rustc};
++
++fn main() {
++    let policy = cwd().join("driver policy,with comma");
++    rfs::create_dir(&policy);
++    rfs::create_dir("src");
++    std::fs::copy("driver.rs", "src/lib.rs").unwrap();
++    rfs::write(policy.join("driver"), cwd().canonicalize().unwrap().as_os_str().as_encoded_bytes());
++    rfs::create_dir("objects");
++    for saved in [false, true] {
++        let mut build = rustc();
++        build
++            .input("src/lib.rs")
++            .crate_name("rustc_driver")
++            .crate_type("dylib")
++            .arg("-Csymbol-mangling-version=v0")
++            .arg("-Clinker-features=+lld")
++            .arg("-Clink-self-contained=+linker")
++            .arg("-Zunstable-options")
++            .output("driver.so")
++            .env("CARGO_MANIFEST_DIR", cwd())
++            .env("OHM_RUSTC_DRIVER_LINK_DIR", &policy);
++        if saved {
++            build.arg("-Zemit-rlink").arg("-Ztemps-dir=objects");
++        }
++        build.run();
++        check_relocations(saved);
++    }
++
++    check_supplier(&policy);
++    rfs::remove_dir_all(&policy);
++    rfs::remove_file("driver.so");
++    rustc().input("driver.rlink").arg("-Zlink-only").run();
++    check_relocations(true);
++}
++
++fn check_relocations(preemptible: bool) {
++    let relocs = llvm_readobj().arg("--dyn-relocations").input("driver.so").run().stdout_utf8();
++    assert!(relocs.contains("exported_hook"), "{relocs}");
++    assert_eq!(relocs.contains("compiler_value"), preemptible, "{relocs}");
++}
++
++fn check_supplier(policy: &std::path::Path) {
++    use std::os::unix::fs::MetadataExt;
++
++    let rlib = cwd().join("librustc_fixture.rlib");
++    rustc()
++        .input("supplier.rs")
++        .crate_name("rustc_fixture")
++        .crate_type("rlib")
++        .arg("-Csymbol-mangling-version=v0")
++        .output(&rlib)
++        .run();
++    let id = rlib.metadata().unwrap();
++    let receipt = policy.join(format!("{:x}-{:x}.rlib", id.dev(), id.ino()));
++    for owned in [false, true] {
++        if owned {
++            std::fs::hard_link(&rlib, &receipt).unwrap();
++        }
++        rustc()
++            .input("src/lib.rs")
++            .crate_name("rustc_driver")
++            .crate_type("dylib")
++            .cfg("supplier")
++            .extern_("rustc_fixture", &rlib)
++            .arg("-Csymbol-mangling-version=v0")
++            .arg("-Clinker-features=+lld")
++            .arg("-Clink-self-contained=+linker")
++            .arg("-Zunstable-options")
++            .env("CARGO_MANIFEST_DIR", cwd())
++            .env("OHM_RUSTC_DRIVER_LINK_DIR", policy)
++            .output("with-supplier.so")
++            .run();
++        let relocs =
++            llvm_readobj().arg("--dyn-relocations").input("with-supplier.so").run().stdout_utf8();
++        assert_eq!(relocs.contains("supplier_value"), !owned, "{relocs}");
++    }
++}
+diff --git a/tests/run-make/ohm-driver-preemption-link-modes/supplier.rs b/tests/run-make/ohm-driver-preemption-link-modes/supplier.rs
+new file mode 100644
+index 0000000000000000000000000000000000000000..42f66de8a418f35b2a8ff9393d389231f54c0a0e
+--- /dev/null
++++ b/tests/run-make/ohm-driver-preemption-link-modes/supplier.rs
+@@ -0,0 +1,4 @@
++#[inline(never)]
++pub fn supplier_value() -> usize {
++    13
++}

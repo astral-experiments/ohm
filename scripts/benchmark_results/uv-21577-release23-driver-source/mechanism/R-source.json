@@ -1,0 +1,119 @@
+{
+  "baseline": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+  "command": "./scripts/build-optimized-dist.sh \\\n  \"$OHM_TARGET\" \\\n  \"$OHM_TOOLCHAIN\" \\\n  \"$GITHUB_WORKSPACE/source/rust\" \\\n  \"$GITHUB_WORKSPACE/official-release/release/bootstrap.toml\" 2>&1 | tee \"$GITHUB_WORKSPACE/trait-evidence/build.log\"\n",
+  "commit": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+  "coordinator": "6aa4ca42185a20df40680c5ee62d349d875e20a4",
+  "original": {
+    "attempt": "1",
+    "coordinator": "ce64a5de6f8c9f404fc57598c5a2a2ab869276bf",
+    "manifest": {
+      "$schema": "../manifest.schema.json",
+      "bundled_tools": {
+        "wild": {
+          "sha256": "25012a78de164686f552b7703b5d0223adab4829c79cd1fb351108221d61c7d8",
+          "version": "0.11.0"
+        }
+      },
+      "prepare_relocated_pgo_dependencies": true,
+      "release": {
+        "ohm_revision": 23,
+        "toolchain_name": "ohm-1.99.0-23",
+        "upstream_rust_version": "1.99.0"
+      },
+      "schema_version": 1,
+      "sources": {
+        "cargo": {
+          "repository": "https://github.com/astral-sh/ohm-cargo",
+          "revision": "7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed"
+        },
+        "clippy": {
+          "repository": "https://github.com/astral-sh/ohm-rust-clippy",
+          "revision": "6ca9ddc53c5a39e911e6c93637c093bd1d2eba05"
+        },
+        "rust": {
+          "repository": "https://github.com/astral-sh/ohm-rust",
+          "revision": "d57fd1515986dccecdcece8da85e651bfb4b81f9"
+        },
+        "rustfmt": {
+          "repository": "https://github.com/astral-sh/ohm-rustfmt",
+          "revision": "e5feafbfd640fe7326971cf7721ca7de38a86e40"
+        }
+      },
+      "status": "pinned"
+    },
+    "manifest_sha256": "44fc4cb1789ae8f1639d05a1b45b549ae6b400c8abf8d05e8f598a88151df490",
+    "run": "41615634254",
+    "source_trees": {
+      "cargo": {
+        "revision": "7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed",
+        "tree": "130a1314aa1be0441988781e8e2b52bd11d3e4a9"
+      },
+      "clippy": {
+        "revision": "6ca9ddc53c5a39e911e6c93637c093bd1d2eba05",
+        "tree": "42035145f0cb1536205ca0d0ea9353387a9bede9"
+      },
+      "rust": {
+        "revision": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+        "tree": "f5bf03d73f71243fb88e34ecb0b155ef11e99a47"
+      },
+      "rustfmt": {
+        "revision": "e5feafbfd640fe7326971cf7721ca7de38a86e40",
+        "tree": "13cde549b75899fa11b34de587b89b188edfcae5"
+      }
+    },
+    "target": "x86_64-unknown-linux-gnu",
+    "workflow": "6aa4ca42185a20df40680c5ee62d349d875e20a4"
+  },
+  "packet": null,
+  "registration": "4394731c4ad4d9dbbfedad61ef590ef02447c369d1c3d36cd37bb9f32d50c4e5",
+  "release": "9c2397d36f033900a0864484714d526788d1dc77",
+  "release_files": {
+    ".github/workflows/release.yml": {
+      "oid": "c4c3a80613cd2279042084d5848d95019e5aca8a",
+      "previous_oid": "c4c3a80613cd2279042084d5848d95019e5aca8a",
+      "sha256": "6ddc1aa07458ae94b9d673a0c3a9c62a7b7b5b5e1f7e27511109a018f2bb5938"
+    },
+    "release/bootstrap.toml": {
+      "oid": "4ff31bcc8a1ffe8a3875f25a5cd7d253f6288ca5",
+      "previous_oid": "4ff31bcc8a1ffe8a3875f25a5cd7d253f6288ca5",
+      "sha256": "5822d2ae682a27193ef413f013281b0849797c88c78545607ab563ea48f87684"
+    },
+    "release/rustc-perf-relocated-dependencies.patch": {
+      "oid": "4e3627ebe0d56449e523fc4005041647b0678034",
+      "previous_oid": null,
+      "sha256": "e9bf8ac4b08fbdb731f9944689d33d0fc7478b75cce39b0883743ac627872bed"
+    },
+    "scripts/build-optimized-dist.sh": {
+      "oid": "c5e690b7569c3f1ace17bfb3f2fb0ff6fa1ca414",
+      "previous_oid": "9b8d3c98624e8b05fda480f8a9612d3b05cdfdff",
+      "sha256": "88c1655898536f1e1a0ee232afffd0dfb33f0025e6546c7dc8a5d6d353a99591"
+    },
+    "scripts/prepare-wild.py": {
+      "oid": "b1a713dd407b7bd7de2bf2128274894ece0d0d5f",
+      "previous_oid": "b1a713dd407b7bd7de2bf2128274894ece0d0d5f",
+      "sha256": "aa0fa93dab4166ef425abb4ec2f623b7d44cc3367bf1e2051551d5ddb0321189"
+    },
+    "scripts/verify-release-sources.sh": {
+      "oid": "47836c375805a6959236d00f1d356f1af4aa84d9",
+      "previous_oid": "6d2652796e16b3152e181eedb772d725a42975dd",
+      "sha256": "710685b2a484d41bcedf4e38343d8479fd1fc9c7342a822a66f5937cd446c7be"
+    },
+    "toolchains/1.99.0/23.json": {
+      "oid": "06df51d0d0fa1c517e9d15b9e01cc5cb174c2b46",
+      "previous_oid": null,
+      "sha256": "44fc4cb1789ae8f1639d05a1b45b549ae6b400c8abf8d05e8f598a88151df490"
+    }
+  },
+  "role": "R",
+  "training": {
+    "compiler/rustc_codegen_ssa/src/back/link.rs": "878bd83103681efc90c08adf074a10e075d152ee",
+    "compiler/rustc_incremental/src/persist/file_format.rs": "f96e27d853eaf23289d72479b990780eda43eacc",
+    "compiler/rustc_metadata/src/rmeta/mod.rs": "3978c04307904c9710620f4b065e63167c02e415",
+    "library": "4f7a8f755164dc68fff80790db8a844ae030fd03",
+    "src/llvm-project": "1b9c0d5ff9bbe7634aead059efe6b11a7eeba145",
+    "src/tools/opt-dist": "8621d963d87ee57b56dfa9682d5eb48479ef05df",
+    "src/tools/opt-dist/component-pgo-v1": "e2f13ea7ee82287b8584b73c27b604b55cf7cd32",
+    "src/tools/rustc-perf": "0a054b0ead56e41a4584bfab6fdc1a5fad2aedc3"
+  },
+  "tree": "f5bf03d73f71243fb88e34ecb0b155ef11e99a47"
+}

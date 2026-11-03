@@ -1,0 +1,160 @@
+{
+ "actual_image": "a88f95fc4677e9185ec8c7f47994fe5d4af48752ff1720c5f57fccd73317fad2",
+ "commands": [
+  {
+   "argv": [
+    "/home/runner/work/ohm/ohm/rc23-native/sdk/bin/rustc",
+    "--edition=2024",
+    "-Csymbol-mangling-version=v0",
+    "-Ccodegen-units=1",
+    "-Cprefer-dynamic=no",
+    "--crate-name",
+    "rustc_fixture",
+    "--crate-type=rlib",
+    "/home/runner/work/ohm/ohm/scripts/rc23-driver-link/integrated/provider.rs",
+    "-o",
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/librustc_fixture.rlib"
+   ],
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "argv": [
+    "/home/runner/work/ohm/ohm/rc23-native/sdk/bin/rustc",
+    "--edition=2024",
+    "-Csymbol-mangling-version=v0",
+    "-Ccodegen-units=1",
+    "-Cprefer-dynamic=no",
+    "--crate-name",
+    "support",
+    "--crate-type=rlib",
+    "/home/runner/work/ohm/ohm/scripts/rc23-driver-link/integrated/support.rs",
+    "-o",
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/libsupport.rlib"
+   ],
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "argv": [
+    "/home/runner/work/ohm/ohm/rc23-native/sdk/bin/rustc",
+    "--edition=2024",
+    "-Csymbol-mangling-version=v0",
+    "-Ccodegen-units=1",
+    "-Cprefer-dynamic=no",
+    "--crate-name",
+    "rustc_driver",
+    "--crate-type=dylib",
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/canonical-driver/src/lib.rs",
+    "--extern",
+    "rustc_fixture=/home/runner/work/ohm/ohm/rc23-native/integrated/librustc_fixture.rlib",
+    "--extern",
+    "support=/home/runner/work/ohm/ohm/rc23-native/integrated/libsupport.rlib",
+    "-o",
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/librustc_driver.so"
+   ],
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "argv": [
+    "nm",
+    "-D",
+    "-P",
+    "--defined-only",
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/librustc_driver.so"
+   ],
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "argv": [
+    "cc",
+    "-shared",
+    "-fPIC",
+    "-O2",
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/override.c",
+    "-o",
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/override.so"
+   ],
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "argv": [
+    "cc",
+    "-O2",
+    "/home/runner/work/ohm/ohm/scripts/rc23-driver-link/integrated/check.c",
+    "-ldl",
+    "-o",
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/check"
+   ],
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "argv": [
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/check",
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/librustc_driver.so",
+    "_RNvCsa55k4g6hH5c_13rustc_fixture12driver_value",
+    "_RNvCsfh9M6P7p5dG_7support13support_value"
+   ],
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "argv": [
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/check",
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/librustc_driver.so",
+    "_RNvCsa55k4g6hH5c_13rustc_fixture12driver_value",
+    "_RNvCsfh9M6P7p5dG_7support13support_value"
+   ],
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "argv": [
+    "readelf",
+    "-Wr",
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/librustc_driver.so"
+   ],
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "argv": [
+    "/home/runner/work/ohm/ohm/rc23-native/sdk/bin/rustc",
+    "-vV"
+   ],
+   "exit": 0,
+   "stderr": ""
+  }
+ ],
+ "compiler_image": "7ed37fe22089b0bb2f38b87768e2d40982db068560b19e010fb89f0bcdca1dea",
+ "driver_relocations": [],
+ "driver_symbol": "_RNvCsa55k4g6hH5c_13rustc_fixture12driver_value",
+ "expected": "local",
+ "normal": [
+  11,
+  12,
+  13,
+  11,
+  12,
+  13
+ ],
+ "preloaded": [
+  11,
+  22,
+  23,
+  21,
+  22,
+  23
+ ],
+ "relocations_sha256": "564f8799eb67fa4f179560710712271f97dcfdde1970630f3f272375c023208f",
+ "rustc_vV": "rustc 1.99.0-dev (9b63803c2 2026-11-03) (ohm-1.99.0-23)\nbinary: rustc\ncommit-hash: 9b63803c29b00106e2eeb544b2387a6e8a8cba1f\ncommit-date: 2026-11-03\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0-dev\nLLVM version: 23.1.1\n",
+ "support_relocations": [
+  "0000000000128090  0000018900000001 R_X86_64_64            000000000007d790 _RNvCsfh9M6P7p5dG_7support13support_value + 0"
+ ],
+ "support_symbol": "_RNvCsfh9M6P7p5dG_7support13support_value",
+ "symbols_sha256": "37e448fd737c937355c8ab0a7c55650109ff486085ecb377a02b34937a556ecb"
+}

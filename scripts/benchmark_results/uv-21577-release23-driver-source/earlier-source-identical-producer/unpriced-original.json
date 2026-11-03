@@ -1,0 +1,135 @@
+{
+  "R_run": 41615634254,
+  "T_job": 125894837534,
+  "T_run": 41629356922,
+  "eligible_for_performance": false,
+  "first_failure": {
+    "actual_final_object_operands": 259,
+    "actual_lld_and_cc_trace": {
+      "bytes": 102249,
+      "path": "/home/dev-user/Documents/Codex/2026-10-28/i-want-you-to-hillclimb-on/work/check-root-20261101/remainder/loader-small-edits/production-source/product-amendment/run-41629356922/refused-qa/driver-witness/capture.json",
+      "sha256": "2d5797d88202c0b01f48dd1ba98668f2ddb1a57f0f28fe4b2e2218210faab3da"
+    },
+    "assertion": "matched and protected",
+    "direct_final_rlib_operands": [
+      {
+        "bytes": 499868,
+        "dev": 33,
+        "ino": 8743741,
+        "mtime_ns": 1793707449059673635,
+        "path": "/home/runner/work/ohm/ohm/source/rust/build/x86_64-unknown-linux-gnu/stage2-rustc/x86_64-unknown-linux-gnu/release/build/rustc_driver/b03bf00bec23bb9a/out/rustc0QuEV6/librustc_codegen_llvm-e7e878f90e852df6.rlib"
+      },
+      {
+        "bytes": 499868,
+        "dev": 33,
+        "ino": 8743743,
+        "mtime_ns": 1793707449060034361,
+        "path": "/home/runner/work/ohm/ohm/source/rust/build/x86_64-unknown-linux-gnu/stage2-rustc/x86_64-unknown-linux-gnu/release/build/rustc_driver/b03bf00bec23bb9a/out/rustc0QuEV6/librustc_llvm-04d879737fc5c52a.rlib"
+      },
+      {
+        "bytes": 73406,
+        "dev": 33,
+        "ino": 8743898,
+        "mtime_ns": 1793707449067607918,
+        "path": "/home/runner/work/ohm/ohm/source/rust/build/x86_64-unknown-linux-gnu/stage2-rustc/x86_64-unknown-linux-gnu/release/build/rustc_driver/b03bf00bec23bb9a/out/rustc0QuEV6/libblake3-0c707ad82c45cfa5.rlib"
+      },
+      {
+        "bytes": 1689032,
+        "dev": 33,
+        "ino": 8365441,
+        "mtime_ns": 1793706455119282867,
+        "path": "/home/runner/work/ohm/ohm/source/rust/build/x86_64-unknown-linux-gnu/stage1/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-2c8a5c6ff1eaecd1.rlib"
+      }
+    ],
+    "direct_final_rlibs_matching_early_inode": [],
+    "original_held_supplier_rlibs": 70,
+    "original_mode_tests_before_refusal": [
+      "native EII",
+      "integrated focused provider/foreign/C slot fixture",
+      "ordinary signed-Cargo smoke"
+    ],
+    "post_refusal_newly_run_native": {
+      "bfd": "21 22",
+      "bfd-user": "11 12",
+      "emit": "21 22",
+      "fallback": "21 22",
+      "fallback-user": "11 12",
+      "genuine-old-cc": "21 22",
+      "genuine-old-cc-user": "11 12",
+      "normal": "11 22",
+      "replay": "21 22",
+      "untreated": "21 22"
+    },
+    "reader": "scripts/rc23-driver-link/trace_qa.py:76",
+    "reason": "The consumer compared source rlib hardlink inodes to final native linker arguments after cross-crate ThinLTO replaced Rust archives with object modules. The stage where the typed supplier predicate read the rlib was earlier.",
+    "upstream_source": [
+      "compiler/rustc_codegen_ssa/src/back/linker.rs:1761",
+      "compiler/rustc_codegen_ssa/src/back/link.rs:2637",
+      "compiler/rustc_codegen_ssa/src/back/link.rs:3729",
+      "compiler/rustc_codegen_ssa/src/back/link.rs:3805"
+    ]
+  },
+  "mechanism": {
+    "T_named_local_slots": 0,
+    "ambiguous_original_slots": 1096,
+    "matched_local_R_slots": 8047,
+    "whole_image": {
+      "R": {
+        "DT_RELACOUNT": 100902,
+        "all_named_in_both_tables": 14350,
+        "named_non_plt": 14032,
+        "named_plt": 318,
+        "other_unnamed_non_plt": 20,
+        "physical_PT_DYNAMIC_and_PT_LOAD_match_sections": true,
+        "relative_beyond_fast_prefix": 0,
+        "relocations_non_plt": 114954,
+        "role_elf_sha256": "e200165fcc7173ad18a4773c7aa3cca5e310945e9e03f58a42ebe85eff4f2921"
+      },
+      "T": {
+        "DT_RELACOUNT": 109728,
+        "all_named_in_both_tables": 5528,
+        "named_non_plt": 5210,
+        "named_plt": 318,
+        "other_unnamed_non_plt": 20,
+        "physical_PT_DYNAMIC_and_PT_LOAD_match_sections": true,
+        "relative_beyond_fast_prefix": 0,
+        "relocations_non_plt": 114958,
+        "role_elf_sha256": "874390474211837f6252c75549b0b75142e6a126f26a3df873a424b1239397df"
+      }
+    }
+  },
+  "original_service": {
+    "bytes": 25300,
+    "path": "/home/dev-user/Documents/Codex/2026-10-28/i-want-you-to-hillclimb-on/work/check-root-20261101/remainder/loader-small-edits/production-source/product-amendment/run-41629356922/refused-original.json",
+    "sha256": "71c62ada79856c57bd7274ec4e86b0fa9344b46779bc9f85af026dbab4949855"
+  },
+  "performance_observations": 0,
+  "physical_native_followup": {
+    "bytes": 8350,
+    "path": "/home/dev-user/Documents/Codex/2026-10-28/i-want-you-to-hillclimb-on/work/check-root-20261101/remainder/loader-small-edits/production-source/product-amendment/completed-production/original-native-02/accepted-native.json",
+    "sha256": "393bfd59d5ac2ff79f84ef459b81d583b3e51497066dd069c279b7f4f97c6469"
+  },
+  "quarantine": {
+    "bytes": 3269,
+    "path": "/home/dev-user/Documents/Codex/2026-10-28/i-want-you-to-hillclimb-on/work/check-root-20261101/remainder/loader-small-edits/production-source/product-amendment/completed-production/quarantined-T/original.json",
+    "sha256": "7f32ae41fe0a92fd50924b93134f2c95ecf54bc0caa64eb3b35dee2953d88675"
+  },
+  "runner_id": 2033,
+  "source": "9b63803c29b00106e2eeb544b2387a6e8a8cba1f",
+  "stage2_release_step": {
+    "capacity_records": 9101,
+    "exit": 0,
+    "minimum_available": 180809314304,
+    "original_log": {
+      "bytes": 904088,
+      "path": "/home/dev-user/Documents/Codex/2026-10-28/i-want-you-to-hillclimb-on/work/check-root-20261101/remainder/loader-small-edits/production-source/product-amendment/run-41629356922/refused-qa/build.log",
+      "sha256": "80a67b24e5e7f509dbd25d8c57810ae65a75023e339f4c4c4ce141fc39898c9e"
+    }
+  },
+  "tree": "8baa0c39260b1bc23a181a1de0be4a6885f36cc1",
+  "two_way_physical_elf": {
+    "bytes": 6389,
+    "path": "/home/dev-user/Documents/Codex/2026-10-28/i-want-you-to-hillclimb-on/work/check-root-20261101/remainder/loader-small-edits/production-source/product-amendment/completed-production/refused-original-cross-role/received.json",
+    "sha256": "96ab1ff4ef8112f7e904378473c9fd7917d70a3164c9d0803bcb2409276e852d"
+  }
+}

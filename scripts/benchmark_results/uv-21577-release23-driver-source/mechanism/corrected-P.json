@@ -1,0 +1,120 @@
+{
+  "branch": "charlie/local-ohm-driver-preemption-link-modes",
+  "changed_formats": [],
+  "checkout": "/home/dev-user/Documents/Codex/2026-10-28/i-want-you-to-hillclimb-on/work/ohm-rust-23-driver-link-compat",
+  "commit": "9b63803c29b00106e2eeb544b2387a6e8a8cba1f",
+  "common_git": "/home/dev-user/Documents/Codex/2026-10-28/i-want-you-to-hillclimb-on/work/ohm-rust-23-driver-link-compat/.git",
+  "files": {
+    "compiler/rustc_codegen_ssa/src/back/linker.rs": {
+      "after": {
+        "bytes": 73500,
+        "mode": "100644",
+        "oid": "c7f58f5cb0fb7685d5686a0be710b4cb907637e4",
+        "sha256": "93674065522f41b77dbd9c64f35f40fd652dce10509b9304d6c893e7654b0a55"
+      },
+      "before": {
+        "bytes": 69843,
+        "mode": "100644",
+        "oid": "a4aefc2a02b33a453c922cb5eea963a26eab8f87",
+        "sha256": "a687d983c5d8a0d03fb0989a882f7e3f9771d0fa1de13f3ff82c955ccf791ea3"
+      }
+    },
+    "src/bootstrap/src/core/build_steps/compile.rs": {
+      "after": {
+        "bytes": 128219,
+        "mode": "100644",
+        "oid": "dcb2c6171888e6bb59a99b45d201bf68b13be9eb",
+        "sha256": "7494f027ee85f736200f93dbe9de907c4201a6bbeea7ad387ff4e77d3736cd83"
+      },
+      "before": {
+        "bytes": 124849,
+        "mode": "100644",
+        "oid": "e58d418a1717e7ec6e47770d19bedf22948ac679",
+        "sha256": "2f618b730adf941ea5fad52d9a206ce9c8ad6cf45efb8dfeaad7bae00c8fecbc"
+      }
+    },
+    "src/tools/lld-wrapper/src/main.rs": {
+      "after": {
+        "bytes": 4547,
+        "mode": "100644",
+        "oid": "ddb273584c7c477b56b5fd77f92425bed52e46eb",
+        "sha256": "677dfe2851d2ae37c63faaab2e6f74d892016203f663cb6436de4a1ca6e57812"
+      },
+      "before": {
+        "bytes": 4183,
+        "mode": "100644",
+        "oid": "299f0329b940ee2e56821bb129b602772e5c20f5",
+        "sha256": "a30a23820589cf9c94efd91cf85d2585e49e522461c861c574cdc7d3e3126214"
+      }
+    },
+    "tests/run-make/ohm-driver-preemption-link-modes/driver.rs": {
+      "after": {
+        "bytes": 483,
+        "mode": "100644",
+        "oid": "c36ea741c7807d456967a58d79b60a1924e51858",
+        "sha256": "5618e375ae70d01e1ccc49cbf994e1c7c4bae0a3f67b138634a0e70d2c42b6b1"
+      },
+      "before": null
+    },
+    "tests/run-make/ohm-driver-preemption-link-modes/rmake.rs": {
+      "after": {
+        "bytes": 2883,
+        "mode": "100644",
+        "oid": "c2a4a51d13c78839b8661fc2e45cd1b0d95606dc",
+        "sha256": "aeb7ced77f79b3880f64eb2bf17e7ae10f2bfff4fa8535b486b7929a0ea99d5d"
+      },
+      "before": null
+    },
+    "tests/run-make/ohm-driver-preemption-link-modes/supplier.rs": {
+      "after": {
+        "bytes": 61,
+        "mode": "100644",
+        "oid": "42f66de8a418f35b2a8ff9393d389231f54c0a0e",
+        "sha256": "a745e9b98f0548c5e1f062a7ec9ce41b514074c936f20a985db22af14447a2ab"
+      },
+      "before": null
+    }
+  },
+  "formats_unchanged": {
+    "compiler/rustc_incremental/src/persist/file_format.rs": "f96e27d853eaf23289d72479b990780eda43eacc",
+    "compiler/rustc_metadata/src/rmeta/mod.rs": "3978c04307904c9710620f4b065e63167c02e415"
+  },
+  "identity": "charlie.r.marsh@gmail.com",
+  "linker": "only the bundled actual GNU LLD through the native x86_64 Linux BOLT bootstrap; ephemeral typed export policy; --emit-rlink, -Zno-link, -Zlink-only, GCC/BFD fallback and user override decline",
+  "ordinary_driver_policy": "consumer rlib identity from Cargo path-package manifest and library artifact, complete live device/inode join, exact local driver source and Cargo package, preserving externally overridable ELF symbols",
+  "packet": {
+    "bytes": 78005,
+    "objects": [
+      "02cb3f185d0f46597d875d42d58081da09693078",
+      "0b3378bd963ee26b2e1604f9db3728cebea04d4d",
+      "14dc7d9337a7a06a55ae4c9a9156a746c3bcf6d4",
+      "42f66de8a418f35b2a8ff9393d389231f54c0a0e",
+      "4b4f45e52d8f2a1b6cd9f503ed09e982efcae3cc",
+      "554a9921d33e2cb7fbf8493d3c296e79d29d60f7",
+      "5bbb575ebd6f65fe4c6d303c994e617d29c650f5",
+      "67c6cecf40b5b8372e21a8a24b0a751a967bef0b",
+      "7b90b719d6c85dc88933f684afc7244bb47cefd5",
+      "8baa0c39260b1bc23a181a1de0be4a6885f36cc1",
+      "965aea5d57a25d6199bd02866175ad57192a444c",
+      "9b63803c29b00106e2eeb544b2387a6e8a8cba1f",
+      "c2a4a51d13c78839b8661fc2e45cd1b0d95606dc",
+      "c36ea741c7807d456967a58d79b60a1924e51858",
+      "c7f58f5cb0fb7685d5686a0be710b4cb907637e4",
+      "c803886b40499a13f4cda9759215050d7d19b9c2",
+      "c844f5ae12f202e5596c0141ed0a983c6cdc59c5",
+      "ca2416dea1a7c9f89e3be8faa78fbf8fa02bf9a4",
+      "dcb2c6171888e6bb59a99b45d201bf68b13be9eb",
+      "ddb273584c7c477b56b5fd77f92425bed52e46eb",
+      "f3b9e00d3d5e5d14454ef0da1b062269b54a0185",
+      "f5143db85960e889e010b8e8d6ee04e4bd1ee050",
+      "fe9c7849d8ee28b3ebad2a00f353adf30e42efd0"
+    ],
+    "sha256": "0dfaaeabc0b1b642a88759c0342aaa9248081704510ef807991c16f06697fb00"
+  },
+  "parent": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+  "parent_tree": "f5bf03d73f71243fb88e34ecb0b155ef11e99a47",
+  "patch_sha256": "dc334c782a2ab9ab3045a956b47e6042bd2b39ca2be547cd669fffa8bf2afd6e",
+  "remote": "",
+  "role": "P",
+  "tree": "8baa0c39260b1bc23a181a1de0be4a6885f36cc1"
+}

@@ -1,0 +1,147 @@
+{
+ "comma_space_path_byte_identical": true,
+ "count": 9,
+ "exports": {
+  "_RNvC6spoof_10hook_name": "T",
+  "_RNvCs68oAqXSVcvC_12rustc_driver11strong_hook": "T",
+  "_RNvCs68oAqXSVcvC_12rustc_driver13explicit_body": "T",
+  "_RNvCs68oAqXSVcvC_12rustc_driver9rust_work": "T",
+  "_RNvCs68oAqXSVcvC_12rustc_driver9weak_hook": "W"
+ },
+ "lld": "9f47056ea756a869ce9d130f4633894c0c0a17ef8575d32a16f6f43397c5228c",
+ "missing_file_refused": true,
+ "observed": {
+  "integrated": {
+   "actual_lld": "/home/runner/work/ohm/ohm/rc23-native/sdk/lib/rustlib/x86_64-unknown-linux-gnu/bin/rust-lld",
+   "actual_policy_flags": [
+    "-Bsymbolic-non-weak-functions",
+    "--export-dynamic-symbol-list=/home/runner/work/ohm/ohm/rc23-native/tmpginx6hxk/automatic policy/142891.exports"
+   ],
+   "exception_sha256": "42198eb439b74c00a40183c84264db5496758b122f8e3bc2911da9775cd70277",
+   "interposed": [
+    11,
+    112,
+    113,
+    115,
+    111
+   ],
+   "kernel_bytes": 12187,
+   "kernel_sha256": "ee31fc88728633808ac47ef38dfd3cbcb162e86ae9e8e95e6ee683cc1b8227fa",
+   "normal": [
+    11,
+    12,
+    13,
+    14,
+    11
+   ],
+   "outer_cc": [
+    [
+     "cc",
+     "-Wl,--version-script=/home/runner/work/ohm/ohm/rc23-native/tmpginx6hxk/auto/rustcrjy7u9/list",
+     "-Wl,--no-undefined-version",
+     "-m64",
+     "/home/runner/work/ohm/ohm/rc23-native/tmpginx6hxk/auto/rustcrjy7u9/symbols.o",
+     "/home/runner/work/ohm/ohm/rc23-native/tmpginx6hxk/auto/libpolicy.rustc_driver.47768fd2e601e192-cgu.0.rcgu.o",
+     "/home/runner/work/ohm/ohm/rc23-native/tmpginx6hxk/auto/rustcrjy7u9/rmeta.o",
+     "-Wl,--as-needed",
+     "-Wl,-Bdynamic",
+     "/home/runner/work/ohm/ohm/rc23-native/sdk/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd-150b24506f9fb8c9.so",
+     "-Wl,-Bstatic",
+     "/home/runner/work/ohm/ohm/rc23-native/sdk/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-2c8a5c6ff1eaecd1.rlib",
+     "-Wl,-Bdynamic",
+     "-lgcc_s",
+     "-lutil",
+     "-lrt",
+     "-lpthread",
+     "-lm",
+     "-ldl",
+     "-lc",
+     "-L",
+     "/home/runner/work/ohm/ohm/rc23-native/tmpginx6hxk/auto/rustcrjy7u9/raw-dylibs",
+     "-B/home/runner/work/ohm/ohm/rc23-native/sdk/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+     "-fuse-ld=lld",
+     "-Wl,--eh-frame-hdr",
+     "-Wl,-z,noexecstack",
+     "-L",
+     "/home/runner/work/ohm/ohm/rc23-native/sdk/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+     "-o",
+     "/home/runner/work/ohm/ohm/rc23-native/tmpginx6hxk/auto/libpolicy.so",
+     "-shared",
+     "-Wl,-soname=libpolicy.so",
+     "-Wl,-z,relro,-z,now",
+     "-nodefaultlibs",
+     "-Wl,-q"
+    ]
+   ],
+   "typed_policy": true
+  },
+  "original": {
+   "baseline": [
+    11,
+    12,
+    13,
+    14,
+    11
+   ],
+   "dynamic_relocations": {
+    "_RNvC6spoof_10hook_name": 1,
+    "_RNvCs68oAqXSVcvC_12rustc_driver11strong_hook": 1,
+    "_RNvCs68oAqXSVcvC_12rustc_driver9rust_work": 1,
+    "_RNvCs68oAqXSVcvC_12rustc_driver9weak_hook": 1
+   },
+   "dynsym": "caa74454e3716c0fa74358d9e12578e033b14fed6f5f8ea326c8faa7f67dbf26",
+   "elf_sha256": "c3660987c9c3caac86a2a88461c8ad696b0e9dd9c3a3f4c8048afe422391b65b",
+   "interposed": [
+    111,
+    112,
+    113,
+    115,
+    111
+   ],
+   "linker_flags": [
+    "-fuse-ld=lld"
+   ]
+  },
+  "policy": {
+   "baseline": [
+    11,
+    12,
+    13,
+    14,
+    11
+   ],
+   "dynamic_relocations": {
+    "_RNvC6spoof_10hook_name": 1,
+    "_RNvCs68oAqXSVcvC_12rustc_driver11strong_hook": 1,
+    "_RNvCs68oAqXSVcvC_12rustc_driver9rust_work": 0,
+    "_RNvCs68oAqXSVcvC_12rustc_driver9weak_hook": 1
+   },
+   "dynsym": "caa74454e3716c0fa74358d9e12578e033b14fed6f5f8ea326c8faa7f67dbf26",
+   "elf_sha256": "c1fe151847e924470ba4d5c95c1c47ab676a67dd203547211f78f371323284ea",
+   "interposed": [
+    11,
+    112,
+    113,
+    115,
+    111
+   ],
+   "linker_flags": [
+    "-fuse-ld=lld",
+    "-Bsymbolic-non-weak-functions",
+    "--export-dynamic-symbol-list="
+   ]
+  }
+ },
+ "preserved_names_sha": "11c795d4c8423bd9ff589647bf654896f1d3724b70e6176ae9d8c6f86d72a803",
+ "removed_strong_and_c_hook": [
+  11,
+  112,
+  13,
+  14,
+  111
+ ],
+ "rustc": "7ed37fe22089b0bb2f38b87768e2d40982db068560b19e010fb89f0bcdca1dea",
+ "scope": "The actual installed Rust compiler and GNU LLD. This auxiliary EII fixture supplies its independent known exception names explicitly.",
+ "source_sha256": "ef82032b5ce03777a2746e6bb781af207bb87b5972a579647da504987aa1f709",
+ "target_linker": "gnu-lld-cc"
+}

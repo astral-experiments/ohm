@@ -1,0 +1,162 @@
+{
+ "actual_image": "552ed8af5de19bf58ad2a3068a8827e02e8a023f4ba8f67ac9cb44fe4c8382cc",
+ "commands": [
+  {
+   "argv": [
+    "/home/runner/work/ohm/ohm/rc23-native/sdk/bin/rustc",
+    "--edition=2024",
+    "-Csymbol-mangling-version=v0",
+    "-Ccodegen-units=1",
+    "-Cprefer-dynamic=no",
+    "--crate-name",
+    "rustc_fixture",
+    "--crate-type=rlib",
+    "/home/runner/work/ohm/ohm/scripts/rc23-driver-link/integrated/provider.rs",
+    "-o",
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/librustc_fixture.rlib"
+   ],
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "argv": [
+    "/home/runner/work/ohm/ohm/rc23-native/sdk/bin/rustc",
+    "--edition=2024",
+    "-Csymbol-mangling-version=v0",
+    "-Ccodegen-units=1",
+    "-Cprefer-dynamic=no",
+    "--crate-name",
+    "support",
+    "--crate-type=rlib",
+    "/home/runner/work/ohm/ohm/scripts/rc23-driver-link/integrated/support.rs",
+    "-o",
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/libsupport.rlib"
+   ],
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "argv": [
+    "/home/runner/work/ohm/ohm/rc23-native/sdk/bin/rustc",
+    "--edition=2024",
+    "-Csymbol-mangling-version=v0",
+    "-Ccodegen-units=1",
+    "-Cprefer-dynamic=no",
+    "--crate-name",
+    "rustc_driver",
+    "--crate-type=dylib",
+    "/home/runner/work/ohm/ohm/scripts/rc23-driver-link/integrated/driver.rs",
+    "--extern",
+    "rustc_fixture=/home/runner/work/ohm/ohm/rc23-native/integrated/librustc_fixture.rlib",
+    "--extern",
+    "support=/home/runner/work/ohm/ohm/rc23-native/integrated/libsupport.rlib",
+    "-o",
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/librustc_driver.so"
+   ],
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "argv": [
+    "nm",
+    "-D",
+    "-P",
+    "--defined-only",
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/librustc_driver.so"
+   ],
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "argv": [
+    "cc",
+    "-shared",
+    "-fPIC",
+    "-O2",
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/override.c",
+    "-o",
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/override.so"
+   ],
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "argv": [
+    "cc",
+    "-O2",
+    "/home/runner/work/ohm/ohm/scripts/rc23-driver-link/integrated/check.c",
+    "-ldl",
+    "-o",
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/check"
+   ],
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "argv": [
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/check",
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/librustc_driver.so",
+    "_RNvCs6u3BNXhcH5v_13rustc_fixture12driver_value",
+    "_RNvCsaFiMWfE9Sue_7support13support_value"
+   ],
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "argv": [
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/check",
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/librustc_driver.so",
+    "_RNvCs6u3BNXhcH5v_13rustc_fixture12driver_value",
+    "_RNvCsaFiMWfE9Sue_7support13support_value"
+   ],
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "argv": [
+    "readelf",
+    "-Wr",
+    "/home/runner/work/ohm/ohm/rc23-native/integrated/librustc_driver.so"
+   ],
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "argv": [
+    "/home/runner/work/ohm/ohm/rc23-native/sdk/bin/rustc",
+    "-vV"
+   ],
+   "exit": 0,
+   "stderr": ""
+  }
+ ],
+ "compiler_image": "6842898bafad7cf932fea14bd8915a0adff0eecdc03bee91f589ac95a89743dd",
+ "driver_relocations": [
+  "0000000000128030  000004d100000001 R_X86_64_64            000000000007d748 _RNvCs6u3BNXhcH5v_13rustc_fixture12driver_value + 0"
+ ],
+ "driver_symbol": "_RNvCs6u3BNXhcH5v_13rustc_fixture12driver_value",
+ "expected": "ordinary",
+ "normal": [
+  11,
+  12,
+  13,
+  11,
+  12,
+  13
+ ],
+ "preloaded": [
+  21,
+  22,
+  23,
+  21,
+  22,
+  23
+ ],
+ "relocations_sha256": "e8f293408b76b6a4be261eedd48a6267186536c5bbf8dde7ebca32169152dcc5",
+ "rustc_vV": "rustc 1.99.0-dev (d57fd1515 2026-11-02) (ohm-1.99.0-23)\nbinary: rustc\ncommit-hash: d57fd1515986dccecdcece8da85e651bfb4b81f9\ncommit-date: 2026-11-02\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0-dev\nLLVM version: 23.1.1\n",
+ "support_relocations": [
+  "0000000000128040  0000076c00000001 R_X86_64_64            000000000007d740 _RNvCsaFiMWfE9Sue_7support13support_value + 0"
+ ],
+ "support_symbol": "_RNvCsaFiMWfE9Sue_7support13support_value",
+ "symbols_sha256": "ec278a741714003100eaf9eccdf8f72eadf63063cd6c94c906f46b18e04787de"
+}

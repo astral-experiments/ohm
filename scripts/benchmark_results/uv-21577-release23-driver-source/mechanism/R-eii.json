@@ -1,0 +1,101 @@
+{
+ "comma_space_path_byte_identical": true,
+ "count": 9,
+ "exports": {
+  "_RNvC6spoof_10hook_name": "T",
+  "_RNvCs8CzKCN4mxcJ_12rustc_driver11strong_hook": "T",
+  "_RNvCs8CzKCN4mxcJ_12rustc_driver13explicit_body": "T",
+  "_RNvCs8CzKCN4mxcJ_12rustc_driver9rust_work": "T",
+  "_RNvCs8CzKCN4mxcJ_12rustc_driver9weak_hook": "W"
+ },
+ "lld": "9f47056ea756a869ce9d130f4633894c0c0a17ef8575d32a16f6f43397c5228c",
+ "missing_file_refused": true,
+ "observed": {
+  "integrated": {
+   "exception_sha256": null,
+   "interposed": [
+    111,
+    112,
+    113,
+    115,
+    111
+   ],
+   "normal": [
+    11,
+    12,
+    13,
+    14,
+    11
+   ],
+   "typed_policy": false
+  },
+  "original": {
+   "baseline": [
+    11,
+    12,
+    13,
+    14,
+    11
+   ],
+   "dynamic_relocations": {
+    "_RNvC6spoof_10hook_name": 1,
+    "_RNvCs8CzKCN4mxcJ_12rustc_driver11strong_hook": 1,
+    "_RNvCs8CzKCN4mxcJ_12rustc_driver9rust_work": 1,
+    "_RNvCs8CzKCN4mxcJ_12rustc_driver9weak_hook": 1
+   },
+   "dynsym": "3e3413d0318a0134334cffc52f4e1485a5fd5a534c853e9b6382e9ed5de1807c",
+   "elf_sha256": "c5c54e832c49dc2b246d3a20bef10e003d2fa52b5b77b43cda9a11dc70f33a91",
+   "interposed": [
+    111,
+    112,
+    113,
+    115,
+    111
+   ],
+   "linker_flags": [
+    "-fuse-ld=lld"
+   ]
+  },
+  "policy": {
+   "baseline": [
+    11,
+    12,
+    13,
+    14,
+    11
+   ],
+   "dynamic_relocations": {
+    "_RNvC6spoof_10hook_name": 1,
+    "_RNvCs8CzKCN4mxcJ_12rustc_driver11strong_hook": 1,
+    "_RNvCs8CzKCN4mxcJ_12rustc_driver9rust_work": 0,
+    "_RNvCs8CzKCN4mxcJ_12rustc_driver9weak_hook": 1
+   },
+   "dynsym": "3e3413d0318a0134334cffc52f4e1485a5fd5a534c853e9b6382e9ed5de1807c",
+   "elf_sha256": "501362ca3196e8fa6f1e09a0d62745b67150c51ba104bd09750b4191104763c4",
+   "interposed": [
+    11,
+    112,
+    113,
+    115,
+    111
+   ],
+   "linker_flags": [
+    "-fuse-ld=lld",
+    "-Bsymbolic-non-weak-functions",
+    "--export-dynamic-symbol-list="
+   ]
+  }
+ },
+ "preserved_names_sha": "f0c123b1ed02e3a1a705885a89f18db152364f1cfc9229e0fb9648788b330b28",
+ "removed_strong_and_c_hook": [
+  11,
+  112,
+  13,
+  14,
+  111
+ ],
+ "rustc": "6842898bafad7cf932fea14bd8915a0adff0eecdc03bee91f589ac95a89743dd",
+ "scope": "The actual installed Rust compiler and GNU LLD. This auxiliary EII fixture supplies its independent known exception names explicitly.",
+ "source_sha256": "ef82032b5ce03777a2746e6bb781af207bb87b5972a579647da504987aa1f709",
+ "target_linker": "gnu-lld-cc"
+}

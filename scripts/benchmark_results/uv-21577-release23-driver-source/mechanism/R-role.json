@@ -1,0 +1,4494 @@
+{
+  "archive_bytes": 359914394,
+  "archive_sha256": "b826d1a8d55cfef2ca8f219863ee3491284d37dd8d70600ff686532e31aa00df",
+  "bundled_cargo": {
+    "bytes": 39238144,
+    "component": "cargo",
+    "mode": 493,
+    "path": "bin/cargo",
+    "sha256": "4c21ab0fd9d54c79264b4b9ff08ab4d68cd0d03bb5c2f496fe8f146a57ed209a"
+  },
+  "cargo_banner": "cargo 1.99.0-dev (7024b0d2d 2026-11-02) (ohm-1.99.0-23)\nrelease: 1.99.0-dev\ncommit-hash: 7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed\ncommit-date: 2026-11-02\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]",
+  "component_inventory_sha256": "59af5499fed43a8a8b953d3c2299df5fe385688a95bf6fc1c3bf2d5dbcfa392e",
+  "driver": {
+    "bytes": 162668624,
+    "component": "rustc",
+    "mode": 420,
+    "path": "lib/librustc_driver-b03bf00bec23bb9a.so",
+    "sha256": "e200165fcc7173ad18a4773c7aa3cca5e310945e9e03f58a42ebe85eff4f2921"
+  },
+  "effective_cargo": {
+    "bytes": 39238824,
+    "sha256": "f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee"
+  },
+  "eii": {
+    "exception_sha256": null,
+    "interposed": [
+      111,
+      112,
+      113,
+      115,
+      111
+    ],
+    "normal": [
+      11,
+      12,
+      13,
+      14,
+      11
+    ],
+    "typed_policy": false
+  },
+  "execution_pgo": "verified executed PGO profile coverage for rustc, rustdoc, Cargo, Clippy, rustfmt, and cargo-fmt",
+  "installed_elf": {
+    "bolt_note": true,
+    "bytes": 162668624,
+    "census_uncompressed_sha256": "0992d2fb08ce618659edd4aca426d9616c320a609cd039aae04a4c46d96adec0",
+    "defined": 20047,
+    "dynamic_symbols": 20941,
+    "linker": "Linker: LLD 23.1.1 (/checkout/src/llvm-project/llvm 1b9c0d5ff9bbe7634aead059efe6b11a7eeba145)",
+    "probes": {
+      "_RINvMs6_NtCsiL5HTBa2gsh_9hashbrown3rawINtB6_8RawTableTNtNtCs9pfriLqNw2j_4core3any6TypeIdINtNtCsinnh2goo3YA_5alloc5boxed3BoxDNtBS_3AnyEL_EEE14reserve_rehashNCINvNtB8_3map11make_hasherBQ_B1o_NtCshwxNp6T97B_10rustc_hash13FxBuildHasherE0ECs9CDBmnYJSVz_8type_map": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91588344,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 117480596
+      },
+      "_RINvMs6_NtCsiL5HTBa2gsh_9hashbrown3rawINtB6_8RawTableTNtNtCs9pfriLqNw2j_4core3any6TypeIdINtNtCsinnh2goo3YA_5alloc5boxed3BoxDNtBS_3AnyNtNtBU_6marker4SyncNtB29_4SendEL_EEE14reserve_rehashNCINvNtB8_3map11make_hasherBQ_B1o_NtCshwxNp6T97B_10rustc_hash13FxBuildHasherE0ECs9CDBmnYJSVz_8type_map": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91588336,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 88904608
+      },
+      "_RINvMs6_NtCsiL5HTBa2gsh_9hashbrown3rawINtB6_8RawTableTNtNtCsaF3Uq2Yf6RO_9measureme13serialization7PageTagINtNtCsinnh2goo3YA_5alloc3vec3VechEEE14reserve_rehashNCINvNtB8_3map11make_hasherBQ_B1F_INtNtCs9pfriLqNw2j_4core4hash18BuildHasherDefaultNtCs6zMxwH7nnuM_10rustc_hash8FxHasherEE0EBU_": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91551904,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 63288304
+      },
+      "_RNvCs9FOASsVYGOS_14rustc_demangle8demangle": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91586464,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 69683499
+      },
+      "_RNvCsfqMCxFUT9YY_14rustc_demangle12try_demangle": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91581008,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 119437520
+      },
+      "_RNvCsfqMCxFUT9YY_14rustc_demangle8demangle": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91580584,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 119437632
+      },
+      "_RNvMNtCskCjDmw6lkT1_17rustc_stable_hash6sip128NtB2_12SipHasher12826slice_write_process_buffer": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91559376,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 98860672
+      },
+      "_RNvXCs4IyH6uThxCO_13rustc_privacyNtB2_14LazyDefPathStrNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90890256,
+            1,
+            ".data.rel.ro"
+          ]
+        ],
+        "value": 80739584
+      },
+      "_RNvXCs6il9LRof6Pz_9rustc_abiNtB2_9ReprFlagsNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90645712,
+            1,
+            ".data.rel.ro"
+          ]
+        ],
+        "value": 64139472
+      },
+      "_RNvXCskXWQGUsPVcg_12rustc_hir_idNtB2_7OwnerIdNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90013112,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90166824,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90236456,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90318744,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90353320,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90422480,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90549224,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90861024,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90968080,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91250816,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91314024,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91560192,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 72104560
+      },
+      "_RNvXNtCs9FOASsVYGOS_14rustc_demangle6legacyNtB2_8DemangleNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91586472,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 69695202
+      },
+      "_RNvXNtCsdbmZVWwc6bt_14rustc_metadata7creaderNtB2_6CStoreNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90042904,
+            1,
+            ".data.rel.ro"
+          ]
+        ],
+        "value": 75930160
+      },
+      "_RNvXNtCsfqMCxFUT9YY_14rustc_demangle6legacyNtB2_8DemangleNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91586432,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 69672672
+      },
+      "_RNvXNtNtCs6il9LRof6Pz_9rustc_abi6layout2tyNtB2_6LayoutNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89893080,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89943688,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89998752,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90225328,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90741856,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90846776,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90950664,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91303048,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91557048,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 64139952
+      },
+      "_RNvXNtNtCsceHjax90lu_12rustc_public2ty3tysNtB2_2TyNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90071840,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90900240,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91588168,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 81107616
+      },
+      "_RNvXs0_Cs9FOASsVYGOS_14rustc_demangleINtB5_21SizeLimitedFmtAdapterQNtNtCs9pfriLqNw2j_4core3fmt9FormatterENtB15_5Write9write_strB5_": {
+        "pool": "foreign",
+        "slots": [
+          [
+            90039496,
+            1,
+            ".data.rel.ro"
+          ]
+        ],
+        "value": 69698828
+      },
+      "_RNvXs0_NtCs9FOASsVYGOS_14rustc_demangle2v0NtB5_5IdentNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91586456,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 69698871
+      },
+      "_RNvXs0_NtCsfqMCxFUT9YY_14rustc_demangle2v0NtB5_5IdentNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91586424,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 119439686
+      },
+      "_RNvXs18_NtCsc7Nzra4uNwN_12rustc_middle3mirNtB6_5LocalNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89763008,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90697256,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90916744,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91566928,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 116891520
+      },
+      "_RNvXs1_Cs9FOASsVYGOS_14rustc_demangleNtB5_8DemangleNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91586496,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 69699937
+      },
+      "_RNvXs1_CsfqMCxFUT9YY_14rustc_demangleNtB5_8DemangleNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91580592,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 119263576
+      },
+      "_RNvXs1_CsjY2JXHDy7gv_12rustc_hashesNtB5_6Hash64NtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89645576,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90866808,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91319456,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91557176,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 70611008
+      },
+      "_RNvXs1_NtCs46DyBwifqvl_10rustc_span6symbolNtB5_5IdentNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89650480,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89673952,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89799432,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89827816,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89997008,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90069664,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90121784,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90155792,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90223824,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90254992,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90305072,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90342392,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90411000,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90475616,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90576232,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90646800,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90751912,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90813888,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90844800,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90946144,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91021720,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91236800,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91301600,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91558720,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 84159584
+      },
+      "_RNvXs1_NtCs46DyBwifqvl_10rustc_span7hygieneNtB5_6ExpnIdNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89675424,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90548024,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91116312,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91561168,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 84159728
+      },
+      "_RNvXs1i_NtCs9pfriLqNw2j_4core3fmtRNtCs9FOASsVYGOS_14rustc_demangle13DemangleStyleNtB6_7Display3fmtBy_": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91586504,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 69700346
+      },
+      "_RNvXs1o_NtCs46DyBwifqvl_10rustc_span6def_idNtB6_8DefIndexNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            91113824,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91561072,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 84163616
+      },
+      "_RNvXs24_Cs46DyBwifqvl_10rustc_spanNtB6_6AttrIdNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89658096,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89686272,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89835184,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90015416,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90079272,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90129616,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90168904,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90238528,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90320848,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90355400,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90424616,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90593600,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90666208,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90821856,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90863352,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90969936,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91031016,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91252984,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91316128,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91558976,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 84164608
+      },
+      "_RNvXs3_NtNtCsceHjax90lu_12rustc_public2ty3tysNtB5_4SpanNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90073504,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91588256,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 81142592
+      },
+      "_RNvXs7_CskXWQGUsPVcg_12rustc_hir_idNtB5_5HirIdNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89674432,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89799400,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89997744,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90155088,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90193872,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90254960,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90305840,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90342840,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90411512,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90475776,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90577352,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90648144,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90824600,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90845728,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90949568,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91237600,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91302272,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91561056,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 72105152
+      },
+      "_RNvXs8_Cs6il9LRof6Pz_9rustc_abiNtB5_6EndianNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89897224,
+            1,
+            ".data.rel.ro"
+          ]
+        ],
+        "value": 113003968
+      },
+      "_RNvXs9_NtCs46DyBwifqvl_10rustc_span6symbolNtB5_6SymbolNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89650256,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89673568,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89704416,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89803160,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89827592,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89996720,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90069280,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90121560,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90155536,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90198168,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90256936,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90304760,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90342200,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90410808,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90475456,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90549256,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90645616,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90742184,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90813632,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90844576,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90885248,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90944496,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91021336,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91236256,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91301344,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91558808,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 84166096
+      },
+      "_RNvXs9_NvCs4cUQigF5m8y_13rustc_apfloat1__NtB5_16InternalBitFlagsNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91557192,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 64147136
+      },
+      "_RNvXsI_CskXWQGUsPVcg_12rustc_hir_idNtB5_11ItemLocalIdNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90161240,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90650296,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90952984,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91561048,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 72105296
+      },
+      "_RNvXsL_NtCs46DyBwifqvl_10rustc_span6def_idNtB5_8CrateNumNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90066968,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90547960,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91113792,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91560752,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 84167024
+      },
+      "_RNvXsQ_CsfskVvxKQXRd_13rustc_type_irNtB5_13UniverseIndexNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89810472,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89905192,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90329800,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90605104,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90673832,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90750960,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90887272,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90914424,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90983872,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91252312,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91569536,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 87968960
+      },
+      "_RNvXsT_NtCsc7Nzra4uNwN_12rustc_middle4thirNtB5_6ExprIdNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90650456,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90953016,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91608768,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 77043472
+      },
+      "_RNvXsX_NtCs12JXEd0KTHo_9rustc_ast3astNtB5_12ImplPolarityNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89659616,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89688208,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89836672,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90017592,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90080760,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90131184,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90170808,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90240432,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90322816,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90357304,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90426552,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90595616,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90668160,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90823344,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90865352,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90971672,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91032504,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91254912,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91318032,
+            1,
+            ".data.rel.ro"
+          ]
+        ],
+        "value": 64236736
+      },
+      "_RNvXs_Cs9FOASsVYGOS_14rustc_demangleNtB4_13DemangleStyleNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91586520,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 69700424
+      },
+      "_RNvXs_CsfqMCxFUT9YY_14rustc_demangleNtB4_13DemangleStyleNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91586440,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 61342544
+      },
+      "_RNvXs_NtCs12JXEd0KTHo_9rustc_ast3astNtB4_8LifetimeNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89652816,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89677768,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89829928,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90003544,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90073472,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90124008,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90159336,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90228336,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90310272,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90345848,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90414904,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90582696,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90653976,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90816464,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90849952,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90956936,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91025368,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91242456,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91306072,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91558904,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 64237312
+      },
+      "_RNvXsa_NtCs46DyBwifqvl_10rustc_span6def_idNtB5_5DefIdNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89673280,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89798824,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89893544,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89944056,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89996432,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90155248,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90223440,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90254768,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90304376,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90341976,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90386552,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90410584,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90475264,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90530968,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90547928,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90645336,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90690832,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90743208,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90763736,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90844288,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90886512,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90890784,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90900872,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90911152,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90943952,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91021112,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91040592,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91120536,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91234664,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91274312,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91278416,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91301120,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91560248,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 84169120
+      },
+      "_RNvXsa_NvCs4cUQigF5m8y_13rustc_apfloat1__NtB5_16InternalBitFlagsNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91557200,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 64147280
+      },
+      "_RNvXsb_Cs6il9LRof6Pz_9rustc_abiNtB5_4SizeNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89644520,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89895456,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89965848,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90608672,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90742376,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90848280,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90902936,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90972568,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91278992,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91304712,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91557120,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 64145232
+      },
+      "_RNvXsg_Cs9ASqejsh1Rc_13rustc_resolveNtB5_6ModuleNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            91033152,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91620176,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 83746272
+      },
+      "_RNvXsi_NtCs12JXEd0KTHo_9rustc_ast7node_idNtB5_6NodeIdNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89650512,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89673984,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89827848,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89997040,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90069696,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90121816,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90155824,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90223856,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90305104,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90342424,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90411032,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90576264,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90646832,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90813920,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90844832,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90946176,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91021752,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91236832,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91301632,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91558968,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 64242416
+      },
+      "_RNvXsi_NtCsc7Nzra4uNwN_12rustc_middle2tyNtB5_4TermNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89802192,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89894048,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90000672,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90226168,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90307728,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90386744,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90476696,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90579448,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90650040,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90691024,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90743584,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90847336,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90891168,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90901128,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91040808,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91120760,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91239192,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91274528,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91278608,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91303576,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91567024,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 77104192
+      },
+      "_RNvXsj_Cs6il9LRof6Pz_9rustc_abiNtB5_5AlignNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89645544,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89999264,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90658424,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90742024,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90854728,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90961288,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91319424,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91557144,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 64145520
+      },
+      "_RNvXsj_NtCsc7Nzra4uNwN_12rustc_middle3mirNtB5_8LocationNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89798288,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90750648,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91569616,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 77109184
+      },
+      "_RNvXsl_NtCs9tWoyJZfb42_9rustc_hir3hirNtB5_10OwnerNodesNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90960120,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91588144,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 70722080
+      },
+      "_RNvXsn_CsfskVvxKQXRd_13rustc_type_irNtB5_13DebruijnIndexNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90236040,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90966672,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91594608,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 87972144
+      },
+      "_RNvXsq_Cslb6rUDZrxT1_16rustc_proc_macroNtB5_4SpanNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90893784,
+            1,
+            ".data.rel.ro"
+          ]
+        ],
+        "value": 80918584
+      },
+      "_RNvXsr_Cs6il9LRof6Pz_9rustc_abiNtB5_9PrimitiveNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89645320,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90006080,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90853272,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91279528,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91308456,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91557072,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 64145712
+      },
+      "_RNvXst_Cs6il9LRof6Pz_9rustc_abiNtB5_6ScalarNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89644744,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89895328,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89944344,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90004216,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90745128,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90850488,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91278832,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91306616,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91557064,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 64145904
+      },
+      "_RNvXsu_Cslb6rUDZrxT1_16rustc_proc_macroNtB5_9TokenTreeNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90892544,
+            1,
+            ".data.rel.ro"
+          ]
+        ],
+        "value": 80919264
+      },
+      "_RNvYINtCs9FOASsVYGOS_14rustc_demangle21SizeLimitedFmtAdapterQNtNtCs9pfriLqNw2j_4core3fmt9FormatterENtBZ_5Write10write_charB5_": {
+        "pool": "foreign",
+        "slots": [
+          [
+            90039504,
+            1,
+            ".data.rel.ro"
+          ]
+        ],
+        "value": 69701586
+      },
+      "_RNvYINtCs9FOASsVYGOS_14rustc_demangle21SizeLimitedFmtAdapterQNtNtCs9pfriLqNw2j_4core3fmt9FormatterENtBZ_5Write9write_fmtB5_": {
+        "pool": "foreign",
+        "slots": [
+          [
+            90039512,
+            1,
+            ".data.rel.ro"
+          ]
+        ],
+        "value": 69701776
+      }
+    },
+    "relocation_kinds": [
+      [
+        ".rela.dyn",
+        1,
+        3834
+      ],
+      [
+        ".rela.dyn",
+        6,
+        9972
+      ],
+      [
+        ".rela.dyn",
+        8,
+        100902
+      ],
+      [
+        ".rela.dyn",
+        16,
+        7
+      ],
+      [
+        ".rela.dyn",
+        17,
+        6
+      ],
+      [
+        ".rela.dyn",
+        18,
+        233
+      ],
+      [
+        ".rela.plt",
+        7,
+        318
+      ]
+    ],
+    "sha256": "e200165fcc7173ad18a4773c7aa3cca5e310945e9e03f58a42ebe85eff4f2921",
+    "strong_self_names": 9984,
+    "strong_self_slots": 11641,
+    "text_and_dynamic_sha256": "748b8a19d15625e7a61be7441cc75302edf0d3f0ce459fe9030c39f0005dd18a"
+  },
+  "integrated": {
+    "actual_image": "552ed8af5de19bf58ad2a3068a8827e02e8a023f4ba8f67ac9cb44fe4c8382cc",
+    "commands": [
+      {
+        "argv": [
+          "/home/runner/work/ohm/ohm/rc23-native/sdk/bin/rustc",
+          "--edition=2024",
+          "-Csymbol-mangling-version=v0",
+          "-Ccodegen-units=1",
+          "-Cprefer-dynamic=no",
+          "--crate-name",
+          "rustc_fixture",
+          "--crate-type=rlib",
+          "/home/runner/work/ohm/ohm/scripts/rc23-driver-link/integrated/provider.rs",
+          "-o",
+          "/home/runner/work/ohm/ohm/rc23-native/integrated/librustc_fixture.rlib"
+        ],
+        "exit": 0,
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "/home/runner/work/ohm/ohm/rc23-native/sdk/bin/rustc",
+          "--edition=2024",
+          "-Csymbol-mangling-version=v0",
+          "-Ccodegen-units=1",
+          "-Cprefer-dynamic=no",
+          "--crate-name",
+          "support",
+          "--crate-type=rlib",
+          "/home/runner/work/ohm/ohm/scripts/rc23-driver-link/integrated/support.rs",
+          "-o",
+          "/home/runner/work/ohm/ohm/rc23-native/integrated/libsupport.rlib"
+        ],
+        "exit": 0,
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "/home/runner/work/ohm/ohm/rc23-native/sdk/bin/rustc",
+          "--edition=2024",
+          "-Csymbol-mangling-version=v0",
+          "-Ccodegen-units=1",
+          "-Cprefer-dynamic=no",
+          "--crate-name",
+          "rustc_driver",
+          "--crate-type=dylib",
+          "/home/runner/work/ohm/ohm/scripts/rc23-driver-link/integrated/driver.rs",
+          "--extern",
+          "rustc_fixture=/home/runner/work/ohm/ohm/rc23-native/integrated/librustc_fixture.rlib",
+          "--extern",
+          "support=/home/runner/work/ohm/ohm/rc23-native/integrated/libsupport.rlib",
+          "-o",
+          "/home/runner/work/ohm/ohm/rc23-native/integrated/librustc_driver.so"
+        ],
+        "exit": 0,
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "nm",
+          "-D",
+          "-P",
+          "--defined-only",
+          "/home/runner/work/ohm/ohm/rc23-native/integrated/librustc_driver.so"
+        ],
+        "exit": 0,
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "cc",
+          "-shared",
+          "-fPIC",
+          "-O2",
+          "/home/runner/work/ohm/ohm/rc23-native/integrated/override.c",
+          "-o",
+          "/home/runner/work/ohm/ohm/rc23-native/integrated/override.so"
+        ],
+        "exit": 0,
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "cc",
+          "-O2",
+          "/home/runner/work/ohm/ohm/scripts/rc23-driver-link/integrated/check.c",
+          "-ldl",
+          "-o",
+          "/home/runner/work/ohm/ohm/rc23-native/integrated/check"
+        ],
+        "exit": 0,
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "/home/runner/work/ohm/ohm/rc23-native/integrated/check",
+          "/home/runner/work/ohm/ohm/rc23-native/integrated/librustc_driver.so",
+          "_RNvCs6u3BNXhcH5v_13rustc_fixture12driver_value",
+          "_RNvCsaFiMWfE9Sue_7support13support_value"
+        ],
+        "exit": 0,
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "/home/runner/work/ohm/ohm/rc23-native/integrated/check",
+          "/home/runner/work/ohm/ohm/rc23-native/integrated/librustc_driver.so",
+          "_RNvCs6u3BNXhcH5v_13rustc_fixture12driver_value",
+          "_RNvCsaFiMWfE9Sue_7support13support_value"
+        ],
+        "exit": 0,
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "readelf",
+          "-Wr",
+          "/home/runner/work/ohm/ohm/rc23-native/integrated/librustc_driver.so"
+        ],
+        "exit": 0,
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "/home/runner/work/ohm/ohm/rc23-native/sdk/bin/rustc",
+          "-vV"
+        ],
+        "exit": 0,
+        "stderr": ""
+      }
+    ],
+    "compiler_image": "6842898bafad7cf932fea14bd8915a0adff0eecdc03bee91f589ac95a89743dd",
+    "driver_relocations": [
+      "0000000000128030  000004d100000001 R_X86_64_64            000000000007d748 _RNvCs6u3BNXhcH5v_13rustc_fixture12driver_value + 0"
+    ],
+    "driver_symbol": "_RNvCs6u3BNXhcH5v_13rustc_fixture12driver_value",
+    "expected": "ordinary",
+    "normal": [
+      11,
+      12,
+      13,
+      11,
+      12,
+      13
+    ],
+    "preloaded": [
+      21,
+      22,
+      23,
+      21,
+      22,
+      23
+    ],
+    "relocations_sha256": "e8f293408b76b6a4be261eedd48a6267186536c5bbf8dde7ebca32169152dcc5",
+    "rustc_vV": "rustc 1.99.0-dev (d57fd1515 2026-11-02) (ohm-1.99.0-23)\nbinary: rustc\ncommit-hash: d57fd1515986dccecdcece8da85e651bfb4b81f9\ncommit-date: 2026-11-02\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0-dev\nLLVM version: 23.1.1\n",
+    "support_relocations": [
+      "0000000000128040  0000076c00000001 R_X86_64_64            000000000007d740 _RNvCsaFiMWfE9Sue_7support13support_value + 0"
+    ],
+    "support_symbol": "_RNvCsaFiMWfE9Sue_7support13support_value",
+    "symbols_sha256": "ec278a741714003100eaf9eccdf8f72eadf63063cd6c94c906f46b18e04787de"
+  },
+  "launcher": {
+    "bytes": 171720,
+    "component": "rustc",
+    "mode": 493,
+    "path": "bin/rustc",
+    "sha256": "6842898bafad7cf932fea14bd8915a0adff0eecdc03bee91f589ac95a89743dd"
+  },
+  "ldd": "linux-vdso.so.1 (0x00007f5214b62000)\n\tlibrustc_driver-b03bf00bec23bb9a.so => /home/runner/work/ohm/ohm/rc23-native/sdk/bin/../lib/librustc_driver-b03bf00bec23bb9a.so (0x00007f520c400000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f5214aed000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f520c1ed000)\n\tlibLLVM.so.23.1-rust-1.99.0-beta => /home/runner/work/ohm/ohm/rc23-native/sdk/bin/../lib/../lib/libLLVM.so.23.1-rust-1.99.0-beta (0x00007f5201200000)\n\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f5200f82000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f5214b64000)\n\tlibrt.so.1 => /lib/x86_64-linux-gnu/librt.so.1 (0x00007f5214ae6000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f5214ae1000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f5214adc000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f52149f3000)\n\tlibz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007f520c1d1000)",
+  "llvm": {
+    "bytes": 208144480,
+    "component": "rustc",
+    "mode": 420,
+    "path": "lib/libLLVM.so.23.1-rust-1.99.0-beta",
+    "sha256": "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51"
+  },
+  "policy_evidence": {
+    "arm": "R",
+    "captured_linkers": 3,
+    "linker": "Linker: LLD 23.1.1 (/checkout/src/llvm-project/llvm 1b9c0d5ff9bbe7634aead059efe6b11a7eeba145)",
+    "live_preload": {
+      "arm": "R",
+      "driver_sha256": "e200165fcc7173ad18a4773c7aa3cca5e310945e9e03f58a42ebe85eff4f2921",
+      "normal": {
+        "compiler": {
+          "driver_dlsym": true,
+          "external_override": false,
+          "overridden": false,
+          "slots": 11
+        },
+        "foreign": {
+          "driver_dlsym": true,
+          "external_override": false,
+          "overridden": false,
+          "slots": 1
+        }
+      },
+      "preloaded": {
+        "compiler": {
+          "driver_dlsym": true,
+          "external_override": true,
+          "overridden": true,
+          "slots": 11
+        },
+        "foreign": {
+          "driver_dlsym": true,
+          "external_override": true,
+          "overridden": true,
+          "slots": 1
+        }
+      },
+      "selection": {
+        "compiler": {
+          "locally_bound": false,
+          "name": "_RNvXsb_Cs6il9LRof6Pz_9rustc_abiNtB5_4SizeNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt",
+          "pool": "compiler",
+          "slots": [
+            [
+              89644520,
+              1,
+              ".data.rel.ro"
+            ],
+            [
+              89895456,
+              1,
+              ".data.rel.ro"
+            ],
+            [
+              89965848,
+              1,
+              ".data.rel.ro"
+            ],
+            [
+              90608672,
+              1,
+              ".data.rel.ro"
+            ],
+            [
+              90742376,
+              1,
+              ".data.rel.ro"
+            ],
+            [
+              90848280,
+              1,
+              ".data.rel.ro"
+            ],
+            [
+              90902936,
+              1,
+              ".data.rel.ro"
+            ],
+            [
+              90972568,
+              1,
+              ".data.rel.ro"
+            ],
+            [
+              91278992,
+              1,
+              ".data.rel.ro"
+            ],
+            [
+              91304712,
+              1,
+              ".data.rel.ro"
+            ],
+            [
+              91557120,
+              6,
+              ".got"
+            ]
+          ],
+          "value": 64145232
+        },
+        "foreign": {
+          "locally_bound": false,
+          "name": "_RNvCs9FOASsVYGOS_14rustc_demangle8demangle",
+          "pool": "foreign",
+          "slots": [
+            [
+              91586464,
+              6,
+              ".got"
+            ]
+          ],
+          "value": 69683499
+        }
+      },
+      "shim_sha256": "13776a830c3c65e477868a1960a7922c27343ab44c64e276b1c41f7d0873261e"
+    },
+    "packaged_stage2": {
+      "bytes": 162668624,
+      "sha256": "e200165fcc7173ad18a4773c7aa3cca5e310945e9e03f58a42ebe85eff4f2921",
+      "text_and_dynamic_sha256": "748b8a19d15625e7a61be7441cc75302edf0d3f0ce459fe9030c39f0005dd18a"
+    },
+    "policies": {},
+    "pre_bolt": {
+      "backup_inode": 7635715,
+      "bytes": 155104984,
+      "copy_line": "[2026-11-03T10:28:11.732Z INFO  opt_dist::utils::io] Copying file /home/runner/work/ohm/ohm/source/rust/build/x86_64-unknown-linux-gnu/stage2/lib/librustc_driver-b03bf00bec23bb9a.so to /tmp/.tmpXqbqsV",
+      "instrument_line": "[2026-11-03T10:28:11.785Z INFO  opt_dist::exec] Executing `/home/runner/work/_temp/ohm-bolt.tkp0eG/bin/llvm-bolt -instrument /home/runner/work/ohm/ohm/source/rust/build/x86_64-unknown-linux-gnu/stage2/lib/librustc_driver-b03bf00bec23bb9a.so --instrumentation-file=/tmp/.tmpQP415e/prof.fdata --instrumentation-file-append-pid -o /tmp/.tmpaSLzde [at /home/runner/work/ohm/ohm/source/rust]`",
+      "live": "/home/runner/work/ohm/ohm/source/rust/build/x86_64-unknown-linux-gnu/stage2/lib/librustc_driver-b03bf00bec23bb9a.so",
+      "sha256": "45aff2c3b2274e700416e644e7713f3b3f4ad3f775f698c9a6fa421f764a1134",
+      "source": "/tmp/.tmpXqbqsV"
+    },
+    "source": []
+  },
+  "pre_bolt": {
+    "bolt_note": false,
+    "bytes": 155104984,
+    "census_uncompressed_sha256": "f46fb38a5500493f398fe7dd06a668c622d9c80b8ebf0fb2917d7be95fb12a32",
+    "defined": 20047,
+    "dynamic_symbols": 20941,
+    "linker": "Linker: LLD 23.1.1 (/checkout/src/llvm-project/llvm 1b9c0d5ff9bbe7634aead059efe6b11a7eeba145)",
+    "probes": {
+      "_RINvMs6_NtCsiL5HTBa2gsh_9hashbrown3rawINtB6_8RawTableTNtNtCs9pfriLqNw2j_4core3any6TypeIdINtNtCsinnh2goo3YA_5alloc5boxed3BoxDNtBS_3AnyEL_EEE14reserve_rehashNCINvNtB8_3map11make_hasherBQ_B1o_NtCshwxNp6T97B_10rustc_hash13FxBuildHasherE0ECs9CDBmnYJSVz_8type_map": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91588344,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 60053664
+      },
+      "_RINvMs6_NtCsiL5HTBa2gsh_9hashbrown3rawINtB6_8RawTableTNtNtCs9pfriLqNw2j_4core3any6TypeIdINtNtCsinnh2goo3YA_5alloc5boxed3BoxDNtBS_3AnyNtNtBU_6marker4SyncNtB29_4SendEL_EEE14reserve_rehashNCINvNtB8_3map11make_hasherBQ_B1o_NtCshwxNp6T97B_10rustc_hash13FxBuildHasherE0ECs9CDBmnYJSVz_8type_map": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91588336,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 88904608
+      },
+      "_RINvMs6_NtCsiL5HTBa2gsh_9hashbrown3rawINtB6_8RawTableTNtNtCsaF3Uq2Yf6RO_9measureme13serialization7PageTagINtNtCsinnh2goo3YA_5alloc3vec3VechEEE14reserve_rehashNCINvNtB8_3map11make_hasherBQ_B1F_INtNtCs9pfriLqNw2j_4core4hash18BuildHasherDefaultNtCs6zMxwH7nnuM_10rustc_hash8FxHasherEE0EBU_": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91551904,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 63288304
+      },
+      "_RNvCs9FOASsVYGOS_14rustc_demangle8demangle": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91586464,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 69683499
+      },
+      "_RNvCsfqMCxFUT9YY_14rustc_demangle12try_demangle": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91581008,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 61339216
+      },
+      "_RNvCsfqMCxFUT9YY_14rustc_demangle8demangle": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91580584,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 61339312
+      },
+      "_RNvMNtCskCjDmw6lkT1_17rustc_stable_hash6sip128NtB2_12SipHasher12826slice_write_process_buffer": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91559376,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 45167792
+      },
+      "_RNvXCs4IyH6uThxCO_13rustc_privacyNtB2_14LazyDefPathStrNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90890256,
+            1,
+            ".data.rel.ro"
+          ]
+        ],
+        "value": 80739584
+      },
+      "_RNvXCs6il9LRof6Pz_9rustc_abiNtB2_9ReprFlagsNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90645712,
+            1,
+            ".data.rel.ro"
+          ]
+        ],
+        "value": 64139472
+      },
+      "_RNvXCskXWQGUsPVcg_12rustc_hir_idNtB2_7OwnerIdNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90013112,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90166824,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90236456,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90318744,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90353320,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90422480,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90549224,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90861024,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90968080,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91250816,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91314024,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91560192,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 72104560
+      },
+      "_RNvXNtCs9FOASsVYGOS_14rustc_demangle6legacyNtB2_8DemangleNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91586472,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 69695202
+      },
+      "_RNvXNtCsdbmZVWwc6bt_14rustc_metadata7creaderNtB2_6CStoreNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90042904,
+            1,
+            ".data.rel.ro"
+          ]
+        ],
+        "value": 75930160
+      },
+      "_RNvXNtCsfqMCxFUT9YY_14rustc_demangle6legacyNtB2_8DemangleNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91586432,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 69672672
+      },
+      "_RNvXNtNtCs6il9LRof6Pz_9rustc_abi6layout2tyNtB2_6LayoutNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89893080,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89943688,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89998752,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90225328,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90741856,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90846776,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90950664,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91303048,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91557048,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 64139952
+      },
+      "_RNvXNtNtCsceHjax90lu_12rustc_public2ty3tysNtB2_2TyNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90071840,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90900240,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91588168,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 81107616
+      },
+      "_RNvXs0_Cs9FOASsVYGOS_14rustc_demangleINtB5_21SizeLimitedFmtAdapterQNtNtCs9pfriLqNw2j_4core3fmt9FormatterENtB15_5Write9write_strB5_": {
+        "pool": "foreign",
+        "slots": [
+          [
+            90039496,
+            1,
+            ".data.rel.ro"
+          ]
+        ],
+        "value": 69698828
+      },
+      "_RNvXs0_NtCs9FOASsVYGOS_14rustc_demangle2v0NtB5_5IdentNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91586456,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 69698871
+      },
+      "_RNvXs0_NtCsfqMCxFUT9YY_14rustc_demangle2v0NtB5_5IdentNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91586424,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 61345232
+      },
+      "_RNvXs18_NtCsc7Nzra4uNwN_12rustc_middle3mirNtB6_5LocalNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89763008,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90697256,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90916744,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91566928,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 58885760
+      },
+      "_RNvXs1_Cs9FOASsVYGOS_14rustc_demangleNtB5_8DemangleNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91586496,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 69699937
+      },
+      "_RNvXs1_CsfqMCxFUT9YY_14rustc_demangleNtB5_8DemangleNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91580592,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 61396304
+      },
+      "_RNvXs1_CsjY2JXHDy7gv_12rustc_hashesNtB5_6Hash64NtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89645576,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90866808,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91319456,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91557176,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 70611008
+      },
+      "_RNvXs1_NtCs46DyBwifqvl_10rustc_span6symbolNtB5_5IdentNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89650480,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89673952,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89799432,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89827816,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89997008,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90069664,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90121784,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90155792,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90223824,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90254992,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90305072,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90342392,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90411000,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90475616,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90576232,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90646800,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90751912,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90813888,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90844800,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90946144,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91021720,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91236800,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91301600,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91558720,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 84159584
+      },
+      "_RNvXs1_NtCs46DyBwifqvl_10rustc_span7hygieneNtB5_6ExpnIdNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89675424,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90548024,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91116312,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91561168,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 84159728
+      },
+      "_RNvXs1i_NtCs9pfriLqNw2j_4core3fmtRNtCs9FOASsVYGOS_14rustc_demangle13DemangleStyleNtB6_7Display3fmtBy_": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91586504,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 69700346
+      },
+      "_RNvXs1o_NtCs46DyBwifqvl_10rustc_span6def_idNtB6_8DefIndexNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            91113824,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91561072,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 84163616
+      },
+      "_RNvXs24_Cs46DyBwifqvl_10rustc_spanNtB6_6AttrIdNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89658096,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89686272,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89835184,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90015416,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90079272,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90129616,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90168904,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90238528,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90320848,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90355400,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90424616,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90593600,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90666208,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90821856,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90863352,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90969936,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91031016,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91252984,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91316128,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91558976,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 84164608
+      },
+      "_RNvXs3_NtNtCsceHjax90lu_12rustc_public2ty3tysNtB5_4SpanNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90073504,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91588256,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 81142592
+      },
+      "_RNvXs7_CskXWQGUsPVcg_12rustc_hir_idNtB5_5HirIdNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89674432,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89799400,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89997744,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90155088,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90193872,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90254960,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90305840,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90342840,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90411512,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90475776,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90577352,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90648144,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90824600,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90845728,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90949568,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91237600,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91302272,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91561056,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 72105152
+      },
+      "_RNvXs8_Cs6il9LRof6Pz_9rustc_abiNtB5_6EndianNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89897224,
+            1,
+            ".data.rel.ro"
+          ]
+        ],
+        "value": 64143616
+      },
+      "_RNvXs9_NtCs46DyBwifqvl_10rustc_span6symbolNtB5_6SymbolNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89650256,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89673568,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89704416,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89803160,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89827592,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89996720,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90069280,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90121560,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90155536,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90198168,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90256936,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90304760,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90342200,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90410808,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90475456,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90549256,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90645616,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90742184,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90813632,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90844576,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90885248,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90944496,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91021336,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91236256,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91301344,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91558808,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 84166096
+      },
+      "_RNvXs9_NvCs4cUQigF5m8y_13rustc_apfloat1__NtB5_16InternalBitFlagsNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91557192,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 64147136
+      },
+      "_RNvXsI_CskXWQGUsPVcg_12rustc_hir_idNtB5_11ItemLocalIdNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90161240,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90650296,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90952984,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91561048,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 72105296
+      },
+      "_RNvXsL_NtCs46DyBwifqvl_10rustc_span6def_idNtB5_8CrateNumNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90066968,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90547960,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91113792,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91560752,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 84167024
+      },
+      "_RNvXsQ_CsfskVvxKQXRd_13rustc_type_irNtB5_13UniverseIndexNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89810472,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89905192,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90329800,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90605104,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90673832,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90750960,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90887272,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90914424,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90983872,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91252312,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91569536,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 87968960
+      },
+      "_RNvXsT_NtCsc7Nzra4uNwN_12rustc_middle4thirNtB5_6ExprIdNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90650456,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90953016,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91608768,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 77043472
+      },
+      "_RNvXsX_NtCs12JXEd0KTHo_9rustc_ast3astNtB5_12ImplPolarityNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89659616,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89688208,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89836672,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90017592,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90080760,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90131184,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90170808,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90240432,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90322816,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90357304,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90426552,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90595616,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90668160,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90823344,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90865352,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90971672,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91032504,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91254912,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91318032,
+            1,
+            ".data.rel.ro"
+          ]
+        ],
+        "value": 64236736
+      },
+      "_RNvXs_Cs9FOASsVYGOS_14rustc_demangleNtB4_13DemangleStyleNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91586520,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 69700424
+      },
+      "_RNvXs_CsfqMCxFUT9YY_14rustc_demangleNtB4_13DemangleStyleNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91586440,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 61342544
+      },
+      "_RNvXs_NtCs12JXEd0KTHo_9rustc_ast3astNtB4_8LifetimeNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89652816,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89677768,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89829928,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90003544,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90073472,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90124008,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90159336,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90228336,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90310272,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90345848,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90414904,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90582696,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90653976,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90816464,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90849952,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90956936,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91025368,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91242456,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91306072,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91558904,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 64237312
+      },
+      "_RNvXsa_NtCs46DyBwifqvl_10rustc_span6def_idNtB5_5DefIdNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89673280,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89798824,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89893544,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89944056,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89996432,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90155248,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90223440,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90254768,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90304376,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90341976,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90386552,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90410584,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90475264,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90530968,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90547928,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90645336,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90690832,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90743208,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90763736,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90844288,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90886512,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90890784,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90900872,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90911152,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90943952,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91021112,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91040592,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91120536,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91234664,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91274312,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91278416,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91301120,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91560248,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 84169120
+      },
+      "_RNvXsa_NvCs4cUQigF5m8y_13rustc_apfloat1__NtB5_16InternalBitFlagsNtNtCs9pfriLqNw2j_4core3fmt7Display3fmt": {
+        "pool": "foreign",
+        "slots": [
+          [
+            91557200,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 64147280
+      },
+      "_RNvXsb_Cs6il9LRof6Pz_9rustc_abiNtB5_4SizeNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89644520,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89895456,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89965848,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90608672,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90742376,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90848280,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90902936,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90972568,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91278992,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91304712,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91557120,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 64145232
+      },
+      "_RNvXsg_Cs9ASqejsh1Rc_13rustc_resolveNtB5_6ModuleNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            91033152,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91620176,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 83746272
+      },
+      "_RNvXsi_NtCs12JXEd0KTHo_9rustc_ast7node_idNtB5_6NodeIdNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89650512,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89673984,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89827848,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89997040,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90069696,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90121816,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90155824,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90223856,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90305104,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90342424,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90411032,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90576264,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90646832,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90813920,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90844832,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90946176,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91021752,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91236832,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91301632,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91558968,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 64242416
+      },
+      "_RNvXsi_NtCsc7Nzra4uNwN_12rustc_middle2tyNtB5_4TermNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89802192,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89894048,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90000672,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90226168,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90307728,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90386744,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90476696,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90579448,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90650040,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90691024,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90743584,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90847336,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90891168,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90901128,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91040808,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91120760,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91239192,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91274528,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91278608,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91303576,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91567024,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 77104192
+      },
+      "_RNvXsj_Cs6il9LRof6Pz_9rustc_abiNtB5_5AlignNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89645544,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89999264,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90658424,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90742024,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90854728,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90961288,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91319424,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91557144,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 64145520
+      },
+      "_RNvXsj_NtCsc7Nzra4uNwN_12rustc_middle3mirNtB5_8LocationNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89798288,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90750648,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91569616,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 77109184
+      },
+      "_RNvXsl_NtCs9tWoyJZfb42_9rustc_hir3hirNtB5_10OwnerNodesNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90960120,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91588144,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 70722080
+      },
+      "_RNvXsn_CsfskVvxKQXRd_13rustc_type_irNtB5_13DebruijnIndexNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90236040,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90966672,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91594608,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 87972144
+      },
+      "_RNvXsq_Cslb6rUDZrxT1_16rustc_proc_macroNtB5_4SpanNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90893784,
+            1,
+            ".data.rel.ro"
+          ]
+        ],
+        "value": 80918584
+      },
+      "_RNvXsr_Cs6il9LRof6Pz_9rustc_abiNtB5_9PrimitiveNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89645320,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90006080,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90853272,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91279528,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91308456,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91557072,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 64145712
+      },
+      "_RNvXst_Cs6il9LRof6Pz_9rustc_abiNtB5_6ScalarNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            89644744,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89895328,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            89944344,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90004216,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90745128,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            90850488,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91278832,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91306616,
+            1,
+            ".data.rel.ro"
+          ],
+          [
+            91557064,
+            6,
+            ".got"
+          ]
+        ],
+        "value": 64145904
+      },
+      "_RNvXsu_Cslb6rUDZrxT1_16rustc_proc_macroNtB5_9TokenTreeNtNtCs9pfriLqNw2j_4core3fmt5Debug3fmt": {
+        "pool": "compiler",
+        "slots": [
+          [
+            90892544,
+            1,
+            ".data.rel.ro"
+          ]
+        ],
+        "value": 80919264
+      },
+      "_RNvYINtCs9FOASsVYGOS_14rustc_demangle21SizeLimitedFmtAdapterQNtNtCs9pfriLqNw2j_4core3fmt9FormatterENtBZ_5Write10write_charB5_": {
+        "pool": "foreign",
+        "slots": [
+          [
+            90039504,
+            1,
+            ".data.rel.ro"
+          ]
+        ],
+        "value": 69701586
+      },
+      "_RNvYINtCs9FOASsVYGOS_14rustc_demangle21SizeLimitedFmtAdapterQNtNtCs9pfriLqNw2j_4core3fmt9FormatterENtBZ_5Write9write_fmtB5_": {
+        "pool": "foreign",
+        "slots": [
+          [
+            90039512,
+            1,
+            ".data.rel.ro"
+          ]
+        ],
+        "value": 69701776
+      }
+    },
+    "relocation_kinds": [
+      [
+        ".rela.dyn",
+        1,
+        3834
+      ],
+      [
+        ".rela.dyn",
+        6,
+        9972
+      ],
+      [
+        ".rela.dyn",
+        8,
+        100902
+      ],
+      [
+        ".rela.dyn",
+        16,
+        7
+      ],
+      [
+        ".rela.dyn",
+        17,
+        6
+      ],
+      [
+        ".rela.dyn",
+        18,
+        233
+      ],
+      [
+        ".rela.plt",
+        7,
+        318
+      ]
+    ],
+    "sha256": "45aff2c3b2274e700416e644e7713f3b3f4ad3f775f698c9a6fa421f764a1134",
+    "strong_self_names": 10109,
+    "strong_self_slots": 11641,
+    "text_and_dynamic_sha256": "b22439bc11c7508d14aa3442a79a97e3bfb1989c02dc1a1f34bb6291361bc8d0"
+  },
+  "qa": {
+    "build.log": "c5dcf0e88bcfa14154b0b07b93067dcd62ec4b84253daff942410173e89181e5",
+    "eii.json": "dae3523886091b82423640ecaefaa9a8c126061e218aaacb574dafa033e80db0",
+    "integration.json": "b6ca6d61412a9baa3e9cd089dfcf41b1f16e08d1fbb261a7caa7f0a43f3aedf6",
+    "native-proofs.json": "ce5bec502c0ddaeefdd3a97d6d8ae52aeb6ef0e070c4daa69458dcd4926379f2",
+    "policy.json": "bbbe1539ea5c44d78be718a0fe2ebf53090168ccc74251f8f57de0e33dd67e9a",
+    "signed-cargo.json": "b53aaf1b830e458412aae676cc2d0fc31998516f75b5ead905bfa366a1028901",
+    "source.json": "a59cd2d703ae3681de0cf2b2a9ab6f43590719e30c41d9edfb6f8c1b30dac4aa"
+  },
+  "role": "R",
+  "rustc_banner": "rustc 1.99.0-dev (d57fd1515 2026-11-02) (ohm-1.99.0-23)\nbinary: rustc\ncommit-hash: d57fd1515986dccecdcece8da85e651bfb4b81f9\ncommit-date: 2026-11-02\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0-dev\nLLVM version: 23.1.1",
+  "sdk_inventory_sha256": "0ce83aeb3e4398fb54ff79a155ab5cfcf6c5ba20c7d93283126e03a5fff779b8",
+  "signed_cargo_smoke": {
+    "binary": "c423c8f96c4ccf4aa80f92d6f79fd7278457927f54f7ab5eda4fa52586ac3f90",
+    "cargo": "f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee",
+    "command": [
+      "/home/runner/work/ohm/ohm/official-cargo/cargo",
+      "run",
+      "--offline",
+      "-q"
+    ],
+    "rustc": "6842898bafad7cf932fea14bd8915a0adff0eecdc03bee91f589ac95a89743dd",
+    "source": "d9e27f7ca51a0ec63ca00d3d0bb0a8858c025baa71ec46af5ed13906c0ff80e6",
+    "stdout": "ordinary cargo 19"
+  },
+  "source_commit": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+  "source_sha256": "a59cd2d703ae3681de0cf2b2a9ab6f43590719e30c41d9edfb6f8c1b30dac4aa",
+  "source_tree": "f5bf03d73f71243fb88e34ecb0b155ef11e99a47"
+}
