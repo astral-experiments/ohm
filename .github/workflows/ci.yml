@@ -1,157 +1,74 @@
-name: Qualify private derived enum metadata on the RUF009 edit
-run-name: RUF009 source-built ${{ inputs.phase }} ${{ inputs.reviewed_head }}
+name: Private enum neighbor controls
 on:
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Full frozen QA commit
+        description: Exact registered packaging SHA
         required: true
         type: string
-      phase:
-        description: Separate pilot or admitted confirmation
-        required: true
-        type: choice
-        options: [pilot, confirmation]
 permissions:
   contents: read
   actions: read
 jobs:
-  schedule:
-    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruf009-sete-counts-20261103' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+  structural:
+    name: Two real Ruff checks
+    if: github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
-    outputs:
-      matrix: ${{ steps.bind.outputs.matrix }}
-      factory: ${{ steps.bind.outputs.factory }}
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          persist-credentials: false
-          sparse-checkout: |
-            scripts/ruff-ruf009-derived-enum
-            scripts/ruff-module-16149
-      - name: Reopen frozen compatibility and original metadata controls
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: python3 -IB scripts/ruff-ruf009-derived-enum/admission.py "${{ inputs.phase }}"
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        if: always() && inputs.phase == 'pilot'
-        with:
-          name: ruf009-opaque-reader-${{ github.run_id }}
-          path: ${{ runner.temp }}/ruf009-opaque-controls.json
-          if-no-files-found: ignore
-      - id: bind
-        env:
-          STAGE: ${{ inputs.phase }}
-        run: |
-          python3 -IB - <<'PY'
-          import json,os,re
-          from pathlib import Path
-          d=Path('scripts/ruff-ruf009-derived-enum')
-          f=json.loads((d/'factory.json').read_bytes())
-          r=json.loads((d/'registration.json').read_bytes())
-          assert f['source']=={k:v['revision'] for k,v in r['matched_sources'].items()} and f['branch']==r['factory_branch'] and re.fullmatch('[0-9a-f]{40}',f['head'])
-          s=os.environ['STAGE']
-          assert s=='pilot' or (s=='confirmation' and (d/'admitted-pilot.json').is_file())
-          blocks=[0] if s=='pilot' else list(range(1,9))
-          with open(os.environ['GITHUB_OUTPUT'],'a')as out:
-              print('matrix='+json.dumps({'block':blocks},separators=(',',':')),file=out)
-              print('factory='+f['head'],file=out)
-          PY
-  pair:
-    needs: schedule
-    name: ${{ inputs.phase }}-${{ matrix.block }}
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.schedule.outputs.matrix) }}
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 180
+    timeout-minutes: 75
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      PHASE: ${{ inputs.phase }}
-      BLOCK: ${{ matrix.block }}
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: ${{ github.sha }}
           path: qa
+          ref: ${{ github.sha }}
           persist-credentials: false
           sparse-checkout: |
             .github/workflows
+            scripts/ruff-private-enum-neighbors
             scripts/ruff-ruf009-derived-enum
             scripts/ruff-module-16149
             scripts/ruff-linter-check-attribution
             scripts/ruff-heldout-mono-fold/residual
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: bd7b58765ae44b21a1c9273b3ff0be8e923adc47
           path: donor
+          ref: bd7b58765ae44b21a1c9273b3ff0be8e923adc47
           persist-credentials: false
           sparse-checkout: scripts/ruff-default-owner-pmu
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: ${{ needs.schedule.outputs.factory }}
           path: scope-ruf009
+          ref: 6250ceba040bc15c2a296ae7ee1e5c6897f3ff06
           persist-credentials: false
           sparse-checkout: scripts/ruff-matched-stage
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           repository: astral-sh/ruff
-          ref: b00f68a23cedbd3a38fc25bac63638f0f11fc3f0
+          path: line-index
+          ref: 88d851449d2345e11da991794f3e9bfbbd666719
           fetch-depth: 2
-          path: ruff
           persist-credentials: false
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
-        with:
-          python-version: '3.13'
-      - name: Install the independent process observer
-        run: sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends strace zstd b3sum llvm-18
-      - name: Reopen source-built SDKs and registry and calibrate the inherited counter
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: python3 -IB qa/scripts/ruff-ruf009-derived-enum/case.py "$PHASE" "$BLOCK"
-      - name: Verify the historical macro reader against four original get-size plugin images on both compilers
-        run: python3 -IB qa/scripts/ruff-ruf009-derived-enum/historical_macro_controls.py
-      - name: Run both roles with independent physical targets and source transitions
-        run: python3 -IB qa/scripts/ruff-ruf009-derived-enum/qualification.py
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        if: always()
-        with:
-          name: ruf009-${{ inputs.phase }}-${{ matrix.block }}-${{ github.run_id }}
-          path: ${{ runner.temp }}/ohm-ruf009/receipt
-          if-no-files-found: error
-          compression-level: 1
-          retention-days: 7
-  reopen:
-    needs: pair
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 150
-    env:
-      PHASE: ${{ inputs.phase }}
-    steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: ${{ github.sha }}
+          repository: astral-sh/ruff
+          path: unicode
+          ref: 88a50d695c1142294bb4c780fad47d3306173885
+          fetch-depth: 2
           persist-credentials: false
-          sparse-checkout: |
-            .github/workflows
-            scripts/ruff-ruf009-derived-enum
-            scripts/ruff-module-16149
-            scripts/ruff-linter-check-attribution
-            scripts/ruff-heldout-mono-fold/residual
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Install the independent native ELF and DWARF readers
-        run: sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends llvm-18 zstd b3sum
-      - name: Independently open each authenticated original on this separate host
+      - run: sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends strace zstd
+      - name: Reopen the matched kits and exercise both complete ordinary histories
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 -IB scripts/ruff-ruf009-derived-enum/reader.py "$PHASE"
+        run: python3 -IB qa/scripts/ruff-private-enum-neighbors/worker.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: ruf009-reviewed-${{ github.run_id }}
-          path: ${{ runner.temp }}/ruf009-reviewed
+          name: private-enum-neighbors-${{ github.run_id }}
+          path: ${{ runner.temp }}/ohm-ruf009/receipt
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 5

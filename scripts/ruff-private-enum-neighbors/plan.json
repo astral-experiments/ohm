@@ -1,0 +1,87 @@
+{
+  "branch": "charlie/qa-private-enum-neighbor-controls-20261103",
+  "cargo": "0617e34321cf33fcce38904d066f0d4981b79f752896d37b97d1aed1fbddc48f",
+  "cases": {
+    "line-index": {
+      "error_source": "crates/ruff_source_file/src/line_index.rs",
+      "owner": "ruff_source_file",
+      "package": "ruff_source_file",
+      "selected": [
+        "ruff_source_file",
+        "ruff_python_trivia",
+        "ruff_python_ast",
+        "ruff_python_literal"
+      ],
+      "selector": [
+        "-p",
+        "ruff_python_literal",
+        "--lib"
+      ],
+      "sources": {
+        "new": {
+          "commit": "88d851449d2345e11da991794f3e9bfbbd666719",
+          "lock_sha256": "dbd2643768bb47fb06e289d2cd1a887da1deb9dad8fc535aa055cd83936d1145",
+          "source": {
+            "crates/ruff_source_file/src/line_index.rs": "b983aad9cb56623278c9303501c3a7454d75fe3d9d7ef4f3b0cebeba5affa7ff"
+          },
+          "tree": "02be5656a3c69c093adf9b1f50dcf74e09398f7b"
+        },
+        "old": {
+          "commit": "a8d0fffc4d72da193b2a2ae4c53277fdf1f1794d",
+          "lock_sha256": "dbd2643768bb47fb06e289d2cd1a887da1deb9dad8fc535aa055cd83936d1145",
+          "source": {
+            "crates/ruff_source_file/src/line_index.rs": "c1b412a94a1acf59f436ebd5ca8ba6c327aaa36db761ba13c2b6d2219fb58230"
+          },
+          "tree": "f64c68149967b6e05a725c7071ef292b7152ebc1"
+        }
+      }
+    },
+    "unicode": {
+      "error_source": "crates/ruff_unicode_names2/src/lib.rs",
+      "owner": "unicode_names2",
+      "package": "ruff_unicode_names2",
+      "selected": [
+        "unicode_names2",
+        "character",
+        "count",
+        "name"
+      ],
+      "selector": [
+        "-p",
+        "ruff_unicode_names2",
+        "--examples"
+      ],
+      "sources": {
+        "new": {
+          "commit": "88a50d695c1142294bb4c780fad47d3306173885",
+          "lock_sha256": "e4886c7f2ec2b52cc7bf90b183b620800dd81a9c615d68dea1d83ea995ba3d1b",
+          "source": {
+            "crates/ruff_unicode_names2/src/lib.rs": "194298d4ebccc300628a74cee82a83844c24e94e723717a5a4e54efb54c64699",
+            "crates/ruff_unicode_names2_generator/src/lib.rs": "11059ceacd39516d5617f29c76fbdea0d20a9605ce7d4995a70c30a25c69c753",
+            "crates/ruff_unicode_names2_generator/src/phf.rs": "f47e5d0278ba96b424891732f37e84474d480dcb4af546fe9754eda13313e89b"
+          },
+          "tree": "5d2e559c505bbd4d14d844c854ca3214d01f3a72"
+        },
+        "old": {
+          "commit": "276832aa91f2086a6ec880884fcdd987991cddf2",
+          "lock_sha256": "e4886c7f2ec2b52cc7bf90b183b620800dd81a9c615d68dea1d83ea995ba3d1b",
+          "source": {
+            "crates/ruff_unicode_names2/src/lib.rs": "5ba07f33ef6cc5a956a6457d9ed23cf8a77fcdf7fac79d9896589c9dd6156270",
+            "crates/ruff_unicode_names2_generator/src/lib.rs": "226e4f1350376056174350cc66b9b94f9e274d157bf44827dc6bb057c94fe908",
+            "crates/ruff_unicode_names2_generator/src/phf.rs": "f0fbe6990e8ae583398fb43e60185befc45e5a220181f245308ee0231247f47e"
+          },
+          "tree": "8bc76426c6dce7248c1d73be0267f0033e233259"
+        }
+      }
+    }
+  },
+  "driver": {
+    "C": "3d419b19fd0571df79fcbd6edaeda3d44132d4ce21ad24d3ea63442418c50561",
+    "P": "3c729770038b0b6fc7fd284fc5bf9ac059d5d2a8067cc8fee23bfa4c8cd4aba2"
+  },
+  "factory": 41621745224,
+  "source_commits": {
+    "C": "e157d8912adcdae91bd43df88959f3a510bfa34a",
+    "P": "dad5fae340339ea631fdafc3ef27956df1ffb81a"
+  }
+}
