@@ -62,8 +62,8 @@ def enroll(phase, block):
         source(tag)
         (BASE/'source'/(tag+'.rs')).write_bytes((w.SRC/REG['path']).read_bytes())
     (BASE/'source'/'invalid.rs').write_bytes((w.SRC/REG['path']).read_bytes()+ERROR)
-    need(phase=='native-owner' and block==0,'unregistered native control')
-    order='C'
+    need(phase=='native-gate' and block==0,'unregistered native control')
+    order='CP'
     bind=json.loads((HERE/'factory.json').read_bytes())
     need(bind['source']=={k:v['revision']for k,v in REG['matched_sources'].items()} and bind['branch']==REG['factory_branch'],'wrong experimental Rust versions')
     if phase=='confirmation':
@@ -84,6 +84,9 @@ def enroll(phase, block):
         log=z.read('run-make-C.log');proof=(builder/'build.py').read_text()
         need('"tests/run-make/rdr-public-hash-private-native-derive"]' in proof and 'guarded(run_make, rust, env, run_make_log, root)' in proof and b'Testing stage1 with compiletest suite=run-make mode=run-make' in log and b'running 1 tests' in log and b'1 passed; 0 failed; 0 ignored' in log,'missing real product run-make')
         for k,label in [('P','parent'),('C','candidate')]:
+            for name in ('consumed','sete'):
+                test=z.read('run-make-'+name+'-'+k+'.log')
+                need(b'running 1 tests' in test and b'1 passed; 0 failed; 0 ignored' in test,'missing common native/writer run-make')
             g=json.loads(z.read('scope-guard-'+label+'.json'));ph=g['phases']
             need(g['role']==label and len(ph)==12 and sorted(ph['private-edit']['dirty']) in ([['dep'],['app','dep']] if k=='C' else [['app','dep']]) and
                  g['kernel']['old']['kernel']==['app','dep'] and g['kernel']['unchanged']['kernel']==[] and g['kernel']['edit']['kernel']==['app','dep'] and

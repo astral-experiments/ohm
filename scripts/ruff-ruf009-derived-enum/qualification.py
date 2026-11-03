@@ -171,9 +171,14 @@ def native(label,state,environment):
     source(state);dest=w.OUT/label
     w.run(BUILD,environment,dest,timeout=3600)
     arts=typed_rows(dest,True)
+    data=keep_native(arts,dest,state,environment)
     if LIVE and label in COLD:LIVE.cold('build',dest)
     if label=='native-fully-empty-fixed':
         need(len(arts)==REG['native_unit_count'] and all(not r['fresh']for r in arts),'fully cold native controls reused compiled units')
+    return data
+
+
+def keep_native(arts,dest,state,environment):
     cli,=[r for r in arts if r['target']['name']=='ruff' and r['target']['kind']==['bin']]
     exe=Path(cli['executable'])
     with exe.open('rb') as f:need(f.read(4)==b'\x7fELF','missing native Ruff executable')
@@ -185,6 +190,7 @@ def native(label,state,environment):
         payload=f'import attr\n@{decorator}\nclass Example:\n    value: list[int] = {expr}\n'
         cmd=[exe,'check','--isolated','--no-cache','--select','RUF009','--output-format=json','--stdin-filename=case.py','-']
         res=subprocess.run(cmd,cwd=w.SRC,env=environment,input=payload.encode(),capture_output=True,timeout=30)
+        save(dest/('runtime-'+name+'.json'),dict(argv=list(map(str,cmd)),input=payload,code=res.returncode,stdout=res.stdout.decode(),stderr=res.stderr.decode(),elf=key))
         d=json.loads(res.stdout);want=fix if state=='fixed' else bug
         expect_message='Do not perform function call `'+expr.split('(')[0]+'` in dataclass defaults'
         need(res.returncode==want and not res.stderr and [m['code']for m in d]==['RUF009']*want,'different native RUF009 diagnostic')
