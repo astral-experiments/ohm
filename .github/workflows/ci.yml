@@ -7,7 +7,7 @@ on:
         description: Diagnostic fixtures or release-profile Ruff acceptance
         type: choice
         default: fixture
-        options: [fixture, release-ruff]
+        options: [fixture, reader, release-ruff]
       reviewed_head:
         description: Exact reviewed nonrelease QA source
         required: true
@@ -52,9 +52,10 @@ jobs:
           sudo sysctl -w kernel.perf_event_paranoid=-1 || true
           python3 -IB qa/scripts/ruff-join-proof/release/ruff.py
       - name: Build and validate actual Cargo after dependencies complete
-        if: inputs.lane == 'fixture'
+        if: inputs.lane == 'fixture' || inputs.lane == 'reader'
         env:
           OHM_INPUT_RECHECK_QA: '1'
+          OHM_DEP_INFO_READER_QA: ${{ inputs.lane == 'reader' && '1' || '0' }}
           OHM_SDK_READ_TOKEN: ${{ github.token }}
         run: |
           command -v strace || (sudo apt-get -qq update && sudo apt-get -qq install -y --no-install-recommends strace)

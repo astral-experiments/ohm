@@ -32,6 +32,17 @@ def setup(sdk,e,release=False):
     assert sdk.hf(bundle)==spec['bundle_sha256'] and git('rev-parse','HEAD')==spec['parent']
     git('fetch',str(bundle),'HEAD:refs/qa/input-recheck-candidate');git('switch','--detach',spec['candidate'])
     assert git('rev-parse','HEAD^')==spec['second_candidate'] and git('rev-parse','HEAD^^')==spec['first_candidate'] and git('rev-parse','HEAD^^^')==spec['parent']and git('rev-parse','HEAD^{tree}')==spec['tree']and not git('status','--porcelain')
+    if os.environ.get('OHM_DEP_INFO_READER_QA') == '1':
+        registration=json.loads((src/'reader/plan.json').read_bytes())
+        overlay=src/'reader/overlay.bundle'
+        assert not release and sdk.hf(overlay)==registration['sha256']
+        assert git('rev-parse','HEAD')==registration['predecessor']
+        git('fetch',str(overlay),'HEAD:refs/qa/reader');git('switch','--detach',registration['source'])
+        assert git('rev-parse','HEAD^')==registration['parent']
+        assert git('rev-parse','HEAD^{tree}')==registration['tree'] and git('write-tree')==registration['tree']
+        assert git('merge-base',registration['source'],registration['predecessor'])==registration['predecessor']
+        git('fsck','--full','--strict','--no-progress')
+        spec.update(candidate=registration['source'],tree=registration['tree'])
     target=sdk.root/'factory-target';shared=sdk.root/'factory-shared'
     env={**e,'RUSTUP_TOOLCHAIN':'ohm','CARGO_TARGET_DIR':str(target),'CARGO_BUILD_BUILD_DIR':str(shared),'CARGO_PROFILE_DEV_DEBUG':'0','CARGO_INCREMENTAL':'0'}
     if release:
@@ -47,6 +58,9 @@ def setup(sdk,e,release=False):
     sdk.put(sdk.proof/'factory-identity.json',{'source':spec['candidate'],'parent':spec['parent'],'tree':spec['tree'],'bin_sha256':sdk.hf(portable),'bin_bytes':portable.stat().st_size,'version':version,'rustc':subprocess.check_output(['rustc','+ohm','-vV'],env=e,text=True)})
     return portable,env,root
 def suite(sdk,env,root):
+    if os.environ.get('OHM_DEP_INFO_READER_QA')=='1':
+        output=run(sdk,env,'cargo-reader-unit-tests',['cargo','+ohm','-Zohm-defaults=no','test','--locked','-p','cargo','-j8','--lib','compiler::fingerprint::dep_info::','--','--test-threads=3'],root).read_text()
+        assert 'freshness_requires_agreement_between_equivalent_input_paths ... ok' in output and '0 failed' in output
     for n,s in enumerate(spec['regression_tests']):
         a=run(sdk,env,'cargo-tests-'+str(n),['cargo','+ohm','-Zohm-defaults=no','test','--locked','-p','cargo','-j8','--test','testsuite',s,'--','--test-threads=3'],root)
         data=a.read_text()
