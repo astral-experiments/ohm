@@ -1,0 +1,90 @@
+{"$message_type":"artifact","artifact":"/home/runner/work/_temp/ohm-foreign-join/private-edit/out/ty_project-44304014a392a987.d","emit":"dep-info"}
+{"$message_type":"artifact","artifact":"/home/runner/work/_temp/ohm-foreign-join/private-edit/out/libty_project-44304014a392a987.rmeta","emit":"metadata","public_api_hash":{"version":1,"value":"f26c336821540d09743236cb846950dc"}}
+
+thread 'opt 64vg1iiv7m40rqw2vo2trd4lc' (9191) panicked at /home/runner/work/_temp/ohm-branch-object-qa/cargo-home/registry/src/index.crates.io-1949cf8c6b5b557f/measureme-12.0.3/src/raw_event.rs:55:9:
+assertion failed: start <= end
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+   1: core::panicking::panic_fmt
+   2: core::panicking::panic
+   3: core::ptr::drop_glue::<rustc_data_structures::profiling::TimingGuard>
+   4: rustc_codegen_llvm::back::write::optimize
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+
+error: the compiler unexpectedly panicked. This is a bug
+
+note: we would appreciate a bug report: https://github.com/rust-lang/rust/issues/new?labels=C-bug%2C+I-ICE%2C+T-compiler&template=ice.md
+
+note: please make sure that you have updated to the latest nightly
+
+note: please attach the file at `/home/runner/work/ohm/ohm/ruff/rustc-ice-2026-11-03T16_14_48-9123.txt` to your bug report
+
+note: rustc 1.99.0-dev running on x86_64-unknown-linux-gnu
+
+note: compiler flags: -Z ohm-shared-stages -Z public-api-hash -Z threads=8 -Z ohm-caller-local-cgus -Z ohm-stable-cgu-merging -Z ohm-incremental-mono-partitions -Z remap-cwd-prefix=/ohm-workspace/v7 --crate-type lib -C opt-level=1 -C lto=off -C embed-bitcode=no -C debuginfo=line-tables-only -C debug-assertions=on -C incremental=[REDACTED] -Z ohm-early-metadata -C linker-features=-lld -C link-self-contained=-linker -C link-arg=-B/home/runner/work/_temp/ohm-foreign-join/sdk/lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld -C link-arg=-fuse-ld=bfd -Z checksum-hash-algorithm=blake3 -Z ohm-check-relink-inputs -Z self-profile=/home/runner/work/_temp/ohm-foreign-join/published/diagnostic/edit/profile -Z self-profile-counter=instructions:u -Z self-profile-events=generic-activity,artifact-sizes
+
+note: some of the compiler flags provided by cargo are hidden
+
+query stack during panic:
+end of query stack
+
+thread 'opt 64vg1iiv7m40rqw2vo2trd4lc' (9191) panicked at /home/runner/work/_temp/ohm-branch-object-qa/cargo-home/registry/src/index.crates.io-1949cf8c6b5b557f/measureme-12.0.3/src/raw_event.rs:55:9:
+assertion failed: start <= end
+stack backtrace:
+   0:     0x7ffbf47d0ec1 - <<std[5167731717db2e51]::sys::backtrace::BacktraceLock>::print::DisplayBacktrace as core[8c5ac2f034688f9a]::fmt::Display>::fmt
+   1:     0x7ffbf481438a - core[8c5ac2f034688f9a]::fmt::write
+   2:     0x7ffbf47e2fec - <std[5167731717db2e51]::sys::stdio::unix::Stderr as std[5167731717db2e51]::io::Write>::write_fmt
+   3:     0x7ffbf479cc36 - std[5167731717db2e51]::panicking::default_hook::{closure#0}
+   4:     0x7ffbf47c1361 - std[5167731717db2e51]::panicking::default_hook
+   5:     0x7ffbf0fc7136 - std[5167731717db2e51]::panicking::update_hook::<alloc[93e694a8365d93dd]::boxed::Box<rustc_driver_impl[3d15bfbdb5f306ec]::install_ice_hook::{closure#1}>>::{closure#0}
+   6:     0x7ffbf47c16c2 - std[5167731717db2e51]::panicking::panic_with_hook
+   7:     0x7ffbf479cd14 - std[5167731717db2e51]::panicking::panic_handler::{closure#0}
+   8:     0x7ffbf4790949 - std[5167731717db2e51]::sys::backtrace::__rust_end_short_backtrace::<std[5167731717db2e51]::panicking::panic_handler::{closure#0}, !>
+   9:     0x7ffbf479e51d - __rustc[4b1ee1ef74718a7b]::rust_begin_unwind
+  10:     0x7ffbf4814ddc - core[8c5ac2f034688f9a]::panicking::panic_fmt
+  11:     0x7ffbf4814da2 - core[8c5ac2f034688f9a]::panicking::panic
+  12:     0x7ffbf131c6af - core[8c5ac2f034688f9a]::ptr::drop_glue::<rustc_data_structures[773a3d58886ff0bd]::profiling::TimingGuard>
+  13:     0x7ffbf131e879 - std[5167731717db2e51]::sys::backtrace::__rust_begin_short_backtrace::<rustc_codegen_ssa[a41160a592265dc5]::back::write::spawn_work<rustc_codegen_llvm[3eca759c9d680467]::LlvmCodegenBackend>::{closure#0}, ()>
+  14:     0x7ffbf122f986 - <std[5167731717db2e51]::thread::lifecycle::spawn_unchecked<rustc_codegen_ssa[a41160a592265dc5]::back::write::spawn_work<rustc_codegen_llvm[3eca759c9d680467]::LlvmCodegenBackend>::{closure#0}, ()>::{closure#1} as core[8c5ac2f034688f9a]::ops::function::FnOnce<()>>::call_once::{shim:vtable#0}
+  15:     0x7ffbf47cd43f - <std[5167731717db2e51]::sys::thread::unix::Thread>::new::thread_start
+  16:     0x7ffbef284b84 - <unknown>
+  17:     0x7ffbef311ecc - <unknown>
+  18:                0x0 - <unknown>
+
+error: the compiler unexpectedly panicked. This is a bug
+
+note: we would appreciate a bug report: https://github.com/rust-lang/rust/issues/new?labels=C-bug%2C+I-ICE%2C+T-compiler&template=ice.md
+
+note: please make sure that you have updated to the latest nightly
+
+note: please attach the file at `/home/runner/work/ohm/ohm/ruff/rustc-ice-2026-11-03T16_14_48-9123.txt` to your bug report
+
+note: rustc 1.99.0-dev running on x86_64-unknown-linux-gnu
+
+note: compiler flags: -Z ohm-shared-stages -Z public-api-hash -Z threads=8 -Z ohm-caller-local-cgus -Z ohm-stable-cgu-merging -Z ohm-incremental-mono-partitions -Z remap-cwd-prefix=/ohm-workspace/v7 --crate-type lib -C opt-level=1 -C lto=off -C embed-bitcode=no -C debuginfo=line-tables-only -C debug-assertions=on -C incremental=[REDACTED] -Z ohm-early-metadata -C linker-features=-lld -C link-self-contained=-linker -C link-arg=-B/home/runner/work/_temp/ohm-foreign-join/sdk/lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld -C link-arg=-fuse-ld=bfd -Z checksum-hash-algorithm=blake3 -Z ohm-check-relink-inputs -Z self-profile=/home/runner/work/_temp/ohm-foreign-join/published/diagnostic/edit/profile -Z self-profile-counter=instructions:u -Z self-profile-events=generic-activity,artifact-sizes
+
+note: some of the compiler flags provided by cargo are hidden
+
+query stack during panic:
+end of query stack
+
+thread 'opt 64vg1iiv7m40rqw2vo2trd4lc' (9191) panicked at /rustc/88d9e12ae178fab0fb5cc050a94da85685d449ea/library/core/src/panicking.rs:233:5:
+panic in a destructor during cleanup
+
+error: the compiler unexpectedly panicked. This is a bug
+
+note: we would appreciate a bug report: https://github.com/rust-lang/rust/issues/new?labels=C-bug%2C+I-ICE%2C+T-compiler&template=ice.md
+
+note: please make sure that you have updated to the latest nightly
+
+note: please attach the file at `/home/runner/work/ohm/ohm/ruff/rustc-ice-2026-11-03T16_14_48-9123.txt` to your bug report
+
+note: rustc 1.99.0-dev running on x86_64-unknown-linux-gnu
+
+note: compiler flags: -Z ohm-shared-stages -Z public-api-hash -Z threads=8 -Z ohm-caller-local-cgus -Z ohm-stable-cgu-merging -Z ohm-incremental-mono-partitions -Z remap-cwd-prefix=/ohm-workspace/v7 --crate-type lib -C opt-level=1 -C lto=off -C embed-bitcode=no -C debuginfo=line-tables-only -C debug-assertions=on -C incremental=[REDACTED] -Z ohm-early-metadata -C linker-features=-lld -C link-self-contained=-linker -C link-arg=-B/home/runner/work/_temp/ohm-foreign-join/sdk/lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld -C link-arg=-fuse-ld=bfd -Z checksum-hash-algorithm=blake3 -Z ohm-check-relink-inputs -Z self-profile=/home/runner/work/_temp/ohm-foreign-join/published/diagnostic/edit/profile -Z self-profile-counter=instructions:u -Z self-profile-events=generic-activity,artifact-sizes
+
+note: some of the compiler flags provided by cargo are hidden
+
+query stack during panic:
+end of query stack
+thread caused non-unwinding panic. aborting.
