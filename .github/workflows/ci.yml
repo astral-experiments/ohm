@@ -1,5 +1,5 @@
-name: Trace the real signed workspace Ron producer
-run-name: Observe signed workspace Ron span returns ${{ inputs.reviewed_head }}
+name: Reopen the real signed Ron macro input and its returned range
+run-name: Reopen the signed Ron foreign span observable ${{ inputs.reviewed_head }}
 permissions:
   contents: read
   actions: read
@@ -7,7 +7,7 @@ jobs:
   inspect:
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1'
       && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head
-      && github.ref_name == 'charlie/qa-workspace-ron-native-observer-20261103'
+      && github.ref_name == 'charlie/qa-current-ron-returned-span-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 60
     steps:
@@ -30,15 +30,15 @@ jobs:
         persist-credentials: false
     - name: Provision the signed Cargo record checksum and debugger
       run: sudo apt-get update -qq && sudo apt-get install -qy b3sum gdb libunwind-dev liblzma-dev
-    - name: Acquire the genuine workspace Ron producer and replay the signed native stores
+    - name: Restore the original actual operands and examine native Rust diagnostics
       env:
         REVIEWED_HEAD: ${{ inputs.reviewed_head }}
         OHM_SDK_READ_TOKEN: ${{ github.token }}
-      run: python3 -IB qa/scripts/ruff-original-ty-instructions/ron_owner_only.py
+      run: python3 -IB qa/scripts/ruff-original-ty-instructions/ron_full_input.py
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: workspace-ron-signed-observer-29697-${{ github.run_id }}
+        name: workspace-ron-returned-span-29697-${{ github.run_id }}
         path: ${{ runner.temp }}/ohm-foreign-join/published/
         retention-days: 10
         if-no-files-found: error
