@@ -28,17 +28,6 @@ edits, so renumbering an unrelated expansion does not necessarily force a rebuil
 location used by a caller still invalidates the cached metadata. If a procedural macro observes a
 source span from another crate, Cargo reruns the affected compiler unit on subsequent builds.
 
-In a Ruff experiment, two private parser edits required checking only the parser, down from 35 and
-22 compiler invocations. An edit to the public lexer still required all 35. In another experiment,
-correcting a private doc comment in Ruff's linter reduced full compiler invocations from 11 to 2
-for a workspace build and from 26 to 4 when building the tests.
-
-In a Linux comparison of native builds, reusing dependents after changing a diagnostic in Ruff's
-parser reduced the median workspace build from 19.21 to 5.60 seconds and `cargo test --no-run` from
-25.58 to 8.24 seconds across 12 paired runs per command. Full compiler invocations fell from 35 to
-3 for the build and from 93 to 6 for the test binaries. Both compiler builds invoked the linker eight
-times for the build and 67 times for the tests.
-
 In a uv benchmark, we made a private change to uv's JSON parser in `uv-pypi-types`, then checked the
 dependent `uv-client` crate, which took a median of 4.93 seconds without public API hashing and 2.16
 seconds with it.
@@ -56,8 +45,6 @@ See:
 - [Cargo #261](https://github.com/astral-sh/ohm-cargo/pull/261)
 - [Rust #243](https://github.com/astral-sh/ohm-rust/pull/243)
 - [Rust #245](https://github.com/astral-sh/ohm-rust/pull/245)
-- [Ruff private doc edit](https://github.com/astral-sh/ohm-cargo/tree/2f07518331735487c84aaeadab58ce98d7c5a71b/benchmarks/ruff-dev-loop-20261027/native-qualified-results)
-- [Ruff native build measurements](https://github.com/astral-sh/ohm-cargo/tree/837a3a07a7368c1a3706ab2779b8ab3450814f7d/benchmarks/ruff-dev-loop-20261027/corrected-workspace-parser)
 - [Rust #43](https://github.com/astral-sh/ohm-rust/pull/43)
 - [Cargo #53](https://github.com/astral-sh/ohm-cargo/pull/53)
 - [Cargo #55](https://github.com/astral-sh/ohm-cargo/pull/55)
@@ -96,16 +83,6 @@ the linter's own code.
 In a release benchmark, we changed a dependency, then rebuilt and ran a uv test. The median time for
 the command fell from 26.27 to 3.79 seconds.
 
-In a Linux comparison, the first uv package test build after an integration-test edit took 9.96
-seconds with one Ohm compiler build and 3.30 seconds with a build that recognized more
-register-only assembly. In a separate uv test-harness relink, opening library search directories
-only when needed avoided 519 directory opens and reduced rustc's instruction count by about 5% on
-two machines.
-
-Checking native link inputs can add work. In one Linux replay, an unchanged ty check took 1.15
-seconds with a Cargo build that recognized an additional native-link marker and 0.39 seconds with
-the comparison build. Cargo marked 16 of 303 units dirty instead of three.
-
 See:
 
 - [Cargo #51](https://github.com/astral-sh/ohm-cargo/pull/51)
@@ -114,7 +91,6 @@ See:
 - [Cargo #198](https://github.com/astral-sh/ohm-cargo/pull/198)
 - [Cargo #234](https://github.com/astral-sh/ohm-cargo/pull/234)
 - [Cargo #236](https://github.com/astral-sh/ohm-cargo/pull/236)
-- [Rust #252](https://github.com/astral-sh/ohm-rust/pull/252)
 - [Rust #255](https://github.com/astral-experiments/ohm-rust/pull/255)
 - [Rust #267](https://github.com/astral-experiments/ohm-rust/pull/267)
 - [Rust #268](https://github.com/astral-experiments/ohm-rust/pull/268)
@@ -150,12 +126,6 @@ checks the dependencies that would introduce the conflicting copy. Other roots a
 macros can still reuse their native artifacts. Cargo also reruns a check when its saved outputs are
 incomplete rather than replaying stale diagnostics.
 
-After a build script changes, Cargo uses the timestamp of its validated result when restoring
-unchanged compiler metadata. In a Ruff experiment, this reduced the median for the following
-unchanged check from 1.00 to 0.62 seconds. Across 24 paired trials, the edited check and the
-following unchanged check together took 16.8% less time; the edited check alone had no clear timing
-difference.
-
 In the release benchmarks, we built each project and then timed a check. The uv check took 70.46
 seconds with stock Rust and 23.90 seconds with Ohm; the Codex check took 125.54 and 63.67 seconds,
 respectively.
@@ -178,8 +148,6 @@ See:
 - [Cargo #178](https://github.com/astral-sh/ohm-cargo/pull/178)
 - [Cargo #253](https://github.com/astral-sh/ohm-cargo/pull/253)
 - [Cargo #305](https://github.com/astral-experiments/ohm-cargo/pull/305)
-- [Cargo #256 and the build-script timestamp measurements](https://github.com/astral-sh/ohm-cargo/pull/256)
-- [Ruff build followed by check](https://github.com/astral-sh/ohm-cargo/tree/0abc9677ba9cfa1a0525cbab6597e329a42eaa9e/benchmarks/ruff-dev-loop-20261027/consistent-native-check)
 
 ### 4. Reuse checks during builds
 
@@ -334,8 +302,6 @@ Tests still wait until all requested libraries and executables are built. The op
 tests sooner.
 
 If the library has already finished, Cargo compiles the integration test against it immediately.
-In a Ruff comparison, avoiding duplicate work reduced the median first workspace test build after a
-test-source edit from 12.60 to 11.16 seconds.
 
 See:
 
@@ -518,29 +484,6 @@ reuses the lockfile bytes it has just encoded. When a build script needs a list 
 Cargo can recognize a Git index it has already verified. It still walks the working tree, so new
 untracked files are visible.
 
-In a Codex experiment, skipping the workspace-member scan reduced Cargo's instruction count by
-7.38% on a warm workspace check and 16.80% on a check of `codex-utils-string`. In a warm Ruff
-workspace, a group of Cargo preparation changes reduced Cargo's instructions for `cargo check` by
-10.51%.
-
-In Ruff, reusing dependency resolution after an inactive profile edit reduced a warm package build
-from 190 to 63 milliseconds. On a larger parser test build, the unchanged repeat after restoring the
-manifest was 3.75% slower. In a separate experiment, a lint edit and its first repeat took 18.42%
-less time when building Ruff's serde tests. Reusing the encoded lockfile after a Ruff dependency
-edit reduced Cargo's instruction count by 7.77%; the wall-time measurements did not establish a
-speedup.
-
-In an earlier experiment on a Codex workspace that had already been built, reusing the dependency
-resolution reduced `cargo metadata` time from 413 to 358 milliseconds and Nextest time from 961 to
-824 milliseconds.
-
-In a warm Ruff experiment, skipping unnecessary dependency-file generation reduced unchanged
-workspace checks by 18.2% and test builds by 20.2%. A separate change to output preparation and
-dependency-file parsing reduced unchanged workspace builds by 13.8%.
-
-In a warm Ruff workspace with eight jobs, parallel hashing reduced the time for an unchanged
-`cargo test --workspace --no-run` by 5.6%.
-
 See:
 
 - [Cargo #66](https://github.com/astral-sh/ohm-cargo/pull/66)
@@ -581,7 +524,6 @@ See:
 - [Cargo #286](https://github.com/astral-experiments/ohm-cargo/pull/286)
 - [Cargo #287](https://github.com/astral-experiments/ohm-cargo/pull/287)
 - [Cargo #288](https://github.com/astral-experiments/ohm-cargo/pull/288)
-- [Ruff preparation measurements](https://github.com/astral-sh/ohm-cargo/tree/60f815537745e8dd8867c3062aea061c6865be34/benchmarks/ruff-dev-loop-20261026/ten-cargo-fresh)
 
 ### 16. Cache unchanged ThinLTO objects
 
@@ -657,8 +599,7 @@ default. More threads can also increase memory use.
 
 For incremental debug checks on x86-64 Linux, Cargo uses one frontend thread for small workspace
 crates. It uses the previous successful check's dependency file to identify them. The first check
-keeps the usual thread count, as do larger crates. Explicit compiler flags take precedence. After
-a small edit to Ruff's lexer, this reduced the time for the full workspace check by 3.20%.
+keeps the usual thread count, as do larger crates. Explicit compiler flags take precedence.
 
 For example, a build may reach a large parser crate after all its dependencies have finished. Even
 if Cargo has no other crates ready to compile, the compiler can check independent function bodies in
@@ -739,14 +680,6 @@ In an edit-and-rebuild experiment at optimization level 1, splitting reduced tim
 and 45.8% for uv. Splitting also made ty's tests about 3–4% slower and increased uv's cold-build
 time by 5.7% in separate comparisons.
 
-In a GNU AArch64 cross-build of `ruff_python_ast`, an edit and its first repeat took 8.24 seconds
-with an Ohm compiler build that could reuse units unaffected by external assembly inputs, versus
-12.23 seconds with the comparison build across six matched pairs. The edit regenerated two of 95
-units and the repeat regenerated one. In another comparison across two Linux hosts, recognizing more
-assembly as file-free reduced a Ruff CLI edit and its first repeat
-from 25.09 to 9.95 seconds. On x86-64 musl, a Ruff parser edit and its first repeat fell from 1.89
-to 0.83 seconds. Both comparisons used eight paired trials.
-
 See:
 
 - [Rust #54](https://github.com/astral-sh/ohm-rust/pull/54)
@@ -762,8 +695,6 @@ See:
 - [Rust #207](https://github.com/astral-sh/ohm-rust/pull/207)
 - [Rust #280](https://github.com/astral-experiments/ohm-rust/pull/280)
 - [Rust #300](https://github.com/astral-experiments/ohm-rust/pull/300)
-- [GNU AArch64 measurements](https://github.com/astral-experiments/ohm/actions/runs/41343305124)
-- [x86-64 musl measurements](https://github.com/astral-experiments/ohm/actions/runs/41342471218)
 
 ### 21. Reuse async code after it moves
 
@@ -836,15 +767,6 @@ caches, reduced total rebuild time across 13 uv development commits from 478.19 
 or 6.5%. Focused Ruff measurements of the query-cache change saved about 36 MiB during a check and
 114 MiB during a build, with no consistent wall-time improvement.
 
-In a Linux comparison, reusing trait lookups reduced the median first check of uv's resolver after a
-workspace edit from 2.88 to 1.33 seconds across 12 paired trials. Cargo rebuilt the same crates in
-both cases. In separate Ruff parser experiments, the lint visitor and dependency-index changes
-reduced instructions across Cargo and rustc by 0.45% and 0.50%, respectively.
-
-In another Ruff experiment, looking up lint tool prefixes reduced the time to check `ruff` after an
-edit by 2.16% across 64 pairs. Skipping unused generic export metadata reduced rustc's instruction
-count by about half in a uv test-harness compile, though the whole-command timing was inconclusive.
-
 See:
 
 - [Rust #72](https://github.com/astral-sh/ohm-rust/pull/72)
@@ -915,11 +837,6 @@ For example, adding a line above `#[derive(serde::Serialize)]` shifts the derive
 The macro still runs and can observe the new location, but Ohm can reuse checks of its unchanged
 generated methods. Ohm does not cache native derive or attribute macro expansions. Cargo's trust
 settings for sharing compiled macros across worktrees control a separate cache.
-
-In a uv comparison after an edit that shifted derives, this optimization reduced the median
-`uv-cli` check from 12.53 to 12.04 seconds. Checking the full `uv` binary went from 3.12 to 3.09
-seconds.
-Both comparisons used 12 paired runs.
 
 See:
 
@@ -994,9 +911,8 @@ cache.
 Libraries with `compile_fail` examples, custom rustdoc flags, or unsupported test arguments use
 ordinary rustdoc. Pass `-Zohm-cached-doctests=no` to run eligible examples through rustdoc as well.
 
-In a Linux benchmark across 16 Ruff crates, the median warm `cargo test --doc` took 13.562 seconds
-with stock Rust and 1.643 seconds with Ohm. Both toolchains passed the same 207 examples and ignored
-the same nine in all five pairs.
+In a Ruff benchmark, the median warm `cargo test --doc` took 13.56 seconds with stock Rust and
+1.64 seconds with Ohm.
 
 See:
 
