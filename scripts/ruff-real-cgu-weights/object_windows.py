@@ -6,8 +6,10 @@ import hashlib
 import os
 from pathlib import Path
 import archive_diagnostic as archives
+import typed_archive
 import subprocess
 import tarfile
+import tempfile
 
 HERE = Path(__file__).resolve().parent
 OBS = HERE / "observer.c"
@@ -209,12 +211,17 @@ def observe(prior, kit, loc, work, repo, env, cmd, suite, graph, which, extras, 
         code = prior.guards.run(argv,repo,env,loc,work,loc,timeout=3000)
         require(code == 0, ("ordinary instrument-free Cargo command failed",code,(loc/"outer.stderr").read_bytes()[-700:]))
         plain = ordinary_execs(loc.parent/"new"/"trace", prior.support.EXEC)
-        observed, _, _, _ = observed_execs(custody, read_counters=False)
+        observed, _, images, _ = observed_execs(custody, read_counters=False)
         require(Counter(plain) == Counter(observed),
                 ("different genuine execs/argv",[(r[2][:4],n) for r,n in (Counter(plain)-Counter(observed)).items()],[(r[2][:4],n) for r,n in (Counter(observed)-Counter(plain)).items()]))
         root_args = tuple(baseline["root_argv"][0][1])
         st = native.stat()
         require(observed.count((st.st_dev,st.st_ino,root_args)) == 1 and len(baseline["root_argv"])==1, "different genuine root compiler")
+        owner, = table(custody/"owners.tsv")
+        group = int(owner["tgid"])
+        actual = images[int(owner["image"])]
+        require(int(owner["tid"])==group and actual[:3]==(group, st.st_dev, st.st_ino) and actual[4]==root_args,
+                "owner journal did not identify the unique ordinary compiler process and arguments")
         cargo = prior.replay.cargo_rows((loc / "outer.stdout").read_bytes())
         ar = prior.study.artifact(prior.study.results(cargo,True),prior.study.OWNER)
         complete=archives.capture(out,"observed",ar)
@@ -227,10 +234,11 @@ def observe(prior, kit, loc, work, repo, env, cmd, suite, graph, which, extras, 
              "native":len(physical),"library_owner":list((st.st_dev,st.st_ino)),
              "baseline":{k:baseline[k] for k in ("elf","verdict","owner_archive","inventory","dirty")},
              "observed":{k:probe[k] for k in ("elf","verdict","owner_archive","inventory","dirty")}})
-        for k in ("elf","verdict","owner_archive","inventory","dirty"):
+        canonical = typed_archive.match(out, reference)
+        for k in ("elf","verdict","inventory","dirty"):
             require(probe[k]==baseline[k], ("changed normal compiler/consumer result",k))
         save(out/"record.json",{"sources":expected["source"],"ordinary_argv":baseline["root_argv"],"execs":len(observed),
-             "native":len(physical),"verdict":probe["verdict"],"elf":probe["elf"],"archive":probe["owner_archive"]})
+             "native":len(physical),"verdict":probe["verdict"],"elf":probe["elf"],"archive":probe["owner_archive"], "canonical":canonical})
         libs = {}
         for row in table(custody/"windows.tsv"):
             kind = row["kind"]
@@ -255,10 +263,21 @@ def finalize(out, save):
     """Open the hardware prices only after ordinary cold, edit, unchanged and repair controls."""
     import json
     state = json.loads((out/"native-inputs.json").read_bytes())
-    custody = Path(state["custody"])
-    require(state["files"] == {p.name:H(p.read_bytes()) for p in sorted(custody.iterdir()) if p.is_file()},
-            "per-task evidence changed during the remaining Cargo history")
-    rows = prices(custody,state["expected"],tuple(state["owner"]),state["libraries"])
+    archive = out/"native-window-custody.tar.gz"
+    with tempfile.TemporaryDirectory(dir=out.parent) as tmp, tarfile.open(archive, "r:gz") as saved:
+        custody = Path(tmp)
+        require(set(saved.getnames())==set(state["files"]) and len(saved.getnames())==len(state["files"]),
+                "incomplete archived observer journals")
+        for member in saved:
+            require(Path(member.name).name==member.name and member.isfile() and member.size < 16 << 20,
+                    "invalid archived observer entry")
+            body = saved.extractfile(member).read()
+            require(H(body)==state["files"][member.name], "per-task evidence changed during the remaining Cargo history")
+            (custody/member.name).write_bytes(body)
+        rows = prices(custody,state["expected"],tuple(state["owner"]),state["libraries"])
+        owner, = table(custody/"owners.tsv")
+        require(len(rows)==21 and all(v["tid"]!=int(owner["tid"]) for v in rows.values()),
+                "the 21 native objects must come from separately spawned compiler workers")
     save(out/"counts.json",{"scope":"retired user instructions between successful creation and close of the matching native ELF",
          "units":rows,"native_total":sum(x["native_instructions"] for x in rows.values()),
          "worker_total":sum(x["worker_instructions"] for x in rows.values()),

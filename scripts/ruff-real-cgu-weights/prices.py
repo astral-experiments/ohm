@@ -145,7 +145,7 @@ def history(kit, where, work, repo, env, which, suite, graph, cmd, extras, gold,
         save(out/"checkpoint.json",before)
         loc=where.parent/"new-profiled"
         object_windows.observe(prior,kit,loc,work,repo,env,cmd,suite,graph,which,extras,gold,baseline,reference,out,EXPECTED,elf_members,save)
-        assert all(p["whole_bytes_equal"] for p in archives.compare(out)["pairs"].values()), "original/repeated/observed rlibs differ"
+        assert (out/"typed-archive-admission.json").is_file(), "missing entire archive comparison"
     except Exception as error:
         save(out/"refusal.json",{"error":str(error)[:4000],"phase":"restored ordinary Cargo edit"})
         for which in ("outer.stderr","outer.stdout"):
@@ -159,7 +159,7 @@ def history(kit, where, work, repo, env, which, suite, graph, cmd, extras, gold,
                 (work/name).rename(snap/"profiled"/name)
             (snap/"ordinary"/name).rename(work/name)
         shutil.rmtree(snap)
-    raise archives.DiscoveryComplete()
+    return baseline
 
 
 def main():
@@ -176,13 +176,14 @@ def main():
             return history(*visit,normal=normal,bare=bare,out=out)
         with patch.object(prior.acquire,"phase",wrap):
             return original_suite(*args)
-    try:
-        with patch.object(prior.transport,"BRANCH",BRANCH),patch.object(prior.acquire,"suite_run",suite):
-            prior.collect("admit",1,{"option":Path(sys.argv[1]).resolve(strict=True)})
-    except archives.DiscoveryComplete:
-        save(out/"archive-only-terminal.json",{"all_three_complete_rlibs_equal":True,"real_unit_prices_opened":False})
-        return
-    raise RuntimeError("the enrolled real P archive diagnostic did not execute")
+    with patch.object(prior.transport,"BRANCH",BRANCH),patch.object(prior.acquire,"suite_run",suite):
+        prior.collect("admit",1,{"option":Path(sys.argv[1]).resolve(strict=True)})
+    object_windows.finalize(out,save)
+    assert (out/"counts.json").exists()
+    save(out/"terminal.json",{"sha":os.environ["GITHUB_SHA"],"run":os.environ["GITHUB_RUN_ID"],
+         "replicate":int(os.environ["NATIVE_WINDOW_REPLICATE"]),"boot":Path("/proc/sys/kernel/random/boot_id").read_text().strip(),
+         "ordered_counts":DIGEST((out/"counts.json").read_bytes()),"native_gate":DIGEST((out/"record.json").read_bytes()),
+         "source":EXPECTED["source"],"ordinary_parent":"531eb1980c08c75ccbf3f6b77adbee53cd9b8bd5"})
 
 if __name__=="__main__":
     # This run has its own head. The downloaded factory remains on its original branch.

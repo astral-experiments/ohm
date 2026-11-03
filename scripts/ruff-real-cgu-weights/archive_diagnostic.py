@@ -153,7 +153,3 @@ def compare(out):
     result={"archives":{k:{f:v[f] for f in ("bytes","sha256","gzip_bytes","gzip_sha256")}for k,v in arms.items()},"pairs":pairs}
     save(out/"archive-comparison.json",result)
     return result
-
-
-class DiscoveryComplete(Exception):
-    """The archive diagnostic obtained three complete equal programs; no real unit prices were opened."""
