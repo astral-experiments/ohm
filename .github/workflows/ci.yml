@@ -7,7 +7,7 @@ on:
       experiment:
         description: Registered experiment to execute
         type: choice
-        options: [baseline, macro-host-o1, visibility-scope]
+        options: [baseline, macro-host-o1, visibility-scope, visibility-matched]
         default: baseline
       reviewed_head:
         description: Exact independently reviewed nonrelease QA commit
@@ -60,7 +60,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: python3 -IB qa/scripts/ruff-linter-check-attribution/worker.py acquire
       - name: Fetch the exact registry closure without compiling
-        if: inputs.experiment != 'visibility-scope'
+        if: inputs.experiment != 'visibility-scope' && inputs.experiment != 'visibility-matched'
         run: python3 -IB qa/scripts/ruff-linter-check-attribution/worker.py prefetch
       - name: Compare the ordinary and sampled edit with the independent clean result
         if: inputs.experiment == 'baseline'
@@ -69,7 +69,7 @@ jobs:
         if: inputs.experiment == 'macro-host-o1'
         run: python3 -IB qa/scripts/ruff-linter-check-attribution/macro_host.py
       - name: Install the off-clock native process reader
-        if: inputs.experiment == 'visibility-scope'
+        if: inputs.experiment == 'visibility-scope' || inputs.experiment == 'visibility-matched'
         run: |
           sudo apt-get -qq update
           sudo apt-get install -y --no-install-recommends strace
@@ -79,6 +79,50 @@ jobs:
         run: |
           python3 -IB qa/scripts/ruff-linter-check-attribution/scope_inventory.py prefetch
           python3 -IB qa/scripts/ruff-linter-check-attribution/scope_inventory.py study
+      - name: Check out the wide factory reader
+        if: inputs.experiment == 'visibility-matched'
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: a00637de704a07c57070799d306a4c4e9d2c6ccf
+          path: scope-wide
+          persist-credentials: false
+          sparse-checkout: scripts/ruff-matched-stage
+      - name: Check out the root factory reader
+        if: inputs.experiment == 'visibility-matched'
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: a126c17db143071a502603870986ff9b4d8c69f7
+          path: scope-root
+          persist-credentials: false
+          sparse-checkout: scripts/ruff-matched-stage
+      - name: Authenticate three source-built compiler roles
+        id: source_compilers
+        if: inputs.experiment == 'visibility-matched'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_matched.py acquire
+      - name: Authenticate normal source and dependencies for the matched roles
+        id: source_registry
+        if: inputs.experiment == 'visibility-matched'
+        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_inventory.py prefetch
+      - name: Run root-P fixture with exact source, diagnostics and native outputs
+        if: always() && inputs.experiment == 'visibility-matched' && steps.source_compilers.outcome == 'success'
+        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_matched.py fixture root-P
+      - name: Run root-P study with exact source, diagnostics and native outputs
+        if: always() && inputs.experiment == 'visibility-matched' && steps.source_compilers.outcome == 'success' && steps.source_registry.outcome == 'success'
+        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_matched.py study root-P
+      - name: Run root-C fixture with exact source, diagnostics and native outputs
+        if: always() && inputs.experiment == 'visibility-matched' && steps.source_compilers.outcome == 'success'
+        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_matched.py fixture root-C
+      - name: Run root-C study with exact source, diagnostics and native outputs
+        if: always() && inputs.experiment == 'visibility-matched' && steps.source_compilers.outcome == 'success' && steps.source_registry.outcome == 'success'
+        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_matched.py study root-C
+      - name: Run wide-C fixture with exact source, diagnostics and native outputs
+        if: always() && inputs.experiment == 'visibility-matched' && steps.source_compilers.outcome == 'success'
+        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_matched.py fixture wide-C
+      - name: Run wide-C study with exact source, diagnostics and native outputs
+        if: always() && inputs.experiment == 'visibility-matched' && steps.source_compilers.outcome == 'success' && steps.source_registry.outcome == 'success'
+        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_matched.py study wide-C
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
