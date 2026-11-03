@@ -111,7 +111,10 @@ def footprint():
     return dict(physical_files=len(seen),logical_unique_bytes=logical,allocated_unique_bytes=disk,incremental_classes=classes)
 def count(exe,path,cmd,env,original_dir):
     with (path/"stdout.jsonl").open("xb")as out,(path/"stderr").open("xb")as err:
-        p=sp.run([exe,path/"hardware.json",*cmd],env=env,cwd=original_dir,stdout=out,stderr=err)
+        # whole_count uses execv(PROGRAM, ARGV); keep the executable and the complete literal argv.
+        program=shutil.which(os.fspath(cmd[0]),path=env["PATH"])
+        require(program is not None,"whole-command executable was not found")
+        p=sp.run([exe,path/"hardware.json",program,*cmd],env=env,cwd=original_dir,stdout=out,stderr=err)
     h=json.loads((path/"hardware.json").read_bytes());require(p.returncode==0 and h["status"]==0 and h["instructions"]>0 and h["enabled"]==h["running"]>0,"invalid complete Cargo PMU")
     return h["instructions"]
 def census(path,env):
@@ -145,7 +148,7 @@ def main():
     w.sdk.rename(w.root/"original-signed-reference")
     whole=w.root/"whole_count";trace=w.root/"exec_count"
     for tool in (whole,trace):sp.run(["cc","-O2","-Wall","-Wextra","-Werror",here.parent/(tool.name+".c"),"-o",tool],check=True)
-    source=w.root/"counter.c";source.write_text('#include <stdint.h>\n#include <stdlib.h>\nint main(int c,char **v){uint64_t n=strtoull(v[1],0,10);volatile uint64_t x=1;for(uint64_t i=0;i<n;i++)x=x*3+i;return c!=2;}\n')
+    source=w.root/"counter.c";source.write_text('#include <stdint.h>\n#include <stdlib.h>\nint main(int c,char **v){if(c!=2)return 126;uint64_t n=strtoull(v[1],0,10);volatile uint64_t x=1;for(uint64_t i=0;i<n;i++)x=x*3+i;return 0;}\n')
     actor=w.root/"calibration";sp.run(["cc","-O2",source,"-o",actor],check=True)
     preflight={}
     for n in (1000000,4000000):
