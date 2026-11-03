@@ -64,7 +64,8 @@ def read_expansion(d):
             errors.append([allowed[child['message']],line])
         else:
             expected=["cannot find `get_size2` in the list of imported crates","cannot find module or crate `get_size2` in this scope"][i-4]
-            need(all(errors[i+1][0] in messages(*pair) for i,pair in enumerate(pairs)),'different two-attribute conflict order')
+            need(row['message']==expected and (row['code'] or {}).get('code')=='E0433','different unlinked valid expansion error')
+    need(all(errors[i+1][0] in messages(*pair) for i,pair in enumerate(pairs)),'different two-attribute conflict order')
     need(rows[6]['message']=='aborting due to 6 previous errors'and not rows[6]['spans'] and rows[7]['message']=="For more information about this error, try `rustc --explain E0433`.",'unexpected terminal diagnostics')
     return {'macro':c['macro'],'expanded':digest(raw),'errors':errors,'stderr':digest(stderr)}
 

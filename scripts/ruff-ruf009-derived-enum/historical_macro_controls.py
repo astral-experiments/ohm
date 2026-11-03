@@ -113,6 +113,17 @@ def offline():
                 assert str(err) == frozen["mutations"][label], (label, err)
             else:
                 raise AssertionError(("damaged original passed", label))
+        for index in (4, 5):
+            damaged = deepcopy(original)
+            damaged[index]["code"]["code"] = "E0000"
+            (folder / "stdout").write_bytes(stdout)
+            (folder / "stderr").write_bytes(b"".join(json.dumps(row).encode() + b"\n" for row in damaged))
+            try:
+                external.read_expansion(folder)
+            except ValueError as err:
+                assert str(err) == "different unlinked valid expansion error"
+            else:
+                raise AssertionError(("wrong missing-crate code passed", index))
         # A true reverse wording is a separate output, even though the named pair is the same.
         altered = deepcopy(original)
         msg = altered[1]["children"][0]["message"]
