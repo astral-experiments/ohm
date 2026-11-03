@@ -71,6 +71,13 @@ def archive_members(path):
             if size%2:assert len(f.read(1))==1
             out.append([name,size,digest.hexdigest()])
     return out
+def preserve(path):
+    key=w.hf(path);out=w.proof/(key+'.native.zst')
+    assert path.is_file() and 0<path.stat().st_size<1_500_000_000
+    if not out.exists():
+        with out.open('xb')as f:sp.run(['zstd','-q','-3','-c',str(path)],stdout=f,check=True)
+    return {'name':path.name,'bytes':path.stat().st_size,'sha256':key,'zstd':out.name}
+
 def phase(role,label,kind):
     dst=w.proof/(role+'-'+label);dst.mkdir()
     cmd=['cargo','+ohm','build','-p','ruff','--bin','ruff','--locked','--offline','-j4','--message-format=json']
@@ -92,6 +99,10 @@ def phase(role,label,kind):
     obj=dict(role=role,label=label,kind=kind,source=rev,command=cmd,elf=w.hf(exe),probes=verdicts,
              units=sorted([r['package_id'],r['target']['name'],r['target']['kind'],sorted(r['features'])]for r in arts),
              dirty=sorted([r['package_id'],r['target']['name']]for r in arts if not r['fresh']),owners={})
+    if label in ('old','settled','independent-clean'):
+        obj['binary']=preserve(exe)
+        for args in (['-W','-S'],['-W','-n'],['-W','-l']):
+            with (dst/('readelf-'+args[-1]+'.txt')).open('xb')as f:sp.run(['readelf',*args,exe],stdout=f,check=True)
     for crate in ('portable_atomic','salsa','ruff_linter','ty_python_semantic'):
         r,=[a for a in arts if a['target']['name']==crate and a['target']['kind']==['lib']]
         archive,=[Path(n)for n in r['filenames'] if n.endswith('.rlib')]
@@ -131,17 +142,22 @@ def expected_failure(role,label,needle):
     return {'code':ret.returncode,'failed':ret.returncode==101 and msgs[-1]=={'reason':'build-finished','success':False} and needle in (raw+(dst/'stderr').read_bytes())}
 
 def holdouts(role):
-    roots=set()
+    roots=set();linked=[]
     wild=w.sdk/'lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd';wid=(wild.stat().st_dev,wild.stat().st_ino)
     for f in (w.proof/(role+'-census')/'tasks').glob('*.nul'):
         fields=f.read_bytes().split(b'\0')
         if (int(fields[1]),int(fields[2]))!=wid: continue
         args=list(map(os.fsdecode,fields[4:-1]))
+        for arg in args:
+            part=Path(arg)
+            if part.is_absolute() and part.suffix in ('.a','.rlib','.o','.so'):
+                linked.append([str(part),w.hf(part) if part.is_file()else None])
         for n,arg in enumerate(args):
             name=args[n+1]if arg=='-L' else arg[2:]if arg.startswith('-L') else ''
             if name and (Path(name)/'libjemalloc_pic.a').is_file():roots.add(Path(name).resolve())
     assert len(roots)==1,roots
     path,=roots;assert path.is_relative_to(w.shared) or path.is_relative_to(w.target)
+    save(role+'-link-inputs.json',{'inputs':linked,'jemalloc':preserve(path/'libjemalloc_pic.a')})
     shadow=path/'libm.so';body=b'not an ELF shared library\n';assert not shadow.exists()
     with shadow.open('xb')as f:f.write(body)
     try: native=expected_failure(role,'malformed-shadow',b'libm.so')
