@@ -75,8 +75,12 @@ def acquire():
     run = int(os.environ['GITHUB_RUN_ID'])
     info = json.loads(subprocess.check_output(gh(f'actions/runs/{run}')))
     jobs = json.loads(subprocess.check_output(gh(f'actions/runs/{run}/attempts/1/jobs?per_page=100')))
-    need(info['head_sha'] == os.environ['REVIEWED_HEAD'] and info['head_branch'] == BRANCH and info['run_attempt'] == 1 and info['event'] == 'workflow_dispatch' and jobs['total_count'] == len(jobs['jobs']) == 1, 'hosted run identity')
-    job, = jobs['jobs']; need(job['name'] == 'Check the held-out ty_server edit' and job['runner_name'] == os.environ['RUNNER_NAME'] and job['runner_id'] > 0, 'worker identity')
+    need(info['head_sha'] == os.environ['REVIEWED_HEAD'] and info['head_branch'] == BRANCH and info['run_attempt'] == 1 and info['event'] == 'workflow_dispatch' and jobs['total_count'] == len(jobs['jobs']) == 2, 'hosted run identity')
+    order = os.environ['ROLE_ORDER']
+    need(order in ('PC', 'CP'), 'unregistered compiler order')
+    job, = [j for j in jobs['jobs'] if j['runner_name'] == os.environ['RUNNER_NAME'] and j['runner_id'] > 0]
+    name = 'Check the held-out ty_server edit ' + order
+    need(job['name'] in (name, name+' ('+order+')') and job['status']=='in_progress', 'worker identity')
     save(OUT/'worker.json',dict(run=run,job=job['id'],head=info['head_sha'],runner=job['runner_name'],runner_id=job['runner_id'],boot=Path('/proc/sys/kernel/random/boot_id').read_text().strip(),source=TREES,lock=LOCK,resources=resources()))
     sys.path.insert(0,str(WS/'donor/scripts/ruff-default-owner-pmu'))
     import acquire as signed

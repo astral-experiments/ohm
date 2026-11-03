@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
 import tarfile
@@ -69,12 +70,28 @@ def metadata_outputs(arts):
 
 def phase(name, state, *, preserve=False, invalid=False):
     """Compare complete Cargo verdicts separately from native compiler process inventories."""
-    trace = w.ROOT/'traces'/name
+    trace = w.ROOT/'traces'/w.OUT.name/name
     trace.mkdir(parents=True)
     out = w.OUT/name
+    env = w.environment()
+    score = w.OUT.name in ('P','C') and name in ('old','old-unchanged','edited','new-unchanged')
+    ordinary = w.CMD
+    if score:
+        proxy = shutil.which('cargo', path=env['PATH'])
+        w.need(proxy and w.CMD[0]=='cargo', 'ordinary cargo proxy')
+        ordinary = [w.ROOT/'whole-count',out/'pmu.json',proxy,*w.CMD]
     cmd = ['/usr/bin/strace', '-ff', '-qq', '-s', '131072', '-e', 'trace=execve,execveat',
-           '-o', trace/'exec', '--', *w.CMD]
-    w.run(cmd, w.environment(), out, expected=101 if invalid else 0)
+           '-o', trace/'exec', '--', *ordinary]
+    w.run(cmd, env, out, expected=101 if invalid else 0)
+    if score:
+        pm = json.loads((out/'pmu.json').read_bytes())
+        w.need(pm['instructions']>0 and pm['enabled']==pm['running']>0 and os.waitstatus_to_exitcode(pm['status'])==0,
+               'incomplete or multiplexed whole-Cargo count')
+        first = next(line for line in (trace/('exec.'+str(pm['pid']))).read_text().splitlines()
+                     if line.startswith('execve(') and line.endswith('= 0'))
+        entry = EXEC.fullmatch(first)
+        w.need(entry and os.path.samefile(ast.literal_eval(entry[1]),proxy) and ast.literal_eval(entry[2])==w.CMD,
+               'the first counted process did not execute this Cargo command')
     roots = executed_compilers(trace)
     w.save(out/'rustcs.json', roots)
     rows = [json.loads(s) for s in (out/'stdout').read_bytes().splitlines() if s]
