@@ -8,7 +8,10 @@ An experimental fork of the Rust toolchain, designed for fast, highly parallel l
 With Ohm, incremental builds can be up to 33× faster, replayed development sessions take around
 48% less time, and `target/` disk usage decreases by around 55%.
 
-Comparing stock Rust and Ohm on replayed development sessions:
+On Linux, the Codex TUI session took 200.71 s with Ohm 1.99.0-23 and 364.92 s with stock
+Rust 1.99.0. Each toolchain ran the same 3,439 tests. [Codex replay](scripts/benchmark_results/1.99.0-23-codex.md)
+
+Comparing stock Rust and Ohm 1.99.0-17 on replayed development sessions:
 
 <!-- benchmark:sessions -->
 
