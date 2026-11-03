@@ -54,8 +54,8 @@ def collect(argv,path,env):
    if f'"--crate-name", "{n}"' in s:hits.setdefault(n,[]).append(k)
  rows=[json.loads(ln)for ln in(path/'stdout').read_text().splitlines()if ln.startswith('{')]
  sdk.put(path/'exec-index.json',{'argv':argv,'exit':p.returncode,'rustcs':hits,'minimum_available':low});return p.returncode,rows,hits
-def observe(mode,label,path,flags,env):
- argv=['cargo','+ohm',*flags,mode,'-p','selected_client','--locked','--offline','-j2','--message-format=json'];rc,rows,hits=collect(argv,path,env)
+def observe(mode,label,path,flags,env,package='selected_client'):
+ argv=['cargo','+ohm',*flags,mode,'-p',package,'--locked','--offline','-j2','--message-format=json'];rc,rows,hits=collect(argv,path,env)
  filenames=[Path(f)for r in rows if r['reason']=='compiler-artifact'and r['target']['name']=='selected_producer'for f in r['filenames']]
  choices=[p for p in filenames if p.suffix=='.rmeta'and p.is_file()]
  if not choices:choices=[p.with_suffix('.rmeta')for p in filenames if p.suffix=='.rlib'and p.with_suffix('.rmeta').is_file()]
@@ -72,7 +72,7 @@ def observe(mode,label,path,flags,env):
    for dep in d.rglob('selected_client*.d'):
     if dep.is_file()and not dep.is_symlink():
      content=dep.read_bytes();i=len(ds);(path/f'raw-{i}.d').write_bytes(content);ds.append(str(dep))
- out={'exit':rc,'rustc_execs':hits,'metadata_path':str(meta),'lexical_include':str(alias),'private':h1,'public':h2,'rmeta':sdk.hf(meta),'bytes':len(raw),'fnv':fnv(raw),'nonfresh':[r['target']['name']for r in rows if r['reason']=='compiler-artifact'and not r['fresh']],'errors':[r['message']['code']['code']for r in rows if r['reason']=='compiler-message'and r['message']['level']=='error'and r['message'].get('code')],'depfiles':ds,'source_sha':sdk.hf(producer),'source_mtime_ns':producer.stat().st_mtime_ns,'client_source_sha':sdk.hf(client)}
+ out={'exit':rc,'rustc_execs':hits,'metadata_path':str(meta),'metadata_mtime_ns':meta.stat().st_mtime_ns,'lexical_include':str(alias),'private':h1,'public':h2,'rmeta':sdk.hf(meta),'bytes':len(raw),'fnv':fnv(raw),'nonfresh':[r['target']['name']for r in rows if r['reason']=='compiler-artifact'and not r['fresh']],'errors':[r['message']['code']['code']for r in rows if r['reason']=='compiler-message'and r['message']['level']=='error'and r['message'].get('code')],'depfiles':ds,'source_sha':sdk.hf(producer),'source_mtime_ns':producer.stat().st_mtime_ns,'client_source_sha':sdk.hf(client)}
  if label.startswith('old')or label=='discover':assert rc==0,(label,out)
  if mode=='build'and rc==0:
   exe=tgt/'debug/selected_client';sig=sdk.hf(exe);b=pub/'bodies'/sig;b.parent.mkdir(exist_ok=True)
@@ -120,4 +120,13 @@ if candidate:
    assert rs['next-unchanged']['errors']==rs['independent-clean']['errors']==['E0308']
    nb=out[arm][case]['build']
    assert nb['edit']['native']==nb['edit']['fnv']==nb['independent-clean']['native']
+ for arm in ('shipped','fixed'):
+  x=pub/arm/'private/check/old'
+  for owner in ('selected_client','selected_producer'):
+   trace=''.join((x/h).read_text() for h in json.loads((x/'proof.json').read_bytes())['rustc_execs'][owner])
+   assert '"-Zthreads=8"' in trace and '"checksum-hash-algorithm=blake3"'in trace and '"-Zpublic-api-hash"'in trace,(arm,owner,trace[:1800])
+  assert any('# checksum:blake3=' in p.read_text()and 'selected.rmeta' in p.read_text()for p in x.glob('raw-*.d'))
+ import adverse
+ failed=adverse.run(globals())
  factory.suite(sdk,build_env,cargo_repo)
+ assert not failed,failed
