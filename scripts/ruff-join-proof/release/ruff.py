@@ -5,6 +5,10 @@ src=Path(__file__).resolve().parent;sys.path[:0]=[str(src.parent/'fix'),str(src.
 import worker as sdk
 import build
 plan=json.loads((src/'plan.json').read_bytes());w=sdk.work;out=sdk.proof
+reader=os.environ.get('OHM_READER_RELEASE_QA')=='1'
+if reader:
+    import reader_factory
+    plan.update(child=reader_factory.REG['candidate']['source'],tree=reader_factory.REG['candidate']['tree'],role_order=reader_factory.REG['role_order'])
 git=lambda *args:subprocess.check_output(['git','-C',w,*args],text=True).strip()
 assert git('rev-parse','HEAD')==plan['ruff_new']and git('rev-parse','HEAD^')==plan['ruff_old'] and sdk.hf(w/'Cargo.lock')==plan['ruff_lock'] and not git('status','--porcelain')
 assert sdk.hf(src/'whole_count.c')==plan['counter']
@@ -94,5 +98,39 @@ for role in plan['role_order']:
         errors[role]=traceback.format_exc();sdk.put(out/'release-refusals.json',errors);print(errors[role],flush=True)
     finally:
         git('restore','--worktree','--staged','--',files['path']);sdk.put(out/'release-results.json',roles)
+if reader:
+    from collections import Counter
+    # Use the ordinary recorder above, including the original kernel exec, counter and metadata guards.
+    for prior in reader_factory.REG['migration']:
+        role='upgrade-'+prior;rec={};roles[role]=rec
+        try:
+            empty(role+'-previous')
+            git('switch','--detach',plan['ruff_new'])
+            assert not git('status','--porcelain')
+            subject=bodies[prior]
+            install=trial/'bin-incoming'
+            os.link(subject,install);os.replace(install,link)
+            assert sdk.hf(link)==sdk.hf(subject) and Path(subprocess.check_output(['rustup','which','--toolchain','ohm','cargo'],env=ce,text=True).strip()).samefile(link)
+            old=phase('prior-empty');steady=phase('prior-unchanged')
+            roots=(('target',tgt),('shared',shared))
+            before=reader_factory.files(roots,sdk);sdk.put(out/role/'prior-records.json',before)
+            subject=bodies['release-child'];os.link(subject,install);os.replace(install,link)
+            assert sdk.hf(link)==sdk.hf(subject) and plan['child'] in subprocess.check_output(['cargo','+ohm','-Vv'],env=ce,text=True)
+            first=phase('first-upgraded');after=reader_factory.files(roots,sdk);sdk.put(out/role/'upgraded-records.json',after)
+            settled=phase('next-unchanged');marked=phase('settled-json',json_mode=True)
+            same=before.keys()&after.keys()
+            stats={'prior':dict(Counter(r['version'] for r in before.values())),'after':dict(Counter(r['version']for r in after.values())),
+                'retained_names':len(same),'paths_before_only':len(before)-len(same),'paths_after_only':len(after)-len(same),
+                'versions_same_path':dict(Counter(str(before[k]['version'])+'>'+str(after[k]['version'])for k in same)),
+                'instructions_and_all_rustcs':'original per-command files','phases':{r:sorted(x['rustcs'].values())for r,x in rec.items()},
+                'prior_public_stable_after':{k:v['public']==first['metadata'][k]['public']==settled['metadata'][k]['public']for k,v in steady['metadata'].items()},
+                'public_matches_independent_new':{k:v['public']==roles['release-child']['independent-clean-edited']['metadata'][k]['public']for k,v in first['metadata'].items()}}
+            sdk.put(out/role/'epoch.json',stats)
+            assert sorted(steady['rustcs'].values())==sorted(settled['rustcs'].values())==['ty_python_semantic'] and len(marked['nominal_nonfresh'])==6
+            assert len(first['rustcs'])>=1 and any(v['version']==4 for v in before.values()) and any(v['version']==5 for v in after.values())
+            assert all(stats['prior_public_stable_after'].values()) and all(stats['public_matches_independent_new'].values()),stats
+        except Exception:
+            errors[role]=traceback.format_exc();sdk.put(out/'release-refusals.json',errors)
+        finally:sdk.put(out/'release-results.json',roles)
 assert not errors,errors
 assert not git('status','--porcelain')

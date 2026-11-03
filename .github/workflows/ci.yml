@@ -7,13 +7,14 @@ on:
         description: Diagnostic fixtures or release-profile Ruff acceptance
         type: choice
         default: fixture
-        options: [fixture, reader, release-ruff]
+        options: [fixture, reader, release-ruff, reader-ruff]
       reviewed_head:
         description: Exact reviewed nonrelease QA source
         required: true
         type: string
 permissions:
   contents: read
+  actions: read
 jobs:
   inspect:
     if: github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruf009-join-proof-20261103'
@@ -36,7 +37,7 @@ jobs:
           path: accepted-source
           sparse-checkout: scripts/ohm-apple-zmij/cargo293
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        if: inputs.lane == 'release-ruff'
+        if: inputs.lane == 'release-ruff' || inputs.lane == 'reader-ruff'
         with:
           repository: astral-sh/ruff
           ref: b00f68a23cedbd3a38fc25bac63638f0f11fc3f0
@@ -44,8 +45,9 @@ jobs:
           path: ruff
           persist-credentials: false
       - name: Build matched release-profile Cargo and check real Ruff
-        if: inputs.lane == 'release-ruff'
+        if: inputs.lane == 'release-ruff' || inputs.lane == 'reader-ruff'
         env:
+          OHM_READER_RELEASE_QA: ${{ inputs.lane == 'reader-ruff' && '1' || '0' }}
           OHM_SDK_READ_TOKEN: ${{ github.token }}
         run: |
           command -v strace || (sudo apt-get -qq update && sudo apt-get -qq install -y --no-install-recommends strace zstd)

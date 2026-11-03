@@ -1,0 +1,85 @@
+{
+  "prior_run": 41603095196,
+  "archive_id": 13214744711,
+  "archive_size": 144558404,
+  "archive_sha256": "2fbee4ca8f00dbce6ebbd44db9a5faa94e3bb1d0410fb62fb357314a04542e6a",
+  "prior": {
+    "release-child": {
+      "cargo_source": "ba07041c4b41686b0f80ad89985b8881046cb48e",
+      "tree": "ec57f05e842ceb8b0c972436b18501654f7ef296",
+      "bytes": 42854064,
+      "sha256": "c67a662901b9d15945579f0b607c234cf92e55488c687b68ba8a95f9e22326a2",
+      "argv": [
+        "cargo",
+        "+ohm",
+        "-Zohm-defaults=no",
+        "build",
+        "--locked",
+        "--release",
+        "-p",
+        "cargo",
+        "--bin",
+        "cargo",
+        "--features",
+        "ohm-defaults,all-static",
+        "-j8",
+        "--message-format=json-render-diagnostics"
+      ],
+      "profile": {
+        "CARGO_INCREMENTAL": "0",
+        "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": "1",
+        "CARGO_PROFILE_RELEASE_DEBUG": "0",
+        "CARGO_PROFILE_RELEASE_LTO": "thin",
+        "CFG_RELEASE_CHANNEL": "dev"
+      },
+      "rustc": "rustc 1.99.0-dev (d57fd1515 2026-11-02) (ohm-1.99.0-23)\nbinary: rustc\ncommit-hash: d57fd1515986dccecdcece8da85e651bfb4b81f9\ncommit-date: 2026-11-02\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0-dev\nLLVM version: 23.1.1\n"
+    },
+    "release-parent": {
+      "cargo_source": "7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed",
+      "tree": "130a1314aa1be0441988781e8e2b52bd11d3e4a9",
+      "bytes": 42854704,
+      "sha256": "9e65ff9195787519d9d1f1b810d028cf9083db78fc65b665abef35f3def9fbb5",
+      "argv": [
+        "cargo",
+        "+ohm",
+        "-Zohm-defaults=no",
+        "build",
+        "--locked",
+        "--release",
+        "-p",
+        "cargo",
+        "--bin",
+        "cargo",
+        "--features",
+        "ohm-defaults,all-static",
+        "-j8",
+        "--message-format=json-render-diagnostics"
+      ],
+      "profile": {
+        "CARGO_INCREMENTAL": "0",
+        "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": "1",
+        "CARGO_PROFILE_RELEASE_DEBUG": "0",
+        "CARGO_PROFILE_RELEASE_LTO": "thin",
+        "CFG_RELEASE_CHANNEL": "dev"
+      },
+      "rustc": "rustc 1.99.0-dev (d57fd1515 2026-11-02) (ohm-1.99.0-23)\nbinary: rustc\ncommit-hash: d57fd1515986dccecdcece8da85e651bfb4b81f9\ncommit-date: 2026-11-02\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0-dev\nLLVM version: 23.1.1\n"
+    }
+  },
+  "candidate": {
+    "source": "4a6de7858c60e579fc30e01f5b60ddcaa84c2e30",
+    "parent": "ba07041c4b41686b0f80ad89985b8881046cb48e",
+    "tree": "1a128e47d068ee91f33ba94e416ee0c0e014de5a",
+    "predecessor": "9f2bf0359b8186e059bd853e2ce89ceef9fc5087",
+    "sha256": "a52e4441ebfbe375ff8b9e3e406850d858460db1caea26cf31542b6d1361fca2"
+  },
+  "role_order": [
+    "release-child",
+    "release-parent",
+    "signed"
+  ],
+  "migration": [
+    "signed",
+    "pre-reader"
+  ],
+  "policy": "Only swap Cargo at a stable private path. Count every real rustc and every existing/checksummed record before/after the first upgrade. Preserve full whole-PMU, no-op, E0308, independent-clean and source-grade gates. Record counts even when a role is independently refused. All raw originals precede inference."
+}
