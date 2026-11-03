@@ -4,6 +4,7 @@ import collections,hashlib,json,os,re,shutil,signal,subprocess,sys,time,tracebac
 src=Path(__file__).resolve().parent;sys.path[:0]=[str(src),str(src.parent/'fix'),str(src.parent.parent/'ruff-foreign-span-observer')]
 import worker as sdk
 import build
+import counter_argv
 plan=json.loads((src/'plan.json').read_bytes());w=sdk.work;out=sdk.proof
 reader=os.environ.get('OHM_READER_RELEASE_QA')=='1'
 if reader:
@@ -26,10 +27,8 @@ subprocess.run(['rustup','toolchain','link','ohm',box],check=True,env=ce)
 assert not any(ce.get(k)for k in ('RUSTFLAGS','RUSTC','RUSTC_WRAPPER','LD_PRELOAD','CARGO_LOG','CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST','CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST'))
 build.run(sdk,ce,'ruff-registry-prefetch',['cargo','+ohm','fetch','--locked','--target','x86_64-unknown-linux-gnu'],w)
 counter=trial/'whole-count';subprocess.run(['cc','-O2','-Wall','-Werror',src/'whole_count.c','-o',counter],check=True)
-cal=trial/'counter.json';physical=subprocess.run([counter,cal,'true','probe']).returncode==0
-if physical:
-    check=json.loads(cal.read_bytes());assert 0<check['instructions'] and check['running']>0 and check['enabled']<=check['running']*1.01
-sdk.put(out/'counter.json',{'available':physical,'source':sdk.hf(src/'whole_count.c'),'executable':sdk.hf(counter),'control':json.loads(cal.read_bytes())if physical else None})
+physical,calibration=counter_argv.calibrate(counter,trial,ce)
+sdk.put(out/'counter.json',{'available':physical,'source':sdk.hf(src/'whole_count.c'),'executable':sdk.hf(counter),'controls':calibration})
 files=plan['additional_private'];changed=w/files['path'];git('switch','--detach',plan['ruff_old'])
 def empty(label):
     for d in (tgt,shared):
@@ -53,7 +52,7 @@ for role in plan['role_order']:
     rec={};roles[role]=rec;subject=bodies[role];expected=plan['parent']if role in('signed','release-parent')else plan['child']
     def phase(label,wrong=False,json_mode=False):
         d=out/role/label;d.mkdir(parents=True);cmd=plan['primary']+(['--message-format=json']if json_mode else[])
-        cost=d/'instructions.json';tr=d/'exec';argv=['strace','-ff','-qq','-s','8192','-e','trace=execve','-o',str(tr),'--']+([str(counter),str(cost)]if physical else[])+cmd
+        cost=d/'instructions.json';tr=d/'exec';argv=['strace','-ff','-qq','-s','8192','-e','trace=execve','-o',str(tr),'--']+(counter_argv.command(counter,cost,cmd,ce)if physical else cmd)
         started=time.monotonic();minimum=sdk.avail();assert minimum>=9*2**30 and shutil.disk_usage(w).free>20*2**30
         with (d/'stdout').open('wb')as so,(d/'stderr').open('wb')as se:
             proc=subprocess.Popen(argv,env=ce,cwd=w,stdout=so,stderr=se,start_new_session=True)
