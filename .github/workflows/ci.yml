@@ -11,34 +11,26 @@ permissions:
   contents: read
 jobs:
   inspect:
-    if: github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruf009-foreign-join-debug-20261103'
+    if: github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruf009-join-proof-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 55
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           ref: ${{ inputs.reviewed_head }}
           path: qa
           persist-credentials: false
-          sparse-checkout: scripts/ruff-foreign-span-observer
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          repository: astral-sh/ruff
-          ref: b00f68a23cedbd3a38fc25bac63638f0f11fc3f0
-          fetch-depth: 2
-          path: ruff
-          persist-credentials: false
-      - name: Build the public historical source and inspect the signed compiler
+          sparse-checkout: |
+            scripts/ruff-foreign-span-observer
+            scripts/ruff-join-proof
+      - name: Run independent signed Cargo boundary and macro controls
         env:
           OHM_SDK_READ_TOKEN: ${{ github.token }}
-        run: |
-          sudo apt-get -qq update
-          sudo apt-get -qq install -y --no-install-recommends gdb libunwind-dev liblzma-dev
-          python3 -IB qa/scripts/ruff-foreign-span-observer/worker.py
+        run: python3 -IB qa/scripts/ruff-join-proof/worker.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: ruf009-foreign-span-${{ github.run_id }}
+          name: ruf009-join-proof-${{ github.run_id }}
           path: ${{ runner.temp }}/ohm-foreign-join/published/
           retention-days: 15
           if-no-files-found: error
