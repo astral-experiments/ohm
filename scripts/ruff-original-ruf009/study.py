@@ -1,5 +1,6 @@
 """Independent mechanism replay of the original three-file Ruff #19021 commit on the matched pair."""
 from pathlib import Path
+from collections import Counter
 import re
 import shutil
 import tomllib
@@ -111,11 +112,19 @@ def phase(name, revision, success=True):
             if not launch or not line.endswith(' = 0') or '"--crate-name", "' not in line or '"--emit' not in line:continue
             path=Path(launch[1]);path=path if path.is_absolute() else work/path
             if not path.exists() or not path.samefile(compiler):continue
-            name=re.search(r'"--crate-name", "([^"]+)"',line)[1]
+            crate_name=re.search(r'"--crate-name", "([^"]+)"',line)[1]
             kind=re.search(r'"--crate-type", "([^"]+)"',line)
             assert stream.name not in kernel
-            kernel[stream.name]=[name,kind[1] if kind else None]
-    assert all('pid.'+pid in kernel for pid in seen)
+            kernel[stream.name]=[crate_name,kind[1] if kind else None]
+    # A sampled process can inherit rustc's image across fork before exec'ing its own program.
+    # Keep those observations for diagnosis; only a successful exec is counted as a compiler.
+    sampled_only={p:argv for p,argv in seen.items() if 'pid.'+p not in kernel}
+    (dest/'sampled-only.json').write_text(json.dumps(sampled_only,sort_keys=True)+'\n')
+    if name=='old':
+        named=Counter(r['target']['name'].replace('-','_') for r in units if not r['fresh'])
+        launched=Counter(v[0] for v in kernel.values())
+        assert not (named-launched),('missing fresh cold rustc execs',named-launched)
+        assert all(re.fullmatch(r'autocfg_[0-9a-f]+_\d+',k) for k in (launched-named)),('extra cold rustc execs',launched-named)
     data={'kernel_rustcs':kernel,'role':arm,'label':name,'revision':revision,'source_git_diff':git('diff','--name-only',old),'factory':json.loads((study/'sdk.json').read_bytes())['factory'],'driver_sha256':sha(driver),
           'command':cmd,'exit':process.returncode,'units':len(units),'dirty':[[r['target']['name'],r['target']['kind']]for r in units if not r['fresh']],
           'observed_rustc':seen,'metadata':files,'errors':[e.get('code')for e in errors]}
