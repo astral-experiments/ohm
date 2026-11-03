@@ -16,19 +16,8 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from capsule import HOST, REG, need, reopen, save, seal, sha
 
-BRANCH = "charlie/qa-frozen-literal-stage-20261103"
-BASE = "34e78f19c0d0c58c86e42d83e05a4dc6db6b0f6d"
-
-
-def verify_named_span_test(log, name):
-    """Require the named test's own native harness result before admitting the kit."""
-    tests = re.findall(r"^ +Running unittests src/lib\.rs \((/[^()\r\n]+/rustc_span-[a-f0-9]+)\)$", log, re.M)
-    need(len(tests) == 1, "different rustc_span unit test executable")
-    unit = log.split("(" + tests[0] + ")\n", 1)[1].split("Doc-tests", 1)[0]
-    outcomes = [line for line in unit.splitlines() if line.startswith("test ") and not line.startswith("test result: ")]
-    need(outcomes == ["test " + name + " ... ok"] and
-         re.search(r"^test result: ok\. 1 passed; 0 failed; 0 ignored; 0 measured;", unit, re.M),
-         "candidate symbol test did not run")
+BRANCH = "charlie/qa-ty-ide-mono-stage-29697-20261103"
+BASE = "f1af047a36a1a7ea0fce11ddae61a4028d5e7582"
 
 
 def git(repo, *args):
@@ -316,20 +305,14 @@ def build(workspace, root):
         path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
 
         if role == "C":
-            run_make = argv[:argv.index("build")] + ["test", "--stage", "1", "-j8",
-                                                      "tests/run-make/incremental-large-byte-literal"]
-            run_make_log = root / "logs/run-make-C.log"
-            guarded(run_make, rust, env, run_make_log, root)
-            need("1 passed; 0 failed; 0 ignored" in run_make_log.read_text(), "candidate regression did not run")
-            test_name = "symbol::tests::large_strings_keep_their_bytes_and_share_symbol_ids"
-            symbol = argv[:argv.index("build")] + [
-                "test", "--set", "rust.verbose-tests=true", "--stage", "1", "-j8",
-                "compiler/rustc_span", "--test-args", test_name + " --exact",
-            ]
-            symbol_log = root / "logs/symbol-C.log"
-            guarded(symbol, rust, env, symbol_log, root)
-            verify_named_span_test(symbol_log.read_text(), test_name)
-
+            fixture = "tests/incremental/upstream-monomorphization-buckets/main.rs"
+            test_cmd = argv[:argv.index("build")] + ["test", "--stage", "1", "-j8", fixture]
+            test_log = root / "logs/upstream-owner-bucket-incremental-C.log"
+            guarded(test_cmd, rust, env, test_log)
+            log = test_log.read_text(errors="replace")
+            need(any("upstream-monomorphization-buckets" in line and "ok" in line for line in log.splitlines())
+                 and re.search(r"test result: ok\. [1-9][0-9]* passed; 0 failed", log),
+                 "candidate incremental owner-bucket test did not report its own pass")
         need(
             json.loads(json.dumps(layout.checked(rust, rev, desc["tree"], substitutions))) == full,
             "bootstrap changed enrolled source",
