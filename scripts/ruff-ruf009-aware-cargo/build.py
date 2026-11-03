@@ -43,8 +43,8 @@ def materialize(root, evidence, pack):
     git("switch", "--detach", signed)
     assert git("write-tree") == PREVIOUS["signed_tree"]
     for name, digest, head in (
-        (FIX / "candidate-v3.bundle", PREVIOUS["bundle_sha256"], PLAN["parent"]),
-        (HERE / "aware.bundle", PLAN["aware_bundle_sha256"], PLAN["source"]),
+        (FIX / "candidate-v3.bundle", PREVIOUS["bundle_sha256"], PLAN["transport_base"]),
+        (HERE / PLAN["aware_bundle"], PLAN["aware_bundle_sha256"], PLAN["source"]),
     ):
         assert sha(name) == digest
         git("bundle", "verify", str(name))
@@ -52,10 +52,9 @@ def materialize(root, evidence, pack):
         assert git("rev-parse", "FETCH_HEAD") == head
         git("switch", "--detach", head)
     git("fsck", "--full", "--strict", "--no-progress")
-    assert git("rev-parse", "HEAD^") == PREVIOUS["candidate"] == PLAN["parent"]
-    assert git("rev-parse", "HEAD^^") == PREVIOUS["second_candidate"]
-    assert git("rev-parse", "HEAD^^^") == PREVIOUS["first_candidate"]
-    assert git("rev-parse", "HEAD^^^^") == signed == PLAN["cargo_release"]
+    assert git("rev-parse", "HEAD^") == PLAN["parent"]
+    assert git("rev-list", "--first-parent", "--reverse", signed + "..HEAD").splitlines() == PLAN["source_chain"]
+    assert PLAN["source_chain"][:3] == [PREVIOUS["first_candidate"], PREVIOUS["second_candidate"], PREVIOUS["candidate"]]
     assert git("rev-parse", "HEAD^{tree}") == git("write-tree") == PLAN["tree"]
     assert not git("status", "--porcelain")
     assert set(git("diff", "--name-only", "HEAD^", "HEAD").splitlines()) == set(PLAN["changed"])
