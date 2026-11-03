@@ -1,0 +1,359 @@
+{
+  "archive": {
+    "bytes": 1548625,
+    "sha256": "8992b1d512a4bc31247981f2e6d211753e07140e12f7ccb100f2521120ac2ffe"
+  },
+  "complete": false,
+  "prices": {
+    "edit": {
+      "elapsed_ns": 16975145283,
+      "enabled": 66349417498,
+      "instructions": 286389070531,
+      "pid": 28682,
+      "running": 66349417498,
+      "status": 0
+    },
+    "old": {
+      "elapsed_ns": 289442497752,
+      "enabled": 1150080333351,
+      "instructions": 6284047288755,
+      "pid": 3600,
+      "running": 1150080333351,
+      "status": 0
+    },
+    "warm1": {
+      "elapsed_ns": 7620468314,
+      "enabled": 21473624304,
+      "instructions": 81598869376,
+      "pid": 32069,
+      "running": 21473624304,
+      "status": 0
+    },
+    "warm2": {
+      "coordinator_instruction_charge": 165488322,
+      "elapsed_ns": 6104250334,
+      "enabled": 21945973870,
+      "instructions": 78298021764,
+      "pid": 33010,
+      "running": 21945973870,
+      "status": 0
+    }
+  },
+  "registration": {
+    "boot": "51e18508-1d35-418b-b76e-63aed6ec1ce3",
+    "head": "a916de370078819ea0db5a64de3f1383828b7951",
+    "never_skip": false,
+    "original_refusal": 41702972179,
+    "qualified_separate_source_and_elf_receiver": true,
+    "reference": {
+      "list": "76d24b892727ff181fdf019636ef5e928d741eb8df4f58f06dcc626d0bf67c52",
+      "new": "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+      "old": "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2"
+    },
+    "run": "41716344525",
+    "sdk": "645149ec05ae49e6038fe26c42710c1ef603159fefe0f85bf1fb843cc28d9a8d"
+  },
+  "stages": {
+    "edit": {
+      "accepted": [],
+      "cargo_terminal": {
+        "reason": "build-finished",
+        "success": true
+      },
+      "input_eligible": false,
+      "input_proof": {
+        "bytes": 618902647,
+        "denied_lookups": 94,
+        "inputs": 409,
+        "key": "1a7c98d79ade98221dcbc83ccb30c7f4b14d20a232d509e0faf3e371350bffd7",
+        "parts": {
+          "argv": "a036ffc1c3550157381eb86415d923309bc608d5605aedd67e641784408c410e",
+          "context": "ce9a39d82017915bab82cb426534a55078b675d26cceb5ad68e94cda53e08c2e",
+          "native_inputs": "31e44921e5cd60c43905013bf9558ed914269a97ee75e70923321abedea35e41",
+          "requests": "c1dbf3090c484e7d100d6c5f3e6e24d6aae6e6e8a11c8370b291d951a14f7f83",
+          "unclaimed_probes": "ca0b6447dd67099dca6067bc9f8cf948399af6574dc65ce31acabebf2e016463"
+        },
+        "requests": 409
+      },
+      "published": [],
+      "refused": [
+        [
+          "coordinator-full"
+        ]
+      ],
+      "resources": {
+        "exit": 0,
+        "minimum_disk": 286406639616,
+        "minimum_mem": 63329980416,
+        "seconds": 17.012415759999953
+      },
+      "source_elf": {
+        "buildid": "2e1fc716ca0b42608dc7f2d4238dc953a80634d5b63569d624d7d5bd6b4321b7",
+        "sha256": "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+        "size": 227979336,
+        "zeroed_complete_buildid": "2e1fc716ca0b42608dc7f2d4238dc953a80634d5b63569d624d7d5bd6b4321b7"
+      },
+      "source_groups": {
+        "count": 15,
+        "typed_order": [
+          "723506",
+          "18446744073709551615",
+          "256",
+          "15",
+          "f9db41b50f1d68134dee44cb7f83e01d2adc6c9178e51a2f30b71fad6707a0a3"
+        ]
+      },
+      "stored": {
+        "allocated": 227983360,
+        "links": 1,
+        "old_delete_entry_present": false,
+        "path": "/home/runner/work/_temp/ohm-foreign-join/target/debug/build/workspaces/f44635c822fcb5f3/v2-059f6eeac60cfd90/ty_server/f5c6198f896cf7b0/out/e2e-f5c6198f896cf7b0",
+        "size": 227979336
+      },
+      "verified": [
+        []
+      ],
+      "worker_count": 1
+    },
+    "old": {
+      "accepted": [],
+      "cargo_terminal": {
+        "reason": "build-finished",
+        "success": true
+      },
+      "input_eligible": false,
+      "input_proof": {
+        "bytes": 618900091,
+        "denied_lookups": 94,
+        "inputs": 409,
+        "key": "07441968e33506eb7baa8bf9c88ec7a06f634e9174d70561daea0a86dacef35c",
+        "parts": {
+          "argv": "179399577ee3a1e4b303cd44602aabd0278d54b820d94e5a26d4a40da9dea0bf",
+          "context": "3f641f788004d2de6b1efbedbb3d1def0cc413dff9332323a15eae11bb428444",
+          "native_inputs": "09ef10f174daab714f4fe606100fff4efc8548cdafbf44f21f240bc18880c39f",
+          "requests": "c6c72da15b4c2e274cd008c4ffdc6f0016ea40b87ac1d40cefd1a4a34637b19a",
+          "unclaimed_probes": "4b8359374c2fffbcd102a5005b1f232c4dd407a7d7369710daa848f7ddb5519d"
+        },
+        "requests": 409
+      },
+      "published": [],
+      "refused": [
+        [
+          "coordinator-full"
+        ]
+      ],
+      "resources": {
+        "exit": 0,
+        "minimum_disk": 288150007808,
+        "minimum_mem": 60211736576,
+        "seconds": 289.722566543
+      },
+      "signed_elf": {
+        "buildid": "c83520e0ec1209811b9ec22c681c4c2df357c604b856405b59d0c00e88be9245",
+        "sha256": "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+        "size": 227977696,
+        "zeroed_complete_buildid": "c83520e0ec1209811b9ec22c681c4c2df357c604b856405b59d0c00e88be9245"
+      },
+      "source_elf": {
+        "buildid": "c83520e0ec1209811b9ec22c681c4c2df357c604b856405b59d0c00e88be9245",
+        "sha256": "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+        "size": 227977696,
+        "zeroed_complete_buildid": "c83520e0ec1209811b9ec22c681c4c2df357c604b856405b59d0c00e88be9245"
+      },
+      "source_groups": {
+        "count": 15,
+        "typed_order": [
+          "723505",
+          "18446744073709551615",
+          "256",
+          "15",
+          "5acd108917fc70870f6b2a4b7feb2425c6f71f6093a3cfa3228268eabf51480f"
+        ]
+      },
+      "stored": {
+        "allocated": 227979264,
+        "links": 1,
+        "old_delete_entry_present": false,
+        "path": "/home/runner/work/_temp/ohm-foreign-join/target/debug/build/workspaces/f44635c822fcb5f3/v2-059f6eeac60cfd90/ty_server/f5c6198f896cf7b0/out/e2e-f5c6198f896cf7b0",
+        "size": 227977696
+      },
+      "verified": [
+        []
+      ],
+      "worker_count": 1
+    },
+    "warm1": {
+      "accepted": [],
+      "cargo_terminal": {
+        "reason": "build-finished",
+        "success": true
+      },
+      "input_eligible": false,
+      "input_proof": {
+        "bytes": 618902647,
+        "denied_lookups": 94,
+        "inputs": 409,
+        "key": "1a7c98d79ade98221dcbc83ccb30c7f4b14d20a232d509e0faf3e371350bffd7",
+        "parts": {
+          "argv": "a036ffc1c3550157381eb86415d923309bc608d5605aedd67e641784408c410e",
+          "context": "ce9a39d82017915bab82cb426534a55078b675d26cceb5ad68e94cda53e08c2e",
+          "native_inputs": "31e44921e5cd60c43905013bf9558ed914269a97ee75e70923321abedea35e41",
+          "requests": "c1dbf3090c484e7d100d6c5f3e6e24d6aae6e6e8a11c8370b291d951a14f7f83",
+          "unclaimed_probes": "ca0b6447dd67099dca6067bc9f8cf948399af6574dc65ce31acabebf2e016463"
+        },
+        "requests": 409
+      },
+      "published": [],
+      "refused": [
+        [
+          "coordinator-full"
+        ]
+      ],
+      "resources": {
+        "exit": 0,
+        "minimum_disk": 286510858240,
+        "minimum_mem": 64239263744,
+        "seconds": 8.008176899999967
+      },
+      "signed_elf": {
+        "buildid": "2e1fc716ca0b42608dc7f2d4238dc953a80634d5b63569d624d7d5bd6b4321b7",
+        "sha256": "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+        "size": 227979336,
+        "zeroed_complete_buildid": "2e1fc716ca0b42608dc7f2d4238dc953a80634d5b63569d624d7d5bd6b4321b7"
+      },
+      "source_elf": {
+        "buildid": "2e1fc716ca0b42608dc7f2d4238dc953a80634d5b63569d624d7d5bd6b4321b7",
+        "sha256": "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+        "size": 227979336,
+        "zeroed_complete_buildid": "2e1fc716ca0b42608dc7f2d4238dc953a80634d5b63569d624d7d5bd6b4321b7"
+      },
+      "source_groups": {
+        "count": 15,
+        "typed_order": [
+          "723506",
+          "18446744073709551615",
+          "256",
+          "15",
+          "f9db41b50f1d68134dee44cb7f83e01d2adc6c9178e51a2f30b71fad6707a0a3"
+        ]
+      },
+      "stored": {
+        "allocated": 227983360,
+        "links": 1,
+        "old_delete_entry_present": false,
+        "path": "/home/runner/work/_temp/ohm-foreign-join/target/debug/build/workspaces/f44635c822fcb5f3/v2-059f6eeac60cfd90/ty_server/f5c6198f896cf7b0/out/e2e-f5c6198f896cf7b0",
+        "size": 227979336
+      },
+      "verified": [
+        []
+      ],
+      "worker_count": 1
+    },
+    "warm2": {
+      "accepted": [
+        [
+          "33",
+          "7766371",
+          "227979336",
+          "37a9acb1d7db4ced0823854caa9eb968f196e5e9342350b4be2695816374ddb3",
+          "100001722"
+        ]
+      ],
+      "cargo_terminal": {
+        "reason": "build-finished",
+        "success": true
+      },
+      "input_eligible": true,
+      "input_proof": {
+        "bytes": 618902647,
+        "denied_lookups": 94,
+        "inputs": 409,
+        "key": "1a7c98d79ade98221dcbc83ccb30c7f4b14d20a232d509e0faf3e371350bffd7",
+        "parts": {
+          "argv": "a036ffc1c3550157381eb86415d923309bc608d5605aedd67e641784408c410e",
+          "context": "ce9a39d82017915bab82cb426534a55078b675d26cceb5ad68e94cda53e08c2e",
+          "native_inputs": "31e44921e5cd60c43905013bf9558ed914269a97ee75e70923321abedea35e41",
+          "requests": "c1dbf3090c484e7d100d6c5f3e6e24d6aae6e6e8a11c8370b291d951a14f7f83",
+          "unclaimed_probes": "ca0b6447dd67099dca6067bc9f8cf948399af6574dc65ce31acabebf2e016463"
+        },
+        "requests": 409
+      },
+      "published": [
+        [
+          "227979336",
+          "148073627"
+        ]
+      ],
+      "refused": [],
+      "resources": {
+        "exit": 0,
+        "minimum_disk": 286509113344,
+        "minimum_mem": 64564776960,
+        "seconds": 6.505138935000048
+      },
+      "source_elf": {
+        "buildid": "2e1fc716ca0b42608dc7f2d4238dc953a80634d5b63569d624d7d5bd6b4321b7",
+        "sha256": "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+        "size": 227979336,
+        "zeroed_complete_buildid": "2e1fc716ca0b42608dc7f2d4238dc953a80634d5b63569d624d7d5bd6b4321b7"
+      },
+      "source_groups": {
+        "count": 15,
+        "typed_order": [
+          "723506",
+          "18446744073709551615",
+          "256",
+          "15",
+          "f9db41b50f1d68134dee44cb7f83e01d2adc6c9178e51a2f30b71fad6707a0a3"
+        ]
+      },
+      "stored": {
+        "allocated": 227983360,
+        "links": 1,
+        "old_delete_entry_present": false,
+        "path": "/home/runner/work/_temp/ohm-foreign-join/target/debug/build/workspaces/f44635c822fcb5f3/v2-059f6eeac60cfd90/ty_server/f5c6198f896cf7b0/out/e2e-f5c6198f896cf7b0",
+        "same_image_in_both_output_roots": [
+          "/home/runner/work/_temp/ohm-foreign-join/target/debug/build/workspaces/f44635c822fcb5f3/v2-059f6eeac60cfd90/ty_server/f5c6198f896cf7b0/out/e2e-f5c6198f896cf7b0"
+        ],
+        "size": 227979336
+      },
+      "verified": [
+        []
+      ],
+      "worker_count": 1
+    }
+  },
+  "terminal": null,
+  "verdicts": {
+    "edit-verdict": {
+      "expected_failure": false,
+      "names": 200,
+      "stderr": "70ab573c25026cac0a9b64c08016d27ad9618e9301aefa0b5ff94e2a7c06bea3",
+      "stdout": "1b86ef92e991a80fc985a49e7775c75b6aba0ccaa257360b9563ac1fb34e1777"
+    },
+    "old-verdict": {
+      "expected_failure": false,
+      "names": 200,
+      "stderr": "47fc538a2fe25dd8466c79f7d4d1d5a5070e930c556f3335979cb87c5204de8b",
+      "stdout": "5ed3926c2a0831433b3a2f4c45a9b73b80e267620e6e7d4b4299926432b195a3"
+    },
+    "warm1-verdict": {
+      "expected_failure": false,
+      "names": 200,
+      "stderr": "89d093d9a6c95cc51b29e27710d2459b438ab6a5b7c75d9979fa6c26fe4b52a7",
+      "stdout": "8af00a4b6d8b88f55464a1c436f01fa93ca268d99d828d94347d5b55841597de"
+    },
+    "warm2-verdict": {
+      "expected_failure": false,
+      "names": 200,
+      "stderr": "f3e2ae577fdf94aa293a7f3ca9963d922767a48e6bbf56835e59455947e9d691",
+      "stdout": "1b86ef92e991a80fc985a49e7775c75b6aba0ccaa257360b9563ac1fb34e1777"
+    },
+    "withheld-old-fails": {
+      "expected_failure": true,
+      "names": 200,
+      "stderr": "3a7221bc26b42fe18ee2df730288ef29dc2b3e359d5d74bd29d41dadafc7c7e3",
+      "stdout": "51a909071f410b220641db4e459ecdd10dde30bf062563e621e7241233d1ef05"
+    }
+  }
+}

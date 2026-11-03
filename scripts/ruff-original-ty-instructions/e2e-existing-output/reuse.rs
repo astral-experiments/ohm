@@ -49,7 +49,7 @@ fn image() -> Option<String> {
     Some(hash.finalize().to_string())
 }
 
-pub(crate) fn request(output: &Path, eligible: bool) -> std::io::Result<Option<Vec<u8>>> {
+pub(crate) fn request(output: &Path, eligible: bool) -> std::io::Result<Option<(Vec<u8>,File)>> {
     use crate::frozen::log;
     let image = image();
     let forbidden = std::env::vars_os().any(|(k,_)| k.to_str().is_none_or(|k| k.starts_with("WILD_") ||
@@ -108,7 +108,7 @@ pub(crate) fn request(output: &Path, eligible: bool) -> std::io::Result<Option<V
         log(format_args!("MISS\toutput-bytes-or-generation"));return Ok(None);
     }
     log(format_args!("ACCEPT\t{}\t{}\t{}\t{}\t{}",before.dev(),before.ino(),size,expected.unwrap(),started.elapsed().as_nanos()));
-    Ok(Some(bytes))
+    Ok(Some((bytes,file)))
 }
 
 pub(crate) fn normalized_environment() {
@@ -183,4 +183,46 @@ pub(crate) fn symbols_only(bytes: &[u8]) -> bool {
         Some(())
     }
     inspect(bytes).is_some()
+}
+
+// One link runs in this process. The background writer needs the same exclusive-create guard.
+static FRESH:std::sync::atomic::AtomicBool=std::sync::atomic::AtomicBool::new(false);
+static COLLISION:std::sync::atomic::AtomicBool=std::sync::atomic::AtomicBool::new(false);
+static CREATED:std::sync::OnceLock<(u64,u64)>=std::sync::OnceLock::new();
+pub(crate) fn start_fresh_creation(){
+    assert!(!FRESH.swap(true,std::sync::atomic::Ordering::SeqCst));
+}
+pub(crate) fn fresh_creation()->bool{FRESH.load(std::sync::atomic::Ordering::SeqCst)}
+pub(crate) fn record_collision(err:&std::io::Error){
+    if err.kind()==std::io::ErrorKind::AlreadyExists {
+        COLLISION.store(true,std::sync::atomic::Ordering::SeqCst);
+    }
+}
+pub(crate) fn record_fresh_file(file:&File)->std::io::Result<()>{
+    let st=file.metadata()?;
+    CREATED.set((st.dev(),st.ino())).map_err(|_|std::io::Error::other("too many output generations"))?;
+    Ok(())
+}
+pub(crate) fn finish_fresh_creation()->bool{
+    assert!(FRESH.swap(false,std::sync::atomic::Ordering::SeqCst));
+    COLLISION.load(std::sync::atomic::Ordering::SeqCst)
+}
+pub(crate) fn before_fresh_open(path:&Path)->std::io::Result<()>{
+    if !state().join("exclusive-witness").exists(){return Ok(());}
+    notice("fresh-opening", path.as_os_str().as_encoded_bytes())?;
+    let limit=Instant::now()+Duration::from_secs(25);
+    while !state().join("fresh-continue").exists(){
+        if Instant::now()>limit{return Err(std::io::Error::other("new output collision witness timed out"));}
+        std::thread::sleep(Duration::from_millis(2));
+    }
+    Ok(())
+}
+pub(crate) fn published_new_generation(donor:&File,path:&Path)->std::io::Result<bool>{
+    let old=donor.metadata()?;
+    let Some((dev,ino))=CREATED.get().copied()else{return Ok(false)};
+    let curr=match std::fs::symlink_metadata(path){Ok(m)=>m,Err(_)=>return Ok(false)};
+    crate::frozen::log(format_args!("FRESH-GENERATIONS\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}",
+        old.dev(),old.ino(),old.len(),old.blocks(),old.nlink(),dev,ino,curr.dev(),curr.ino()));
+    Ok((old.dev(),old.ino())!=(dev,ino) && old.nlink()==0 && (curr.dev(),curr.ino())==(dev,ino)
+        && curr.is_file() && curr.nlink()==1 && curr.len()==old.len())
 }

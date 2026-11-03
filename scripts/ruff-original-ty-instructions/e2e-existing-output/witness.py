@@ -36,3 +36,23 @@ def replace_before_lookup(state,binary):
     assert (src.st_dev,src.st_mode,src.st_size,src.st_mtime_ns)==(now.st_dev,now.st_mode,now.st_size,now.st_mtime_ns)and src.st_ino!=now.st_ino
     (state/'entry-continue').touch(exist_ok=False)
     return {'mode':'replace-before-search','old_ino':src.st_ino,'new_ino':now.st_ino,'size':now.st_size,'mode_bits':now.st_mode,'mtime_ns':now.st_mtime_ns,'allocated':512*now.st_blocks}
+
+def output_collision(state,binary):
+    ready=state/'fresh-opening';limit=time.monotonic()+100
+    while not ready.exists():
+        if time.monotonic()>limit:raise RuntimeError('the actual new exclusive open did not start')
+        time.sleep(.005)
+    assert ready.read_text()==str(binary)
+    payload=b'untouched native race witness before the exclusive open\n'
+    fd=os.open(binary,os.O_CREAT|os.O_EXCL|os.O_RDWR|os.O_CLOEXEC,0o640)
+    try:
+        assert os.write(fd,payload)==len(payload);before=os.fstat(fd)
+        (state/'fresh-continue').touch(exist_ok=False)
+        until=time.monotonic()+100
+        while os.fstat(fd).st_nlink:
+            if time.monotonic()>until:raise RuntimeError('full native repair did not replace the racing output')
+            time.sleep(.01)
+        after=os.fstat(fd);actual=os.pread(fd,len(payload)+1,0)
+        assert actual==payload and after.st_size==before.st_size==len(payload)
+        return {'mode':'exclusive-collision','dev':before.st_dev,'ino':before.st_ino,'size':after.st_size,'old_link_count_after_native_repair':after.st_nlink,'sentinel_sha256':__import__('hashlib').sha256(actual).hexdigest()}
+    finally:os.close(fd)

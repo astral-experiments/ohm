@@ -51,14 +51,25 @@ pub fn qa_route_other_target() {
             crate::frozen::log(format_args!("TYPED\\t{}\\t{}\\t{}\\t{}\\t{}\\t{:?}\\t{}",
                 loaded.objects.len(),loaded.linker_scripts.len(),loaded.stub_libraries.len(),loaded.lto_objects.len(),
                 common.available_threads,common.files_per_group,output.publishes_new()));
-            if let Some(bytes)=crate::reuse::request(args.output(),safe)? {
-                let start=std::time::Instant::now();
-                output.set_size(bytes.len() as u64);
-                output.with_output_bytes(|s|{s.out.copy_from_slice(&bytes);Ok(())})?;
-                crate::frozen::log(format_args!("FRESH-PUBLISH\\t{}\\t{}",bytes.len(),start.elapsed().as_nanos()));
-                return Ok(LinkerOutput::empty());
-            }
+            FRESH_APPLICATION
         }'''.replace('all(Result::is_ok)','all(|entry| entry.is_ok())'))
+    base.rep(lib,'            FRESH_APPLICATION',Path(__file__).with_name('fresh_output.inc').read_text().rstrip())
+    fs=pub/'fs.rs'
+    create='        let file = match open_options.read(true).write(true).create(true).open(&path) {'
+    base.rep(fs,create,'''        let fresh=crate::reuse::fresh_creation();
+        if fresh {
+            crate::reuse::before_fresh_open(&path)?;
+            open_options.create_new(true);
+        }
+'''+create)
+    err="                // Retry open operation with UnlinkAndReplace if it's an ETXTBSY error and"
+    base.rep(fs,err,'''                if fresh {crate::reuse::record_collision(&error);return Err(error.into());}
+'''+err)
+    branch='if options.file_replacement_mode == FileReplacementMode::UpdateInPlaceWithFallback {'
+    base.rep(fs,branch,'if !fresh && options.file_replacement_mode == FileReplacementMode::UpdateInPlaceWithFallback {')
+    start='        let huge_pages_required = options.madvise_huge_pages == Some(true);'
+    base.rep(fs,start,'''        if fresh {crate::reuse::record_fresh_file(&file)?;}
+'''+start)
     grouping=pub/'grouping.rs';g=grouping.read_text()
     for name in ('determine_symbols_per_group','determine_max_files_per_group'):
         start='fn '+name+'(';assert g.count(start)==1;g=g.replace(start,'pub(crate) '+start)

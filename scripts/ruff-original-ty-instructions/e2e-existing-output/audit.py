@@ -18,6 +18,7 @@ import bound_inputs
 import elf_container
 import measure
 import eligibility
+import lease_cases
 import symbols_control
 import matched_stock
 import witness
@@ -131,22 +132,14 @@ def main(enable=False):
     meta=json.loads(subprocess.check_output(['cargo','+ohm','metadata','--format-version=1','--locked','--offline','--no-deps'],cwd=w.work,env=env));assert len(meta['workspace_default_members'])==55
     result={};signed_reference=None;latch=None
     phases=STAGES.copy()
-    if enable:phases[5:5]=[('warm-control',None),('warm-repeat',None),('mid-output','mid-output'),('rename-output','rename-output')]
+    if enable:phases[5:5]=[('warm-control',None),('warm-repeat',None),('mid-output','mid-output'),('rename-output','rename-output'),('exclusive-collision','exclusive-collision')]
     for tag,mode in phases:
         if tag=='edit':b.select(b.NEW);assert b.verdict(out,'withheld-old-fails',env,101)==contact.LITERALS['list']
         if tag=='corrupt':
             stat=out.stat();i=donor.text_flip(out);os.utime(out,ns=(stat.st_atime_ns,stat.st_mtime_ns));assert w.hf(out)!=contact.LITERALS['new'];b.write(P/'corrupt-preset.json',{'text_offset':i,'sha256':w.hf(out)})
-        cap=os.open(out,os.O_PATH|os.O_CLOEXEC)if tag=='capability'else None
+        cap=lease_cases.held(out,lambda v:b.write(P/'actual-lease-independent-controls.json',v))if tag=='capability'else None
         capability_start_ns=time.monotonic_ns() if cap is not None else None
-        if cap is not None:
-            old_id=os.fstat(cap)
-            saved_handler=signal.signal(signal.SIGIO,signal.SIG_IGN)
-            try:
-                with out.open('rb')as owner:
-                    fcntl.fcntl(owner,fcntl.F_SETLEASE,fcntl.F_WRLCK)
-                    assert fcntl.fcntl(owner,fcntl.F_GETLEASE)==fcntl.F_WRLCK
-                    fcntl.fcntl(owner,fcntl.F_SETLEASE,fcntl.F_UNLCK)
-            finally:signal.signal(signal.SIGIO,saved_handler)
+        if cap is not None:old_id=os.fstat(cap)
         failed=mode in ('malformed','mid-read');before=set(state.glob('actor-*.tsv'));ready=set(state.glob('ready-*'));stop=threading.Event()
         wants=enable and tag not in ('old','warm1','warm-control','native-repair','save-repair','final') and not failed
         serial=(not failed and tag not in ('capability','corrupt','replace')) if not enable else tag in ('old','warm1','native-repair','save-repair','final')
@@ -158,11 +151,13 @@ def main(enable=False):
         if serial:(state/'stock-reference').touch(exist_ok=False)
         if mode:
             marker='mid-output' if mode in ('mid-output','rename-output') else ('mid-read' if mode=='mid-read'else'entry-wait')
+            if mode=='exclusive-collision':marker='exclusive-witness'
             (state/marker).touch(exist_ok=False)
         with ThreadPoolExecutor(max_workers=2)as pool:
             target=pool.submit(control,state,stop,stock,llvm,tag,serial,wants,latch,ready)if not failed else None
             if mode in ('mid-output','rename-output'):
                 mutate=pool.submit(witness.output_save,state,out,mode=='rename-output')
+            elif mode=='exclusive-collision':mutate=pool.submit(witness.output_collision,state,out)
             elif mode=='replace':mutate=pool.submit(witness.replace_before_lookup,state,out)
             else:mutate=pool.submit(donor.witness,state,mode,provider,out)if mode else None
             try:
@@ -194,10 +189,16 @@ def main(enable=False):
                 if held['candidate_requested']:assert groups
             did_reuse=any(x.startswith('FRESH-PUBLISH\t')for x in rows)
             assert did_reuse==(tag in ('warm2','warm-repeat','capability')),(tag,did_reuse,a['native_operations'])
+            generations=[r.split('\t')[1:]for r in rows if r.startswith('FRESH-GENERATIONS\t')]
+            if did_reuse:
+                assert len(generations)==1
+                old_dev,old_ino,old_size,old_blocks,old_links,opened_dev,opened_ino,named_dev,named_ino=map(int,generations[0])
+                assert old_links==0 and old_size>0 and old_blocks>0 and (opened_dev,opened_ino)==(named_dev,named_ino)!=(old_dev,old_ino)
+                a['fresh_inode']={'held_old':[old_dev,old_ino,old_size,old_blocks*512,old_links],'newly_created':[opened_dev,opened_ino],'named':[named_dev,named_ino]}
             if did_reuse:assert held['candidate_requested'] and not serial and sum(x.startswith('ACCEPT\t')for x in rows)==1
             if tag in ('edit','earlier','four','native-repair'):assert not held['candidate_requested'],tag
             if tag=='edit':assert held['role']['key']!=latch['key'], 'an ordinary real Ruff edit collided with the OLD latch'
-            if tag in ('corrupt','replace','mid-output','rename-output'):
+            if tag in ('corrupt','replace','mid-output','rename-output','exclusive-collision'):
                 assert held['candidate_requested'] and any(x.startswith('MISS\toutput-')for x in rows),(tag,a['native_operations'])
         if not failed:
             assert held and (enable or not held['candidate_requested']);native=elf_container.inspect(out,llvm);b.write(P/(tag+'-source-container.json.gz'),native)
@@ -251,7 +252,7 @@ def main(enable=False):
                 t=subprocess.run([out,'--list'],cwd=w.work/'crates/ty_server',env=env,capture_output=True);assert t.returncode==83 and not t.stdout;a['exit']=t.returncode
             else:assert b.verdict(out,tag+'-verdict',env,0)==contact.LITERALS['list']
         b.write(P/(tag+'-complete.json'),a);result[tag]=a
-        for f in ('coordinate','stock-reference','mid-output','output-half','output-continue','mid-read','entry-wait','entry-ready','read-first-half','entry-continue','continue-read'):(state/f).unlink(missing_ok=True)
+        for f in ('exclusive-witness','fresh-opening','fresh-continue','coordinate','stock-reference','mid-output','output-half','output-continue','mid-read','entry-wait','entry-ready','read-first-half','entry-continue','continue-read'):(state/f).unlink(missing_ok=True)
         for f in state.glob('local-env-*'):f.unlink()
     if enable:
         # Dispose only this worker's own isolated build state before the unmodified
