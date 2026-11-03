@@ -1,0 +1,7 @@
+# Private GNU compiler build for uv #21577
+
+Both workers reconstruct the four sources of signed Ohm 1.99.0-23. R rebuilds its Rust revision d57fd151. T applies the independently checked 13-object source packet for 1e84052b. The normal optimized distribution retains its compiled Cargo in each SDK. Native checks and subsequent comparisons use the same Cargo executable from the signed release.
+
+Both workers execute the merged GNU release recipe for x86_64-unknown-linux-gnu with extended stage2, executed PGO training, ThinLTO, BOLT, Wild, a physical disk reserve and a stage watchdog. A separate reader copies opt-dist's actual pre-BOLT backup during the command. It preserves complete bootstrap exception files before their owning Cargo invocation cleans up. Available linker arguments supplement that source and physical evidence.
+
+The rc23-21577-sdk-{R,T} artifacts contain the untouched ohm.tar.gz, source.json, role.json, component and file inventories, and SHA256SUMS. The same-run rc23-21577-qa-{R,T}-attempt-1 artifacts contain full build logs, capacity evidence, both ELF censuses, the observed exception list and native EII, FFI and preload probes. The rc23-21577-signed-cargo artifact carries the authenticated common Cargo and its archive/member receipt. The rc23-21577-pair artifact reports the number of common symbols and previous dynamic slots that changed. This build collects zero performance samples.

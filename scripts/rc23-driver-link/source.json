@@ -1,0 +1,59 @@
+{
+  "changed_formats": [],
+  "commit": "1e84052bab906c68e8d63eecc806198d299b55c4",
+  "files": {
+    "compiler/rustc_codegen_ssa/src/back/linker.rs": {
+      "after": {
+        "bytes": 72631,
+        "mode": "100644",
+        "oid": "3db97a0044b33ea98c37a9ce36c310bfd91f03a4",
+        "sha256": "c1357c208b20b1ad70eded1e5f4ed94d13a1e3def30014159cc41f1fb0c67ba9"
+      },
+      "before": {
+        "bytes": 69843,
+        "mode": "100644",
+        "oid": "a4aefc2a02b33a453c922cb5eea963a26eab8f87",
+        "sha256": "a687d983c5d8a0d03fb0989a882f7e3f9771d0fa1de13f3ff82c955ccf791ea3"
+      }
+    },
+    "src/bootstrap/src/core/build_steps/compile.rs": {
+      "after": {
+        "bytes": 125799,
+        "mode": "100644",
+        "oid": "743e91b231f32f6f24f33ae87ed724a0eeb862c7",
+        "sha256": "e6d4a5e4a79bad6790cd4d336277b59e4d52252552c50a5f316f71d193c09083"
+      },
+      "before": {
+        "bytes": 124849,
+        "mode": "100644",
+        "oid": "e58d418a1717e7ec6e47770d19bedf22948ac679",
+        "sha256": "2f618b730adf941ea5fad52d9a206ce9c8ad6cf45efb8dfeaad7bae00c8fecbc"
+      }
+    }
+  },
+  "linker": "GNU LLD x86_64-unknown-linux-gnu BOLT stage1 rustc_driver",
+  "ordinary_driver_policy": "typed strong Rust-only function references from unique in-tree compiler crates; all C-visible, retained, raw and thread-local symbols excluded",
+  "packet": {
+    "bytes": 56446,
+    "objects": [
+      "1e84052bab906c68e8d63eecc806198d299b55c4",
+      "3db97a0044b33ea98c37a9ce36c310bfd91f03a4",
+      "58f28df8c5f27c035b80ac78211b2ac1368e2a51",
+      "743e91b231f32f6f24f33ae87ed724a0eeb862c7",
+      "7d9976a6f883c396564c3d102ddfd2933847c50b",
+      "86f09fe0ba8685f46d16d884ebbedc8b84e01aa3",
+      "89a1bfd58d99a33eb0fbcebbc1d627a58db5795b",
+      "b5248ae8a7416bfb2373152cb1fd33a2bee2db80",
+      "b667c9aebda6b0bced2be26aaab25304cf83f769",
+      "c6c07f5f45df05dee1cf4f1e2823a0c24e469983",
+      "cbb86f861bbc191f03f5ba8294c47b00226f8f28",
+      "e9e2758f12aabf9839084bf5642aafb9d26fb1b3",
+      "fe38587b79da961a99573f9a65a223f06452a39e"
+    ],
+    "sha256": "d725de1efa50594808bcaf3b6b6157edb2cbbd27b98fb9cc157f30c87b4c3f76"
+  },
+  "parent": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+  "parent_tree": "f5bf03d73f71243fb88e34ecb0b155ef11e99a47",
+  "role": "P",
+  "tree": "cbb86f861bbc191f03f5ba8294c47b00226f8f28"
+}

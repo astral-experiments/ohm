@@ -1,4 +1,4 @@
-name: Build one private handwritten-impl compiler
+name: Build private stage-2 GNU driver-link pair
 'on':
   workflow_dispatch:
     inputs:
@@ -9,14 +9,15 @@ name: Build one private handwritten-impl compiler
 permissions: {}
 jobs:
   plan:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21134-handwritten-production23' && github.sha == inputs.reviewed_head && github.run_attempt
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21577-driver-link-production23' && github.sha == inputs.reviewed_head && github.run_attempt
       == 1
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-    timeout-minutes: 5
+    timeout-minutes: 15
     outputs:
       roles: ${{ steps.admission.outputs.roles }}
+      signed_cargo_id: ${{ steps.upload.outputs.artifact-id }}
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       OHM_TARGET: x86_64-unknown-linux-gnu
@@ -29,12 +30,28 @@ jobs:
         ref: ${{ github.sha }}
         fetch-depth: 2
     - id: admission
-      name: Admit the sole reviewed G source packet
-      run: python3 -ISB scripts/rc23-22958-production/gate.py plan >> "$GITHUB_OUTPUT"
+      name: Admit the signed baseline and one reviewed compiler delta
+      run: python3 -ISB scripts/rc23-driver-link/gate.py plan >> "$GITHUB_OUTPUT"
+    - name: Verify the original signed distribution and extract the common Cargo
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: python3 -ISB scripts/rc23-driver-link/signed_cargo.py fixed-cargo
+    - id: upload
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: rc23-21577-signed-cargo
+        path: fixed-cargo/
+        if-no-files-found: error
+        compression-level: 0
+        retention-days: 14
   build:
-    name: Private GNU SDK (G)
+    name: Private GNU SDK (${{ matrix.arm }})
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: ${{ fromJSON(needs.plan.outputs.roles) }}
     needs: plan
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21134-handwritten-production23' && github.sha == inputs.reviewed_head && github.run_attempt
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21577-driver-link-production23' && github.sha == inputs.reviewed_head && github.run_attempt
       == 1
     runs-on: namespace-profile-ubuntu-24-04-16
     permissions:
@@ -45,7 +62,7 @@ jobs:
       OHM_TARGET: x86_64-unknown-linux-gnu
       OHM_TOOLCHAIN: ohm-1.99.0-23
       PYTHONDONTWRITEBYTECODE: '1'
-      BENCH_ARM: G
+      BENCH_ARM: ${{ matrix.arm }}
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
@@ -122,13 +139,13 @@ jobs:
           toolchains
           .github/workflows
     - name: Require the signed source decision and approved role transport
-      run: python3 -ISB scripts/rc23-22958-production/gate.py build
+      run: python3 -ISB scripts/rc23-driver-link/gate.py build
     - name: Admit actual workspace and reserve physical capacity
       run: python3 -ISB scripts/rc23-22958-production/standard-capacity.py init
     - name: Reopen the same four qualified sources and the precise compiler change
       run: |
         python3 -IB scripts/rc23-cross-qualification/materialize-final.py
-        python3 -ISB scripts/rc23-22958-production/materialize.py
+        python3 -ISB scripts/rc23-driver-link/source.py
       shell: python3 -ISB scripts/rc23-22958-production/standard-capacity.py watch materialize {0}
     - name: Install native GNU bootstrap prerequisites
       shell: python3 -ISB scripts/rc23-22958-production/standard-capacity.py watch prerequisites {0}
@@ -226,8 +243,14 @@ jobs:
           "$GITHUB_WORKSPACE/official-release/release/bootstrap.toml" 2>&1 | tee "$GITHUB_WORKSPACE/trait-evidence/build.log"
       shell: python3 -ISB ../scripts/rc23-22958-production/standard-capacity.py watch production {0}
       working-directory: official-release
-    - name: Verify installed components, ELF and native regression suites
-      run: python3 -ISB scripts/rc23-22958-production/native.py
+    - name: Receive the common signed Cargo from this exact plan
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+      with:
+        artifact-ids: ${{ needs.plan.outputs.signed_cargo_id }}
+        path: official-cargo
+        merge-multiple: true
+    - name: Verify installed components, ELF, EII and real external interposition
+      run: python3 -ISB scripts/rc23-driver-link/native.py
       shell: python3 -ISB scripts/rc23-22958-production/standard-capacity.py watch native-qa {0}
     - name: Reopen role, native and capacity evidence
       run: python3 -ISB scripts/rc23-22958-production/standard-capacity.py summarize
@@ -235,7 +258,7 @@ jobs:
     - name: Upload qualified private SDK
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: rc23-21134-sdk-G
+        name: rc23-21577-sdk-${{ matrix.arm }}
         path: trait-sdk/
         if-no-files-found: error
         compression-level: 0
@@ -244,7 +267,38 @@ jobs:
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: rc23-21134-qa-G-attempt-${{ github.run_attempt }}
+        name: rc23-21577-qa-${{ matrix.arm }}-attempt-${{ github.run_attempt }}
         path: trait-evidence/
         if-no-files-found: warn
+        retention-days: 14
+  pair:
+    name: Compare actual GNU driver policy evidence
+    needs: build
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21577-driver-link-production23' && github.sha == inputs.reviewed_head && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    timeout-minutes: 10
+    env:
+      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        persist-credentials: false
+        ref: ${{ github.sha }}
+        fetch-depth: 2
+    - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+      with:
+        name: rc23-21577-qa-R-attempt-1
+        path: incoming/R
+    - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+      with:
+        name: rc23-21577-qa-T-attempt-1
+        path: incoming/T
+    - run: python3 -ISB scripts/rc23-driver-link/pair.py
+    - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: rc23-21577-pair
+        path: pair-evidence/
+        if-no-files-found: error
         retention-days: 14

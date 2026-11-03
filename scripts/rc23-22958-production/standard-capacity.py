@@ -23,7 +23,7 @@ FLOOR = 32 * GIB
 INTERVAL = 0.25
 MAX_GAP = 2.0
 CHILD_GRACE_NS = 5_000_000_000
-BRANCH = "refs/heads/charlie/codex-21134-handwritten-production23"
+BRANCH = "refs/heads/charlie/codex-21577-driver-link-production23"
 STAGES = ("materialize", "prerequisites", "bolt-tools", "wild", "production", "native-qa")
 SENTINEL = ".ctfe22-physical-emergency-reserve"
 
@@ -116,14 +116,14 @@ def release(path, held):
 def context():
     e = os.environ
     assert e["GITHUB_REPOSITORY"] == "astral-experiments/ohm" and e["GITHUB_EVENT_NAME"] == "workflow_dispatch"
-    assert e["GITHUB_REF"] == BRANCH and e["BENCH_ARM"] == "G"
+    assert e["GITHUB_REF"] == BRANCH and e["BENCH_ARM"] in ("R","T")
     assert e["GITHUB_ACTIONS"]=="true" and e["GITHUB_JOB"]=="build" and e["GITHUB_RUN_ATTEMPT"]=="1" and e["GITHUB_WORKFLOW_SHA"]==e["GITHUB_SHA"] and e["GITHUB_WORKFLOW_REF"]==e["GITHUB_REPOSITORY"]+"/.github/workflows/ci.yml@"+BRANCH
     assert e["RUNNER_OS"]=="Linux" and e["RUNNER_ARCH"]=="X64" and e["RUNNER_NAME"].startswith("nsc-runner-")
     assert re.fullmatch(r"/home/runner/work/ohm/ohm/?",e["GITHUB_WORKSPACE"])
     assert e["GITHUB_SHA"] == e["REVIEWED_HEAD"] and re.fullmatch("[0-9a-f]{40}",e["GITHUB_SHA"])
     w = Path(e["GITHUB_WORKSPACE"]).resolve()
     head=subprocess.check_output(["git","-C",w,"rev-parse","HEAD","HEAD^"],text=True).splitlines()
-    assert head==[e["GITHUB_SHA"],'683db047247d11b881bfea1bca34543826a7511d']
+    assert head==[e["GITHUB_SHA"],'aecbf860cfee7523292d41c38a5e397567895074']
     assert e["GITHUB_RUN_ATTEMPT"]=="1"
     return w, w/"capacity-evidence"
 
@@ -277,7 +277,9 @@ def watch(w, evidence, stage, shellfile):
                 cause = pressure(free,last_free,gap)
                 if cause:raise RuntimeError(cause)
                 if proc is None:
-                    proc = subprocess.Popen(["/bin/bash","--noprofile","--norc","-e","-o","pipefail",shellfile],start_new_session=True)
+                    cmd = ["/bin/bash","--noprofile","--norc","-e","-o","pipefail",shellfile]
+                    if stage=="production":cmd=[sys.executable,"-ISB",str(HOOK.parent/"rc23-driver-link/watch.py"),shellfile]
+                    proc = subprocess.Popen(cmd,start_new_session=True)
                 elif proc.poll() is not None:
                     diagnostic["exit"]=proc.returncode
                     if proc.returncode:raise RuntimeError("release command failed")
@@ -366,7 +368,7 @@ def score(w,evidence):
     if complete:
         assert all(any(k.startswith(f"Stage {n} (") and " > " not in k for k in finished) for n in (1,3,5))
         import runpy
-        gate = runpy.run_path(str(HOOK/"gate.py"))
+        gate = runpy.run_path(str(HOOK.parent/"rc23-driver-link/gate.py"))
         gate["verify_sdk_receipts"](w, src, role, proofs)
         assert all(v["min_available"]>STOP and v["max_gap_s"]<=MAX_GAP for v in steps.values())
         assert all(v["adopted"]["no_children"] is True and v["adopted"]["grace_ns"]==CHILD_GRACE_NS
