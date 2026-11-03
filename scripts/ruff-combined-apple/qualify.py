@@ -9,7 +9,7 @@ import subprocess as sp
 import sys
 import tarfile
 
-host = "aarch64-apple-darwin"
+host = os.environ["OHM_TARGET"]
 root = Path(os.environ["RUNNER_TEMP"]) / "combined"
 workspace = Path(os.environ["GITHUB_WORKSPACE"])
 normal = root / "reopened/normal"
@@ -17,7 +17,7 @@ fixed = root / "reopened/defer"
 ru = root / "rustup"
 logs = root / "logs"
 logs.mkdir(exist_ok=True)
-assert platform.system() == "Darwin" and platform.machine() == "arm64"
+assert (host,platform.system(),platform.machine()) in [("aarch64-apple-darwin","Darwin","arm64"),("x86_64-unknown-linux-gnu","Linux","x86_64")]
 assert os.environ["GITHUB_RUN_ATTEMPT"] == "1"
 src = workspace / "source/rust"
 cargo = workspace / "cargo-src"
@@ -25,12 +25,40 @@ sys.path.insert(0, str(workspace / "fixtures/scripts/ruff-matched-stage"))
 import smoke
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import matched_paths
+import macho
+import release_cases
 
 def git_sha(path, expr):
     return sp.check_output(["git", "-C", path, "rev-parse", expr], text=True).strip()
 
+def check_cargo_files():
+    import stat
+    items=sp.check_output(["git","-C",cargo,"ls-tree","-rz","HEAD"]).split(b"\0")
+    expected=set()
+    for item in items:
+        if not item:continue
+        header,raw=item.split(b"\t",1);mode,kind,oid=header.split()
+        rel=Path(os.fsdecode(raw));path=cargo/rel;expected.add(rel)
+        info=path.lstat()
+        if mode==b"120000":
+            assert stat.S_ISLNK(info.st_mode);body=os.fsencode(os.readlink(path))
+        else:
+            assert kind==b"blob" and stat.S_ISREG(info.st_mode)
+            assert mode==(b"100755" if info.st_mode&stat.S_IXUSR else b"100644")
+            body=path.read_bytes()
+        assert hashlib.sha1(b"blob "+str(len(body)).encode()+b"\0"+body).hexdigest()==oid.decode(),rel
+    actual=set()
+    for directory,dirs,files in os.walk(cargo):
+        base=Path(directory)
+        if base==cargo and ".git" in dirs:dirs.remove(".git")
+        for name in dirs[:]:
+            if (base/name).is_symlink():files.append(name);dirs.remove(name)
+        actual.update((base/name).relative_to(cargo)for name in files)
+    assert len(expected)>3000 and actual==expected,(actual-expected,expected-actual)
+
 def check_sources():
-    for repo, ref, tree in ((src, "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2", "d9d8d190d49a742d7b990d46420bace16f9fd2db"), (cargo, "4a6de7858c60e579fc30e01f5b60ddcaa84c2e30", "1a128e47d068ee91f33ba94e416ee0c0e014de5a"), (workspace/"fixtures", "5b47d5755bd515e61a98b9f85eca3af0aaf7c137", "d22f09981bdd81fc892fd47d894233639d0f3dab")):
+    check_cargo_files()
+    for repo, ref, tree in ((src, "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2", "d9d8d190d49a742d7b990d46420bace16f9fd2db"), (cargo, "d5185be60b88e36ffb5e9daeb543b9f14d077a37", "4b9a4d7ca2e5abb29c307fa501ec6a437e30dea3"), (workspace/"fixtures", "5b47d5755bd515e61a98b9f85eca3af0aaf7c137", "d22f09981bdd81fc892fd47d894233639d0f3dab")):
         assert git_sha(repo, "HEAD") == ref and git_sha(repo, "HEAD^{tree}") == tree
         if repo!=src:
             sp.run(["git", "-C", repo, "diff", "--exit-code", "HEAD", "--"], check=True)
@@ -57,6 +85,13 @@ def source():
     sp.run(["git","-C",src,"fetch","--no-tags","--no-recurse-submodules",packet,"refs/heads/charlie/record-included-bytes-at-read"],check=True)
     assert git_sha(src,"FETCH_HEAD")=="d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2"
     sp.run(["git","-C",src,"checkout","--quiet","--detach","--no-recurse-submodules",git_sha(src,"FETCH_HEAD")],check=True)
+    cargo_packet=Path(__file__).resolve().with_name("integrated-cargo.bundle")
+    assert git_sha(cargo,"HEAD")=="4a6de7858c60e579fc30e01f5b60ddcaa84c2e30" and smoke.sha(cargo_packet)=="aac42ae4a0b972050f8d8492e70c927487e3c89ae889890a319bae15281255f2"
+    sp.run(["git","-C",cargo,"bundle","verify",cargo_packet],check=True)
+    sp.run(["git","-C",cargo,"fetch","--no-tags",cargo_packet,"refs/heads/charlie/qa-rc23-combined-doctest-and-input-fixes"],check=True)
+    assert git_sha(cargo,"FETCH_HEAD")=="d5185be60b88e36ffb5e9daeb543b9f14d077a37"
+    sp.run(["git","-C",cargo,"checkout","--quiet","--detach","FETCH_HEAD"],check=True)
+    assert [git_sha(cargo,r) for r in ("HEAD^1","HEAD^2")]==["4a6de7858c60e579fc30e01f5b60ddcaa84c2e30","aee854cc8cc48194c5cb4e240fd944e2fdd14bce"]
     check_sources()
     smoke.save(logs/"sources.json",{"rust":git_sha(src,"HEAD"),"cargo":git_sha(cargo,"HEAD"),"packet":smoke.sha(packet)})
 
@@ -66,8 +101,10 @@ def clean_env():
 
 def install():
     check_sources()
-    archive = root / "ohm-1.99.0-23-aarch64-apple-darwin.tar.gz"
-    assert archive.stat().st_size == 295155861 and smoke.sha(archive) == "371e7cb6ca778e44b599ee4fbb83c7ca85f6306353825bce1d40f7d692f03a53"
+    archive = root / ("ohm-1.99.0-23-"+host+".tar.gz")
+    wanted={"aarch64-apple-darwin":(295155861,"371e7cb6ca778e44b599ee4fbb83c7ca85f6306353825bce1d40f7d692f03a53"),
+            "x86_64-unknown-linux-gnu":(359921838,"fc85a2ca6d47711058cd89c790c8e57f1799472e38f0ee0a08b0a51d06c1ee7b")}
+    assert (archive.stat().st_size,smoke.sha(archive))==wanted[host]
     pack = root/"dist"; pack.mkdir()
     with tarfile.open(archive, "r:gz") as tar:
         tar.extractall(pack, filter="data")
@@ -76,7 +113,7 @@ def install():
     smoke.save(logs/"signed.json", {"release":smoke.sha(archive), "tools": tools(normal)})
 
 def tools(sdk):
-    driver, = (sdk/"lib").glob("librustc_driver-*.dylib")
+    driver, = (sdk/"lib").glob("librustc_driver-*.dylib" if host.startswith("aarch64") else "librustc_driver-*.so")
     paths = [sdk/"bin"/n for n in ("rustc","cargo","rustdoc")]+[driver]
     return {str(p.relative_to(sdk)): smoke.sha(p) for p in paths}
 
@@ -86,9 +123,9 @@ def build():
     bindir = root/"bootstrap-alias"/"toolchains"
     bindir.mkdir(parents=True)
     (bindir/"ohm").symlink_to(normal, target_is_directory=True)
-    ce = dict(env, RUSTUP_HOME=str(bindir.parent), RUSTUP_TOOLCHAIN="ohm", CARGO_HOME=str(root/"builder-cargo-home"), CARGO_TARGET_DIR=str(root/"cargo-target"), CARGO_BUILD_BUILD_DIR=str(root/"cargo-build"), CARGO_PROFILE_DEV_DEBUG="0", CARGO_PROFILE_DEV_INCREMENTAL="false", CARGO_NET_GIT_FETCH_WITH_CLI="true")
-    sp.run(["cargo","+ohm","-Zohm-defaults=no","build","--locked","-p","cargo","--bin","cargo","--features","ohm-defaults","-j6"], env=ce, cwd=cargo, check=True)
-    candidate = root/"cargo-target/debug/cargo"
+    ce = dict(env, RUSTUP_HOME=str(bindir.parent), RUSTUP_TOOLCHAIN="ohm", CARGO_HOME=str(root/"builder-cargo-home"), CARGO_TARGET_DIR=str(root/"cargo-target"), CARGO_BUILD_BUILD_DIR=str(root/"cargo-build"), CARGO_PROFILE_RELEASE_LTO="thin", CARGO_PROFILE_RELEASE_INCREMENTAL="false", CARGO_PROFILE_RELEASE_DEBUG="0", CARGO_NET_GIT_FETCH_WITH_CLI="true")
+    sp.run(["cargo","+ohm","-Zohm-defaults=no","build","--release","--locked","-p","cargo","--bin","cargo","--features","all-static,ohm-defaults","-j6"], env=ce, cwd=cargo, check=True)
+    candidate = root/"cargo-target/release/cargo"
     assert candidate.is_file()
     output = root/"rust-build"
     args = [sys.executable,"-IB","x.py","--ci","false","--build-dir",str(output),"--set","build.submodules=false","--set","rust.debug-assertions=false","--set","rust.lto=off","--set","llvm.download-ci-llvm=true","--set","rust.download-rustc=false","build","--stage","1","-j6","compiler/rustc","library","src/tools/rustdoc"]
@@ -166,7 +203,25 @@ def exercise():
     for role,sdk in (("signed",normal),("fixed",fixed)):
         prerequisite(role,sdk,base)
     assert before=={"P":tools(normal),"C":tools(fixed)}
-    assert all(len(set(group)) == 1 for group in comparisons), comparisons
+    import gzip
+    native=[]
+    for group in comparisons:
+        if group[0] is None:
+            assert set(group)=={None}
+            continue
+        if host.startswith("x86_64"):
+            assert len(set(group))==1
+            native.append({"identical":group[0]})
+        else:
+            left,right=group[0],group[-2]
+            assert group[-1]==left
+            data=[gzip.decompress((logs/(key+".macho.gz")).read_bytes())for key in (left,right)]
+            assert [hashlib.sha256(b).hexdigest()for b in data]==[left,right]
+            native.append(macho.compare(*data))
+    assert len(native)==8
+    smoke.save(logs/"native-comparisons.json",native)
+    release_cases.run(root,normal,fixed,base,logs)
+    assert before=={"P":tools(normal),"C":tools(fixed)}
     smoke.save(logs/"accepted-combined.json", {"rust":git_sha(src,"HEAD"),"cargo":git_sha(cargo,"HEAD"),"summaries":smoke.sha(logs/"smoke.json"),"tools":before,"prerequisite_commands":14})
 
 if __name__=="__main__":

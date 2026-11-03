@@ -20,8 +20,9 @@ def native(work, env, mode, label):
                  if a.get("target", {}).get("name") == smoke.TARGET and a.get("executable")]
     executable = Path(artifact["executable"])
     data = executable.read_bytes()
-    assert data[:4] == bytes.fromhex("cffaedfe") and hashlib.sha256(data).hexdigest() == row["elf"]
-    dest = logs / (row["elf"] + ".macho.gz")
+    magic = bytes.fromhex("cffaedfe") if os.uname().sysname=="Darwin" else b"\x7fELF"
+    assert data[:4] == magic and hashlib.sha256(data).hexdigest() == row["elf"]
+    dest = logs / (row["elf"] + (".macho.gz" if os.uname().sysname=="Darwin" else ".elf.gz"))
     if not dest.exists():
         dest.write_bytes(gzip.compress(data, compresslevel=4, mtime=0))
     row["executable"] = str(executable)
