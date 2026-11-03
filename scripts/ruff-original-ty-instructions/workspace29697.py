@@ -147,10 +147,10 @@ def save_elf(path):
     return content['sha256']
 
 
-def run(argv,env,td,allowed=0):
+def run(argv,env,td,allowed=0,*,pass_fds=()):
     w.guard();start=time.monotonic();resources=[(w.avail(),shutil.disk_usage(w.root).free)]
     with (td/'stdout.jsonl').open('xb') as out,(td/'stderr').open('xb') as err:
-        child=sp.Popen(argv,cwd=w.work,env=env,stdout=out,stderr=err,start_new_session=True)
+        child=sp.Popen(argv,cwd=w.work,env=env,stdout=out,stderr=err,start_new_session=True,pass_fds=pass_fds)
         try:
             while child.poll() is None:
                 mem=w.avail();free=shutil.disk_usage(w.root).free;resources.append((mem,free))
