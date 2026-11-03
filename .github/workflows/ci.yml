@@ -158,6 +158,7 @@ jobs:
         retention-days: 15
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      OHM_TARGET: aarch64-apple-darwin
       PYTHONDONTWRITEBYTECODE: '1'
 'on':
   workflow_dispatch:
