@@ -20,7 +20,7 @@ permissions:
   attestations: read
 jobs:
   eight-real-session-pairs:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22536-signed23-split-projection' && github.sha == inputs.reviewed_head && github.run_attempt == 1 && false
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22536-signed23-split-projection' && github.sha == inputs.reviewed_head && github.run_attempt == 1 && inputs.enrollment_sha == 'd94a4cf11bfb1345e14760dd4b1ea970848f6b6936aed0d9de81d51f55c28007' && inputs.primary_head == 'aca48cdac3a4c37076a4e91ef53efa17d0144efc'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 210
     env:
