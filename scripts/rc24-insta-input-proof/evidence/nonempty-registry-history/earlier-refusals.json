@@ -1,0 +1,24 @@
+[
+  {
+    "case": "published-historical",
+    "included_in_61": false,
+    "partial_evidence": {
+      "evidence/fetch.stderr": "d3f071f3fb7d259de54efea7a19abfda72ddfb4b7bb3cc2fdd33aa6960a5c031",
+      "evidence/lock.stderr": "ca18adb57bdd3939344f6fd1872a81b7bf41ad943c89bd7621f54b760039b895",
+      "evidence/old-parent/stderr": "1a1e679f97ec11081ff93671bd8d3b264c0496cc4fd4a3df564b87ff4e4f4193",
+      "evidence/old-parent/stdout.jsonl": "36930e873fd4d174cc7131e25b185a730d7f30ab11a169f1eb5e5d89d2a94d50",
+      "evidence/registration.json": "1d4a805bfe8cc09cca4559d71b9a045260286b7c34c9156f525bb8dd2ad712a5"
+    },
+    "reason": "old translation was read using a misplaced fixture-local variable",
+    "source_sha256": "5c1d14d6fd2a4784dc171b93c03527897c1007c82d364f23a34cf4509006839c",
+    "stderr": "Traceback (most recent call last):\n  File \"/home/dev-user/.cache/ohm-llvm-dev-pipeline-20261102/insta-unchanged-release-23-24-01/late-registry-inputs-01/legacy-partial/release.py\", line 525, in <module>\n    main()\n  File \"/home/dev-user/.cache/ohm-llvm-dev-pipeline-20261102/insta-unchanged-release-23-24-01/late-registry-inputs-01/legacy-partial/release.py\", line 427, in main\n    old = visit(\"old-parent\", \"parent\", wanted=\"7 17 83\")\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/dev-user/.cache/ohm-llvm-dev-pipeline-20261102/insta-unchanged-release-23-24-01/late-registry-inputs-01/legacy-partial/release.py\", line 340, in visit\n    parsed = parse(raw)\n             ^^^^^^^^^^\n  File \"/home/dev-user/.cache/ohm-llvm-dev-pipeline-20261102/insta-unchanged-release-23-24-01/late-registry-inputs-01/legacy-partial/release.py\", line 66, in parse\n    if a.published_parent:\n       ^\nNameError: name 'a' is not defined\n"
+  },
+  {
+    "case": "attribution-matched23",
+    "included_in_61": false,
+    "partial_evidence": {},
+    "reason": "signed -23 rustc was sent through a -24-only front check",
+    "source_sha256": "a1a611e86996744aec5d5c04d0713447000098634b11a390a080c041a4b27c8d",
+    "stderr": "Traceback (most recent call last):\n  File \"/home/dev-user/.cache/ohm-llvm-dev-pipeline-20261102/insta-unchanged-release-23-24-01/late-registry-inputs-01/legacy-partial/attribution.py\", line 558, in <module>\n    main()\n  File \"/home/dev-user/.cache/ohm-llvm-dev-pipeline-20261102/insta-unchanged-release-23-24-01/late-registry-inputs-01/legacy-partial/attribution.py\", line 261, in main\n    b\"f5a51d8cc3e76236c2d0f17d495d59ebb03306e4\"\nAssertionError\n"
+  }
+]

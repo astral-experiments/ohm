@@ -1,0 +1,689 @@
+{
+  "commands": 61,
+  "histories": {
+    "downgrade": {
+      "cargo": {
+        "candidate": "f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee",
+        "parent": "a4faa288657042d02767a38812c7498218dfcafc945abfe3b4a44c07323a1a24"
+      },
+      "phases": {
+        "old-parent": {
+          "consumer_rmeta": "4d4c467e3def45b613ff8f3e9b6317308c6a1693946846b9fb2ae5b174e8137f",
+          "elf": "5acf8317b62617c45347330313c3e93ce098272e3ce35365e635c6dc57bdf0c6",
+          "exit": 0,
+          "provider_public": "f94dd3834a2fde0ca404ad1500c94f1a",
+          "runtime": "7 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 1,
+          "wire_version": 5
+        },
+        "predecessor-first-edit": {
+          "consumer_rmeta": "3ffaad8eca92de703df87a57d73d1df87cb8485bf6d04fea0bc775029007b5f8",
+          "elf": "04ba4a7f22cb0170514df49a50900407d8b653a081c6d01d08478e3cf287254c",
+          "exit": 0,
+          "provider_public": "f94dd3834a2fde0ca404ad1500c94f1a",
+          "runtime": "9 29 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 1,
+          "wire_version": 2
+        },
+        "predecessor-independent-empty": {
+          "consumer_rmeta": "3ffaad8eca92de703df87a57d73d1df87cb8485bf6d04fea0bc775029007b5f8",
+          "elf": "04ba4a7f22cb0170514df49a50900407d8b653a081c6d01d08478e3cf287254c",
+          "exit": 0,
+          "provider_public": "f94dd3834a2fde0ca404ad1500c94f1a",
+          "runtime": "9 29 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 1,
+          "wire_version": 2
+        },
+        "predecessor-unchanged": {
+          "consumer_rmeta": "3ffaad8eca92de703df87a57d73d1df87cb8485bf6d04fea0bc775029007b5f8",
+          "elf": "04ba4a7f22cb0170514df49a50900407d8b653a081c6d01d08478e3cf287254c",
+          "exit": 0,
+          "provider_public": "f94dd3834a2fde0ca404ad1500c94f1a",
+          "runtime": "9 29 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 1,
+          "wire_version": 2
+        },
+        "settled-parent": {
+          "consumer_rmeta": "4d4c467e3def45b613ff8f3e9b6317308c6a1693946846b9fb2ae5b174e8137f",
+          "elf": "5acf8317b62617c45347330313c3e93ce098272e3ce35365e635c6dc57bdf0c6",
+          "exit": 0,
+          "provider_public": "f94dd3834a2fde0ca404ad1500c94f1a",
+          "runtime": "7 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 1,
+          "wire_version": 5
+        }
+      }
+    },
+    "matched-fixed": {
+      "cargo": {
+        "candidate": "32df98560d4ac57c4c959c762095a3afe6a3bbe62b44d8fc6e6bf8071f53a53e",
+        "parent": "b05c0f1a01f8cae3ccb7446647fcb7d9b5a36c3dfabc340a78a8b189561036b6"
+      },
+      "phases": {
+        "empty-candidate": {
+          "consumer_rmeta": "4f47dfc19f1c1ecbed7bb0dea7e7c0222ff4fc7bd8fa374ef685c5a9f87d4d5f",
+          "elf": "19de8f3fae619d1dbe150ceffb325238f504d54a95d076a86b6f80dd7830bb56",
+          "exit": 0,
+          "provider_public": "4991b0215d5a42c558938111eb0ca25b",
+          "runtime": "8 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 2,
+          "wire_version": 6
+        },
+        "first-invalid": {
+          "consumer_rmeta": "af384268b48aaf128191b680e5f7f4cd84d1257d14c06d887212d6f590e8f567",
+          "elf": "892d1404c428beb2d3e9bebcabd17022b5b2f7f16fb445d44150ec0ecd0c99c4",
+          "exit": 101,
+          "provider_public": "4991b0215d5a42c558938111eb0ca25b",
+          "runtime": "9 29 83",
+          "source_sha256": "b2a0beec67abc2a0c86e4bb5f64bbbb94717240e5448cf104ddf8937a6ea64b6",
+          "wire_inputs": 2,
+          "wire_version": 6
+        },
+        "old-parent": {
+          "consumer_rmeta": "4f47dfc19f1c1ecbed7bb0dea7e7c0222ff4fc7bd8fa374ef685c5a9f87d4d5f",
+          "elf": "c0b70eac0d25970248d2d3cec06d02ee2b5fb015e869f630a22dc12b4df7ebf4",
+          "exit": 0,
+          "provider_public": "4991b0215d5a42c558938111eb0ca25b",
+          "runtime": "7 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 1,
+          "wire_version": 5
+        },
+        "repaired-candidate": {
+          "consumer_rmeta": "4f47dfc19f1c1ecbed7bb0dea7e7c0222ff4fc7bd8fa374ef685c5a9f87d4d5f",
+          "elf": "19de8f3fae619d1dbe150ceffb325238f504d54a95d076a86b6f80dd7830bb56",
+          "exit": 0,
+          "provider_public": "4991b0215d5a42c558938111eb0ca25b",
+          "runtime": "8 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 2,
+          "wire_version": 6
+        },
+        "second-invalid": {
+          "consumer_rmeta": "af384268b48aaf128191b680e5f7f4cd84d1257d14c06d887212d6f590e8f567",
+          "elf": "892d1404c428beb2d3e9bebcabd17022b5b2f7f16fb445d44150ec0ecd0c99c4",
+          "exit": 101,
+          "provider_public": "4991b0215d5a42c558938111eb0ca25b",
+          "runtime": "9 29 83",
+          "source_sha256": "b2a0beec67abc2a0c86e4bb5f64bbbb94717240e5448cf104ddf8937a6ea64b6",
+          "wire_inputs": 2,
+          "wire_version": 6
+        },
+        "settled-candidate": {
+          "consumer_rmeta": "af384268b48aaf128191b680e5f7f4cd84d1257d14c06d887212d6f590e8f567",
+          "elf": "892d1404c428beb2d3e9bebcabd17022b5b2f7f16fb445d44150ec0ecd0c99c4",
+          "exit": 0,
+          "provider_public": "4991b0215d5a42c558938111eb0ca25b",
+          "runtime": "9 29 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 2,
+          "wire_version": 6
+        },
+        "settled-parent": {
+          "consumer_rmeta": "4f47dfc19f1c1ecbed7bb0dea7e7c0222ff4fc7bd8fa374ef685c5a9f87d4d5f",
+          "elf": "c0b70eac0d25970248d2d3cec06d02ee2b5fb015e869f630a22dc12b4df7ebf4",
+          "exit": 0,
+          "provider_public": "4991b0215d5a42c558938111eb0ca25b",
+          "runtime": "7 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 1,
+          "wire_version": 5
+        },
+        "upgraded-real-edit": {
+          "consumer_rmeta": "af384268b48aaf128191b680e5f7f4cd84d1257d14c06d887212d6f590e8f567",
+          "elf": "892d1404c428beb2d3e9bebcabd17022b5b2f7f16fb445d44150ec0ecd0c99c4",
+          "exit": 0,
+          "provider_public": "4991b0215d5a42c558938111eb0ca25b",
+          "runtime": "9 29 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 2,
+          "wire_version": 6
+        }
+      }
+    },
+    "matched-legacy": {
+      "cargo": {
+        "candidate": "32df98560d4ac57c4c959c762095a3afe6a3bbe62b44d8fc6e6bf8071f53a53e",
+        "parent": "b05c0f1a01f8cae3ccb7446647fcb7d9b5a36c3dfabc340a78a8b189561036b6"
+      },
+      "phases": {
+        "new-reader-after-prerequisite": {
+          "consumer_rmeta": "76dd4489c8cf587db15b99a3a3f621db441909887b5ff1b9c7ba1338a61f8512",
+          "elf": "d36e2fddc99a30ba152c0d09d780f28ae45ff7e05d6543b85282cade6b0c6995",
+          "exit": 0,
+          "provider_public": "a1fe53296947ddc48248b8b0d6c816b8",
+          "runtime": "8 29 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 2,
+          "wire_version": 6
+        },
+        "new-reader-independent-empty": {
+          "consumer_rmeta": "76dd4489c8cf587db15b99a3a3f621db441909887b5ff1b9c7ba1338a61f8512",
+          "elf": "d36e2fddc99a30ba152c0d09d780f28ae45ff7e05d6543b85282cade6b0c6995",
+          "exit": 0,
+          "provider_public": "a1fe53296947ddc48248b8b0d6c816b8",
+          "runtime": "8 29 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 2,
+          "wire_version": 6
+        },
+        "old-parent": {
+          "consumer_rmeta": "ff4bf597419a462752852ac04c69b8442287b4872cbdbb865ffabc83a6ed19df",
+          "elf": "d7c96c658ff3a41314b018b85ce995e0c3d5588080e4c4c24771b87ec2be71b7",
+          "exit": 0,
+          "provider_public": "a1fe53296947ddc48248b8b0d6c816b8",
+          "runtime": "7 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 1,
+          "wire_version": 5
+        },
+        "old-reader-real-edit": {
+          "consumer_rmeta": "ff4bf597419a462752852ac04c69b8442287b4872cbdbb865ffabc83a6ed19df",
+          "elf": "e449f8e6d3aeae443b0950d64397c33e5561f2cd764a2d01ceb08f890d7f263a",
+          "exit": 0,
+          "provider_public": "a1fe53296947ddc48248b8b0d6c816b8",
+          "runtime": "9 17 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 1,
+          "wire_version": 5
+        },
+        "old-reader-unchanged": {
+          "consumer_rmeta": "ff4bf597419a462752852ac04c69b8442287b4872cbdbb865ffabc83a6ed19df",
+          "elf": "e449f8e6d3aeae443b0950d64397c33e5561f2cd764a2d01ceb08f890d7f263a",
+          "exit": 0,
+          "provider_public": "a1fe53296947ddc48248b8b0d6c816b8",
+          "runtime": "9 17 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 1,
+          "wire_version": 5
+        },
+        "settled-parent": {
+          "consumer_rmeta": "ff4bf597419a462752852ac04c69b8442287b4872cbdbb865ffabc83a6ed19df",
+          "elf": "d7c96c658ff3a41314b018b85ce995e0c3d5588080e4c4c24771b87ec2be71b7",
+          "exit": 0,
+          "provider_public": "a1fe53296947ddc48248b8b0d6c816b8",
+          "runtime": "7 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 1,
+          "wire_version": 5
+        },
+        "upgrade-without-new-prerequisite": {
+          "consumer_rmeta": "ff4bf597419a462752852ac04c69b8442287b4872cbdbb865ffabc83a6ed19df",
+          "elf": "e449f8e6d3aeae443b0950d64397c33e5561f2cd764a2d01ceb08f890d7f263a",
+          "exit": 0,
+          "provider_public": "a1fe53296947ddc48248b8b0d6c816b8",
+          "runtime": "9 17 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 1,
+          "wire_version": 5
+        }
+      }
+    },
+    "predecessor": {
+      "cargo": {
+        "candidate": "f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee",
+        "parent": "f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee"
+      },
+      "phases": {
+        "old-parent": {
+          "consumer_rmeta": "3eb74aa9be68eef717dc0ad21c02566b56870fc87b3cda2321018e96657b70c4",
+          "elf": "7cd5e6466875bcf0c8cff79b7924377628c153b8be5947078ec60ab9e29a9e68",
+          "exit": 0,
+          "provider_public": "55dfb1a855ee5ca1d406641daf98b9e5",
+          "runtime": "7 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 1,
+          "wire_version": 2
+        },
+        "predecessor-first-edit": {
+          "consumer_rmeta": "3eb74aa9be68eef717dc0ad21c02566b56870fc87b3cda2321018e96657b70c4",
+          "elf": "cca83fdfedb32f2dc6204044353ab2940efc00c7c63efc316f56e060aeb31aed",
+          "exit": 0,
+          "provider_public": "55dfb1a855ee5ca1d406641daf98b9e5",
+          "runtime": "9 17 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 1,
+          "wire_version": 2
+        },
+        "predecessor-independent-empty": {
+          "consumer_rmeta": "78fd10fcaa2d9351aa60698bdda39d87ebf053ee76f68d95ca051a5f3504c8f9",
+          "elf": "977996c3760dd9a2e4279aa5684f34ddb3dab14f1442292f4d239ca1f9147a21",
+          "exit": 0,
+          "provider_public": "55dfb1a855ee5ca1d406641daf98b9e5",
+          "runtime": "9 29 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 1,
+          "wire_version": 2
+        },
+        "predecessor-unchanged": {
+          "consumer_rmeta": "3eb74aa9be68eef717dc0ad21c02566b56870fc87b3cda2321018e96657b70c4",
+          "elf": "cca83fdfedb32f2dc6204044353ab2940efc00c7c63efc316f56e060aeb31aed",
+          "exit": 0,
+          "provider_public": "55dfb1a855ee5ca1d406641daf98b9e5",
+          "runtime": "9 17 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 1,
+          "wire_version": 2
+        },
+        "settled-parent": {
+          "consumer_rmeta": "3eb74aa9be68eef717dc0ad21c02566b56870fc87b3cda2321018e96657b70c4",
+          "elf": "7cd5e6466875bcf0c8cff79b7924377628c153b8be5947078ec60ab9e29a9e68",
+          "exit": 0,
+          "provider_public": "55dfb1a855ee5ca1d406641daf98b9e5",
+          "runtime": "7 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 1,
+          "wire_version": 2
+        }
+      }
+    },
+    "predecessor-same-rust": {
+      "cargo": {
+        "candidate": "f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee",
+        "parent": "f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee"
+      },
+      "phases": {
+        "old-parent": {
+          "consumer_rmeta": "24f448a19206fc414622d5e193cac634090ed4ef9c6db88b79889ee79fa68ec0",
+          "elf": "9f129823fc0d13f92a43aa01b738882e13d0fdb1017364d39bdf3f45528dee47",
+          "exit": 0,
+          "provider_public": "4b4790e174df26c676b6a1d83b3a718f",
+          "runtime": "7 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 1,
+          "wire_version": 2
+        },
+        "predecessor-first-edit": {
+          "consumer_rmeta": "24f448a19206fc414622d5e193cac634090ed4ef9c6db88b79889ee79fa68ec0",
+          "elf": "4ae38daa66b351422ba1eccbaac0942e2f95eaf73869a41d34967268ebe23958",
+          "exit": 0,
+          "provider_public": "4b4790e174df26c676b6a1d83b3a718f",
+          "runtime": "9 17 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 1,
+          "wire_version": 2
+        },
+        "predecessor-independent-empty": {
+          "consumer_rmeta": "386d4af078ed48c3fde966683b1ac43869da309f16f46f7441695ec832008f21",
+          "elf": "6c6950ded38ab517279b821f0b178646cecc5b8e8a59e8e1a15be430df323282",
+          "exit": 0,
+          "provider_public": "4b4790e174df26c676b6a1d83b3a718f",
+          "runtime": "9 29 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 1,
+          "wire_version": 2
+        },
+        "predecessor-unchanged": {
+          "consumer_rmeta": "24f448a19206fc414622d5e193cac634090ed4ef9c6db88b79889ee79fa68ec0",
+          "elf": "4ae38daa66b351422ba1eccbaac0942e2f95eaf73869a41d34967268ebe23958",
+          "exit": 0,
+          "provider_public": "4b4790e174df26c676b6a1d83b3a718f",
+          "runtime": "9 17 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 1,
+          "wire_version": 2
+        },
+        "settled-parent": {
+          "consumer_rmeta": "24f448a19206fc414622d5e193cac634090ed4ef9c6db88b79889ee79fa68ec0",
+          "elf": "9f129823fc0d13f92a43aa01b738882e13d0fdb1017364d39bdf3f45528dee47",
+          "exit": 0,
+          "provider_public": "4b4790e174df26c676b6a1d83b3a718f",
+          "runtime": "7 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 1,
+          "wire_version": 2
+        }
+      }
+    },
+    "signed-fixed": {
+      "cargo": {
+        "candidate": "32df98560d4ac57c4c959c762095a3afe6a3bbe62b44d8fc6e6bf8071f53a53e",
+        "parent": "a4faa288657042d02767a38812c7498218dfcafc945abfe3b4a44c07323a1a24"
+      },
+      "phases": {
+        "empty-candidate": {
+          "consumer_rmeta": "b19ac708b8688ae7b8e5b9d335b663311404c33c26c789e376a7671b11cff57e",
+          "elf": "a9f5d2e38ee3cfcf9ed6eb32e34e6c5e5b1f846834fec49da63f222ec9dd26d5",
+          "exit": 0,
+          "provider_public": "31cd2a543ac69eb5df7649910c996c18",
+          "runtime": "8 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 2,
+          "wire_version": 6
+        },
+        "first-invalid": {
+          "consumer_rmeta": "144933884c178cb45672305bc0a2750f537e9e519bdc3a6559048edd6fbb859e",
+          "elf": "d5b7fdeb4509d7a60eff50c020ca5edadad4669d436496598667737c5ff7413c",
+          "exit": 101,
+          "provider_public": "31cd2a543ac69eb5df7649910c996c18",
+          "runtime": "9 29 83",
+          "source_sha256": "b2a0beec67abc2a0c86e4bb5f64bbbb94717240e5448cf104ddf8937a6ea64b6",
+          "wire_inputs": 2,
+          "wire_version": 6
+        },
+        "old-parent": {
+          "consumer_rmeta": "b19ac708b8688ae7b8e5b9d335b663311404c33c26c789e376a7671b11cff57e",
+          "elf": "2cd3fe71ff3ec5976f3fe7420b507578473eb380d501cf6b5dd9d41937d1bd7f",
+          "exit": 0,
+          "provider_public": "31cd2a543ac69eb5df7649910c996c18",
+          "runtime": "7 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 1,
+          "wire_version": 5
+        },
+        "repaired-candidate": {
+          "consumer_rmeta": "b19ac708b8688ae7b8e5b9d335b663311404c33c26c789e376a7671b11cff57e",
+          "elf": "a9f5d2e38ee3cfcf9ed6eb32e34e6c5e5b1f846834fec49da63f222ec9dd26d5",
+          "exit": 0,
+          "provider_public": "31cd2a543ac69eb5df7649910c996c18",
+          "runtime": "8 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 2,
+          "wire_version": 6
+        },
+        "second-invalid": {
+          "consumer_rmeta": "144933884c178cb45672305bc0a2750f537e9e519bdc3a6559048edd6fbb859e",
+          "elf": "d5b7fdeb4509d7a60eff50c020ca5edadad4669d436496598667737c5ff7413c",
+          "exit": 101,
+          "provider_public": "31cd2a543ac69eb5df7649910c996c18",
+          "runtime": "9 29 83",
+          "source_sha256": "b2a0beec67abc2a0c86e4bb5f64bbbb94717240e5448cf104ddf8937a6ea64b6",
+          "wire_inputs": 2,
+          "wire_version": 6
+        },
+        "settled-candidate": {
+          "consumer_rmeta": "144933884c178cb45672305bc0a2750f537e9e519bdc3a6559048edd6fbb859e",
+          "elf": "d5b7fdeb4509d7a60eff50c020ca5edadad4669d436496598667737c5ff7413c",
+          "exit": 0,
+          "provider_public": "31cd2a543ac69eb5df7649910c996c18",
+          "runtime": "9 29 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 2,
+          "wire_version": 6
+        },
+        "settled-parent": {
+          "consumer_rmeta": "b19ac708b8688ae7b8e5b9d335b663311404c33c26c789e376a7671b11cff57e",
+          "elf": "2cd3fe71ff3ec5976f3fe7420b507578473eb380d501cf6b5dd9d41937d1bd7f",
+          "exit": 0,
+          "provider_public": "31cd2a543ac69eb5df7649910c996c18",
+          "runtime": "7 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 1,
+          "wire_version": 5
+        },
+        "upgraded-real-edit": {
+          "consumer_rmeta": "144933884c178cb45672305bc0a2750f537e9e519bdc3a6559048edd6fbb859e",
+          "elf": "d5b7fdeb4509d7a60eff50c020ca5edadad4669d436496598667737c5ff7413c",
+          "exit": 0,
+          "provider_public": "31cd2a543ac69eb5df7649910c996c18",
+          "runtime": "9 29 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 2,
+          "wire_version": 6
+        }
+      }
+    },
+    "signed-fixed-both-oracles": {
+      "cargo": {
+        "candidate": "32df98560d4ac57c4c959c762095a3afe6a3bbe62b44d8fc6e6bf8071f53a53e",
+        "parent": "a4faa288657042d02767a38812c7498218dfcafc945abfe3b4a44c07323a1a24"
+      },
+      "phases": {
+        "empty-candidate": {
+          "consumer_rmeta": "cbc6d4ac8876194537cc9922b94f72b97dc6ff362d5973efe1433927e973c3a2",
+          "elf": "d5975617e2d7288de0e087b9185c9502ac54fd9c35cd91047d3bc1f776f45259",
+          "exit": 0,
+          "provider_public": "881a0936b35a41e6931821c1e151c051",
+          "runtime": "8 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 2,
+          "wire_version": 6
+        },
+        "empty-first-candidate": {
+          "consumer_rmeta": "62abbd64daf8eea77117f076a3b106d5eb75cdf4e21e87f86bde2703c84d7859",
+          "elf": "3692619316df24add87400a047deb3c3a21af617c53f97d23ad422d20d91bc9c",
+          "exit": 0,
+          "provider_public": "881a0936b35a41e6931821c1e151c051",
+          "runtime": "9 29 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 2,
+          "wire_version": 6
+        },
+        "first-invalid": {
+          "consumer_rmeta": "62abbd64daf8eea77117f076a3b106d5eb75cdf4e21e87f86bde2703c84d7859",
+          "elf": "3692619316df24add87400a047deb3c3a21af617c53f97d23ad422d20d91bc9c",
+          "exit": 101,
+          "provider_public": "881a0936b35a41e6931821c1e151c051",
+          "runtime": "9 29 83",
+          "source_sha256": "b2a0beec67abc2a0c86e4bb5f64bbbb94717240e5448cf104ddf8937a6ea64b6",
+          "wire_inputs": 2,
+          "wire_version": 6
+        },
+        "old-parent": {
+          "consumer_rmeta": "cbc6d4ac8876194537cc9922b94f72b97dc6ff362d5973efe1433927e973c3a2",
+          "elf": "ed35c8345edb6eafdbfbd42329f6845b6b3b8cf5f6d00bd71429e5e20472083c",
+          "exit": 0,
+          "provider_public": "881a0936b35a41e6931821c1e151c051",
+          "runtime": "7 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 1,
+          "wire_version": 5
+        },
+        "repaired-candidate": {
+          "consumer_rmeta": "cbc6d4ac8876194537cc9922b94f72b97dc6ff362d5973efe1433927e973c3a2",
+          "elf": "d5975617e2d7288de0e087b9185c9502ac54fd9c35cd91047d3bc1f776f45259",
+          "exit": 0,
+          "provider_public": "881a0936b35a41e6931821c1e151c051",
+          "runtime": "8 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 2,
+          "wire_version": 6
+        },
+        "second-invalid": {
+          "consumer_rmeta": "62abbd64daf8eea77117f076a3b106d5eb75cdf4e21e87f86bde2703c84d7859",
+          "elf": "3692619316df24add87400a047deb3c3a21af617c53f97d23ad422d20d91bc9c",
+          "exit": 101,
+          "provider_public": "881a0936b35a41e6931821c1e151c051",
+          "runtime": "9 29 83",
+          "source_sha256": "b2a0beec67abc2a0c86e4bb5f64bbbb94717240e5448cf104ddf8937a6ea64b6",
+          "wire_inputs": 2,
+          "wire_version": 6
+        },
+        "settled-candidate": {
+          "consumer_rmeta": "62abbd64daf8eea77117f076a3b106d5eb75cdf4e21e87f86bde2703c84d7859",
+          "elf": "3692619316df24add87400a047deb3c3a21af617c53f97d23ad422d20d91bc9c",
+          "exit": 0,
+          "provider_public": "881a0936b35a41e6931821c1e151c051",
+          "runtime": "9 29 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 2,
+          "wire_version": 6
+        },
+        "settled-parent": {
+          "consumer_rmeta": "cbc6d4ac8876194537cc9922b94f72b97dc6ff362d5973efe1433927e973c3a2",
+          "elf": "ed35c8345edb6eafdbfbd42329f6845b6b3b8cf5f6d00bd71429e5e20472083c",
+          "exit": 0,
+          "provider_public": "881a0936b35a41e6931821c1e151c051",
+          "runtime": "7 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 1,
+          "wire_version": 5
+        },
+        "upgraded-real-edit": {
+          "consumer_rmeta": "62abbd64daf8eea77117f076a3b106d5eb75cdf4e21e87f86bde2703c84d7859",
+          "elf": "3692619316df24add87400a047deb3c3a21af617c53f97d23ad422d20d91bc9c",
+          "exit": 0,
+          "provider_public": "881a0936b35a41e6931821c1e151c051",
+          "runtime": "9 29 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 2,
+          "wire_version": 6
+        }
+      }
+    },
+    "signed-legacy": {
+      "cargo": {
+        "candidate": "32df98560d4ac57c4c959c762095a3afe6a3bbe62b44d8fc6e6bf8071f53a53e",
+        "parent": "a4faa288657042d02767a38812c7498218dfcafc945abfe3b4a44c07323a1a24"
+      },
+      "phases": {
+        "new-reader-after-prerequisite": {
+          "consumer_rmeta": "d9b51312163cf5d0457e1dd31b9bb3e40e926cff44d1e4d3e9c1d77fd512b025",
+          "elf": "c3c674fca8afe45268847f2682c12b2a15ceeb27ebb234f27e329958ec0c9f08",
+          "exit": 0,
+          "provider_public": "a57a2d160d1f3cabde86257d8c679bfd",
+          "runtime": "8 29 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 2,
+          "wire_version": 6
+        },
+        "new-reader-empty-at-original-edit": {
+          "consumer_rmeta": "d9b51312163cf5d0457e1dd31b9bb3e40e926cff44d1e4d3e9c1d77fd512b025",
+          "elf": "652f4993c038b1240c170a4ff29a54ff87d309c2d0fd0ee797ac3f7b61655419",
+          "exit": 0,
+          "provider_public": "a57a2d160d1f3cabde86257d8c679bfd",
+          "runtime": "9 29 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 2,
+          "wire_version": 6
+        },
+        "new-reader-independent-empty": {
+          "consumer_rmeta": "d9b51312163cf5d0457e1dd31b9bb3e40e926cff44d1e4d3e9c1d77fd512b025",
+          "elf": "c3c674fca8afe45268847f2682c12b2a15ceeb27ebb234f27e329958ec0c9f08",
+          "exit": 0,
+          "provider_public": "a57a2d160d1f3cabde86257d8c679bfd",
+          "runtime": "8 29 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 2,
+          "wire_version": 6
+        },
+        "old-parent": {
+          "consumer_rmeta": "7843b3657d0243cb15de9e7210673b12fb67d7028939040b2f9241fda95c6825",
+          "elf": "c5d4f74dc6d5e0d079b265b8ebf0efed332b90317254cebd813d9c4ba3ea450a",
+          "exit": 0,
+          "provider_public": "a57a2d160d1f3cabde86257d8c679bfd",
+          "runtime": "7 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 1,
+          "wire_version": 5
+        },
+        "old-reader-real-edit": {
+          "consumer_rmeta": "7843b3657d0243cb15de9e7210673b12fb67d7028939040b2f9241fda95c6825",
+          "elf": "6906542013673d86ac81fbc944478d5e863a5eaf12524eff726bf6a6a9d26c1d",
+          "exit": 0,
+          "provider_public": "a57a2d160d1f3cabde86257d8c679bfd",
+          "runtime": "9 17 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 1,
+          "wire_version": 5
+        },
+        "old-reader-unchanged": {
+          "consumer_rmeta": "7843b3657d0243cb15de9e7210673b12fb67d7028939040b2f9241fda95c6825",
+          "elf": "6906542013673d86ac81fbc944478d5e863a5eaf12524eff726bf6a6a9d26c1d",
+          "exit": 0,
+          "provider_public": "a57a2d160d1f3cabde86257d8c679bfd",
+          "runtime": "9 17 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 1,
+          "wire_version": 5
+        },
+        "published-reader-empty-at-original-edit": {
+          "consumer_rmeta": "d9b51312163cf5d0457e1dd31b9bb3e40e926cff44d1e4d3e9c1d77fd512b025",
+          "elf": "652f4993c038b1240c170a4ff29a54ff87d309c2d0fd0ee797ac3f7b61655419",
+          "exit": 0,
+          "provider_public": "a57a2d160d1f3cabde86257d8c679bfd",
+          "runtime": "9 29 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 1,
+          "wire_version": 5
+        },
+        "settled-parent": {
+          "consumer_rmeta": "7843b3657d0243cb15de9e7210673b12fb67d7028939040b2f9241fda95c6825",
+          "elf": "c5d4f74dc6d5e0d079b265b8ebf0efed332b90317254cebd813d9c4ba3ea450a",
+          "exit": 0,
+          "provider_public": "a57a2d160d1f3cabde86257d8c679bfd",
+          "runtime": "7 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 1,
+          "wire_version": 5
+        },
+        "upgrade-without-new-prerequisite": {
+          "consumer_rmeta": "7843b3657d0243cb15de9e7210673b12fb67d7028939040b2f9241fda95c6825",
+          "elf": "6906542013673d86ac81fbc944478d5e863a5eaf12524eff726bf6a6a9d26c1d",
+          "exit": 0,
+          "provider_public": "a57a2d160d1f3cabde86257d8c679bfd",
+          "runtime": "9 17 83",
+          "source_sha256": "1c84b49a0d8beb3452e58fe22dd1a98d150e796ac4f890bc1bffa530cce2fbae",
+          "wire_inputs": 1,
+          "wire_version": 5
+        }
+      }
+    },
+    "signed-pristine": {
+      "cargo": {
+        "candidate": "32df98560d4ac57c4c959c762095a3afe6a3bbe62b44d8fc6e6bf8071f53a53e",
+        "parent": "a4faa288657042d02767a38812c7498218dfcafc945abfe3b4a44c07323a1a24"
+      },
+      "phases": {
+        "old-parent": {
+          "consumer_rmeta": "1aa9572c59b13f315312b96eb3ed3b96e6c866fa4f7dde3408b2aba3d372f85b",
+          "elf": "5178123e0067a1d59eed103f9b07f46779a595f825ed5258a7f1e13289a1d561",
+          "exit": 0,
+          "provider_public": "80ab9e18547f174db31687c1d24dabe5",
+          "runtime": "7 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 1,
+          "wire_version": 5
+        },
+        "prerequisite-alone": {
+          "consumer_rmeta": "1aa9572c59b13f315312b96eb3ed3b96e6c866fa4f7dde3408b2aba3d372f85b",
+          "elf": "2e463f238cc4c07262c2870d2e4298971766bb9f48a8c0893d45c036761fa051",
+          "exit": 0,
+          "provider_public": "80ab9e18547f174db31687c1d24dabe5",
+          "runtime": "9 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 1,
+          "wire_version": 5
+        },
+        "pristine-independent-empty": {
+          "consumer_rmeta": "1aa9572c59b13f315312b96eb3ed3b96e6c866fa4f7dde3408b2aba3d372f85b",
+          "elf": "2e463f238cc4c07262c2870d2e4298971766bb9f48a8c0893d45c036761fa051",
+          "exit": 0,
+          "provider_public": "80ab9e18547f174db31687c1d24dabe5",
+          "runtime": "9 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 1,
+          "wire_version": 5
+        },
+        "settled-parent": {
+          "consumer_rmeta": "1aa9572c59b13f315312b96eb3ed3b96e6c866fa4f7dde3408b2aba3d372f85b",
+          "elf": "5178123e0067a1d59eed103f9b07f46779a595f825ed5258a7f1e13289a1d561",
+          "exit": 0,
+          "provider_public": "80ab9e18547f174db31687c1d24dabe5",
+          "runtime": "7 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 1,
+          "wire_version": 5
+        },
+        "settled-prerequisite-alone": {
+          "consumer_rmeta": "1aa9572c59b13f315312b96eb3ed3b96e6c866fa4f7dde3408b2aba3d372f85b",
+          "elf": "2e463f238cc4c07262c2870d2e4298971766bb9f48a8c0893d45c036761fa051",
+          "exit": 0,
+          "provider_public": "80ab9e18547f174db31687c1d24dabe5",
+          "runtime": "9 17 83",
+          "source_sha256": "c36b9f8bf54e0988543e59822021cd7a09a27e2163b75efafe98560f2b9f1689",
+          "wire_inputs": 1,
+          "wire_version": 5
+        }
+      }
+    }
+  },
+  "originals_sha256": "eae0421727e3f13524a6c3710a5da281fa7bc44081003172726b0decad42aa4a",
+  "reexecuted_unique_native_bodies": 26
+}
