@@ -20,7 +20,7 @@ b.SRCS={b.OLD:'09af3d91c8734ba18e61d7db1b122695bf0327ec14c1aaa40ecda26d1ca59d54'
 b.LOCK='4f1629d6337b4e24b94810bc031f0f68ddb120152726ac1f2c558ecdee46bf4c'
 OUT=Path(os.environ['RUNNER_TEMP'])/'reverse-metadata-raw'
 DRIVER='b13243dc392a808cce88cb68486614d04bc00e0a6dc9fdf7a7f13b8335476f01'
-pub=json.loads((HERE/'published.json').read_bytes());ver=pub['linux_sdk']['rustc'].splitlines()[0].split(' (ohm-',1)[0]+' (Ohm metadata 3)'
+pub=json.loads((HERE/'published.json').read_bytes());ver=pub['linux_sdk']['rustc'].splitlines()[0]+' (Ohm metadata 3)'
 schema=legacy/'evidence-release-24/schema';S=schema/'compiler/rustc_span/src/symbol.rs';T=schema/'compiler/rustc_metadata/src/rmeta/mod.rs'
 if not S.is_file():
     S=schema/'symbol.rs';T=schema/'rmeta.rs'
@@ -82,8 +82,10 @@ def epochs(path):
         s=(b.SDK/'bin/rustc').stat();identity=list(map(int,raw[1:3]));a=list(map(os.fsdecode,raw[4:]));name=b.crate_arg(a,'--crate-name')
         if identity==[s.st_dev,s.st_ino]and name:rows.append({'crate':name,'kind':b.crate_arg(a,'--crate-type'),'argv':a,'pid':int(f[2])})
     return rows
+FINGERPRINT_TRACE=False
 def command(dst,args,observer=False,expected=0):
     dst.mkdir();kd=dst/'kernel';kd.mkdir();env=b.env()
+    if FINGERPRINT_TRACE:env['CARGO_LOG']='cargo::core::compiler::fingerprint=trace'
     if observer:env.update(LD_PRELOAD=str(b.ROOT/'observe.so'),OHM_GRAPH_RUSTC=str(b.SDK/'bin/rustc'),OHM_GRAPH_DIR=str(dst))
     with (dst/'stdout').open('xb')as out,(dst/'stderr').open('xb')as err:p=sp.run([b.ROOT/'exec_count',kd,'cargo','+ohm','build',*args],env=env,cwd=b.WORK,stdout=out,stderr=err)
     b.need(p.returncode==expected,(dst.name,p.returncode,(dst/'stderr').read_text()[-800:]));rows=epochs(kd);b.put(dst/'real-compiler.json',rows);return rows
@@ -133,6 +135,8 @@ def try_schema():
 def rows_at(dst,sy,tabs):
     m=read(dst/'selected.json');raw=sp.check_output(['zstd','-qdc',OUT/'metadata'/(m['meta_sha']+'.zst')]);b.need(H(raw)==m['meta_sha']and len(raw)==m['bytes'],'wrong deposited physical rmeta');return md.decode(raw,sy,tabs,'ruff',ver)
 def run_lane(lane,consumer,client,prod,observe):
+    global FINGERPRINT_TRACE
+    FINGERPRINT_TRACE=observe
     folder=OUT/lane;folder.mkdir();b.select(b.OLD);b.prepare();old=folder/'initial-consumer';r=command(old,client,observe);files=selected(r,consumer);snapshot(old,files,False);orig=verdict(old,consumer);footprint(old)
     no=folder/'settled-original';assert not command(no,client);assert verdict(no,consumer)==orig
     b.select(b.NEW);d=folder/'producer-NEW';r=command(d,prod,observe);b.need(any(x['crate']=='ruff'and x['kind']in('lib','rlib')for x in r)and not any(x['kind']=='bin'and x['crate']==consumer for x in r),'wrong changed producer roster');snapshot(d,files,True)
@@ -158,13 +162,17 @@ def main():
     def clear():
         for p in (b.TARGET,b.HOME,b.BUILD):
             if p.exists():b.need(p.parent==b.ROOT and p.is_dir()and not p.is_symlink(),'unknown private root');shutil.rmtree(p)
-    trials={}
-    for target,client,producer in choices:
-        clear();trials[target]=run_lane('normal-'+target,target,client,producer,False);b.put(OUT/'ordinary-admission.json',trials)
-    for target,client,producer in choices:
-        normal=trials[target]
-        if not normal['changed_public_rows']:continue
-        clear();observed=run_lane('observed-'+target,target,client,producer,True)
-        b.need(observed['changed_public_rows']==normal['changed_public_rows'] and observed['downstream_actual']==normal['downstream_actual'] and observed['initial_native']['help']==normal['initial_native']['help'] and observed['final_native']['help']==normal['final_native']['help'],'physical graph recorder changed the normal outcome')
-        b.put(OUT/'observed-admission.json',{'normal':normal,'observed':observed});break
+    # The first original already includes the complete ordinary Ruff bin, both typed states,
+    # actual unchanged-consumer exec and both invalid checks. Re-open that original directly.
+    ident=13279721095;digest='e85366bc775a176d9818e12875c9b08d61a22f882182f9b93142b9d6c0826cd7'
+    record=json.loads(sp.check_output(['gh','api',f'repos/astral-experiments/ohm/actions/artifacts/{ident}']))
+    b.need(record['digest']=='sha256:'+digest and record['size_in_bytes']==6095517 and record['workflow_run']['id']==41736319575,'wrong original signed worker')
+    archive=b.ROOT/'first-original.zip';getbin(f'actions/artifacts/{ident}/zip',archive)
+    run([sys.executable,'-IB',HERE/'reopen.py',archive,digest,OUT/'original-normal.json','--legacy',legacy/'evidence-release-24'])
+    normal=read(OUT/'original-normal.json');b.need(len(normal['rows'])==1098 and normal['exact_unchanged_consumer_output'] and normal['rustcs']['unchanged-consumer']==[['ruff','bin']],'different original signed case')
+    short,=[c for c in choices if c[0]=='ruff'];dev,=[c for c in choices if c[0]=='ruff_dev']
+    clear();observed=run_lane('observed-ruff',*short,True);b.put(OUT/'observed-ruff-summary.json',observed)
+    # Persist any differences in observation before exercising the disjoint external client.
+    b.put(OUT/'observed-comparison.json',{'changed_public_rows_match':observed['changed_public_rows']==len(normal['rows']),'native_work_matches':observed['downstream_actual']==list(map(tuple,normal['rustcs']['unchanged-consumer'])),'native_help_matches':observed['initial_native']['help']==normal['consumer_programs']['initial-consumer']['help'] and observed['final_native']['help']==normal['consumer_programs']['unchanged-consumer']['help']})
+    clear();external=run_lane('normal-ruff_dev',*dev,False);b.put(OUT/'separate-external.json',external)
 if __name__=='__main__':main()
