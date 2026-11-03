@@ -33,7 +33,11 @@ def fetch(role,cache,dest):
         with zipfile.ZipFile(p) as z:
             require(len(set(z.namelist()))==len(z.namelist()) and all(not n.startswith('/') and '..'not in Path(n).parts for n in z.namelist()),'zip members')
             if label=='qualification':
-                for n in ('source.json','bootstrap.json','reported-versions.json','sdk.json','sdk-sha256','probes/verdict.json'):
+                files=['source.json','bootstrap.json','reported-versions.json','sdk.json','sdk-sha256']
+                if role=='C':
+                    require(spec['caps_replayed_before_every_original']and spec['qa']=='618d4b64348527f7463715f038ee94e9bde357e6'and sorted(z.namelist())==sorted(files),'wrong capped-compiler manifest')
+                else:files.append('probes/verdict.json')
+                for n in files:
                     require(z.getinfo(n).file_size<1024*1024,'oversized proof');(dest/n).parent.mkdir(parents=True,exist_ok=True);(dest/n).write_bytes(z.read(n))
                 proof=json.loads((dest/'sdk.json').read_bytes());source=json.loads((dest/'source.json').read_bytes());versions=json.loads((dest/'reported-versions.json').read_bytes())
                 name={'P':'parent','C':'candidate'}[role]

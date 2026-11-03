@@ -156,7 +156,7 @@ def verify_role(z,role,reg,case):
         states[ph],ars[ph],session=roster(z,pre)
         if ph in ('cold-old','edit','empty-new'):
             decl=read(ph+'/library-ordinary-partition.json');demand(decl['session']==session and decl['members']=={k:v[5]for k,v in states[ph]['lib'].items()},'real selected RSIC/ELF relation')
-            n,raw=body(z,role+'/native/'+decl['cache']+'.zst',True);demand(n==decl['bytes']and raw.startswith(b'RSIC'+{'P':57124,'C':60597}[role].to_bytes(2,'little')),'wrong compiler-specific RSIC')
+            n,raw=body(z,role+'/native/'+decl['cache']+'.zst',True);demand(n==decl['bytes']and raw.startswith(b'RSIC'+reg['registration']['incremental_headers'][role].to_bytes(2,'little')),'wrong compiler-specific RSIC')
             census=None
             try:
                 table=partitions.table(raw,{'objects':decl['members']},None,len(decl['members']));demand(table==read(ph+'/complete-cgu-table.json'),'original query vectors differ')
@@ -215,7 +215,11 @@ def verify_role(z,role,reg,case):
         for n,m in [('second-cold-old','second-old-unchanged'),('observed-edit','observed-new-unchanged')]:demand(same(n,m),'second settled changed')
         ordinary=read('ordinary-admission.json');demand(ordinary==dict(role=role,case=case,old=products['cold-old'],edit=products['edit'],clean=products['empty-new'],ordinary_controls=True),'incomplete initial native control')
     mini=read('mini/verdict.json');guards=read('guards/guard-verdict.json');demand(mini['edit']==mini['clean']and len(set(mini['named_native_units'].values()))==(1 if role=='P'else 3),'derive native control')
-    return dict(compiler=src,driver=sdk['driver'],independent_forward_proof=proof,ordinary=price,lifetime=detail,transitions=transitions,census=cgas,storage=sizes,runtime=runtime,native_clap=scans,guards=guards,metadata_warm_clean={k:products['edit'].get(k)==products['empty-new'].get(k)for k in ('rmeta','embedded_rmeta','rlib','canonical_archive')},elf={k:products[k]['elf']for k in('cold-old','edit','empty-new')},source_verdicts={k:products[k]['verdict']for k in('cold-old','edit','empty-new')},original_objects=len(scanned),raw_bodies=len(have_elf))
+    caps=read('caps/caps.json');demand(caps['role']==role and set(caps['cases'])=={'default','limit1','limit2','already-two'},'missing actual explicit cap controls')
+    for label,case_proof in caps['cases'].items():
+        demand(sha(z.read(role+'/caps/'+label+'.out'))==case_proof['compiler_stdout_sha256']and case_proof['runtime']==['119','179'],'wrong observed native cap')
+    ci=caps['cases'];demand(ci['limit1']['units_for_owners']==1 and ci['limit2']['units_for_owners']<=(2 if role=='C'else 1)and ci['already-two']['size_units']==2 and not ci['already-two']['combined'],'per-source cap exceeded')
+    return dict(caps=caps,compiler=src,driver=sdk['driver'],independent_forward_proof=proof,ordinary=price,lifetime=detail,transitions=transitions,census=cgas,storage=sizes,runtime=runtime,native_clap=scans,guards=guards,metadata_warm_clean={k:products['edit'].get(k)==products['empty-new'].get(k)for k in ('rmeta','embedded_rmeta','rlib','canonical_archive')},elf={k:products[k]['elf']for k in('cold-old','edit','empty-new')},source_verdicts={k:products[k]['verdict']for k in('cold-old','edit','empty-new')},original_objects=len(scanned),raw_bodies=len(have_elf))
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('archive',type=Path);p.add_argument('digest');p.add_argument('output',type=Path);args=p.parse_args()
     with args.archive.open('rb')as f:demand(hashlib.file_digest(f,'sha256').hexdigest()==args.digest,'wrong complete Actions ZIP')

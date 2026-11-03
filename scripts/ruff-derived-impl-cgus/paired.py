@@ -81,7 +81,7 @@ def footprint():
 
 def dump_partitions(td,role):
     name='library-ordinary-partition.json';native=json.loads((td/'selected-ruff-members.json').read_bytes());members={m[2]+'.o':m[3]for m in native['members']};sessions=json.loads((td/'incremental-native-sessions.json').read_bytes())
-    match=[(k,rows)for k,rows in sessions.items()if {v[0]:v[5]for v in rows}==members];b.need(len(match)==1,'no unique actual selected library incremental generation');k,rows=match[0];session=b.TARGET/k;query=session/'query-cache.bin';b.need(query.stat().st_size<256*2**20,'large selected cache');cache=b.zsave(query,b.PUB/'native');wire=query.read_bytes();b.need(wire[:6]==b'RSIC'+{'P':57124,'C':60597}[role].to_bytes(2,'little') and wire[-13:]==b'rust-end-file','wrong incremental file format')
+    match=[(k,rows)for k,rows in sessions.items()if {v[0]:v[5]for v in rows}==members];b.need(len(match)==1,'no unique actual selected library incremental generation');k,rows=match[0];session=b.TARGET/k;query=session/'query-cache.bin';b.need(query.stat().st_size<256*2**20,'large selected cache');cache=b.zsave(query,b.PUB/'native');wire=query.read_bytes();b.need(wire[:6]==b'RSIC'+reg['incremental_headers'][role].to_bytes(2,'little') and wire[-13:]==b'rust-end-file','wrong incremental file format')
     for r in rows:b.need(b.zsave(session/r[0],b.PUB/'native')==r[5],'actual codegen body moved')
     decl={'cache':cache,'bytes':len(wire),'session':k,'members':members};b.put(td/name,decl)
     try:
@@ -138,7 +138,20 @@ def run_role(role):
     for n in ('rustc','cargo'):
         output=sp.check_output([n,'+ohm','-vV'],env=env,text=True);b.need(output==proof['versions'][n],'actual toolchain role was changed')
     for name in ('exec_count','whole_count','thread_meter'):sp.run(['cc','-O2','-pthread','-Wall','-Wextra','-Werror',frozen/(name+'.c'),'-o',b.ROOT/name],check=True)
-    b.select(b.OLD);source_snapshot=b.ROOT/'initial-source';source_proof=old_namespace.save_checkout(b.WORK,source_snapshot);b.put(b.PUB/'source-initial.json',source_proof)
+    mini=b.ROOT/'mini';guards=b.ROOT/'guards';caps=b.ROOT/'caps'
+    try:
+        sp.run([sys.executable,'-IB',HERE/'probe.py',mini,{'P':'parent','C':'candidate'}[role]],env=b.env(),check=True)
+        sp.run([sys.executable,'-IB',HERE/'guards.py',mini,guards,role],env=b.env(),check=True)
+        sp.run([sys.executable,'-IB',HERE/'caps.py',mini,caps,role],env=b.env(),check=True)
+    finally:
+        for root,label in ((mini,'mini'),(guards,'guards'),(caps,'caps')):
+            if root.is_dir():
+                dest=b.PUB/label;dest.mkdir()
+                for f in root.iterdir():
+                    if f.is_file()and f.suffix in ('.err','.out','.stdout','.stderr','.json'):shutil.copyfile(f,dest/f.name)
+    b.select(b.OLD)
+    if CASE=='26372':
+        source_snapshot=b.ROOT/'initial-source';source_proof=old_namespace.save_checkout(b.WORK,source_snapshot);b.put(b.PUB/'source-initial.json',source_proof)
     b.prepare();old=phase(role,'cold-old',b.OLD,'cold');b.need('canonical_archive'in old,'unknown producer archive')
     held=b.ROOT/'retained/ruff';held.parent.mkdir();shutil.copy2(b.TARGET/'debug/ruff',held)
     no=phase(role,'old-unchanged',b.OLD,'lifetime');b.need(b.same_artifacts(old,no),'old no-op native output')
@@ -156,6 +169,9 @@ def run_role(role):
             td=b.PUB/name;b.command(td,b.CMD,101);err=(td/'stderr').read_bytes();b.need(b'error[E0308]'in err and b'owner_cgu_invalid'in err,'stale diagnostic')
     finally:b.SRC.write_bytes(base)
     repaired=phase(role,'repair',b.NEW);b.need(b.same_artifacts(repaired,edit),'repair missed a native or metadata delta')
+    if CASE=='28392':
+        b.select(b.OLD);back=phase(role,'reverse',b.OLD);b.need(b.same_artifacts(back,old),'reverse missed original')
+        b.select(b.NEW);direct=phase(role,'observed-edit',b.NEW,'lifetime');b.need(b.same_artifacts(direct,edit),'observed edit missed reference')
     empty_outputs();b.prepare();clean=phase(role,'empty-new',b.NEW,'cold')
     b.need(clean['elf']==edit['elf'] and clean['verdict']==edit['verdict'],'independent complete CLI or verdict differs')
     b.need(native_ledger(b.PUB/'edit')==native_ledger(b.PUB/'empty-new'),'independent producer archive differs')
@@ -165,32 +181,23 @@ def run_role(role):
     b.need(objects('edit')==objects('empty-new'),'independent complete native CGU census differs')
     b.need(not b.git('status','--porcelain'),'unexpected dirty Ruff source')
     b.put(b.PUB/'ordinary-admission.json',{'role':role,'case':CASE,'old':old,'edit':edit,'clean':clean,'ordinary_controls':True})
-    # Price a genuinely separate forward edit. A cached artifact tree on a reverted checkout proved insufficient.
-    empty_outputs();b.put(b.PUB/'source-restored.json',old_namespace.restore_checkout(b.WORK,source_snapshot,source_proof))
-    b.need(b.git('rev-parse','HEAD')==b.OLD and b.hf(b.SRC)==b.SRCS[b.OLD] and b.hf(b.WORK/'Cargo.lock')==b.LOCK,'wrong physical replay source')
-    b.prepare();seed=phase(role,'second-cold-old',b.OLD,'cold')
-    no2=phase(role,'second-old-unchanged',b.OLD,'lifetime');b.need(b.same_artifacts(seed,no2),'second OLD no-op changed output')
-    b.select(b.NEW);direct=phase(role,'observed-edit',b.NEW,'lifetime')
-    no3=phase(role,'observed-new-unchanged',b.NEW,'lifetime');b.need(b.same_artifacts(direct,no3),'second NEW no-op changed output')
-    for first,repeat,a,both in [('cold-old','second-cold-old',old,seed),('edit','observed-edit',edit,direct)]:
-        b.need(a['elf']==both['elf'] and a['verdict']==both['verdict'] and native_ledger(b.PUB/first)==native_ledger(b.PUB/repeat) and objects(first)==objects(repeat),'different complete native outputs on independent forward history')
-    b.put(b.PUB/'independent-metadata.json',{'first_to_second_old':b.same_artifacts(old,seed),'first_to_second_edit':b.same_artifacts(edit,direct),'first_to_empty_edit':b.same_artifacts(edit,clean),'primary_states':{k:v for k,v in [('cold-old',old),('edit',edit),('empty-new',clean),('second-cold-old',seed),('observed-edit',direct)]}})
-    # Independently empty external images can change full metadata. Keep the true whole command and the
-    # second native/roster verdict, but decline transferring its subsidiary rustc cost if the inputs differ.
-    mini=b.ROOT/'mini';guards=b.ROOT/'guards'
-    try:
-        sp.run([sys.executable,'-IB',HERE/'probe.py',mini,{'P':'parent','C':'candidate'}[role]],env=b.env(),check=True)
-        sp.run([sys.executable,'-IB',HERE/'guards.py',mini,guards,role],env=b.env(),check=True)
-    finally:
-        for root,label in ((mini,'mini'),(guards,'guards')):
-            if root.is_dir():
-                dest=b.PUB/label;dest.mkdir()
-                for f in root.iterdir():
-                    if f.is_file()and f.suffix in ('.err','.out','.stdout','.stderr','.json'):shutil.copyfile(f,dest/f.name)
+    if CASE=='26372':
+        # Price a genuinely separate forward edit. A cached artifact tree on a reverted checkout proved insufficient.
+        empty_outputs();b.put(b.PUB/'source-restored.json',old_namespace.restore_checkout(b.WORK,source_snapshot,source_proof))
+        b.need(b.git('rev-parse','HEAD')==b.OLD and b.hf(b.SRC)==b.SRCS[b.OLD] and b.hf(b.WORK/'Cargo.lock')==b.LOCK,'wrong physical replay source')
+        b.prepare();seed=phase(role,'second-cold-old',b.OLD,'cold')
+        no2=phase(role,'second-old-unchanged',b.OLD,'lifetime');b.need(b.same_artifacts(seed,no2),'second OLD no-op changed output')
+        b.select(b.NEW);direct=phase(role,'observed-edit',b.NEW,'lifetime')
+        no3=phase(role,'observed-new-unchanged',b.NEW,'lifetime');b.need(b.same_artifacts(direct,no3),'second NEW no-op changed output')
+        for first,repeat,a,both in [('cold-old','second-cold-old',old,seed),('edit','observed-edit',edit,direct)]:
+            b.need(a['elf']==both['elf'] and a['verdict']==both['verdict'] and native_ledger(b.PUB/first)==native_ledger(b.PUB/repeat) and objects(first)==objects(repeat),'different complete native outputs on independent forward history')
+        b.put(b.PUB/'independent-metadata.json',{'first_to_second_old':b.same_artifacts(old,seed),'first_to_second_edit':b.same_artifacts(edit,direct),'first_to_empty_edit':b.same_artifacts(edit,clean),'primary_states':{k:v for k,v in [('cold-old',old),('edit',edit),('empty-new',clean),('second-cold-old',seed),('observed-edit',direct)]}})
+        # Independently empty external images can change full metadata. Keep the true whole command and the
+        # second native/roster verdict, but decline transferring its subsidiary rustc cost if the inputs differ.
     b.put(b.PUB/'admission.json',{'role':role,'case':CASE,'old':old,'edit':edit,'clean':clean,'all_probes':True})
     empty_outputs();b.need(b.ROOT.parent==OUTPUT.parent and b.ROOT.name=='ohm-clap-cli','private role root');shutil.rmtree(b.ROOT)
 def main():
-    b.need(os.environ['GITHUB_RUN_ATTEMPT']=='1'and os.environ['GITHUB_SHA']==os.environ['REVIEWED_HEAD']and os.environ['GITHUB_REF_NAME']=='charlie/qa-ruff-derived-impl-cgus-20261103','unregistered invocation')
+    b.need(os.environ['GITHUB_RUN_ATTEMPT']=='1'and os.environ['GITHUB_SHA']==os.environ['REVIEWED_HEAD']and os.environ['GITHUB_REF_NAME']=='charlie/qa-ruff-derived-impl-caps-20261103','unregistered invocation')
     b.need(sp.check_output(['git','-C',frozen,'rev-parse','HEAD'],text=True).strip()=='e48abf3b09f415b296d0ee2e8ec81c0de7b50611','wrong ordinary source')
     b.need(b.git('rev-parse','HEAD')==b.NEW and b.git('rev-parse','HEAD^')==b.OLD,'wrong original history')
     OUTPUT.mkdir();b.put(OUTPUT/'registration.json',{'native_sources':[b.OLD,b.NEW],'source_paths':b.SRCS,'lock':b.LOCK,'case':CASE,'order':ORDER,'boot':Path('/proc/sys/kernel/random/boot_id').read_text().strip(),'registration':reg,'transports':transport.KIT})
