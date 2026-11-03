@@ -13,3 +13,5 @@ Dispatch the published QA commit with the ordinary release-ref and registration 
 ```sh
 gh workflow run ci.yml --repo astral-experiments/ohm --ref charlie/qa-ron-consumed-inputs-20261103 -f reviewed_head="$(git rev-parse HEAD)" -f lane=runtime-hardware
 ```
+
+The normal runner overlay reported different actual mapped and freshly opened devices. Both original hardware treatments refused; their raw disposition is in the adjacent `refused-private-overlay-6dfb8fb.json`. A separate one-host three-ELF preflight physically demonstrated the private mapping and blocked a writer (ordinary and private SHA-256 identical). The two whole-project workers therefore use an independently emptied, capped 512 MiB tmpfs only for the fifteen native software files, bound back to the same visible names. They explicitly charge staging and all per-invocation checks. This is a controlled diagnostic platform. The real ordinary overlay remains ineligible.

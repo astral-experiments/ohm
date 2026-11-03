@@ -82,6 +82,11 @@ extern "C" bool registered_diagnostic_trampoline(unsigned long page) {
         rows.append(dict(name=str(f),source=str(src),sha256=sha,blake3=dig,bytes=st.st_size,
                          dev=st.st_dev,ino=st.st_ino,uid=st.st_uid,original_uid=f.stat().st_uid,
                          original_dev=f.stat().st_dev,original_ino=f.stat().st_ino))
+    compile_supervisor(root, rows, bound["role"]["argv_sha256"])
+    return rows
+
+def compile_supervisor(root, rows, argv_fingerprint):
+    base=root/'three';full=root/'all-native';objs=sorted(base.glob('blake3*.o'));assert len(objs)==7
     decl=lambda values:','.join(values)
     names=decl(json.dumps(r['name'])for r in rows);hashes=decl(json.dumps(r['blake3'])for r in rows)
     dev=decl(str(r['dev'])for r in rows);ino=decl(str(r['ino'])for r in rows)
@@ -90,12 +95,12 @@ extern "C" bool registered_diagnostic_trampoline(unsigned long page) {
     header=header.replace('RON_PRIVATE_INODES','const unsigned long expected_dev[]={'+dev+'}, expected_ino[]={'+ino+'};')
     (full/'generation.h').write_text(header)
     prefix=(HERE.parent/'src/supervisor-prefix.cpp').read_text()
-    (full/'supervisor.cpp').write_text(prefix+'\n#define REGISTERED_CMD "'+bound['role']['argv_sha256']+'"\n'+(HERE/'main.inc').read_text())
+    (full/'supervisor.cpp').write_text(prefix+'\n#define REGISTERED_CMD "'+argv_fingerprint+'"\n'+(HERE/'main.inc').read_text())
     prepare.execute(['c++','-std=c++17','-O2','-g','-I'+str(base/'blake3'),'-I'+str(HERE),'-I'+str(HERE.parent/'src'),full/'supervisor.cpp',*objs,'-lcrypto','-o',full/'supervise'])
     dep=sp.check_output(['ldd',str(full/'contact.so')],text=True);assert 'libcrypto.so.3 =>' in dep and 'not found' not in dep
     prepare.dump(full/'physical.json',dict(files=rows,ldd=dep,actor=prepare.sha(full/'contact.so'),
-                 supervisor=prepare.sha(full/'supervise'),argv=bound['role']['argv_sha256']))
-    return rows
+                 supervisor=prepare.sha(full/'supervise'),argv=argv_fingerprint))
+
 
 def enter_namespace(context,rows):
     """Drop privileges before mounting any copied ELF and never execute user code as root."""
@@ -106,16 +111,32 @@ def enter_namespace(context,rows):
     sh='set -eu\n'
     sh+='test "$(/bin/busybox readlink /proc/self/ns/mnt)" != "$(/bin/busybox readlink /proc/$PPID/ns/mnt)"\n'
     sh+="/bin/busybox awk '{for(i=7;i<=NF && $i!=\"-\";i++) if($i~/^(shared|master):/)exit 1}' /proc/self/mountinfo\n"
+    stage=context.parent/'physical-input-generations';stage.mkdir()
+    assert context.parent.resolve()==context.parent and stage.stat().st_uid==uid and not list(stage.iterdir())
+    assert sum(r['bytes'] for r in rows)<450*2**20
+    sh+=f'/bin/busybox mount -t tmpfs -o mode=0700,uid={uid},gid={gid},size=512m,nosuid,nodev tmpfs {q(str(stage))}\n'
+    base="/usr/bin/env -i PATH=/usr/sbin:/usr/bin:/bin "
+    py="/usr/bin/python3 -IB "+q(str(HERE/'work.py'))
+    drop=f"/usr/bin/setpriv --reuid={uid} --regid={gid} --clear-groups --no-new-privs /bin/busybox sh -c "
+    ctx=json.loads(context.read_bytes());proof=Path(ctx['proof']);counter=context.parent/'whole_count'
+    # All physical copying and all registration of the new generation happens as the regular user.
+    for action in ('--copy-generations','--bind-supervisor'):
+        cmd=('exec '+base+q(str(counter))+' '+q(str(proof/(action[2:]+'-hardware.json')))+' /usr/bin/python3 '+py+' '+action+' '+q(str(context)))
+        sh+=drop+q(cmd)+'\n'
     cmd="kill -STOP $$; exec /usr/bin/env -i PATH=/usr/sbin:/usr/bin:/bin /usr/bin/python3 -IB "+q(str(HERE/'work.py'))+" --inside "+q(str(context))
     sh+=f"/usr/bin/setpriv --reuid={uid} --regid={gid} --clear-groups --no-new-privs /bin/busybox sh -c {q(cmd)} &\nchild=$!\n"
     sh+="trap 'kill -CONT \"$child\" 2>/dev/null || :; kill -TERM \"$child\" 2>/dev/null || :; wait \"$child\" 2>/dev/null || :' EXIT\n"
     check=f'/^State:/ {{a=($2=="T")}} /^Uid:/ {{b=($2=={uid} && $3=={uid} && $4=={uid} && $5=={uid})}} /^CapEff:/ {{c=($2=="0000000000000000")}} /^NoNewPrivs:/ {{d=($2==1)}} END {{exit !(a&&b&&c&&d)}}'
     sh+=f'i=0; while ! /bin/busybox awk {q(check)} "/proc/$child/status"; do i=$((i+1)); [ "$i" -le 500 ]; /bin/busybox sleep 0.02; done\n'
-    for r in rows:
-        if r['source']==r['name']:continue
-        src=Path(r['source']);dest=Path(r['name'])
-        assert dest.parent==Path('/usr/lib/x86_64-linux-gnu') and dest.name in (*SYSTEM,'libcrypto.so.3')
-        assert src.parent.name=='private-elf-generations' and src.name==dest.name and src.is_file() and src.stat().st_uid==uid
+    user_root=context.parent.resolve()
+    for idx,r in enumerate(rows):
+        src=stage/str(idx);dest=Path(r['name'])
+        assert dest.resolve()==dest and dest.is_file() and not dest.is_symlink()
+        if dest.is_relative_to(user_root):
+            assert (idx in (0,1,2,12,13)) and dest.stat().st_uid==uid
+        else:
+            assert idx in (*range(3,12),14) and dest.parent==Path('/usr/lib/x86_64-linux-gnu')
+            assert dest.name in (*SYSTEM,'libcrypto.so.3') and dest.stat().st_uid==0
         a=q(str(src));b=q(str(dest))
         sh+=f'/bin/busybox mount -o bind {a} {b}\n/bin/busybox mount -o remount,bind,ro {b}\n'
         sh+=f'[ "$(/bin/busybox stat -c %d:%i {a})" = "$(/bin/busybox stat -c %d:%i {b})" ]\n'
