@@ -1,13 +1,15 @@
 {
   "bootstrap_config": "5822d2ae682a27193ef413f013281b0849797c88c78545607ab563ea48f87684",
   "build_script": "88c1655898536f1e1a0ee232afffd0dfb33f0025e6546c7dc8a5d6d353a99591",
-  "bundle": "3eff24185de6c70af6e5293543c0a4f8b0d8991e461f74c932b7b4a4eab28bfa",
-  "candidate": "025c787a77f5d887ba9bf860ef69b7756b59fe57",
-  "candidate_tree": "7131c943fd18000071a008820c20a1e8265bc46d",
+  "bundle": "058531c6a0940b70cc19276b29bb8b47aa2c77778dc6be7719a71b5c271c2da6",
+  "candidate": "6c2874a0b6a0bf3570f8959733b6f87907e5cce6",
+  "candidate_tree": "1a86c989ac19e14b8bc53ec8a92be4feafef5a9f",
   "commits": [
-    "16264cadb0974a4d35e6fabe025bb653ca0a7d1e",
-    "6273e0aadbd181ac81bf7355d5e2323c6be4512a",
-    "025c787a77f5d887ba9bf860ef69b7756b59fe57"
+    "a60f4f4476d4819b62730e92ea07c1343f8e6dac",
+    "2bc7e7b7c898e7fa82a1dde03978c59263d8167d",
+    "dda36b958be0f0c393c22039fb2f53c0ff436968",
+    "8574afc64801c199c8d090e3e0e013adf6ccd496",
+    "6c2874a0b6a0bf3570f8959733b6f87907e5cce6"
   ],
   "enabled_roles": [
     "candidate"
@@ -25,16 +27,34 @@
       "source": "rust-1.99.0-dev-x86_64-unknown-linux-gnu/rustc/lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd"
     }
   },
+  "native_array_probe": "0ffa4d63207d86d3f06d40bec0cb6cc04b017bdcd805989f2f00dac887cb3143",
   "parent": "f5a51d8cc3e76236c2d0f17d495d59ebb03306e4",
   "parent_tree": "b4f0ad237b667d5227e63b44f6e8d3ba885bf7a1",
   "paths": [
-    "compiler/rustc_incremental/src/persist/file_format.rs",
-    "compiler/rustc_monomorphize/src/partitioning.rs"
+    "compiler/rustc_data_structures/src/unord.rs",
+    "compiler/rustc_hir_typeck/src/expr.rs",
+    "compiler/rustc_hir_typeck/src/writeback.rs",
+    "compiler/rustc_middle/src/thir.rs",
+    "compiler/rustc_middle/src/thir/visit.rs",
+    "compiler/rustc_middle/src/ty/typeck_results.rs",
+    "compiler/rustc_mir_build/src/builder/expr/as_constant.rs",
+    "compiler/rustc_mir_build/src/builder/expr/as_place.rs",
+    "compiler/rustc_mir_build/src/builder/expr/as_rvalue.rs",
+    "compiler/rustc_mir_build/src/builder/expr/category.rs",
+    "compiler/rustc_mir_build/src/builder/expr/into.rs",
+    "compiler/rustc_mir_build/src/builder/scope.rs",
+    "compiler/rustc_mir_build/src/check_unsafety.rs",
+    "compiler/rustc_mir_build/src/thir/cx/expr.rs",
+    "compiler/rustc_mir_build/src/thir/pattern/check_match.rs",
+    "compiler/rustc_mir_build/src/thir/print.rs",
+    "compiler/rustc_parse/src/parser/expr.rs",
+    "compiler/rustc_ty_utils/src/consts.rs"
   ],
   "published_run": 41691269002,
-  "ref": "refs/heads/charlie/clap-derived-owner-cgus",
+  "ref": "refs/heads/charlie/qa-compact-integer-arrays-20261103",
   "release": "8f25c47ff9e7c4ab2f22a1cad0638a26c7e26e1c",
   "signed": "ecde6809d7f1fc1966798198479867c4a49bdf7a51f3873336d23a40fabce453",
-  "stage1_driver": "5674cfac4871c10a64730ec06679f8fdcfc9bbc0ec1b4c8db02a557cbbd1381d",
-  "stage1_receipt_run": 41737298796
+  "stage1_driver": "e2d82be3436c6fc5728b53f5c602cf2014fc7a5c7cd9987fbcc1dfe6b1bf2382",
+  "stage1_price": 41741463395,
+  "stage1_receipt_run": 41738460962
 }

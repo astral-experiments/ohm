@@ -98,6 +98,8 @@ def collect():
     bad=[sp.run([*call,"--error-format=json"],capture_output=True,env=e)for _ in range(2)]
     assert all(r.returncode!=0 and b"E0308" in r.stderr for r in bad) and bad[0].stderr==bad[1].stderr
     put("native.json",dict(baseline="Row(42)",rejected_twice="E0308",diagnostic=hashlib.sha256(bad[0].stderr).hexdigest()))
+    assert sha(kit/"array_probe.py")==spec["native_array_probe"]
+    sp.run([sys.executable,"-IB",kit/"array_probe.py",proof/"array-native",role],env=e,check=True)
     sp.run(["tar","--zstd","-cf",root/"sdk.tar.zst","-C",sdk,"bin","lib"],check=True)
     (proof/"sdk-sha256").write_text(sha(root/"sdk.tar.zst")+"\n")
 if __name__=="__main__":{"source":source,"collect":collect}[sys.argv[1]]()
