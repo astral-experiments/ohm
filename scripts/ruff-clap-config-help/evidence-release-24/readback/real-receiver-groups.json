@@ -1,0 +1,741 @@
+{
+ "actual_machine_module": "ruff.6d12376b25bedff1-args",
+ "all_native_function_bytes": 325267,
+ "archive": "5a6dda2e382e0f7f2381afa9de48aa90c0752560231d24124332ff86bd7b4465",
+ "args_rank_by_full_object_size": 2,
+ "args_size": 1644904,
+ "by_named_clap_receiver": {
+  "AnalyzeCommand": {
+   "global_definitions": 7,
+   "methods": 7,
+   "native_bytes": 1949
+  },
+  "AnalyzeGraphCommand": {
+   "global_definitions": 9,
+   "methods": 9,
+   "native_bytes": 24506
+  },
+  "Args": {
+   "global_definitions": 9,
+   "methods": 9,
+   "native_bytes": 2817
+  },
+  "CheckCommand": {
+   "global_definitions": 9,
+   "methods": 9,
+   "native_bytes": 133149
+  },
+  "Command": {
+   "global_definitions": 7,
+   "methods": 7,
+   "native_bytes": 33319
+  },
+  "FormatCommand": {
+   "global_definitions": 9,
+   "methods": 9,
+   "native_bytes": 53781
+  },
+  "GlobalConfigArgs": {
+   "global_definitions": 7,
+   "methods": 7,
+   "native_bytes": 9748
+  },
+  "LogLevelArgs": {
+   "global_definitions": 7,
+   "methods": 7,
+   "native_bytes": 10465
+  },
+  "ServerCommand": {
+   "global_definitions": 9,
+   "methods": 9,
+   "native_bytes": 5784
+  },
+  "other": {
+   "global_definitions": 22,
+   "methods": 52,
+   "native_bytes": 49749
+  }
+ },
+ "exact_machine_byte_edits": [
+  {
+   "bytes": 4147,
+   "different_bytes": [
+    [
+     648,
+     225,
+     220
+    ]
+   ],
+   "method": "<ruff::args::GlobalConfigArgs as clap_builder::derive::Args>::augment_args"
+  },
+  {
+   "bytes": 4345,
+   "different_bytes": [
+    [
+     648,
+     225,
+     220
+    ]
+   ],
+   "method": "<ruff::args::GlobalConfigArgs as clap_builder::derive::Args>::augment_args_for_update"
+  }
+ ],
+ "library_cgus": 236,
+ "methods": {
+  "AnalyzeCommand": [
+   {
+    "binding": 1,
+    "bytes": 79,
+    "method": "<ruff::args::AnalyzeCommand as clap_builder::derive::FromArgMatches>::from_arg_matches"
+   },
+   {
+    "binding": 1,
+    "bytes": 611,
+    "method": "<ruff::args::AnalyzeCommand as clap_builder::derive::FromArgMatches>::from_arg_matches_mut"
+   },
+   {
+    "binding": 1,
+    "bytes": 82,
+    "method": "<ruff::args::AnalyzeCommand as clap_builder::derive::FromArgMatches>::update_from_arg_matches"
+   },
+   {
+    "binding": 1,
+    "bytes": 616,
+    "method": "<ruff::args::AnalyzeCommand as clap_builder::derive::FromArgMatches>::update_from_arg_matches_mut"
+   },
+   {
+    "binding": 1,
+    "bytes": 29,
+    "method": "<ruff::args::AnalyzeCommand as clap_builder::derive::Subcommand>::has_subcommand"
+   },
+   {
+    "binding": 1,
+    "bytes": 266,
+    "method": "<ruff::args::AnalyzeCommand as clap_builder::derive::Subcommand>::augment_subcommands"
+   },
+   {
+    "binding": 1,
+    "bytes": 266,
+    "method": "<ruff::args::AnalyzeCommand as clap_builder::derive::Subcommand>::augment_subcommands_for_update"
+   }
+  ],
+  "AnalyzeGraphCommand": [
+   {
+    "binding": 1,
+    "bytes": 63,
+    "method": "<ruff::args::AnalyzeGraphCommand as clap_builder::derive::CommandFactory>::command_for_update"
+   },
+   {
+    "binding": 1,
+    "bytes": 63,
+    "method": "<ruff::args::AnalyzeGraphCommand as clap_builder::derive::CommandFactory>::command"
+   },
+   {
+    "binding": 1,
+    "bytes": 79,
+    "method": "<ruff::args::AnalyzeGraphCommand as clap_builder::derive::FromArgMatches>::from_arg_matches"
+   },
+   {
+    "binding": 1,
+    "bytes": 1113,
+    "method": "<ruff::args::AnalyzeGraphCommand as clap_builder::derive::FromArgMatches>::from_arg_matches_mut"
+   },
+   {
+    "binding": 1,
+    "bytes": 82,
+    "method": "<ruff::args::AnalyzeGraphCommand as clap_builder::derive::FromArgMatches>::update_from_arg_matches"
+   },
+   {
+    "binding": 1,
+    "bytes": 1136,
+    "method": "<ruff::args::AnalyzeGraphCommand as clap_builder::derive::FromArgMatches>::update_from_arg_matches_mut"
+   },
+   {
+    "binding": 1,
+    "bytes": 10648,
+    "method": "<ruff::args::AnalyzeGraphCommand as clap_builder::derive::Args>::augment_args"
+   },
+   {
+    "binding": 1,
+    "bytes": 11304,
+    "method": "<ruff::args::AnalyzeGraphCommand as clap_builder::derive::Args>::augment_args_for_update"
+   },
+   {
+    "binding": 1,
+    "bytes": 18,
+    "method": "<ruff::args::AnalyzeGraphCommand as clap_builder::derive::Args>::group_id"
+   }
+  ],
+  "Args": [
+   {
+    "binding": 1,
+    "bytes": 63,
+    "method": "<ruff::args::Args as clap_builder::derive::CommandFactory>::command_for_update"
+   },
+   {
+    "binding": 1,
+    "bytes": 63,
+    "method": "<ruff::args::Args as clap_builder::derive::CommandFactory>::command"
+   },
+   {
+    "binding": 1,
+    "bytes": 79,
+    "method": "<ruff::args::Args as clap_builder::derive::FromArgMatches>::from_arg_matches"
+   },
+   {
+    "binding": 1,
+    "bytes": 403,
+    "method": "<ruff::args::Args as clap_builder::derive::FromArgMatches>::from_arg_matches_mut"
+   },
+   {
+    "binding": 1,
+    "bytes": 103,
+    "method": "<ruff::args::Args as clap_builder::derive::FromArgMatches>::update_from_arg_matches"
+   },
+   {
+    "binding": 1,
+    "bytes": 52,
+    "method": "<ruff::args::Args as clap_builder::derive::FromArgMatches>::update_from_arg_matches_mut"
+   },
+   {
+    "binding": 1,
+    "bytes": 979,
+    "method": "<ruff::args::Args as clap_builder::derive::Args>::augment_args"
+   },
+   {
+    "binding": 1,
+    "bytes": 1057,
+    "method": "<ruff::args::Args as clap_builder::derive::Args>::augment_args_for_update"
+   },
+   {
+    "binding": 1,
+    "bytes": 18,
+    "method": "<ruff::args::Args as clap_builder::derive::Args>::group_id"
+   }
+  ],
+  "CheckCommand": [
+   {
+    "binding": 1,
+    "bytes": 52668,
+    "method": "<ruff::args::CheckCommand as clap_builder::derive::Args>::augment_args"
+   },
+   {
+    "binding": 1,
+    "bytes": 55625,
+    "method": "<ruff::args::CheckCommand as clap_builder::derive::Args>::augment_args_for_update"
+   },
+   {
+    "binding": 1,
+    "bytes": 18,
+    "method": "<ruff::args::CheckCommand as clap_builder::derive::Args>::group_id"
+   },
+   {
+    "binding": 1,
+    "bytes": 63,
+    "method": "<ruff::args::CheckCommand as clap_builder::derive::CommandFactory>::command_for_update"
+   },
+   {
+    "binding": 1,
+    "bytes": 63,
+    "method": "<ruff::args::CheckCommand as clap_builder::derive::CommandFactory>::command"
+   },
+   {
+    "binding": 1,
+    "bytes": 79,
+    "method": "<ruff::args::CheckCommand as clap_builder::derive::FromArgMatches>::from_arg_matches"
+   },
+   {
+    "binding": 1,
+    "bytes": 16686,
+    "method": "<ruff::args::CheckCommand as clap_builder::derive::FromArgMatches>::from_arg_matches_mut"
+   },
+   {
+    "binding": 1,
+    "bytes": 82,
+    "method": "<ruff::args::CheckCommand as clap_builder::derive::FromArgMatches>::update_from_arg_matches"
+   },
+   {
+    "binding": 1,
+    "bytes": 7865,
+    "method": "<ruff::args::CheckCommand as clap_builder::derive::FromArgMatches>::update_from_arg_matches_mut"
+   }
+  ],
+  "Command": [
+   {
+    "binding": 1,
+    "bytes": 79,
+    "method": "<ruff::args::Command as clap_builder::derive::FromArgMatches>::from_arg_matches"
+   },
+   {
+    "binding": 1,
+    "bytes": 2402,
+    "method": "<ruff::args::Command as clap_builder::derive::FromArgMatches>::from_arg_matches_mut"
+   },
+   {
+    "binding": 1,
+    "bytes": 82,
+    "method": "<ruff::args::Command as clap_builder::derive::FromArgMatches>::update_from_arg_matches"
+   },
+   {
+    "binding": 1,
+    "bytes": 4296,
+    "method": "<ruff::args::Command as clap_builder::derive::FromArgMatches>::update_from_arg_matches_mut"
+   },
+   {
+    "binding": 1,
+    "bytes": 280,
+    "method": "<ruff::args::Command as clap_builder::derive::Subcommand>::has_subcommand"
+   },
+   {
+    "binding": 1,
+    "bytes": 12801,
+    "method": "<ruff::args::Command as clap_builder::derive::Subcommand>::augment_subcommands"
+   },
+   {
+    "binding": 1,
+    "bytes": 13379,
+    "method": "<ruff::args::Command as clap_builder::derive::Subcommand>::augment_subcommands_for_update"
+   }
+  ],
+  "FormatCommand": [
+   {
+    "binding": 1,
+    "bytes": 63,
+    "method": "<ruff::args::FormatCommand as clap_builder::derive::CommandFactory>::command_for_update"
+   },
+   {
+    "binding": 1,
+    "bytes": 63,
+    "method": "<ruff::args::FormatCommand as clap_builder::derive::CommandFactory>::command"
+   },
+   {
+    "binding": 1,
+    "bytes": 79,
+    "method": "<ruff::args::FormatCommand as clap_builder::derive::FromArgMatches>::from_arg_matches"
+   },
+   {
+    "binding": 1,
+    "bytes": 3929,
+    "method": "<ruff::args::FormatCommand as clap_builder::derive::FromArgMatches>::from_arg_matches_mut"
+   },
+   {
+    "binding": 1,
+    "bytes": 82,
+    "method": "<ruff::args::FormatCommand as clap_builder::derive::FromArgMatches>::update_from_arg_matches"
+   },
+   {
+    "binding": 1,
+    "bytes": 2804,
+    "method": "<ruff::args::FormatCommand as clap_builder::derive::FromArgMatches>::update_from_arg_matches_mut"
+   },
+   {
+    "binding": 1,
+    "bytes": 22628,
+    "method": "<ruff::args::FormatCommand as clap_builder::derive::Args>::augment_args"
+   },
+   {
+    "binding": 1,
+    "bytes": 24115,
+    "method": "<ruff::args::FormatCommand as clap_builder::derive::Args>::augment_args_for_update"
+   },
+   {
+    "binding": 1,
+    "bytes": 18,
+    "method": "<ruff::args::FormatCommand as clap_builder::derive::Args>::group_id"
+   }
+  ],
+  "GlobalConfigArgs": [
+   {
+    "binding": 1,
+    "bytes": 79,
+    "method": "<ruff::args::GlobalConfigArgs as clap_builder::derive::FromArgMatches>::from_arg_matches"
+   },
+   {
+    "binding": 1,
+    "bytes": 596,
+    "method": "<ruff::args::GlobalConfigArgs as clap_builder::derive::FromArgMatches>::from_arg_matches_mut"
+   },
+   {
+    "binding": 1,
+    "bytes": 82,
+    "method": "<ruff::args::GlobalConfigArgs as clap_builder::derive::FromArgMatches>::update_from_arg_matches"
+   },
+   {
+    "binding": 1,
+    "bytes": 481,
+    "method": "<ruff::args::GlobalConfigArgs as clap_builder::derive::FromArgMatches>::update_from_arg_matches_mut"
+   },
+   {
+    "binding": 1,
+    "bytes": 4147,
+    "method": "<ruff::args::GlobalConfigArgs as clap_builder::derive::Args>::augment_args"
+   },
+   {
+    "binding": 1,
+    "bytes": 4345,
+    "method": "<ruff::args::GlobalConfigArgs as clap_builder::derive::Args>::augment_args_for_update"
+   },
+   {
+    "binding": 1,
+    "bytes": 18,
+    "method": "<ruff::args::GlobalConfigArgs as clap_builder::derive::Args>::group_id"
+   }
+  ],
+  "LogLevelArgs": [
+   {
+    "binding": 1,
+    "bytes": 79,
+    "method": "<ruff::args::LogLevelArgs as clap_builder::derive::FromArgMatches>::from_arg_matches"
+   },
+   {
+    "binding": 1,
+    "bytes": 202,
+    "method": "<ruff::args::LogLevelArgs as clap_builder::derive::FromArgMatches>::from_arg_matches_mut"
+   },
+   {
+    "binding": 1,
+    "bytes": 82,
+    "method": "<ruff::args::LogLevelArgs as clap_builder::derive::FromArgMatches>::update_from_arg_matches"
+   },
+   {
+    "binding": 1,
+    "bytes": 302,
+    "method": "<ruff::args::LogLevelArgs as clap_builder::derive::FromArgMatches>::update_from_arg_matches_mut"
+   },
+   {
+    "binding": 1,
+    "bytes": 4789,
+    "method": "<ruff::args::LogLevelArgs as clap_builder::derive::Args>::augment_args"
+   },
+   {
+    "binding": 1,
+    "bytes": 4993,
+    "method": "<ruff::args::LogLevelArgs as clap_builder::derive::Args>::augment_args_for_update"
+   },
+   {
+    "binding": 1,
+    "bytes": 18,
+    "method": "<ruff::args::LogLevelArgs as clap_builder::derive::Args>::group_id"
+   }
+  ],
+  "ServerCommand": [
+   {
+    "binding": 1,
+    "bytes": 63,
+    "method": "<ruff::args::ServerCommand as clap_builder::derive::CommandFactory>::command_for_update"
+   },
+   {
+    "binding": 1,
+    "bytes": 63,
+    "method": "<ruff::args::ServerCommand as clap_builder::derive::CommandFactory>::command"
+   },
+   {
+    "binding": 1,
+    "bytes": 210,
+    "method": "<ruff::args::ServerCommand as clap_builder::derive::FromArgMatches>::from_arg_matches"
+   },
+   {
+    "binding": 1,
+    "bytes": 140,
+    "method": "<ruff::args::ServerCommand as clap_builder::derive::FromArgMatches>::from_arg_matches_mut"
+   },
+   {
+    "binding": 1,
+    "bytes": 82,
+    "method": "<ruff::args::ServerCommand as clap_builder::derive::FromArgMatches>::update_from_arg_matches"
+   },
+   {
+    "binding": 1,
+    "bytes": 204,
+    "method": "<ruff::args::ServerCommand as clap_builder::derive::FromArgMatches>::update_from_arg_matches_mut"
+   },
+   {
+    "binding": 1,
+    "bytes": 2447,
+    "method": "<ruff::args::ServerCommand as clap_builder::derive::Args>::augment_args"
+   },
+   {
+    "binding": 1,
+    "bytes": 2557,
+    "method": "<ruff::args::ServerCommand as clap_builder::derive::Args>::augment_args_for_update"
+   },
+   {
+    "binding": 1,
+    "bytes": 18,
+    "method": "<ruff::args::ServerCommand as clap_builder::derive::Args>::group_id"
+   }
+  ],
+  "other": [
+   {
+    "binding": 0,
+    "bytes": 321,
+    "method": "<clap_builder::builder::arg::Arg>::value_name::<&str>"
+   },
+   {
+    "binding": 0,
+    "bytes": 433,
+    "method": "<clap_builder::builder::arg::Arg>::default_value::<&str>"
+   },
+   {
+    "binding": 0,
+    "bytes": 433,
+    "method": "<clap_builder::builder::arg::Arg>::default_missing_value::<&str>"
+   },
+   {
+    "binding": 0,
+    "bytes": 469,
+    "method": "<clap_builder::builder::arg::Arg>::env::<&str>"
+   },
+   {
+    "binding": 0,
+    "bytes": 39,
+    "method": "core::ptr::drop_glue::<core::option::Option<ruff_linter::rules::flake8_tidy_imports::settings::ImportSelector>>"
+   },
+   {
+    "binding": 0,
+    "bytes": 22,
+    "method": "core::ptr::drop_glue::<core::result::Result<std::path::PathBuf, shellexpand::strings::funcs::LookupError<std::env::VarError>>>"
+   },
+   {
+    "binding": 0,
+    "bytes": 16,
+    "method": "core::ptr::drop_glue::<ruff::args::InvalidConfigFlagReason>"
+   },
+   {
+    "binding": 0,
+    "bytes": 89,
+    "method": "core::ptr::drop_glue::<ruff::args::Command>"
+   },
+   {
+    "binding": 0,
+    "bytes": 78,
+    "method": "<std::sync::once::Once>::call_once_force::<<std::sync::lazy_lock::LazyLock<std::path::PathBuf>>::force::{closure#0}>::{closure#0}"
+   },
+   {
+    "binding": 0,
+    "bytes": 78,
+    "method": "<<std::sync::once::Once>::call_once_force<<std::sync::lazy_lock::LazyLock<std::path::PathBuf>>::force::{closure#0}>::{closure#0} as core::ops::function::FnOnce<(&std::sync::once::OnceState,)>>::call_once::{shim:vtable#0}"
+   },
+   {
+    "binding": 1,
+    "bytes": 10,
+    "method": "<ruff::args::GlobalConfigArgs>::log_level"
+   },
+   {
+    "binding": 1,
+    "bytes": 28,
+    "method": "<ruff::args::ConfigArguments>::config_file"
+   },
+   {
+    "binding": 0,
+    "bytes": 7674,
+    "method": "<ruff::args::ConfigArguments>::from_cli_arguments"
+   },
+   {
+    "binding": 1,
+    "bytes": 2818,
+    "method": "<ruff::args::CheckCommand>::partition"
+   },
+   {
+    "binding": 1,
+    "bytes": 1921,
+    "method": "<ruff::args::FormatCommand>::partition"
+   },
+   {
+    "binding": 1,
+    "bytes": 825,
+    "method": "<ruff::args::AnalyzeGraphCommand>::partition"
+   },
+   {
+    "binding": 1,
+    "bytes": 152,
+    "method": "<ruff::args::FormatRange>::to_text_range"
+   },
+   {
+    "binding": 1,
+    "bytes": 48,
+    "method": "<ruff::args::ServerCommand>::resolve_preview"
+   },
+   {
+    "binding": 0,
+    "bytes": 1190,
+    "method": "<ruff::args::LineColumnParseError>::write"
+   },
+   {
+    "binding": 0,
+    "bytes": 67,
+    "method": "anyhow::__private::format_err"
+   },
+   {
+    "binding": 0,
+    "bytes": 880,
+    "method": "ruff::args::collect_per_file_ignores"
+   },
+   {
+    "binding": 0,
+    "bytes": 244,
+    "method": "alloc::fmt::format"
+   },
+   {
+    "binding": 1,
+    "bytes": 13,
+    "method": "<ruff::args::HelpFormat as clap_builder::derive::ValueEnum>::value_variants"
+   },
+   {
+    "binding": 1,
+    "bytes": 35,
+    "method": "<ruff::args::HelpFormat as clap_builder::derive::ValueEnum>::to_possible_value"
+   },
+   {
+    "binding": 1,
+    "bytes": 8140,
+    "method": "<ruff::args::ConfigArguments as ruff_workspace::resolver::ConfigurationTransformer>::transform"
+   },
+   {
+    "binding": 0,
+    "bytes": 2186,
+    "method": "<core::option::Option<ruff_workspace::options::IsortOptions> as core::clone::Clone>::clone"
+   },
+   {
+    "binding": 0,
+    "bytes": 398,
+    "method": "<core::option::Option<ruff_workspace::options::PylintOptions> as core::clone::Clone>::clone"
+   },
+   {
+    "binding": 0,
+    "bytes": 473,
+    "method": "<core::option::Option<ruff_workspace::options::Pep8NamingOptions> as core::clone::Clone>::clone"
+   },
+   {
+    "binding": 0,
+    "bytes": 479,
+    "method": "<core::option::Option<ruff_workspace::options::Flake8BanditOptions> as core::clone::Clone>::clone"
+   },
+   {
+    "binding": 0,
+    "bytes": 479,
+    "method": "<core::option::Option<ruff_workspace::options::Flake8BuiltinsOptions> as core::clone::Clone>::clone"
+   },
+   {
+    "binding": 0,
+    "bytes": 550,
+    "method": "<core::option::Option<ruff_workspace::options::Flake8PytestStyleOptions> as core::clone::Clone>::clone"
+   },
+   {
+    "binding": 0,
+    "bytes": 920,
+    "method": "<core::option::Option<ruff_workspace::options::Flake8TidyImportsOptions> as core::clone::Clone>::clone"
+   },
+   {
+    "binding": 0,
+    "bytes": 349,
+    "method": "<core::option::Option<ruff_workspace::options::Flake8TypeCheckingOptions> as core::clone::Clone>::clone"
+   },
+   {
+    "binding": 0,
+    "bytes": 506,
+    "method": "<core::option::Option<ruff_workspace::options::Flake8ImportConventionsOptions> as core::clone::Clone>::clone"
+   },
+   {
+    "binding": 1,
+    "bytes": 1,
+    "method": "<ruff::args::SingleConfigArgument as clap_builder::builder::value_parser::ValueParserFactory>::value_parser"
+   },
+   {
+    "binding": 1,
+    "bytes": 4729,
+    "method": "<ruff::args::ConfigArgumentParser as clap_builder::builder::value_parser::TypedValueParser>::parse_ref"
+   },
+   {
+    "binding": 1,
+    "bytes": 13,
+    "method": "<ruff::args::TerminalColor as clap_builder::derive::ValueEnum>::value_variants"
+   },
+   {
+    "binding": 1,
+    "bytes": 557,
+    "method": "<ruff::args::TerminalColor as clap_builder::derive::ValueEnum>::to_possible_value"
+   },
+   {
+    "binding": 0,
+    "bytes": 654,
+    "method": "<clap_builder::parser::matches::arg_matches::ArgMatches as core::clone::Clone>::clone"
+   },
+   {
+    "binding": 0,
+    "bytes": 21,
+    "method": "<core::fmt::Error as core::fmt::Debug>::fmt"
+   },
+   {
+    "binding": 0,
+    "bytes": 5873,
+    "method": "<ruff_workspace::options::LintCommonOptions as core::clone::Clone>::clone"
+   },
+   {
+    "binding": 0,
+    "bytes": 250,
+    "method": "<alloc::string::String as core::fmt::Write>::write_char"
+   },
+   {
+    "binding": 0,
+    "bytes": 140,
+    "method": "<alloc::string::String as core::fmt::Write>::write_str"
+   },
+   {
+    "binding": 1,
+    "bytes": 499,
+    "method": "<ruff::args::FormatRange as core::str::traits::FromStr>::from_str"
+   },
+   {
+    "binding": 1,
+    "bytes": 1415,
+    "method": "<ruff::args::FormatRangeParseError as core::fmt::Display>::fmt"
+   },
+   {
+    "binding": 1,
+    "bytes": 65,
+    "method": "<ruff::args::LineColumn as core::fmt::Display>::fmt"
+   },
+   {
+    "binding": 1,
+    "bytes": 11,
+    "method": "<ruff::args::LineColumn as core::default::Default>::default"
+   },
+   {
+    "binding": 1,
+    "bytes": 22,
+    "method": "<ruff::args::LineColumn as core::cmp::Ord>::cmp"
+   },
+   {
+    "binding": 1,
+    "bytes": 21,
+    "method": "<ruff::args::LineColumn as core::cmp::PartialEq>::eq"
+   },
+   {
+    "binding": 1,
+    "bytes": 1004,
+    "method": "<ruff::args::LineColumn as core::str::traits::FromStr>::from_str"
+   },
+   {
+    "binding": 1,
+    "bytes": 2091,
+    "method": "<ruff::args::ExplicitConfigOverrides as ruff_workspace::resolver::ConfigurationTransformer>::transform"
+   },
+   {
+    "binding": 0,
+    "bytes": 20,
+    "method": "<alloc::string::String as core::fmt::Display>::fmt"
+   }
+  ]
+ },
+ "separate_changed_version_module": "ruff.6d12376b25bedff1-version",
+ "separate_help_literal_section": {
+  "new_bytes": 476,
+  "old_bytes": 481,
+  "section": [
+   ".rodata..Lanon.f293b5adc4ac199b05fcb9305d5ccc43.489",
+   1,
+   ""
+  ]
+ }
+}
