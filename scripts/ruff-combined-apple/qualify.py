@@ -61,7 +61,7 @@ def check_cargo_files():
 
 def check_sources():
     check_cargo_files()
-    for repo, ref, tree in ((src, "c3aa3a605e56878669c745a9dd3ba09c9ccfa1ef", "14360661a7c5954793b95499b5e86027d2d23c6f"), (cargo, "abc70d60a6fd89c10d5f65cf85820d9b78d5affe", "68e5a1e9b52324ad2e6fb8382eaa7cf53428f97d"), (workspace/"fixtures", "5b47d5755bd515e61a98b9f85eca3af0aaf7c137", "d22f09981bdd81fc892fd47d894233639d0f3dab")):
+    for repo, ref, tree in ((src, "f5a51d8cc3e76236c2d0f17d495d59ebb03306e4", "b4f0ad237b667d5227e63b44f6e8d3ba885bf7a1"), (cargo, "abc70d60a6fd89c10d5f65cf85820d9b78d5affe", "68e5a1e9b52324ad2e6fb8382eaa7cf53428f97d"), (workspace/"fixtures", "5b47d5755bd515e61a98b9f85eca3af0aaf7c137", "d22f09981bdd81fc892fd47d894233639d0f3dab")):
         assert git_sha(repo, "HEAD") == ref and git_sha(repo, "HEAD^{tree}") == tree
         if repo!=src:
             sp.run(["git", "-C", repo, "diff", "--exit-code", "HEAD", "--"], check=True)
@@ -133,6 +133,12 @@ def source():
     assert git_sha(src, "FETCH_HEAD") == "c3aa3a605e56878669c745a9dd3ba09c9ccfa1ef" and git_sha(src, "FETCH_HEAD^") == git_sha(src, "HEAD")
     assert sp.check_output(["git", "-C", src, "diff", "--name-only", "HEAD", "FETCH_HEAD"]).splitlines() == [b"src/tools/cargo"]
     sp.run(["git", "-C", src, "checkout", "--quiet", "--detach", "--no-recurse-submodules", "FETCH_HEAD"], check=True)
+    combined = Path(__file__).with_name("combined-24.bundle")
+    assert smoke.sha(combined) == "c15901fb248e8315f3983c7cb14e8967d011f97dd1e40980b63ce784ec4b2ff3"
+    sp.run(["git", "-C", src, "bundle", "verify", combined], check=True)
+    sp.run(["git", "-C", src, "fetch", "--no-tags", "--no-recurse-submodules", combined, "refs/heads/charlie/codex-rc24-verified-cargo"], check=True)
+    assert git_sha(src, "FETCH_HEAD") == "f5a51d8cc3e76236c2d0f17d495d59ebb03306e4" and git_sha(src, "FETCH_HEAD^{tree}") == "b4f0ad237b667d5227e63b44f6e8d3ba885bf7a1"
+    sp.run(["git", "-C", src, "checkout", "--quiet", "--no-recurse-submodules", "--detach", "FETCH_HEAD"], check=True)
     nested=src/"src/tools/cargo"
     if (nested/".git").exists():
         sp.run(["git","-C",nested,"fetch","--no-tags",cargo,git_sha(cargo,"HEAD")],check=True)

@@ -1,12 +1,12 @@
-name: Qualify the -23 Cargo and Rust regression fixes together
-run-name: Integrated metadata stub, coverage, checksum and doctest fixes ${{ inputs.reviewed_head
+name: Qualify Ohm 1.99.0-24 on both release hosts
+run-name: Ohm -24 correctness, cache migration and compiler optimizations ${{ inputs.reviewed_head
   }}
 permissions:
   contents: read
 jobs:
   qualify:
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1'
-      && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-rc23-integrated-green-stub-20261103'
+      && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/codex-rc24-native-qualification'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     steps:
@@ -167,6 +167,10 @@ jobs:
         python3 -IB qa-code/scripts/ruff-combined-apple/qualify.py build
 
         '
+    - name: Verify signed-cache upgrade, warm reuse, changed bytes and downgrade
+      run: |
+        root="$RUNNER_TEMP/combined"
+        python3 -IB qa-code/scripts/ruff-combined-apple/cache_upgrade.py "$root/reopened/normal" "$root/reopened/defer" "$root/cache-migration" "$root/logs/cache-migration.json"
     - name: Preserve the all-static ThinLTO Cargo executable
       shell: bash
       run: 'set -euo pipefail
@@ -204,6 +208,10 @@ jobs:
     - name: Verify checked inputs, ordinary doctests, native archive edits and Git
         ownership
       run: python3 -IB qa-code/scripts/ruff-combined-apple/qualify.py exercise
+    - name: Run the three compiler regression tests on the combined sources
+      working-directory: source/rust
+      run: |
+        python3 -IB x.py --ci false --build-dir "$RUNNER_TEMP/combined/rust-build" --set build.submodules=false --set build.profiler=true --set rust.debug-assertions=false --set rust.lto=off --set llvm.download-ci-llvm=true --set rust.download-rustc=false test --stage 1 -j6 tests/incremental/upstream-monomorphization-buckets tests/run-make/incremental-large-byte-literal tests/run-make/ohm-checked-dep-info
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
