@@ -147,8 +147,13 @@ def main():
         vv = sp.check_output([str(sdk/"bin/rustc"), "-vV"], text=True)
         assert expected_commit in vv or (role == "pr329" and expected_commit == cfg["source"]["C"] and "release: 1.99.0-dev" in vv)
         elf_id = sp.check_output(["readelf", "-n", str(driver)], text=True)
+        found_id = re.findall(r"Build ID: (\w+)", elf_id)
+        expected_ids = {"stock": [], "signed23": ["13d77347e7b9583b23105b596b85d283cd70af08"],
+                        "pr329": ["3fddb018801dfd1844f2ce5f4b21268ecf66f355"]}
+        assert found_id == expected_ids[role], (role, found_id)
+        (w.proof/(role+"-elf-notes.txt")).write_text(elf_id)
         save(w.proof/(role+"-sdk.json"), {"source": expected_commit, "version": vv, "driver": str(driver),
-             "rustc_sha256": exe_sha, "driver_sha256": driver_sha, "build_id": re.search(r"Build ID: (\w+)", elf_id)[1]})
+             "rustc_sha256": exe_sha, "driver_sha256": driver_sha, "build_ids": found_id})
         drivers[role] = driver
     rows = {}
     for role in sdks:
