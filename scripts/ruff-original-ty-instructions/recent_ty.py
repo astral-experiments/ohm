@@ -10,6 +10,8 @@ import sys
 here=Path(__file__).resolve().parent
 sys.path.insert(0,str(here.parent/"ruff-foreign-span-observer"))
 import worker as w
+sys.path.insert(0, str(here / "source-pcs"))
+import study
 OLD="157caa55a51ebae4fa541d31697e3af9a6c32ccf"
 NEW="bfa2407e98ee1343caeefd02b4b69043509baa8c"
 LOCK="b9cbcf372621bf3aa25ba0985e0b066b8c70624d51ecc50cc2f29b98712e6f40"
@@ -21,6 +23,9 @@ w.put(w.proof/"registration.json",dict(old=OLD,edited=NEW,lock=LOCK,command=cmd,
 env=w.install()
 whole,trace=(w.root/v for v in ("whole_count","exec_count"))
 for exe in (whole,trace):sp.run(["cc","-O2","-Wall","-Wextra","-Werror",here/(exe.name+".c"),"-o",exe],check=True)
+profiler = study.prepare(w, env, trace)
+raw_profile = w.root / "ty-ide.perf.data"
+
 def select(state):
     w.git("switch","--detach",state)
     assert w.hf(w.work/"Cargo.lock")==LOCK and not w.git("status","--porcelain")
@@ -50,10 +55,14 @@ def verdict(exe,tag,expected):
     return names
 def receipt(tag,kind="whole"):
     w.guard();td=w.proof/tag;td.mkdir()
-    if kind=="census":
+    if kind in ("census", "profile"):
         (td/"tasks").mkdir();actual=[trace,td/"tasks",*cmd]
+        if kind == "profile":
+            actual = study.record(profiler, raw_profile, env, actual)
     else:actual=[whole,td/"hardware.json",shutil.which("cargo",path=env["PATH"]),*cmd]
     with (td/"stdout.jsonl").open("xb")as o,(td/"stderr").open("xb")as e:p=sp.run(actual,cwd=w.work,env=env,stdout=o,stderr=e)
+    if kind == "profile" and raw_profile.is_file():
+        study.preserve_profile(w, raw_profile)
     assert p.returncode==0,(tag,(td/"stderr").read_text()[-500:])
     msgs=list(map(json.loads,(td/"stdout.jsonl").read_bytes().splitlines()))
     assert msgs[-1]=={"reason":"build-finished","success":True}
@@ -62,7 +71,13 @@ def receipt(tag,kind="whole"):
     exe=Path(row["executable"])
     data=dict(commit=w.git("rev-parse","HEAD"),units=sorted([v["package_id"],v["target"]["name"],v["target"]["kind"],sorted(v["features"])]for v in arts),
               dirty=sorted([v["package_id"],v["target"]["name"]]for v in arts if not v["fresh"]),elf=preserve(exe),executable=str(exe))
-    if kind=="census":
+    if tag in ("old", "edit", "independent-NEW", "profile-OLD", "profile-NEW", "edit-again-observed"):
+        inc = None
+        if tag.startswith("profile-"):
+            owner, = (v for v in study.processes(w, td/"tasks") if v["name"] == "ty_ide" and v["reason"] == "exec")
+            inc, = (Path(arg.split("=",1)[1]) for arg in owner["argv"] if arg.startswith("incremental="))
+        study.products(w, td, arts, inc)
+    if kind in ("census", "profile"):
         def identity(path):
             stat=path.stat()
             return stat.st_dev,stat.st_ino
@@ -115,3 +130,14 @@ assert first["elf"]!=edited["elf"] and all(x["units"]==first["units"]for x in(ed
 assert len({x["elf"]for x in(edited,warm,census,repaired,clean,again)})==1 and reverted["elf"]==first["elf"]
 assert not w.git("status","--porcelain")
 w.put(w.proof/"accepted-current.json",{"first_unchanged":warm["instructions"],"edit":edited["instructions"],"actual_unchanged":census["actual"],"remaining":census["by_executable"],"test_count":len(inventory),"changed":edited["elf"],"old":first["elf"]})
+
+assert len(inventory) == 200
+assert not w.git("diff", "--name-only", OLD, NEW, "--", "crates/ty_ide")
+select(OLD)
+_, before_profile, names = price("profile-OLD", "census")
+assert names == inventory and before_profile["elf"] == first["elf"]
+select(NEW)
+_, sampled, names = price("profile-NEW", "profile")
+assert names == inventory and sampled["elf"] == clean["elf"] == again["elf"]
+assert sampled["units"] == again["units"] and sampled["dirty"] == again["dirty"] and not w.git("status", "--porcelain")
+study.close(w, profiler, raw_profile, w.proof/"profile-NEW", w.proof/"edit-again-observed")
