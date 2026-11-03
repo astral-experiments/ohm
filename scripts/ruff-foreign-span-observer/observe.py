@@ -132,14 +132,12 @@ class MacroEnter(gdb.Breakpoint):
   return False
 def maybe_macros():
  if macro_ptrs:return
- spec=json.loads((d/'deep-joins/macro-entries.json').read_bytes());path=Path(spec['dylib']);bases=[]
- for row in maps.read_text().splitlines():
-  s=row.split()
-  if len(s)>5 and s[2]=='00000000'and Path(s[5]).name==path.name:
-   with open(s[5],'rb')as fp:assert hashlib.file_digest(fp,'sha256').hexdigest()==spec['same_physical_sha']
-   bases.append(int(s[0].split('-')[0],16))
+ spec=json.loads((d/'deep-joins/macro-entries.json').read_bytes());path=Path(spec['dylib']);sysmod=__import__('sys');sysmod.path.insert(0,str(Path(os.environ['OHM_F_SPAN_PY']).parent))
+ from image import native_bases
+ offsets=[int(v,16)for n,v in spec['symbols'].items()if n!='salsa_macros::token_stream_with_error']
+ bases=native_bases(maps.read_text(),path.name,spec['same_physical_sha'],offsets)
  if not bases:return
- assert len(bases)==1
+ assert len(bases)==1,(str(path),bases)
  for name,s in spec['symbols'].items():
   if name!='salsa_macros::token_stream_with_error':macro_ptrs.append(MacroEnter(name,bases[0]+int(s,16)))
 class DS(gdb.Breakpoint):
