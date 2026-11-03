@@ -3,7 +3,9 @@ import json
 import os
 from pathlib import Path
 import subprocess as sp
+import sys
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 import actor
 from actor import CASES, COMMAND, CRATES, HERE, LIB, base, need, old, w
 from member_names import native_identity

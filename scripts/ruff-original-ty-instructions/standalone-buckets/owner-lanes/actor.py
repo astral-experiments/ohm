@@ -94,6 +94,8 @@ def native_oracle(case,rows,env,td,rev):
     w.put(output/"argv.json",args)
     p=sp.run(args,cwd=w.work,env=env,capture_output=True);(output/"compile.stderr").write_bytes(p.stderr)
     need(p.returncode==0,("source-built held-out consumer",p.stderr[-2000:]))
+    saved=old.keep(exe)
+    w.put(output/"linked-client.json",saved)
     p=sp.run([exe],cwd=root,env=env,capture_output=True,timeout=60);(output/"stdout").write_bytes(p.stdout);(output/"stderr").write_bytes(p.stderr)
     expected=b"unrelated-preserved="+(b"false" if rev==old.old else b"true")+b"\nvendored-path=stdlib/os.pyi\n"
     need(p.returncode==0 and p.stdout==expected,("actual held-out source change",rev,p.returncode,p.stdout,p.stderr[-700:]))
@@ -104,7 +106,7 @@ def native_oracle(case,rows,env,td,rev):
             if len(fields)>=4 and fields[1] in ("t","T","w","W") and any(x in fields[0] for x in ("map_system_to_vendored","apply_changes","set_diagnostics","replace_index_diagnostics")):hits.append(fields)
         need(name.wait()==0 and all(any(s in f[0] for f in hits)for s in ("apply_changes","map_system_to_vendored")),"wrong private-edit native target")
     w.put(output/"linked-symbols.json",hits)
-    return {"elf":old.keep(exe),"stdout":p.stdout.decode()}
+    return {"elf":saved,"stdout":p.stdout.decode()}
 
 def main():
     case=os.environ["OHM_OWNER_CASE"];old.old,old.new,old.lock,order=CASES[case]

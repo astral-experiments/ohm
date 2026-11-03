@@ -12,8 +12,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - case: '29697'
-            revision: bfa2407e98ee1343caeefd02b4b69043509baa8c
           - case: '29604'
             revision: dfe14506d23010aa5dbc4ff6fea702a22ba312bd
     timeout-minutes: 165
@@ -68,6 +66,33 @@ jobs:
         retention-days: 21
         if-no-files-found: ignore
     name: Unscored source edit ${{ matrix.case }}
+  reopen_original:
+    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruff-root-owner-lanes-20261103'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 30
+    name: Independently reopen the completed 29697 native and Cargo originals
+    steps:
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: ${{ inputs.reviewed_head }}
+        persist-credentials: false
+        sparse-checkout: scripts/ruff-original-ty-instructions
+    - name: Authenticate and reopen the complete native archive
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        cd "$RUNNER_TEMP"
+        gh api repos/astral-experiments/ohm/actions/artifacts/13266000990 > original.json
+        python3 -IB -c 'import json; r=json.load(open("original.json")); assert r["workflow_run"]["id"]==41706721214 and r["workflow_run"]["head_sha"]=="1417b5aec4ae74c7bed6733efd3a34d49eaaa611" and r["size_in_bytes"]==400903442 and r["digest"]=="sha256:9a1b4cffbe9c717b920c52fb3b57e6c82a7cad761ded3da6a15cad73fca209e2"'
+        gh api repos/astral-experiments/ohm/actions/artifacts/13266000990/zip > original.zip
+        python3 -IB "$GITHUB_WORKSPACE/scripts/ruff-original-ty-instructions/standalone-buckets/owner-lanes/reopen.py" original.zip --case 29697 --sha256 9a1b4cffbe9c717b920c52fb3b57e6c82a7cad761ded3da6a15cad73fca209e2 --work "$RUNNER_TEMP/independent-native-work" --output "$RUNNER_TEMP/independent-complete.json"
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: independent-29697-owner-lanes-${{ github.run_id }}
+        path: ${{ runner.temp }}/independent-complete.json
+        retention-days: 21
+        if-no-files-found: error
 'on':
   workflow_dispatch:
     inputs:

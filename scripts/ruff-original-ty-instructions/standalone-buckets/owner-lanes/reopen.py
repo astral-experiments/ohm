@@ -12,6 +12,7 @@ import sys
 import tempfile
 
 here=Path(__file__).resolve().parent
+sys.path.insert(0,str(here))
 sys.path.insert(0,str(here.parent))
 from member_names import read_names, native_identity
 from public_states import inspect as inspect_metadata
