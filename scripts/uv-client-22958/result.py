@@ -8,6 +8,7 @@ import json
 import service as s
 import collector as cc
 import scoped
+import split_host
 from release23_verdict import verdict
 
 m = s.m
@@ -48,6 +49,8 @@ def verify(out, meter, check_binary=False):
         and guards["case"] == s.case["registered"]
     )
     allocation = m.read(out / "boot-attestation.json")
+    placement = split_host.verify_placement(m.read(out/"placement.json"), s.CONTRAST, s.lock, m.filesha(s.LOCK_PATH), s.case["registered"])
+    assert allocation["placement_sha256"] == m.filesha(out/"placement.json") and all(allocation[k] == v for k,v in placement.items())
     hosted_workspace = Path(allocation["workspace"])
     assert hosted_workspace.is_absolute() and ".." not in hosted_workspace.parts
     assert (
@@ -169,18 +172,20 @@ def verify(out, meter, check_binary=False):
     return dict(
         complete=True,
         actual_signed_Cargo=s.CHECK,
-        sources=s.SOURCES,
+        sources={r:s.SOURCES[r] for r in s.ROLES},
+        contrast=s.CONTRAST, control=s.CONTROL, treatment="F",
         boot=ready["boot"],
         metrics=metrics,
         predeclared=declaration,
         signed_release=s.lock["signed_release"]["tag"],
-        control_kind=s.choice["physical_role_choice"],
+        control_kind=s.split_register["role_names"][s.CONTROL],
         primary_wall_twofold_all_eight=primary,
         observed_Cargo_Finished_lines=cargo_lines,
         independent_histories=len(history),
         registered=s.case["registered"],
         release_lock=m.filesha(s.LOCK_PATH),
-        scope="Eight paired, unwrapped first edits using the signed -23 Cargo. The candidate adds the remaining three rustc performance changes to the selected control. Whole-Cargo and per-rustc hardware visits independently restore the same cold-A histories.",
+        scope=("F and S both include #318. This comparison isolates #327, #328 and #336." if s.CONTRAST=="marginal" else
+               "F adds #318, #327, #328 and #336 to published stock R on the independently admitted uv edit."),
     )
 
 

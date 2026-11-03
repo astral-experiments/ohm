@@ -1,4 +1,4 @@
-name: Measure the remaining Ohm -23 rustc changes on uv 22958
+name: Measure a registered signed or marginal Ohm -23 contrast on uv 22958
 'on':
   workflow_dispatch:
     inputs:
@@ -9,20 +9,35 @@ name: Measure the remaining Ohm -23 rustc changes on uv 22958
       release_lock:
         required: true
         type: string
-        description: SHA-256 of the signed -23 and private GNU build enrollment
+        description: SHA-256 of the common three-role signed -23 release and private builds
+      contrast:
+        required: true
+        type: choice
+        description: Registered comparison
+        options:
+        - marginal
+        - signed
+      prior_marginal:
+        required: true
+        type: string
+        default: none
+        description: Marginal uses none. Signed requires the marginal run:job:artifact:ZIP_SHA256
 permissions:
   contents: read
   actions: read
   attestations: read
 jobs:
   root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22958-release23-check'
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22958-release23-split-check'
       && github.sha == inputs.reviewed_head && github.run_attempt == 1
+      && ((inputs.contrast == 'marginal' && inputs.prior_marginal == 'none') || (inputs.contrast == 'signed' && inputs.prior_marginal != 'none'))
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 120
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       RELEASE_LOCK: ${{ inputs.release_lock }}
+      UV_22958_CONTRAST: ${{ inputs.contrast }}
+      UV_22958_PRIOR_MARGINAL: ${{ inputs.prior_marginal }}
     steps:
     - name: Check out coordinator
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -104,6 +119,10 @@ jobs:
         mkdir trait-results
         /usr/bin/python3.12 -ISB coordinator/scripts/uv-client-22958/manifest.py
         /usr/bin/bash opening/scripts/uv-root-20991-opening/host-prerequisites.sh 2>&1 | tee trait-results/host-prerequisites.log
+    - name: Authenticate this assignment and the previous marginal calibration on the signed contrast
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-client-22958/service.py placement
     - name: Calibrate inherited userspace instructions for real fork, exec and threads
       run: |
         set -euo pipefail
@@ -111,7 +130,7 @@ jobs:
     - name: Seal the fresh physical runner and its blocking wall calibration
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-22958-release23-runner-boot
+        name: uv-22958-release23-${{ inputs.contrast }}-runner-boot
         path: trait-results/boot-attestation.json
         if-no-files-found: error
         retention-days: 14
@@ -137,7 +156,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-22958-release23-wall-eight-pairs
+        name: uv-22958-release23-${{ inputs.contrast }}-wall-eight-pairs
         path: trait-results/
         if-no-files-found: error
         compression-level: '1'
