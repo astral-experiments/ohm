@@ -15,7 +15,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from capsule import HOST, REG, need, reopen, save, seal, sha
 
-BRANCH = "charlie/qa-native-equality-asm-stage1-20261103"
+BRANCH = "charlie/qa-asm-equality-single-driver-20261103"
 BASE = "34e78f19c0d0c58c86e42d83e05a4dc6db6b0f6d"
 
 
