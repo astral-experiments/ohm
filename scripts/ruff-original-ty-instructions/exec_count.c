@@ -27,6 +27,18 @@ static void require(int value, const char *why) { if (!value) { perror(why); exi
 static uint64_t now(void) { struct timespec t; require(clock_gettime(CLOCK_MONOTONIC,&t)==0,"clock"); return (uint64_t)t.tv_sec*1000000000u+t.tv_nsec; }
 static void resume(pid_t pid,int sig) { if(ptrace(PTRACE_CONT,pid,0,sig)<0 && errno!=ESRCH) require(0,"resume"); }
 static void output(char *buf, size_t size,const char *format,int id) { int n=snprintf(buf,size,format,id); require(n>0 && (size_t)n<size,"path"); }
+/* The optional external reader belongs to the tracer. The completed exec remains
+   stopped until it has copied the actual final link's temporary inputs. */
+static const char *snapshot, *python;
+static struct stat linker;
+static void record_link(pid_t tid, const char *image) {
+    char pid[32]; output(pid,sizeof(pid),"%d",tid);
+    pid_t child=fork(); require(child>=0,"fork linker reader");
+    if(!child) { execl(python,python,"-IB",snapshot,directory,pid,image,(char*)0); _exit(127); }
+    int status;
+    while(waitpid(child,&status,0)<0) if(errno!=EINTR) require(0,"wait linker reader");
+    require(WIFEXITED(status) && WEXITSTATUS(status)==0,"linker reader");
+}
 static void record_image(struct task *task, const char *trigger) {
     char path[128], executable[4096], name[4096], buffer[16384];
     output(path,sizeof(path),"/proc/%d/exe",task->tid); ssize_t n=readlink(path,executable,sizeof(executable)-1); require(n>0 && (size_t)n<sizeof(executable)-1,"read image"); executable[n]=0;
@@ -36,6 +48,7 @@ static void record_image(struct task *task, const char *trigger) {
     output(path,sizeof(path),"/proc/%d/cmdline",task->tid); int fd=open(path,O_RDONLY|O_CLOEXEC); require(fd>=0,"argv open"); size_t total=0;
     while ((n=read(fd,buffer,sizeof(buffer)))>0) { total+=(size_t)n; require(total<=8u<<20 && fwrite(buffer,1,(size_t)n,f)==(size_t)n,"argv bound"); }
     require(n==0 && total && close(fd)==0 && fclose(f)==0,"argv completed");
+    if(snapshot && !strcmp(trigger,"exec") && st.st_dev==linker.st_dev && st.st_ino==linker.st_ino) record_link(task->tid,name);
     require(fprintf(journal,"I %d %d %d %"PRIu64" %s\n",id,task->group,task->tid,now(),trigger)>0,"image journal");
     for(size_t i=0;i<sizeof(tasks)/sizeof(tasks[0]);i++) if(tasks[i].tid && tasks[i].group==task->group) tasks[i].image=id;
 }
@@ -60,6 +73,10 @@ static struct task *lookup(pid_t tid,int create) {
     return free_slot;
 }
 int main(int argc,char **argv) {
+    if(argc>5 && !strcmp(argv[1],"--link-inputs")) {
+        require(stat(argv[2],&linker)==0 && S_ISREG(linker.st_mode),"linker image");
+        python=argv[3]; snapshot=argv[4]; argc-=4; argv+=4;
+    }
     require(argc>=4,"OUTPUT_DIR PROGRAM ARGS");directory=argv[1];char out[4096];int n=snprintf(out,sizeof(out),"%s/epochs.tsv",directory);require(n>0 && (size_t)n<sizeof(out),"journal name");journal=fopen(out,"wx");require(journal!=NULL,"open journal");
     require(fprintf(journal,"M %d %"PRIu64"\n",getpid(),now())>0,"monitor journal");
     pid_t root=fork();require(root>=0,"fork");if(!root){require(ptrace(PTRACE_TRACEME,0,0,0)==0,"trace child");raise(SIGSTOP);execvp(argv[2],argv+2);_exit(127);}

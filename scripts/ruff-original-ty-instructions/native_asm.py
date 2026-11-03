@@ -185,39 +185,40 @@ def park(role, kind):
     for path in (w.target,w.shared,w.home):
         assert path.parent==w.root and path.is_dir() and not path.is_symlink()
         path.rename(held/(role+'-'+kind+'-'+path.name))
-assert w.git('rev-parse','HEAD')==w.NEW and w.git('rev-parse','HEAD^')==w.OLD and w.hf(w.work/'Cargo.lock')==w.OLDLOCK and not w.git('status','--porcelain')
-assert os.environ['GITHUB_SHA']==os.environ['REVIEWED_HEAD'] and os.environ['GITHUB_RUN_ATTEMPT']=='1' and os.uname().machine=='x86_64'
-save('registered.json',R); manif=intake()
-env={k:os.environ[k]for k in ('PATH','HOME','LANG','USER')if k in os.environ}
-env.update(RUSTUP_HOME=str(w.ru),RUSTUP_TOOLCHAIN='ohm',CARGO_HOME=str(w.home),CARGO_TARGET_DIR=str(w.target),CARGO_BUILD_BUILD_DIR=str(w.shared),CARGO_NET_GIT_FETCH_WITH_CLI='true',LD_LIBRARY_PATH=str(w.sdk/'lib'))
-(w.ru/'toolchains').mkdir(parents=True);(w.ru/'toolchains/ohm').symlink_to(w.sdk,True)
-whole=w.root/'whole_count';tasks=w.root/'exec_count'
-for exe in (whole,tasks):
-    sp.run(['/usr/bin/cc','-Wall','-Wextra','-Werror','-O2',str(HERE/(exe.name+'.c')),'-o',str(exe)],check=True)
-receipts={};safety={}
-for role in R['order']:
-    label={'P':'normal','C':'defer'}[role];original=Path(manif['arms'][label]['root']);original.rename(w.sdk)
-    for name in ('cargo','rustc','rustdoc'):
-        actual=Path(sp.check_output(['rustup','which','--toolchain','ohm',name],env=env,text=True).strip())
-        assert actual.samefile(w.sdk/'bin'/name) and w.hf(actual)==manif['arms'][label]['files']['bin/'+name]
-    driver,=(w.sdk/'lib').glob('librustc_driver-*.so');assert w.hf(driver)==manif['arms'][label]['files']['lib/'+driver.name]
-    w.git('switch','--detach',w.OLD)
-    prepare_empty();hist={}
-    hist['old']=phase(role,'old','ordinary');w.git('switch','--detach',w.NEW)
-    hist['edit']=phase(role,'edit','whole');hist['settled']=phase(role,'settled','whole')
-    for n in range(3):hist['sample-'+str(n)]=phase(role,'sample-'+str(n),'whole')
-    hist['census']=phase(role,'census','census')
-    hist['shadow-repair'],hist['source-repair'],safety[role]=holdouts(role);park(role,'warm')
-    prepare_empty();hist['independent-clean']=phase(role,'independent-clean','ordinary');park(role,'clean')
-    assert min(len(hist[k]['dirty']) for k in ('old','independent-clean'))>330
-    w.sdk.rename(original);receipts[role]=hist
-summary={}
-for label in receipts['P']:
-    p=receipts['P'][label];c=receipts['C'][label]
-    summary[label]={'same_units':p['units']==c['units'],'same_verdicts':p['probes']==c['probes'],'same_elf':p['elf']==c['elf'],
-                    'P':p.get('instructions'),'C':c.get('instructions'),'P_actual':p.get('typed_execs'),'C_actual':c.get('typed_execs')}
-save('summary.json',summary);assert all(safety.values()),safety
-assert all(x['same_units']and x['same_verdicts'] and x['same_elf']for x in summary.values()),summary
-for role,h in receipts.items():
-    assert h['old']['elf']!=h['edit']['elf'] and len({x['elf']for k,x in h.items()if k!='old'})==1
-    assert all(row['owners']['portable_atomic']['marker']==(role=='P') for row in h.values())
+if __name__ == '__main__':
+    assert w.git('rev-parse','HEAD')==w.NEW and w.git('rev-parse','HEAD^')==w.OLD and w.hf(w.work/'Cargo.lock')==w.OLDLOCK and not w.git('status','--porcelain')
+    assert os.environ['GITHUB_SHA']==os.environ['REVIEWED_HEAD'] and os.environ['GITHUB_RUN_ATTEMPT']=='1' and os.uname().machine=='x86_64'
+    save('registered.json',R); manif=intake()
+    env={k:os.environ[k]for k in ('PATH','HOME','LANG','USER')if k in os.environ}
+    env.update(RUSTUP_HOME=str(w.ru),RUSTUP_TOOLCHAIN='ohm',CARGO_HOME=str(w.home),CARGO_TARGET_DIR=str(w.target),CARGO_BUILD_BUILD_DIR=str(w.shared),CARGO_NET_GIT_FETCH_WITH_CLI='true',LD_LIBRARY_PATH=str(w.sdk/'lib'))
+    (w.ru/'toolchains').mkdir(parents=True);(w.ru/'toolchains/ohm').symlink_to(w.sdk,True)
+    whole=w.root/'whole_count';tasks=w.root/'exec_count'
+    for exe in (whole,tasks):
+        sp.run(['/usr/bin/cc','-Wall','-Wextra','-Werror','-O2',str(HERE/(exe.name+'.c')),'-o',str(exe)],check=True)
+    receipts={};safety={}
+    for role in R['order']:
+        label={'P':'normal','C':'defer'}[role];original=Path(manif['arms'][label]['root']);original.rename(w.sdk)
+        for name in ('cargo','rustc','rustdoc'):
+            actual=Path(sp.check_output(['rustup','which','--toolchain','ohm',name],env=env,text=True).strip())
+            assert actual.samefile(w.sdk/'bin'/name) and w.hf(actual)==manif['arms'][label]['files']['bin/'+name]
+        driver,=(w.sdk/'lib').glob('librustc_driver-*.so');assert w.hf(driver)==manif['arms'][label]['files']['lib/'+driver.name]
+        w.git('switch','--detach',w.OLD)
+        prepare_empty();hist={}
+        hist['old']=phase(role,'old','ordinary');w.git('switch','--detach',w.NEW)
+        hist['edit']=phase(role,'edit','whole');hist['settled']=phase(role,'settled','whole')
+        for n in range(3):hist['sample-'+str(n)]=phase(role,'sample-'+str(n),'whole')
+        hist['census']=phase(role,'census','census')
+        hist['shadow-repair'],hist['source-repair'],safety[role]=holdouts(role);park(role,'warm')
+        prepare_empty();hist['independent-clean']=phase(role,'independent-clean','ordinary');park(role,'clean')
+        assert min(len(hist[k]['dirty']) for k in ('old','independent-clean'))>330
+        w.sdk.rename(original);receipts[role]=hist
+    summary={}
+    for label in receipts['P']:
+        p=receipts['P'][label];c=receipts['C'][label]
+        summary[label]={'same_units':p['units']==c['units'],'same_verdicts':p['probes']==c['probes'],'same_elf':p['elf']==c['elf'],
+                        'P':p.get('instructions'),'C':c.get('instructions'),'P_actual':p.get('typed_execs'),'C_actual':c.get('typed_execs')}
+    save('summary.json',summary);assert all(safety.values()),safety
+    assert all(x['same_units']and x['same_verdicts'] and x['same_elf']for x in summary.values()),summary
+    for role,h in receipts.items():
+        assert h['old']['elf']!=h['edit']['elf'] and len({x['elf']for k,x in h.items()if k!='old'})==1
+        assert all(row['owners']['portable_atomic']['marker']==(role=='P') for row in h.values())
