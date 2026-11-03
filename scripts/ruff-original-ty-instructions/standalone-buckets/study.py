@@ -1,7 +1,7 @@
 """First independently admitted normal ty_ide library build pair for Ruff #29697."""
 import hashlib,json,os,shutil,subprocess as sp,sys
 from pathlib import Path
-HERE=Path(__file__).resolve().parent;B=HERE.parent/"owner-buckets";sys.path.insert(0,str(B))
+HERE=Path(__file__).resolve().parent;B=HERE.parent/"owner-buckets";sys.path.insert(0,str(B));sys.path.insert(0,str(HERE))
 from member_names import read_names, native_identity
 import pilot as old
 from kit import acquire
