@@ -1,5 +1,5 @@
-name: Isolate the signed Ron reason in the current workspace test build
-run-name: Isolate the Ron dependency in the real Ruff test build ${{ inputs.reviewed_head }}
+name: Count surviving native inputs on the original signed Ruff workspace
+run-name: Price the native input union of the real Ruff test build ${{ inputs.reviewed_head }}
 permissions:
   contents: read
   actions: read
@@ -7,7 +7,7 @@ jobs:
   inspect:
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1'
       && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head
-      && github.ref_name == 'charlie/qa-workspace-test-29697-ron-cause-20261103'
+      && github.ref_name == 'charlie/qa-workspace-native-inputs-29697-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 120
     steps:
@@ -28,17 +28,17 @@ jobs:
         fetch-depth: 2
         path: ruff
         persist-credentials: false
-    - name: Provision the signed Cargo record checksum and debugger
-      run: sudo apt-get update -qq && sudo apt-get install -qy b3sum gdb libunwind-dev liblzma-dev
-    - name: Exercise one original foreign sentinel on OLD and NEW
+    - name: Provision the system SHA-256 library
+      run: sudo apt-get update -qq && sudo apt-get install -qy libssl-dev
+    - name: Observe 50 actual links and price their shared input files
       env:
         REVIEWED_HEAD: ${{ inputs.reviewed_head }}
         OHM_SDK_READ_TOKEN: ${{ github.token }}
-      run: python3 -IB qa/scripts/ruff-original-ty-instructions/workspace_ron_probe.py
+      run: python3 -IB qa/scripts/ruff-original-ty-instructions/native-input-union/measure.py
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: workspace-ron-29697-cause-${{ github.run_id }}
+        name: workspace-native-input-union-${{ github.run_id }}
         path: ${{ runner.temp }}/ohm-foreign-join/published/
         retention-days: 10
         if-no-files-found: error
