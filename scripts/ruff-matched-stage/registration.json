@@ -17,10 +17,14 @@
   ],
   "bundle": {
     "baseline_commits": [],
-    "branch": "refs/heads/charlie/check-private-builtin-derives",
-    "bytes": 2869,
+    "branch": "refs/heads/charlie/check-private-derive-input-validation",
+    "bytes": 4229,
+    "candidate_commits": [
+      "16a25d901318369d5ff788dd5c6ac0656d6e0bd6",
+      "bda205d80135686b13271360017cce554b79e09d"
+    ],
     "prerequisite": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
-    "sha256": "d383ce91fcf93d26fbc481e0864a339bf24681074646bbfe20aa6c88c87651fc"
+    "sha256": "dd54588a74edbf8dd059abf70ec6e5d8bf4548a87a086ea02d4b0b0af1df3785"
   },
   "changed_sources": {
     "compiler/rustc_incremental/src/persist/file_format.rs": {
@@ -28,15 +32,19 @@
       "P": "f96e27d853eaf23289d72479b990780eda43eacc"
     },
     "compiler/rustc_metadata/src/rmeta/encoder.rs": {
-      "C": "cebe55432abd77ccf04e95ae1c2b1e8443484f33",
+      "C": "71d1fe5a53e79db08278560955208be396e5c980",
       "P": "2b2f08dbca687cd0352adeeffe80d38fb1a06a50"
+    },
+    "compiler/rustc_session/src/options.rs": {
+      "C": "0e18377c6a9f1fec5a7271fe10f68a46061d3c54",
+      "P": "f59c76a62d2f974de0f0924448a7379fab911d6d"
     },
     "tests/run-make/rdr-public-hash-private-native-derive/dep.rs": {
       "C": "43cd74a57bfa7d9a2e415d4f8c14a5120514d0e9",
       "P": "81febc630f3d5923456a1ac93bd72c20e5f9b82e"
     },
     "tests/run-make/rdr-public-hash-private-native-derive/rmake.rs": {
-      "C": "ddb8113ee775fa031f5343414c67bd585786d90d",
+      "C": "01d61e42df471004ca3258ad89409c3853917f87",
       "P": "08e37538012b212cee347cb5710774cfe961c510"
     },
     "tests/run-make/rdr-public-hash-private-native-derive/send.rs": {
@@ -51,9 +59,9 @@
   },
   "roles": {
     "C": {
-      "compiler": "00242f37d22326f470500b2b531d0eeb704ec542",
-      "revision": "16a25d901318369d5ff788dd5c6ac0656d6e0bd6",
-      "tree": "f1517182df5dfbb4425689d27bd6168eea6ebe1b"
+      "compiler": "5c325c6cf350d847dfdaae678f84a584f957d960",
+      "revision": "bda205d80135686b13271360017cce554b79e09d",
+      "tree": "b0e79cdb3bd593389d2070e1a0986bf3f8ee30ba"
     },
     "P": {
       "compiler": "01614e1dbcdedca33c620ad320c07b30207e256e",

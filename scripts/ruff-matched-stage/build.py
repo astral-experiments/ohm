@@ -15,8 +15,8 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from capsule import HOST, REG, need, reopen, save, seal, sha
 
-BRANCH = "charlie/qa-matched-check-derive-rc23-20261103"
-BASE = "3a830cdc9f00b01c7110fac3653d8cd0b305c355"
+BRANCH = "charlie/qa-derive-input-capability-factory-20261103"
+BASE = "34e78f19c0d0c58c86e42d83e05a4dc6db6b0f6d"
 
 
 def git(repo, *args):
@@ -44,10 +44,13 @@ def bundle(repo):
     )
     git(repo, "bundle", "verify", str(packet))
     git(repo, "fetch", "--no-tags", "--no-recurse-submodules", str(packet), entry["branch"])
+    chain = entry["candidate_commits"]
     need(
-        git(repo, "rev-parse", "FETCH_HEAD", c + "^").splitlines() == [c, p]
-        and git(repo, "rev-list", c, "^" + p).splitlines() == [c],
-        "not the single prepared compiler commit",
+        git(repo, "rev-parse", "FETCH_HEAD") == c
+        and chain[-1] == c
+        and git(repo, "rev-list", "--parents", "--reverse", c, "^" + p).splitlines()
+        == [child + " " + parent for child, parent in zip(chain, [p, *chain[:-1]], strict=True)],
+        "unexpected private-derive/capability source history",
     )
     need(
         git(repo, "rev-list", "--reverse", p, "^" + entry["prerequisite"]).splitlines()

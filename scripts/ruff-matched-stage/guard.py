@@ -119,6 +119,7 @@ def owners(directory):
                 result['other_rustc_execs'].append(entry)
                 continue
             crate=argv[argv.index('--crate-name')+1]
+            assert not any('ohm-checked-private-derives' in v for v in argv), ('released Cargo unexpectedly enabled the new cutoff',pid,argv)
             assert crate in ('app','dep') and '--emit=dep-info,metadata' in argv, ('unexpected physical compiler',entry)
             assert argv[argv.index('--crate-type')+1]=={'app':'bin','dep':'lib'}[crate]
             maps=[ln for ln in lines if ln.startswith('mmap(') and 'PROT_EXEC' in ln and
@@ -194,8 +195,16 @@ edit=get('private-edit',interface,moved)
 assert not get('private-edit-unchanged',interface,moved)['dirty']
 repair=get('private-repair',interface,hidden)
 assert repair['provider_public']==old['provider_public']
-allow=a.role=='candidate'
-assert (old['provider_public']==edit['provider_public'])==allow
+option='-Zohm-checked-private-derives'
+probe=invoke(['rustc','+ohm',option,'--print=sysroot'])
+save(out/'capability.json',{'role':a.role,'option':option,'exit':probe.returncode,
+                           'stdout':probe.stdout.decode(),'stderr':probe.stderr.decode(),
+                           'rustc':str(rustc),'driver_sha256':a.compiler_sha})
+if a.role=='candidate':
+    assert probe.returncode==0 and Path(probe.stdout.decode().strip()).samefile(rustc.parent.parent), 'wrong probed candidate sysroot'
+else:
+    assert probe.returncode!=0 and 'unknown unstable option' in probe.stderr.decode() and option[2:] in probe.stderr.decode(), 'old compiler accepted the capability probe'
+assert old['provider_public']!=edit['provider_public'], 'legacy Cargo must preserve the original checked-interface boundary'
 gen=get('generated-old',generated,hidden)
 gen_move=get('generated-edit',generated,moved)
 assert gen['provider_public']!=gen_move['provider_public'] and gen_move['dirty']==['dep','app']
@@ -216,11 +225,8 @@ assert set(kernel['old']['after'])==set(kernel['unchanged']['after'])==set(kerne
 assert kernel['old']['kernel']==['app','dep'] and kernel['unchanged']['kernel']==[], 'cold or unchanged physical compiler roster'
 assert kernel['unchanged']['before']==kernel['old']['after'] and kernel['unchanged']['after']==kernel['edit']['before'], 'physical history changed between Cargo commands'
 assert kernel['unchanged']['after']==kernel['unchanged']['before'], 'unchanged Cargo rewrote physical outputs'
-assert kernel['edit']['kernel']==(['dep'] if allow else ['app','dep']), ('actual edited compiler roster',kernel['edit']['kernel'],edit['dirty'])
-assert sorted(edit['dirty']) in ([['dep'],['app','dep']] if allow else [['app','dep']]), ('unexpected typed roster',edit['dirty'])
-if allow:
-    for kind in ('rmeta','d'):
-        assert kernel['edit']['after']['app'][kind]['sha256']==kernel['edit']['before']['app'][kind]['sha256'], ('ungenerated consumer output content changed',kind)
+assert kernel['edit']['kernel']==['app','dep'], ('legacy Cargo edited kernel roster',kernel['edit']['kernel'])
+assert sorted(edit['dirty'])==['app','dep'], ('unexpected legacy Cargo typed roster',edit['dirty'])
 fact={'role':a.role,'rustc':invoke(['rustc','+ohm','-vV']).stdout.decode(),'driver':str(driver),'driver_sha256':a.compiler_sha,'phases':book,'kernel':kernel}
 (out/'accepted.json').write_text(json.dumps(fact,indent=2)+'\n')
 print(json.dumps({k:(v['dirty'],v['errors'],v['provider_public'])for k,v in book.items()},indent=2))
