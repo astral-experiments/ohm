@@ -25,6 +25,8 @@ for idx, (client, role) in enumerate(reg["switch_order"]):
     roles[f"{idx:02d}-{client}-{role}"] = (client, role)
 roles["check-build"] = ("aware", "C")
 for cel, (client, role) in roles.items():
+    option = reg["option"] if client == "aware" else reg.get("secondary") if client == "fixed" else None
+    expected_active = (role == "C" and client == "aware") or (role == "P" and client == "fixed" and "secondary" in reg)
     cell = p / cel
     names = (["build", "empty-build", "explicit-defaults-off", "workspace-wrapper"] if cel == "check-build"
              else ["old", "edit", "unchanged", "repair"])
@@ -58,16 +60,17 @@ for cel, (client, role) in roles.items():
                 if "--crate-name" in argv and "--out-dir" in argv:
                     assert "--crate-name" in argv and tid not in typed
                     typed[tid]=(argv[argv.index("--crate-name")+1], argv)
-                elif argv[1:] == ["-Zohm-checked-private-derives","--print=sysroot"]:probes.append(tid)
+                elif len(argv) == 3 and argv[1] in ("-Zohm-checked-private-derives","-Zohm-checked-private-derives-v2") and argv[2] == "--print=sysroot":
+                    assert argv[1] == option;probes.append(tid)
                 else:continue
                 assert re.search(r"^mmap\(.*PROT_EXEC.*<"+re.escape(str(base/"install/lib"))+r"/librustc_driver-[^/<>]+\.so>.* = 0x[0-9a-f]+$",s,re.M)
         assert len(cargos)==1 and sorted(probes)==sorted(obs["probes"])
         assert native==[tuple(x) for x in obs["native"]] and all(sha==reg["wild"] for _,sha in native)
         assert typed=={r["pid"]:(r["crate"],r["argv"]) for r in obs["true"]}
-        on=client=="aware" and role=="C" and name not in ("explicit-defaults-off","workspace-wrapper")
+        on=expected_active and name not in ("explicit-defaults-off","workspace-wrapper")
         for crate, argv in typed.values():
-            assert ("-Zohm-checked-private-derives" in argv) == (on and crate=="dep")
-        if client=="aware" and name not in ("explicit-defaults-off","workspace-wrapper"):
+            assert set(argv).intersection({"-Zohm-checked-private-derives","-Zohm-checked-private-derives-v2"}) == ({option} if on and crate=="dep" else set())
+        if option is not None and name not in ("explicit-defaults-off","workspace-wrapper"):
             assert 1<=len(probes)<=2
             if len(probes)==2:
                 assert unlinks==cargos
@@ -86,7 +89,7 @@ for cel, (client, role) in roles.items():
         suite[name]=obs
         visits.append({"cell":cel,"visit":name,"probe_count":len(probes),"typed":targets,"linkers":len(native),"nominal":obs["nominal"],"meta_sha256":obs["metadata_sha256"]})
     if cel!="check-build":
-        assert (suite["old"]["public"]==suite["edit"]["public"]) == (client=="aware" and role=="C")
+        assert (suite["old"]["public"]==suite["edit"]["public"]) == (expected_active)
         assert suite["old"]["metadata_sha256"]==suite["repair"]["metadata_sha256"]!=suite["edit"]["metadata_sha256"]
         identity=tuple(suite["old"][k] for k in ("meta","metadata_sha256"))+(suite["edit"]["metadata_sha256"],)
         assert same.setdefault((role,client),identity)==identity

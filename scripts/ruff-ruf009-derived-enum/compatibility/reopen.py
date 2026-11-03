@@ -61,10 +61,10 @@ def all_records(root, b3, mode):
                     for x in s.glob('trace.*.gz'):
                         event=gzip.decompress(x.read_bytes()).decode();maps=re.findall(r'^mmap\(.*PROT_EXEC.*<([^>]*?/librustc_driver-[^<>]*?\.so)>.* = 0x[\da-f]+$',event,re.M)
                         for line in event.splitlines():
-                            if (line.startswith('execve(') and line.endswith(' = 0') and '"-Zohm-checked-private-derives"' in line and '"--print=sysroot"' in line):
+                            if (line.startswith('execve(') and line.endswith(' = 0') and json.dumps(plan["option"]) in line and '"--print=sysroot"' in line):
                                 image, at=decoder.raw_decode(line[7:]);argv,_=decoder.raw_decode(line[7+at:].lstrip(', '))
                                 if image.endswith('/bin/rustc'):
-                                    assert maps and argv[1:]==['-Zohm-checked-private-derives','--print=sysroot']
+                                    assert maps and argv[1:]==[plan["option"],'--print=sysroot']
                                     probes+=1
                             if not line.startswith('execve(')or not line.endswith(' = 0')or'"--crate-name"'not in line or '"--emit=dep-info,metadata"'not in line:continue
                             image,i=decoder.raw_decode(line[7:]);argv,_=decoder.raw_decode(line[7+i:].lstrip(', '))
@@ -73,7 +73,7 @@ def all_records(root, b3, mode):
                             pid=int(x.name.split('.')[1]);sealed=attached.pop(pid)
                             assert sealed['argv']==argv and sealed['driver']==plan['driver'][role] and sealed['mappings'] and all(m in event for m in sealed['mappings'])
                             crate=argv[argv.index('--crate-name')+1];assert crate in ('dep','app')
-                            assert ('-Zohm-checked-private-derives'in argv)==(mode=='aware'and role=='C'and crate=='dep')
+                            assert (plan["option"]in argv)==(mode=='aware'and role=='C'and crate=='dep')
                             if crate=='app':assert '--extern'in argv and 'dep='+f in argv
                             kernel.append(crate)
                     assert not attached and sorted(kernel)==checked['kernel'];kcount+=len(kernel)

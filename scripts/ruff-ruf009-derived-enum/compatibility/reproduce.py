@@ -128,7 +128,7 @@ def invoke(d,environment,driver,meta,traced):
    crate=arr[arr.index('--crate-name')+1];assert crate in ('app','dep')
    mappings=[l for l in lines if l.startswith('mmap(') and 'PROT_EXEC' in l and '<'+str(driver)+'>' in l and re.search(r' = 0x[0-9a-f]+$',l)]
    assert mappings,(d,crate,driver)
-   assert ('-Zohm-checked-private-derives' in arr)==(args.expect=='aware' and role=='C' and crate=='dep'),(d,role,crate,arr)
+   assert (R["option"] in arr)==(args.expect=='aware' and role=='C' and crate=='dep'),(d,role,crate,arr)
    kernels.append(dict(pid=int(t.suffix[1:]),crate=crate,argv=arr,mappings=mappings,exe=stamp(frontend),driver=sha(driver)))
   with gzip.open(str(t)+'.gz','wb',compresslevel=1)as out:out.write(t.read_bytes())
   t.unlink()

@@ -55,7 +55,7 @@ def main():
         ap.add_argument("--" + name, type=Path, required=True)
     args = ap.parse_args()
     reg = json.loads(args.registration.read_bytes())
-    assert reg["C"] == "800fcd497d67c2e0926f26ecbfe12b8837013637"
+    assert reg["C"] in ('800fcd497d67c2e0926f26ecbfe12b8837013637', 'b6c3da0e9c7df8d7239cdf702600d334a8057c3a') and reg["option"] == ('-Zohm-checked-private-derives' if reg["C"] == '800fcd497d67c2e0926f26ecbfe12b8837013637' else '-Zohm-checked-private-derives-v2')
     base = args.work.resolve()
     base.mkdir(mode=0o700, exist_ok=False)
     proof = base / "proof"
@@ -188,6 +188,7 @@ def main():
         if not (snaps / digest).exists():
             shutil.copyfile(meta, snaps / digest)
         assert sha(snaps / digest) == digest
+        option = reg.get("secondary") if client == "fixed" else reg["option"] if client == "aware" else None
         true, probes, native = [], [], []
         hint_custody = []
         for path in result.glob("trace.*"):
@@ -216,18 +217,20 @@ def main():
                     native.append([image, image_digest])
                 if not file.exists() or not file.samefile(front):
                     continue
-                if args[1:] == ["-Zohm-checked-private-derives", "--print=sysroot"]:
+                if len(args) == 3 and args[1] in ("-Zohm-checked-private-derives", "-Zohm-checked-private-derives-v2") and args[2] == "--print=sysroot":
+                    assert args[1] == option
                     assert maps
                     probes.append(int(path.suffix[1:]))
                 if "--crate-name" in args and "--out-dir" in args:
                     assert maps
                     crate = args[args.index("--crate-name") + 1]
                     assert crate in ("dep", "app")
-                    assert ("-Zohm-checked-private-derives" in args) == (active and crate == "dep")
+                    flags = set(args) & {"-Zohm-checked-private-derives", "-Zohm-checked-private-derives-v2"}
+                    assert flags == ({option} if active and crate == "dep" else set())
                     true.append({"crate": crate, "pid": int(path.suffix[1:]), "argv": args, "maps": maps})
             path.with_suffix(path.suffix + ".gz").write_bytes(gzip.compress(body, compresslevel=1, mtime=0))
             path.unlink()
-        if client != "aware" or explicit_off or wrapper is not None:
+        if option is None or explicit_off or wrapper is not None:
             assert not probes, (name, probes)
         elif len(probes) != 1:
             assert len(probes) == 2 and command == "check" and len(hint_custody) == 1, (name, probes, hint_custody)
@@ -253,7 +256,7 @@ def main():
         d = proof / label; d.mkdir()
         bind(client, role)
         assert sha(driver) == reg["driver"][role]
-        active = role == "C" and client == "aware"
+        active = (role == "C" and client == "aware") or (role == "P" and client == "fixed" and "secondary" in reg)
         tested = {}
         for label, source in (("old", None), ("edit", "dep-hidden-edited.rs"), ("unchanged", None), ("repair", "dep-hidden-old.rs")):
             if source:
@@ -276,6 +279,8 @@ def main():
         assert c == variants[c["role"], c["client"]]
     assert variants["P", "aware"]["provider"] != variants["C", "aware"]["provider"]
     assert variants["C", "fixed"]["provider"] != variants["C", "aware"]["provider"]
+    if "secondary" in reg:
+        assert variants["P", "fixed"]["active"] and variants["P", "fixed"]["provider"] != variants["C", "aware"]["provider"]
     current = cells[-1]
     assert current["role"] == "C" and current["client"] == "aware"
     extra = proof / "check-build"; extra.mkdir()

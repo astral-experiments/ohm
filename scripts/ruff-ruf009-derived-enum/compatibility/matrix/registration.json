@@ -1,0 +1,199 @@
+{
+  "alias_roles": [
+    "P2",
+    "Q2"
+  ],
+  "alias_source": "435b8410d0b644b32a2bac28cd51105398a70b69abcef89a1d27f8851fc2c7d6",
+  "both_active_order": [
+    [
+      "signed",
+      "P"
+    ],
+    [
+      "signed",
+      "C"
+    ],
+    [
+      "aware",
+      "P"
+    ],
+    [
+      "fixed",
+      "P"
+    ],
+    [
+      "aware",
+      "C"
+    ],
+    [
+      "fixed",
+      "P"
+    ],
+    [
+      "aware",
+      "C"
+    ],
+    [
+      "fixed",
+      "C"
+    ],
+    [
+      "fixed",
+      "P"
+    ],
+    [
+      "aware",
+      "C"
+    ]
+  ],
+  "both_active_reason": "Three direct old active Q1/v1 \u2194 corrected active Q2/v2 transitions at identical real paths; retain every ordinary .rmeta, genuine typed flags, native ELF and cache namespaces. The older shipped and both mismatched clients remain conservative.",
+  "clients": {
+    "current": {
+      "binary": "0617e34321cf33fcce38904d066f0d4981b79f752896d37b97d1aed1fbddc48f",
+      "bytes": 16688884,
+      "head": "dfc102c99ce18da1b3bc48b8d607e3ca75ee7759",
+      "id": 13218130947,
+      "name": "ruf009-aware-v5-cargo-41608216138",
+      "product": "candidate-cargo",
+      "run": 41608216138,
+      "sha256": "546730c33bf48a90172266455054683a05aefbd3d3b64fceb150cf0fbe8a503a",
+      "source": "c1d1c6c84ea7985bad7f4bab5815fe03b562b0b0"
+    },
+    "early": {
+      "binary": "1d4c93cd725a06b9a31704dc05a67a5d418c4cf97a3d3680ce8fb522ccee404f",
+      "bytes": 16686003,
+      "head": "506173f916bbf2d9946b0eb326ad6a800e6e43a5",
+      "id": 13215562626,
+      "name": "ruf009-aware-cargo-41602805652",
+      "product": "candidate-cargo",
+      "run": 41602805652,
+      "sha256": "633ea94f876fc16e0a6ecdae7971f84f3df75c840b51f1f135461ba8925c4da4",
+      "source": "7c5f8b2d570b66f2125a8683bc2ce0cb98af88a6"
+    },
+    "fixed": {
+      "binary": "f97b6020c860e05eb3b4a20f0d2ae0d0e1b10953bc2a2d2205b77df9565cb13d",
+      "bytes": 191509985,
+      "head": "1f536b597882c66470c8ea0d38c300283c8dbda6",
+      "id": 13217478384,
+      "name": "ruf009-join-proof-41606683189",
+      "product": "cargo-release-child",
+      "run": 41606683189,
+      "sha256": "a5a390f0f430c15209d44794cbb8358e6a540992822c3d9dbea26eb54a200172",
+      "source": "4a6de7858c60e579fc30e01f5b60ddcaa84c2e30"
+    }
+  },
+  "factory": {
+    "current": {
+      "branch": "charlie/qa-derive-consumed-rust-20261103",
+      "guard_archives": {
+        "C": "51842c8b06d619b0f96d7bbcdda38c8cc5ea35cfbf14e7cccdea78ae92f4e0fd",
+        "P": "370e6dfc1769940a2d1ce9a37456d92fa8084fed9be61e2eb89bb40a977f85ba"
+      },
+      "head": "95b405a443e75f1e08daefb0dbd86d29581a5bde",
+      "kit": [
+        "ohm-rc23-consumed-private-derive-v2-stage1",
+        13218490859,
+        195818385,
+        "2b1f5dd67961207026f7a1aa340510ed39947896cb4f560ada11ba53b1d94dd1"
+      ],
+      "receipts": [
+        "ohm-rc23-consumed-private-derive-v2-stage1-receipts",
+        13218156679,
+        430801,
+        "358448b15692934b80df23076e413b7437fd310908d83de6dec909e382e762f0"
+      ],
+      "run": 41608210663,
+      "source": {
+        "C": "b6c3da0e9c7df8d7239cdf702600d334a8057c3a",
+        "P": "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2"
+      }
+    },
+    "early": {
+      "branch": "charlie/qa-derive-input-capability-factory-20261103",
+      "guard_archives": {
+        "C": "8d64f22b94698151d36c459ac237015408bc60fa394101eb054d3f40f1d147f0",
+        "P": "22a5ce56fc4ba46913fe495350d022c38b74d344489538581687e14fc3b84fd0"
+      },
+      "head": "cf380559123e1144ac83f03d2fc1c4a2e89a9286",
+      "kit": [
+        "ohm-rc23-private-derive-capability-stage1",
+        13212974771,
+        195716136,
+        "0c557125bead8be231305132cc86dc8eece7a45de2bc8efa261ec7814b81d5d2"
+      ],
+      "receipts": [
+        "ohm-rc23-private-derive-capability-stage1-receipts",
+        13212899992,
+        425552,
+        "852c31949bcc5372e424c50d0edbf2016a04ea68cadd841a567bcbeee123a4f2"
+      ],
+      "run": 41598619513,
+      "source": {
+        "C": "800fcd497d67c2e0926f26ecbfe12b8837013637",
+        "P": "d57fd1515986dccecdcece8da85e651bfb4b81f9"
+      }
+    }
+  },
+  "flags": {
+    "current": "-Zohm-checked-private-derives-v2",
+    "early": "-Zohm-checked-private-derives"
+  },
+  "floors": {
+    "active_ram_GiB": 8,
+    "disk_GiB": 15,
+    "entry_ram_GiB": 9.25
+  },
+  "literal": [
+    "legacy",
+    "aware",
+    "aware-registry"
+  ],
+  "previous_case_receiver": "ddfeceeb6fd33fdea233a39a3d59ab523f5ab170",
+  "purpose": "Unscored Linux ABI, input validation and parked same-path upgrades; the historical Ruff performance refusal contributes no samples.",
+  "raw_witnesses": "Real include_bytes of actual emitted selected rmeta, raw BLAKE3, first edited E0308 and independent empty + repair. Both true corrected rustcs also consume conflicting reads of one input at identical mtime. Every counterexample refuses qualification.",
+  "reader": "08ca9605d18606a16a1b178f1c5d11efb3c8c65d",
+  "roles": {
+    "P2": {
+      "driver": "401860d7243a9af2e02d9d51fa6f0565c3352de4962eae163023daf65ecb5599",
+      "source": "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2"
+    },
+    "Q1": {
+      "driver": "6e9431a3850b72fe6512d8c9082fd7776f0008d693ff7f9cf70c2ba3b546f8e9",
+      "source": "800fcd497d67c2e0926f26ecbfe12b8837013637"
+    },
+    "Q2": {
+      "driver": "45345893362d95f8343e3f366dffcc663d2e105b8ee27bea8c16fe248665f51d",
+      "source": "b6c3da0e9c7df8d7239cdf702600d334a8057c3a"
+    }
+  },
+  "schema": 1,
+  "signed_cargo": "f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee",
+  "source_constructor": "Both original successful factories and physical signed SDK/driver/Cargo files are authenticated before any test.",
+  "switches": [
+    [
+      "matched",
+      "P2",
+      "Q2",
+      "current"
+    ],
+    [
+      "old-writer",
+      "Q1",
+      "Q2",
+      "current"
+    ],
+    [
+      "old-client",
+      "Q2",
+      "Q1",
+      "early"
+    ],
+    [
+      "parked-both-active",
+      "Q1",
+      "Q2",
+      "current"
+    ]
+  ],
+  "wild": "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
+}
