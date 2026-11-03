@@ -16,28 +16,39 @@
     "rust.download-rustc=false"
   ],
   "bundle": {
-    "baseline_commits": [],
-    "branch": "refs/heads/charlie/check-private-derive-input-validation",
-    "bytes": 4881,
+    "baseline_commits": [
+      "6b53006403f4b0194f5ef89be6bef622d000ef4c",
+      "55f4bd7498ca455141dd13086ad4d0f624314f4c",
+      "d70d44a7b3edc2207d60f07bb0324128f56f119e",
+      "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2"
+    ],
+    "branch": "refs/heads/charlie/private-derives-after-consumed-inputs-v2",
+    "bytes": 10615,
     "candidate_commits": [
-      "16a25d901318369d5ff788dd5c6ac0656d6e0bd6",
-      "bda205d80135686b13271360017cce554b79e09d",
-      "800fcd497d67c2e0926f26ecbfe12b8837013637"
+      "b6c3da0e9c7df8d7239cdf702600d334a8057c3a"
     ],
     "prerequisite": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
-    "sha256": "08d0963a0bea72ba0e0c295324b0245b9e83b6fbed236a2cc379c99429c40137"
+    "sha256": "8ee09638befc3d5993f9b86621a01c2c6dfec3a922bb1d7197c342f56adf037d"
+  },
+  "capability": {
+    "active": "-Zohm-checked-private-derives-v2",
+    "incremental_header": 21578,
+    "old_qualifier": "800fcd497d67c2e0926f26ecbfe12b8837013637",
+    "old_qualifier_header": 53142,
+    "shared_parent_header": 26655,
+    "unversioned_must_be_unknown": "-Zohm-checked-private-derives"
   },
   "changed_sources": {
     "compiler/rustc_incremental/src/persist/file_format.rs": {
-      "C": "81ce0d310326b2f381fb244b9c97c7f4e62291e0",
+      "C": "4356303d035dd94e6153e5422cfa216b535eb901",
       "P": "f96e27d853eaf23289d72479b990780eda43eacc"
     },
     "compiler/rustc_metadata/src/rmeta/encoder.rs": {
-      "C": "71d1fe5a53e79db08278560955208be396e5c980",
+      "C": "4230b97d6e6c0f0a8da4614801f4d6676ad0f0af",
       "P": "2b2f08dbca687cd0352adeeffe80d38fb1a06a50"
     },
     "compiler/rustc_session/src/options.rs": {
-      "C": "041ad8c65f2e779b5f50ab3779bf9acccdd346ce",
+      "C": "decd2fe144d513ee63e788af11fce74b2bc654e9",
       "P": "f59c76a62d2f974de0f0924448a7379fab911d6d"
     },
     "tests/run-make/rdr-public-hash-private-native-derive/dep.rs": {
@@ -45,13 +56,22 @@
       "P": "81febc630f3d5923456a1ac93bd72c20e5f9b82e"
     },
     "tests/run-make/rdr-public-hash-private-native-derive/rmake.rs": {
-      "C": "01d61e42df471004ca3258ad89409c3853917f87",
+      "C": "c332701204c5725a6184991ee9ec2936dd741799",
       "P": "08e37538012b212cee347cb5710774cfe961c510"
     },
     "tests/run-make/rdr-public-hash-private-native-derive/send.rs": {
       "C": "6e0c4d65bbce160c5ac63130d5cc2f1b8cac8634",
       "P": null
     }
+  },
+  "common_consumed_inputs": {
+    ".github/workflows/ci.yml": "fecb141897a0c06a420fd7ca9eb57325a8e15038",
+    "compiler/rustc_builtin_macros/src/source_util.rs": "2395b87936e239962bbc343c627a8c6c0fdc2ce8",
+    "compiler/rustc_interface/src/passes.rs": "d3f27d08b964622976664abbce326774ac888371",
+    "compiler/rustc_session/src/session.rs": "b71b985daad5502924179e9517e003e655fe84f4",
+    "compiler/rustc_span/src/source_map.rs": "5581b3e5c041d8da0daddfaefab48585a6946c59",
+    "tests/run-make/dep-info-consumed-input/rmake.rs": "a05fbe142cf79ebefd75008752ccd69569dc9de7",
+    "tests/run-make/dep-info-consumed-input/save.rs": "4d6e19d02ffe141575d31e953acb212d6e462084"
   },
   "kit": {
     "commit": "bc0e3e18ccf825c4eeaece4727b9ac3b4ecd8a89",
@@ -60,14 +80,14 @@
   },
   "roles": {
     "C": {
-      "compiler": "ba7d44d8d16845aafc18f4e41cd951f269d25403",
-      "revision": "800fcd497d67c2e0926f26ecbfe12b8837013637",
-      "tree": "b8f4b22daf941c13362b4e1b59d76e8098de4595"
+      "compiler": "27a445213f2f2e558199ed52a32d3ac51374dc7d",
+      "revision": "b6c3da0e9c7df8d7239cdf702600d334a8057c3a",
+      "tree": "eca2be1fda279d04fb40aff9b4a063fc513a5130"
     },
     "P": {
-      "compiler": "01614e1dbcdedca33c620ad320c07b30207e256e",
-      "revision": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
-      "tree": "f5bf03d73f71243fb88e34ecb0b155ef11e99a47"
+      "compiler": "ffa79fe56d9bace88c7d159289fb5229538651cf",
+      "revision": "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2",
+      "tree": "d9d8d190d49a742d7b990d46420bace16f9fd2db"
     }
   },
   "schema": "ohm-remat-builder-registration-v1",

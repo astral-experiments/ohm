@@ -195,7 +195,13 @@ edit=get('private-edit',interface,moved)
 assert not get('private-edit-unchanged',interface,moved)['dirty']
 repair=get('private-repair',interface,hidden)
 assert repair['provider_public']==old['provider_public']
-option='-Zohm-checked-private-derives'
+legacy_option='-Zohm-checked-private-derives'
+legacy_probe=invoke(['rustc','+ohm',legacy_option,'--print=sysroot'])
+save(out/'legacy-capability.json',{'role':a.role,'option':legacy_option,'exit':legacy_probe.returncode,
+                                  'stdout':legacy_probe.stdout.decode(),'stderr':legacy_probe.stderr.decode(),
+                                  'rustc':str(rustc),'driver_sha256':a.compiler_sha})
+assert legacy_probe.returncode!=0 and 'unknown unstable option' in legacy_probe.stderr.decode() and legacy_option[2:] in legacy_probe.stderr.decode()
+option='-Zohm-checked-private-derives-v2'
 probe=invoke(['rustc','+ohm',option,'--print=sysroot'])
 save(out/'capability.json',{'role':a.role,'option':option,'exit':probe.returncode,
                            'stdout':probe.stdout.decode(),'stderr':probe.stderr.decode(),

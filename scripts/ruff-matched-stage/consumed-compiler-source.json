@@ -1,0 +1,60 @@
+{
+  "C": "b6c3da0e9c7df8d7239cdf702600d334a8057c3a",
+  "P": "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2",
+  "bundle": {
+    "baseline_commits": [
+      "6b53006403f4b0194f5ef89be6bef622d000ef4c",
+      "55f4bd7498ca455141dd13086ad4d0f624314f4c",
+      "d70d44a7b3edc2207d60f07bb0324128f56f119e",
+      "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2"
+    ],
+    "branch": "refs/heads/charlie/private-derives-after-consumed-inputs-v2",
+    "bytes": 10615,
+    "candidate_commits": [
+      "b6c3da0e9c7df8d7239cdf702600d334a8057c3a"
+    ],
+    "prerequisite": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+    "sha256": "8ee09638befc3d5993f9b86621a01c2c6dfec3a922bb1d7197c342f56adf037d"
+  },
+  "compared_common_consumed_inputs": {
+    ".github/workflows/ci.yml": "fecb141897a0c06a420fd7ca9eb57325a8e15038",
+    "compiler/rustc_builtin_macros/src/source_util.rs": "2395b87936e239962bbc343c627a8c6c0fdc2ce8",
+    "compiler/rustc_interface/src/passes.rs": "d3f27d08b964622976664abbce326774ac888371",
+    "compiler/rustc_session/src/session.rs": "b71b985daad5502924179e9517e003e655fe84f4",
+    "compiler/rustc_span/src/source_map.rs": "5581b3e5c041d8da0daddfaefab48585a6946c59",
+    "tests/run-make/dep-info-consumed-input/rmake.rs": "a05fbe142cf79ebefd75008752ccd69569dc9de7",
+    "tests/run-make/dep-info-consumed-input/save.rs": "4d6e19d02ffe141575d31e953acb212d6e462084"
+  },
+  "differences_from_prior_derive_implementation": {
+    "compiler/rustc_incremental/src/persist/file_format.rs": {
+      "candidate_sha256": "c77cd55ae3e7405a9d721a361c2b09ec6dfe38a4f7191a6936eb19f8d6e0dd4e",
+      "prior_sha256": "9a6391a07433c62146bca986e1e6f81bfa4ad0e989232ac5a5444b8e768e75f3"
+    },
+    "compiler/rustc_metadata/src/rmeta/encoder.rs": {
+      "candidate_sha256": "0b68dd061fc8c9489021ec9615ae1920dfe1fe0c2ae5570bccf5fba846b7ead7",
+      "prior_sha256": "b370eabcd52b1fd0ab7013fe7a05ba46b204ccb8d6b7a2638acb2ce89462429c"
+    },
+    "compiler/rustc_session/src/options.rs": {
+      "candidate_sha256": "60172f5bb6f9bf9254154df84bbae6ed262f8b168d88428c345ceaaa85452aa2",
+      "prior_sha256": "fd8d5dca780c6d971267d3320b7fffdf8554b3849bb6624210918ceda844a20b"
+    },
+    "tests/run-make/rdr-public-hash-private-native-derive/dep.rs": {
+      "candidate_sha256": "2de0d7fa182baf0513cbaac95cb7351a4947cdd0357cff394f94441524fbac69",
+      "prior_sha256": "2de0d7fa182baf0513cbaac95cb7351a4947cdd0357cff394f94441524fbac69"
+    },
+    "tests/run-make/rdr-public-hash-private-native-derive/rmake.rs": {
+      "candidate_sha256": "cf1eba5e606f61decabdb56763435422d034be953f63ce4d6e2315b786b993c7",
+      "prior_sha256": "79cc5c0b7619c933d19893a75e2508053610390082b9793ab3f7c0b7f085aa50"
+    },
+    "tests/run-make/rdr-public-hash-private-native-derive/send.rs": {
+      "candidate_sha256": "cd470243e16dca883e85d237db2e1414a96ae36bd5ced1620554d6987cecb192",
+      "prior_sha256": "cd470243e16dca883e85d237db2e1414a96ae36bd5ced1620554d6987cecb192"
+    }
+  },
+  "new_roles_absent_from_seed": true,
+  "schema": 1,
+  "seed_bytes": 2254845,
+  "signed_seed_objects": 4624,
+  "signed_source": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+  "tree": "eca2be1fda279d04fb40aff9b4a063fc513a5130"
+}

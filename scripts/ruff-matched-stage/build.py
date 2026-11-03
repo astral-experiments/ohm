@@ -15,7 +15,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from capsule import HOST, REG, need, reopen, save, seal, sha
 
-BRANCH = "charlie/qa-derive-input-capability-factory-20261103"
+BRANCH = "charlie/qa-derive-consumed-rust-20261103"
 BASE = "34e78f19c0d0c58c86e42d83e05a4dc6db6b0f6d"
 
 
@@ -67,6 +67,8 @@ def bundle(repo):
         rev = entry["revision"]
         need(git(repo, "rev-parse", rev + "^{tree}", rev + ":compiler").splitlines()
              == [entry["tree"], entry["compiler"]], "different pinned compiler tree")
+        for path, common in REG["common_consumed_inputs"].items():
+            need(git(repo, "rev-parse", rev + ":" + path) == common, ("consumed-input writer differs", role, path))
         for path in changed:
             oid = REG["changed_sources"][path][role]
             expected = "" if oid is None else "100644 blob " + oid + "\t" + path
@@ -230,7 +232,8 @@ def build(workspace, root):
     layout = load("qa_layout", workspace / "legacy/scripts/dep-graph-slots/layout.py")
     orig = json.loads((root / "logs/source.json").read_bytes())
     need(
-        git(rust, "rev-parse", "HEAD") == orig["source"]["rust"] and orig["qa"] == os.environ["GITHUB_SHA"],
+        git(rust, "rev-parse", "HEAD") == orig["source"]["rust"] and orig["source"]["rust"] == REG["bundle"]["prerequisite"]
+        and orig["qa"] == os.environ["GITHUB_SHA"],
         "missing authenticated complete composite",
     )
     bundle(rust)
@@ -305,6 +308,12 @@ def build(workspace, root):
         need("bin/rustdoc" not in manifest["files"], "duplicate executable")
         manifest["files"]["bin/rustdoc"] = [digest, doc.stat().st_size, doc.stat().st_mode & 0o777]
         path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
+
+        consumed = argv[:argv.index("build")] + ["test", "--stage", "1", "-j8",
+                                                  "tests/run-make/dep-info-consumed-input"]
+        consumed_log = root / "logs" / ("run-make-consumed-" + role + ".log")
+        guarded(consumed, rust, env, consumed_log, root)
+        need("1 passed; 0 failed; 0 ignored" in consumed_log.read_text(), "consumed-input regression did not run")
 
         if role == "C":
             run_make = argv[:argv.index("build")] + ["test", "--stage", "1", "-j8",
