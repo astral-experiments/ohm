@@ -11,11 +11,12 @@ the Ohm repository with enough space for separate builds. Cache dependencies bef
 
 On x86_64 Linux, compare stock Rust 1.99.0 with Ohm 1.99.0-23, which bundles Wild 0.11.0.
 The versioned installer checks the archive's SHA-256 against
-`163267d26889b1bd2c467d7db97efee42cd2ac9dc9af2abc3a56ade8da9a9572`.
+`fc85a2ca6d47711058cd89c790c8e57f1799472e38f0ee0a08b0a51d06c1ee7b`.
 [Ohm installer](https://labs.astral.sh/ohm/releases/ohm-1.99.0-23/install.sh) · [Release manifest](toolchains/1.99.0/23.json)
 
-Run the examples below from Ohm commit `04c83d53483607aec4f93fd2bb55b412f101d677` to use the
-same benchmark drivers, workload revisions and replay fixtures as the campaign.
+Run the developer-workflow and individual-command examples below from Ohm commit
+`04c83d53483607aec4f93fd2bb55b412f101d677` to use the same drivers, workload revisions and replay
+fixtures as the campaign.
 [Benchmark drivers and fixtures](https://github.com/astral-sh/ohm/tree/04c83d53483607aec4f93fd2bb55b412f101d677/scripts)
 
 ## Run the developer workflows

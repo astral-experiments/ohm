@@ -101,8 +101,8 @@ cargo +ohm fmt
 Exact toolchain names have the form `ohm-<rust-version>-<ohm-revision>`.
 For example, `cargo +ohm-1.99.0-9 test` selects that installed revision.
 
-Ohm enables dependency-aware rebuild reduction, cached relinking, proc-macro caching, parallel
-compiler frontends, and reuse of previously built registry and workspace dependencies by default.
+Ohm enables dependency-aware rebuild reduction, cached relinking, parallel compiler frontends,
+and reuse of previously built registry and workspace dependencies by default.
 Opt out with `-Zohm-defaults=no`:
 
 ```console
@@ -216,10 +216,7 @@ avoid rebuilding unchanged dependents:
 
 <!-- /benchmark:features -->
 
-**Warm doctests** show how long it takes to rerun Ruff’s documentation examples with unchanged
-source. We report the median of five Linux runs per toolchain. Each passed 207 examples and
-ignored nine across 16 crates.
-[Method and individual runs](BENCHMARKS.md#ruff-doctests)
+**Doctests** show how long it takes to rerun Ruff's documentation examples with unchanged source:
 
 <!-- benchmark:ruff-doctests -->
 
