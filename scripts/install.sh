@@ -166,7 +166,20 @@ case "$download_url" in
         ;;
     file:///*)
         info "copying $version for $host_target"
-        cp "${download_url#file://}/$archive_name" "$archive_path" ||
+        # Include the archive name so trailing newlines in the directory survive command substitution.
+        local_archive=$(printf '%s/%s\n' "${download_url#file://}" "$archive_name" | LC_ALL=C awk '
+            function digit(c) { return index("0123456789abcdef", tolower(c)) - 1 }
+            {
+                while (match($0, /%[[:xdigit:]][[:xdigit:]]/)) {
+                    byte = 16 * digit(substr($0, RSTART + 1, 1)) + digit(substr($0, RSTART + 2, 1))
+                    if (byte == 0) exit 1
+                    printf "%s%c", substr($0, 1, RSTART - 1), byte
+                    $0 = substr($0, RSTART + 3)
+                }
+                print
+            }
+        ') || fail 'invalid local archive URL'
+        cp "$local_archive" "$archive_path" ||
             fail 'could not copy the local Ohm release archive'
         ;;
 esac
