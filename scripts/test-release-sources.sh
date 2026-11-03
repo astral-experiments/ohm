@@ -111,6 +111,17 @@ git -C "$cargo_checkout" config --unset core.trustctime
 
 embedded_cargo="$rust_checkout/src/tools/cargo"
 nested_dependency="$embedded_cargo/vendor/fixture code"
+mv "$nested_dependency/.git" "$test_root/dependency-gitfile"
+mv "$nested_dependency/lib.rs" "$test_root/dependency-source"
+"${verify_sources[@]}" >/dev/null
+mv "$test_root/dependency-source" "$nested_dependency/.source.rs"
+if "${verify_sources[@]}" >/dev/null 2>&1; then
+  echo 'source verification accepted a populated uninitialized submodule' >&2
+  exit 1
+fi
+mv "$nested_dependency/.source.rs" "$nested_dependency/lib.rs"
+mv "$test_root/dependency-gitfile" "$nested_dependency/.git"
+
 git -C "$rust_checkout" config submodule.src/tools/cargo.ignore all
 git -C "$embedded_cargo" config submodule.fixture.ignore all
 for source in "$embedded_cargo/README.md" "$nested_dependency/lib.rs"; do

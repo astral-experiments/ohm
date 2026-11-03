@@ -58,6 +58,14 @@ verify_clean_checkout() {
       submodule="$checkout/${entry#*$'\t'}"
       if [[ -e "$submodule/.git" ]]; then
         verify_clean_checkout "$submodule" .
+      elif [[ -d "$submodule" ]] && ! (
+        # Git ignores the contents of an uninitialized submodule.
+        shopt -s dotglob nullglob
+        set -- "$submodule"/*
+        [[ $# -eq 0 && -r "$submodule" && -x "$submodule" ]]
+      ); then
+        echo "cannot verify an uninitialized source submodule: $submodule" >&2
+        exit 1
       fi
     done
 }
