@@ -3,6 +3,7 @@ import hashlib,json,os,shutil,statistics,subprocess as sp,sys,zipfile
 from pathlib import Path
 q=Path(__file__).resolve().parent;out=Path(os.environ['RUNNER_TEMP'])/'reopened';out.mkdir();r=int(os.environ['ORIGINAL_RUN']);kind=os.environ['READ_DATASET'];assert kind in('pilots','confirm');live=lambda p:json.loads(sp.check_output(['gh','api','repos/astral-experiments/ohm/'+p]));sha=lambda p:hashlib.file_digest(p.open('rb'),'sha256').hexdigest()
 def put(n,d):(out/n).write_text(json.dumps(d,sort_keys=True,indent=1)+'\n')
+sys.path.insert(0,str(q))
 plan=json.loads((q/'confirmation-plan.json').read_bytes())
 if kind=='pilots':
  assert r==41738655551;head=plan['primary_receiver_commit'];cases={n:('derived-impl-'+n+'-'+str(r),'Real Ruff edit '+n)for n in('28392','26372')}
