@@ -1,0 +1,616 @@
+{
+  "admitted_2x": true,
+  "all_cross_boot_ELFs_equal": true,
+  "assets": [
+    {
+      "bytes": 213809079,
+      "id": 13226499256,
+      "job": 125892335886,
+      "sha256": "d679d9e46efe21c47a0704ce726680aad2f5ae766ea1e96374b642d53389079e",
+      "slot": 0
+    },
+    {
+      "bytes": 213779504,
+      "id": 13227342520,
+      "job": 125892335705,
+      "sha256": "1da55c2361f30e630187c94c27b612881a5c26aba9712c887778d87b01f647c5",
+      "slot": 1
+    },
+    {
+      "bytes": 213798613,
+      "id": 13227103108,
+      "job": 125892335726,
+      "sha256": "fd58788b3331a2d752b38f5a926fbc648d4a3c351312171db20da5034a954ea1",
+      "slot": 2
+    },
+    {
+      "bytes": 213781254,
+      "id": 13227532131,
+      "job": 125892335645,
+      "sha256": "d3482f8b6e94b6e1ce90c9375bb9524294bbcda0e1badf66b0655953eef8217f",
+      "slot": 3
+    },
+    {
+      "bytes": 213770593,
+      "id": 13227920670,
+      "job": 125892335767,
+      "sha256": "41c33e2e7ffe5730da07f54ef1d1711c95dc1b7b61a5af6ec6e53e7d8e7cccaf",
+      "slot": 4
+    },
+    {
+      "bytes": 213800542,
+      "id": 13227008783,
+      "job": 125892335372,
+      "sha256": "40daa140161c0acb9bb06b36415f775f549424fdbef4ecb34e6894bfeff2181d",
+      "slot": 5
+    }
+  ],
+  "boots": [
+    {
+      "C": 36416020549,
+      "CGUs": 171,
+      "P": 90083784542,
+      "boot": "4561925f-d984-420e-acef-27e6fb42da3d",
+      "local_clean_ELFs": {
+        "0P/edit": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "0P/independent-clean": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "0P/old": "c13ba33d1c3ba67deb363d2ba861f5ef640b2fa33eadd67cad758cd98d4ffc9b",
+        "0P/repair": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "1C/edit": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "1C/independent-clean": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "1C/old": "c13ba33d1c3ba67deb363d2ba861f5ef640b2fa33eadd67cad758cd98d4ffc9b",
+        "1C/repair": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074"
+      },
+      "objects_C": 171,
+      "objects_P": 148,
+      "order": "PC",
+      "physical_files_reopened": 32,
+      "process_replay": {
+        "C": {
+          "physical": {
+            "cargo": 548836351,
+            "collect2": 489060,
+            "exec_count": 2153,
+            "rustc:e2e": 3539148641,
+            "rustc:ty_ide": 4499392795,
+            "rustc:ty_project": 14664057560,
+            "rustc:ty_server": 10302837580,
+            "rustup": 9902736,
+            "wild": 3290487498,
+            "x86_64-linux-gnu-gcc-13": 11301980
+          },
+          "same_donors": true,
+          "truncated_clock": {}
+        },
+        "P": {
+          "physical": {
+            "cargo": 549287872,
+            "collect2": 489105,
+            "exec_count": 2152,
+            "rustc:e2e": 14941020922,
+            "rustc:ty_ide": 28842195295,
+            "rustc:ty_project": 14731501223,
+            "rustc:ty_server": 28323409259,
+            "rustup": 9904051,
+            "wild": 3289191847,
+            "x86_64-linux-gnu-gcc-13": 11301279
+          },
+          "same_donors": true,
+          "truncated_clock": {
+            "rustc:ty_ide": 16683
+          }
+        }
+      },
+      "reduction": 0.5957538780797818,
+      "runner": "nsc-runner-bpjp14cj32k2e",
+      "slot": 0,
+      "speedup": 2.473740490693834
+    },
+    {
+      "C": 36360394316,
+      "CGUs": 171,
+      "P": 90046410951,
+      "boot": "ae5161a2-9b62-446b-9c7c-f5ac8471f091",
+      "local_clean_ELFs": {
+        "0C/edit": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "0C/independent-clean": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "0C/old": "c13ba33d1c3ba67deb363d2ba861f5ef640b2fa33eadd67cad758cd98d4ffc9b",
+        "0C/repair": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "1P/edit": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "1P/independent-clean": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "1P/old": "c13ba33d1c3ba67deb363d2ba861f5ef640b2fa33eadd67cad758cd98d4ffc9b",
+        "1P/repair": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074"
+      },
+      "objects_C": 171,
+      "objects_P": 148,
+      "order": "CP",
+      "physical_files_reopened": 32,
+      "process_replay": {
+        "C": {
+          "physical": {
+            "cargo": 549104451,
+            "collect2": 489060,
+            "exec_count": 2152,
+            "rustc:e2e": 3551594804,
+            "rustc:ty_ide": 4497474378,
+            "rustc:ty_project": 14666792474,
+            "rustc:ty_server": 10305283366,
+            "rustup": 9903302,
+            "wild": 3289044497,
+            "x86_64-linux-gnu-gcc-13": 11298765
+          },
+          "same_donors": true,
+          "truncated_clock": {}
+        },
+        "P": {
+          "physical": {
+            "cargo": 548855584,
+            "collect2": 489083,
+            "exec_count": 2153,
+            "rustc:e2e": 14882668281,
+            "rustc:ty_ide": 28847872288,
+            "rustc:ty_project": 14724153661,
+            "rustc:ty_server": 28332545803,
+            "rustup": 9904695,
+            "wild": 3289317660,
+            "x86_64-linux-gnu-gcc-13": 11298702
+          },
+          "same_donors": true,
+          "truncated_clock": {
+            "rustc:ty_server": 15657
+          }
+        }
+      },
+      "reduction": 0.5962038471940208,
+      "runner": "nsc-runner-lsqaih38juuc6",
+      "slot": 1,
+      "speedup": 2.476497096495349
+    },
+    {
+      "C": 36361709454,
+      "CGUs": 171,
+      "P": 90095917745,
+      "boot": "f34b7ab0-ef4b-49e9-8d97-8ad5926c62ba",
+      "local_clean_ELFs": {
+        "0C/edit": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "0C/independent-clean": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "0C/old": "c13ba33d1c3ba67deb363d2ba861f5ef640b2fa33eadd67cad758cd98d4ffc9b",
+        "0C/repair": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "1P/edit": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "1P/independent-clean": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "1P/old": "c13ba33d1c3ba67deb363d2ba861f5ef640b2fa33eadd67cad758cd98d4ffc9b",
+        "1P/repair": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074"
+      },
+      "objects_C": 171,
+      "objects_P": 148,
+      "order": "CP",
+      "physical_files_reopened": 32,
+      "process_replay": {
+        "C": {
+          "physical": {
+            "cargo": 549020929,
+            "collect2": 489061,
+            "exec_count": 2153,
+            "rustc:e2e": 3611982194,
+            "rustc:ty_ide": 4499367345,
+            "rustc:ty_project": 14662890454,
+            "rustc:ty_server": 10356442346,
+            "rustup": 9903630,
+            "wild": 3289932122,
+            "x86_64-linux-gnu-gcc-13": 11299080
+          },
+          "same_donors": true,
+          "truncated_clock": {}
+        },
+        "P": {
+          "physical": {
+            "cargo": 548754698,
+            "collect2": 489060,
+            "exec_count": 2152,
+            "rustc:e2e": 14941428342,
+            "rustc:ty_ide": 28834887470,
+            "rustc:ty_project": 14724671185,
+            "rustc:ty_server": 28340910753,
+            "rustup": 9902224,
+            "wild": 3291886029,
+            "x86_64-linux-gnu-gcc-13": 11297438
+          },
+          "same_donors": true,
+          "truncated_clock": {}
+        }
+      },
+      "reduction": 0.5964111320013947,
+      "runner": "nsc-runner-9bkukcqnv5rhq",
+      "slot": 2,
+      "speedup": 2.4777690350058315
+    },
+    {
+      "C": 36403786849,
+      "CGUs": 171,
+      "P": 90128982509,
+      "boot": "8d557337-bd93-4f90-afdf-cf61924faed2",
+      "local_clean_ELFs": {
+        "0P/edit": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "0P/independent-clean": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "0P/old": "c13ba33d1c3ba67deb363d2ba861f5ef640b2fa33eadd67cad758cd98d4ffc9b",
+        "0P/repair": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "1C/edit": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "1C/independent-clean": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "1C/old": "c13ba33d1c3ba67deb363d2ba861f5ef640b2fa33eadd67cad758cd98d4ffc9b",
+        "1C/repair": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074"
+      },
+      "objects_C": 171,
+      "objects_P": 148,
+      "order": "PC",
+      "physical_files_reopened": 32,
+      "process_replay": {
+        "C": {
+          "physical": {
+            "cargo": 548690194,
+            "collect2": 489106,
+            "exec_count": 2152,
+            "rustc:e2e": 3603255896,
+            "rustc:ty_ide": 4498560036,
+            "rustc:ty_project": 14664479628,
+            "rustc:ty_server": 10284764823,
+            "rustup": 9904134,
+            "wild": 3291662552,
+            "x86_64-linux-gnu-gcc-13": 11297121
+          },
+          "same_donors": true,
+          "truncated_clock": {}
+        },
+        "P": {
+          "physical": {
+            "cargo": 549061966,
+            "collect2": 489060,
+            "exec_count": 2152,
+            "rustc:e2e": 14891531591,
+            "rustc:ty_ide": 28842153917,
+            "rustc:ty_project": 14718008977,
+            "rustc:ty_server": 28329594124,
+            "rustup": 9904842,
+            "wild": 3289198148,
+            "x86_64-linux-gnu-gcc-13": 11296263
+          },
+          "same_donors": true,
+          "truncated_clock": {}
+        }
+      },
+      "reduction": 0.59609233527778,
+      "runner": "nsc-runner-teskjilmhj28i",
+      "slot": 3,
+      "speedup": 2.475813378505039
+    },
+    {
+      "C": 36357401821,
+      "CGUs": 171,
+      "P": 90057648422,
+      "boot": "8884f149-a978-44e9-a63e-6bd8248a3c64",
+      "local_clean_ELFs": {
+        "0P/edit": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "0P/independent-clean": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "0P/old": "c13ba33d1c3ba67deb363d2ba861f5ef640b2fa33eadd67cad758cd98d4ffc9b",
+        "0P/repair": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "1C/edit": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "1C/independent-clean": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "1C/old": "c13ba33d1c3ba67deb363d2ba861f5ef640b2fa33eadd67cad758cd98d4ffc9b",
+        "1C/repair": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074"
+      },
+      "objects_C": 171,
+      "objects_P": 148,
+      "order": "PC",
+      "physical_files_reopened": 32,
+      "process_replay": {
+        "C": {
+          "physical": {
+            "cargo": 548901210,
+            "collect2": 489062,
+            "exec_count": 2151,
+            "rustc:e2e": 3602146356,
+            "rustc:ty_ide": 4499548386,
+            "rustc:ty_project": 14670330927,
+            "rustc:ty_server": 10330002860,
+            "rustup": 9903145,
+            "wild": 3289516487,
+            "x86_64-linux-gnu-gcc-13": 11297310
+          },
+          "same_donors": true,
+          "truncated_clock": {}
+        },
+        "P": {
+          "physical": {
+            "cargo": 548948532,
+            "collect2": 489061,
+            "exec_count": 2153,
+            "rustc:e2e": 14954757846,
+            "rustc:ty_ide": 28835578944,
+            "rustc:ty_project": 14724168416,
+            "rustc:ty_server": 28339640990,
+            "rustup": 9903582,
+            "wild": 3289371535,
+            "x86_64-linux-gnu-gcc-13": 11306660
+          },
+          "same_donors": true,
+          "truncated_clock": {}
+        }
+      },
+      "reduction": 0.5962874618862652,
+      "runner": "nsc-runner-hp9g2i401ovne",
+      "slot": 4,
+      "speedup": 2.4770100147800655
+    },
+    {
+      "C": 36418272897,
+      "CGUs": 171,
+      "P": 90064906940,
+      "boot": "66558ef5-a7a3-4815-a09c-eaa19ed0d5f2",
+      "local_clean_ELFs": {
+        "0C/edit": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "0C/independent-clean": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "0C/old": "c13ba33d1c3ba67deb363d2ba861f5ef640b2fa33eadd67cad758cd98d4ffc9b",
+        "0C/repair": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "1P/edit": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "1P/independent-clean": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074",
+        "1P/old": "c13ba33d1c3ba67deb363d2ba861f5ef640b2fa33eadd67cad758cd98d4ffc9b",
+        "1P/repair": "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074"
+      },
+      "objects_C": 171,
+      "objects_P": 148,
+      "order": "CP",
+      "physical_files_reopened": 32,
+      "process_replay": {
+        "C": {
+          "physical": {
+            "cargo": 549410030,
+            "collect2": 489105,
+            "exec_count": 2152,
+            "rustc:e2e": 3603197430,
+            "rustc:ty_ide": 4496848192,
+            "rustc:ty_project": 14666396433,
+            "rustc:ty_server": 10304863842,
+            "rustup": 9903808,
+            "wild": 3291564789,
+            "x86_64-linux-gnu-gcc-13": 11296264
+          },
+          "same_donors": true,
+          "truncated_clock": {}
+        },
+        "P": {
+          "physical": {
+            "cargo": 549067118,
+            "collect2": 489060,
+            "exec_count": 2151,
+            "rustc:e2e": 14883558325,
+            "rustc:ty_ide": 28850076960,
+            "rustc:ty_project": 14723143449,
+            "rustc:ty_server": 28325383583,
+            "rustup": 9903947,
+            "wild": 3289264316,
+            "x86_64-linux-gnu-gcc-13": 11302339
+          },
+          "same_donors": true,
+          "truncated_clock": {}
+        }
+      },
+      "reduction": 0.5956441400504489,
+      "runner": "nsc-runner-g1qhd7sg5dm9q",
+      "slot": 5,
+      "speedup": 2.4730691429197127
+    }
+  ],
+  "head": "49f33a6fcd94d15b1cc5e442315613aed1b8cafe",
+  "median_range_coverage": 0.96875,
+  "median_reduction": 0.5961480912359004,
+  "median_reduction_interval": [
+    0.5956441400504489,
+    0.5964111320013947
+  ],
+  "median_speedup": 2.476155237500194,
+  "new_cross_boot": [
+    "f0e785ff42ca6227d246a7cb0998af88654c1776c7a595f2f9e97733028c0074"
+  ],
+  "old_cross_boot": [
+    "c13ba33d1c3ba67deb363d2ba861f5ef640b2fa33eadd67cad758cd98d4ffc9b"
+  ],
+  "paired_two_sided_exact_sign_p": 0.03125,
+  "resources": [
+    {
+      "cold": 2491300046988,
+      "noop": 446986933,
+      "role": "P",
+      "slot": 0,
+      "storage": {
+        "allocated_unique_bytes": 2734952448,
+        "incremental_classes": {
+          "dep-graph.bin": 822980936,
+          "query-cache.bin": 415841132,
+          "work-products.bin": 209998
+        },
+        "logical_unique_bytes": 2720836579,
+        "physical_files": 5887
+      }
+    },
+    {
+      "cold": 2491226868906,
+      "noop": 447173104,
+      "role": "C",
+      "slot": 0,
+      "storage": {
+        "allocated_unique_bytes": 2744143872,
+        "incremental_classes": {
+          "dep-graph.bin": 835699173,
+          "query-cache.bin": 412253538,
+          "work-products.bin": 209998
+        },
+        "logical_unique_bytes": 2730006766,
+        "physical_files": 5887
+      }
+    },
+    {
+      "cold": 2491754161222,
+      "noop": 447128277,
+      "role": "P",
+      "slot": 1,
+      "storage": {
+        "allocated_unique_bytes": 2736762880,
+        "incremental_classes": {
+          "dep-graph.bin": 824002055,
+          "query-cache.bin": 416589844,
+          "work-products.bin": 209998
+        },
+        "logical_unique_bytes": 2722643299,
+        "physical_files": 5887
+      }
+    },
+    {
+      "cold": 2491055890397,
+      "noop": 447085692,
+      "role": "C",
+      "slot": 1,
+      "storage": {
+        "allocated_unique_bytes": 2743349248,
+        "incremental_classes": {
+          "dep-graph.bin": 835279305,
+          "query-cache.bin": 411910078,
+          "work-products.bin": 209998
+        },
+        "logical_unique_bytes": 2729206285,
+        "physical_files": 5887
+      }
+    },
+    {
+      "cold": 2491104413534,
+      "noop": 447074630,
+      "role": "P",
+      "slot": 2,
+      "storage": {
+        "allocated_unique_bytes": 2731364352,
+        "incremental_classes": {
+          "dep-graph.bin": 820835915,
+          "query-cache.bin": 414362230,
+          "work-products.bin": 209998
+        },
+        "logical_unique_bytes": 2717249800,
+        "physical_files": 5887
+      }
+    },
+    {
+      "cold": 2490961266348,
+      "noop": 447130923,
+      "role": "C",
+      "slot": 2,
+      "storage": {
+        "allocated_unique_bytes": 2743382016,
+        "incremental_classes": {
+          "dep-graph.bin": 835293801,
+          "query-cache.bin": 411925978,
+          "work-products.bin": 209998
+        },
+        "logical_unique_bytes": 2729236666,
+        "physical_files": 5887
+      }
+    },
+    {
+      "cold": 2490853945089,
+      "noop": 447247318,
+      "role": "P",
+      "slot": 3,
+      "storage": {
+        "allocated_unique_bytes": 2731257856,
+        "incremental_classes": {
+          "dep-graph.bin": 820780222,
+          "query-cache.bin": 414333874,
+          "work-products.bin": 209998
+        },
+        "logical_unique_bytes": 2717128677,
+        "physical_files": 5887
+      }
+    },
+    {
+      "cold": 2492528160195,
+      "noop": 447017523,
+      "role": "C",
+      "slot": 3,
+      "storage": {
+        "allocated_unique_bytes": 2752114688,
+        "incremental_classes": {
+          "dep-graph.bin": 840204222,
+          "query-cache.bin": 415709642,
+          "work-products.bin": 209998
+        },
+        "logical_unique_bytes": 2737967524,
+        "physical_files": 5887
+      }
+    },
+    {
+      "cold": 2491033738755,
+      "noop": 447162924,
+      "role": "P",
+      "slot": 4,
+      "storage": {
+        "allocated_unique_bytes": 2731892736,
+        "incremental_classes": {
+          "dep-graph.bin": 821181621,
+          "query-cache.bin": 414580259,
+          "work-products.bin": 209998
+        },
+        "logical_unique_bytes": 2717776651,
+        "physical_files": 5887
+      }
+    },
+    {
+      "cold": 2491372925940,
+      "noop": 447103706,
+      "role": "C",
+      "slot": 4,
+      "storage": {
+        "allocated_unique_bytes": 2746064896,
+        "incremental_classes": {
+          "dep-graph.bin": 836842330,
+          "query-cache.bin": 413029152,
+          "work-products.bin": 209998
+        },
+        "logical_unique_bytes": 2731925506,
+        "physical_files": 5887
+      }
+    },
+    {
+      "cold": 2491078729423,
+      "noop": 446973828,
+      "role": "P",
+      "slot": 5,
+      "storage": {
+        "allocated_unique_bytes": 2731282432,
+        "incremental_classes": {
+          "dep-graph.bin": 820790134,
+          "query-cache.bin": 414312271,
+          "work-products.bin": 209998
+        },
+        "logical_unique_bytes": 2717154272,
+        "physical_files": 5887
+      }
+    },
+    {
+      "cold": 2490425197040,
+      "noop": 447233104,
+      "role": "C",
+      "slot": 5,
+      "storage": {
+        "allocated_unique_bytes": 2743382016,
+        "incremental_classes": {
+          "dep-graph.bin": 835313458,
+          "query-cache.bin": 411913179,
+          "work-products.bin": 209998
+        },
+        "logical_unique_bytes": 2729243252,
+        "physical_files": 5887
+      }
+    }
+  ],
+  "run": 41628659619,
+  "speedup_interval": [
+    2.4730691429197127,
+    2.4777690350058315
+  ]
+}
