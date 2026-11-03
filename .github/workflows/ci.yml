@@ -1,5 +1,5 @@
-name: Profile signed ty_ide compiling Ruff e2e
-run-name: Signed Ruff ty_ide instruction profile ${{ inputs.reviewed_head }}
+name: Qualify owner buckets on the Ruff e2e edit
+run-name: Ruff 29697 source-matched owner bucket pilot ${{ inputs.reviewed_head }}
 permissions:
   contents: read
   actions: read
@@ -9,7 +9,7 @@ jobs:
       && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head
       && github.ref_name == 'charlie/qa-ruff-ty-ide-profile-29697-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 55
+    timeout-minutes: 165
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
@@ -28,15 +28,27 @@ jobs:
         fetch-depth: 2
         path: ruff
         persist-credentials: false
-    - name: Profile one unchanged-source test-build consumer and verify the real native e2e
+    - name: Read the exact nonrelease compiler source constructor
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 3166ffe9aa98befcb452cc25af269af53578604c
+        path: factory-src
+        persist-credentials: false
+        sparse-checkout: scripts/ruff-matched-stage
+    - name: Run the source-matched owner bucket pilot and check the real native e2e
       env:
         REVIEWED_HEAD: ${{ inputs.reviewed_head }}
         OHM_SDK_READ_TOKEN: ${{ github.token }}
-      run: python3 -IB qa/scripts/ruff-original-ty-instructions/recent_ty.py
+      run: python3 -IB qa/scripts/ruff-original-ty-instructions/owner-buckets/pilot.py
+    - name: Reopen the separate signed discovery
+      if: always()
+      env:
+        OHM_SDK_READ_TOKEN: ${{ github.token }}
+      run: python3 -IB qa/scripts/ruff-original-ty-instructions/source-pcs/verified-29697/hosted_read.py
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: signed-ty-ide-source-profile-${{ github.run_id }}
+        name: matched-ty-ide-bucket-pilot-${{ github.run_id }}
         path: ${{ runner.temp }}/ohm-foreign-join/published/
         retention-days: 21
         if-no-files-found: error
