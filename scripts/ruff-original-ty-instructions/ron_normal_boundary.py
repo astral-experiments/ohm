@@ -50,9 +50,18 @@ def enroll(image):
 
 def clean_output(argv):
     out=Path(argv[argv.index('--out-dir')+1]);assert out==w.root/'ron-replay/private-out'
-    out.mkdir(exist_ok=True,parents=True)
-    for p in out.iterdir():
-        assert p.is_file()and not p.is_symlink();p.unlink()
+    # SIGKILL at the backend frontier leaves rustc's TmpFile/TempDir ownership intact.
+    # Preserve the complete prior directory. The next invocation still uses the exact path.
+    store=w.root/'prior-outputs'
+    store.mkdir(exist_ok=True)
+    if out.exists():
+        assert out.is_dir() and not out.is_symlink() and len(list(store.iterdir()))<24
+        old=store/str(len(list(store.iterdir())))
+        out.rename(old)
+        entries={str(p.relative_to(old)):('dir'if p.is_dir()else p.stat().st_size)
+                 for p in old.rglob('*')if not p.is_symlink()}
+        b.write(P/('prior-layout-'+old.name+'.json'),entries)
+    out.mkdir(parents=True)
     return out
 
 
