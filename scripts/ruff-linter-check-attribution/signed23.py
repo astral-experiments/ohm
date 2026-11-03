@@ -7,9 +7,8 @@ import shutil
 import subprocess
 import tarfile
 
-import worker as w
 
-BINDING = json.loads((w.HERE/"signed23-source.json").read_bytes())
+BINDING = json.loads((Path(__file__).resolve().parent/"signed23-source.json").read_bytes())
 RUST = BINDING["provenance"]["sources"]["rust"]["revision"]
 CARGO = BINDING["provenance"]["sources"]["cargo"]["revision"]
 
@@ -20,7 +19,7 @@ def role(name):
     # Rust's compiler/standard-library member suffix is derived from the build, so read the actual release member name.
     return re.sub(r"-[0-9a-f]{16}(?=\.(?:rlib|rmeta|so|o)$)", "-<crate>", name)
 
-def install(template):
+def install(w, template):
     b=BINDING;a=b["assets"]["archive"]
     meta=json.loads(subprocess.check_output(w.gh("releases/tags/"+b["release"])))
     w.need((meta["tag_name"],meta["target_commitish"],meta["published_at"])==(b["release"],b["packaging"],b["published_at"]),

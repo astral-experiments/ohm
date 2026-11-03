@@ -83,7 +83,7 @@ def acquire():
     sys.path.insert(0,str(WS/'donor/scripts/ruff-default-owner-pmu'))
     import acquire as signed
     import signed23
-    signed23.install(signed.c.SDK["members"])
+    signed23.install(sys.modules[__name__], signed.c.SDK["members"])
     proxy=ROOT/'proxies'; proxy.mkdir(); rustup=Path(shutil.which('rustup')).resolve(strict=True); shutil.copy2(rustup,proxy/'rustup')
     need(sha(proxy/'rustup') == sha(rustup),'different rustup proxy')
     for name in ('cargo','rustc','rustdoc'):
