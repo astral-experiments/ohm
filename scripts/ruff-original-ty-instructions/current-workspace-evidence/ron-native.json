@@ -1,0 +1,273 @@
+{
+  "guard": {
+    "dso": {
+      "malformed": "8368c172c85e6f95909389982327bc7073d83c7ecf4a355f9808d442f0825564",
+      "normal": "55a67de464b0c94a13102f5b0a9179c88611e2560919bea83382e9e94992cc8b",
+      "offsets": [
+        187962,
+        199680
+      ],
+      "rodata": [
+        [
+          134208,
+          92152,
+          "94897661a6c6cdbc8d76fe18f0c26549b7f3b552b0f72d263fd25424f0516098"
+        ],
+        [
+          134208,
+          92152,
+          "84462af2145affe235e89566b11ebe2d71583b8a8e021abb4aca6ac805792f4f"
+        ]
+      ],
+      "rustc": [
+        2491696,
+        60367,
+        "314c8aab86a6aecdb8ce47eb6acece938152c4504306e3f5727a433769df53fd"
+      ],
+      "size": 3973856,
+      "text": [
+        591920,
+        1820730,
+        "e8959ed378ef3a8f4ce2776258bff263da9b1a3f32b2544ea32f0aeed25fa4a2"
+      ]
+    },
+    "stages": {
+      "ablated-again": {
+        "build_ok": true,
+        "errors": [],
+        "ron_execs": 0
+      },
+      "ablated-first": {
+        "build_ok": true,
+        "errors": [],
+        "ron_execs": 0
+      },
+      "cold": {
+        "build_ok": true,
+        "errors": [],
+        "ron_execs": 1
+      },
+      "empty-repair": {
+        "build_ok": true,
+        "errors": [],
+        "ron_execs": 1
+      },
+      "empty-same-malformed": {
+        "build_ok": false,
+        "errors": [
+          [
+            "E0782",
+            "extensions.rs",
+            5,
+            83,
+            5,
+            94
+          ],
+          [
+            "E0782",
+            "public.rs",
+            17,
+            37,
+            17,
+            98
+          ]
+        ],
+        "ron_execs": 1
+      },
+      "ordinary-malformed": {
+        "build_ok": false,
+        "errors": [
+          [
+            "E0782",
+            "extensions.rs",
+            5,
+            83,
+            5,
+            94
+          ],
+          [
+            "E0782",
+            "public.rs",
+            17,
+            37,
+            17,
+            98
+          ]
+        ],
+        "ron_execs": 1
+      },
+      "real-source-malformed": {
+        "build_ok": false,
+        "errors": [
+          [
+            "E0782",
+            "public.rs",
+            17,
+            37,
+            17,
+            98
+          ]
+        ],
+        "ron_execs": 1
+      },
+      "repair": {
+        "build_ok": true,
+        "errors": [],
+        "ron_execs": 1
+      },
+      "warm": {
+        "build_ok": true,
+        "errors": [],
+        "ron_execs": 1
+      }
+    }
+  },
+  "observer": {
+    "argv_layout_differences": 14,
+    "bridge_entries": {
+      "span_join": 68
+    },
+    "foreign_stores": {
+      "join": 3
+    },
+    "locations": {
+      "/home/runner/work/_temp/ohm-foreign-join/cargo-home/registry/src/index.crates.io-1949cf8c6b5b557f/bitflags-2.13.2/src/public.rs": {
+        "bytes": 21101,
+        "crate_sha": "3ded4057c258ba199e2d26386d3af3780957ecaee6c4ef4041c6b4b8b97c0b06",
+        "physical_sha": "1237676ca4687d8eb8364eb52b23c5f284f73f4d4113ee833fa3470c8b512be9",
+        "source_file_id": "69754195d398d941cd88b96d81bd6a7d"
+      }
+    },
+    "returned_range": [
+      549,
+      610
+    ],
+    "rlib": "da159c2ae58df1a78438e7afb316ae9e4659ce0a9fabccba7e83a3a1de8b70b3",
+    "rmeta_equal_within_replay": false
+  },
+  "whole_role": {
+    "malformed": {
+      "malformed": "d10101784698b81eec63d9994e59590a3c4596f0861a46f8ee7ccf41718b5d14",
+      "normal": "406b8448ec89af1429a3a253381c6d9176970deb874c1035e680264ba8df382b",
+      "offsets": [
+        230435,
+        241192
+      ],
+      "rodata": [
+        [
+          170432,
+          99312,
+          "d48370673f8a1086c661cd29a7285f3b259b795f9e68ddc7b12dd6558f74a37a"
+        ],
+        [
+          170432,
+          99312,
+          "b6527d419d2839a289728fb0983a7377d9eec719e3f528a3d2431e4f10fbf10c"
+        ]
+      ],
+      "rustc": [
+        3140960,
+        60951,
+        "f3f1bb213228abd57e9197059273c1ae47694f311e3cf0ffd490d0b53c686c5c"
+      ],
+      "size": 4902736,
+      "text": [
+        722944,
+        2321849,
+        "018f20e1d94710709991be9f530c817297d09953f5e348b1e0d4d9d93f653cb7"
+      ]
+    },
+    "stages": {
+      "clamp-return-malformed": {
+        "errors": [
+          [
+            "E0782",
+            "extensions.rs",
+            5,
+            83,
+            5,
+            94
+          ],
+          [
+            "E0782",
+            "public.rs",
+            17,
+            37,
+            17,
+            38
+          ]
+        ],
+        "products": {
+          "ron-0b42003ff6bbcee9.d": "df4b5d9ac782afdfd98050abede3eb2416a79d358f126999b89e227d50ca5b87"
+        },
+        "returns": 3
+      },
+      "inspect-malformed": {
+        "errors": [
+          [
+            "E0782",
+            "extensions.rs",
+            5,
+            83,
+            5,
+            94
+          ],
+          [
+            "E0782",
+            "public.rs",
+            17,
+            37,
+            17,
+            98
+          ]
+        ],
+        "products": {
+          "ron-0b42003ff6bbcee9.d": "df4b5d9ac782afdfd98050abede3eb2416a79d358f126999b89e227d50ca5b87"
+        },
+        "returns": 3
+      },
+      "signed-healthy": {
+        "errors": [],
+        "products": {
+          "libron-0b42003ff6bbcee9.rlib": "da159c2ae58df1a78438e7afb316ae9e4659ce0a9fabccba7e83a3a1de8b70b3",
+          "libron-0b42003ff6bbcee9.rmeta": "a9f3750354c877a4f7d0b48c81823d7a36386638b270d2ec1124bd33e009f778",
+          "ron-0b42003ff6bbcee9.d": "bd5d49d6f716325d626fb41bdf00fb210033e1a95e73b2fc72f0f5a403a4b9dc"
+        },
+        "returns": 0
+      },
+      "signed-malformed": {
+        "errors": [
+          [
+            "E0782",
+            "extensions.rs",
+            5,
+            83,
+            5,
+            94
+          ],
+          [
+            "E0782",
+            "public.rs",
+            17,
+            37,
+            17,
+            98
+          ]
+        ],
+        "products": {
+          "ron-0b42003ff6bbcee9.d": "df4b5d9ac782afdfd98050abede3eb2416a79d358f126999b89e227d50ca5b87"
+        },
+        "returns": 0
+      },
+      "signed-repair": {
+        "errors": [],
+        "products": {
+          "libron-0b42003ff6bbcee9.rlib": "da159c2ae58df1a78438e7afb316ae9e4659ce0a9fabccba7e83a3a1de8b70b3",
+          "libron-0b42003ff6bbcee9.rmeta": "1e71a7ff563f283c82d2ff16abaa1609fb86585830778479a4f6d43d7ef77d67",
+          "ron-0b42003ff6bbcee9.d": "bd5d49d6f716325d626fb41bdf00fb210033e1a95e73b2fc72f0f5a403a4b9dc"
+        },
+        "returns": 0
+      }
+    }
+  }
+}

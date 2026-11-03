@@ -1,0 +1,32 @@
+# One Ron observation schedules 50 native links on signed Ohm -23
+
+The default Ruff workspace test build repeats one complete Ron compile and 50 native links on both sides of the real Ruff #29697 edit. Removing a single authenticated Cargo input record made all 51 disappear on each revision. Restoring it brought all 51 back. The record protects a real observable in the released compiler. [Ordinary command, hardware counters and behavioral controls](RESULTS.md) · [Signed causal run](https://github.com/astral-experiments/ohm/actions/runs/41621281440) · [Independent causal reader](https://github.com/astral-experiments/ohm/actions/runs/41622522175).
+
+The intervention removed only Ron’s translated file entry ending in `ohm-foreign-span-bytes`, its authenticated `OBS1` footer and one file count. It preserved all other file and environment entries, the inode and the modification time. The diagnostic recorded 56 dirty artifacts before and after restoration and zero on removal. All 50 destinations had a real dependency path to Ron. Of the literal linker argument lists, 35 directly contained its archive. Thirty destinations were integration tests, 17 were library test harnesses and three were binaries. [Signed diagnostic source](https://github.com/astral-experiments/ohm/tree/5bbcf310dc4f1d1717d289cccdf4540df57b0c3f/scripts/ruff-original-ty-instructions) · [Full destination list and raw comparison hashes](ron-causality.json).
+
+The 102 executable files were byte-identical before and after removal on each source revision. Restoration also reproduced 102/102 on OLD and 101/102 on NEW. The restored NEW `mdtest` file matched the independently clean NEW. In the other NEW variant, the only differing recorded section among all 42 was its 48-byte GNU build-ID note. The archive retained the section digests and complete-file hashes, which leave ELF padding unclassified. The first causal job’s later independent debugger replay stopped on SIGUSR1. The independent receiver reopened the completed six causal visits from its terminal failure artifact. [Causal archive receiver](https://github.com/astral-experiments/ohm/blob/1f76034fef9e303ba2329c936b166bbdc34c2e29/scripts/ruff-original-ty-instructions/ron_cause_reopen.py).
+
+### A real native edit
+
+On a smaller ordinary Cargo test-build with the *same eleven locked crate versions*, two bytes in the genuine Serde proc-macro’s `.rodata` changed. Its path, size, inode, mtime, GNU build ID, `.text`, `.rustc` and every other ELF section matched the original. With the single Ron record suppressed, two builds accepted the old executable and its named native test passed. With the record restored, signed rustc rejected that native library with two E0782 errors. An independent empty target using the same malformed library gave the same errors. Restoring the healthy library and building again matched the clean executable. A genuine one-line Serde Rust source mutation also failed. The smaller Cargo fixture selected fewer optional Serde and Syn features than the full workspace. [Small ordinary Cargo control](https://github.com/astral-experiments/ohm/actions/runs/41622837372).
+
+The original small collector compared the rustc path to its SDK directory spelling. The raw successful `execve` records name the private rustup link to that SDK. The independent reader checks the actual executable field and argv[0]. It found one physical Ron exec on every guard or clean visit and zero on each stale success. A preceding attempt selected the wrong Syn version and stopped before compiling anything. [Excluded setup failure](https://github.com/astral-experiments/ohm/actions/runs/41622454126).
+
+### What the span changes
+
+A fresh worker acquired Ron’s actual full-workspace producer and all six private extern operands, then stopped root Cargo once the library finished. Both graphs had 693 units, and Ron’s full transitive role and feature graph matched the causal acquisition. The two hosts used different physical Cargo layout directories in 14 argument paths. The signed GDB replay matched its own producer’s complete archive and dep-info after output relocation. The two raw metadata images differed. [Producer, graph and physical inputs](https://github.com/astral-experiments/ohm/actions/runs/41623657148).
+
+Of 68 real Span::join calls, three joined foreign spans. All three returned the same 61-byte span for offsets 549 through 610 in `bitflags-2.13.2/src/public.rs`. The only later bridge calls matching a recorded value repeated the two original inputs. There were no calls to the source-text, byte-range, Debug, line, column or subspan bridge operations. The source file and its complete official registry archive were authenticated.
+
+A separate worker rehydrated the original 36 retained input/product paths. It changed two bytes in the full workspace’s *actual* 4,902,736-byte Serde proc-macro. Signed rustc produced one E0782 on Ron’s derive and a second E0782 highlighting columns 37–98 of line 17 in the imported bitflags file. A read-only debugger reproduced those errors. Changing only the three returned 8-byte spans to their first operands, keeping the `Some` tag and original marker, shortened the real diagnostic highlight to columns 37–38. The other error stayed at line 5, columns 83–94. The first healthy replay matched the previous debugger’s archive and metadata. The repaired compile matched the healthy archive and dep-info. Its metadata hashed differently. [Complete full-role control](https://github.com/astral-experiments/ohm/actions/runs/41624755220) · [Decoded native originals](ron-native.json).
+
+The three originals below reproduce the native report from their immutable artifact digests. The runner script and short report commit no native binary data.
+
+```sh
+for id in 13224930612 13225550728 13224659228; do
+  gh-auto api "repos/astral-experiments/ohm/actions/artifacts/$id/zip" > "$id.zip"
+done
+python3 -IB reopen-ron.py 13224930612.zip 13225550728.zip 13224659228.zip | cmp - ron-native.json
+```
+
+The measured root command uses signed Rust `d57fd1515986dccecdcece8da85e651bfb4b81f9` and Cargo `7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed`. Keeping the observer preserves both the native error and its source range. A replacement would have to preserve the physical macro actually loaded, its dependency observations and its returned spans before safely making a downstream freshness decision. [Shipped Cargo guard](https://github.com/astral-experiments/ohm-cargo/pull/261).

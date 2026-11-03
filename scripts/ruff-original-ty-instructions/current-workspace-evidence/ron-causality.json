@@ -1,0 +1,608 @@
+{
+ "archive": "sha256:3a03693ece5de011544ab69a6e3393a96856ffd9960f9662fb3ef51a507d7ec9",
+ "artifact": 13224910006,
+ "boot": "819e6f46-268e-4423-88ad-5c924be0035f",
+ "head": "5bbcf310dc4f1d1717d289cccdf4540df57b0c3f",
+ "mdtest": {
+  "ablated_sha256": "f65382ccdb75dafcd571ac435bd2bbae563f4d0ae19ad5387b4fe8339f09c158",
+  "bytes": 50845920,
+  "caveat": "Full original mdtest ELFs absent from packet; section payloads and physical file sizes were observed. File headers and padding were not independently compared.",
+  "different_sections": [
+   {
+    "ablated": "7b5401ac9e4e9fec9fa571090561f9bc4d23a214cecc371e23aabff03c3ccc6f",
+    "bytes": 48,
+    "flags": 2,
+    "index": 2,
+    "name": ".note.gnu.build-id",
+    "restored": "bb98375b4b630bb72c1aeb3085e2a4fa035a480cdafc82b454e1043e8a416f1e",
+    "type": 7
+   }
+  ],
+  "num_sections": 42,
+  "ordinary_clean_sha256": "8b1991229b0c8d29c64c1b7f8c6f558bff9e54d2b31627d49a8aeca6e5f64e80",
+  "ordinary_matching": [
+   "edit-observed",
+   "first-unchanged",
+   "independent-NEW",
+   "ordinary-edit",
+   "ordinary-old",
+   "repair",
+   "repeat-observed",
+   "repeat-unchanged",
+   "reverse-observed",
+   "unchanged-observed"
+  ]
+ },
+ "native_roster": [
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/mdtest/8eaa15ce3959c614/out/mdtest-8eaa15ce3959c614",
+   "link-only",
+   "mdtest",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff/5d937a0ff06a6ca9/out/config-5d937a0ff06a6ca9",
+   "link-only",
+   "config",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff/768a81132ddfba2b/out/cli-768a81132ddfba2b",
+   "link-only",
+   "cli",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff/82a6b65b1d36d43c/out/ruff-82a6b65b1d36d43c",
+   "link-only",
+   "ruff",
+   false,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff/9b7163f1aa25ebed/out/ruff-9b7163f1aa25ebed",
+   "link-only",
+   "ruff",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff/a5a26402c1b73239/out/analyze_graph-a5a26402c1b73239",
+   "link-only",
+   "analyze_graph",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff/bc9586b6a7f8a38d/out/integration_test-bc9586b6a7f8a38d",
+   "link-only",
+   "integration_test",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff/c4ac03854507c570/out/resolve_files-c4ac03854507c570",
+   "link-only",
+   "resolve_files",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff/eb440299b8692620/out/direxist_guard-eb440299b8692620",
+   "link-only",
+   "direxist_guard",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_db/ed9dc8a67f05fc16/out/ruff_db-ed9dc8a67f05fc16",
+   "link-only",
+   "ruff_db",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_linter/f4a2620ff34a201f/out/ruff_linter-f4a2620ff34a201f",
+   "link-only",
+   "ruff_linter",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_markdown/d5db54eaf317d978/out/ruff_markdown-d5db54eaf317d978",
+   "link-only",
+   "ruff_markdown",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_mdtest/f0288d735527b474/out/mdtest-f0288d735527b474",
+   "link-only",
+   "mdtest",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_python_ast_integration_tests/1a954bc61655adff/out/identifier-1a954bc61655adff",
+   "link-only",
+   "identifier",
+   false,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_python_ast_integration_tests/27b9693fa894e668/out/match_pattern-27b9693fa894e668",
+   "link-only",
+   "match_pattern",
+   false,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_python_ast_integration_tests/3812311b8e1a1d80/out/visitor-3812311b8e1a1d80",
+   "link-only",
+   "visitor",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_python_ast_integration_tests/465235b871c4facb/out/source_order-465235b871c4facb",
+   "link-only",
+   "source_order",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_python_ast_integration_tests/6f0d221374b326d5/out/comparable-6f0d221374b326d5",
+   "link-only",
+   "comparable",
+   false,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_python_ast_integration_tests/9014ad8f12726f32/out/parentheses-9014ad8f12726f32",
+   "link-only",
+   "parentheses",
+   false,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_python_ast_integration_tests/bf76fe897037c4a0/out/stmt_if-bf76fe897037c4a0",
+   "link-only",
+   "stmt_if",
+   false,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_python_ast_integration_tests/d5aec9e6458fb544/out/parenthesize-d5aec9e6458fb544",
+   "link-only",
+   "parenthesize",
+   false,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_python_formatter/128d39ead1a7a7d5/out/ruff_python_formatter-128d39ead1a7a7d5",
+   "link-only",
+   "ruff_python_formatter",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_python_formatter/637c9ff5e54afd76/out/normalizer-637c9ff5e54afd76",
+   "link-only",
+   "normalizer",
+   false,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_python_formatter/97e5633297c510c7/out/ruff_python_formatter-97e5633297c510c7",
+   "link-only",
+   "ruff_python_formatter",
+   false,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_python_formatter/c1a9d7554afacc3b/out/fixtures-c1a9d7554afacc3b",
+   "link-only",
+   "fixtures",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_python_importer/4dfa9b459e89bc10/out/ruff_python_importer-4dfa9b459e89bc10",
+   "link-only",
+   "ruff_python_importer",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_python_parser/2ca1a585a24321fc/out/ruff_python_parser-2ca1a585a24321fc",
+   "link-only",
+   "ruff_python_parser",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_python_parser/91e07be5b2137b3b/out/generate_inline_tests-91e07be5b2137b3b",
+   "link-only",
+   "generate_inline_tests",
+   false,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_python_parser/c10635ffdb9be0f5/out/fixtures-c10635ffdb9be0f5",
+   "link-only",
+   "fixtures",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_python_semantic/ffd30b3a0e46edfc/out/ruff_python_semantic-ffd30b3a0e46edfc",
+   "link-only",
+   "ruff_python_semantic",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_python_trivia_integration_tests/a3146232bfbc9702/out/block_comments-a3146232bfbc9702",
+   "link-only",
+   "block_comments",
+   false,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_python_trivia_integration_tests/cc2d14f2da695b4b/out/whitespace-cc2d14f2da695b4b",
+   "link-only",
+   "whitespace",
+   false,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_python_trivia_integration_tests/fe301be4c78c2e27/out/simple_tokenizer-fe301be4c78c2e27",
+   "link-only",
+   "simple_tokenizer",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_server/5204acdcd5dfee6b/out/ruff_server-5204acdcd5dfee6b",
+   "link-only",
+   "ruff_server",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_server/d290c616fb2d112c/out/document-d290c616fb2d112c",
+   "link-only",
+   "document",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ruff_server/deda0710daf50d94/out/e2e-deda0710daf50d94",
+   "link-only",
+   "e2e",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ty/0099d1d7349a58e3/out/ty-0099d1d7349a58e3",
+   "link-only",
+   "ty",
+   false,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ty/1a709ed5f7dd31d8/out/ty-1a709ed5f7dd31d8",
+   "link-only",
+   "ty",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ty/1c161eb317ef86e9/out/cli-1c161eb317ef86e9",
+   "link-only",
+   "cli",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ty/5fee0aa1c7ea01e7/out/file_watching-5fee0aa1c7ea01e7",
+   "link-only",
+   "file_watching",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ty/8bd60535ee1bec7b/out/self_environment-8bd60535ee1bec7b",
+   "link-only",
+   "self_environment",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ty_ide/19327ac76b0a23b2/out/ty_ide-19327ac76b0a23b2",
+   "link-only",
+   "ty_ide",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ty_module_resolver/64d42009b17aa8c6/out/ty_module_resolver-64d42009b17aa8c6",
+   "link-only",
+   "ty_module_resolver",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ty_project/0429e02744c8b6ad/out/ty_project-0429e02744c8b6ad",
+   "link-only",
+   "ty_project",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ty_python_semantic/2b8047d809154fcd/out/ty_python_semantic-2b8047d809154fcd",
+   "link-only",
+   "ty_python_semantic",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ty_python_semantic/bcd4ffc95eb2395d/out/corpus-bcd4ffc95eb2395d",
+   "link-only",
+   "corpus",
+   false,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ty_python_semantic/eca13b826c0ae8a9/out/mdtest-eca13b826c0ae8a9",
+   "link-only",
+   "mdtest",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ty_server/997a0f89140c05d1/out/ty_server-997a0f89140c05d1",
+   "link-only",
+   "ty_server",
+   false,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ty_server/f5c6198f896cf7b0/out/e2e-f5c6198f896cf7b0",
+   "link-only",
+   "e2e",
+   true,
+   [
+    327
+   ]
+  ],
+  [
+   "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ty_test/2f0952f217a4e5bc/out/ty_test-2f0952f217a4e5bc",
+   "link-only",
+   "ty_test",
+   true,
+   [
+    327
+   ]
+  ]
+ ],
+ "native_roster_fields": [
+  "destination",
+  "original_rustc_mode",
+  "relink_owner",
+  "literal_ron_rlib",
+  "transitive_ron_unit_indices"
+ ],
+ "original_reader": 41622522175,
+ "raw_verdict_hashes": {
+  "new-verdict": [
+   "76d24b892727ff181fdf019636ef5e928d741eb8df4f58f06dcc626d0bf67c52",
+   "96c132d75be6d0b543d8abdd6b9860e89fa1a4919af8249d8e8155d6410a0ed1"
+  ],
+  "old-on-new": [
+   "76d24b892727ff181fdf019636ef5e928d741eb8df4f58f06dcc626d0bf67c52",
+   "61a0d44ddd138fcfe952dd7c39b3ad3e0fc79e1bbe7db516a8f0fd554eb46c4d"
+  ],
+  "old-verdict": [
+   "76d24b892727ff181fdf019636ef5e928d741eb8df4f58f06dcc626d0bf67c52",
+   "be5f4992c6d07852845e593dab2d30e88c93a50ed07d64f1a807df6c9e321d6c"
+  ],
+  "restored-verdict": [
+   "76d24b892727ff181fdf019636ef5e928d741eb8df4f58f06dcc626d0bf67c52",
+   "8af00a4b6d8b88f55464a1c436f01fa93ca268d99d828d94347d5b55841597de"
+  ]
+ },
+ "ron_graph": [
+  [
+   327,
+   "registry+https://github.com/rust-lang/crates.io-index#ron@0.12.0",
+   [
+    "default",
+    "std"
+   ]
+  ]
+ ],
+ "run": 41621281440,
+ "run_conclusion": "failure",
+ "states": {
+  "new": {
+   "ablate_changed_elfs": [],
+   "dirty_artifacts": [
+    56,
+    0,
+    56
+   ],
+   "native_links": [
+    50,
+    0,
+    50
+   ],
+   "restore_changed_elfs": [
+    "target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/mdtest/8eaa15ce3959c614/out/mdtest-8eaa15ce3959c614"
+   ],
+   "rlibs": [
+    "bbe592d9b48fe881acd8c83008f6f97bbbd6bc03cda67a7aec9e569279c31d41",
+    "bbe592d9b48fe881acd8c83008f6f97bbbd6bc03cda67a7aec9e569279c31d41",
+    "bbe592d9b48fe881acd8c83008f6f97bbbd6bc03cda67a7aec9e569279c31d41"
+   ],
+   "rmetas": [
+    "89abce7c790de20380c36927d46519609c16ab339dfdc7d9c7c65fe48d8deee2",
+    "89abce7c790de20380c36927d46519609c16ab339dfdc7d9c7c65fe48d8deee2",
+    "89abce7c790de20380c36927d46519609c16ab339dfdc7d9c7c65fe48d8deee2"
+   ],
+   "typed_ron": [
+    1,
+    0,
+    1
+   ]
+  },
+  "old": {
+   "ablate_changed_elfs": [],
+   "dirty_artifacts": [
+    56,
+    0,
+    56
+   ],
+   "native_links": [
+    50,
+    0,
+    50
+   ],
+   "restore_changed_elfs": [],
+   "rlibs": [
+    "bbe592d9b48fe881acd8c83008f6f97bbbd6bc03cda67a7aec9e569279c31d41",
+    "bbe592d9b48fe881acd8c83008f6f97bbbd6bc03cda67a7aec9e569279c31d41",
+    "bbe592d9b48fe881acd8c83008f6f97bbbd6bc03cda67a7aec9e569279c31d41"
+   ],
+   "rmetas": [
+    "89abce7c790de20380c36927d46519609c16ab339dfdc7d9c7c65fe48d8deee2",
+    "89abce7c790de20380c36927d46519609c16ab339dfdc7d9c7c65fe48d8deee2",
+    "89abce7c790de20380c36927d46519609c16ab339dfdc7d9c7c65fe48d8deee2"
+   ],
+   "typed_ron": [
+    1,
+    0,
+    1
+   ]
+  }
+ },
+ "translated": {
+  "new": {
+   "changed": "01022b27073db43ca9f88adc621e2b76f3fb9d2e3466c8ce997c11e871553a6e",
+   "env": 0,
+   "files": 20,
+   "index": 8,
+   "marker": "/home/runner/work/_temp/ohm-foreign-join/target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ron/0b42003ff6bbcee9/out/ron-0b42003ff6bbcee9.d/ohm-foreign-span-bytes",
+   "original": "35d380e2854922f409107026ad2b567b078220d6b048e6191208e5d463316bdf",
+   "remaining_inputs_sha256": "8826904682e329a73fc714b45b75d67dc4f98259271b95b6c803b129528ca379"
+  },
+  "old": {
+   "changed": "01022b27073db43ca9f88adc621e2b76f3fb9d2e3466c8ce997c11e871553a6e",
+   "env": 0,
+   "files": 20,
+   "index": 8,
+   "marker": "/home/runner/work/_temp/ohm-foreign-join/target/debug/build/workspaces/f44635c822fcb5f3/v2-2dcf25bc4dcf1721/ron/0b42003ff6bbcee9/out/ron-0b42003ff6bbcee9.d/ohm-foreign-span-bytes",
+   "original": "35d380e2854922f409107026ad2b567b078220d6b048e6191208e5d463316bdf",
+   "remaining_inputs_sha256": "8826904682e329a73fc714b45b75d67dc4f98259271b95b6c803b129528ca379"
+  }
+ }
+}
