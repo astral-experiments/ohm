@@ -1,0 +1,36 @@
+   Compiling ron v0.12.0
+   Compiling ty_project v0.0.0 (/home/runner/work/ohm/ohm/ruff/crates/ty_project)
+   Compiling ruff v0.17.2 (/home/runner/work/ohm/ohm/ruff/crates/ruff)
+   Compiling ty v0.0.0 (/home/runner/work/ohm/ohm/ruff/crates/ty)
+   Compiling ty_wasm v0.0.0 (/home/runner/work/ohm/ohm/ruff/crates/ty_wasm)
+   Compiling insta v1.48.0
+   Compiling insta-cmd v0.7.0
+   Compiling mdtest v0.0.0 (/home/runner/work/ohm/ohm/ruff/crates/mdtest)
+   Compiling ty_test v0.0.0 (/home/runner/work/ohm/ohm/ruff/crates/ty_test)
+   Compiling ruff_mdtest v0.0.0 (/home/runner/work/ohm/ohm/ruff/crates/ruff_mdtest)
+   Compiling ty_python_semantic v0.0.19 (/home/runner/work/ohm/ohm/ruff/crates/ty_python_semantic)
+   Compiling ty_ide v0.0.0 (/home/runner/work/ohm/ohm/ruff/crates/ty_ide)
+   Compiling ty_server v0.0.0 (/home/runner/work/ohm/ohm/ruff/crates/ty_server)
+   Compiling ruff_dev v0.0.0 (/home/runner/work/ohm/ohm/ruff/crates/ruff_dev)
+Traceback (most recent call last):
+  File "/home/runner/work/ohm/ohm/qa/scripts/ruff-original-ty-instructions/workspace-link-pilot/coordinator.py", line 225, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/runner/work/ohm/ohm/qa/scripts/ruff-original-ty-instructions/workspace-link-pilot/coordinator.py", line 172, in main
+    assert pid.isdecimal() and notice.read_bytes()==b"complete\n"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+   Compiling ty_completion_bench v0.0.0 (/home/runner/work/ohm/ohm/ruff/crates/ty_completion_bench)
+   Compiling ty_completion_eval v0.0.0 (/home/runner/work/ohm/ohm/ruff/crates/ty_completion_eval)
+   Compiling ruff_python_ast_integration_tests v0.0.0 (/home/runner/work/ohm/ohm/ruff/crates/ruff_python_ast_integration_tests)
+   Compiling ruff_python_formatter v0.0.19 (/home/runner/work/ohm/ohm/ruff/crates/ruff_python_formatter)
+   Compiling ruff_server v0.0.19 (/home/runner/work/ohm/ohm/ruff/crates/ruff_server)
+   Compiling ruff_python_parser v0.0.19 (/home/runner/work/ohm/ohm/ruff/crates/ruff_python_parser)
+   Compiling ruff_python_trivia_integration_tests v0.0.0 (/home/runner/work/ohm/ohm/ruff/crates/ruff_python_trivia_integration_tests)
+   Compiling ruff_markdown v0.0.19 (/home/runner/work/ohm/ohm/ruff/crates/ruff_markdown)
+   Compiling ty_module_resolver v0.0.19 (/home/runner/work/ohm/ohm/ruff/crates/ty_module_resolver)
+   Compiling ruff_linter v0.17.2 (/home/runner/work/ohm/ohm/ruff/crates/ruff_linter)
+   Compiling ruff_python_semantic v0.0.19 (/home/runner/work/ohm/ohm/ruff/crates/ruff_python_semantic)
+   Compiling ruff_db v0.0.19 (/home/runner/work/ohm/ohm/ruff/crates/ruff_db)
+   Compiling ruff_python_importer v0.0.19 (/home/runner/work/ohm/ohm/ruff/crates/ruff_python_importer)
+    Finished `test` profile [optimized + debuginfo] target(s) in 18m 14s

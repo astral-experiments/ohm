@@ -12,6 +12,18 @@ import coordinator, release_scope
 E2E = "/ty_server/f5c6198f896cf7b0/out/e2e-f5c6198f896cf7b0"
 
 
+def wild_argv(body, row):
+    """Authenticate a physical Wild exec and its single literal GNU output operand."""
+    fields = body.split(b"\0")
+    args = fields[4:-1]
+    assert bytes_for(body) == row["argv_sha256"] and fields[-1] == b""
+    assert list(map(int, fields[:3])) == [row["pid"], row["dev"], row["ino"]]
+    assert fields[3] == args[0] and fields[3].decode() == row["path"]
+    assert args.count(b"-o") == 1
+    assert args[args.index(b"-o") + 1].decode() == row["output"]
+    return fields
+
+
 def fresh_generation(op, old, physical):
     (accept,) = op["ACCEPT"]
     (f,) = op["FRESH-GENERATIONS"]
@@ -163,12 +175,57 @@ def intake(path, expected_sha, head, run, release):
             wild = [r for r in actual if r["mode"] == "Wild"]
             names_out = [k for r in wild for k in full if r["output"].endswith(k)]
             assert len(names_out) == len(set(names_out)) == 50
+            original = [
+                r for r in actual if r["path"].endswith("/qa-diagnostic-build/original")
+            ]
+            others = {}
+            enrolled = {r["epoch"]: r for r in e["roles"]}
             for r in wild:
                 body = data(prefix + "tasks/" + r["argv"])
-                assert (
-                    bytes_for(body) == r["argv_sha256"]
-                    and body.split(b"\0")[4:-1][19].decode() == r["output"]
-                )
+                fields = wild_argv(body, r)
+                if not any(r["output"].endswith(k) for k in full):
+                    owner = enrolled[r["owning_rustc_epoch"]]
+                    assert owner["trigger"] == "exec" and owner["mode"] in (
+                        "full",
+                        "test",
+                        "link-only",
+                    )
+                    assert r["output"] not in others
+                    others[r["output"]] = [
+                        owner["mode"],
+                        owner["crate"],
+                        r["argv_sha256"],
+                    ]
+                redirect = [
+                    x
+                    for x in original
+                    if x["pid"] == r["pid"] and x["epoch"] > r["epoch"]
+                ]
+                if tag.startswith("C-") and not any(
+                    r["output"].endswith(k) for k in subset
+                ):
+                    (extra,) = redirect
+                    again = data(prefix + "tasks/" + extra["argv"])
+                    second = again.split(b"\0")
+                    assert (
+                        bytes_for(again) == extra["argv_sha256"]
+                        and second[4:] == fields[4:]
+                    )
+                    assert list(map(int, second[:3])) == [
+                        extra["pid"],
+                        extra["dev"],
+                        extra["ino"],
+                    ]
+                    assert second[3].decode() == extra["path"] and (
+                        r["dev"],
+                        r["ino"],
+                    ) != (extra["dev"], extra["ino"])
+                else:
+                    assert not redirect
+            assert len(original) == (
+                len(wild) - len(subset) if tag.startswith("C-") else 0
+            )
+            record["other_native_full"] = others
             record["physical_execs"] = e["real_execs"]
         if not code:
             inv = j(prefix + "inventory.json.gz")
@@ -387,6 +444,11 @@ def intake(path, expected_sha, head, run, release):
         "native": {k: v["native"] for k, v in phases.items() if "native" in v},
         "actual_execs": {
             k: v["physical_execs"] for k, v in phases.items() if "physical_execs" in v
+        },
+        "extra_edited_native": {
+            k: v["other_native_full"]
+            for k, v in phases.items()
+            if "other_native_full" in v
         },
         "list_sha256": list_sha,
     }
