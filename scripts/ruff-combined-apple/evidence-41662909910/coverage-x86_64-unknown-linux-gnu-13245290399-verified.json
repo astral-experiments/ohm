@@ -1,0 +1,690 @@
+{
+  "LLVM": {
+    "llvm-cov": {
+      "path": "/home/runner/work/_temp/coverage-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+      "sha256": "fb5fe42e1932ab3316465c140bd9851e5da75be688b921af6250394b4e4e615b"
+    },
+    "llvm-profdata": {
+      "path": "/home/runner/work/_temp/coverage-rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+      "sha256": "d70a42ea1a575e6c55878aa2b46b9b1dd7b3c97ca24fac52fa07ce1f260a5ada"
+    }
+  },
+  "cases": {
+    "fixed-cargo-rustc": {
+      "archived_merge_sha256": "52ace1f56aaa81b9cd284d6b4d2ebfebe5fea184f26ca2a5663f62ba659695fd",
+      "cargo_command": [
+        "cargo",
+        "+ohm",
+        "rustc",
+        "--bin",
+        "coverage_case",
+        "--offline",
+        "--message-format=json",
+        "--",
+        "-C",
+        "instrument-coverage"
+      ],
+      "export_sha256": "4be6e6bb8d7a8ca880e3d62aa7e60f410a98d7cd2b187f38b6900a8ae80ccd6e",
+      "fresh": false,
+      "function": "_RNvCs4X3n19V7QJ_13coverage_case4main",
+      "function_hash": "0x36cc7b3b5a647e14",
+      "identical_profdata": true,
+      "independent_merge_sha256": "52ace1f56aaa81b9cd284d6b4d2ebfebe5fea184f26ca2a5663f62ba659695fd",
+      "merged_function_count": 2,
+      "raw_function_counts": [
+        1,
+        1
+      ],
+      "raw_sha256": [
+        "b9e306c5c3d48fbd6ac759e62f086ca4a5d1ac6d2ab88596c1ba18d78d38ccc0",
+        "1af1005ccaf5561bcbf012d75a194a90d67ba6de6c284bc353f81d1fad028f8a"
+      ],
+      "recorded_executable_sha256": "790e100581ec83acd8b1ee414c6747d7807bf35c548024ef57a8dcde9aab917b",
+      "rendered_lines": [
+        [
+          1,
+          2,
+          "fn main() {"
+        ],
+        [
+          2,
+          2,
+          "    let answer = 29;"
+        ],
+        [
+          3,
+          2,
+          "    println!(\"answer={answer}\");"
+        ],
+        [
+          4,
+          2,
+          "}"
+        ]
+      ],
+      "source": "/home/runner/work/_temp/combined/coverage-source/fixed-cargo-rustc/project/src/main.rs"
+    },
+    "fixed-environment": {
+      "archived_merge_sha256": "747102676d12a40c33b330d68b23ba0a9210c9f947f98aae0220f985a058aca4",
+      "cargo_command": [
+        "cargo",
+        "+ohm",
+        "build",
+        "--bin",
+        "coverage_case",
+        "--offline",
+        "--message-format=json"
+      ],
+      "export_sha256": "8a647f4e4efb48ba6fb6e06637a8074f7326164fbe8a30f757669977e875a80e",
+      "fresh": false,
+      "function": "_RNvCs4X3n19V7QJ_13coverage_case4main",
+      "function_hash": "0x36cc7b3b5a647e14",
+      "identical_profdata": true,
+      "independent_merge_sha256": "747102676d12a40c33b330d68b23ba0a9210c9f947f98aae0220f985a058aca4",
+      "merged_function_count": 2,
+      "raw_function_counts": [
+        1,
+        1
+      ],
+      "raw_sha256": [
+        "ce26ad7f945be96a6f68782849d56f6ef4db781fd9ac2de5c227c44a03d0d7ac",
+        "4771e767a405ff1693e5e4c73f941d0ba4c6438f95f8b3ef2bba2f4100bcb66c"
+      ],
+      "recorded_executable_sha256": "ef01ec8311a11087fe74507597319ff1c209004a1c4e065d8f1c408f31b8e79c",
+      "rendered_lines": [
+        [
+          1,
+          2,
+          "fn main() {"
+        ],
+        [
+          2,
+          2,
+          "    let answer = 29;"
+        ],
+        [
+          3,
+          2,
+          "    println!(\"answer={answer}\");"
+        ],
+        [
+          4,
+          2,
+          "}"
+        ]
+      ],
+      "source": "/home/runner/work/_temp/combined/coverage-source/fixed-environment/project/src/main.rs"
+    },
+    "fixed-path-first": {
+      "actual": "/declared-first/src/location.rs",
+      "cargo_command": [
+        "cargo",
+        "+ohm",
+        "run",
+        "--offline",
+        "--quiet"
+      ],
+      "manifest_declared": "/declared-first/src/location.rs",
+      "manifest_sha256": "00687c1b195fff57a573c760ca3418817b348c7a914e81970efcb72b5ca146d0",
+      "recorded_executable_sha256": "33550bea427f3aa53d65e5fc132badeff638bb9b8ff17e7497760f6d465455df",
+      "source_dir": "/home/runner/work/_temp/combined/coverage-source/fixed-path/project"
+    },
+    "fixed-path-second": {
+      "actual": "/declared-second/src/location.rs",
+      "cargo_command": [
+        "cargo",
+        "+ohm",
+        "run",
+        "--offline",
+        "--quiet"
+      ],
+      "manifest_declared": "/declared-second/src/location.rs",
+      "manifest_sha256": "924ed2841351ba9656c23c2d774487d574b8b0aa4c1f1b838f6c4e09144fa0f4",
+      "recorded_executable_sha256": "bd535098117d0fa31125d20bcf66c38e81788782184681404bded4a1435835b5",
+      "source_dir": "/home/runner/work/_temp/combined/coverage-source/fixed-path/project"
+    },
+    "fixed-profile": {
+      "archived_merge_sha256": "8ea278a398b30d9c27ec5d1609da3aa129ffd5a190217ded8de7cac11570597b",
+      "cargo_command": [
+        "cargo",
+        "+ohm",
+        "build",
+        "--bin",
+        "coverage_case",
+        "--offline",
+        "--message-format=json"
+      ],
+      "export_sha256": "080893d368724fe840be8fa30b14a01b3bd88a4b2cb617acdd03aa79d0bdf4a6",
+      "fresh": false,
+      "function": "_RNvCseYI9hfWfoXJ_13coverage_case4main",
+      "function_hash": "0x2c3354078a2cc6a0",
+      "identical_profdata": true,
+      "independent_merge_sha256": "8ea278a398b30d9c27ec5d1609da3aa129ffd5a190217ded8de7cac11570597b",
+      "merged_function_count": 2,
+      "raw_function_counts": [
+        1,
+        1
+      ],
+      "raw_sha256": [
+        "310fa7f5f210bfa18fc9a857810dd2a9433a5b99aac00607c47591dc9bc1d054",
+        "9d7dea225ca0719bb87ada376abccb01db56bdb968fa6990d08485ea8c85e633"
+      ],
+      "recorded_executable_sha256": "e47c976e7d22c2b6ed1ef61b358c91affcd520904e8c0e994b843546d1c5d1e8",
+      "rendered_lines": [
+        [
+          1,
+          2,
+          "fn main() {"
+        ],
+        [
+          2,
+          2,
+          "    let answer = 29;"
+        ],
+        [
+          3,
+          2,
+          "    println!(\"answer={answer}\");"
+        ],
+        [
+          4,
+          2,
+          "}"
+        ]
+      ],
+      "source": "/home/runner/work/_temp/combined/coverage-source/fixed-profile/project/src/main.rs"
+    },
+    "signed-cargo-rustc": {
+      "archived_merge_sha256": "0010f7354981ae8ce369765c9ebe1d6298c080c5447d53e4aa6a945b8ac64e21",
+      "cargo_command": [
+        "cargo",
+        "+ohm",
+        "rustc",
+        "--bin",
+        "coverage_case",
+        "--offline",
+        "--message-format=json",
+        "--",
+        "-C",
+        "instrument-coverage"
+      ],
+      "export_sha256": "25152c4f304eab0b1e662fb557f81260a68acade0bf1c0d25d932d6afd2cab06",
+      "fresh": false,
+      "function": "_RNvCsadtMsIT4iEf_13coverage_case4main",
+      "function_hash": "0xb7af8671229b6453",
+      "identical_profdata": true,
+      "independent_merge_sha256": "0010f7354981ae8ce369765c9ebe1d6298c080c5447d53e4aa6a945b8ac64e21",
+      "merged_function_count": 2,
+      "raw_function_counts": [
+        1,
+        1
+      ],
+      "raw_sha256": [
+        "680e4fa54ff5f36136ec20a98a541c3e2ffd3fe0744c3f6ad3c84a22e268bd9c",
+        "f603f6693790ac4acc1263499879d4958e843fe656028758bd47132ee39c9232"
+      ],
+      "recorded_executable_sha256": "e0bc92eee633787648c38062df3e05c767ea95a7e37d6de6bc7381f176f89ac9",
+      "rendered_lines": [],
+      "source": "/ohm-workspace/v7/src/main.rs"
+    },
+    "signed-environment": {
+      "archived_merge_sha256": "0010f7354981ae8ce369765c9ebe1d6298c080c5447d53e4aa6a945b8ac64e21",
+      "cargo_command": [
+        "cargo",
+        "+ohm",
+        "build",
+        "--bin",
+        "coverage_case",
+        "--offline",
+        "--message-format=json"
+      ],
+      "export_sha256": "25152c4f304eab0b1e662fb557f81260a68acade0bf1c0d25d932d6afd2cab06",
+      "fresh": false,
+      "function": "_RNvCsadtMsIT4iEf_13coverage_case4main",
+      "function_hash": "0xb7af8671229b6453",
+      "identical_profdata": true,
+      "independent_merge_sha256": "0010f7354981ae8ce369765c9ebe1d6298c080c5447d53e4aa6a945b8ac64e21",
+      "merged_function_count": 2,
+      "raw_function_counts": [
+        1,
+        1
+      ],
+      "raw_sha256": [
+        "421cceb65a2d85494ce1e832a75c27129d8280abd2175cfd48452eb06e6380b8",
+        "c5e911cfdb41b428f5301cbe2d0adba423dce6c15c63e6a54fc2cba54ea234af"
+      ],
+      "recorded_executable_sha256": "e0bc92eee633787648c38062df3e05c767ea95a7e37d6de6bc7381f176f89ac9",
+      "rendered_lines": [],
+      "source": "/ohm-workspace/v7/src/main.rs"
+    },
+    "signed-path-first": {
+      "actual": "/ohm-workspace/v7/src/location.rs",
+      "cargo_command": [
+        "cargo",
+        "+ohm",
+        "run",
+        "--offline",
+        "--quiet"
+      ],
+      "manifest_declared": "/declared-first/src/location.rs",
+      "manifest_sha256": "68b6b4aa5056230895b486468003a452515890b975a1910838a177bbccf03737",
+      "recorded_executable_sha256": "39f7c074ee1f8191e6588359ce821645a5887e44c3de799e42bf860d8d2353e4",
+      "source_dir": "/home/runner/work/_temp/combined/coverage-source/signed-path/project"
+    },
+    "signed-path-second": {
+      "actual": "/ohm-workspace/v7/src/location.rs",
+      "cargo_command": [
+        "cargo",
+        "+ohm",
+        "run",
+        "--offline",
+        "--quiet"
+      ],
+      "manifest_declared": "/declared-second/src/location.rs",
+      "manifest_sha256": "d1d0764168ce8d8bb31b5faed42614466fb716ada4f39b7f7a6b855e1875d640",
+      "recorded_executable_sha256": "b4b44be9bc4ca783aac0c0ff3a1fb4f26d7fb5eba4949753f15c25c875dc08ae",
+      "source_dir": "/home/runner/work/_temp/combined/coverage-source/signed-path/project"
+    },
+    "signed-profile": {
+      "archived_merge_sha256": "11f73ad8fd11ae6160c9e3e7289ea7760fdf6cc802d9fe9c1748d8d49279e309",
+      "cargo_command": [
+        "cargo",
+        "+ohm",
+        "build",
+        "--bin",
+        "coverage_case",
+        "--offline",
+        "--message-format=json"
+      ],
+      "export_sha256": "1737751ec957f71cdc6486c8f80a74f3d30bfc348415cf6a7b0a8a4d497bc911",
+      "fresh": false,
+      "function": "_RNvCsc1jjxAfSFcw_13coverage_case4main",
+      "function_hash": "0xdb96156ce1c8d2dc",
+      "identical_profdata": true,
+      "independent_merge_sha256": "11f73ad8fd11ae6160c9e3e7289ea7760fdf6cc802d9fe9c1748d8d49279e309",
+      "merged_function_count": 2,
+      "raw_function_counts": [
+        1,
+        1
+      ],
+      "raw_sha256": [
+        "9c270768b4dc12f2ab8fd11170ca555551191bad29b5b64550c859eab6de690a",
+        "01a2009836acde256e97329ca54ee1da96da6d629acdc033b4ae5be314cb116d"
+      ],
+      "recorded_executable_sha256": "65993bc4780a68900e587b23035eff48081fd63c8e483131c6b144aa963a9cd7",
+      "rendered_lines": [],
+      "source": "/ohm-workspace/v7/src/main.rs"
+    },
+    "warm-coverage-old": {
+      "archived_merge_sha256": "0010f7354981ae8ce369765c9ebe1d6298c080c5447d53e4aa6a945b8ac64e21",
+      "cargo_command": [
+        "cargo",
+        "+ohm",
+        "build",
+        "--bin",
+        "coverage_case",
+        "--offline",
+        "--message-format=json"
+      ],
+      "export_sha256": "25152c4f304eab0b1e662fb557f81260a68acade0bf1c0d25d932d6afd2cab06",
+      "fresh": false,
+      "function": "_RNvCsadtMsIT4iEf_13coverage_case4main",
+      "function_hash": "0xb7af8671229b6453",
+      "identical_profdata": true,
+      "independent_merge_sha256": "0010f7354981ae8ce369765c9ebe1d6298c080c5447d53e4aa6a945b8ac64e21",
+      "merged_function_count": 2,
+      "raw_function_counts": [
+        1,
+        1
+      ],
+      "raw_sha256": [
+        "bd4d78e7ebc34ec856be379bcf33ffc291738e5e72357bc55533dfc7e4f72c44",
+        "7649aea789f9fbeafc25f73d41c6eb496f0e0592b4100a7d428aabc42891dd2e"
+      ],
+      "recorded_executable_sha256": "e0bc92eee633787648c38062df3e05c767ea95a7e37d6de6bc7381f176f89ac9",
+      "rendered_lines": [],
+      "source": "/ohm-workspace/v7/src/main.rs"
+    },
+    "warm-coverage-repeat": {
+      "archived_merge_sha256": "fc979533fd8c1ebec28cd8def908b750b9ff61dcde7b046317be76db4505ea92",
+      "cargo_command": [
+        "cargo",
+        "+ohm",
+        "build",
+        "--bin",
+        "coverage_case",
+        "--offline",
+        "--message-format=json"
+      ],
+      "export_sha256": "db00d881c9282400bfa38e12b6ef7beb8941000979414a5d5a3f069f6f8dd7e2",
+      "fresh": true,
+      "function": "_RNvCsadtMsIT4iEf_13coverage_case4main",
+      "function_hash": "0xb7af8671229b6453",
+      "identical_profdata": true,
+      "independent_merge_sha256": "fc979533fd8c1ebec28cd8def908b750b9ff61dcde7b046317be76db4505ea92",
+      "merged_function_count": 2,
+      "raw_function_counts": [
+        1,
+        1
+      ],
+      "raw_sha256": [
+        "3660f674c6db17c9dba046f7049b98872b980800e014b63696a5660375774d55",
+        "06c90b2a8b6806448e2bd5b3bcd4734f55dfb2c11ea731c2894c37550606ef1f"
+      ],
+      "recorded_executable_sha256": "368043c13b3fc0770b30826cf65f6a7068eebbf834189d5d3338e2d7b507aa43",
+      "rendered_lines": [
+        [
+          1,
+          2,
+          "fn main() {"
+        ],
+        [
+          2,
+          2,
+          "    let answer = 29;"
+        ],
+        [
+          3,
+          2,
+          "    println!(\"answer={answer}\");"
+        ],
+        [
+          4,
+          2,
+          "}"
+        ]
+      ],
+      "source": "/home/runner/work/_temp/combined/coverage-source/warm-coverage/project/src/main.rs"
+    },
+    "warm-coverage-upgrade": {
+      "archived_merge_sha256": "fc979533fd8c1ebec28cd8def908b750b9ff61dcde7b046317be76db4505ea92",
+      "cargo_command": [
+        "cargo",
+        "+ohm",
+        "build",
+        "--bin",
+        "coverage_case",
+        "--offline",
+        "--message-format=json"
+      ],
+      "export_sha256": "db00d881c9282400bfa38e12b6ef7beb8941000979414a5d5a3f069f6f8dd7e2",
+      "fresh": false,
+      "function": "_RNvCsadtMsIT4iEf_13coverage_case4main",
+      "function_hash": "0xb7af8671229b6453",
+      "identical_profdata": true,
+      "independent_merge_sha256": "fc979533fd8c1ebec28cd8def908b750b9ff61dcde7b046317be76db4505ea92",
+      "merged_function_count": 2,
+      "raw_function_counts": [
+        1,
+        1
+      ],
+      "raw_sha256": [
+        "e6a27fd89e748d608c406c9e028415a40780ea56f706f6c7ffc0ae985d0a08c6",
+        "43e795e31385959c70b877b873fe370429542df59b8599ca8af93e92b0572ca6"
+      ],
+      "recorded_executable_sha256": "368043c13b3fc0770b30826cf65f6a7068eebbf834189d5d3338e2d7b507aa43",
+      "rendered_lines": [
+        [
+          1,
+          2,
+          "fn main() {"
+        ],
+        [
+          2,
+          2,
+          "    let answer = 29;"
+        ],
+        [
+          3,
+          2,
+          "    println!(\"answer={answer}\");"
+        ],
+        [
+          4,
+          2,
+          "}"
+        ]
+      ],
+      "source": "/home/runner/work/_temp/combined/coverage-source/warm-coverage/project/src/main.rs"
+    },
+    "warm-path-old": {
+      "actual": "/ohm-workspace/v7/src/location.rs",
+      "cargo_command": [
+        "cargo",
+        "+ohm",
+        "run",
+        "--offline",
+        "--quiet"
+      ],
+      "manifest_declared": "/declared-warm/src/location.rs",
+      "manifest_sha256": "026deac62243645fa2785e74ac4ecdd7789bef3865dd827368aaf67a3929fcc8",
+      "recorded_executable_sha256": "bc636a909d97fcf7ef2ff4b3d55ee6305cc9bbb373a4e142d692861bbfdc6a84",
+      "source_dir": "/home/runner/work/_temp/combined/coverage-source/warm-path/project"
+    },
+    "warm-path-repeat": {
+      "actual": "/declared-warm/src/location.rs",
+      "cargo_command": [
+        "cargo",
+        "+ohm",
+        "run",
+        "--offline",
+        "--quiet"
+      ],
+      "manifest_declared": "/declared-warm/src/location.rs",
+      "manifest_sha256": "026deac62243645fa2785e74ac4ecdd7789bef3865dd827368aaf67a3929fcc8",
+      "recorded_executable_sha256": "327faa751ccc09cb1b80a4179dae441855cab4221064f09a5d7fac85e034e6f7",
+      "source_dir": "/home/runner/work/_temp/combined/coverage-source/warm-path/project"
+    },
+    "warm-path-upgrade": {
+      "actual": "/declared-warm/src/location.rs",
+      "cargo_command": [
+        "cargo",
+        "+ohm",
+        "run",
+        "--offline",
+        "--quiet"
+      ],
+      "manifest_declared": "/declared-warm/src/location.rs",
+      "manifest_sha256": "026deac62243645fa2785e74ac4ecdd7789bef3865dd827368aaf67a3929fcc8",
+      "recorded_executable_sha256": "327faa751ccc09cb1b80a4179dae441855cab4221064f09a5d7fac85e034e6f7",
+      "source_dir": "/home/runner/work/_temp/combined/coverage-source/warm-path/project"
+    }
+  },
+  "github_original": {
+    "archive_download_url": "https://api.github.com/repos/astral-experiments/ohm/actions/artifacts/13245290399/zip",
+    "created_at": "2026-11-03T15:28:49Z",
+    "digest": "sha256:4896afead49d70daf4e594840defe2b614bc7e6f34a32d8ad0cdf3706181adb5",
+    "expired": false,
+    "expires_at": "2026-11-18T15:28:48Z",
+    "id": 13245290399,
+    "name": "integrated-release-verdicts-x86_64-unknown-linux-gnu-41662909910",
+    "node_id": "MDg6QXJ0aWZhY3QxMzI0NTI5MDM5OQ==",
+    "size_in_bytes": 1699989,
+    "updated_at": "2026-11-03T15:28:49Z",
+    "url": "https://api.github.com/repos/astral-experiments/ohm/actions/artifacts/13245290399",
+    "workflow_run": {
+      "head_branch": "charlie/qa-rc23-integrated-green-stub-20261103",
+      "head_repository_id": 1319437234,
+      "head_sha": "1082c4561804649509970095a015daa656dd4fc4",
+      "id": 41662909910,
+      "repository_id": 1319437234
+    }
+  },
+  "signed_sysroot_through_warm_upgrade": "/home/runner/work/_temp/combined/reopened/normal",
+  "source_tool_binding": {
+    "candidate": {
+      "cargo": "abc70d60a6fd89c10d5f65cf85820d9b78d5affe",
+      "rust": "c3aa3a605e56878669c745a9dd3ba09c9ccfa1ef",
+      "rust_command": [
+        "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+        "-IB",
+        "x.py",
+        "--ci",
+        "false",
+        "--build-dir",
+        "/home/runner/work/_temp/combined/rust-build",
+        "--set",
+        "build.submodules=false",
+        "--set",
+        "build.profiler=true",
+        "--set",
+        "rust.debug-assertions=false",
+        "--set",
+        "rust.lto=off",
+        "--set",
+        "llvm.download-ci-llvm=true",
+        "--set",
+        "rust.download-rustc=false",
+        "build",
+        "--stage",
+        "1",
+        "-j6",
+        "compiler/rustc",
+        "library",
+        "src/tools/rustdoc"
+      ],
+      "tools": {
+        "bin/cargo": "172b7ab8e409bea81d9f912f94ea09b0004c3a236040d821e7255c5fa8c3b307",
+        "bin/rustc": "8bfdc9779937e9cd2c9ef5db9f50cee9aab03ddec5672b37a3a3c9278cf1f5d0",
+        "bin/rustdoc": "7e12ccea3e694ce348ee70b11f379c7d6c1528741d62fa98f78739e04d0e5c3a",
+        "lib/librustc_driver-fa217dfcec654979.so": "40dd1137155b684b3bf75e4620f6f0b6e890918c31bab9b5ae5094bcd0abc104"
+      }
+    },
+    "complete_combined_verdict": true,
+    "pinned_bundled_tools": {
+      "wild": {
+        "sha256": "25012a78de164686f552b7703b5d0223adab4829c79cd1fb351108221d61c7d8",
+        "version": "0.11.0"
+      }
+    },
+    "pinned_other_sources": {
+      "clippy": {
+        "repository": "https://github.com/astral-sh/ohm-rust-clippy",
+        "revision": "6ca9ddc53c5a39e911e6c93637c093bd1d2eba05"
+      },
+      "rustfmt": {
+        "repository": "https://github.com/astral-sh/ohm-rustfmt",
+        "revision": "e5feafbfd640fe7326971cf7721ca7de38a86e40"
+      }
+    },
+    "scope": "Compiler and Cargo SHA are independently joined across native build and exercise records. Their executable payloads are excluded by this small-verdict-archive reader.",
+    "signed": {
+      "release": "fc85a2ca6d47711058cd89c790c8e57f1799472e38f0ee0a08b0a51d06c1ee7b",
+      "tools": {
+        "bin/cargo": "f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee",
+        "bin/rustc": "6842898bafad7cf932fea14bd8915a0adff0eecdc03bee91f589ac95a89743dd",
+        "bin/rustdoc": "e0fcb7f1d4e9fc48345865c4465e35890d457b1974f7aa7beff37defecedb34b",
+        "lib/librustc_driver-b03bf00bec23bb9a.so": "53aecb7726b1863849a89c4260c169132f98d0d33ba62e0892a06739b6e32e52"
+      }
+    },
+    "source_manifest_sha256": "8d53d8e89674da89229d4f0df60e7a8394ffd82a790bcfb7960ba040dcb399a5",
+    "sources": {
+      "cargo": "abc70d60a6fd89c10d5f65cf85820d9b78d5affe",
+      "packet": "00cf7f98b1f31f484580a86dca0ed2696ed9e4545025110bfc7c3ca4f5fccb9f",
+      "rust": "c3aa3a605e56878669c745a9dd3ba09c9ccfa1ef"
+    }
+  },
+  "warm": {
+    "phases": [
+      {
+        "cargo_sha256": "f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee",
+        "coverage": {
+          "annotated_line_counts": [],
+          "count": 2,
+          "exe_sha256": "e0bc92eee633787648c38062df3e05c767ea95a7e37d6de6bc7381f176f89ac9",
+          "executable": "/home/runner/work/_temp/combined/coverage-source/warm-coverage/target/debug/coverage_case",
+          "filename": "/ohm-workspace/v7/src/main.rs",
+          "fresh": false,
+          "lines": {
+            "count": 4,
+            "covered": 4,
+            "percent": 100
+          },
+          "manifest_sha256": "fab2f750f258ad63ec336dc3c6c0103bce65d3894772f3d27f1d8769a6a82a93",
+          "merged_sha256": "0010f7354981ae8ce369765c9ebe1d6298c080c5447d53e4aa6a945b8ac64e21",
+          "raw_sha256": [
+            "bd4d78e7ebc34ec856be379bcf33ffc291738e5e72357bc55533dfc7e4f72c44",
+            "7649aea789f9fbeafc25f73d41c6eb496f0e0592b4100a7d428aabc42891dd2e"
+          ],
+          "rendered": false,
+          "source_sha256": "ebfddf079202953ca56c670a1242e80e4103b1e8db4fd220213c0e0a7a66ffe9"
+        },
+        "path": "/ohm-workspace/v7/src/location.rs",
+        "phase": "old"
+      },
+      {
+        "cargo_sha256": "172b7ab8e409bea81d9f912f94ea09b0004c3a236040d821e7255c5fa8c3b307",
+        "coverage": {
+          "annotated_line_counts": [
+            2
+          ],
+          "count": 2,
+          "exe_sha256": "368043c13b3fc0770b30826cf65f6a7068eebbf834189d5d3338e2d7b507aa43",
+          "executable": "/home/runner/work/_temp/combined/coverage-source/warm-coverage/target/debug/coverage_case",
+          "filename": "/home/runner/work/_temp/combined/coverage-source/warm-coverage/project/src/main.rs",
+          "fresh": false,
+          "lines": {
+            "count": 4,
+            "covered": 4,
+            "percent": 100
+          },
+          "manifest_sha256": "fab2f750f258ad63ec336dc3c6c0103bce65d3894772f3d27f1d8769a6a82a93",
+          "merged_sha256": "fc979533fd8c1ebec28cd8def908b750b9ff61dcde7b046317be76db4505ea92",
+          "raw_sha256": [
+            "e6a27fd89e748d608c406c9e028415a40780ea56f706f6c7ffc0ae985d0a08c6",
+            "43e795e31385959c70b877b873fe370429542df59b8599ca8af93e92b0572ca6"
+          ],
+          "rendered": true,
+          "source_sha256": "ebfddf079202953ca56c670a1242e80e4103b1e8db4fd220213c0e0a7a66ffe9"
+        },
+        "path": "/declared-warm/src/location.rs",
+        "phase": "upgrade"
+      },
+      {
+        "cargo_sha256": "172b7ab8e409bea81d9f912f94ea09b0004c3a236040d821e7255c5fa8c3b307",
+        "coverage": {
+          "annotated_line_counts": [
+            2
+          ],
+          "count": 2,
+          "exe_sha256": "368043c13b3fc0770b30826cf65f6a7068eebbf834189d5d3338e2d7b507aa43",
+          "executable": "/home/runner/work/_temp/combined/coverage-source/warm-coverage/target/debug/coverage_case",
+          "filename": "/home/runner/work/_temp/combined/coverage-source/warm-coverage/project/src/main.rs",
+          "fresh": true,
+          "lines": {
+            "count": 4,
+            "covered": 4,
+            "percent": 100
+          },
+          "manifest_sha256": "fab2f750f258ad63ec336dc3c6c0103bce65d3894772f3d27f1d8769a6a82a93",
+          "merged_sha256": "fc979533fd8c1ebec28cd8def908b750b9ff61dcde7b046317be76db4505ea92",
+          "raw_sha256": [
+            "3660f674c6db17c9dba046f7049b98872b980800e014b63696a5660375774d55",
+            "06c90b2a8b6806448e2bd5b3bcd4734f55dfb2c11ea731c2894c37550606ef1f"
+          ],
+          "rendered": true,
+          "source_sha256": "ebfddf079202953ca56c670a1242e80e4103b1e8db4fd220213c0e0a7a66ffe9"
+        },
+        "path": "/declared-warm/src/location.rs",
+        "phase": "repeat"
+      }
+    ],
+    "unchanged_rust": {
+      "bin/rustc": [
+        33,
+        7635814,
+        "6842898bafad7cf932fea14bd8915a0adff0eecdc03bee91f589ac95a89743dd"
+      ],
+      "lib/librustc_driver-b03bf00bec23bb9a.so": [
+        33,
+        7635819,
+        "53aecb7726b1863849a89c4260c169132f98d0d33ba62e0892a06739b6e32e52"
+      ],
+      "lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd-150b24506f9fb8c9.rlib": [
+        33,
+        7635908,
+        "3d5eed4e30bd37e4a1b657e19e33a02f163ea85dbf48d3a8f6c84eabaee7d1e3"
+      ]
+    }
+  }
+}
