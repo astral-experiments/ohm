@@ -31,10 +31,10 @@ def materialize(archive,ref,path):
     need(path.stat().st_size==size and hash_file(path)==digest,("different complete native input",digest))
     frame.unlink()
 
-def observation(z,role):
-    root=role+"/observed-edit/tasks/";tools=z.js(role+"/tools.json")
+def observation(z,role,tools):
+    root=role+"/observed-edit/tasks/"
     rust=(tools["rustc"]["dev"],tools["rustc"]["ino"])
-    owners={};by=Counter();execs=[];no_clock=Counter();monitor=None;whole=None
+    owners={};by=Counter();execs=[];no_clock=Counter();monitor=None;whole=None;lifetime={};images={}
     for line in z.file.read(root+"epochs.tsv").splitlines():
         fields=line.split();tag=fields[0]
         if tag==b"M":
@@ -50,8 +50,14 @@ def observation(z,role):
             owner=Path(os.fsdecode(parts[3])).name;pair=tuple(map(int,parts[1:3]));args=parts[4:]
             if pair==rust and b"--crate-name" in args:owner="rustc:"+os.fsdecode(args[args.index(b"--crate-name")+1])
             need(owner not in ("wild","ld.bfd"),"unexpected native linker in a library-only edit")
-            owners[index]=owner
+            owners[index]=owner;images[index]=(int(fields[2]),pair)
             if fields[5]==b"exec" and owner.startswith("rustc:"):execs.append(owner)
+        elif tag==b"R":
+            i,pid,n,e,r,code=map(int,fields[1:])
+            need(images[i]==(pid,rust) and e==r>0 and n>0 and code==0,"unqualified whole rustc lifetime")
+            owner=owners[i]
+            if owner.startswith("rustc:"):
+                k=owner.split(":",1)[1];need(k not in lifetime,"duplicate selected program");lifetime[k]=n
         elif tag==b"C":
             index,_,_,n,e,r=map(int,fields[1:]);need(index in owners and n>=0 and e==r,"partial or multiplexed process")
             by[owners[index]]+=n
@@ -59,16 +65,23 @@ def observation(z,role):
         else:raise ValueError(("unknown wait event",fields))
     receipt=z.js(role+"/observed-edit/result.json")["observed"]
     need(dict(by)==receipt["process_instructions"] and execs==receipt["real_execs"] and dict(no_clock)==receipt["positive_instructions_without_clock"],"different hardware attribution")
-    need(by["rustc:ty_project"]>0 and not no_clock["rustc:ty_project"],"no qualified affected compiler")
+    need(by["rustc:ty_project"]>0,"no qualified affected compiler")
     need(monitor is not None and whole is not None,"missing process boundaries")
-    return {"commands":execs,"instructions":by,"observed_command":whole}
+    need(lifetime==z.js(role+"/observed-edit/result.json")["lifetimes"] and lifetime["ty_project"]>0,"different measured lifetime")
+    return {"commands":execs,"instructions":by,"observed_command":whole,"lifetime":lifetime}
 
 def main():
     p=argparse.ArgumentParser();p.add_argument("archive",type=Path);p.add_argument("--sha256",required=True);p.add_argument("--case",choices=["29697","29604"],required=True)
-    p.add_argument("--output",type=Path,required=True);p.add_argument("--work",type=Path,required=True);a=p.parse_args()
+    p.add_argument("--diagnostic",type=Path);p.add_argument("--diagnostic-sha256");p.add_argument("--output",type=Path,required=True);p.add_argument("--work",type=Path,required=True);a=p.parse_args()
     need(a.archive.is_file() and hash_file(a.archive)==a.sha256,"different original GitHub artifact")
+    p_mem=Path("/proc/meminfo").read_text().splitlines();mem,=(int(x.split()[1])*1024 for x in p_mem if x.startswith("MemAvailable:"))
+    need(mem>8*2**30,"independent native RAM reserve")
     a.work.mkdir(exist_ok=True);need(shutil.disk_usage(a.work).free>15*2**30,"native reader disk reserve")
     z=Archive(a.archive);case=a.case;report={"archive":a.sha256,"case":case,"roles":{}}
+    diag=None
+    if a.diagnostic is not None:
+        need(a.diagnostic.is_file() and hash_file(a.diagnostic)==a.diagnostic_sha256,"different immutable diagnostic archive")
+        diag=Archive(a.diagnostic);report["diagnostic_archive"]=a.diagnostic_sha256
     terminal=z.js("result.json");binding=json.loads((here/"binding.json").read_bytes())
     reg=z.js("registration.json");need(reg["binding"]==binding and reg["case"]==case and reg["order"]==("PC" if case=="29697"else"CP"),"incorrect source registration or role order")
     need(z.js("factory-consumed.json")["drivers"]==binding["driver"],"registered and consumed compilers differ")
@@ -104,7 +117,10 @@ def main():
                 need(native_identity(native["edit"][k])==native_identity(native["independent-clean"][k]),("clean original native archives differ",k))
             errors=list(map(json.loads,z.file.read(role+"/invalid/stdout.jsonl").splitlines()))
             need(any((r.get("message",{}).get("code")or{}).get("code")=="E0308" for r in errors if r["reason"]=="compiler-message") and errors[-1]=={"reason":"build-finished","success":False},"absent genuine Rust diagnostic")
-            observed=observation(z,role);need(accounts["edit"]==terminal["roles"][role]["primary"] and observed["instructions"]["rustc:ty_project"]==terminal["roles"][role]["project"],"different complete/driver accounting")
+            observed=observation(diag,role,z.js(role+"/tools.json")) if diag is not None else None
+            need(accounts["edit"]==terminal["roles"][role]["primary"],"different complete Cargo accounting")
+            if diag is not None:
+                need(observed["lifetime"]==diag.js("result.json")["roles"][role]["lifetimes"],"different selected compiler accounting")
             report["roles"][role]={"hardware":accounts,"observed":observed,"verdicts":verdicts}
     class Metadata:
         def read(self,name):
