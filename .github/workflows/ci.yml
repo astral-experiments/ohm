@@ -13,7 +13,7 @@ jobs:
   inspect:
     if: github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruf009-join-proof-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -23,10 +23,12 @@ jobs:
           sparse-checkout: |
             scripts/ruff-foreign-span-observer
             scripts/ruff-join-proof
-      - name: Run independent signed Cargo boundary and macro controls
+      - name: Compare shipped, defaults-off, and official upstream Cargo
         env:
           OHM_SDK_READ_TOKEN: ${{ github.token }}
-        run: python3 -IB qa/scripts/ruff-join-proof/worker.py
+        run: |
+          command -v strace || (sudo apt-get -qq update && sudo apt-get -qq install -y --no-install-recommends strace)
+          python3 -IB qa/scripts/ruff-join-proof/causality/probe.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
