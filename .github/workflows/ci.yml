@@ -13,7 +13,7 @@ jobs:
   inspect:
     if: github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruf009-join-proof-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 20
+    timeout-minutes: 65
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -23,8 +23,26 @@ jobs:
           sparse-checkout: |
             scripts/ruff-foreign-span-observer
             scripts/ruff-join-proof
-      - name: Compare shipped, defaults-off, and official upstream Cargo
+      - name: Create read-only Cargo source token
+        id: source-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
+        with:
+          client-id: ${{ vars.OHM_RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.OHM_RELEASE_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ohm-cargo
+          permission-contents: read
+      - name: Check out the signed source parent
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: astral-experiments/ohm-cargo
+          ref: 7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed
+          token: ${{ steps.source-token.outputs.token }}
+          persist-credentials: false
+          path: cargo
+      - name: Build and validate actual Cargo after dependencies complete
         env:
+          OHM_INPUT_RECHECK_QA: '1'
           OHM_SDK_READ_TOKEN: ${{ github.token }}
         run: |
           command -v strace || (sudo apt-get -qq update && sudo apt-get -qq install -y --no-install-recommends strace)

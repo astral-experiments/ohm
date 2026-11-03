@@ -10,6 +10,10 @@ with tarfile.open(archive)as ar:
  m,=[m for m in ar.getmembers()if m.name.endswith('/cargo/bin/cargo')and m.isfile()];assert m.size<=150*2**20
  with ar.extractfile(m)as a,official.open('xb')as b:shutil.copyfileobj(a,b)
 official.chmod(0o755);e={**se,'RUSTUP_HOME':str(root/'rustup'),'CARGO_TARGET_DIR':str(tgt),'CARGO_BUILD_BUILD_DIR':str(shared)};subprocess.run(['rustup','toolchain','link','ohm',active],env=e,check=True);sdk.put(pub/'admission.json',{'plan':plan,'source_sha':sdk.hf(Path(__file__)),'selected_ohm':sdk.hf(sdk.sdk/'bin/cargo'),'official_bin':sdk.hf(official),'official_tar':sdk.hf(archive),'same_rustc':sdk.hf(sdk.sdk/'bin/rustc')})
+candidate=None
+if os.environ.get('OHM_INPUT_RECHECK_QA')=='1':
+ sys.path.insert(0,str(src.parent/'fix'));import build as factory
+ candidate,build_env,cargo_repo=factory.setup(sdk,se)
 def write(rel,body):
  f=w/rel;f.parent.mkdir(parents=True,exist_ok=True);f.write_text(body);return f
 write('Cargo.toml','[workspace]\nmembers=["producer","client"]\nresolver="2"\n')
@@ -94,9 +98,10 @@ def history(arm,case,mode,flags,env):
  else:assert rs['old']['native']==rs['old']['fnv'] and rs['independent-clean']['native']==rs['edit']['fnv']
  return rs
 subprocess.run(['cargo','+ohm','generate-lockfile','--offline'],env=e,cwd=w,check=True);out={};fail={}
-for arm,flags,target in [('shipped',[],sdk.sdk/'bin/cargo'),('shipped-defaults-off',['-Zohm-defaults=no'],sdk.sdk/'bin/cargo'),('upstream',[],official)]:
- flip_link(target);version=subprocess.check_output(['cargo','+ohm','-Vv'],env=e,text=True);assert plan['upstream_cargo'if arm=='upstream'else'cargo_shipped']in version;assert plan['rustc']in subprocess.check_output(['rustc','+ohm','-vV'],env=e,text=True);sdk.put(pub/(arm+'-cargo.json'),{'version':version,'executable':sdk.hf(binding)});out[arm]={}
- for c in ('private','macro_bytes',*(('private-same-mtime',)if arm=='shipped'else())):
+roles=[('shipped',[],sdk.sdk/'bin/cargo'),('shipped-defaults-off',['-Zohm-defaults=no'],sdk.sdk/'bin/cargo'),('upstream',[],official)] if candidate is None else [('shipped',[],sdk.sdk/'bin/cargo'),('fixed',[],candidate)]
+for arm,flags,target in roles:
+ flip_link(target);version=subprocess.check_output(['cargo','+ohm','-Vv'],env=e,text=True);assert (factory.spec['candidate']if arm=='fixed'else plan['upstream_cargo'if arm=='upstream'else'cargo_shipped'])in version;assert plan['rustc']in subprocess.check_output(['rustc','+ohm','-vV'],env=e,text=True);sdk.put(pub/(arm+'-cargo.json'),{'version':version,'executable':sdk.hf(binding)});out[arm]={}
+ for c in ('private','macro_bytes',*(('private-same-mtime',)if arm in ('shipped','fixed')else())):
   out[arm][c]={}
   for mode in ('check','build'):
    try:out[arm][c][mode]=history(arm,c,mode,flags,{**e,**({'CARGO_INCREMENTAL':'0'}if c=='macro_bytes'else{})})
@@ -106,3 +111,13 @@ for arm,flags,target in [('shipped',[],sdk.sdk/'bin/cargo'),('shipped-defaults-o
    sdk.put(pub/'completed.json',out);sdk.put(pub/'failures.json',fail)
 for p in ('Cargo.toml','producer/Cargo.toml','client/Cargo.toml'):shutil.copyfile(w/p,pub/(p.replace('/','.')))
 sdk.put(pub/'fixture-shapes.json',{'client':client_source,'private':cases('private'),'macro_bytes':cases('macro_bytes')});assert not fail,fail
+
+if candidate:
+ for case in ('private','macro_bytes','private-same-mtime'):
+  for arm in ('shipped','fixed'):
+   rs=out[arm][case]['check'];edit=rs['edit']
+   assert ('selected_client' in edit['rustc_execs'])==(arm=='fixed') and edit['errors']==(['E0308'] if arm=='fixed' else []) and edit['exit']==(101 if arm=='fixed' else 0)
+   assert rs['next-unchanged']['errors']==rs['independent-clean']['errors']==['E0308']
+   nb=out[arm][case]['build']
+   assert nb['edit']['native']==nb['edit']['fnv']==nb['independent-clean']['native']
+ factory.suite(sdk,build_env,cargo_repo)

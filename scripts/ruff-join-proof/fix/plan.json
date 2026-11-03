@@ -1,0 +1,16 @@
+{
+  "parent": "7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed",
+  "candidate": "256d5e65ded7c8a83cd484968e2f3533112200e4",
+  "tree": "fb4543363da3061954d8e9378c8dd251db1ae350",
+  "bundle_sha256": "210feb387bc3b4d391b378a001574771ad7f6b761439a8332b2121e2617a6dad",
+  "cold_positive": "old check/build and no-op agree",
+  "edit_check": "consumer executes, E0308 with immediate and empty target",
+  "edit_build": "independent clean full ELF and actual input FNV",
+  "regression_tests": [
+    "freshness::early_cutoff_",
+    "freshness::ohm_defaults_enable_check_early_cutoff",
+    "freshness::conditional_metadata_waits_for_unchanged_hash_and_preserves_early_cutoff"
+  ],
+  "signed_admission": "9 GiB RAM before each task; kill group below 8 GiB; require 15 GiB disk throughout",
+  "counter_test": "checks only; no elapsed-time or hardware performance inference"
+}
