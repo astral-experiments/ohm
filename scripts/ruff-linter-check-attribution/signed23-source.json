@@ -1,0 +1,274 @@
+{
+  "assets": {
+    "archive": {
+      "digest": "sha256:fc85a2ca6d47711058cd89c790c8e57f1799472e38f0ee0a08b0a51d06c1ee7b",
+      "id": 704038224,
+      "name": "ohm-1.99.0-23-x86_64-unknown-linux-gnu.tar.gz",
+      "size": 359921838
+    },
+    "checksum": {
+      "digest": "sha256:c9b49621be82604f81d5b46333a3f7116feef2d251af24872cbd73e3b5f03157",
+      "id": 704038226,
+      "name": "ohm-1.99.0-23-x86_64-unknown-linux-gnu.tar.gz.sha256",
+      "size": 112
+    },
+    "provenance": {
+      "digest": "sha256:8e00e87c5b08d61f13ed5f2d5d5f17573f5d0e08f1d1873c2baf60e2c5a80789",
+      "id": 704038256,
+      "name": "ohm-1.99.0-23-x86_64-unknown-linux-gnu-provenance.json",
+      "size": 877
+    }
+  },
+  "cargo-release-changes": {
+    "commits": [
+      [
+        "84d13b4b5a8218f2d2b47ed56f0ce78462f873d7",
+        "Recheck GNU links when scripts can search for unobserved libraries"
+      ],
+      [
+        "81427c629c8f8bfbfe0ecf8c48fa7a2fa53eb1cf",
+        "Include the current GCC driver prefixes in native link checks"
+      ],
+      [
+        "7b643c384568b1598373dc209fcb7c05162e6547",
+        "Validate implicit GNU startup objects and private driver configuration"
+      ],
+      [
+        "ec883b0b5c91bbdfc6613555ca3ac4dacceb80d4",
+        "Check input generations after resolving the complete GNU link key"
+      ],
+      [
+        "0fe9899490ce8b396c991aa39b440145f422255a",
+        "Accept resolved spellings of the same GNU startup object"
+      ],
+      [
+        "1ca08234f134d8be51c11e3d804c595de5aff843",
+        "Resolve physical storage paths before creating a worktree"
+      ],
+      [
+        "1a548e9b728fa43780dc9bb94578108824f402d4",
+        "Honor explicit source remapping when preparing worktree seeds"
+      ],
+      [
+        "bd93d8defb29d9d44ea044b92a9f81575044faef",
+        "Finish a stopped relay after its ready test exits"
+      ],
+      [
+        "62fc26b909a2e9d7345ede6eae3a9b9658f22464",
+        "Use explicit Ohm stage flags for the documentation test"
+      ],
+      [
+        "0d4fce4d1ce3015426b8b4ed11289c5f79ee2db6",
+        "Wait for inherited consumer leases in cache GC tests"
+      ],
+      [
+        "6aa29970a8c5f8a4bc11409b7696aef98b629b55",
+        "Require both exact Ohm profile tests in CI"
+      ],
+      [
+        "6a956739bb28e7295b914d33c980d6ccde05ae28",
+        "Keep unchanged native builds fresh"
+      ],
+      [
+        "4ac31de9db2ba6ac2b6f1736fce7d4fb2f59c1f0",
+        "Cache inline doctests in Cargo's build graph"
+      ],
+      [
+        "642e088bc021cbb8f53efaca5f60787638844c52",
+        "Update the unstable flag help snapshot"
+      ],
+      [
+        "ab7009645d7508dfb09259520e0f80353c858ef5",
+        "Enable cached doctests with Ohm defaults"
+      ],
+      [
+        "7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed",
+        "Run the cached doctest defaults test with stock rustc"
+      ]
+    ],
+    "new": "7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed",
+    "old": "ed0ae15d22da9a0af9afb3d0fdeb4ceb8a71b770",
+    "paths": [
+      ".github/workflows/ci.yml",
+      "Cargo.lock",
+      "Cargo.toml",
+      "doc/book/src/reference/unstable.md",
+      "src/compiler/build_config.rs",
+      "src/compiler/build_runner/compilation_files.rs",
+      "src/compiler/build_runner/mod.rs",
+      "src/compiler/cached_doctests/generate.rs",
+      "src/compiler/cached_doctests/harness.rs",
+      "src/compiler/cached_doctests/mod.rs",
+      "src/compiler/compilation.rs",
+      "src/compiler/fingerprint/mod.rs",
+      "src/compiler/mod.rs",
+      "src/compiler/native_link/declared.rs",
+      "src/compiler/native_link/mod.rs",
+      "src/ops/cargo_compile/mod.rs",
+      "src/ops/cargo_test/mod.rs",
+      "src/ops/cargo_test/ready_test_process.rs",
+      "src/ops/cargo_worktree/mod.rs",
+      "src/workspace/build_cache_gc/mod.rs",
+      "src/workspace/features.rs",
+      "tests/testsuite/cargo/z_help/stdout.term.svg",
+      "tests/testsuite/doc.rs",
+      "tests/testsuite/freshness.rs",
+      "tests/testsuite/ohm_worktree.rs",
+      "tests/testsuite/rustflags.rs",
+      "tests/testsuite/test.rs"
+    ]
+  },
+  "encoder_git_blobs": {
+    "008a21ac0d750dc9a1c18b7959d7e7984c03d887": "2b2f08dbca687cd0352adeeffe80d38fb1a06a50",
+    "259ad7069e47eaf08cf106f187b2b6393f7fd7c2": "2b2f08dbca687cd0352adeeffe80d38fb1a06a50",
+    "d57fd1515986dccecdcece8da85e651bfb4b81f9": "2b2f08dbca687cd0352adeeffe80d38fb1a06a50"
+  },
+  "manifest": {
+    "$schema": "../manifest.schema.json",
+    "bundled_tools": {
+      "wild": {
+        "sha256": "25012a78de164686f552b7703b5d0223adab4829c79cd1fb351108221d61c7d8",
+        "version": "0.11.0"
+      }
+    },
+    "prepare_relocated_pgo_dependencies": true,
+    "release": {
+      "ohm_revision": 23,
+      "toolchain_name": "ohm-1.99.0-23",
+      "upstream_rust_version": "1.99.0"
+    },
+    "schema_version": 1,
+    "sources": {
+      "cargo": {
+        "repository": "https://github.com/astral-sh/ohm-cargo",
+        "revision": "7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed"
+      },
+      "clippy": {
+        "repository": "https://github.com/astral-sh/ohm-rust-clippy",
+        "revision": "6ca9ddc53c5a39e911e6c93637c093bd1d2eba05"
+      },
+      "rust": {
+        "repository": "https://github.com/astral-sh/ohm-rust",
+        "revision": "d57fd1515986dccecdcece8da85e651bfb4b81f9"
+      },
+      "rustfmt": {
+        "repository": "https://github.com/astral-sh/ohm-rustfmt",
+        "revision": "e5feafbfd640fe7326971cf7721ca7de38a86e40"
+      }
+    },
+    "status": "pinned"
+  },
+  "packaging": "9c2397d36f033900a0864484714d526788d1dc77",
+  "provenance": {
+    "bundled_tools": {
+      "wild": {
+        "sha256": "25012a78de164686f552b7703b5d0223adab4829c79cd1fb351108221d61c7d8",
+        "version": "0.11.0"
+      }
+    },
+    "coordinator": {
+      "repository": "astral-experiments/ohm",
+      "revision": "9c2397d36f033900a0864484714d526788d1dc77"
+    },
+    "manifest": {
+      "path": "toolchains/1.99.0/23.json",
+      "sha256": "44fc4cb1789ae8f1639d05a1b45b549ae6b400c8abf8d05e8f598a88151df490"
+    },
+    "schema_version": 1,
+    "sources": {
+      "cargo": {
+        "revision": "7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed"
+      },
+      "clippy": {
+        "revision": "6ca9ddc53c5a39e911e6c93637c093bd1d2eba05"
+      },
+      "rust": {
+        "revision": "d57fd1515986dccecdcece8da85e651bfb4b81f9"
+      },
+      "rustfmt": {
+        "revision": "e5feafbfd640fe7326971cf7721ca7de38a86e40"
+      }
+    },
+    "target": "x86_64-unknown-linux-gnu",
+    "toolchain": "ohm-1.99.0-23"
+  },
+  "published_at": "2026-11-03T02:57:19Z",
+  "release": "ohm-1.99.0-23",
+  "run": 41552791237,
+  "rust-release-changes": {
+    "commits": [
+      [
+        "5c9c293a137e79a6f599fc15d4ba1f3af9080c55",
+        "Discard damaged graphs when reusing Ohm stage checkpoints"
+      ],
+      [
+        "42c99db9af7e6d6f8e0ccec4c1816a20140d9b8b",
+        "Pin Cargo with the stock-compiler rustdoc regression test"
+      ],
+      [
+        "0c892ef151f07d885e2cfa50eb84e198f598436d",
+        "Include the qualified installer fixes in the compiler build"
+      ],
+      [
+        "6083e88aad1df62f3c36a48b9529b296e6a9c356",
+        "Qualify existing Rust #296 on the Ohm -23 source"
+      ],
+      [
+        "d04a00f8d2073960ffed045580bc8a0da07d54af",
+        "Qualify existing Rust #306 on the Ohm -23 source"
+      ],
+      [
+        "7d6a276e532662ef77d05d70f7b27905cb902804",
+        "Format the register-only assembly checks"
+      ],
+      [
+        "155bd093dd9ab6d3fa2ccaa503df47e408d1aef9",
+        "Recognize a literal Linux AArch64 syscall as file-free assembly"
+      ],
+      [
+        "d5b9fe5429bf1b7c4b49eae8efb5d9507111dac0",
+        "Wrap the AArch64 assembler file-input fixture for tidy"
+      ],
+      [
+        "4866e142a4a425cbd42c170cf916b35358be891d",
+        "Type the expected musl dep-info marker in the run-make check"
+      ],
+      [
+        "27f5659481d0d2b35d0b523cb9fb24a44e8246ed",
+        "Pin Cargo with stock native build freshness"
+      ],
+      [
+        "bf0e3d14d299cb4d67c07e146d1f79bd00b57b86",
+        "Update Cargo to cache inline doctests by default"
+      ],
+      [
+        "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+        "Pin Cargo with the stock-compiler doctest check"
+      ]
+    ],
+    "new": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+    "old": "008a21ac0d750dc9a1c18b7959d7e7984c03d887",
+    "paths": [
+      "compiler/rustc_codegen_llvm/src/asm.rs",
+      "compiler/rustc_incremental/src/persist/file_format.rs",
+      "compiler/rustc_incremental/src/persist/load.rs",
+      "compiler/rustc_middle/src/dep_graph/graph.rs",
+      "compiler/rustc_middle/src/dep_graph/serialized.rs",
+      "compiler/rustc_middle/src/queries.rs",
+      "compiler/rustc_middle/src/query/keys.rs",
+      "compiler/rustc_middle/src/ty/context/impl_interner.rs",
+      "compiler/rustc_middle/src/ty/mod.rs",
+      "compiler/rustc_middle/src/ty/trait_def.rs",
+      "compiler/rustc_query_impl/src/dep_kind_vtables.rs",
+      "compiler/rustc_query_impl/src/execution.rs",
+      "src/tools/cargo",
+      "tests/run-make/incremental-missing-query-cache/rmake.rs",
+      "tests/run-make/ohm-checked-dep-info/gnu_aarch64.rs",
+      "tests/run-make/ohm-checked-dep-info/musl_x86_64.rs",
+      "tests/run-make/ohm-checked-dep-info/rmake.rs",
+      "tests/run-make/trait-impl-bucket-projection/reader.rs",
+      "tests/run-make/trait-impl-bucket-projection/rmake.rs",
+      "tests/run-make/trait-impl-bucket-projection/roster.rs"
+    ]
+  }
+}

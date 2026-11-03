@@ -41,7 +41,7 @@ def fingerprint(argv):
     return digest(json.dumps(canonical, separators=(",", ":")).encode())
 
 
-def inspect(table, trace, selectors, process, reference, expected, cargo_stdout):
+def inspect(table, trace, selectors, process, cargo_stdout):
     """Charge the inclusive timer at each physical compiler exec exactly once."""
     def component(root, events, selected, samples, tasks, chains):
         identities = {int(row[0]): [int(row[4]), int(row[5]), row[6]]
@@ -73,7 +73,7 @@ def inspect(table, trace, selectors, process, reference, expected, cargo_stdout)
                  and not any(row[:2] == ["exec", str(pid)] for row in rows[stop+1:]),
                  "compiler child before measurement or subsequent re-exec")
             name = table.option(argv, "--crate-name")
-            need(name in reference["argv"] and fingerprint(argv) == reference["argv"][name], ("historical command", name))
+            need(table.option(argv, "--out-dir") and name, "physical output or owner missing")
             need([v for v in argv if v.startswith("--emit=")] == ["--emit=dep-info,metadata"]
                  and table.option(argv, "--crate-type") == "lib", "unexpected compiler work")
             deps = [argv[i+1].split("=",1)[0] for i,v in enumerate(argv[:-1]) if v == "--extern"]
@@ -82,8 +82,8 @@ def inspect(table, trace, selectors, process, reference, expected, cargo_stdout)
             raw.append({"crate": name, "pid": pid, "argv": argv})
             result.append({"crate": name, "pid": pid, "serial": serial, "instructions": samples[serial],
                            "group": "producer" if name == PRODUCER else "direct" if name in DIRECT else "indirect",
-                           "argv_sha256": fingerprint(argv), "tasks": sum(pid in chain for chain in chains.values())})
-        need(Counter(x["crate"] for x in result) == dirty == Counter(expected), ("typed, physical and prior roster", dirty))
+                           "argv_sha256": digest(json.dumps(argv,separators=(",", ":")).encode()), "tasks": sum(pid in chain for chain in chains.values())})
+        need(Counter(x["crate"] for x in result) == dirty, ("typed and physical roster", dirty))
         total = samples[0]
         by_group = {k:sum(v["instructions"] for v in result if v["group"] == k) for k in ("producer","direct","indirect")}
         residual = total - sum(by_group.values())

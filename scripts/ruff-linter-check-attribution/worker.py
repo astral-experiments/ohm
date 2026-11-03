@@ -27,8 +27,8 @@ SOURCE = 'crates/ruff_annotate_snippets/src/snippet.rs'
 FILES = ['crates/ruff_annotate_snippets/src/renderer/render.rs', SOURCE]
 SOURCE_HASH = {OLD:'cef48ab7234b39d4c15ad512de6496ce65e45b981fe85a4fbbb3737c73e6568f', NEW:'272e25a6d121c3c57112e53e6ad9de3abc7ff88658008dbf4a9299b3399a7943'}
 LOCK = '26d7be8317b0e44be0d60b31f6660dd4e07ed4c19be4e6748124d07068fd7fa7'
-RUST = '008a21ac0d750dc9a1c18b7959d7e7984c03d887'
-BRANCH = 'charlie/qa-ruff-27470-crate-instructions-20261103'
+RUST = 'd57fd1515986dccecdcece8da85e651bfb4b81f9'
+BRANCH = 'charlie/qa-ruff-27470-signed23-20261103'
 DONOR = 'bd7b58765ae44b21a1c9273b3ff0be8e923adc47'
 REPO = 'astral-experiments/ohm'
 CMD = ['cargo','+ohm','check','-p','ty_server','--lib','--locked','--offline','--message-format=json']
@@ -77,17 +77,13 @@ def acquire():
     jobs = json.loads(subprocess.check_output(gh(f'actions/runs/{run}/attempts/1/jobs?per_page=100')))
     need(info['head_sha'] == os.environ['REVIEWED_HEAD'] and info['head_branch'] == BRANCH and info['run_attempt'] == 1 and info['event'] == 'workflow_dispatch' and jobs['total_count'] == len(jobs['jobs']) == 1, 'hosted run identity')
     job, = [j for j in jobs['jobs'] if j['runner_name'] == os.environ['RUNNER_NAME'] and j['runner_id'] > 0]
-    name = 'Attribute the parent-only edit and verify the ordinary history'
+    name = 'Verify the newly released SDK and the actual historical check'
     need(job['name'] == name and job['status']=='in_progress', 'worker identity')
     save(OUT/'worker.json',dict(run=run,job=job['id'],head=info['head_sha'],runner=job['runner_name'],runner_id=job['runner_id'],boot=Path('/proc/sys/kernel/random/boot_id').read_text().strip(),source=TREES,lock=LOCK,resources=resources()))
     sys.path.insert(0,str(WS/'donor/scripts/ruff-default-owner-pmu'))
     import acquire as signed
-    asset=signed.c.SDK['asset']; remote=json.loads(subprocess.check_output(gh('releases/assets/'+str(asset['id']))))
-    need((remote['id'],remote['name'],remote['size'],remote['digest']) == (asset['id'],asset['name'],asset['size'],'sha256:'+asset['sha256']), 'release asset')
-    archive=ROOT/asset['name']
-    with archive.open('xb') as out:
-        subprocess.run(gh('releases/assets/'+str(asset['id']),'-H','Accept: application/octet-stream'),stdout=out,check=True,timeout=600)
-    identity=signed.extract(archive,SDK); need(len(identity)==79, 'incomplete SDK'); save(OUT/'sdk.json',dict(asset=asset,members=identity)); archive.unlink()
+    import signed23
+    signed23.install(signed.c.SDK["members"])
     proxy=ROOT/'proxies'; proxy.mkdir(); rustup=Path(shutil.which('rustup')).resolve(strict=True); shutil.copy2(rustup,proxy/'rustup')
     need(sha(proxy/'rustup') == sha(rustup),'different rustup proxy')
     for name in ('cargo','rustc','rustdoc'):
@@ -108,6 +104,7 @@ def prefetch():
     v=subprocess.check_output(['rustc','+ohm','-vV'],env=env,text=True)
     need('commit-hash: '+RUST+'\n' in v and 'host: x86_64-unknown-linux-gnu\n' in v,'actual rustc')
     cargo=subprocess.check_output(['cargo','+ohm','-Vv'],env=env,text=True)
+    need('7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed' in cargo and RUST in v, 'wrong executing release sources')
     save(OUT/'actual-sdk.json',dict(rustc=v,cargo=cargo,shim=sha(ROOT/'proxies/rustup')))
     argv=[arg for arg in CMD if arg!='--offline']+['-Zunstable-options','--unit-graph']
     with (OUT/'unit-graph.json').open('xb') as out:

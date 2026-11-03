@@ -1,5 +1,5 @@
-name: Attribute one real parent compiler check to its 12 processes
-run-name: Ruff 27470 parent check instruction ownership ${{ inputs.reviewed_head }}
+name: Refresh the released Ohm 23 baseline for the real Ruff 27470 check
+run-name: Ruff 27470 published Ohm 23 ownership ${{ inputs.reviewed_head }}
 
 on:
   workflow_dispatch:
@@ -14,8 +14,8 @@ permissions:
 
 jobs:
   profile:
-    name: Attribute the parent-only edit and verify the ordinary history
-    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-27470-crate-instructions-20261103' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+    name: Verify the newly released SDK and the actual historical check
+    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-27470-signed23-20261103' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 90
     permissions:
@@ -49,18 +49,6 @@ jobs:
           persist-credentials: false
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: 1273cbdd1b8c827ea4d2fc2141348c8e683336ed
-          path: scope-loader
-          persist-credentials: false
-          sparse-checkout: scripts/ruff-linter-check-attribution
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: a126c17db143071a502603870986ff9b4d8c69f7
-          path: scope-root
-          persist-credentials: false
-          sparse-checkout: scripts/ruff-matched-stage
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
           ref: 8a659140df8ab27fd6a8cc61f5eb38717b3f8bbc
           path: collector
           persist-credentials: false
@@ -80,11 +68,7 @@ jobs:
         run: python3 -IB qa/scripts/ruff-linter-check-attribution/worker.py acquire
       - name: Fetch the exact registry closure without compiling
         run: python3 -IB qa/scripts/ruff-linter-check-attribution/worker.py prefetch
-      - name: Reopen both source compilers from their original qualified factory
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: python3 -IB qa/scripts/ruff-linter-check-attribution/matched.py acquire
-      - name: Calibrate kernel exec-stop ownership and acquire the sole parent history
+      - name: Calibrate kernel exec-stop ownership and run the sole signed release history
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends strace zstd
@@ -92,7 +76,7 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: ruff-27470-parent-owners-${{ github.run_id }}
+          name: ruff-27470-signed23-owners-${{ github.run_id }}
           path: ${{ runner.temp }}/ohm-ruff-visibility/receipt
           if-no-files-found: error
           compression-level: 1

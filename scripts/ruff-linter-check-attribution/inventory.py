@@ -74,7 +74,7 @@ def phase(name, state, *, preserve=False, invalid=False, observe=None):
     trace.mkdir(parents=True)
     out = w.OUT/name
     env = w.environment()
-    score = observe is None and w.OUT.name in ('P','C') and name in ('old','old-unchanged','edited','new-unchanged')
+    score = observe is None and w.OUT.name in ('P','C','release23') and name in ('old','old-unchanged','edited','new-unchanged')
     ordinary = w.CMD
     if score:
         proxy = shutil.which('cargo', path=env['PATH'])
