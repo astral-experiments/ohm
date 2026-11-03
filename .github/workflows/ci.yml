@@ -14,7 +14,16 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         persist-credentials: false
+        ref: 634d090f0f565936996a817bcb884c64cbe7e6cc
+    - name: Check out the current release source verifier
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        persist-credentials: false
         ref: b4dab2cbe352ee63daffbeda179f77f061137049
+        path: current-verifier
+        sparse-checkout: |
+          scripts
+          toolchains
     - name: Check out the signed -23 source manifest
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:

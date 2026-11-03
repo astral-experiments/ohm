@@ -149,11 +149,12 @@ def source():
     canonical=root/"source-proof/toolchains"
     proof=canonical/"1.99.0/24.json"
     proof.parent.mkdir(parents=True)
-    assert git_sha(workspace, "HEAD") == "b4dab2cbe352ee63daffbeda179f77f061137049"
-    (canonical/"manifest.schema.json").write_bytes(sp.check_output(["git","-C",workspace,"show","HEAD:toolchains/manifest.schema.json"]))
+    current_verifier = workspace / "current-verifier"
+    assert git_sha(current_verifier, "HEAD") == "b4dab2cbe352ee63daffbeda179f77f061137049"
+    (canonical/"manifest.schema.json").write_bytes(sp.check_output(["git","-C",current_verifier,"show","HEAD:toolchains/manifest.schema.json"]))
     smoke.save(proof,manifest)
     shutil.copyfile(proof,logs/"source-manifest-for-qa.json")
-    verifier=workspace/"scripts/verify-release-sources.sh"
+    verifier = current_verifier / "scripts/verify-release-sources.sh"
     verified=sp.run(["bash",verifier,proof,src,nested,src/"src/tools/clippy",src/"src/tools/rustfmt"],stdout=sp.PIPE,stderr=sp.STDOUT)
     (logs/"release-source-verifier.stdout").write_bytes(verified.stdout)
     print(verified.stdout.decode(),flush=True)
