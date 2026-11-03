@@ -50,7 +50,7 @@ def build():
     store = root / "output"
     cmd = [sys.executable, "-IB", "x.py", "--ci", "false", "--build-dir", str(store),
            "--set", "build.submodules=false", "--set", "build.profiler=true", "--set", "rust.debug-assertions=false",
-           "--set", "rust.lto=off", "--set", "llvm.download-ci-llvm=true", "--set", "rust.download-rustc=false",
+           "--set", "rust.lto=off", "--set", "rust.omit-git-hash=false", "--set", "llvm.download-ci-llvm=true", "--set", "rust.download-rustc=false",
            "build", "--stage", "1", "-j6", "compiler/rustc", "library", "src/tools/rustdoc"]
     (root/"bootstrap.json").write_text(json.dumps(cmd,indent=2)+"\n")
     child={k:os.environ[k] for k in ("PATH","HOME","USER","LANG","TMPDIR") if k in os.environ}
@@ -78,6 +78,8 @@ def build():
     e=dict(child,RUSTUP_HOME=str(alias.parent.parent))
     for tool in ("rustc","cargo"):
         versions[tool]=subprocess.check_output([tool,"+ohm","-vV"],env=e,text=True)
+    (root/"reported-versions.json").write_text(json.dumps(versions,indent=2)+"\n")
+    print(versions["rustc"],versions["cargo"],flush=True)
     assert register[role] in versions["rustc"] and register["cargo"] in versions["cargo"]
     driver,=(sdk/"lib").glob("librustc_driver-*.so")
     (root/"sdk.json").write_text(json.dumps({"role":role,"versions":versions,"driver":sha(driver),
