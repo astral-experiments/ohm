@@ -11,7 +11,7 @@ DIRS=('build','cargo-home','target')
 MARKERS=('ruff-incremental-roots.json','selected-binary-input.json')
 def check(ok,message):
     if not ok:raise ValueError(message)
-def fingerprint(root):
+def fingerprint(root, names=(*DIRS,*MARKERS)):
     """Bind every supported path, link group, regular body, permission and modification time."""
     digest=hashlib.sha256(); owners={}; bytes_=files=dirs=links=0
     def record(fields):
@@ -30,7 +30,7 @@ def fingerprint(root):
             with p.open('rb')as f:value=hashlib.file_digest(f,'sha256').hexdigest()
             owners[identity]=(name,value);bytes_+=st.st_size
         origin,h=owners[identity];files+=1;record(row+[st.st_size,origin,h])
-    for n in (*DIRS,*MARKERS):visit(root/n)
+    for n in names:visit(root/n)
     return {'sha256':digest.hexdigest(),'logical_unique_bytes':bytes_,'regular_paths':files,'distinct_regular_files':len(owners),'directories':dirs,'symlinks':links},set(owners)
 def save(root):
     dst=root/'authenticated-initial-old';check(not dst.exists(),'existing namespace')
@@ -48,3 +48,19 @@ def restore(root,proof):
     for n in (*DIRS,*MARKERS):(src/n).rename(root/n)
     src.rmdir();out,_=fingerprint(root);check(out==proof,'rebuilt observed source differs from original OLD')
     return out
+
+def save_checkout(work, private):
+    check(work.name=='ruff' and (work/'.git').is_dir() and not work.is_symlink(),'unrecognized private Ruff checkout')
+    private.mkdir();original,ids=fingerprint(work.parent,(work.name,))
+    subprocess.run(['cp','--archive','--reflink=auto','--',work,private],check=True)
+    copy,other=fingerprint(private,(work.name,));check(original==copy and not ids&other,'incomplete or mutable source copy')
+    return original
+def restore_checkout(work, private, original):
+    check(work.name=='ruff' and (work/'.git').is_dir() and not work.is_symlink() and (private/work.name/'.git').is_dir(),'unexpected source checkout')
+    saved,_=fingerprint(private,(work.name,));check(saved==original,'archived source changed')
+    parked=work.parent/'prior-edited-ruff-namespace';check(not parked.exists(),'unexpected previous source')
+    work.rename(parked)
+    subprocess.run(['cp','--archive','--reflink=auto','--',private/work.name,work],check=True)
+    rebuilt,_=fingerprint(work.parent,(work.name,));check(rebuilt==original,'full source, file times or Git state differ')
+    shutil.rmtree(parked)
+    return rebuilt

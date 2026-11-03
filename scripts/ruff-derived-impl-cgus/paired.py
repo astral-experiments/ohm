@@ -138,10 +138,10 @@ def run_role(role):
     for n in ('rustc','cargo'):
         output=sp.check_output([n,'+ohm','-vV'],env=env,text=True);b.need(output==proof['versions'][n],'actual toolchain role was changed')
     for name in ('exec_count','whole_count','thread_meter'):sp.run(['cc','-O2','-pthread','-Wall','-Wextra','-Werror',frozen/(name+'.c'),'-o',b.ROOT/name],check=True)
-    b.select(b.OLD);b.prepare();old=phase(role,'cold-old',b.OLD,'cold');b.need('canonical_archive'in old,'unknown producer archive')
+    b.select(b.OLD);source_snapshot=b.ROOT/'initial-source';source_proof=old_namespace.save_checkout(b.WORK,source_snapshot);b.put(b.PUB/'source-initial.json',source_proof)
+    b.prepare();old=phase(role,'cold-old',b.OLD,'cold');b.need('canonical_archive'in old,'unknown producer archive')
     held=b.ROOT/'retained/ruff';held.parent.mkdir();shutil.copy2(b.TARGET/'debug/ruff',held)
     no=phase(role,'old-unchanged',b.OLD,'lifetime');b.need(b.same_artifacts(old,no),'old no-op native output')
-    snapshot=old_namespace.save(b.ROOT);b.put(b.PUB/'initial-old-namespace.json',snapshot)
     b.select(b.NEW);td=b.PUB/'old-on-new';td.mkdir();b.need(b.verdict(held,td,b.OLD)==old['verdict'],'saved OLD changed behavior')
     edit=phase(role,'edit',b.NEW);b.need(edit['elf']!=old['elf'] and edit['verdict']!=old['verdict'],'no real edit')
     if CASE=='28392':
@@ -156,12 +156,6 @@ def run_role(role):
             td=b.PUB/name;b.command(td,b.CMD,101);err=(td/'stderr').read_bytes();b.need(b'error[E0308]'in err and b'owner_cgu_invalid'in err,'stale diagnostic')
     finally:b.SRC.write_bytes(base)
     repaired=phase(role,'repair',b.NEW);b.need(b.same_artifacts(repaired,edit),'repair missed a native or metadata delta')
-    b.select(b.OLD)
-    # The prior reverse compile yielded 1,098 differing published rows on both compilers.
-    # Keep it outside every price: the diagnostic needs the exact pre-edit state, not that history.
-    b.put(b.PUB/'restored-old-namespace.json',old_namespace.restore(b.ROOT,snapshot))
-    prior=phase(role,'restored-old',b.OLD,'lifetime');b.need(b.same_artifacts(prior,old),'restored OLD no-op changed a complete native or metadata input')
-    b.select(b.NEW);direct=phase(role,'observed-edit',b.NEW,'lifetime');b.need(b.same_artifacts(direct,edit),'traced re-edit changed a native product')
     empty_outputs();b.prepare();clean=phase(role,'empty-new',b.NEW,'cold')
     b.need(clean['elf']==edit['elf'] and clean['verdict']==edit['verdict'],'independent complete CLI or verdict differs')
     b.need(native_ledger(b.PUB/'edit')==native_ledger(b.PUB/'empty-new'),'independent producer archive differs')
@@ -170,6 +164,19 @@ def run_role(role):
         return sorted(sorted((x[0],x[4],x[5])for x in rows)for rows in all_sessions.values())
     b.need(objects('edit')==objects('empty-new'),'independent complete native CGU census differs')
     b.need(not b.git('status','--porcelain'),'unexpected dirty Ruff source')
+    b.put(b.PUB/'ordinary-admission.json',{'role':role,'case':CASE,'old':old,'edit':edit,'clean':clean,'ordinary_controls':True})
+    # Price a genuinely separate forward edit. A cached artifact tree on a reverted checkout proved insufficient.
+    empty_outputs();b.put(b.PUB/'source-restored.json',old_namespace.restore_checkout(b.WORK,source_snapshot,source_proof))
+    b.need(b.git('rev-parse','HEAD')==b.OLD and b.hf(b.SRC)==b.SRCS[b.OLD] and b.hf(b.WORK/'Cargo.lock')==b.LOCK,'wrong physical replay source')
+    b.prepare();seed=phase(role,'second-cold-old',b.OLD,'cold')
+    no2=phase(role,'second-old-unchanged',b.OLD,'lifetime');b.need(b.same_artifacts(seed,no2),'second OLD no-op changed output')
+    b.select(b.NEW);direct=phase(role,'observed-edit',b.NEW,'lifetime')
+    no3=phase(role,'observed-new-unchanged',b.NEW,'lifetime');b.need(b.same_artifacts(direct,no3),'second NEW no-op changed output')
+    for first,repeat,a,both in [('cold-old','second-cold-old',old,seed),('edit','observed-edit',edit,direct)]:
+        b.need(a['elf']==both['elf'] and a['verdict']==both['verdict'] and native_ledger(b.PUB/first)==native_ledger(b.PUB/repeat) and objects(first)==objects(repeat),'different complete native outputs on independent forward history')
+    b.put(b.PUB/'independent-metadata.json',{'first_to_second_old':b.same_artifacts(old,seed),'first_to_second_edit':b.same_artifacts(edit,direct),'first_to_empty_edit':b.same_artifacts(edit,clean),'primary_states':{k:v for k,v in [('cold-old',old),('edit',edit),('empty-new',clean),('second-cold-old',seed),('observed-edit',direct)]}})
+    # Independently empty external images can change full metadata. Keep the true whole command and the
+    # second native/roster verdict, but decline transferring its subsidiary rustc cost if the inputs differ.
     mini=b.ROOT/'mini';guards=b.ROOT/'guards'
     try:
         sp.run([sys.executable,'-IB',HERE/'probe.py',mini,{'P':'parent','C':'candidate'}[role]],env=b.env(),check=True)
