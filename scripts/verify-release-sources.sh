@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# Release revisions name the original objects, even in checkouts with replacement refs.
+export GIT_NO_REPLACE_OBJECTS=1
 unset CDPATH
 
 if [[ $# -ne 5 ]]; then
@@ -23,14 +25,52 @@ rustfmt_revision="$(jq -er '.sources.rustfmt.revision' "$manifest")"
 rust_version="$(jq -er '.release.upstream_rust_version' "$manifest")"
 expected_cargo_repository="$(jq -er '.sources.cargo.repository' "$manifest")"
 
-for checkout in "$rust_checkout" "$cargo_checkout" "$clippy_checkout" "$rustfmt_checkout"; do
-  if ! git -C "$checkout" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    echo "not a Git checkout: $checkout" >&2
+verify_clean_checkout() {
+  local checkout="$1" checkout_status entry submodule
+  # Release builds depend on the executable bits and symlinks in the pinned tree.
+  local mode_config=(-c core.fileMode=true -c core.symlinks=true)
+  shift
+  checkout_status="$(git -C "$checkout" "${mode_config[@]}" status --porcelain --untracked-files=normal \
+    --ignore-submodules=none -- "$@")"
+  if [[ -n "$checkout_status" ]]; then
+    echo "source checkout is not clean: $checkout" >&2
     exit 1
   fi
 
+  # The checkout index can hide edits through file flags or cached timestamps.
+  # A fresh index compares the tracked contents with the pinned tree.
+  if ! (
+    index_directory="$(mktemp -d)" || exit 1
+    trap 'rm -rf -- "$index_directory"' EXIT
+    GIT_INDEX_FILE="$(cd -- "$index_directory" && pwd -P)/index" || exit 1
+    export GIT_INDEX_FILE
+    git -C "$checkout" -c core.sparseCheckout=false read-tree HEAD &&
+      git -C "$checkout" "${mode_config[@]}" -c core.sparseCheckout=false diff --no-ext-diff --no-textconv --quiet --ignore-submodules=none HEAD -- "$@"
+  ); then
+    echo "could not verify tracked source files against HEAD: $checkout" >&2
+    exit 1
+  fi
+
+  # Git applies each submodule's own ignore settings when checking its children.
+  git -C "$checkout" ls-files --stage -z -- "$@" |
+    while IFS= read -r -d '' entry; do
+      [[ "$entry" == '160000 '* ]] || continue
+      submodule="$checkout/${entry#*$'\t'}"
+      if [[ -e "$submodule/.git" ]]; then
+        verify_clean_checkout "$submodule" .
+      fi
+    done
+}
+
+for checkout in "$rust_checkout" "$cargo_checkout" "$clippy_checkout" "$rustfmt_checkout"; do
+  if ! git -C "$checkout" rev-parse --show-toplevel >/dev/null 2>&1 ||
+    [[ -n "$(git -C "$checkout" rev-parse --show-prefix)" ]]; then
+    echo "not the root of a Git worktree: $checkout" >&2
+    exit 1
+  fi
+
+  checkout_paths=(.)
   if [[ "$checkout" == "$rust_checkout" ]]; then
-    checkout_paths=(.)
     if [[ "$clippy_checkout" -ef "$rust_checkout/src/tools/clippy" ]]; then
       checkout_paths+=(':(exclude)src/tools/clippy')
     fi
@@ -38,17 +78,8 @@ for checkout in "$rust_checkout" "$cargo_checkout" "$clippy_checkout" "$rustfmt_
     if [[ "$rustfmt_checkout" -ef "$rust_checkout/src/tools/rustfmt" ]]; then
       checkout_paths+=(':(exclude)src/tools/rustfmt')
     fi
-
-    checkout_status="$(git -C "$checkout" status --porcelain --untracked-files=normal \
-      -- "${checkout_paths[@]}")"
-  else
-    checkout_status="$(git -C "$checkout" status --porcelain --untracked-files=normal)"
   fi
-
-  if [[ -n "$checkout_status" ]]; then
-    echo "source checkout is not clean: $checkout" >&2
-    exit 1
-  fi
+  verify_clean_checkout "$checkout" "${checkout_paths[@]}"
 done
 
 actual_rust_revision="$(git -C "$rust_checkout" rev-parse HEAD)"

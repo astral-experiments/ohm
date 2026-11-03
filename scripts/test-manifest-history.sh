@@ -22,13 +22,13 @@ git -C "$test_root" \
 base_revision="$(git -C "$test_root" rev-parse HEAD)"
 
 check_history() {
-  (cd -- "$test_root" && "$script_dir/check-manifest-history.sh" "$base_revision")
+  (cd -- "${1:-$test_root}" && "$script_dir/check-manifest-history.sh" "$base_revision")
 }
 
 expect_history_failure() {
   local description="$1"
 
-  if check_history >/dev/null 2>&1; then
+  if check_history "${2:-$test_root}" >/dev/null 2>&1; then
     echo "manifest history accepted $description" >&2
     exit 1
   fi
@@ -81,8 +81,42 @@ check_history
 release_tag="$(git -C "$test_root" show "$base_revision:$manifest_path" | jq -er '.release.toolchain_name')"
 git -C "$test_root" tag "$release_tag"
 expect_history_failure 'a published Rustfmt source revision change'
+expect_history_failure 'a published revision change from a subdirectory' "$test_root/toolchains/1.97.1"
+ln -s toolchains/1.97.1 "$test_root/nested"
+expect_history_failure 'a published revision change from a symlinked subdirectory' "$test_root/nested"
+
+published_blob="$(git -C "$test_root" rev-parse "$base_revision:$manifest_path")"
+changed_blob="$(git -C "$test_root" hash-object -w -- "$manifest")"
+git -C "$test_root" replace "$published_blob" "$changed_blob"
+expect_history_failure 'a published change hidden by a replacement object'
+git -C "$test_root" replace -d "$published_blob" >/dev/null
 
 git -C "$test_root" show "$base_revision:$manifest_path" > "$manifest"
 check_history
+
+check_history "$test_root/toolchains/1.97.1"
+
+mv -- "$manifest" "$test_root/same-content.json"
+ln -s ../../same-content.json "$manifest"
+expect_history_failure 'a symlink replacing a published manifest'
+unlink "$manifest"
+mv -- "$test_root/same-content.json" "$manifest"
+
+ln -s 1.json "$test_root/toolchains/1.97.1/2.json"
+expect_history_failure 'a new symlinked manifest'
+unlink "$test_root/toolchains/1.97.1/2.json"
+
+mv -- "$test_root/toolchains/1.97.1" "$test_root/version"
+ln -s ../version "$test_root/toolchains/1.97.1"
+expect_history_failure 'a symlink replacing the manifest directory'
+
+# The base commit can be available while its tree still needs to be fetched.
+partial_checkout="$test_root/partial"
+git -C "$test_root" config uploadpack.allowFilter true
+git clone --quiet --filter=tree:0 --no-checkout "file://$test_root" "$partial_checkout"
+git -C "$partial_checkout" checkout --quiet HEAD
+git -C "$partial_checkout" remote set-url origin "$test_root/missing-remote"
+base_revision="$(git -C "$partial_checkout" rev-parse HEAD^)"
+expect_history_failure 'an unavailable base tree' "$partial_checkout"
 
 echo 'manifest history tests passed'
