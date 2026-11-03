@@ -1,13 +1,14 @@
 {
-  "bundle": "92fe89f034715ae582a1748335983d8354cfb6ef78ffbc7e8e30518d315a44e6",
-  "candidate": "8574afc64801c199c8d090e3e0e013adf6ccd496",
-  "candidate_tree": "69e168ef2d18cb0b9f8ee6589d006e5ed4303283",
+  "bundle": "058531c6a0940b70cc19276b29bb8b47aa2c77778dc6be7719a71b5c271c2da6",
+  "candidate": "6c2874a0b6a0bf3570f8959733b6f87907e5cce6",
+  "candidate_tree": "1a86c989ac19e14b8bc53ec8a92be4feafef5a9f",
   "cargo": "abc70d60a6fd89c10d5f65cf85820d9b78d5affe",
   "compiler_commits": [
     "a60f4f4476d4819b62730e92ea07c1343f8e6dac",
     "2bc7e7b7c898e7fa82a1dde03978c59263d8167d",
     "dda36b958be0f0c393c22039fb2f53c0ff436968",
-    "8574afc64801c199c8d090e3e0e013adf6ccd496"
+    "8574afc64801c199c8d090e3e0e013adf6ccd496",
+    "6c2874a0b6a0bf3570f8959733b6f87907e5cce6"
   ],
   "criterion": "20% fewer instructions in a full affected compiler or 2x across a real ordinary command; no PR from the factory alone.",
   "initial_build": {
@@ -19,10 +20,12 @@
   "parent": "f5a51d8cc3e76236c2d0f17d495d59ebb03306e4",
   "parent_tree": "b4f0ad237b667d5227e63b44f6e8d3ba885bf7a1",
   "paths": [
+    "compiler/rustc_data_structures/src/unord.rs",
     "compiler/rustc_hir_typeck/src/expr.rs",
     "compiler/rustc_hir_typeck/src/writeback.rs",
     "compiler/rustc_middle/src/thir.rs",
     "compiler/rustc_middle/src/thir/visit.rs",
+    "compiler/rustc_middle/src/ty/typeck_results.rs",
     "compiler/rustc_mir_build/src/builder/expr/as_constant.rs",
     "compiler/rustc_mir_build/src/builder/expr/as_place.rs",
     "compiler/rustc_mir_build/src/builder/expr/as_rvalue.rs",
