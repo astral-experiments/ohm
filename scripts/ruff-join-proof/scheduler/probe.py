@@ -36,7 +36,7 @@ def compile(mode,label,tgt,shared):
   exe=tgt/'debug/selected_client';b['verdict']=int(subprocess.check_output([exe]));b['elf']=sha(exe.read_bytes());ea=q/'bodies'/b['elf'];ea.parent.mkdir(exist_ok=True);ea.write_bytes(exe.read_bytes())
  if label in ('old','old-unchanged','edit','next-unchanged','independent-clean'):
   dep=[p for root in(tgt,shared)if root.exists()for p in root.rglob('selected_client*.d')if p.is_file()and not p.is_symlink()]
-  checks=[(p,ln)for p in dep for ln in p.read_text().splitlines()if ln.startswith('# checksum:')and ln.split(' ',2)[-1]==str(meta)]
+  checks=[(p,ln)for p in dep for ln in p.read_text().splitlines()if ln.startswith('# checksum:')and ln.split(' ',3)[-1]==str(meta)]
   if not checks and code==0:print('RAW_CANDIDATES',[(str(x),x.read_text()[-1000:])for x in dep],flush=True)
   if code==0:assert len({r for _,r in checks})==1,(label,dep,checks)
   b['declared_rmeta_checksums']=[r for _,r in checks]

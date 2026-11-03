@@ -1,0 +1,15 @@
+{
+  "source": "independently clean states from one original source-written exported macro with both literal endpoints, equal-size prefix/footer displacement, 65536-column displacement in the same line, then true same-file and split-file exported macro controls",
+  "roles": [
+    "normal signed Cargo no incremental",
+    "registry-like no public hash diagnostic: signed Cargo -Zohm-defaults=no, no incremental, independent artifacts, no performance claim"
+  ],
+  "compare": [
+    "whole private/public crate hashes",
+    "metadata bytes",
+    "plain native Some/None",
+    "actual returned Span::byte_range in its own binary",
+    "E0308 diagnostics with assigned Span"
+  ],
+  "purpose": "try falsifying both owner-private SVH and existing source-written macro public hash as exact placement proofs"
+}
