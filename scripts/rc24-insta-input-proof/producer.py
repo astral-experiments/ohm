@@ -60,14 +60,18 @@ assert sha(bundle)==reg["bundle"] and git("bundle","list-heads",str(bundle)).spl
 git("bundle","verify",str(bundle))
 git("fetch","--no-tags","--no-recurse-submodules",str(bundle),reg["ref"])
 assert git("rev-parse","FETCH_HEAD^")==reg["parent"] and git("rev-parse","FETCH_HEAD^{tree}")==reg["candidate_tree"]
-assert git("diff","--name-only",reg["parent"],reg["candidate"]).splitlines()==["src/compiler/mod.rs"]
+assert git("diff","--name-only",reg["parent"],reg["candidate"]).splitlines()==sorted(reg["files"])
+for filename, hashes in reg["files"].items():
+    for role, expected in zip(("parent", "candidate"), hashes, strict=True):
+        content = subprocess.check_output(["git", "show", reg[role] + ":" + filename], cwd=src)
+        assert hashlib.sha256(content).hexdigest() == expected
 subprocess.run(["cargo","+ohm","-Zohm-defaults=no","fetch","--locked"],cwd=src,env=e,check=True)
 cs={}
 for name in ("parent","candidate"):
     git("checkout","--quiet","--detach",reg[name])
     assert git("rev-parse","HEAD")==reg[name] and git("rev-parse","HEAD^{tree}")==reg[name+"_tree"]
     build=root/(name+"-target")
-    use=dict(e,CARGO_TARGET_DIR=str(build),CARGO_NET_OFFLINE="true")
+    use=dict(e,CARGO_TARGET_DIR=str(build),CARGO_BUILD_BUILD_DIR=str(root/(name+"-stage-build")),CARGO_NET_OFFLINE="true")
     cmd=["cargo","+ohm","-Zohm-defaults=no","build","--release","--locked","--offline","-p","cargo","--bin","cargo",
          "--features","all-static,ohm-defaults","-j6"]
     subprocess.run(cmd,cwd=src,env=use,check=True)

@@ -1,13 +1,34 @@
 {
-  "parent": "abc70d60a6fd89c10d5f65cf85820d9b78d5affe",
-  "candidate": "9e279eed91964b0029904928baa3035830ae2e28",
-  "ref": "refs/heads/charlie/retain-registry-compiler-inputs-20261103",
-  "bundle": "04965e5d86306e71922d87e93816efdb3de803a6c6a27ce000903d1304b21e42",
-  "parent_tree": "68e5a1e9b52324ad2e6fb8382eaa7cf53428f97d",
-  "candidate_tree": "c3ba3ccec4c0305f86371e33427eca6241aa7b10",
-  "rust": "f5a51d8cc3e76236c2d0f17d495d59ebb03306e4",
-  "release_sha256": "ecde6809d7f1fc1966798198479867c4a49bdf7a51f3873336d23a40fabce453",
-  "reason": "The signed -24 recheck refuses the empty translated records for registry Insta and Insta-cmd.",
+  "admission": "Price complete Cargo hardware instructions on fresh workers. Charge cold, edit, first and second unchanged, and an unaffected all-fresh check with the same signed compiler. Compare selected native versions, diagnostic refusal with preserved file stamps, repaired behavior, and independent clean. Keep stored bytes and every refusal visible. A single pilot is never a product PR result.",
+  "bundle": "659877d3a81039e0dca6dfdfc5ecbed1c946109b092d4c2916e95ba3ad9f5c7e",
+  "candidate": "1b44b5d3dc540c491c79bbf47fae8b286e8f797a",
+  "candidate_tree": "4fa3ceed3d7bb1797a403d9bf1e3da466493f4c2",
+  "files": {
+    "src/compiler/cached_doctests/mod.rs": [
+      "73df42fadd9f17aaa0a77ae531e74bdd6398c0f71f8e74f14449d52f8f5868f4",
+      "1aceb6fe5d96ab38af174015dfb2da1921977a6a0fc1f700d60c0d30841a1bd6"
+    ],
+    "src/compiler/fingerprint/dep_info.rs": [
+      "59491f1b2466bef47aacbdf2af351dccc1a87ca23c56a442842a35bfb3982fe9",
+      "d37a7c87e67fffbf8ad6a516a3090915b856c7172cf6f6d8016e0a95f975416e"
+    ],
+    "src/compiler/fingerprint/mod.rs": [
+      "155a30690714c5891f3298a7d9bf5b519c995604b2043c140bfad074ad8462a9",
+      "211ff1fcde49653a50cd1882f04294a3e3a2c6a35431050de7306ef6cc202ab7"
+    ],
+    "src/compiler/fingerprint/worktree.rs": [
+      "ab4dd0faab9b58ca446dc9350ef26d8e119fe4721aad67aec799843b3ad193d7",
+      "7ae71f81317379d3d81526817868ec5998ab45fb82f2d0337ab524a652e05995"
+    ],
+    "src/compiler/mod.rs": [
+      "f76914576718e35a8c1cb1f6d53caac346353b52b65ddfdb997a730c5c1add6e",
+      "fec6a19e9eeb70c27ef9e6dd2f0f7c70a01ddf1fb32fb7c900fd7ed132dc2a56"
+    ],
+    "src/ops/cargo_worktree/mod.rs": [
+      "c38a6515306bcf3fd00788c2f74af28b7e7b7b6e5ad81b4d0d1a7c004d37c433",
+      "2a68bee2786e9e6cbdb1fec2e666d810863d7759914db80978c88fbd4f2e5f3f"
+    ]
+  },
   "mixed_sdk_reproducer": {
     "23_23": [
       "ron"
@@ -27,8 +48,6 @@
     ]
   },
   "normal_project": {
-    "old": "3bf4988cf062dc76895ff2f8421acf766172392b",
-    "new": "dfe14506d23010aa5dbc4ff6fea702a22ba312bd",
     "command": [
       "cargo",
       "+ohm",
@@ -42,11 +61,11 @@
       "-j4",
       "--message-format=json"
     ],
+    "new": "dfe14506d23010aa5dbc4ff6fea702a22ba312bd",
+    "old": "3bf4988cf062dc76895ff2f8421acf766172392b",
     "verdict": "the new unrelated_file_change_does_not_advance_revision test appears and executes successfully"
   },
   "normal_workspace": {
-    "old": "157caa55a51ebae4fa541d31697e3af9a6c32ccf",
-    "new": "bfa2407e98ee1343caeefd02b4b69043509baa8c",
     "command": [
       "cargo",
       "+ohm",
@@ -56,7 +75,14 @@
       "--offline",
       "-j4",
       "--message-format=json"
-    ]
+    ],
+    "new": "bfa2407e98ee1343caeefd02b4b69043509baa8c",
+    "old": "157caa55a51ebae4fa541d31697e3af9a6c32ccf"
   },
-  "admission": "Price complete Cargo hardware instructions on fresh workers. Charge cold, edit, first and second unchanged, and an unaffected all-fresh check with the same signed compiler. Compare selected native versions, diagnostic refusal with preserved file stamps, repaired behavior, and independent clean. Keep stored bytes and every refusal visible. A single pilot is never a product PR result."
+  "parent": "abc70d60a6fd89c10d5f65cf85820d9b78d5affe",
+  "parent_tree": "68e5a1e9b52324ad2e6fb8382eaa7cf53428f97d",
+  "reason": "Only a rebuilt prerequisite lets Cargo consider an API-hash cutoff. Validate the stored raw rustc checksums of registry sources at that point. Keep ordinary initial freshness on its existing input set. Reject old registry records which cannot establish completeness.",
+  "ref": "refs/heads/charlie/after-prerequisite-registry-inputs-20261103",
+  "release_sha256": "ecde6809d7f1fc1966798198479867c4a49bdf7a51f3873336d23a40fabce453",
+  "rust": "f5a51d8cc3e76236c2d0f17d495d59ebb03306e4"
 }
