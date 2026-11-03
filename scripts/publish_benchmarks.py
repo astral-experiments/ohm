@@ -18,6 +18,7 @@ TIMING_KINDS = ("workflow", "sessions", "historical", "ablation")
 KINDS = (*TIMING_KINDS, "disk")
 TY_WORKTREE_REPORT = "ty-worktree.json"
 TY_SCENARIO = "scripts/session_replays/ty-29327.json"
+RUFF_DOCTEST_REPORT = "ruff-doctests.json"
 DEVELOPER_WORKFLOW_REPORT = "developer-workflows.json"
 
 
@@ -408,10 +409,33 @@ def render_tables(reports, ty_worktree, ty_scenario):
     return rendered, headlines
 
 
+def ruff_doctest_table(report):
+    medians = {}
+    for lane in ("stock", "ohm"):
+        samples = [s for s in report["samples"] if s["toolchain"] == lane]
+        if [s["pair"] for s in samples] != list(range(6)):
+            raise ValueError(f"Expected one cold run and five warm Ruff doctest runs for {lane}")
+        times = [s["seconds"] for s in samples[1:]]
+        if not all(math.isfinite(t) and t > 0 for t in times):
+            raise ValueError(f"Invalid Ruff doctest time for {lane}")
+        medians[lane] = statistics.median(times)
+    stock, ohm = medians["stock"], medians["ohm"]
+    version = report["ohm"].removeprefix("ohm-")
+    headers = ["Workload", f"Rust {report['upstream']}", f"Ohm {version}", "Speedup"]
+    row = [
+        "Ruff doctests (`cargo test --doc`)",
+        f"{stock:.3f} s",
+        f"{ohm:.3f} s",
+        f"{stock / ohm:.2f}×",
+    ]
+    return table(headers, [row])
+
+
 def documents(reports):
     tables, headlines = render_tables(
         reports, load(RESULTS / TY_WORKTREE_REPORT), load(ROOT / TY_SCENARIO)
     )
+    tables["ruff-doctests"] = ruff_doctest_table(load(RESULTS / RUFF_DOCTEST_REPORT))
     workflows = load(RESULTS / DEVELOPER_WORKFLOW_REPORT)
     tables["developer-workflows"] = table(
         [

@@ -24,10 +24,19 @@ class PublicationTests(unittest.TestCase):
         fixture = root / publish.TY_SCENARIO
         fixture.parent.mkdir(parents=True, exist_ok=True)
         publish.write_json(fixture, self.ty_scenario)
-        shutil.copyfile(
-            publish.RESULTS / publish.DEVELOPER_WORKFLOW_REPORT,
-            root / "scripts/benchmark_results" / publish.DEVELOPER_WORKFLOW_REPORT,
-        )
+        for name in (publish.DEVELOPER_WORKFLOW_REPORT, publish.RUFF_DOCTEST_REPORT):
+            shutil.copyfile(publish.RESULTS / name, root / "scripts/benchmark_results" / name)
+
+    def test_ruff_doctests_exclude_cold_runs(self):
+        samples = [
+            {"pair": pair, "toolchain": lane, "seconds": 1000 if not pair else base + pair}
+            for pair in range(6) for lane, base in (("stock", 10), ("ohm", 0))
+        ]
+        report = {"upstream": "1.99.0", "ohm": "ohm-1.99.0-23", "samples": samples}
+        self.assertIn("| 13.000 s | 3.000 s | 4.33× |", publish.ruff_doctest_table(report))
+        samples.pop()
+        with self.assertRaisesRegex(ValueError, "five warm"):
+            publish.ruff_doctest_table(report)
 
     def test_tables_match_current_reports(self):
         for name, expected in publish.documents(self.reports).items():
@@ -262,6 +271,7 @@ class PublicationTests(unittest.TestCase):
                 | {
                     Path(publish.TY_WORKTREE_REPORT).stem,
                     Path(publish.DEVELOPER_WORKFLOW_REPORT).stem,
+                    Path(publish.RUFF_DOCTEST_REPORT).stem,
                 },
             )
 

@@ -114,6 +114,27 @@ to select a revision. The run-count flags in the example control repetitions. `-
 removes build artifacts after each workflow and keeps results and logs. Run
 `uv run scripts/benchmark.py --help` for the full list.
 
+## Ruff doctests
+
+This benchmark times `cargo test --doc --all-features --locked --offline` on 16 crates from
+[Ruff revision `23a16fa`](https://github.com/astral-sh/ruff/tree/23a16fa018cf3b219c2edc7a2b739881e023a874).
+Each toolchain starts with its own empty target directory. The first run primes it. We then time
+five pairs, alternating which toolchain runs first, and report each toolchain’s median. The
+runner checks every example’s crate, name, and outcome against the first run.
+
+On a quiet x86-64 Linux host, install both toolchains and run the following from the Ohm checkout.
+`--source` must point to a clean checkout of the pinned Ruff revision.
+
+```console
+cargo +1.99.0 fetch --locked --manifest-path /path/to/ruff/Cargo.toml
+python3 scripts/benchmark_ruff_doctests.py --source /path/to/ruff \
+  --upstream 1.99.0 --ohm ohm-1.99.0-23 --jobs 32 --output /path/to/new-results
+```
+
+The results record all five warm pairs, the Cargo, rustc and rustdoc binaries used, and the
+test inventory hash. Both priming runs and all ten measured runs passed the same 207 examples
+and ignored the same nine. [Ruff doctest measurements](scripts/benchmark_results/ruff-doctests.json)
+
 ## Read the results
 
 The individual-command runner writes `summary.md`, `results.json`, and per-command logs. A stock/Ohm

@@ -213,6 +213,19 @@ avoid rebuilding unchanged dependents:
 
 <!-- /benchmark:features -->
 
+**Warm doctests** show how long it takes to rerun Ruff’s documentation examples with unchanged
+source. We report the median of five Linux runs per toolchain. Each passed 207 examples and
+ignored nine across 16 crates.
+[Method and individual runs](BENCHMARKS.md#ruff-doctests)
+
+<!-- benchmark:ruff-doctests -->
+
+| Workload                           | Rust 1.99.0 | Ohm 1.99.0-23 | Speedup |
+| ---------------------------------- | ----------- | ------------- | ------- |
+| Ruff doctests (`cargo test --doc`) | 13.562 s    | 1.643 s       | 8.25×   |
+
+<!-- /benchmark:ruff-doctests -->
+
 ## Philosophy
 
 Rust's compile times and disk usage are increasingly viewed as bottlenecks in day-to-day
