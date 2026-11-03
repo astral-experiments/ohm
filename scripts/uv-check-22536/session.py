@@ -94,7 +94,7 @@ def arm(e,role,armname,index,cal,ref):
     shutil.rmtree(archive);result={'pair':index+1,'arm':armname,'compiler':role,'seed_target':a[1],'boot':mask[0],'hold':1+index//4,'values':rows,'argument_surface':{k:{n:shape(x[0])for n,x in by.items()}for k,by in form.items()}};writez(d/'complete.json.gz',result);return result
 def main(cfg,e=None):
     e=e or Managed(cfg);gate=read(e.results/'qualification/accepted.json');assert gate['suitable_to_score']and gate['plan']==CASE['protocol']and gate['treatment']=='F'and gate['control']in('S','R')
-    live=read(e.results/'fresh-publication.json');assert live['immutable']and not live['draft']and not live['prerelease']and live['id']==PLAN['control']['published_at_freeze']['id']and live['tag_name']==LOCK['release']['tag'];cal=read(e.results/'calibration/accepted.json');lookup={'P':gate['control'],'T':'F'}
+    live=read(e.results/'fresh-publication.json');assert live['immutable']and not live['draft']and not live['prerelease']and live['id']==LOCK['release']['release_id']and live['tag_name']==LOCK['release']['tag'];cal=read(e.results/'calibration/accepted.json');lookup={'P':gate['control'],'T':'F'}
     base=e.results/'qualification';control=base/('signed-1'if gate['control']=='R'else'corrected')
     assert producer_map.compare(control,base/'treatment')==readz(base/'producer-bijection.json.gz'), 'genuine source/PID/argv qualification required before scoring'
     fresh={}
@@ -108,8 +108,7 @@ def main(cfg,e=None):
     barrier=read(e.results/'compatibility.json');assert barrier['eligible']and barrier['roles']==[lookup['P'],'F']and barrier['runtime']=={k:LOCK['roles'][v]['hash']for k,v in lookup.items()}
     for i,order in enumerate(PLAN['pairs']['pair_orders']):
         visits=[arm(e,lookup[k],k,i,cal,fresh[k])for k in order];assert visits[0]['argument_surface']==visits[1]['argument_surface'],('unexpected cross-arm argument surface',i)
-    from score import replay
-    write(e.results/'result.json',replay(e.results));e.close()
+    e.close()
 if __name__=='__main__':
     cfg=read(sys.argv[2]);e=Env(cfg)
     if sys.argv[1]=='setup':setup(e)

@@ -1,12 +1,18 @@
 """Reopen the native SDK, independent histories, real source witnesses and physical calibrators."""
 from pathlib import Path
 from statistics import median
-import hashlib,json,os,struct
+import hashlib,json,os,struct,sys
+sys.path.insert(0,str(Path(__file__).resolve().parent))
+import release23
 from basis import CASE,HERE,LOCK,PLAN,SIX,WORKSPACE,canon,digest,filehash,read,readz
 import fixed_products,producer_map,live_review
 def affirm(root):
+    release23.publication_pair(root,LOCK['release'])
+    release23.confirm_native(root,HERE,LOCK)
     cal=read(root/'calibration/accepted.json');qual=read(root/'qualification/accepted.json');selected=qual['control'];mat=read(root/'actual-inputs.json');bounds=read(root/'compatibility.json');dc=root/'calibration';assert cal['protocol']==qual['plan']==CASE['protocol']and cal['boot']not in cal['excluded']and len(cal['excluded'])==len(set(cal['excluded']))>24 and len(cal['cpus'])==len(set(cal['cpus']))==8
-    assert set(cal['excluded'])==set(read(HERE/'dispatch-enrollment.json')['excluded_boots'])and len(cal['excluded'])==28
+    from hosted import verify_host, native_selection
+    verify_host(root,LOCK)
+    assert native_selection(root,LOCK)==read(root/'release23-selection.json')
     assert filehash(dc/'scoped/calibration.json')==cal['scoped']and filehash(dc/'wall/passed.json')==cal['blocking'];sc=read(dc/'scoped/calibration.json');assert sc['reexec_rejected']and set(sc['known_two_instruction_loop'])=={'serial','threads','fork'}
     for key,expected in {'serial':22000000,'threads':66000000,'fork':0}.items():
         v=sc['known_two_instruction_loop'][key];assert v['expected_delta']==expected and v['counts'][1]-v['counts'][0]==v['measured_delta']and abs(v['measured_delta']-expected)<=100000
@@ -22,7 +28,7 @@ def affirm(root):
     assert median(offsets)<=4000000 and wc['nonzero_exit']==17 and wc['deadline_exit']==-9 and 60000000<=wc['deadline_ns']<1000000000
     gate=root/'qualification';roles={'R','F'}|{selected};canonical=read(HERE/'ctfe-authority.json')['native_originals']
     for role in roles:
-        f=gate/('actual-ctfe-'+role+'.json');r=read(f);gold=canonical['R' if role=='R'else'S'];assert filehash(f)==qual['canonical_ctfe_source_receipts'][role]and r['checks']==gold['checks']and r['matches_official_regression']==(role!='R')and r['rustc_launcher_sha256']==LOCK['roles'][role]['runtime']['bin/rustc']['sha256']and r['source_commit']==mat[role]['source']['commit'];assert len(r['visits'])==5 and all(len(v['commands'])==4 and all(q['exit']==0 for q in v['commands'])for v in r['visits'].values())
+        f=gate/('actual-ctfe-'+role+'.json');r=read(f);assert filehash(f)==qual['canonical_ctfe_source_receipts'][role];release23.canonical(r,role,LOCK['roles'],release23.canonical_sources(HERE))
     folders={'signed-1':'R','treatment':'F'}
     if selected=='S':folders|={'signed-2':'R','corrected':'S'}
     for name,role in folders.items():

@@ -1,7 +1,7 @@
 """Move worker-owned installed directories at one fixed sysroot. Never modify a launcher inode."""
 from pathlib import Path
 import os
-from basis import PLAN,Env,EVENTS,canon,filehash,read
+from basis import LOCK,Env,EVENTS,canon,filehash,read
 
 class Managed(Env):
     def __init__(self,cfg):
@@ -29,4 +29,4 @@ class Managed(Env):
         assert role in self.identities and role in self.inp['sdks']
         if self.active!=role:
             self.home();self.move(role,self.pool/role,self.sdk);self.active=role
-        assert filehash(self.sdk/'bin/cargo')==self.identities[role]['signed_cargo']==PLAN['control']['signed_22_cargo']
+        assert filehash(self.sdk/'bin/cargo')==self.identities[role]['signed_cargo']==LOCK['signed_cargo']

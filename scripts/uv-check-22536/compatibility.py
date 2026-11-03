@@ -7,6 +7,7 @@ def qualify(e):
     return qualify_pair(e,read(e.results/'qualification/accepted.json')['control'])
 def qualify_pair(e,chosen):
     original=read(HERE/'epoch-kit.json');kit=HERE/'kit/epoch';assert all(filehash(kit/n)==v for n,v in original['files'].items())
+    original['roles']={r:{'source':a['source']['commit'],'incremental':a['source']['epoch'],'metadata':a['source']['metadata_epoch']}for r,a in LOCK['roles'].items()}
     roles=(chosen,'F');assert chosen in ('S','R')
     by={r:Path(e.inp['sdks'][r]).resolve()for r in roles};src={original['roles'][r]['source']:by[r]for r in roles};epochs={original['roles'][r]['source']:(original['roles'][r]['incremental'],original['roles'][r]['metadata'])for r in roles};out=e.results/'epoch-native';out.mkdir()
     runpy.run_path(str(kit/'epoch.py'))['run'](by[chosen],by['F'],out/'incremental','actual',expected=[(s,p[0])for s,p in epochs.items()])

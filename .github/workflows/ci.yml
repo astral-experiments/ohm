@@ -1,4 +1,4 @@
-name: 'Two real uv #22536 code edits and the intervening rustdoc edit'
+name: 'Signed −23 margin on the two real uv #22536 code edits'
 'on':
   workflow_dispatch:
     inputs:
@@ -6,17 +6,27 @@ name: 'Two real uv #22536 code edits and the intervening rustdoc edit'
         required: true
         type: string
         description: Reviewed full SHA of this benchmark
+      primary_head:
+        required: true
+        type: string
+        description: Completed primary uv 22958 coordinator
+      enrollment_sha:
+        required: true
+        type: string
+        description: SHA256 of the verified signed release 23 physical inputs
 permissions:
   contents: read
   actions: read
   attestations: read
 jobs:
   eight-real-session-pairs:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22536-source-session-check' && github.sha == inputs.reviewed_head && github.run_attempt == 1
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22536-signed23-projection' && github.sha == inputs.reviewed_head && github.run_attempt == 1 && false
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 210
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      PRIMARY_HEAD: ${{ inputs.primary_head }}
+      ENROLLMENT_SHA: ${{ inputs.enrollment_sha }}
     steps:
     - name: Check out coordinator
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -31,7 +41,18 @@ jobs:
           scripts/uv-client-22958
 
           scripts/uv-check-22536'
-        fetch-depth: '4'
+        fetch-depth: '6'
+    - name: Check out the completed primary consumer and its physical SDK locks
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        path: primary-coordinator
+        ref: ${{ inputs.primary_head }}
+        persist-credentials: 'false'
+        fetch-depth: '2'
+        sparse-checkout: |
+          scripts/uv-client-22958
+          scripts/uv-callables-21041
+          scripts/handwritten-panel
     - name: Check out opening
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
@@ -117,11 +138,11 @@ jobs:
         /usr/bin/bash opening/scripts/uv-root-20991-opening/host-prerequisites.sh
 
         '
-    - name: Admit all three source-native distributions and the 654 genuine locked crates
+    - name: Admit the signed release, available private SDK and QA originals, and 654 genuine locked crates
       shell: bash
       run: 'set -euo pipefail
 
-        /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/authority.py acquire
+        /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/hosted.py acquire
 
         '
       env: &id001
@@ -136,7 +157,7 @@ jobs:
     - name: Publish only the early physical attestation
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-22536-session-boot
+        name: uv-22536-release23-boot
         path: session-results/calibration/accepted.json
         if-no-files-found: error
         retention-days: 5
@@ -144,7 +165,7 @@ jobs:
       shell: bash
       run: 'set -euo pipefail
 
-        /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/science.py open session-config.json
+        /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/science.py open session-config.json && /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/hosted.py selection
 
         '
     - name: Check both real compiler epochs and native metadata in both directions
@@ -158,7 +179,7 @@ jobs:
       shell: bash
       run: 'set -euo pipefail
 
-        /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/authority.py latest
+        /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/hosted.py latest
 
         '
       env: *id001
@@ -168,9 +189,18 @@ jobs:
 
         /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/science.py measure session-config.json
 
+        '
+    - name: Recheck the published signed release after the last measurement
+      shell: bash
+      run: /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/hosted.py latest-after
+      env: *id001
+    - name: Reopen every native visit and physical counter on the fresh host
+      shell: bash
+      run: 'set -euo pipefail
+
         /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/score.py session-results > session-results/independent-replay.json
 
-        /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/native_reader.py session-results > session-results/native-replay.json
+        /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/native_reader.py session-results > session-results/native-replay.json && /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/hosted.py results
 
         '
     - name: Pack all raw measurements and custody on failure or success
@@ -185,7 +215,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-22536-two-code-edits
+        name: uv-22536-release23-eight-pairs
         path: session-evidence/
         if-no-files-found: error
         retention-days: 7

@@ -5,7 +5,7 @@ from fractions import Fraction as Fr
 from math import comb
 import json,sys
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-from basis import CASE,LOCK,PLAN,EVENTS,SIX,WUNITS,canon,digest,filehash,read,readz
+from basis import CASE,HERE,LOCK,PLAN,EVENTS,SIX,WUNITS,canon,digest,filehash,read,readz
 import fixed_products
 def ratios(pairs,strict_bar):
     values=[Fr(a,b)for a,b in pairs];assert len(values)==8 and all(v>0 for v in values)
@@ -28,9 +28,14 @@ def inventory(tree,material):
     assert tree['images'][0]['file']==material['cargo_kernel_identity']and tree['exits'][tree['root']]==0
     rows={a['pid']:a for a in tree['images']if a['file']==material['rustc_kernel_identity']};assert all(Path(i['exe']).name!='rustc'or i['pid']in rows for i in tree['images']);return rows
 def replay(root):
+    from hosted import verify_host
+    verify_host(root,LOCK)
+    import release23
+    release23.publication_pair(root,LOCK['release'])
+    release23.confirm_native(root,HERE,LOCK)
     cal=read(root/'calibration/accepted.json');qual=read(root/'qualification/accepted.json');cert=read(root/'compatibility.json');materials=read(root/'actual-inputs.json')
     assert qual['suitable_to_score']and cert['eligible']and qual['plan']==cal['protocol']==CASE['protocol']and cert['roles']==[qual['control'],'F']
-    assert set(qual['actual_role_argv'])==set('BCD')and qual['upstream_rank_witnesses']=={r:{'A':0,'B':1,'C':1,'D':1}for r in cert['roles']};assert set(materials)=={'R','S','F'}and all(v['runtime_sha256']==LOCK['roles'][r]['hash'] and v['signed_cargo']==PLAN['control']['signed_22_cargo']and v['members']==142 and v['core_only']for r,v in materials.items())
+    assert set(qual['actual_role_argv'])==set('BCD')and qual['upstream_rank_witnesses']=={r:{'A':0,'B':1,'C':1,'D':1}for r in cert['roles']};assert set(materials)==set(LOCK['roles'])and all(v['runtime_sha256']==LOCK['roles'][r]['hash'] and v['signed_cargo']==LOCK['signed_cargo']and v['members']==LOCK['member_counts'][r] and v['core_only']for r,v in materials.items())
     assert materials[qual['control']]['rustc_kernel_identity']!=materials['F']['rustc_kernel_identity'];machine=cal['boot'];values=[];receipts=[];seeds=set()
     for i,order in enumerate(PLAN['pairs']['pair_orders'],1):
         typed={};av={};arms={}

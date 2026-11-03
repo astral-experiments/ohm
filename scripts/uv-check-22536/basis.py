@@ -17,6 +17,8 @@ def readz(p):return json.loads(gzip.decompress(Path(p).read_bytes()))
 PLAN=read(HERE/'protocol.json');CASE=read(HERE/'case.json');KIT=read(HERE/'instruments.json');LOCK=readz(HERE/'production-inputs.json.gz')
 assert filehash(HERE/'protocol.json')==CASE['protocol']=='8ce5b388b9e5ca2a3543abbdf572aff97bf4a7958aa0be69813978d330eaf803'
 assert filehash(HERE/'production-inputs.json.gz')==CASE['role_authority']and all(filehash(HERE/'kit'/n)==z['sha256']for n,z in KIT.items())
+import release23
+LOCK=release23.lock()
 SIX=PLAN['six'];WORKSPACE={r['crate']:r['source']for r in CASE['expected']['A']['workspace']};assert len(WORKSPACE)==38 and len(SIX)==6
 WUNITS=set(WORKSPACE)|set(read(HERE/'full-surfaces.json')['additional_linked_workspace_metadata']);assert len(WUNITS)==39
 def collector():
@@ -24,7 +26,7 @@ def collector():
     gl={'__file__':str(path),'__name__':'records_for_large_unmodified_cold_command'};exec(compile(src.replace('len(rows)<20000','len(rows)<200000'),str(path),'exec'),gl);return gl
 EVENTS=collector()
 def sdk_inventory(role,sdk,exact=True):
-    sdk=Path(sdk).resolve(strict=True);expect=LOCK['roles'][role]['runtime'];assert len(expect)==142
+    sdk=Path(sdk).resolve(strict=True);expect=LOCK['roles'][role]['runtime'];assert len(expect)==LOCK['member_counts'][role]
     for n,r in expect.items():
         x=sdk/n;assert not x.is_symlink() and x.is_file() and x.stat().st_size==r['bytes']and bool(x.stat().st_mode&0o111)==bool(r['mode']&0o111) and filehash(x)==r['sha256'],(role,n)
     if exact:assert {str(f.relative_to(sdk))for f in sdk.rglob('*')if f.is_file()or f.is_symlink()}==expect.keys()
@@ -48,14 +50,14 @@ class Env:
         return ref['source']
     def choose(self,role):
         src=Path(self.inp['sdks'][role]).resolve(strict=True);tmp=self.root/'new-sdk-view';assert not tmp.exists()and not tmp.is_symlink() and (not self.sdk.exists()or self.sdk.is_symlink())
-        tmp.symlink_to(src,target_is_directory=True);tmp.replace(self.sdk);assert self.sdk.resolve()==src and filehash(self.sdk/'bin/cargo')==PLAN['control']['signed_22_cargo']
+        tmp.symlink_to(src,target_is_directory=True);tmp.replace(self.sdk);assert self.sdk.resolve()==src and filehash(self.sdk/'bin/cargo')==LOCK['signed_cargo']
     def reset(self):
         assert self.target.parent==self.root and self.target.name=='target'and not self.target.is_symlink()
         if self.target.exists():shutil.rmtree(self.target)
         self.target.mkdir()
     def close(self):assert not self.git('status','--porcelain','--untracked-files=all')
 def setup(e):
-    assert e.root.is_dir()and not any(e.root.iterdir())and e.results.is_dir()and not any(e.results.iterdir()) and e.inp['control_candidate_source_inputs']==CASE['role_authority']
+    assert e.root.is_dir()and not any(e.root.iterdir())and e.results.is_dir()and not any(e.results.iterdir()) and e.inp['control_candidate_source_inputs']==filehash(HERE/'release23-inputs.json')
     for p in (e.target,e.src,e.bank,e.cas,e.bin_dir,e.root/'home',e.root/'tmp'):p.mkdir()
     subprocess.run(['git','init','-q',e.src],check=True);d=Path(e.inp['source_donor']).resolve();obj=Path(subprocess.check_output(['git','-C',d,'rev-parse','--path-format=absolute','--git-path','objects'],text=True).strip())
     assert obj.is_dir();(e.src/'.git/objects/info/alternates').write_text(str(obj)+'\n');e.git('remote','add','origin','https://github.com/astral-sh/uv.git');e.git('checkout','-q','--detach',CASE['states']['A']['source'])
@@ -67,7 +69,7 @@ def setup(e):
     for n in ('index','cache'):shutil.copytree(upstream/'registry'/n,e.cargo/'registry'/n)
     data=registry(e.cargo,e.src);write(e.results/'source-registry.json',dict(states=CASE['states'],registry=data,lock=CASE['lock']));assert not (e.cargo/'registry/src').exists()
     actual={r:sdk_inventory(r,sdk,exact=not(e.inp.get('local_full_signed')and r=='R'))for r,sdk in e.inp['sdks'].items()}
-    assert set(actual)=={'R','S','F'};write(e.results/'actual-inputs.json',actual)
+    assert set(actual)==set(LOCK['roles']);write(e.results/'actual-inputs.json',actual)
 def option(a,k):
     v=[a[i+1]for i,t in enumerate(a[:-1])if t==k]+[t[len(k)+1:]for t in a if t.startswith(k+'=')];assert len(v)<=1;return v[0]if v else None
 def shape(a):

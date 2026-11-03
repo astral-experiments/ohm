@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from basis import CASE,HERE,LOCK,PLAN,Env,SIX,WORKSPACE,canon,digest,filehash,kernel,read,readz,setup,shape,write,writez
-import semantics
+import semantics,release23
 import fixed_input
 def changed_forms(row):
     return {k:v for k,v in row['forms'].items()if k in SIX}
@@ -35,13 +35,17 @@ def qualify(e,include_upstream=True):
     gates=e.results/'qualification';gates.mkdir();kit=HERE/'kit/ctfe';receipt=read(HERE/'ctfe-authority.json');assert all(filehash(kit/n)==h for n,h in receipt['real_inputs'].items());ctfe_runner=runpy.run_path(str(kit/'ctfe_check.py'))['main']
     def linked318(role):
         sdk=Path(e.inp['sdks'][role]);dest=gates/('actual-ctfe-'+role+'.json');commit=LOCK['roles'][role]['source']['commit'];ctfe_runner(sdk,commit,dest);native=read(dest)
-        historic=receipt['native_originals']['R'if role=='R'else'S'];assert native['source_commit']==commit and native['rustc_launcher_sha256']==LOCK['roles'][role]['runtime']['bin/rustc']['sha256']and native['checks']==historic['checks']and native['matches_official_regression']==(role!='R')
-        assert len(native['visits'])==5 and all(len(x['commands'])==4 and all(a['exit']==0 for a in x['commands'])for x in native['visits'].values());return filehash(dest)
+        release23.canonical(native,role,LOCK['roles'],release23.canonical_sources(HERE))
+        return filehash(dest)
     canonical={'R':linked318('R'),'F':linked318('F')};r=reproduce(e,'R',gates/'signed-1');e.reset()
+    replicated=None
     if r['passes']:control='R'
     else:
         assert r['only_known_ctfe'],'untimed signed control had an unexplained failure'
         twin=reproduce(e,'R',gates/'signed-2');e.reset();assert twin['only_known_ctfe']and {s for s,x in r['semantic'].items()if x['ctfe_terminal_only']}=={s for s,x in twin['semantic'].items()if x['ctfe_terminal_only']}
+        assert LOCK['full_variant']=='full_with_ctfe' and 'S' in LOCK['roles'],'registered corrected SDK unavailable'
+        c=release23.canonical(read(gates/'actual-ctfe-R.json'),'R',LOCK['roles'],release23.canonical_sources(HERE))
+        replicated=release23.repeated(gates/'signed-1',gates/'signed-2',c)
         canonical['S']=linked318('S');fixed=reproduce(e,'S',gates/'corrected');e.reset();assert fixed['passes'];control='S'
     full=reproduce(e,'F',gates/'treatment');assert full['passes'];e.reset()
     parent=gates/('signed-1'if control=='R'else'corrected');surfaces={}
@@ -58,7 +62,7 @@ def qualify(e,include_upstream=True):
                 directory=gates/(role+'-upstream-'+state);semantics.upstream(e,state,directory);rows[state]=read(directory/'accepted.json')['passed_rank_tests']
             e.reset();shutil.rmtree(e.root/'fixture-target');witness[role]=rows
         assert witness[control]==witness['F']=={'A':0,'B':1,'C':1,'D':1}
-    data={'plan':CASE['protocol'],'control':control,'treatment':'F','signed_result':r,'canonical_ctfe_source_receipts':canonical,'all_live_sources_semantically_admitted':True,'actual_role_argv':surfaces,'upstream_rank_witnesses':witness,'suitable_to_score':include_upstream}
+    data={'replicated_ctfe':replicated,'plan':CASE['protocol'],'control':control,'treatment':'F','signed_result':r,'canonical_ctfe_source_receipts':canonical,'all_live_sources_semantically_admitted':True,'actual_role_argv':surfaces,'upstream_rank_witnesses':witness,'suitable_to_score':include_upstream}
     write(gates/'accepted.json',data);return data
 if __name__=='__main__':
     import sys

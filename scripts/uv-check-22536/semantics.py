@@ -2,6 +2,7 @@
 import collections,gzip,json,os,re,runpy,shutil,subprocess,tarfile
 from pathlib import Path
 from basis import CASE,HERE,LOCK,WORKSPACE,WUNITS,canon,digest,filehash,read,write,writez
+import release23
 def stash(e,f):
     n=filehash(f);d=e.cas/(n+'.gz')
     if not d.exists():
@@ -13,6 +14,9 @@ def products(e,paths,store=False):
     # Guard against a second stale output for these core normal check units.
     assert {str(f.relative_to(e.target))for n in WORKSPACE for f in (e.target/'debug/build'/n.replace('_','-')).glob('*/out/lib'+n+'-*.rmeta')}==set(paths.values())
     side={str(f.relative_to(e.target)):filehash(f)for f in e.target.rglob('*.public-api-hash')};assert len(side)==423,len(side)
+    if store:
+        terminal=e.target/Path(wk['uv_client'][0]).parent.parent/'fingerprint/lib-uv_client.public-api-hash'
+        assert stash(e,terminal)[1]==side[str(terminal.relative_to(e.target))]
     return {'workspace':wk,'public_sidecars':dict(sorted(side.items()))}
 def decoder(e):
     out=e.root/'decoder';archive=HERE/'kit/metadata-kit.tar.xz';r=read(HERE/'metadata-kit.json');assert filehash(archive)==r['kit_sha']
@@ -27,7 +31,7 @@ def decoder(e):
     return runpy.run_path(str(out/r['kit_module']))
 def typed_compare(e,a,b,d,coverage=None):
     assert a.keys()==b.keys()and a['workspace'].keys()==b['workspace'].keys()and a['public_sidecars'].keys()==b['public_sidecars'].keys()
-    differences={k for k in a['public_sidecars']if a['public_sidecars'][k]!=b['public_sidecars'][k]};changed={};ctfe=[];unresolved=[];dec=None;needs={};coverage=coverage or {};known=read(HERE/'fixed-layout-rule.json')['known_prior_physical_kinds']
+    differences={k for k in a['public_sidecars']if a['public_sidecars'][k]!=b['public_sidecars'][k]};changed={};ctfe=[];terminal_headers=None;unresolved=[];dec=None;needs={};coverage=coverage or {};known=read(HERE/'fixed-layout-rule.json')['known_prior_physical_kinds']
     for n,r in sorted(a['workspace'].items()):
         u=b['workspace'][n];assert r[0]==u[0]
         if r==u:continue
@@ -48,11 +52,14 @@ def typed_compare(e,a,b,d,coverage=None):
             match_public=lambda st:bool(re.match(r'^\s*(?:public_hash|public hash)\b',st,re.I))
             lit=(n=='uv_client' and len(diff)==1 and all(match_public(o)for o in diff[0][1:]) and all(v for k,v in checks.items()if k not in('native_crate_root','ctfe')) and checks['ctfe'] and not metrics['changed_RDR_key_count'] and alloc['multisets_identical'])
             (ctfe if lit else unresolved).append(n)
+            if lit:terminal_headers=(aa,bb)
         changed[n]={'warm':x,'cold':y,'typed':wire,'root_sha256':[digest(g)for g in headers],'all_semantic_guards_passed':full}
-    side_owners={next((n for n,p in a['workspace'].items()if Path(f).parent==Path(p[0]).parent and Path(f).name.startswith('lib'+n+'-')),None)for f in differences}
     ok=not differences and not unresolved and not ctfe
-    ctfe_only=not unresolved and ctfe==['uv_client'] and (not differences or side_owners=={'uv_client'})
-    out={'all_workspace':len(a['workspace']),'all_public':len(a['public_sidecars']),'exact_rmeta':len(a['workspace'])-len(changed),'changes':changed,'changed_sidecars':sorted(differences),'ctfe_terminal_only':ctfe_only,'accepted':ok,'unresolved':unresolved,'needs_fixed_input':needs,'allowed_only_from_actual_certificates':coverage};writez(d/'typed-warm-cold.json.gz',out);return out
+    evidence=None
+    if not unresolved and ctfe==['uv_client']:
+        evidence=release23.terminal((a['public_sidecars'],b['public_sidecars']),a['workspace']['uv_client'][0],terminal_headers,e.cas)
+    ctfe_only=evidence is not None
+    out={'all_workspace':len(a['workspace']),'all_public':len(a['public_sidecars']),'exact_rmeta':len(a['workspace'])-len(changed),'changes':changed,'changed_sidecars':sorted(differences),'ctfe_terminal_only':ctfe_only,'terminal_ctfe_evidence':evidence,'accepted':ok,'unresolved':unresolved,'needs_fixed_input':needs,'allowed_only_from_actual_certificates':coverage};writez(d/'typed-warm-cold.json.gz',out);return out
 def probe(e,state,forms,d):
     src=CASE['states'][state]['source'];assert e.source(state)==src;a,=forms['uv_client'];search=[]
     for i,v in enumerate(a[:-1]):
