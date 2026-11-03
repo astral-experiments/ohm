@@ -1,0 +1,828 @@
+{
+  "study": "ty-29327-and-worktree-start",
+  "rust": "1.99.0",
+  "ohm": "ohm-1.99.0-21",
+  "started_at": "2026-10-30T19:12:46.360325+00:00",
+  "finished_at": "2026-10-30T21:44:43.372193+00:00",
+  "source": {
+    "repository": "https://github.com/astral-sh/ruff",
+    "pull_request": "https://github.com/astral-sh/ruff/pull/29327",
+    "base_revision": "4d6a7db787130c5a4a95bd835369babd78e4a1f6",
+    "final_revision": "e221f3e9b5b22b81b0ce4e7c730ac1f5c990adf0",
+    "fixture": "scripts/session_replays/ty-29327.json"
+  },
+  "environment": {
+    "cpu": "32-CPU AMD EPYC-Genoa Processor",
+    "host": "charlie-ohm-21-ty",
+    "platform": "Linux-7.0.0-42-generic-x86_64-with-glibc2.39",
+    "filesystems": {
+      "session": "ext4",
+      "worktree": ["ext4", "Btrfs loopback backed by an ext4 file"]
+    },
+    "cargo_jobs": 8,
+    "nextest": "0.9.140",
+    "nextest_binary_sha256": "c1630f9a8c447391325a6732a114f9b1c537fbc3e10156ddedbf6e3b8ff11f1a",
+    "compiler_accounting": "verbose",
+    "profile": {
+      "opt_level": 1,
+      "debug": "line-tables-only",
+      "lto": "off",
+      "dependency_overrides": "preserved from source Cargo.toml"
+    },
+    "cargo_network": "offline",
+    "session_ohm_settings": {
+      "shared_build_directory": true,
+      "proc_macro_trust": "all",
+      "native_tool_trust": "all"
+    }
+  },
+  "toolchains": {
+    "1.99.0": {
+      "rustc": {
+        "revision": "b940084d7eb6a299eb4bfeb8e34901bc051e7ac4",
+        "binary_sha256": "f3834d26669b03f6855fa54bd2381443123e860167bc0c7a8dd137e5cf6e5e4f"
+      },
+      "cargo": {
+        "revision": "5f94df4789f005f9a352888e8355ffc645b7ed0e",
+        "binary_sha256": "e951141cc55a6cd7b9876d187bd30a3720e6086b99413af95e3b8de1cdd72f14"
+      },
+      "clippy-driver": {
+        "revision": "b940084d7eb6a299eb4bfeb8e34901bc051e7ac4",
+        "binary_sha256": "ecf6d74d4e13728405acd3749bff486db899e793b5e3cd179ab663f7fe9d6fe6"
+      }
+    },
+    "ohm-1.99.0-21": {
+      "rustc": {
+        "revision": "c79998a5cd143c445a4b2528f20953b176a65c5d",
+        "binary_sha256": "f7663fb7dec7e5c7ea613a85ff1d6e4c00bf97b8c50534f17e5c95cd599712b9"
+      },
+      "cargo": {
+        "revision": "2d44bd4aa68b9ba32cacb5a384ecc18fa5e7553c",
+        "binary_sha256": "4695ab8e260ba4d6363e42b785c8f410dd79d9255f0313dab6c19e978878f43e"
+      },
+      "clippy-driver": {
+        "revision": "c79998a5cd143c445a4b2528f20953b176a65c5d",
+        "binary_sha256": "1b8cb7e4267365507efcd10a54bdd75cf8ef7ad5415a6bda10044cd28d159b21"
+      }
+    }
+  },
+  "release_archive_sha256": "6f550de85f95440a61b5bd1a9d2ab0528d4fcaf674fdc008f5e986d2138be6c4",
+  "harness_revision": "04c83d53483607aec4f93fd2bb55b412f101d677",
+  "methodology": {
+    "session_repetitions": 4,
+    "worktree_repetitions_per_filesystem": 3,
+    "worktree_filesystems": ["ext4", "Btrfs loopback"],
+    "ordering": "Session runs alternate the order of stock and Ohm; worktree configurations rotate.",
+    "session_total": "Nine commands, three edits, and runner overhead; baseline CLI warmup excluded.",
+    "worktree_total": "Creation plus first focused validation; parent warmup and intermediate source checks excluded.",
+    "aggregation": "Session totals use means; worktree and per-step timings use medians. Per-step medians need not sum to the session mean.",
+    "fresh_artifacts": "Each cell starts with fresh source, target, and shared-build directories.",
+    "quiet_preflight": "Six five-second checks: at least 95% idle, at most 0.5% iowait and 0.1% steal, no unrelated compiler, at most 1% outside benchmark-user CPU, and at least 60 GiB free.",
+    "continuous_monitor": "Two-second samples reject unrelated compilers, outside benchmark-user CPU above 1%, three consecutive intervals above 5% outside non-Falcon CPU, any steal interval above 1%, or whole-cell weighted average steal above 0.1%.",
+    "protocol_revision": 5,
+    "services": "Falcon and infrastructure services remain enabled; their overhead is included.",
+    "scope": "Stock-versus-released-Ohm comparison; does not isolate changes between Ohm releases."
+  },
+  "session": {
+    "stock": {
+      "total": {
+        "samples": [
+          374.1522349520001, 371.62737978899986, 370.34337172999994,
+          339.6909803389999
+        ],
+        "median": 370.9853757594999,
+        "minimum": 339.6909803389999,
+        "maximum": 374.1522349520001
+      },
+      "commands": {
+        "samples": [
+          373.27242393599977, 370.6712379909991, 369.38983731799954,
+          338.801532217999
+        ],
+        "median": 370.0305376544993,
+        "minimum": 338.801532217999,
+        "maximum": 373.27242393599977
+      },
+      "warmup": {
+        "samples": [
+          139.4884216979999, 137.02348032999998, 139.968667526,
+          131.07426140999996
+        ],
+        "median": 138.25595101399995,
+        "minimum": 131.07426140999996,
+        "maximum": 139.968667526
+      },
+      "compiler_invocations": [336, 336, 336, 336]
+    },
+    "ohm": {
+      "total": {
+        "samples": [
+          228.5634889999999, 231.05673123499992, 218.68171451300032,
+          218.99510894200012
+        ],
+        "median": 223.779298971,
+        "minimum": 218.68171451300032,
+        "maximum": 231.05673123499992
+      },
+      "commands": {
+        "samples": [
+          226.8637214189996, 229.17686606999905, 216.75912637400006,
+          217.57464582699959
+        ],
+        "median": 222.2191836229996,
+        "minimum": 216.75912637400006,
+        "maximum": 229.17686606999905
+      },
+      "warmup": {
+        "samples": [
+          116.86475398399989, 116.64315112199984, 114.130551406,
+          115.49542325899984
+        ],
+        "median": 116.06928719049984,
+        "minimum": 114.130551406,
+        "maximum": 116.86475398399989
+      },
+      "compiler_invocations": [168, 168, 168, 168]
+    }
+  },
+  "session_steps": [
+    {
+      "label": "Build ty before reproducing the bug",
+      "stock": {
+        "seconds": {
+          "samples": [
+            0.5792317709999679, 0.6303604419999829, 0.48897959699979765,
+            0.45509266699991713
+          ],
+          "median": 0.5341056839998828,
+          "minimum": 0.45509266699991713,
+          "maximum": 0.6303604419999829
+        },
+        "compiler_invocations": [0, 0, 0, 0],
+        "cargo_reported_build_seconds": {
+          "samples": [0.45, 0.47, 0.39, 0.4],
+          "median": 0.42500000000000004,
+          "minimum": 0.39,
+          "maximum": 0.47
+        }
+      },
+      "ohm": {
+        "seconds": {
+          "samples": [
+            0.6135441239998727, 0.4718751529999281, 0.6591030250001495,
+            0.43578222900032415
+          ],
+          "median": 0.5427096384999004,
+          "minimum": 0.43578222900032415,
+          "maximum": 0.6591030250001495
+        },
+        "compiler_invocations": [0, 0, 0, 0],
+        "cargo_reported_build_seconds": {
+          "samples": [0.54, 0.42, 0.55, 0.39],
+          "median": 0.48,
+          "minimum": 0.39,
+          "maximum": 0.55
+        }
+      }
+    },
+    {
+      "label": "Verify the original diagnostics and retain the baseline binary",
+      "stock": {
+        "seconds": {
+          "samples": [
+            0.4093508290000045, 0.4066490109998995, 0.6737685329999294,
+            0.5211406489997898
+          ],
+          "median": 0.4652457389998972,
+          "minimum": 0.4066490109998995,
+          "maximum": 0.6737685329999294
+        },
+        "compiler_invocations": [0, 0, 0, 0]
+      },
+      "ohm": {
+        "seconds": {
+          "samples": [
+            0.389035450999927, 0.334707815999991, 0.38857764100021086,
+            0.34401299899946025
+          ],
+          "median": 0.36629531999983556,
+          "minimum": 0.334707815999991,
+          "maximum": 0.389035450999927
+        },
+        "compiler_invocations": [0, 0, 0, 0]
+      }
+    },
+    {
+      "label": "Observe the first failing mdtest",
+      "stock": {
+        "seconds": {
+          "samples": [
+            103.50836347099994, 102.34754573099963, 104.78449632599995,
+            94.93871374399987
+          ],
+          "median": 102.92795460099978,
+          "minimum": 94.93871374399987,
+          "maximum": 104.78449632599995
+        },
+        "compiler_invocations": [116, 116, 116, 116],
+        "cargo_reported_build_seconds": {
+          "samples": [101.0, 100.0, 103.0, 93.0],
+          "median": 100.5,
+          "minimum": 93.0,
+          "maximum": 103.0
+        },
+        "nextest_reported_test_seconds": {
+          "samples": [1.13, 1.07, 0.801, 0.806],
+          "median": 0.9380000000000001,
+          "minimum": 0.801,
+          "maximum": 1.13
+        }
+      },
+      "ohm": {
+        "seconds": {
+          "samples": [
+            74.1966896859999, 73.61982719699972, 70.64070018800021,
+            72.59448983400034
+          ],
+          "median": 73.10715851550003,
+          "minimum": 70.64070018800021,
+          "maximum": 74.1966896859999
+        },
+        "compiler_invocations": [116, 116, 116, 116],
+        "cargo_reported_build_seconds": {
+          "samples": [72.0, 71.0, 69.0, 70.0],
+          "median": 70.5,
+          "minimum": 69.0,
+          "maximum": 72.0
+        },
+        "nextest_reported_test_seconds": {
+          "samples": [1.142, 0.934, 0.816, 0.955],
+          "median": 0.9445,
+          "minimum": 0.816,
+          "maximum": 1.142
+        }
+      }
+    },
+    {
+      "label": "Repeat the failing mdtest after a test-data-only edit",
+      "stock": {
+        "seconds": {
+          "samples": [
+            1.812148420000085, 1.8167233599997417, 1.8775732889998835,
+            1.7594645819999641
+          ],
+          "median": 1.8144358899999133,
+          "minimum": 1.7594645819999641,
+          "maximum": 1.8775732889998835
+        },
+        "compiler_invocations": [0, 0, 0, 0],
+        "cargo_reported_build_seconds": {
+          "samples": [0.46, 0.28, 0.27, 0.28],
+          "median": 0.28,
+          "minimum": 0.27,
+          "maximum": 0.46
+        },
+        "nextest_reported_test_seconds": {
+          "samples": [0.818, 1.004, 1.044, 0.798],
+          "median": 0.911,
+          "minimum": 0.798,
+          "maximum": 1.044
+        }
+      },
+      "ohm": {
+        "seconds": {
+          "samples": [
+            2.0767479460000686, 1.716099347999716, 1.5832122769998023,
+            1.5594855789995563
+          ],
+          "median": 1.6496558124997591,
+          "minimum": 1.5594855789995563,
+          "maximum": 2.0767479460000686
+        },
+        "compiler_invocations": [0, 0, 0, 0],
+        "cargo_reported_build_seconds": {
+          "samples": [0.29, 0.29, 0.28, 0.28],
+          "median": 0.28500000000000003,
+          "minimum": 0.28,
+          "maximum": 0.29
+        },
+        "nextest_reported_test_seconds": {
+          "samples": [1.02, 0.972, 0.81, 0.822],
+          "median": 0.897,
+          "minimum": 0.81,
+          "maximum": 1.02
+        }
+      }
+    },
+    {
+      "label": "Pass the focused regression after the Rust edit",
+      "stock": {
+        "seconds": {
+          "samples": [
+            31.666029926999954, 31.690798407999864, 32.33039278300021,
+            29.485682658999394
+          ],
+          "median": 31.67841416749991,
+          "minimum": 29.485682658999394,
+          "maximum": 32.33039278300021
+        },
+        "compiler_invocations": [3, 3, 3, 3],
+        "cargo_reported_build_seconds": {
+          "samples": [30.05, 30.04, 30.5, 28.15],
+          "median": 30.045,
+          "minimum": 28.15,
+          "maximum": 30.5
+        },
+        "nextest_reported_test_seconds": {
+          "samples": [1.095, 1.035, 0.807, 0.821],
+          "median": 0.9279999999999999,
+          "minimum": 0.807,
+          "maximum": 1.095
+        }
+      },
+      "ohm": {
+        "seconds": {
+          "samples": [
+            34.26661482600002, 33.30327913600013, 32.339178016000005,
+            31.30545204200007
+          ],
+          "median": 32.82122857600007,
+          "minimum": 31.30545204200007,
+          "maximum": 34.26661482600002
+        },
+        "compiler_invocations": [3, 3, 3, 3],
+        "cargo_reported_build_seconds": {
+          "samples": [32.74, 32.02, 30.89, 30.05],
+          "median": 31.455000000000002,
+          "minimum": 30.05,
+          "maximum": 32.74
+        },
+        "nextest_reported_test_seconds": {
+          "samples": [0.815, 0.785, 0.96, 0.81],
+          "median": 0.8125,
+          "minimum": 0.785,
+          "maximum": 0.96
+        }
+      }
+    },
+    {
+      "label": "Run all semantic package tests",
+      "stock": {
+        "seconds": {
+          "samples": [
+            100.86376656499988, 99.4285305379999, 99.47075619799989,
+            91.05655792400012
+          ],
+          "median": 99.4496433679999,
+          "minimum": 91.05655792400012,
+          "maximum": 100.86376656499988
+        },
+        "compiler_invocations": [2, 2, 2, 2],
+        "cargo_reported_build_seconds": {
+          "samples": [90.0, 88.0, 88.0, 80.0],
+          "median": 88.0,
+          "minimum": 80.0,
+          "maximum": 90.0
+        },
+        "nextest_reported_test_seconds": {
+          "samples": [10.058, 10.227, 9.97, 9.981],
+          "median": 10.0195,
+          "minimum": 9.97,
+          "maximum": 10.227
+        }
+      },
+      "ohm": {
+        "seconds": {
+          "samples": [
+            60.44893633400011, 59.61687386799986, 58.74575936300016,
+            57.83015728400005
+          ],
+          "median": 59.18131661550001,
+          "minimum": 57.83015728400005,
+          "maximum": 60.44893633400011
+        },
+        "compiler_invocations": [2, 2, 2, 2],
+        "cargo_reported_build_seconds": {
+          "samples": [50.04, 49.24, 48.17, 47.63],
+          "median": 48.705,
+          "minimum": 47.63,
+          "maximum": 50.04
+        },
+        "nextest_reported_test_seconds": {
+          "samples": [9.755, 9.87, 10.044, 9.702],
+          "median": 9.8125,
+          "minimum": 9.702,
+          "maximum": 10.044
+        }
+      }
+    },
+    {
+      "label": "Rebuild the ty executable with its original feature graph",
+      "stock": {
+        "seconds": {
+          "samples": [
+            31.458397776999846, 31.27203187000032, 31.162713204999818,
+            28.67858459999934
+          ],
+          "median": 31.21737253750007,
+          "minimum": 28.67858459999934,
+          "maximum": 31.458397776999846
+        },
+        "compiler_invocations": [6, 6, 6, 6],
+        "cargo_reported_build_seconds": {
+          "samples": [31.38, 31.19, 31.08, 28.6],
+          "median": 31.134999999999998,
+          "minimum": 28.6,
+          "maximum": 31.38
+        }
+      },
+      "ohm": {
+        "seconds": {
+          "samples": [
+            19.975545122999847, 19.643052364999676, 18.00902059300006,
+            19.030178818000422
+          ],
+          "median": 19.33661559150005,
+          "minimum": 18.00902059300006,
+          "maximum": 19.975545122999847
+        },
+        "compiler_invocations": [6, 6, 6, 6],
+        "cargo_reported_build_seconds": {
+          "samples": [19.91, 19.57, 17.94, 18.96],
+          "median": 19.265,
+          "minimum": 17.94,
+          "maximum": 19.91
+        }
+      }
+    },
+    {
+      "label": "Compare 24 baseline and fixed diagnostic results",
+      "stock": {
+        "seconds": {
+          "samples": [
+            3.237094208999906, 3.579892634999851, 3.3546125930001836,
+            2.9643509570005335
+          ],
+          "median": 3.295853401000045,
+          "minimum": 2.9643509570005335,
+          "maximum": 3.579892634999851
+        },
+        "compiler_invocations": [0, 0, 0, 0]
+      },
+      "ohm": {
+        "seconds": {
+          "samples": [
+            3.2891716559997803, 3.617331861999901, 2.9779868360001274,
+            2.9161791129999983
+          ],
+          "median": 3.133579245999954,
+          "minimum": 2.9161791129999983,
+          "maximum": 3.617331861999901
+        },
+        "compiler_invocations": [0, 0, 0, 0]
+      }
+    },
+    {
+      "label": "Run Clippy for all semantic targets and features",
+      "stock": {
+        "seconds": {
+          "samples": [
+            99.73804096700019, 99.4987059959999, 95.24654479399987,
+            88.94194443600009
+          ],
+          "median": 97.37262539499989,
+          "minimum": 88.94194443600009,
+          "maximum": 99.73804096700019
+        },
+        "compiler_invocations": [209, 209, 209, 209],
+        "cargo_reported_build_seconds": {
+          "samples": [99.0, 99.0, 95.0, 88.0],
+          "median": 97.0,
+          "minimum": 88.0,
+          "maximum": 99.0
+        }
+      },
+      "ohm": {
+        "seconds": {
+          "samples": [
+            31.607436273000076, 36.85381932500013, 31.415588434999336,
+            31.55890792899936
+          ],
+          "median": 31.583172100999718,
+          "minimum": 31.415588434999336,
+          "maximum": 36.85381932500013
+        },
+        "compiler_invocations": [41, 41, 41, 41],
+        "cargo_reported_build_seconds": {
+          "samples": [31.48, 36.71, 30.96, 31.46],
+          "median": 31.47,
+          "minimum": 30.96,
+          "maximum": 36.71
+        }
+      }
+    }
+  ],
+  "worktree": {
+    "stock": {
+      "total": {
+        "samples": [107.05693046700071, 115.54807586100014, 115.17595338300089],
+        "median": 115.17595338300089,
+        "minimum": 107.05693046700071,
+        "maximum": 115.54807586100014
+      },
+      "creation": {
+        "samples": [1.3756981160004216, 1.4025584609998987, 1.451320840000335],
+        "median": 1.4025584609998987,
+        "minimum": 1.3756981160004216,
+        "maximum": 1.451320840000335
+      },
+      "validation": {
+        "samples": [105.68123235100029, 114.14551740000024, 113.72463254300055],
+        "median": 113.72463254300055,
+        "minimum": 105.68123235100029,
+        "maximum": 114.14551740000024
+      },
+      "warmup": {
+        "samples": [105.68796355599989, 116.20732680499987, 115.26175326900011],
+        "median": 115.26175326900011,
+        "minimum": 105.68796355599989,
+        "maximum": 116.20732680499987
+      },
+      "compiler_invocations": [304, 304, 304],
+      "snapshot_seeding": [null, null, null],
+      "snapshot_seeding_limit": [
+        "stock Git worktree creation",
+        "stock Git worktree creation",
+        "stock Git worktree creation"
+      ]
+    },
+    "ohm": {
+      "total": {
+        "samples": [67.62316403899968, 68.60575271499965, 71.32197939700018],
+        "median": 68.60575271499965,
+        "minimum": 67.62316403899968,
+        "maximum": 71.32197939700018
+      },
+      "creation": {
+        "samples": [1.4314007689999926, 1.4721596649997082, 1.5576795209999545],
+        "median": 1.4721596649997082,
+        "minimum": 1.4314007689999926,
+        "maximum": 1.5576795209999545
+      },
+      "validation": {
+        "samples": [66.19176326999968, 67.13359304999994, 69.76429987600022],
+        "median": 67.13359304999994,
+        "minimum": 66.19176326999968,
+        "maximum": 69.76429987600022
+      },
+      "warmup": {
+        "samples": [82.23453204399993, 87.00151286599976, 88.48248071300077],
+        "median": 87.00151286599976,
+        "minimum": 82.23453204399993,
+        "maximum": 88.48248071300077
+      },
+      "compiler_invocations": [80, 80, 80],
+      "snapshot_seeding": [null, null, null],
+      "snapshot_seeding_limit": [
+        "profile not allowed without trust opt-in",
+        "profile not allowed without trust opt-in",
+        "profile not allowed without trust opt-in"
+      ]
+    },
+    "ohm-trusted": {
+      "total": {
+        "samples": [64.23720688999947, 65.96467652800038, 63.904806260999976],
+        "median": 64.23720688999947,
+        "minimum": 63.904806260999976,
+        "maximum": 65.96467652800038
+      },
+      "creation": {
+        "samples": [1.5512935449996803, 1.5572646370001166, 1.4955530030001682],
+        "median": 1.5512935449996803,
+        "minimum": 1.4955530030001682,
+        "maximum": 1.5572646370001166
+      },
+      "validation": {
+        "samples": [62.68591334499979, 64.40741189100027, 62.40925325799981],
+        "median": 62.68591334499979,
+        "minimum": 62.40925325799981,
+        "maximum": 64.40741189100027
+      },
+      "warmup": {
+        "samples": [84.87705867299974, 86.32312118500067, 87.34828495500005],
+        "median": 86.32312118500067,
+        "minimum": 84.87705867299974,
+        "maximum": 87.34828495500005
+      },
+      "compiler_invocations": [36, 36, 36],
+      "snapshot_seeding": [null, null, null],
+      "snapshot_seeding_limit": [
+        "copy-on-write unavailable",
+        "copy-on-write unavailable",
+        "copy-on-write unavailable"
+      ]
+    }
+  },
+  "worktree_copy_on_write": {
+    "stock": {
+      "total": {
+        "samples": [117.50079095000001, 129.26393281700075, 133.8313918499989],
+        "median": 129.26393281700075,
+        "minimum": 117.50079095000001,
+        "maximum": 133.8313918499989
+      },
+      "creation": {
+        "samples": [1.6050042090000716, 2.090211927999917, 1.8347991249993356],
+        "median": 1.8347991249993356,
+        "minimum": 1.6050042090000716,
+        "maximum": 2.090211927999917
+      },
+      "validation": {
+        "samples": [115.89578674099994, 127.17372088900083, 131.99659272499957],
+        "median": 127.17372088900083,
+        "minimum": 115.89578674099994,
+        "maximum": 131.99659272499957
+      },
+      "warmup": {
+        "samples": [114.26211712799977, 120.80507178800144, 124.03072996300034],
+        "median": 120.80507178800144,
+        "minimum": 114.26211712799977,
+        "maximum": 124.03072996300034
+      },
+      "compiler_invocations": [304, 304, 304],
+      "snapshot_seeding": [null, null, null]
+    },
+    "ohm": {
+      "total": {
+        "samples": [74.54489162299978, 74.24720058499952, 73.28274369199971],
+        "median": 74.24720058499952,
+        "minimum": 73.28274369199971,
+        "maximum": 74.54489162299978
+      },
+      "creation": {
+        "samples": [1.7754829140003494, 2.0359948559998884, 1.9814214460002404],
+        "median": 1.9814214460002404,
+        "minimum": 1.7754829140003494,
+        "maximum": 2.0359948559998884
+      },
+      "validation": {
+        "samples": [72.76940870899944, 72.21120572899963, 71.30132224599947],
+        "median": 72.21120572899963,
+        "minimum": 71.30132224599947,
+        "maximum": 72.76940870899944
+      },
+      "warmup": {
+        "samples": [92.23560541400002, 90.5092558260003, 91.15951214099914],
+        "median": 91.15951214099914,
+        "minimum": 90.5092558260003,
+        "maximum": 92.23560541400002
+      },
+      "compiler_invocations": [80, 80, 80],
+      "snapshot_seeding": [null, null, null]
+    },
+    "ohm-trusted": {
+      "total": {
+        "samples": [12.384617035999327, 11.986156425000445, 13.792647869000575],
+        "median": 12.384617035999327,
+        "minimum": 11.986156425000445,
+        "maximum": 13.792647869000575
+      },
+      "creation": {
+        "samples": [4.441858768999737, 3.6279197910007497, 3.715021894000529],
+        "median": 3.715021894000529,
+        "minimum": 3.6279197910007497,
+        "maximum": 4.441858768999737
+      },
+      "validation": {
+        "samples": [7.94275826699959, 8.358236633999695, 10.077625975000046],
+        "median": 8.358236633999695,
+        "minimum": 7.94275826699959,
+        "maximum": 10.077625975000046
+      },
+      "warmup": {
+        "samples": [90.96431095699973, 88.24398445999941, 100.87189876800039],
+        "median": 90.96431095699973,
+        "minimum": 88.24398445999941,
+        "maximum": 100.87189876800039
+      },
+      "compiler_invocations": [5, 5, 5],
+      "snapshot_seeding": [
+        {
+          "files": 2734,
+          "bytes": 2967285929,
+          "reflinked_files": 2696
+        },
+        {
+          "files": 2734,
+          "bytes": 2968611129,
+          "reflinked_files": 2696
+        },
+        {
+          "files": 2734,
+          "bytes": 2967391397,
+          "reflinked_files": 2696
+        }
+      ]
+    }
+  },
+  "copy_on_write_filesystem": {
+    "copy_on_write_verified": true,
+    "method": "cp --reflink=always followed by an independent clone edit",
+    "source_unchanged_after_clone_edit": true,
+    "mount": {
+      "target": "/home/dev-user/ohm-benchmarks-1.99.0-21/output/ty29327/cow-volume",
+      "source": "/dev/loop0",
+      "fstype": "btrfs",
+      "options": "rw,noatime,discard=async,space_cache=v2,subvolid=5,subvol=/"
+    },
+    "image": "/home/dev-user/ohm-benchmarks-1.99.0-21/output/ty29327/worktree-btrfs.img",
+    "image_bytes": 274877906944,
+    "backing_filesystem": "ext4",
+    "image_owner_uid": 1000,
+    "probe_bytes": 1048576,
+    "probe_source_sha256": "d480f079b5af48f9e420aee1a4c8e40cb9ff45744626da9d050e9f68d0bacc58"
+  },
+  "expected_nextest_counts_per_session": [1, 1, 1, 975],
+  "audit": {
+    "accepted_cells": 26,
+    "worktree_child_source_checks": 18,
+    "ext4": {
+      "passed": true,
+      "accepted_cells": 17,
+      "toolchain_identities_rechecked_after_measurement": true,
+      "cpu_intervals": 2403,
+      "maximum_external_user_cpu_fraction": 0.0025308973557044982,
+      "maximum_monitor_interval_seconds": 2.3859794300005888,
+      "minimum_cpu_tick_coverage_fraction": 0.9464008312256922,
+      "maximum_interval_steal_fraction": 0.0008830022075055188,
+      "weighted_cell_steal_fractions": [
+        2.8353357640807602e-5, 3.381128852151243e-5, 3.267578468247527e-5,
+        2.552881108679796e-5, 2.7936065278082275e-5, 3.681542860982181e-5,
+        4.0378382148350174e-5, 3.536373566786379e-5, 3.6091024450947246e-5,
+        4.677268475210477e-5, 3.6669287841686464e-5, 4.076102779902096e-5,
+        4.1934917008802336e-5, 2.9291310067156986e-5, 3.815498555130942e-5,
+        3.192504000606576e-5, 4.9598064912421265e-5
+      ],
+      "minimum_free_gib": 449.1858940124512,
+      "final_source_files": {
+        "crates/ty_python_semantic/resources/mdtest/liskov.md": "31d37fd2149c62145f5b13e5e04bf83dbae28ad8c11c187126cee71029d05b20",
+        "crates/ty_python_semantic/src/types/overrides.rs": "d52d342836064c3598a566bc0dac47049acca974a0d0c02d60847b1f804a2f0a",
+        "crates/ty_python_semantic/src/types/overrides/attributes.rs": "0b8da3a3d155308aceef93ca04968db2f7570445ac8613c289da1b468efe4e46"
+      },
+      "worktree_child_source_checks": 9,
+      "worktree_direct_original_binary_checks": 9,
+      "ext4_ohm_runs_without_snapshot_seeding": 6,
+      "test_inventory_sha256": {
+        "Observe the first failing mdtest": "90f7e942cbc1ea90c04a264e6a6cdfa9f3992ca875234a0462768789a7dc6588",
+        "Repeat the failing mdtest after a test-data-only edit": "90f7e942cbc1ea90c04a264e6a6cdfa9f3992ca875234a0462768789a7dc6588",
+        "Pass the focused regression after the Rust edit": "90f7e942cbc1ea90c04a264e6a6cdfa9f3992ca875234a0462768789a7dc6588",
+        "Run all semantic package tests": "1e0e614b83ff1d1d5a51c287ebfec788570547d99a267fcc9d252236b5696b32"
+      },
+      "runtime_diagnostic_cases": 192,
+      "implementation_commit": "04c83d53483607aec4f93fd2bb55b412f101d677"
+    },
+    "btrfs_loopback": {
+      "passed": true,
+      "accepted_cells": 9,
+      "cpu_intervals": 747,
+      "maximum_external_user_cpu_fraction": 0.00527420102481787,
+      "weighted_cell_steal_fractions": [
+        2.926100014098482e-5, 3.639533339035269e-5, 5.5613282793543e-5,
+        4.261050478627127e-5, 3.763512457226233e-5, 2.705408110813516e-5,
+        3.912577371217516e-5, 4.0951619275204516e-5, 3.331753835218859e-5
+      ],
+      "trusted_snapshot_seeding_confirmed": 3,
+      "worktree_direct_original_binary_checks": 9
+    }
+  },
+  "excluded_attempts": {
+    "ext4": {
+      "final_protocol": {
+        "attempts": 47,
+        "preflight_rejections": 30,
+        "host_interference_rejections": 0,
+        "host_interference_reasons": {}
+      }
+    },
+    "btrfs_loopback": {
+      "attempts": 31,
+      "preflight_rejections": 17,
+      "host_interference_rejections": 5,
+      "host_interference_reasons": {
+        "unrelated same-user CPU above 1%": 5
+      }
+    }
+  },
+  "raw_archives": [
+    {
+      "archive": "ty-29327-evidence.zip",
+      "sha256": "9a7a06c44d5366b0eb5cc23cd85202bc042fff33fa13f658ab923ed9796043b7",
+      "bytes": 6416424
+    },
+    {
+      "archive": "ty-29327-copy-on-write-evidence.zip",
+      "sha256": "fa0f5f80bb96e862ddd07ddd30ed869674b02150b2aff2570e7c1cd00a681c84",
+      "bytes": 1601721
+    }
+  ]
+}

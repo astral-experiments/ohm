@@ -26,6 +26,16 @@ Each entry gives the wall time in seconds for a complete session replay. The las
 | uv              |                 140.01, 133.76 |                   79.70, 80.63 |     41.44% |
 | ty              | 272.97, 271.95, 271.64, 276.13 | 179.75, 178.53, 184.52, 179.21 |     33.92% |
 
+## Earlier Linux benchmarks
+
+Each release used its own workloads and machines. The session comparisons use the stock toolchain on the same host. The -19 study paired individual edits against -18 instead.
+
+- [1.99.0-22 session results](1.99.0-22/README.md) and [the Codex slowdown](1.99.0-22.md).
+- [1.99.0-21 session results](1.99.0-21/README.md) and [compiler qualification](1.99.0-21.md).
+- [1.99.0-20 session results](1.99.0-20/README.md) and [native linking and Cargo measurements](1.99.0-20.md).
+- [1.99.0-19 paired Ruff and uv edits](1.99.0-19.md) and [per-attempt timings](1.99.0-19-paired.csv).
+- [1.99.0-18 session results](1.99.0-18/README.md) and [Ruff and Codex source studies](1.99.0-18.md).
+
 ## Ruff compiler and Cargo changes in 1.99.0-15
 
 We changed a diagnostic in Ruff’s parser and timed a rebuild of the workspace on x86_64 Linux. Both compilers used the same Ohm Cargo and linker. The new compiler could reuse downstream crates after the edit. It finished first in all 12 pairs for each command. [Compiler change](https://github.com/astral-sh/ohm-rust/pull/233) · [Paired timings and compiler traces](https://github.com/astral-sh/ohm-cargo/tree/837a3a07a7368c1a3706ab2779b8ab3450814f7d/benchmarks/ruff-dev-loop-20261027/corrected-workspace-parser)
