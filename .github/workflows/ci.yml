@@ -1,4 +1,4 @@
-name: Build the two corrected Ohm −23 compilers for the uv check
+name: Build one private handwritten-impl compiler
 'on':
   workflow_dispatch:
     inputs:
@@ -9,7 +9,7 @@ name: Build the two corrected Ohm −23 compilers for the uv check
 permissions: {}
 jobs:
   plan:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22958-split-production23-r2' && github.sha == inputs.reviewed_head && github.run_attempt
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21134-handwritten-production23' && github.sha == inputs.reviewed_head && github.run_attempt
       == 1
     runs-on: ubuntu-24.04
     permissions:
@@ -29,27 +29,23 @@ jobs:
         ref: ${{ github.sha }}
         fetch-depth: 2
     - id: admission
-      name: Open the externally qualified role matrix
+      name: Admit the sole reviewed G source packet
       run: python3 -ISB scripts/rc23-22958-production/gate.py plan >> "$GITHUB_OUTPUT"
   build:
-    name: Private GNU SDK (${{ matrix.role }})
+    name: Private GNU SDK (G)
     needs: plan
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22958-split-production23-r2' && github.sha == inputs.reviewed_head && github.run_attempt
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21134-handwritten-production23' && github.sha == inputs.reviewed_head && github.run_attempt
       == 1
     runs-on: namespace-profile-ubuntu-24-04-16
     permissions:
       contents: read
     timeout-minutes: 360
-    strategy:
-      fail-fast: false
-      matrix:
-        role: ${{ fromJSON(needs.plan.outputs.roles) }}
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       OHM_TARGET: x86_64-unknown-linux-gnu
       OHM_TOOLCHAIN: ohm-1.99.0-23
       PYTHONDONTWRITEBYTECODE: '1'
-      BENCH_ARM: ${{ matrix.role }}
+      BENCH_ARM: G
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
@@ -239,7 +235,7 @@ jobs:
     - name: Upload qualified private SDK
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: rc23-22958-sdk-${{ matrix.role }}
+        name: rc23-21134-sdk-G
         path: trait-sdk/
         if-no-files-found: error
         compression-level: 0
@@ -248,7 +244,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: rc23-22958-qa-${{ matrix.role }}-attempt-${{ github.run_attempt }}
+        name: rc23-21134-qa-G-attempt-${{ github.run_attempt }}
         path: trait-evidence/
         if-no-files-found: warn
         retention-days: 14

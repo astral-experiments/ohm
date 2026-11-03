@@ -1,0 +1,831 @@
+{
+  "control_compiler": "60bd529e1a0d59e5904912bd38e6a13702d10263",
+  "full_native_receipt_sha256": "9e65f263fb1999bede850398afc57d2ff0dd437894f52af32c42a99c2a575251",
+  "owner_bound_native_evidence": {
+    "borrower_envelopes": {
+      "all48": {
+        "calls": 48,
+        "fraction": 0.31004986213059665,
+        "ids": [
+          5856,
+          6145,
+          5998,
+          5706,
+          5345,
+          4859,
+          4817,
+          5303,
+          4911,
+          4630,
+          4451,
+          5483,
+          4410,
+          4385,
+          4394,
+          4378,
+          4365,
+          4278,
+          4745,
+          13141,
+          551,
+          3973,
+          3364,
+          3764,
+          2806,
+          3086,
+          2816,
+          2679,
+          1841,
+          931,
+          1695,
+          2502,
+          1769,
+          1109,
+          2168,
+          1209,
+          3514,
+          809,
+          977,
+          1530,
+          1576,
+          4336,
+          4723,
+          4729,
+          4772,
+          4864,
+          4871,
+          5883
+        ],
+        "label": "all directly exposed borrow checks",
+        "union_Ir": 5278706642
+      },
+      "also_remove_late_inventory": {
+        "calls": 37,
+        "fraction": 0.25353242690261235,
+        "ids": [
+          5856,
+          6145,
+          5998,
+          5706,
+          5345,
+          4859,
+          5303,
+          4911,
+          4630,
+          4451,
+          5483,
+          4410,
+          4385,
+          4394,
+          4378,
+          4365,
+          4278,
+          4745,
+          13141,
+          551,
+          3973,
+          3364,
+          3764,
+          2806,
+          3086,
+          2816,
+          2679,
+          2502,
+          2168,
+          3514,
+          1530,
+          4723,
+          4729,
+          4772,
+          4864,
+          4871,
+          5883
+        ],
+        "label": "also set aside any borrower whose prior typeck read the whole mixed late PythonPreference impl inventory",
+        "union_Ir": 4316477668
+      },
+      "pretend_typeck_execution_makes_MIR_red": {
+        "calls": 5,
+        "fraction": 0.004518203933586791,
+        "ids": [
+          1530,
+          4723,
+          4729,
+          4772,
+          4871
+        ],
+        "label": "strict sensitivity only: additionally exclude any borrower whose typeck must reread an independently changed source span, even though its result can still be green under G",
+        "union_Ir": 76923992
+      },
+      "remove_known_other_MIR": {
+        "calls": 48,
+        "fraction": 0.31004986213059665,
+        "ids": [
+          5856,
+          6145,
+          5998,
+          5706,
+          5345,
+          4859,
+          4817,
+          5303,
+          4911,
+          4630,
+          4451,
+          5483,
+          4410,
+          4385,
+          4394,
+          4378,
+          4365,
+          4278,
+          4745,
+          13141,
+          551,
+          3973,
+          3364,
+          3764,
+          2806,
+          3086,
+          2816,
+          2679,
+          1841,
+          931,
+          1695,
+          2502,
+          1769,
+          1109,
+          2168,
+          1209,
+          3514,
+          809,
+          977,
+          1530,
+          1576,
+          4336,
+          4723,
+          4729,
+          4772,
+          4864,
+          4871,
+          5883
+        ],
+        "label": "exclude a different changed MIR/local HIR input or direct late read before the typeck boundary",
+        "union_Ir": 5278706642
+      }
+    },
+    "budgets": {
+      "additional paid transitive-only / all_changed_or_unknown": {
+        "active_guest_threads_per_interval": {
+          "1": 499
+        },
+        "calls": 499,
+        "fraction_of_whole_marked": 0.014692408665780483,
+        "inclusive_sum_Ir": 250143363,
+        "overlap_Ir": 0,
+        "union_Ir": 250143363
+      },
+      "all / mir_borrowck": {
+        "active_guest_threads_per_interval": {
+          "1": 61
+        },
+        "calls": 61,
+        "fraction_of_whole_marked": 0.36361451809639395,
+        "inclusive_sum_Ir": 6190663523,
+        "overlap_Ir": 0,
+        "union_Ir": 6190663523
+      },
+      "all / mir_built": {
+        "active_guest_threads_per_interval": {
+          "1": 699
+        },
+        "calls": 699,
+        "fraction_of_whole_marked": 0.05221368624177197,
+        "inclusive_sum_Ir": 888956152,
+        "overlap_Ir": 0,
+        "union_Ir": 888956152
+      },
+      "all / typeck_root": {
+        "active_guest_threads_per_interval": {
+          "1": 75
+        },
+        "calls": 75,
+        "fraction_of_whole_marked": 0.1718100513788691,
+        "inclusive_sum_Ir": 2925125827,
+        "overlap_Ir": 0,
+        "union_Ir": 2925125827
+      },
+      "all three physical provider scopes": {
+        "active_guest_threads_per_interval": {
+          "1": 835
+        },
+        "calls": 835,
+        "fraction_of_whole_marked": 0.5735651133544059,
+        "inclusive_sum_Ir": 10004745502,
+        "overlap_Ir": 239600139,
+        "union_Ir": 9765145363
+      },
+      "direct MIR and borrow plus only typeck without these obstacles": {
+        "active_guest_threads_per_interval": {
+          "1": 111
+        },
+        "calls": 111,
+        "fraction_of_whole_marked": 0.3364716864289975,
+        "inclusive_sum_Ir": 5780276813,
+        "overlap_Ir": 51729431,
+        "union_Ir": 5728547382
+      },
+      "direct seven / mir_borrowck": {
+        "active_guest_threads_per_interval": {
+          "1": 48
+        },
+        "calls": 48,
+        "fraction_of_whole_marked": 0.31004986213059665,
+        "inclusive_sum_Ir": 5278706642,
+        "overlap_Ir": 0,
+        "union_Ir": 5278706642
+      },
+      "direct seven / mir_built": {
+        "active_guest_threads_per_interval": {
+          "1": 58
+        },
+        "calls": 58,
+        "fraction_of_whole_marked": 0.026127832119801273,
+        "inclusive_sum_Ir": 444835421,
+        "overlap_Ir": 0,
+        "union_Ir": 444835421
+      },
+      "direct seven / typeck_root": {
+        "active_guest_threads_per_interval": {
+          "1": 50
+        },
+        "calls": 50,
+        "fraction_of_whole_marked": 0.1313554434241976,
+        "inclusive_sum_Ir": 2236372069,
+        "overlap_Ir": 0,
+        "union_Ir": 2236372069
+      },
+      "direct seven, all": {
+        "active_guest_threads_per_interval": {
+          "1": 156
+        },
+        "calls": 156,
+        "fraction_of_whole_marked": 0.4644947602769898,
+        "inclusive_sum_Ir": 7959914132,
+        "overlap_Ir": 51729431,
+        "union_Ir": 7908184701
+      },
+      "direct, also reads separate second impl": {
+        "active_guest_threads_per_interval": {
+          "1": 12
+        },
+        "calls": 12,
+        "fraction_of_whole_marked": 0.02932773103710672,
+        "inclusive_sum_Ir": 499314812,
+        "overlap_Ir": 0,
+        "union_Ir": 499314812
+      },
+      "direct, independently changed source span or second impl": {
+        "active_guest_threads_per_interval": {
+          "1": 45
+        },
+        "calls": 45,
+        "fraction_of_whole_marked": 0.12802307384799227,
+        "inclusive_sum_Ir": 2179637319,
+        "overlap_Ir": 0,
+        "union_Ir": 2179637319
+      },
+      "direct, no independently proved span or second-impl obstacle": {
+        "active_guest_threads_per_interval": {
+          "1": 111
+        },
+        "calls": 111,
+        "fraction_of_whole_marked": 0.3364716864289975,
+        "inclusive_sum_Ir": 5780276813,
+        "overlap_Ir": 51729431,
+        "union_Ir": 5728547382
+      },
+      "direct, separately changed native source span": {
+        "active_guest_threads_per_interval": {
+          "1": 44
+        },
+        "calls": 44,
+        "fraction_of_whole_marked": 0.12778694885833428,
+        "inclusive_sum_Ir": 2175617209,
+        "overlap_Ir": 0,
+        "union_Ir": 2175617209
+      },
+      "prior transitive read / all_changed_or_unknown": {
+        "active_guest_threads_per_interval": {
+          "1": 655
+        },
+        "calls": 655,
+        "fraction_of_whole_marked": 0.4757335697117099,
+        "inclusive_sum_Ir": 8210057495,
+        "overlap_Ir": 110528158,
+        "union_Ir": 8099529337
+      },
+      "prior transitive read / changed_nonzero_intermediate_only": {
+        "active_guest_threads_per_interval": {
+          "1": 156
+        },
+        "calls": 156,
+        "fraction_of_whole_marked": 0.4644947602769898,
+        "inclusive_sum_Ir": 7959914132,
+        "overlap_Ir": 51729431,
+        "union_Ir": 7908184701
+      }
+    },
+    "checks": {
+      "guest": {
+        "actual_pid": 41690,
+        "kernel": "674e23056f60d0b22f20e5b6541831b3fca54bfd0e36ef945f26ade0f07e2ffe",
+        "native-rmetas-and-graphs": "024e7af8a8cb6cd34e4151a38c8b716de0d901577ca67f58c39bed0956520957",
+        "processes": 14,
+        "products": "beccfbd212eca869319308f8763dea5e2208597c8c17e065df63483f3450efa4",
+        "raw": {
+          "bytes": 8484097,
+          "gzip_bytes": 1985886,
+          "gzip_sha256": "afe49a6ab5c8e16ad6524ec2e4bfe92e67f1fb98c388d51b69efe85c8c23f916",
+          "sha256": "1174cff8a45bf8b767ee8c1a38cd2666ac86d3dabdcf6180e06cb86db6f6e772"
+        },
+        "tracees": 59
+      },
+      "marked": {
+        "actual_pid": 41772,
+        "kernel": "c93f9013a50c9d2aa61c63049731156e2b1c972e82bd88f81dcc2137997937a4",
+        "native-rmetas-and-graphs": "024e7af8a8cb6cd34e4151a38c8b716de0d901577ca67f58c39bed0956520957",
+        "processes": 14,
+        "products": "beccfbd212eca869319308f8763dea5e2208597c8c17e065df63483f3450efa4",
+        "raw": {
+          "bytes": 8480878,
+          "gzip_bytes": 1976957,
+          "gzip_sha256": "70d140908c2733925dff3c55d007629c07506ce67517d83a7a50bf58ebc1c971",
+          "sha256": "4e6fa92309febb677695b8ea15ffa6292503204215b5407992d444228a613a49"
+        },
+        "tracees": 59
+      }
+    },
+    "exact_check": [
+      "/tmp/uv-workflow-search/sdk/bin/cargo",
+      "check",
+      "-p",
+      "uv",
+      "--lib",
+      "--locked",
+      "--offline",
+      "-j8"
+    ],
+    "independent_cold": "32b1b69de9352478a0a298903f45008488acc230df0810107647f21d88cdb680",
+    "independent_cold_distinct_roots_by_whether_wire_extension_used": {
+      "false": 10,
+      "true": 1
+    },
+    "independent_cold_fully_typed_paths": 33,
+    "interpretation": "This is an instruction attribution on the existing F compiler. A changed typeck input can force re-execution without forcing a changed output outside F; whether G actually avoids the corresponding borrow checks remains unmeasured. Missing/anonymous inputs do not certify reuse. No Cargo wall or compiler speedup was measured.",
+    "marked_and_graph_join": "e518fe948ac93234e0e0bc9e541f1485f1d73de44546618d2204e68b63b514d9",
+    "marked_guest_Ir": 17025347490,
+    "native_products": {
+      "public_sidecars": 525,
+      "rmeta": 657,
+      "workspace": 66
+    },
+    "ordinary_guest_Ir": 17025396126,
+    "original_marked_refusal": "09e07f6cbe5f5f8ff31fa5f636282bb3f92b583e680f6797fd51a657936a0a27",
+    "other_missing_direct_owners": {
+      "erase_and_anonymize_regions_ty": 46,
+      "type_op_prove_predicate": 27
+    },
+    "other_unfingerprinted_direct_owners": {
+      "TraitSelect": 36,
+      "erase_and_anonymize_regions_ty": 47,
+      "mir_promoted": 48
+    },
+    "physical_admission": "8da8bbd88cd365e612f5cba0d7f6c9a7087ce42b21549eec19d8624a02c9366a",
+    "production": "255d29b80104ded830e0b9e410e85e144123ce7837907a6264ec59890e837992",
+    "recorded_MIR_alternates": "0b12760fe4b213cf0d3831e683c491a7ae60836408ab0e629d37e7c722e88b59",
+    "root_clocks": null,
+    "run": "run-04",
+    "source": "2f240ece4a34014eec97552ae2315af71a07807edfd388675d3e9815b4d11da6",
+    "source_bound_direct_owners": {
+      "mir_borrowck": 48,
+      "mir_built": 58,
+      "typeck_root": 50
+    },
+    "source_elf": "5c1bd08918c8991d8974eb385a3602a99efec4f70cef48eac8029a2ef071b103",
+    "source_observer_control": "3bb20acd0a45f9ecb8e16d46279a001eceff1f9ddae16a2968d473bda4b66af5",
+    "source_spans": "61654251726bb518b370f546fee070d9220402a4f068502cf3a25795e3b40c67",
+    "span_union_groups": {
+      "all nine PythonRequest variant identifiers": {
+        "executed": 36,
+        "fraction_of_entire_marked": 0.11961265220554979,
+        "owners": [
+          "c49540a0a0da1da11126d15d3aab9764",
+          "c49540a0a0da1da113dcd86e946a75e4",
+          "c49540a0a0da1da11785b476b1fb32bf",
+          "c49540a0a0da1da11cfa18cad733412b",
+          "c49540a0a0da1da122138f2ea579f7c5",
+          "c49540a0a0da1da1270e0b9e12925fcd",
+          "c49540a0a0da1da12737ac950bfd82d3",
+          "c49540a0a0da1da1294ea24830e97fc1",
+          "c49540a0a0da1da1318725db892374c7",
+          "c49540a0a0da1da134045401c54b3f37",
+          "c49540a0a0da1da136de776fa4a624d7",
+          "c49540a0a0da1da13915f811dcbb5860",
+          "c49540a0a0da1da1428d11543443d02b",
+          "c49540a0a0da1da147fd8e89e3b7ccfa",
+          "c49540a0a0da1da156035b063be45d9b",
+          "c49540a0a0da1da173639ef60321eea0",
+          "c49540a0a0da1da1789d83e52bb7baae",
+          "c49540a0a0da1da189d6a7c14e0eca51",
+          "c49540a0a0da1da19581a3080bb2a844",
+          "c49540a0a0da1da19e6302397d12d01f",
+          "c49540a0a0da1da1a62175211ea4a62d",
+          "c49540a0a0da1da1a7a08351897c0175",
+          "c49540a0a0da1da1b72e2b58c8f2002a",
+          "c49540a0a0da1da1b9cc01480964cd4b",
+          "c49540a0a0da1da1b9f4a5145b40e2c4",
+          "c49540a0a0da1da1c96c0f78169cb0cc",
+          "c49540a0a0da1da1cae147cfd16d5e66",
+          "c49540a0a0da1da1d25b5d6ff626da28",
+          "c49540a0a0da1da1d369cb05b421de07",
+          "c49540a0a0da1da1d43b14ae8ee05927",
+          "c49540a0a0da1da1d5fc86734b49741b",
+          "c49540a0a0da1da1e454e725e23c41f1",
+          "c49540a0a0da1da1ea637806c93d0929",
+          "c49540a0a0da1da1eee421022fa36f16",
+          "c49540a0a0da1da1f55c8fca624554ad",
+          "c49540a0a0da1da1f6e8ab58ddd89f79"
+        ],
+        "prior_owners": 36,
+        "whole_provider_union_Ir": 2036446968
+      },
+      "all tracked names, even if still called for genuine matching variants": {
+        "executed": 5,
+        "fraction_of_entire_marked": 0.004956665351445347,
+        "owners": [
+          "c49540a0a0da1da11126d15d3aab9764",
+          "c49540a0a0da1da1270e0b9e12925fcd",
+          "c49540a0a0da1da19581a3080bb2a844",
+          "c49540a0a0da1da1bb4fdd327e0b0461",
+          "c49540a0a0da1da1ea637806c93d0929"
+        ],
+        "prior_owners": 5,
+        "whole_provider_union_Ir": 84388950
+      },
+      "def_ident_span": {
+        "executed": 38,
+        "fraction_of_entire_marked": 0.12054109904102756,
+        "owners": [
+          "c49540a0a0da1da11126d15d3aab9764",
+          "c49540a0a0da1da113dcd86e946a75e4",
+          "c49540a0a0da1da11785b476b1fb32bf",
+          "c49540a0a0da1da11cfa18cad733412b",
+          "c49540a0a0da1da122138f2ea579f7c5",
+          "c49540a0a0da1da1270e0b9e12925fcd",
+          "c49540a0a0da1da12737ac950bfd82d3",
+          "c49540a0a0da1da1294ea24830e97fc1",
+          "c49540a0a0da1da1318725db892374c7",
+          "c49540a0a0da1da134045401c54b3f37",
+          "c49540a0a0da1da136de776fa4a624d7",
+          "c49540a0a0da1da13915f811dcbb5860",
+          "c49540a0a0da1da13a0d598338a30787",
+          "c49540a0a0da1da1428d11543443d02b",
+          "c49540a0a0da1da147fd8e89e3b7ccfa",
+          "c49540a0a0da1da156035b063be45d9b",
+          "c49540a0a0da1da173639ef60321eea0",
+          "c49540a0a0da1da1789d83e52bb7baae",
+          "c49540a0a0da1da189d6a7c14e0eca51",
+          "c49540a0a0da1da19581a3080bb2a844",
+          "c49540a0a0da1da19e6302397d12d01f",
+          "c49540a0a0da1da1a62175211ea4a62d",
+          "c49540a0a0da1da1a7a08351897c0175",
+          "c49540a0a0da1da1b72e2b58c8f2002a",
+          "c49540a0a0da1da1b9cc01480964cd4b",
+          "c49540a0a0da1da1b9f4a5145b40e2c4",
+          "c49540a0a0da1da1bb4fdd327e0b0461",
+          "c49540a0a0da1da1c96c0f78169cb0cc",
+          "c49540a0a0da1da1cae147cfd16d5e66",
+          "c49540a0a0da1da1d25b5d6ff626da28",
+          "c49540a0a0da1da1d369cb05b421de07",
+          "c49540a0a0da1da1d43b14ae8ee05927",
+          "c49540a0a0da1da1d5fc86734b49741b",
+          "c49540a0a0da1da1e454e725e23c41f1",
+          "c49540a0a0da1da1ea637806c93d0929",
+          "c49540a0a0da1da1eee421022fa36f16",
+          "c49540a0a0da1da1f55c8fca624554ad",
+          "c49540a0a0da1da1f6e8ab58ddd89f79"
+        ],
+        "prior_owners": 38,
+        "whole_provider_union_Ir": 2052254098
+      },
+      "def_span": {
+        "executed": 39,
+        "fraction_of_entire_marked": 0.12283028350688895,
+        "owners": [
+          "c49540a0a0da1da113dcd86e946a75e4",
+          "c49540a0a0da1da11785b476b1fb32bf",
+          "c49540a0a0da1da1185357c6a6515493",
+          "c49540a0a0da1da11cfa18cad733412b",
+          "c49540a0a0da1da122138f2ea579f7c5",
+          "c49540a0a0da1da12737ac950bfd82d3",
+          "c49540a0a0da1da1294ea24830e97fc1",
+          "c49540a0a0da1da1318725db892374c7",
+          "c49540a0a0da1da1327fcba0a6acb9cd",
+          "c49540a0a0da1da134045401c54b3f37",
+          "c49540a0a0da1da136de776fa4a624d7",
+          "c49540a0a0da1da13915f811dcbb5860",
+          "c49540a0a0da1da13a0d598338a30787",
+          "c49540a0a0da1da1428d11543443d02b",
+          "c49540a0a0da1da147fd8e89e3b7ccfa",
+          "c49540a0a0da1da156035b063be45d9b",
+          "c49540a0a0da1da162529283fe61fcc7",
+          "c49540a0a0da1da173639ef60321eea0",
+          "c49540a0a0da1da1789d83e52bb7baae",
+          "c49540a0a0da1da189d6a7c14e0eca51",
+          "c49540a0a0da1da191e6c28a2942ea72",
+          "c49540a0a0da1da19e6302397d12d01f",
+          "c49540a0a0da1da1a62175211ea4a62d",
+          "c49540a0a0da1da1a7a08351897c0175",
+          "c49540a0a0da1da1b72e2b58c8f2002a",
+          "c49540a0a0da1da1b9cc01480964cd4b",
+          "c49540a0a0da1da1b9f4a5145b40e2c4",
+          "c49540a0a0da1da1bacf769276282d7d",
+          "c49540a0a0da1da1c448ac47dfc6b8d0",
+          "c49540a0a0da1da1c96c0f78169cb0cc",
+          "c49540a0a0da1da1cae147cfd16d5e66",
+          "c49540a0a0da1da1d25b5d6ff626da28",
+          "c49540a0a0da1da1d369cb05b421de07",
+          "c49540a0a0da1da1d43b14ae8ee05927",
+          "c49540a0a0da1da1d5fc86734b49741b",
+          "c49540a0a0da1da1e454e725e23c41f1",
+          "c49540a0a0da1da1eee421022fa36f16",
+          "c49540a0a0da1da1f55c8fca624554ad",
+          "c49540a0a0da1da1f6e8ab58ddd89f79"
+        ],
+        "prior_owners": 39,
+        "whole_provider_union_Ir": 2091228259
+      },
+      "nine-name readers without other typed span or later impl": {
+        "executed": 4,
+        "fraction_of_entire_marked": 0.004578491631127348,
+        "owners": [
+          "c49540a0a0da1da11126d15d3aab9764",
+          "c49540a0a0da1da1270e0b9e12925fcd",
+          "c49540a0a0da1da19581a3080bb2a844",
+          "c49540a0a0da1da1ea637806c93d0929"
+        ],
+        "prior_owners": 4,
+        "whole_provider_union_Ir": 77950411
+      },
+      "no other source obstacle / no literal variant": {
+        "executed": 3,
+        "fraction_of_entire_marked": 0.0009015928167701674,
+        "owners": [
+          "c49540a0a0da1da11126d15d3aab9764",
+          "c49540a0a0da1da1270e0b9e12925fcd",
+          "c49540a0a0da1da1ea637806c93d0929"
+        ],
+        "prior_owners": 3,
+        "whole_provider_union_Ir": 15349931
+      },
+      "no other typed source anchor or late impl besides nine names": {
+        "executed": 9,
+        "fraction_of_entire_marked": 0.007910861207332691,
+        "owners": [
+          "c49540a0a0da1da10d9ab6218a55e361",
+          "c49540a0a0da1da11126d15d3aab9764",
+          "c49540a0a0da1da1270e0b9e12925fcd",
+          "c49540a0a0da1da142f702a9f7eff2f5",
+          "c49540a0a0da1da19581a3080bb2a844",
+          "c49540a0a0da1da1bfe5d36fb39fb219",
+          "c49540a0a0da1da1cb977ee03414b639",
+          "c49540a0a0da1da1dcdc92cc6ef6c4b1",
+          "c49540a0a0da1da1ea637806c93d0929"
+        ],
+        "prior_owners": 9,
+        "whole_provider_union_Ir": 134685161
+      },
+      "no typed anchor or later impl": {
+        "executed": 5,
+        "fraction_of_entire_marked": 0.003332369576205343,
+        "owners": [
+          "c49540a0a0da1da10d9ab6218a55e361",
+          "c49540a0a0da1da142f702a9f7eff2f5",
+          "c49540a0a0da1da1bfe5d36fb39fb219",
+          "c49540a0a0da1da1cb977ee03414b639",
+          "c49540a0a0da1da1dcdc92cc6ef6c4b1"
+        ],
+        "prior_owners": 5,
+        "whole_provider_union_Ir": 56734750
+      },
+      "other displaced typed span": {
+        "executed": 40,
+        "fraction_of_entire_marked": 0.12320845722720694,
+        "owners": [
+          "c49540a0a0da1da113dcd86e946a75e4",
+          "c49540a0a0da1da11785b476b1fb32bf",
+          "c49540a0a0da1da1185357c6a6515493",
+          "c49540a0a0da1da11cfa18cad733412b",
+          "c49540a0a0da1da122138f2ea579f7c5",
+          "c49540a0a0da1da12737ac950bfd82d3",
+          "c49540a0a0da1da1294ea24830e97fc1",
+          "c49540a0a0da1da1318725db892374c7",
+          "c49540a0a0da1da1327fcba0a6acb9cd",
+          "c49540a0a0da1da134045401c54b3f37",
+          "c49540a0a0da1da136de776fa4a624d7",
+          "c49540a0a0da1da13915f811dcbb5860",
+          "c49540a0a0da1da13a0d598338a30787",
+          "c49540a0a0da1da1428d11543443d02b",
+          "c49540a0a0da1da147fd8e89e3b7ccfa",
+          "c49540a0a0da1da156035b063be45d9b",
+          "c49540a0a0da1da162529283fe61fcc7",
+          "c49540a0a0da1da173639ef60321eea0",
+          "c49540a0a0da1da1789d83e52bb7baae",
+          "c49540a0a0da1da189d6a7c14e0eca51",
+          "c49540a0a0da1da191e6c28a2942ea72",
+          "c49540a0a0da1da19e6302397d12d01f",
+          "c49540a0a0da1da1a62175211ea4a62d",
+          "c49540a0a0da1da1a7a08351897c0175",
+          "c49540a0a0da1da1b72e2b58c8f2002a",
+          "c49540a0a0da1da1b9cc01480964cd4b",
+          "c49540a0a0da1da1b9f4a5145b40e2c4",
+          "c49540a0a0da1da1bacf769276282d7d",
+          "c49540a0a0da1da1bb4fdd327e0b0461",
+          "c49540a0a0da1da1c448ac47dfc6b8d0",
+          "c49540a0a0da1da1c96c0f78169cb0cc",
+          "c49540a0a0da1da1cae147cfd16d5e66",
+          "c49540a0a0da1da1d25b5d6ff626da28",
+          "c49540a0a0da1da1d369cb05b421de07",
+          "c49540a0a0da1da1d43b14ae8ee05927",
+          "c49540a0a0da1da1d5fc86734b49741b",
+          "c49540a0a0da1da1e454e725e23c41f1",
+          "c49540a0a0da1da1eee421022fa36f16",
+          "c49540a0a0da1da1f55c8fca624554ad",
+          "c49540a0a0da1da1f6e8ab58ddd89f79"
+        ],
+        "prior_owners": 40,
+        "whole_provider_union_Ir": 2097666798
+      },
+      "source anchor except nine names, or later impl": {
+        "executed": 41,
+        "fraction_of_entire_marked": 0.12344458221686493,
+        "owners": [
+          "c49540a0a0da1da113dcd86e946a75e4",
+          "c49540a0a0da1da11785b476b1fb32bf",
+          "c49540a0a0da1da1185357c6a6515493",
+          "c49540a0a0da1da11cfa18cad733412b",
+          "c49540a0a0da1da122138f2ea579f7c5",
+          "c49540a0a0da1da12737ac950bfd82d3",
+          "c49540a0a0da1da1294ea24830e97fc1",
+          "c49540a0a0da1da1318725db892374c7",
+          "c49540a0a0da1da1327fcba0a6acb9cd",
+          "c49540a0a0da1da134045401c54b3f37",
+          "c49540a0a0da1da136de776fa4a624d7",
+          "c49540a0a0da1da13915f811dcbb5860",
+          "c49540a0a0da1da13a0d598338a30787",
+          "c49540a0a0da1da1428d11543443d02b",
+          "c49540a0a0da1da147fd8e89e3b7ccfa",
+          "c49540a0a0da1da156035b063be45d9b",
+          "c49540a0a0da1da162529283fe61fcc7",
+          "c49540a0a0da1da173639ef60321eea0",
+          "c49540a0a0da1da1789d83e52bb7baae",
+          "c49540a0a0da1da189d6a7c14e0eca51",
+          "c49540a0a0da1da191e6c28a2942ea72",
+          "c49540a0a0da1da19e6302397d12d01f",
+          "c49540a0a0da1da1a62175211ea4a62d",
+          "c49540a0a0da1da1a7a08351897c0175",
+          "c49540a0a0da1da1b337347c4f675a28",
+          "c49540a0a0da1da1b72e2b58c8f2002a",
+          "c49540a0a0da1da1b9cc01480964cd4b",
+          "c49540a0a0da1da1b9f4a5145b40e2c4",
+          "c49540a0a0da1da1bacf769276282d7d",
+          "c49540a0a0da1da1bb4fdd327e0b0461",
+          "c49540a0a0da1da1c448ac47dfc6b8d0",
+          "c49540a0a0da1da1c96c0f78169cb0cc",
+          "c49540a0a0da1da1cae147cfd16d5e66",
+          "c49540a0a0da1da1d25b5d6ff626da28",
+          "c49540a0a0da1da1d369cb05b421de07",
+          "c49540a0a0da1da1d43b14ae8ee05927",
+          "c49540a0a0da1da1d5fc86734b49741b",
+          "c49540a0a0da1da1e454e725e23c41f1",
+          "c49540a0a0da1da1eee421022fa36f16",
+          "c49540a0a0da1da1f55c8fca624554ad",
+          "c49540a0a0da1da1f6e8ab58ddd89f79"
+        ],
+        "prior_owners": 41,
+        "whole_provider_union_Ir": 2101686908
+      },
+      "spelling in body / includes matching enum variant": {
+        "executed": 8,
+        "fraction_of_entire_marked": 0.026545316697086693,
+        "owners": [
+          "c49540a0a0da1da122138f2ea579f7c5",
+          "c49540a0a0da1da1294ea24830e97fc1",
+          "c49540a0a0da1da13915f811dcbb5860",
+          "c49540a0a0da1da19581a3080bb2a844",
+          "c49540a0a0da1da1a62175211ea4a62d",
+          "c49540a0a0da1da1cae147cfd16d5e66",
+          "c49540a0a0da1da1d25b5d6ff626da28",
+          "c49540a0a0da1da1d43b14ae8ee05927"
+        ],
+        "prior_owners": 8,
+        "whole_provider_union_Ir": 451943241
+      },
+      "spelling in body / nonvariant only": {
+        "executed": 28,
+        "fraction_of_entire_marked": 0.09306733550846309,
+        "owners": [
+          "c49540a0a0da1da11126d15d3aab9764",
+          "c49540a0a0da1da113dcd86e946a75e4",
+          "c49540a0a0da1da11785b476b1fb32bf",
+          "c49540a0a0da1da11cfa18cad733412b",
+          "c49540a0a0da1da1270e0b9e12925fcd",
+          "c49540a0a0da1da12737ac950bfd82d3",
+          "c49540a0a0da1da1318725db892374c7",
+          "c49540a0a0da1da134045401c54b3f37",
+          "c49540a0a0da1da136de776fa4a624d7",
+          "c49540a0a0da1da1428d11543443d02b",
+          "c49540a0a0da1da147fd8e89e3b7ccfa",
+          "c49540a0a0da1da156035b063be45d9b",
+          "c49540a0a0da1da173639ef60321eea0",
+          "c49540a0a0da1da1789d83e52bb7baae",
+          "c49540a0a0da1da189d6a7c14e0eca51",
+          "c49540a0a0da1da19e6302397d12d01f",
+          "c49540a0a0da1da1a7a08351897c0175",
+          "c49540a0a0da1da1b72e2b58c8f2002a",
+          "c49540a0a0da1da1b9cc01480964cd4b",
+          "c49540a0a0da1da1b9f4a5145b40e2c4",
+          "c49540a0a0da1da1c96c0f78169cb0cc",
+          "c49540a0a0da1da1d369cb05b421de07",
+          "c49540a0a0da1da1d5fc86734b49741b",
+          "c49540a0a0da1da1e454e725e23c41f1",
+          "c49540a0a0da1da1ea637806c93d0929",
+          "c49540a0a0da1da1eee421022fa36f16",
+          "c49540a0a0da1da1f55c8fca624554ad",
+          "c49540a0a0da1da1f6e8ab58ddd89f79"
+        ],
+        "prior_owners": 28,
+        "whole_provider_union_Ir": 1584503727
+      }
+    },
+    "true_paid_calls": {
+      "mir_borrowck": 61,
+      "mir_built": 699,
+      "typeck_root": 75
+    },
+    "upstream_tests": {
+      "A-stream": {
+        "name": "discovery::tests::sequential_query_strategy_does_not_prefetch_executables",
+        "source": {
+          "actual_tree": "fb88500ba8d61f8c21d9901612743b72b4a7ad39",
+          "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "files": {
+            "crates/uv-python/src/discovery.rs": "697515da4fa686d28c7b9b6869128e242320967b7852356f3088684589c22946",
+            "crates/uv/tests/python/python_find.rs": "05310d654c0ac8ef24e6df0da2305cd2cadf7126ac60d33b6b3674664f70daa8"
+          },
+          "git_head": "728a70d25c0889d9aaa53776256c3a843eea67a6",
+          "lock": "3806ce8de829aab4bb321cfbc7d0cbc8d8a1f5d5bf3f3977a12fb27d7d37c9a7"
+        },
+        "stderr": "84c1596b585317674cd96ae85403ea6ea5fabe0220a955e833e5f4af5dc95422",
+        "stdout": "533d040dbb7f94c37cd5b98a087524873587a1256dcad0418c14195f4bccca70"
+      },
+      "B-ordering": {
+        "name": "discovery::tests::installation_key_order_only_partitions_critical_errors",
+        "source": {
+          "actual_tree": "c83c82f68527b0aefb8f4a01762a1f0928c1ee23",
+          "diff_sha256": "7b283f1cec041fbf03da22a7bc95beb7c38c4a6bf8b9809f1c06c6d5c08bfe1f",
+          "files": {
+            "crates/uv-python/src/discovery.rs": "767e633dc01573460ada37b07ddbe93923c5f3879079f1e50ce958be4b8f10a0",
+            "crates/uv/tests/python/python_find.rs": "59505bf9b927d49305a7a4bc2924cd4da3797d4b588c7deab51c4d285defa44d"
+          },
+          "git_head": "728a70d25c0889d9aaa53776256c3a843eea67a6",
+          "lock": "3806ce8de829aab4bb321cfbc7d0cbc8d8a1f5d5bf3f3977a12fb27d7d37c9a7"
+        },
+        "stderr": "829823d38ef74e8d79ca9f145dd330aa863c7801e6c108fdee399e94737d4447",
+        "stdout": "5521fd9569fa4e667407d008e2feba108913aab01f16cff1d68853c6da99a79f"
+      },
+      "B-stream": {
+        "name": "discovery::tests::sequential_query_strategy_does_not_prefetch_executable_groups",
+        "source": {
+          "actual_tree": "c83c82f68527b0aefb8f4a01762a1f0928c1ee23",
+          "diff_sha256": "7b283f1cec041fbf03da22a7bc95beb7c38c4a6bf8b9809f1c06c6d5c08bfe1f",
+          "files": {
+            "crates/uv-python/src/discovery.rs": "767e633dc01573460ada37b07ddbe93923c5f3879079f1e50ce958be4b8f10a0",
+            "crates/uv/tests/python/python_find.rs": "59505bf9b927d49305a7a4bc2924cd4da3797d4b588c7deab51c4d285defa44d"
+          },
+          "git_head": "728a70d25c0889d9aaa53776256c3a843eea67a6",
+          "lock": "3806ce8de829aab4bb321cfbc7d0cbc8d8a1f5d5bf3f3977a12fb27d7d37c9a7"
+        },
+        "stderr": "d97657579c7e8d096bce66ca08c35bf833ae2da43560549d986c0f63f0c603e8",
+        "stdout": "23a1c3e3bec95b2d0600accc66a180d5475a3cf1326469daeb15881f6280671f"
+      }
+    }
+  },
+  "performance_protocol_sha256": "ed0bcbfd98a69014270bffaf8849d89e1490aba6fea65a92b591611dfc567549",
+  "selection_sha256": "2f240ece4a34014eec97552ae2315af71a07807edfd388675d3e9815b4d11da6",
+  "source_receiver_sha256": "155568591d63b17a04391d595b24da6a1830718de1763afe37aafcb0e890368f",
+  "source_verifier_sha256": "db46821f985002d11322a2a61dbaab147b472c05e9e78c30e03716ab106874fc",
+  "uv_edit": "https://github.com/astral-sh/uv/pull/21134",
+  "workload": "cargo check -p uv --lib --locked --offline -j8"
+}

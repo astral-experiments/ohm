@@ -54,6 +54,9 @@ def main():
     suites=s.scopes(name);commands={}
     if name!="full_without_ctfe":commands["ctfe-unit"]=(["compiler/rustc_middle","--test-args",s.UNIT],["test mir::interpret::tests::"+s.UNIT+" ... ok"])
     if name!="ctfe_control":commands["derive-unit"]=(["compiler/rustc_hir_id","--test-args","proc_derive_impl_tests"],["test definitions::proc_derive_impl_tests::"+s.DERIVE_UNIT+" ... ok"])
+    import candidate
+    assert name == "G"
+    commands["derive-unit"][1].append("test definitions::proc_derive_impl_tests::"+candidate.UNIT+" ... ok")
     commands["run-make"]=(["tests/run-make/"+x for x in suites],["test [run-make] tests/run-make/"+x+" ... ok" for x in suites])
     native={}
     for key,(args,expected)in commands.items():
@@ -72,12 +75,22 @@ def main():
         target_dir=tmp/("installed-"+test);origin=r/"tests/run-make"/test;shutil.copytree(origin,target_dir)
         files={str(p.relative_to(origin)):s.oid(p.read_bytes()) for p in sorted(origin.rglob("*")) if p.is_file()}
         for relative,blob in files.items():assert s.text(r,"rev-parse","HEAD:tests/run-make/"+test+"/"+relative)==blob
-        result=runlog([exe],target_dir,runenv,qa/("installed-"+test+".log"),600)
+        installed_env=runenv
+        if test==arm["run_make"]:
+            llvm_bin=tests/target/"ci-llvm/bin"
+            llvm_nm=llvm_bin/"llvm-nm"
+            assert (llvm_bin/"llvm-config").is_file() and llvm_nm.is_file() and os.access(llvm_nm,os.X_OK)
+            assert llvm_nm.resolve().is_relative_to((tests/target/"ci-llvm").resolve())
+            installed_env=runenv | {"LLVM_BIN_DIR":str(llvm_bin)}
+        result=runlog([exe],target_dir,installed_env,qa/("installed-"+test+".log"),600)
+        if test==arm["run_make"]:
+            result["llvm_nm"]={"path":str(llvm_nm),"sha256":s.h(llvm_nm),"version":out([llvm_nm,"--version"],installed_env)}
         result.update(recipe_sha256=s.h(exe),driver_sha256=db[driver]["sha256"],fixture_blobs=files)
         outputs={}
         if test==s.CTFE:outputs={"main":"LShift Or false 17"}
         if test==s.DOMAIN:outputs={"reader":"11 0 0","local":"0"}
         if test==s.DERIVE:outputs={"consumer":"(5, 11, 7)"}
+        if test==arm["run_make"]:outputs=arm["linked_outputs"]
         for fn,expected in outputs.items():assert out([target_dir/fn],runenv,cwd=target_dir)==expected
         result["linked_outputs"]=outputs;results[test]=result
     product={"role":name,"source_commit":arm["commit"],"source_tree":arm["tree"],"epoch":arm["epoch"],"metadata_epoch":arm["metadata_epoch"],

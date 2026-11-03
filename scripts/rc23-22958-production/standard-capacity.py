@@ -23,7 +23,7 @@ FLOOR = 32 * GIB
 INTERVAL = 0.25
 MAX_GAP = 2.0
 CHILD_GRACE_NS = 5_000_000_000
-BRANCH = "refs/heads/charlie/codex-22958-split-production23-r2"
+BRANCH = "refs/heads/charlie/codex-21134-handwritten-production23"
 STAGES = ("materialize", "prerequisites", "bolt-tools", "wild", "production", "native-qa")
 SENTINEL = ".ctfe22-physical-emergency-reserve"
 
@@ -116,14 +116,14 @@ def release(path, held):
 def context():
     e = os.environ
     assert e["GITHUB_REPOSITORY"] == "astral-experiments/ohm" and e["GITHUB_EVENT_NAME"] == "workflow_dispatch"
-    assert e["GITHUB_REF"] == BRANCH and e["BENCH_ARM"] in {"ctfe_control", "full_with_ctfe", "full_without_ctfe"}
+    assert e["GITHUB_REF"] == BRANCH and e["BENCH_ARM"] == "G"
     assert e["GITHUB_ACTIONS"]=="true" and e["GITHUB_JOB"]=="build" and e["GITHUB_RUN_ATTEMPT"]=="1" and e["GITHUB_WORKFLOW_SHA"]==e["GITHUB_SHA"] and e["GITHUB_WORKFLOW_REF"]==e["GITHUB_REPOSITORY"]+"/.github/workflows/ci.yml@"+BRANCH
     assert e["RUNNER_OS"]=="Linux" and e["RUNNER_ARCH"]=="X64" and e["RUNNER_NAME"].startswith("nsc-runner-")
     assert re.fullmatch(r"/home/runner/work/ohm/ohm/?",e["GITHUB_WORKSPACE"])
     assert e["GITHUB_SHA"] == e["REVIEWED_HEAD"] and re.fullmatch("[0-9a-f]{40}",e["GITHUB_SHA"])
     w = Path(e["GITHUB_WORKSPACE"]).resolve()
     head=subprocess.check_output(["git","-C",w,"rev-parse","HEAD","HEAD^"],text=True).splitlines()
-    assert head==[e["GITHUB_SHA"],'dd1135def2413a18eb5894ca11d5f1f8d842b1fd']
+    assert head==[e["GITHUB_SHA"],'683db047247d11b881bfea1bca34543826a7511d']
     assert e["GITHUB_RUN_ATTEMPT"]=="1"
     return w, w/"capacity-evidence"
 

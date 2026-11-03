@@ -78,7 +78,10 @@ def assert_sources(official, manifest, rust):
 
 
 def main():
-    w=s.checkout("build");selected=s.selected();name=os.environ["BENCH_ARM"]
+    import candidate
+    w=s.checkout("build");request=s.selected()
+    assert os.environ["BENCH_ARM"] == "G"
+    selected=s.baseline_selected();name="full_with_ctfe"
     assert name in selected["role_order"]
     src=w/"source/rust";official=w/"official-release";qa=w/"trait-evidence"
     for path,expected in P["release_files"].items():
@@ -103,6 +106,14 @@ def main():
         target=tmp/"1.99.0/23.json";target.parent.mkdir()
         shutil.copyfile(official/"toolchains/manifest.schema.json",tmp/"manifest.schema.json")
         s.write(target,proposed);assert_sources(official,target,src)
+        parent_proof=proof
+        selected=request;name="G";r=request["roles"][name]
+        proof={"F":parent_proof,"G":candidate.install(src,r)}
+        proposed["sources"]["rust"]["revision"]=r["commit"]
+        candidate_root=tmp/"G";candidate_manifest=candidate_root/"1.99.0/23.json"
+        candidate_manifest.parent.mkdir(parents=True)
+        shutil.copyfile(official/"toolchains/manifest.schema.json",candidate_root/"manifest.schema.json")
+        s.write(candidate_manifest,proposed);assert_sources(official,candidate_manifest,src)
     track=("src/tools/rustc-perf","src/tools/opt-dist","src/tools/opt-dist/component-pgo-v1","src/bootstrap","src/llvm-project","library")
     training={}
     for f in track:
@@ -113,6 +124,6 @@ def main():
            "reviewed_head":os.environ["GITHUB_SHA"],"qualified_parent":P["coordinator_parent"],"original_release":P["official_release"],
            "release_files":P["release_files"],"training_objects":training,"original_four_sources":original,
            "strict_source":proof,"signed_cargo_sha256":selected["signed_cargo_sha256"],
-           "eligibility_sha256":s.h(H/"enrollment/enrollment.json"),"literal_build_command":P["gnulinux_build_command"]})
+           "baseline_eligibility_sha256":s.h(H/"enrollment/enrollment.json"),"eligibility_sha256":candidate.AUTHORIZATION_SHA256,"literal_build_command":P["gnulinux_build_command"]})
 
 if __name__=="__main__":main()

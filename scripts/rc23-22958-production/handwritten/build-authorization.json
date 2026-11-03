@@ -1,0 +1,14 @@
+{
+  "build_authorized": true,
+  "build_role": "G",
+  "decision": "Produce one private optimized compiler and run native correctness gates. Score the first edited check independently.",
+  "guardrail": "Source exposure is not a demonstrated compiler speedup.",
+  "inputs": {
+    "G.json": "897bc91f40f9bfc4955048b33576617e685e21393d385c0fddb46f50c50cdb24",
+    "assigned-epochs.json": "3fc27dca363dea84efd06ded3c26cfb6bc57fa35f934f27a51e3552bed026b75",
+    "owner-profile.json": "95ca2d74115e993abdd8ba9f608678837680f7fc04b30ca229b4676b0b365451"
+  },
+  "parent": "60bd529e1a0d59e5904912bd38e6a13702d10263",
+  "pattern": "Seven first handwritten bare-receiver impls shift after the real upstream uv insertion.",
+  "reason": "37 exercised borrower intervals cover over 20% of the F terminal compiler after the source and MIR exclusions."
+}

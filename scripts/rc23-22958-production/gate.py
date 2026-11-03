@@ -51,6 +51,8 @@ def cargo_digest(s):
     return s
 
 def scopes(role):
+    if role == "G":
+        return scopes("full_with_ctfe") + [selected()["roles"]["G"]["run_make"]]
     need(role in POLICY["default_stock"] + POLICY["matched_recorded_ctfe"], "unknown role")
     cases=["rdr-public-hash-native-exports", "trait-impl-bucket-projection"]
     if role != "full_without_ctfe":
@@ -67,7 +69,7 @@ def version(raw,path,old,value):
     need(n==1,"exactly one original format declaration "+sym)
     return changed
 
-def selected(q=None):
+def baseline_selected(q=None):
     q=HERE/"enrollment" if q is None else Path(q)
     enrollment=read(q/"enrollment.json")
     from split_choice import make_choice
@@ -118,6 +120,10 @@ def selected(q=None):
              and h(HERE/"templates"/r["packet"]["path"])==temp["packet"]["sha256"],"wrong selected packet")
     return enrollment
 
+def selected():
+    from candidate import selected as one_candidate
+    return one_candidate(baseline_selected())
+
 def checkout(stage):
     e=os.environ;w=Path(e["GITHUB_WORKSPACE"]).resolve()
     need(e["GITHUB_REPOSITORY"]==POLICY["repo"] and e["GITHUB_REF"]==POLICY["branch"] and e["GITHUB_EVENT_NAME"]=="workflow_dispatch"
@@ -126,8 +132,8 @@ def checkout(stage):
          and text(w,"rev-parse","HEAD^")==POLICY["coordinator_parent"],"unreviewed workflow context")
     need(e["GITHUB_WORKFLOW_REF"]==POLICY["repo"]+"/.github/workflows/ci.yml@"+POLICY["branch"],"workflow ref")
     remote_paths=text(w,"diff-tree","--no-commit-id","-r","--no-renames","--name-only","HEAD^","HEAD").splitlines()
-    need(".github/workflows/ci.yml"in remote_paths and "scripts/rc23-cross-qualification/materialize-final.py"in remote_paths and
-         all(p in (".github/workflows/ci.yml","scripts/rc23-cross-qualification/materialize-final.py")or p.startswith("scripts/rc23-22958-production/")for p in remote_paths),"unregistered coordinator delta")
+    need(".github/workflows/ci.yml"in remote_paths and "scripts/rc23-22958-production/candidate.py"in remote_paths and
+         all(p == ".github/workflows/ci.yml"or p.startswith("scripts/rc23-22958-production/")for p in remote_paths),"unregistered coordinator delta")
     return w
 
 def verify_sdk_receipts(w,src,role,proofs):
@@ -140,6 +146,10 @@ def verify_sdk_receipts(w,src,role,proofs):
     expected=scopes(name)
     need(set(role["installed_runmake"])==set(expected) and set(role["native_unit_and_runmake"])==
          ({"run-make"} | ({"ctfe-unit"}if name!="full_without_ctfe"else set()) | ({"derive-unit"}if name!="ctfe_control"else set())),"native test roster")
+    new_test=role["installed_runmake"][arm["run_make"]]
+    llvm_nm=w/"rc23-test-build"/POLICY["target"]/"ci-llvm/bin/llvm-nm"
+    need(new_test["llvm_nm"]["path"]==str(llvm_nm) and new_test["llvm_nm"]["sha256"]==h(llvm_nm)
+         and new_test["llvm_nm"]["version"] and new_test["linked_outputs"]==arm["linked_outputs"],"installed handwritten symbol tool or linked output")
     for group in (role["installed_runmake"],role["native_unit_and_runmake"]):
         for record in group.values():
             need(record["exit"]==0 and record["log_sha256"]==proofs[record["log"]]["sha256"],"native test log")
