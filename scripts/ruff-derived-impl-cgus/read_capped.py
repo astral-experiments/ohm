@@ -23,7 +23,24 @@ with zipfile.ZipFile(out/'raw-hardware-and-controls.zip','x',compression=zipfile
     c=json.loads(z.read('confirmation.json'));assert c['recorded_receipt']==head and x['case']=='28392'and x['confirmation_slot']==int(key)and x['order']==plan['orders'][int(key)]
    else:assert x['case']==key and x['confirmation_slot']is None
    ns=[n for n in z.namelist()if n in('registration.json','terminal.json','confirmation.json')or (len(n.split('/'))==3 and n.split('/')[0]in ('P','C')and (n.endswith('/hardware.json')or n.endswith('/footprint.json')or n.endswith('/caps.json')or n.endswith('/program-verdict.json')or n.endswith('/lifetime.json')or n.endswith('/result.json')))]
-   assert {'P/edit/hardware.json','C/edit/hardware.json','P/caps/caps.json','C/caps/caps.json'}<=set(ns);assert sum(z.getinfo(n).file_size for n in ns)<32*2**20
+   for n in z.namelist():
+    parts=n.split('/')
+    if len(parts)==3 and parts[0]in ('P','C')and parts[1]in ('cold-old','edit','empty-new','observed-edit','repair','old-unchanged','edited-unchanged','invalid','invalid-unchanged')and parts[2]in ('products.json','complete-cgu-table.json','selected-ruff-members.json','incremental-native-sessions.json','real-ruff-rustcs.json','help.stdout','check-help.stdout','format-help.stdout','valid-config.stderr','invalid-config.stderr','stderr','version.stdout'):
+     ns.append(n)
+    if len(parts)==4 and parts[0]in ('P','C')and parts[1]in ('observed-edit','old-unchanged','edited-unchanged')and parts[2]=='kernel-execs' and (parts[3].endswith('.nul')or parts[3]=='epochs.tsv'):ns.append(n)
+   assert {'P/edit/hardware.json','C/edit/hardware.json','P/caps/caps.json','C/caps/caps.json'}<=set(ns);ns=set(ns);assert sum(z.getinfo(n).file_size for n in ns)<48*2**20
+   # Keep every native body behind a rebuilt physical WIP across all six boots. All full CLI ELFs and the other donor bodies stay in the authenticated original Actions archives.
+   native=out/'changed-object-originals';native.mkdir(exist_ok=True);manifest={}
+   for k in 'PC':
+    groups=x['roles'][k]['transitions'];wanted=set()
+    for t in groups.values():wanted.update(t['new_names']+t['changed_in_place']+t['rebuilt_unchanged']+t['removed_names'])
+    for stage in ('cold-old','edit','empty-new'):
+     sessions=json.loads(z.read(f'{k}/{stage}/incremental-native-sessions.json'));rows=[r for rs in sessions.values()for r in rs if r[0]in wanted];manifest[k+'/'+stage]=[[r[0],r[4],r[5]]for r in rows]
+     for r in rows:
+      h=r[5];dest=native/(h+'.o.zst')
+      if not dest.exists():
+       src=f'{k}/native/{h}.zst';assert z.getinfo(src).file_size<16*2**20;data=z.read(src);raw_elf=sp.check_output(['zstd','-qdc'],input=data);assert len(raw_elf)==r[4]and raw_elf[:4]==b'\x7fELF'and hashlib.sha256(raw_elf).hexdigest()==h;dest.write_bytes(data)
+   put(key+'-changed-object-bindings.json',manifest);assert sum(p.stat().st_size for p in native.iterdir())<160*2**20
    for n in sorted(ns):
     e=zipfile.ZipInfo(key+'/'+n,(1980,1,1,0,0,0));e.compress_type=zipfile.ZIP_DEFLATED;raw.writestr(e,z.read(n))
   from metadata_controls import read as meta_read
