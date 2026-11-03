@@ -1,13 +1,13 @@
-name: Build matched integer-array compilers
-run-name: Price integer-array lowering on -24 ${{ inputs.reviewed_head }}
+name: Qualify the source-built compiler with the shipped -24 recipe
+run-name: Measure fully trained Linux compilers ${{ inputs.reviewed_head }}
 permissions:
   contents: read
 jobs:
   qualify:
-    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head &&
-      github.ref_name == 'charlie/qa-rc24-static-int-array-20261103'
+    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+      && github.ref_name == 'charlie/qa-rc24-release-compiler-price-20261103'
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 120
+    timeout-minutes: 240
     steps:
     - name: Check out release coordinator
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -161,61 +161,96 @@ jobs:
         --dest "$GITHUB_WORKSPACE/cargo-src"
 
         python3 -IB qa-code/scripts/ruff-combined-apple/qualify.py source'
-    - name: Read this experiment
+    - name: Read exactly the published -24 coordinator
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        ref: 8f25c47ff9e7c4ab2f22a1cad0638a26c7e26e1c
+        path: shipping
+        persist-credentials: false
+    - name: Read the immutable experiment
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         ref: ${{ github.sha }}
-        path: array-qa
-        sparse-checkout: scripts/ruff-static-int-array
+        path: enrollment
+        sparse-checkout: scripts/rc24-release-compiler-price
         persist-credentials: false
-    - name: Verify the source and select the compiler
-      run: python3 -IB array-qa/scripts/ruff-static-int-array/factory.py source
-    - name: Fetch signed Cargo and linker
+    - name: Verify all four published source trees, then apply the registered compiler difference
+      run: python3 -IB enrollment/scripts/rc24-release-compiler-price/factory.py source
+    - name: Install pinned LLVM BOLT tools
+      env:
+        MANIFEST_PATH: toolchains/1.99.0/24.json
+      run: "if [[ \"$(dpkg --print-architecture)\" != amd64 ]]; then\n  echo 'LLVM BOLT tools require an amd64 Linux\
+        \ runner' >&2\n  exit 1\nfi\n\ncase \"$(jq -er '.release.upstream_rust_version' \"$MANIFEST_PATH\")\" in\n\
+        \  1.97.* | 1.98.*)\n    bolt_major=22\n    bolt_version='22.1.8~++20260714014902+ca7933e47d3a-1~exp1~20260714135019.80'\n\
+        \    bolt_sha256='97a9e4e8d2b2219757c38abef93e913793ebc64580aa51207bd23941c44ec070'\n    runtime_sha256='48639dafeb45892eec58f5d8a2d0d612ce791a2f713f06c794b71d6a72fa582d'\n\
+        \    ;;\n  1.99.*)\n    bolt_major=23\n    bolt_version='23.1.2'\n    bolt_sha256='b5ed9675149cc837c282e9b6962c276c9fa62863d5b2f91537b60848552995b7'\n\
+        \    ;;\n  *)\n    echo 'Pin matching LLVM BOLT tools for this Rust version' >&2\n    exit 1\n    ;;\nesac\n\
+        bolt_root=\"$(mktemp -d \"${RUNNER_TEMP:?}/ohm-bolt.XXXXXX\")\"\nif [[ \"$bolt_major\" == 23 ]]; then\n  bolt_archive=\"\
+        $bolt_root/llvm.tar.xz\"\n  bolt_directory=\"LLVM-$bolt_version-Linux-X64\"\n  curl --proto '=https' --proto-redir\
+        \ '=https' --tlsv1.2 \\\n    --fail --location --retry 3 --show-error --silent \\\n    --output \"$bolt_archive\"\
+        \ \\\n    \"https://github.com/llvm/llvm-project/releases/download/llvmorg-$bolt_version/$bolt_directory.tar.xz\"\
+        \n  printf '%s  %s\\n' \"$bolt_sha256\" \"$bolt_archive\" | sha256sum --check --strict\n  # Leave llvm-profdata\
+        \ for the build to link from Rust's matching LLVM.\n  tar -xJf \"$bolt_archive\" -C \"$bolt_root\" --strip-components=1\
+        \ --occurrence=1 \\\n    \"$bolt_directory/bin/llvm-bolt\" \\\n    \"$bolt_directory/bin/merge-fdata\" \\\n\
+        \    \"$bolt_directory/lib/libbolt_rt_hugify.a\" \\\n    \"$bolt_directory/lib/libbolt_rt_instr.a\"\n  rm\
+        \ \"$bolt_archive\"\n  bolt_llvm_dir=\"$bolt_root\"\nelse\n  bolt_base_url=\"https://apt.llvm.org/noble/pool/main/l/llvm-toolchain-$bolt_major\"\
+        \n  for package in \"bolt-$bolt_major\" \"libbolt-$bolt_major-dev\"; do\n    curl --proto '=https' --proto-redir\
+        \ '=https' --tlsv1.2 \\\n      --fail --location --retry 3 --show-error --silent \\\n      --output \"$bolt_root/$package.deb\"\
+        \ \\\n      \"$bolt_base_url/${package}_${bolt_version}_amd64.deb\"\n  done\n\n  printf '%s  %s\\n' \\\n \
+        \   \"$bolt_sha256\" \\\n    \"$bolt_root/bolt-$bolt_major.deb\" \\\n    \"$runtime_sha256\" \\\n    \"$bolt_root/libbolt-$bolt_major-dev.deb\"\
+        \ \\\n    | sha256sum --check --strict\n\n  dpkg-deb --extract \"$bolt_root/bolt-$bolt_major.deb\" \"$bolt_root\"\
+        \n  dpkg-deb --extract \"$bolt_root/libbolt-$bolt_major-dev.deb\" \"$bolt_root\"\n  bolt_llvm_dir=\"$bolt_root/usr/lib/llvm-$bolt_major\"\
+        \nfi\n\"$bolt_llvm_dir/bin/llvm-bolt\" --version\n\"$bolt_llvm_dir/bin/merge-fdata\" --version\nif [[ ! -f\
+        \ \"$bolt_llvm_dir/lib/libbolt_rt_instr.a\" ]]; then\n  echo 'LLVM BOLT instrumentation runtime is missing'\
+        \ >&2\n  exit 1\nfi\n\nprintf 'OHM_BOLT_LLVM_DIR=%s\\n' \"$bolt_llvm_dir\" >> \"$GITHUB_ENV\"\n"
+      working-directory: shipping
+    - name: Prepare pinned Wild linker
+      env:
+        MANIFEST_PATH: toolchains/1.99.0/24.json
+      run: "wild_directory=\"$(python3 scripts/prepare-wild.py \\\n  \"$MANIFEST_PATH\" \"$OHM_TARGET\" \"$RUNNER_TEMP/ohm-wild\"\
+        )\"\nprintf 'OHM_WILD_LINKER_DIR=%s\\n' \"$wild_directory\" >> \"$GITHUB_ENV\"\n"
+      working-directory: shipping
+    - name: Train and link the Linux compiler with the published PGO, ThinLTO and BOLT recipe
+      id: distribution
+      env:
+        OHM_TOOLCHAIN: ohm-1.99.0-24
+      run: "./scripts/build-optimized-dist.sh \\\n  \"$OHM_TARGET\" \\\n  \"$OHM_TOOLCHAIN\" \\\n  \"$GITHUB_WORKSPACE/source/rust\"\
+        \ \\\n  \"$GITHUB_WORKSPACE/shipping/release/bootstrap.toml\"\n"
+      working-directory: shipping
+    - name: Read the unchanged signed Cargo and Wild
       env:
         GH_TOKEN: ${{ github.token }}
-      run: gh release download ohm-1.99.0-24 -R astral-experiments/ohm -p ohm-1.99.0-24-x86_64-unknown-linux-gnu.tar.gz --dir
-        "$RUNNER_TEMP/static-int-array"
-    - name: Build the compiler and check typed arrays
-      run: 'set -euo pipefail
-
-        test -f source/rust/library/backtrace/Cargo.toml || git -C source/rust submodule update --init library/backtrace
-
-        command -v ninja || { sudo apt-get update && sudo apt-get install -y ninja-build; }
-
-        python3 -IB array-qa/scripts/ruff-static-int-array/factory.py build
-
-        '
+      run: gh release download ohm-1.99.0-24 -R astral-experiments/ohm -p ohm-1.99.0-24-x86_64-unknown-linux-gnu.tar.gz
+        --dir "$RUNNER_TEMP/release-compiler-price"
+    - name: Verify the optimized driver, executed profiles and native compiler
+      run: python3 -IB enrollment/scripts/rc24-release-compiler-price/factory.py collect
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       with:
-        name: array-sdk-${{ matrix.role }}-${{ github.run_id }}
-        path: ${{ runner.temp }}/static-int-array/sdk.tar.zst
-        retention-days: 2
+        name: trained-sdk-${{ matrix.role }}-${{ github.run_id }}
+        path: ${{ runner.temp }}/release-compiler-price/sdk.tar.zst
+        retention-days: 3
         compression-level: 0
         if-no-files-found: error
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: array-qualification-${{ matrix.role }}-${{ github.run_id }}
-        path: '${{ runner.temp }}/static-int-array/*.json
-
-          ${{ runner.temp }}/static-int-array/sdk-sha256
-
-          ${{ runner.temp }}/static-int-array/probes/verdict.json'
+        name: trained-proof-${{ matrix.role }}-${{ github.run_id }}
+        path: ${{ runner.temp }}/release-compiler-price/proof
         retention-days: 7
         if-no-files-found: warn
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       OHM_TARGET: ${{ matrix.target }}
       PYTHONDONTWRITEBYTECODE: '1'
-      ARRAY_ARM: ${{ matrix.role }}
+      RELEASE_COMPILER_ARM: ${{ matrix.role }}
     strategy:
       fail-fast: false
       matrix:
         include:
         - os: namespace-profile-ubuntu-24-04-16
           target: x86_64-unknown-linux-gnu
-          role: candidate
-    name: Compile ${{ matrix.role }} and run the typed probes
+          role: parent
+    name: Train the ${{ matrix.role }} compiler with the shipped Linux recipe
 'on':
   workflow_dispatch:
     inputs:
