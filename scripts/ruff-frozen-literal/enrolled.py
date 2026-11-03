@@ -9,9 +9,12 @@ import traceback
 
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
-import prep as p
 import study as s
+import prep as p
 import tree_clock
+
+if any(Path(module.__file__).resolve()!=HERE/name for module,name in ((s,"study.py"),(p,"prep.py"),(tree_clock,"tree_clock.py"))):
+    raise RuntimeError("different authenticated worker module")
 
 w,ROOT,BASE=p.w,p.ROOT,p.BASE
 A,B=p.A,p.B
