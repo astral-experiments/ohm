@@ -9,13 +9,14 @@ Install [uv](https://docs.astral.sh/uv/), Git, and both Rust toolchains. Ruff/ty
 workflows need `cargo-nextest`. Codex session replays also need `just`. Run the commands from
 the Ohm repository with enough space for separate builds. Cache dependencies before an offline run.
 
-On x86_64 Linux, compare stock Rust 1.99.0 with Ohm 1.99.0-17, which bundles Wild 0.11.0.
+On x86_64 Linux, compare stock Rust 1.99.0 with Ohm 1.99.0-23, which bundles Wild 0.11.0.
 The versioned installer checks the archive's SHA-256 against
-`163267d26889b1bd2c467d7db97efee42cd2ac9dc9af2abc3a56ade8da9a9572`.
-[Ohm installer](https://labs.astral.sh/ohm/releases/ohm-1.99.0-17/install.sh) · [Release manifest](toolchains/1.99.0/17.json)
+`fc85a2ca6d47711058cd89c790c8e57f1799472e38f0ee0a08b0a51d06c1ee7b`.
+[Ohm installer](https://labs.astral.sh/ohm/releases/ohm-1.99.0-23/install.sh) · [Release manifest](toolchains/1.99.0/23.json)
 
-Run the examples below from Ohm commit `04c83d53483607aec4f93fd2bb55b412f101d677` to use the
-same benchmark drivers, workload revisions and replay fixtures as the campaign.
+Run the developer-workflow and individual-command examples below from Ohm commit
+`04c83d53483607aec4f93fd2bb55b412f101d677` to use the same drivers, workload revisions and replay
+fixtures as the campaign.
 [Benchmark drivers and fixtures](https://github.com/astral-sh/ohm/tree/04c83d53483607aec4f93fd2bb55b412f101d677/scripts)
 
 ## Run the developer workflows
@@ -38,13 +39,13 @@ Prepare the sources and dependencies, then measure with the same Cargo home in b
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/uv \
   --upstream 1.99.0 \
-  --ohm ohm-1.99.0-17 \
+  --ohm ohm-1.99.0-23 \
   --output-dir /path/to/preparation --prepare-only
 
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/preparation/sources/uv \
   --upstream 1.99.0 \
-  --ohm ohm-1.99.0-17 \
+  --ohm ohm-1.99.0-23 \
   --jobs 8 --repetitions 4 --contention-retries 8 \
   --require-idle --discard-targets --output-dir /path/to/new-empty-results
 ```
@@ -92,7 +93,7 @@ temporary worktrees and use separate target directories.
 
 ```console
 uv run scripts/benchmark.py \
-  --project uv --upstream 1.99.0 --ohm ohm-1.99.0-17 --jobs 8 \
+  --project uv --upstream 1.99.0 --ohm ohm-1.99.0-23 --jobs 8 \
   --cold-runs 1 --noop-runs 3 --dependency-runs 7 --direct-runs 5 \
   --minimum-free-gb 60 --quiet-seconds 30 --require-idle \
   --discard-targets --output-dir /path/to/new-empty-results
@@ -113,6 +114,27 @@ Use `--uv-path` or `--codex-path` to reuse a local checkout and `--uv-rev` or `-
 to select a revision. The run-count flags in the example control repetitions. `--discard-targets`
 removes build artifacts after each workflow and keeps results and logs. Run
 `uv run scripts/benchmark.py --help` for the full list.
+
+## Ruff doctests
+
+This benchmark times `cargo test --doc --all-features --locked --offline` on 16 crates from
+[Ruff revision `23a16fa`](https://github.com/astral-sh/ruff/tree/23a16fa018cf3b219c2edc7a2b739881e023a874).
+Each toolchain starts with its own empty target directory. The first run primes it. We then time
+five pairs, alternating which toolchain runs first, and report each toolchain’s median. The
+runner checks every example’s crate, name, and outcome against the first run.
+
+On a quiet x86-64 Linux host, install both toolchains and run the following from the Ohm checkout.
+`--source` must point to a clean checkout of the pinned Ruff revision.
+
+```console
+cargo +1.99.0 fetch --locked --manifest-path /path/to/ruff/Cargo.toml
+python3 scripts/benchmark_ruff_doctests.py --source /path/to/ruff \
+  --upstream 1.99.0 --ohm ohm-1.99.0-23 --jobs 32 --output /path/to/new-results
+```
+
+The results record all five warm pairs, the Cargo, rustc and rustdoc binaries used, and the
+test inventory hash. Both priming runs and all ten measured runs passed the same 207 examples
+and ignored the same nine. [Ruff doctest measurements](scripts/benchmark_results/ruff-doctests.json)
 
 ## Read the results
 
