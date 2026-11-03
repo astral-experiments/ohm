@@ -27,8 +27,10 @@ expected_cargo_repository="$(jq -er '.sources.cargo.repository' "$manifest")"
 
 verify_clean_checkout() {
   local checkout="$1" checkout_status hidden_entries entry submodule
+  # Release builds depend on the executable bits and symlinks in the pinned tree.
+  local mode_config=(-c core.fileMode=true -c core.symlinks=true)
   shift
-  checkout_status="$(git -C "$checkout" status --porcelain --untracked-files=normal \
+  checkout_status="$(git -C "$checkout" "${mode_config[@]}" status --porcelain --untracked-files=normal \
     --ignore-submodules=none -- "$@")"
   if [[ -n "$checkout_status" ]]; then
     echo "source checkout is not clean: $checkout" >&2
@@ -44,7 +46,7 @@ verify_clean_checkout() {
     GIT_INDEX_FILE="$(cd -- "$index_directory" && pwd -P)/index" || exit 1
     export GIT_INDEX_FILE
     git -C "$checkout" -c core.sparseCheckout=false read-tree HEAD &&
-      git -C "$checkout" -c core.sparseCheckout=false diff --no-ext-diff --no-textconv --quiet --ignore-submodules=none HEAD -- "$@"
+      git -C "$checkout" "${mode_config[@]}" -c core.sparseCheckout=false diff --no-ext-diff --no-textconv --quiet --ignore-submodules=none HEAD -- "$@"
   ); then
     echo "could not verify tracked source files against HEAD: $checkout" >&2
     exit 1

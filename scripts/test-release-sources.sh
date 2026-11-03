@@ -29,7 +29,8 @@ git -C "$cargo_checkout" init --quiet
 git -C "$cargo_checkout" -c protocol.file.allow=always submodule add --quiet \
   --name fixture "$dependency" 'vendor/fixture code'
 printf 'fixture cargo\n' > "$cargo_checkout/README.md"
-git -C "$cargo_checkout" add README.md
+ln -s README.md "$cargo_checkout/readme-link"
+git -C "$cargo_checkout" add README.md readme-link
 commit_fixture "$cargo_checkout" -m 'Add Cargo fixture'
 cargo_revision="$(git -C "$cargo_checkout" rev-parse HEAD)"
 
@@ -111,6 +112,27 @@ if "${verify_sources[@]}" >/dev/null 2>&1; then
   exit 1
 fi
 git -C "$nested_dependency" checkout --quiet --detach "$(git -C "$dependency" rev-parse HEAD)"
+"${verify_sources[@]}"
+
+git -C "$nested_dependency" config core.fileMode false
+chmod +x "$nested_dependency/lib.rs"
+if "${verify_sources[@]}" >/dev/null 2>&1; then
+  echo 'source verification accepted a changed executable bit' >&2
+  exit 1
+fi
+chmod -x "$nested_dependency/lib.rs"
+
+git -C "$cargo_checkout" config core.symlinks false
+git -C "$cargo_checkout" update-index --skip-worktree readme-link
+rm "$cargo_checkout/readme-link"
+printf 'README.md' > "$cargo_checkout/readme-link"
+if "${verify_sources[@]}" >/dev/null 2>&1; then
+  echo 'source verification accepted a symlink replaced by a regular file' >&2
+  exit 1
+fi
+rm "$cargo_checkout/readme-link"
+ln -s README.md "$cargo_checkout/readme-link"
+git -C "$cargo_checkout" update-index --no-skip-worktree readme-link
 "${verify_sources[@]}"
 
 pinned_tree="$(git -C "$cargo_checkout" rev-parse 'HEAD^{tree}')"
