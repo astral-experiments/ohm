@@ -30,7 +30,7 @@ verify_clean_checkout() {
   # Release builds depend on the executable bits and symlinks in the pinned tree.
   local mode_config=(-c core.fileMode=true -c core.symlinks=true)
   shift
-  checkout_status="$(git -C "$checkout" "${mode_config[@]}" status --porcelain --untracked-files=normal \
+  checkout_status="$(git -C "$checkout" "${mode_config[@]}" status --porcelain --untracked-files=normal --ignored=matching \
     --ignore-submodules=none -- "$@")"
   if [[ -n "$checkout_status" ]]; then
     echo "source checkout is not clean: $checkout" >&2
