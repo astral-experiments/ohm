@@ -1,0 +1,1624 @@
+{
+ "block": 0,
+ "boot": "0db05892-1c2d-43d7-8c36-a279e08881aa",
+ "edited_instructions": {
+  "C": 33490876460,
+  "P": 41570091436
+ },
+ "edited_reduction_fraction": 0.19435162870494294,
+ "head": "0c7d0e75a80252dac126704cbc05eaaae6129421",
+ "order": "CP",
+ "original_roles": {
+  "C": {
+   "cargo": "0617e34321cf33fcce38904d066f0d4981b79f752896d37b97d1aed1fbddc48f",
+   "counters": {
+    "buggy-cold": {
+     "enabled": 174088619071,
+     "instructions": 1196054258636,
+     "pid": 2503,
+     "record_sha256": "3976d4b782a6454f6f8c3a3dba0b392df92650e297763d0f99f11a1c77962fd5",
+     "running": 174088619071,
+     "status": 0
+    },
+    "buggy-idle1": {
+     "enabled": 1202180780,
+     "instructions": 9180929007,
+     "pid": 14200,
+     "record_sha256": "8b015d20473c637ebcd4eb49a72ca758e470e2d4c62be9faf5302b1c0b619f24",
+     "running": 1202180780,
+     "status": 0
+    },
+    "buggy-idle2": {
+     "enabled": 1217270319,
+     "instructions": 9209442099,
+     "pid": 14273,
+     "record_sha256": "6e412f95b66c4a73439be1fff43fccc1e97b6c64fcb5346c0670c56974fa551a",
+     "running": 1217270319,
+     "status": 0
+    },
+    "edited": {
+     "enabled": 4612632397,
+     "instructions": 33490876460,
+     "pid": 14387,
+     "record_sha256": "8d867141369ad02fed1af3bc855ce78e1c41b4d5294e96fbde096298a4f6aa91",
+     "running": 4612632397,
+     "status": 0
+    },
+    "fixed-idle1": {
+     "enabled": 1190414153,
+     "instructions": 9144171545,
+     "pid": 14492,
+     "record_sha256": "213622a7bb70fce9b9ad51346c1508496f194d38f6d760e2261a01ea30f4cd06",
+     "running": 1190414153,
+     "status": 0
+    },
+    "fixed-idle2": {
+     "enabled": 1226005050,
+     "instructions": 9208638810,
+     "pid": 14564,
+     "record_sha256": "adf0a65e1ce3b7963590be5d958d3416a65ffa9e87e136839512a4353cdc04e1",
+     "running": 1226005050,
+     "status": 0
+    }
+   },
+   "driver": "3d419b19fd0571df79fcbd6edaeda3d44132d4ce21ad24d3ea63442418c50561",
+   "native": {
+    "native-buggy": {
+     "archive_member": "a99719c5ad3e020fd748946615e04f065d3c26b87c53eac5e91bfaea76776482",
+     "bytes": 167920136,
+     "elf": "571435780d613322c4dd9554cacd7700c6d7c719efbe000489e498b16c5b79f3",
+     "verdicts": {
+      "attr-attributes": [
+       0,
+       []
+      ],
+      "attr-field": [
+       1,
+       [
+        "RUF009"
+       ]
+      ],
+      "both-clean": [
+       0,
+       []
+      ],
+      "both-warn": [
+       1,
+       [
+        "RUF009"
+       ]
+      ]
+     }
+    },
+    "native-edited": {
+     "archive_member": "05b9f9608dcb91694cf45b76c53b010a3b7d9d457e1aaa538ab589c2f6cc5a9b",
+     "bytes": 167920480,
+     "elf": "e8b454858bd7945b45bd6d78725c32cd64b2df7261a767a4219314784c994f9e",
+     "verdicts": {
+      "attr-attributes": [
+       1,
+       [
+        "RUF009"
+       ]
+      ],
+      "attr-field": [
+       0,
+       []
+      ],
+      "both-clean": [
+       0,
+       []
+      ],
+      "both-warn": [
+       1,
+       [
+        "RUF009"
+       ]
+      ]
+     }
+    },
+    "native-fully-empty-fixed": {
+     "archive_member": "05b9f9608dcb91694cf45b76c53b010a3b7d9d457e1aaa538ab589c2f6cc5a9b",
+     "bytes": 167920480,
+     "elf": "e8b454858bd7945b45bd6d78725c32cd64b2df7261a767a4219314784c994f9e",
+     "verdicts": {
+      "attr-attributes": [
+       1,
+       [
+        "RUF009"
+       ]
+      ],
+      "attr-field": [
+       0,
+       []
+      ],
+      "both-clean": [
+       0,
+       []
+      ],
+      "both-warn": [
+       1,
+       [
+        "RUF009"
+       ]
+      ]
+     }
+    },
+    "native-repair": {
+     "archive_member": "05b9f9608dcb91694cf45b76c53b010a3b7d9d457e1aaa538ab589c2f6cc5a9b",
+     "bytes": 167920480,
+     "elf": "e8b454858bd7945b45bd6d78725c32cd64b2df7261a767a4219314784c994f9e",
+     "verdicts": {
+      "attr-attributes": [
+       1,
+       [
+        "RUF009"
+       ]
+      ],
+      "attr-field": [
+       0,
+       []
+      ],
+      "both-clean": [
+       0,
+       []
+      ],
+      "both-warn": [
+       1,
+       [
+        "RUF009"
+       ]
+      ]
+     }
+    },
+    "native-reverse": {
+     "archive_member": "a99719c5ad3e020fd748946615e04f065d3c26b87c53eac5e91bfaea76776482",
+     "bytes": 167920136,
+     "elf": "571435780d613322c4dd9554cacd7700c6d7c719efbe000489e498b16c5b79f3",
+     "verdicts": {
+      "attr-attributes": [
+       0,
+       []
+      ],
+      "attr-field": [
+       1,
+       [
+        "RUF009"
+       ]
+      ],
+      "both-clean": [
+       0,
+       []
+      ],
+      "both-warn": [
+       1,
+       [
+        "RUF009"
+       ]
+      ]
+     }
+    }
+   },
+   "physical_rustc": "8bfdc9779937e9cd2c9ef5db9f50cee9aab03ddec5672b37a3a3c9278cf1f5d0",
+   "traced": {
+    "invalid": {
+     "actual": {
+      "15643": [
+       "ruff_linter",
+       "lib",
+       "94fa719c5358d1ba912e1dfea38eef4db4a97457b94e12cd94a446474685f731"
+      ],
+      "15644": [
+       "ty_python_semantic",
+       "lib",
+       "fb194a557b6bd9af8e041933eab2462699effcceb5501bec7260a3bf135e29c3"
+      ]
+     },
+     "nominal": [
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "roster": [
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "status": 101
+    },
+    "kernel-buggy-idle1": {
+     "actual": {
+      "14883": [
+       "ty_python_semantic",
+       "lib",
+       "fb194a557b6bd9af8e041933eab2462699effcceb5501bec7260a3bf135e29c3"
+      ]
+     },
+     "nominal": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "roster": [
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "status": 0
+    },
+    "kernel-buggy-idle2": {
+     "actual": {
+      "14957": [
+       "ty_python_semantic",
+       "lib",
+       "fb194a557b6bd9af8e041933eab2462699effcceb5501bec7260a3bf135e29c3"
+      ]
+     },
+     "nominal": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "roster": [
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "status": 0
+    },
+    "kernel-buggy-return": {
+     "actual": {
+      "14714": [
+       "ty_python_semantic",
+       "lib",
+       "fb194a557b6bd9af8e041933eab2462699effcceb5501bec7260a3bf135e29c3"
+      ],
+      "14715": [
+       "ruff_linter",
+       "lib",
+       "94fa719c5358d1ba912e1dfea38eef4db4a97457b94e12cd94a446474685f731"
+      ]
+     },
+     "nominal": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "roster": [
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "status": 0
+    },
+    "kernel-edited": {
+     "actual": {
+      "15074": [
+       "ruff_linter",
+       "lib",
+       "94fa719c5358d1ba912e1dfea38eef4db4a97457b94e12cd94a446474685f731"
+      ],
+      "15075": [
+       "ty_python_semantic",
+       "lib",
+       "fb194a557b6bd9af8e041933eab2462699effcceb5501bec7260a3bf135e29c3"
+      ]
+     },
+     "nominal": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "roster": [
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "status": 0
+    },
+    "kernel-fixed-idle1": {
+     "actual": {
+      "15189": [
+       "ty_python_semantic",
+       "lib",
+       "fb194a557b6bd9af8e041933eab2462699effcceb5501bec7260a3bf135e29c3"
+      ]
+     },
+     "nominal": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "roster": [
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "status": 0
+    },
+    "kernel-fixed-idle2": {
+     "actual": {
+      "15263": [
+       "ty_python_semantic",
+       "lib",
+       "fb194a557b6bd9af8e041933eab2462699effcceb5501bec7260a3bf135e29c3"
+      ]
+     },
+     "nominal": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "roster": [
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "status": 0
+    },
+    "repair": {
+     "actual": {
+      "15749": [
+       "ty_python_semantic",
+       "lib",
+       "fb194a557b6bd9af8e041933eab2462699effcceb5501bec7260a3bf135e29c3"
+      ],
+      "15750": [
+       "ruff_linter",
+       "lib",
+       "94fa719c5358d1ba912e1dfea38eef4db4a97457b94e12cd94a446474685f731"
+      ],
+      "15766": [
+       "ruff_graph",
+       "lib",
+       "9c9e207f6fc9f0172c15832b070a23053826c28d5031347062b92b4f509d5664"
+      ],
+      "15770": [
+       "ruff_workspace",
+       "lib",
+       "b8263fc1d3fe1a4d5557b5c6b2b5f85db53de3de61ae2cb354412d30969e7d3c"
+      ],
+      "15774": [
+       "ruff_server",
+       "lib",
+       "cac7ca0a8c00b9e92e5267a5f6200d12db34a5a253ad65e41984a72eafa04deb"
+      ],
+      "15778": [
+       "ruff",
+       "lib",
+       "af88fc12e4f370394b8432a43683d5b8ede3f4995be4859bdca29245d809e15a"
+      ],
+      "15782": [
+       "ruff",
+       "bin",
+       "80aef7d516924ed7c1e3de7845d1a3953c1b462b9818b69964a0092a19775dc7"
+      ]
+     },
+     "nominal": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "roster": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "status": 0
+    },
+    "restore-fixed": {
+     "actual": {
+      "15537": [
+       "ruff_linter",
+       "lib",
+       "94fa719c5358d1ba912e1dfea38eef4db4a97457b94e12cd94a446474685f731"
+      ],
+      "15538": [
+       "ty_python_semantic",
+       "lib",
+       "fb194a557b6bd9af8e041933eab2462699effcceb5501bec7260a3bf135e29c3"
+      ]
+     },
+     "nominal": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "roster": [
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "status": 0
+    },
+    "reverse": {
+     "actual": {
+      "15391": [
+       "ruff_linter",
+       "lib",
+       "94fa719c5358d1ba912e1dfea38eef4db4a97457b94e12cd94a446474685f731"
+      ],
+      "15392": [
+       "ty_python_semantic",
+       "lib",
+       "fb194a557b6bd9af8e041933eab2462699effcceb5501bec7260a3bf135e29c3"
+      ]
+     },
+     "nominal": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "roster": [
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "status": 0
+    }
+   }
+  },
+  "P": {
+   "cargo": "0617e34321cf33fcce38904d066f0d4981b79f752896d37b97d1aed1fbddc48f",
+   "counters": {
+    "buggy-cold": {
+     "enabled": 171713478894,
+     "instructions": 1196050905740,
+     "pid": 58853,
+     "record_sha256": "d47bb7d327a44fb17fdac88c60ac1aceb60a627324e56abaee0518f859f81add",
+     "running": 171713478894,
+     "status": 0
+    },
+    "buggy-idle1": {
+     "enabled": 1214289352,
+     "instructions": 9181186522,
+     "pid": 69343,
+     "record_sha256": "81cbedfb3df43b0b2cca23d5107c274b805be7e74493c4fe7e81c55d7c0483e5",
+     "running": 1214289352,
+     "status": 0
+    },
+    "buggy-idle2": {
+     "enabled": 1230409045,
+     "instructions": 9209692625,
+     "pid": 69414,
+     "record_sha256": "c597cbfee9b473ba6f3105cc7088272ddfa44a567852de80a465f576f65c3f6c",
+     "running": 1230409045,
+     "status": 0
+    },
+    "edited": {
+     "enabled": 5754585778,
+     "instructions": 41570091436,
+     "pid": 69527,
+     "record_sha256": "506245f11752feaace3bcff0af4ea1b0c76fd2cd7a73bea5b0178d10fbddb894",
+     "running": 5754585778,
+     "status": 0
+    },
+    "fixed-idle1": {
+     "enabled": 1216809244,
+     "instructions": 9143715084,
+     "pid": 69667,
+     "record_sha256": "80a708a2af259a3edf08551ecc920884651821de9594aa598b5ae19cb8d2bdf1",
+     "running": 1216809244,
+     "status": 0
+    },
+    "fixed-idle2": {
+     "enabled": 1213407792,
+     "instructions": 9208871371,
+     "pid": 69738,
+     "record_sha256": "9a3dc61f31a224aa29dbb73415ddcae4979a04059602b329c44e5732b098e9fa",
+     "running": 1213407792,
+     "status": 0
+    }
+   },
+   "driver": "3c729770038b0b6fc7fd284fc5bf9ac059d5d2a8067cc8fee23bfa4c8cd4aba2",
+   "native": {
+    "native-buggy": {
+     "archive_member": "3f8fecbc87f876c098adfebd65bf00d87677062e436a1bfc6bcf9280b4762f53",
+     "bytes": 167920136,
+     "elf": "c62ddee679d8e8c59096d19bd57f2ab25e1c4534da56ff7d010a6fee145115f2",
+     "verdicts": {
+      "attr-attributes": [
+       0,
+       []
+      ],
+      "attr-field": [
+       1,
+       [
+        "RUF009"
+       ]
+      ],
+      "both-clean": [
+       0,
+       []
+      ],
+      "both-warn": [
+       1,
+       [
+        "RUF009"
+       ]
+      ]
+     }
+    },
+    "native-edited": {
+     "archive_member": "4e2c5469384a1ae341c8430e4ffe1f2342476f6b3818f0ebc0b846630512adf2",
+     "bytes": 167920480,
+     "elf": "a98446282ec3d98a6282b0db6874e4e0487f494f04429c42cd2eae9f7c4dc096",
+     "verdicts": {
+      "attr-attributes": [
+       1,
+       [
+        "RUF009"
+       ]
+      ],
+      "attr-field": [
+       0,
+       []
+      ],
+      "both-clean": [
+       0,
+       []
+      ],
+      "both-warn": [
+       1,
+       [
+        "RUF009"
+       ]
+      ]
+     }
+    },
+    "native-fully-empty-fixed": {
+     "archive_member": "4e2c5469384a1ae341c8430e4ffe1f2342476f6b3818f0ebc0b846630512adf2",
+     "bytes": 167920480,
+     "elf": "a98446282ec3d98a6282b0db6874e4e0487f494f04429c42cd2eae9f7c4dc096",
+     "verdicts": {
+      "attr-attributes": [
+       1,
+       [
+        "RUF009"
+       ]
+      ],
+      "attr-field": [
+       0,
+       []
+      ],
+      "both-clean": [
+       0,
+       []
+      ],
+      "both-warn": [
+       1,
+       [
+        "RUF009"
+       ]
+      ]
+     }
+    },
+    "native-repair": {
+     "archive_member": "4e2c5469384a1ae341c8430e4ffe1f2342476f6b3818f0ebc0b846630512adf2",
+     "bytes": 167920480,
+     "elf": "a98446282ec3d98a6282b0db6874e4e0487f494f04429c42cd2eae9f7c4dc096",
+     "verdicts": {
+      "attr-attributes": [
+       1,
+       [
+        "RUF009"
+       ]
+      ],
+      "attr-field": [
+       0,
+       []
+      ],
+      "both-clean": [
+       0,
+       []
+      ],
+      "both-warn": [
+       1,
+       [
+        "RUF009"
+       ]
+      ]
+     }
+    },
+    "native-reverse": {
+     "archive_member": "3f8fecbc87f876c098adfebd65bf00d87677062e436a1bfc6bcf9280b4762f53",
+     "bytes": 167920136,
+     "elf": "c62ddee679d8e8c59096d19bd57f2ab25e1c4534da56ff7d010a6fee145115f2",
+     "verdicts": {
+      "attr-attributes": [
+       0,
+       []
+      ],
+      "attr-field": [
+       1,
+       [
+        "RUF009"
+       ]
+      ],
+      "both-clean": [
+       0,
+       []
+      ],
+      "both-warn": [
+       1,
+       [
+        "RUF009"
+       ]
+      ]
+     }
+    }
+   },
+   "physical_rustc": "8bfdc9779937e9cd2c9ef5db9f50cee9aab03ddec5672b37a3a3c9278cf1f5d0",
+   "traced": {
+    "invalid": {
+     "actual": {
+      "70907": [
+       "ruff_linter",
+       "lib",
+       "80817a980dc96a07d3a7ac8740bd8d953980a31efdefa564758cdd2536a91125"
+      ],
+      "70908": [
+       "ty_python_semantic",
+       "lib",
+       "a0afddaf85dc5165843134a5e2c9cc12d28086248b596a7340df665613d657ab"
+      ]
+     },
+     "nominal": [
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "roster": [
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "status": 101
+    },
+    "kernel-buggy-idle1": {
+     "actual": {
+      "70066": [
+       "ty_python_semantic",
+       "lib",
+       "a0afddaf85dc5165843134a5e2c9cc12d28086248b596a7340df665613d657ab"
+      ]
+     },
+     "nominal": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "roster": [
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "status": 0
+    },
+    "kernel-buggy-idle2": {
+     "actual": {
+      "70141": [
+       "ty_python_semantic",
+       "lib",
+       "a0afddaf85dc5165843134a5e2c9cc12d28086248b596a7340df665613d657ab"
+      ]
+     },
+     "nominal": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "roster": [
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "status": 0
+    },
+    "kernel-buggy-return": {
+     "actual": {
+      "69883": [
+       "ruff_linter",
+       "lib",
+       "80817a980dc96a07d3a7ac8740bd8d953980a31efdefa564758cdd2536a91125"
+      ],
+      "69884": [
+       "ty_python_semantic",
+       "lib",
+       "a0afddaf85dc5165843134a5e2c9cc12d28086248b596a7340df665613d657ab"
+      ],
+      "69898": [
+       "ruff_graph",
+       "lib",
+       "b7cd7d112a69c8865574d95e2d72451862a17f44629fb0766990199bc2147e6f"
+      ],
+      "69902": [
+       "ruff_workspace",
+       "lib",
+       "aa29bedea41b714bbf5b2d48e788bc2a853068f133b058ad413f46bce2d8b2d3"
+      ],
+      "69906": [
+       "ruff_server",
+       "lib",
+       "9115e9e0fe93cf9f1373bc966b364ae6292a48f3623b942f8112d71c39d36cb2"
+      ],
+      "69910": [
+       "ruff",
+       "lib",
+       "a5d946795073ed23ec90dfa8b6a8a6b4a55ccb9134e2f84781d7d9ce13e9fd2a"
+      ],
+      "69914": [
+       "ruff",
+       "bin",
+       "6a82f37cdef9cae8adfc8cd9146f931b26350e6c4e7b5a7effb590e37d341fab"
+      ]
+     },
+     "nominal": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "roster": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "status": 0
+    },
+    "kernel-edited": {
+     "actual": {
+      "70257": [
+       "ruff_linter",
+       "lib",
+       "80817a980dc96a07d3a7ac8740bd8d953980a31efdefa564758cdd2536a91125"
+      ],
+      "70258": [
+       "ty_python_semantic",
+       "lib",
+       "a0afddaf85dc5165843134a5e2c9cc12d28086248b596a7340df665613d657ab"
+      ],
+      "70272": [
+       "ruff_graph",
+       "lib",
+       "b7cd7d112a69c8865574d95e2d72451862a17f44629fb0766990199bc2147e6f"
+      ],
+      "70276": [
+       "ruff_workspace",
+       "lib",
+       "aa29bedea41b714bbf5b2d48e788bc2a853068f133b058ad413f46bce2d8b2d3"
+      ],
+      "70280": [
+       "ruff_server",
+       "lib",
+       "9115e9e0fe93cf9f1373bc966b364ae6292a48f3623b942f8112d71c39d36cb2"
+      ],
+      "70284": [
+       "ruff",
+       "lib",
+       "a5d946795073ed23ec90dfa8b6a8a6b4a55ccb9134e2f84781d7d9ce13e9fd2a"
+      ],
+      "70288": [
+       "ruff",
+       "bin",
+       "6a82f37cdef9cae8adfc8cd9146f931b26350e6c4e7b5a7effb590e37d341fab"
+      ]
+     },
+     "nominal": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "roster": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "status": 0
+    },
+    "kernel-fixed-idle1": {
+     "actual": {
+      "70429": [
+       "ty_python_semantic",
+       "lib",
+       "a0afddaf85dc5165843134a5e2c9cc12d28086248b596a7340df665613d657ab"
+      ]
+     },
+     "nominal": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "roster": [
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "status": 0
+    },
+    "kernel-fixed-idle2": {
+     "actual": {
+      "70502": [
+       "ty_python_semantic",
+       "lib",
+       "a0afddaf85dc5165843134a5e2c9cc12d28086248b596a7340df665613d657ab"
+      ]
+     },
+     "nominal": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "roster": [
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "status": 0
+    },
+    "repair": {
+     "actual": {
+      "71011": [
+       "ruff_linter",
+       "lib",
+       "80817a980dc96a07d3a7ac8740bd8d953980a31efdefa564758cdd2536a91125"
+      ],
+      "71012": [
+       "ty_python_semantic",
+       "lib",
+       "a0afddaf85dc5165843134a5e2c9cc12d28086248b596a7340df665613d657ab"
+      ],
+      "71029": [
+       "ruff_graph",
+       "lib",
+       "b7cd7d112a69c8865574d95e2d72451862a17f44629fb0766990199bc2147e6f"
+      ],
+      "71033": [
+       "ruff_workspace",
+       "lib",
+       "aa29bedea41b714bbf5b2d48e788bc2a853068f133b058ad413f46bce2d8b2d3"
+      ],
+      "71037": [
+       "ruff_server",
+       "lib",
+       "9115e9e0fe93cf9f1373bc966b364ae6292a48f3623b942f8112d71c39d36cb2"
+      ],
+      "71041": [
+       "ruff",
+       "lib",
+       "a5d946795073ed23ec90dfa8b6a8a6b4a55ccb9134e2f84781d7d9ce13e9fd2a"
+      ],
+      "71045": [
+       "ruff",
+       "bin",
+       "6a82f37cdef9cae8adfc8cd9146f931b26350e6c4e7b5a7effb590e37d341fab"
+      ]
+     },
+     "nominal": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "roster": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "status": 0
+    },
+    "restore-fixed": {
+     "actual": {
+      "70789": [
+       "ruff_linter",
+       "lib",
+       "80817a980dc96a07d3a7ac8740bd8d953980a31efdefa564758cdd2536a91125"
+      ],
+      "70790": [
+       "ty_python_semantic",
+       "lib",
+       "a0afddaf85dc5165843134a5e2c9cc12d28086248b596a7340df665613d657ab"
+      ],
+      "70804": [
+       "ruff_graph",
+       "lib",
+       "b7cd7d112a69c8865574d95e2d72451862a17f44629fb0766990199bc2147e6f"
+      ],
+      "70808": [
+       "ruff_workspace",
+       "lib",
+       "aa29bedea41b714bbf5b2d48e788bc2a853068f133b058ad413f46bce2d8b2d3"
+      ],
+      "70812": [
+       "ruff_server",
+       "lib",
+       "9115e9e0fe93cf9f1373bc966b364ae6292a48f3623b942f8112d71c39d36cb2"
+      ],
+      "70816": [
+       "ruff",
+       "lib",
+       "a5d946795073ed23ec90dfa8b6a8a6b4a55ccb9134e2f84781d7d9ce13e9fd2a"
+      ],
+      "70820": [
+       "ruff",
+       "bin",
+       "6a82f37cdef9cae8adfc8cd9146f931b26350e6c4e7b5a7effb590e37d341fab"
+      ]
+     },
+     "nominal": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "roster": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "status": 0
+    },
+    "reverse": {
+     "actual": {
+      "70629": [
+       "ruff_linter",
+       "lib",
+       "80817a980dc96a07d3a7ac8740bd8d953980a31efdefa564758cdd2536a91125"
+      ],
+      "70630": [
+       "ty_python_semantic",
+       "lib",
+       "a0afddaf85dc5165843134a5e2c9cc12d28086248b596a7340df665613d657ab"
+      ],
+      "70644": [
+       "ruff_graph",
+       "lib",
+       "b7cd7d112a69c8865574d95e2d72451862a17f44629fb0766990199bc2147e6f"
+      ],
+      "70648": [
+       "ruff_workspace",
+       "lib",
+       "aa29bedea41b714bbf5b2d48e788bc2a853068f133b058ad413f46bce2d8b2d3"
+      ],
+      "70652": [
+       "ruff_server",
+       "lib",
+       "9115e9e0fe93cf9f1373bc966b364ae6292a48f3623b942f8112d71c39d36cb2"
+      ],
+      "70656": [
+       "ruff",
+       "lib",
+       "a5d946795073ed23ec90dfa8b6a8a6b4a55ccb9134e2f84781d7d9ce13e9fd2a"
+      ],
+      "70660": [
+       "ruff",
+       "bin",
+       "6a82f37cdef9cae8adfc8cd9146f931b26350e6c4e7b5a7effb590e37d341fab"
+      ]
+     },
+     "nominal": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "roster": [
+      [
+       "ruff",
+       "bin"
+      ],
+      [
+       "ruff",
+       "lib"
+      ],
+      [
+       "ruff_graph",
+       "lib"
+      ],
+      [
+       "ruff_linter",
+       "lib"
+      ],
+      [
+       "ruff_server",
+       "lib"
+      ],
+      [
+       "ruff_workspace",
+       "lib"
+      ],
+      [
+       "ty_python_semantic",
+       "lib"
+      ]
+     ],
+     "status": 0
+    }
+   }
+  }
+ },
+ "recipe": "cbf08f6f3f930469af4c7263e0489b2375844ff96e1abd3f0df55adc24c4e6e9",
+ "run": 41627091024,
+ "scope": "pilot",
+ "zip_bytes": 355773499,
+ "zip_sha256": "39f2ce270bc4f51941a5ae7266912d7037ac975b6c69465776eb7fe26f491ed9"
+}

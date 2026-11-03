@@ -1,0 +1,2134 @@
+{
+  "accepted": false,
+  "cause": "independently compiled macro and genuinely ordered diagnostic differ in both roles",
+  "confirmation_workers": 0,
+  "descriptive_fraction": 0.19435162870494294,
+  "descriptive_instructions": {
+    "C": 33490876460,
+    "P": 41570091436
+  },
+  "external": {
+    "C": {
+      "changed": [
+        [
+          [
+            "registry+https://github.com/rust-lang/crates.io-index#get-size-derive2@0.5.1",
+            "get_size_derive2",
+            [
+              "proc-macro"
+            ],
+            "/home/runner/work/_temp/ohm-ruf009/state/target/debug/build/workspaces/2591c801a8a7222a/v2-0d3e5713822222e6/get-size-derive2/37f9424ce0ef3e13/out/libget_size_derive2-37f9424ce0ef3e13.so"
+          ],
+          "c4d2e1ce9c45d057a835bc91d404b5f1fc649db4228560160967029bbab84b16",
+          "ee1c1c766bffb8548928384441990577ba0d4dfb6f28e19ea401e7a784f0c099"
+        ],
+        [
+          [
+            "registry+https://github.com/rust-lang/crates.io-index#get-size2@0.5.1",
+            "get_size2",
+            [
+              "lib"
+            ],
+            "/home/runner/work/_temp/ohm-ruf009/state/target/debug/build/workspaces/2591c801a8a7222a/v2-0d3e5713822222e6/get-size2/4e2e941e34a5c2df/out/libget_size2-4e2e941e34a5c2df.rmeta"
+          ],
+          "e11c5d9c93f422ce706b90caac2efbf0b3b521c443e4e2c953bb1fb1b44c3f81",
+          "e44dc4dd56ba903443e660e51a5c73bae3d5804a8fd99d180850bf47a63f4338"
+        ]
+      ],
+      "observed": 373
+    },
+    "P": {
+      "changed": [
+        [
+          [
+            "registry+https://github.com/rust-lang/crates.io-index#get-size-derive2@0.5.1",
+            "get_size_derive2",
+            [
+              "proc-macro"
+            ],
+            "/home/runner/work/_temp/ohm-ruf009/state/target/debug/build/workspaces/2591c801a8a7222a/v2-70dd9704ef7190be/get-size-derive2/37f9424ce0ef3e13/out/libget_size_derive2-37f9424ce0ef3e13.so"
+          ],
+          "58981970152965b11bb35cd67ed283e69e200ebf3dbb2d09ef8bf7fc12855c14",
+          "9da48943936b5befac173713544e9ff079c64fbc4ce699d277538914fe5341f9"
+        ],
+        [
+          [
+            "registry+https://github.com/rust-lang/crates.io-index#get-size2@0.5.1",
+            "get_size2",
+            [
+              "lib"
+            ],
+            "/home/runner/work/_temp/ohm-ruf009/state/target/debug/build/workspaces/2591c801a8a7222a/v2-70dd9704ef7190be/get-size2/4e2e941e34a5c2df/out/libget_size2-4e2e941e34a5c2df.rmeta"
+          ],
+          "bf646f0aa550603b8c614a9800cb8d15096134ec516f33260b3135d9364ab773",
+          "c072127f54472df087a8cf68811f7188047be2f6e4f3d71590ae64a14dd36203"
+        ]
+      ],
+      "observed": 373
+    }
+  },
+  "native_sha256": {
+    "C": {
+      "native-buggy": "571435780d613322c4dd9554cacd7700c6d7c719efbe000489e498b16c5b79f3",
+      "native-edited": "e8b454858bd7945b45bd6d78725c32cd64b2df7261a767a4219314784c994f9e",
+      "native-fixed-idle": "e8b454858bd7945b45bd6d78725c32cd64b2df7261a767a4219314784c994f9e",
+      "native-fully-empty-fixed": "e8b454858bd7945b45bd6d78725c32cd64b2df7261a767a4219314784c994f9e",
+      "native-repair": "e8b454858bd7945b45bd6d78725c32cd64b2df7261a767a4219314784c994f9e",
+      "native-reverse": "571435780d613322c4dd9554cacd7700c6d7c719efbe000489e498b16c5b79f3"
+    },
+    "P": {
+      "native-buggy": "c62ddee679d8e8c59096d19bd57f2ab25e1c4534da56ff7d010a6fee145115f2",
+      "native-edited": "a98446282ec3d98a6282b0db6874e4e0487f494f04429c42cd2eae9f7c4dc096",
+      "native-fixed-idle": "a98446282ec3d98a6282b0db6874e4e0487f494f04429c42cd2eae9f7c4dc096",
+      "native-fully-empty-fixed": "a98446282ec3d98a6282b0db6874e4e0487f494f04429c42cd2eae9f7c4dc096",
+      "native-repair": "a98446282ec3d98a6282b0db6874e4e0487f494f04429c42cd2eae9f7c4dc096",
+      "native-reverse": "c62ddee679d8e8c59096d19bd57f2ab25e1c4534da56ff7d010a6fee145115f2"
+    }
+  },
+  "ordered": {
+    "C": {
+      "empty-edit": {
+        "errors": [
+          [
+            "`ignore` conflicts with mutually exclusive `size_fn`",
+            1
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size`",
+            3
+          ],
+          [
+            "`size` conflicts with mutually exclusive `size_fn`",
+            5
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size_fn`",
+            7
+          ]
+        ],
+        "expanded": "858c08e42ca3fc6c4a9d79592fcf4e7be4b068c302807c95a7b4314a28f544bf",
+        "macro": "ee1c1c766bffb8548928384441990577ba0d4dfb6f28e19ea401e7a784f0c099",
+        "stderr": "6f28e1268bf6ce0fdf77acd338f091bae5e10a5c5be8ff6bd60cf78a05378b4f"
+      },
+      "kernel-buggy-return": {
+        "errors": [
+          [
+            "`size` conflicts with mutually exclusive `size_fn`",
+            1
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size`",
+            3
+          ],
+          [
+            "`size` conflicts with mutually exclusive `size_fn`",
+            5
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size_fn`",
+            7
+          ]
+        ],
+        "expanded": "858c08e42ca3fc6c4a9d79592fcf4e7be4b068c302807c95a7b4314a28f544bf",
+        "macro": "c4d2e1ce9c45d057a835bc91d404b5f1fc649db4228560160967029bbab84b16",
+        "stderr": "d26431505be38189f05a258b392eb8a3395e2ecb4d1c4266bcf648c97b2b1e19"
+      },
+      "kernel-edited": {
+        "errors": [
+          [
+            "`size` conflicts with mutually exclusive `size_fn`",
+            1
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size`",
+            3
+          ],
+          [
+            "`size` conflicts with mutually exclusive `size_fn`",
+            5
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size_fn`",
+            7
+          ]
+        ],
+        "expanded": "858c08e42ca3fc6c4a9d79592fcf4e7be4b068c302807c95a7b4314a28f544bf",
+        "macro": "c4d2e1ce9c45d057a835bc91d404b5f1fc649db4228560160967029bbab84b16",
+        "stderr": "d26431505be38189f05a258b392eb8a3395e2ecb4d1c4266bcf648c97b2b1e19"
+      },
+      "kernel-fixed-idle2": {
+        "errors": [
+          [
+            "`size` conflicts with mutually exclusive `size_fn`",
+            1
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size`",
+            3
+          ],
+          [
+            "`size` conflicts with mutually exclusive `size_fn`",
+            5
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size_fn`",
+            7
+          ]
+        ],
+        "expanded": "858c08e42ca3fc6c4a9d79592fcf4e7be4b068c302807c95a7b4314a28f544bf",
+        "macro": "c4d2e1ce9c45d057a835bc91d404b5f1fc649db4228560160967029bbab84b16",
+        "stderr": "d26431505be38189f05a258b392eb8a3395e2ecb4d1c4266bcf648c97b2b1e19"
+      },
+      "ordinary-buggy-cold": {
+        "errors": [
+          [
+            "`size` conflicts with mutually exclusive `size_fn`",
+            1
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size`",
+            3
+          ],
+          [
+            "`size` conflicts with mutually exclusive `size_fn`",
+            5
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size_fn`",
+            7
+          ]
+        ],
+        "expanded": "858c08e42ca3fc6c4a9d79592fcf4e7be4b068c302807c95a7b4314a28f544bf",
+        "macro": "c4d2e1ce9c45d057a835bc91d404b5f1fc649db4228560160967029bbab84b16",
+        "stderr": "d26431505be38189f05a258b392eb8a3395e2ecb4d1c4266bcf648c97b2b1e19"
+      },
+      "ordinary-edited": {
+        "errors": [
+          [
+            "`size` conflicts with mutually exclusive `size_fn`",
+            1
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size`",
+            3
+          ],
+          [
+            "`size` conflicts with mutually exclusive `size_fn`",
+            5
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size_fn`",
+            7
+          ]
+        ],
+        "expanded": "858c08e42ca3fc6c4a9d79592fcf4e7be4b068c302807c95a7b4314a28f544bf",
+        "macro": "c4d2e1ce9c45d057a835bc91d404b5f1fc649db4228560160967029bbab84b16",
+        "stderr": "d26431505be38189f05a258b392eb8a3395e2ecb4d1c4266bcf648c97b2b1e19"
+      },
+      "ordinary-fixed-idle2": {
+        "errors": [
+          [
+            "`size` conflicts with mutually exclusive `size_fn`",
+            1
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size`",
+            3
+          ],
+          [
+            "`size` conflicts with mutually exclusive `size_fn`",
+            5
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size_fn`",
+            7
+          ]
+        ],
+        "expanded": "858c08e42ca3fc6c4a9d79592fcf4e7be4b068c302807c95a7b4314a28f544bf",
+        "macro": "c4d2e1ce9c45d057a835bc91d404b5f1fc649db4228560160967029bbab84b16",
+        "stderr": "d26431505be38189f05a258b392eb8a3395e2ecb4d1c4266bcf648c97b2b1e19"
+      }
+    },
+    "P": {
+      "empty-edit": {
+        "errors": [
+          [
+            "`size` conflicts with mutually exclusive `size_fn`",
+            1
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size`",
+            3
+          ],
+          [
+            "`size` conflicts with mutually exclusive `size_fn`",
+            5
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size_fn`",
+            7
+          ]
+        ],
+        "expanded": "858c08e42ca3fc6c4a9d79592fcf4e7be4b068c302807c95a7b4314a28f544bf",
+        "macro": "9da48943936b5befac173713544e9ff079c64fbc4ce699d277538914fe5341f9",
+        "stderr": "d26431505be38189f05a258b392eb8a3395e2ecb4d1c4266bcf648c97b2b1e19"
+      },
+      "kernel-buggy-return": {
+        "errors": [
+          [
+            "`ignore` conflicts with mutually exclusive `size_fn`",
+            1
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size`",
+            3
+          ],
+          [
+            "`size` conflicts with mutually exclusive `size_fn`",
+            5
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size_fn`",
+            7
+          ]
+        ],
+        "expanded": "858c08e42ca3fc6c4a9d79592fcf4e7be4b068c302807c95a7b4314a28f544bf",
+        "macro": "58981970152965b11bb35cd67ed283e69e200ebf3dbb2d09ef8bf7fc12855c14",
+        "stderr": "6f28e1268bf6ce0fdf77acd338f091bae5e10a5c5be8ff6bd60cf78a05378b4f"
+      },
+      "kernel-edited": {
+        "errors": [
+          [
+            "`ignore` conflicts with mutually exclusive `size_fn`",
+            1
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size`",
+            3
+          ],
+          [
+            "`size` conflicts with mutually exclusive `size_fn`",
+            5
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size_fn`",
+            7
+          ]
+        ],
+        "expanded": "858c08e42ca3fc6c4a9d79592fcf4e7be4b068c302807c95a7b4314a28f544bf",
+        "macro": "58981970152965b11bb35cd67ed283e69e200ebf3dbb2d09ef8bf7fc12855c14",
+        "stderr": "6f28e1268bf6ce0fdf77acd338f091bae5e10a5c5be8ff6bd60cf78a05378b4f"
+      },
+      "kernel-fixed-idle2": {
+        "errors": [
+          [
+            "`ignore` conflicts with mutually exclusive `size_fn`",
+            1
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size`",
+            3
+          ],
+          [
+            "`size` conflicts with mutually exclusive `size_fn`",
+            5
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size_fn`",
+            7
+          ]
+        ],
+        "expanded": "858c08e42ca3fc6c4a9d79592fcf4e7be4b068c302807c95a7b4314a28f544bf",
+        "macro": "58981970152965b11bb35cd67ed283e69e200ebf3dbb2d09ef8bf7fc12855c14",
+        "stderr": "6f28e1268bf6ce0fdf77acd338f091bae5e10a5c5be8ff6bd60cf78a05378b4f"
+      },
+      "ordinary-buggy-cold": {
+        "errors": [
+          [
+            "`ignore` conflicts with mutually exclusive `size_fn`",
+            1
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size`",
+            3
+          ],
+          [
+            "`size` conflicts with mutually exclusive `size_fn`",
+            5
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size_fn`",
+            7
+          ]
+        ],
+        "expanded": "858c08e42ca3fc6c4a9d79592fcf4e7be4b068c302807c95a7b4314a28f544bf",
+        "macro": "58981970152965b11bb35cd67ed283e69e200ebf3dbb2d09ef8bf7fc12855c14",
+        "stderr": "6f28e1268bf6ce0fdf77acd338f091bae5e10a5c5be8ff6bd60cf78a05378b4f"
+      },
+      "ordinary-edited": {
+        "errors": [
+          [
+            "`ignore` conflicts with mutually exclusive `size_fn`",
+            1
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size`",
+            3
+          ],
+          [
+            "`size` conflicts with mutually exclusive `size_fn`",
+            5
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size_fn`",
+            7
+          ]
+        ],
+        "expanded": "858c08e42ca3fc6c4a9d79592fcf4e7be4b068c302807c95a7b4314a28f544bf",
+        "macro": "58981970152965b11bb35cd67ed283e69e200ebf3dbb2d09ef8bf7fc12855c14",
+        "stderr": "6f28e1268bf6ce0fdf77acd338f091bae5e10a5c5be8ff6bd60cf78a05378b4f"
+      },
+      "ordinary-fixed-idle2": {
+        "errors": [
+          [
+            "`ignore` conflicts with mutually exclusive `size_fn`",
+            1
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size`",
+            3
+          ],
+          [
+            "`size` conflicts with mutually exclusive `size_fn`",
+            5
+          ],
+          [
+            "`ignore` conflicts with mutually exclusive `size_fn`",
+            7
+          ]
+        ],
+        "expanded": "858c08e42ca3fc6c4a9d79592fcf4e7be4b068c302807c95a7b4314a28f544bf",
+        "macro": "58981970152965b11bb35cd67ed283e69e200ebf3dbb2d09ef8bf7fc12855c14",
+        "stderr": "6f28e1268bf6ce0fdf77acd338f091bae5e10a5c5be8ff6bd60cf78a05378b4f"
+      }
+    }
+  },
+  "original": "39f2ce270bc4f51941a5ae7266912d7037ac975b6c69465776eb7fe26f491ed9",
+  "physical_metadata": {
+    "C": {
+      "ordinary-buggy-cold/ordinary-edited": {
+        "ruff": {
+          "changed_rows": 0,
+          "changed_upstream": [],
+          "first_changed_rows": [],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff",
+              "full": "473dfa46963b3bbfd8551a2e78faa636a4f073d404e23ff9c89ce3b2c1a909bb",
+              "global_hash": "2b23ce1d02d1f165d27effafb931085d",
+              "private": "5b56d689f086efc922324dedccbc8b02",
+              "public": "fa61224530b60c0f7d062288af6cdfd8",
+              "stable": "caa85bcd685a6273"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff",
+              "full": "473dfa46963b3bbfd8551a2e78faa636a4f073d404e23ff9c89ce3b2c1a909bb",
+              "global_hash": "2b23ce1d02d1f165d27effafb931085d",
+              "private": "5b56d689f086efc922324dedccbc8b02",
+              "public": "fa61224530b60c0f7d062288af6cdfd8",
+              "stable": "caa85bcd685a6273"
+            }
+          ],
+          "row_counts": [
+            1582,
+            1582
+          ]
+        },
+        "ruff_graph": {
+          "changed_rows": 0,
+          "changed_upstream": [],
+          "first_changed_rows": [],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_graph",
+              "full": "53e7d6a35c761524c1382060456b650a59abafb778d228ad27eb7c375be04f77",
+              "global_hash": "afaf348e16b249e3df677293ec15dec0",
+              "private": "ee318e9e44de662ae2b4ba184c699597",
+              "public": "25f0d1314fd6774143cb4255ba9a9376",
+              "stable": "fd473d2d431d23db"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_graph",
+              "full": "53e7d6a35c761524c1382060456b650a59abafb778d228ad27eb7c375be04f77",
+              "global_hash": "afaf348e16b249e3df677293ec15dec0",
+              "private": "ee318e9e44de662ae2b4ba184c699597",
+              "public": "25f0d1314fd6774143cb4255ba9a9376",
+              "stable": "fd473d2d431d23db"
+            }
+          ],
+          "row_counts": [
+            296,
+            296
+          ]
+        },
+        "ruff_linter": {
+          "changed_rows": 51,
+          "changed_upstream": [],
+          "first_changed_rows": [
+            [
+              "01a00f181636c1c9",
+              [
+                "rules::ruff::helpers::{impl#3}",
+                "5154b95152660e708663a99ea12633a1"
+              ],
+              [
+                "rules::ruff::helpers::{impl#3}",
+                "1b57bfa7971f36d07bb7980b4838337a"
+              ]
+            ],
+            [
+              "0c18495009a2e375",
+              [
+                "rules::ruff::helpers::AttrsAutoAttribs",
+                "5154b95152660e708663a99ea12633a1"
+              ],
+              [
+                "rules::ruff::helpers::AttrsAutoAttribs",
+                "1b57bfa7971f36d07bb7980b4838337a"
+              ]
+            ]
+          ],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_linter",
+              "full": "1b26557a33242e019869b42690f6ad4bc90adfa5bb04d97b0dd7c15f7beb50ff",
+              "global_hash": "a9439cbd226cd9125e00fca73dea1993",
+              "private": "0d56c2a51ba69892d569ea52468814ff",
+              "public": "746140342d3a8a0c0a17050bfd3b5889",
+              "stable": "40b8e31a7580515f"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_linter",
+              "full": "78c6d83b9d6f0455506b2aff55a1a67e083c51c722a0d1e361b3c0c14a217623",
+              "global_hash": "a9439cbd226cd9125e00fca73dea1993",
+              "private": "b823cf5c224188c5d5392863a3427bc6",
+              "public": "746140342d3a8a0c0a17050bfd3b5889",
+              "stable": "40b8e31a7580515f"
+            }
+          ],
+          "row_counts": [
+            38075,
+            38075
+          ]
+        },
+        "ruff_server": {
+          "changed_rows": 0,
+          "changed_upstream": [],
+          "first_changed_rows": [],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_server",
+              "full": "093cf754e55371b6351d7c45bd8e1cf4a78c05646670d446c71a6f69546747cf",
+              "global_hash": "833329321b2a692e83e214bd4a59f73a",
+              "private": "6cbee2d022847e063c8475bc9f1d48c6",
+              "public": "fd422a873cfb276b3786e4bfedf42006",
+              "stable": "97ac877a8ea23b44"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_server",
+              "full": "093cf754e55371b6351d7c45bd8e1cf4a78c05646670d446c71a6f69546747cf",
+              "global_hash": "833329321b2a692e83e214bd4a59f73a",
+              "private": "6cbee2d022847e063c8475bc9f1d48c6",
+              "public": "fd422a873cfb276b3786e4bfedf42006",
+              "stable": "97ac877a8ea23b44"
+            }
+          ],
+          "row_counts": [
+            2265,
+            2265
+          ]
+        },
+        "ruff_workspace": {
+          "changed_rows": 0,
+          "changed_upstream": [],
+          "first_changed_rows": [],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_workspace",
+              "full": "8a27816870067fa7cf08305c24be67f0ad7ce3611d7a80f6a12e851b4f854ae9",
+              "global_hash": "f1267c7dc859554a1dd60717a66d9684",
+              "private": "11fafe2ec44a03ced115739eed4e9803",
+              "public": "be053197dbcd448b88856f8f6131cf52",
+              "stable": "f1a5847e387d6146"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_workspace",
+              "full": "8a27816870067fa7cf08305c24be67f0ad7ce3611d7a80f6a12e851b4f854ae9",
+              "global_hash": "f1267c7dc859554a1dd60717a66d9684",
+              "private": "11fafe2ec44a03ced115739eed4e9803",
+              "public": "be053197dbcd448b88856f8f6131cf52",
+              "stable": "f1a5847e387d6146"
+            }
+          ],
+          "row_counts": [
+            4002,
+            4002
+          ]
+        },
+        "ty_python_semantic": {
+          "changed_rows": 0,
+          "changed_upstream": [],
+          "first_changed_rows": [],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ty_python_semantic",
+              "full": "afe3d25f01920b9327223fdfb876306029149aad6bc7db40af1cadedcb2aa2b6",
+              "global_hash": "edce2de41b43eda8cb1acb18314b22ef",
+              "private": "8d660884db7b99eb8cd4be850609490b",
+              "public": "525590942291b313e582d80660b82b01",
+              "stable": "e0468a554affd9a6"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ty_python_semantic",
+              "full": "afe3d25f01920b9327223fdfb876306029149aad6bc7db40af1cadedcb2aa2b6",
+              "global_hash": "edce2de41b43eda8cb1acb18314b22ef",
+              "private": "8d660884db7b99eb8cd4be850609490b",
+              "public": "525590942291b313e582d80660b82b01",
+              "stable": "e0468a554affd9a6"
+            }
+          ],
+          "row_counts": [
+            20635,
+            20635
+          ]
+        }
+      },
+      "ordinary-edited/empty-edit": {
+        "ruff": {
+          "changed_rows": 1034,
+          "changed_upstream": [
+            "get_size2-4e2e941e34a5c2df",
+            "get_size_derive2-37f9424ce0ef3e13",
+            "ruff_db-74629849566f2308",
+            "ruff_diagnostics-ac3c235d0fac5ef2",
+            "ruff_formatter-e9eaf58f128c89ee",
+            "ruff_graph-4bff48523fb6231c",
+            "ruff_index-38024f529f2f09c1",
+            "ruff_linter-d6d851bc7ad59663",
+            "ruff_notebook-f6276c26bd2bffb5",
+            "ruff_python_ast-41cee6c5c6fd3027",
+            "ruff_python_codegen-41444f7cdc053241",
+            "ruff_python_formatter-d4bc41418c1e93a6",
+            "ruff_python_index-6fc4be88ea616f97",
+            "ruff_python_literal-06349a61632dd918",
+            "ruff_python_parser-5d772a38b02f709c",
+            "ruff_python_semantic-d1b565bdb972b722",
+            "ruff_python_trivia-d592ebf4c670b925",
+            "ruff_server-24742589c2203400",
+            "ruff_source_file-5a26b80884aef1fd",
+            "ruff_text_size-d2586339bb0b07ea",
+            "ruff_workspace-94194fb8d081c0ab",
+            "ty_python_semantic-8a119e04293a5f18"
+          ],
+          "first_changed_rows": [
+            [
+              "00279c514372df15",
+              [
+                "args::{impl#37}::has_subcommand",
+                "b8d393cfd2232e9e594f4d05847d05f0"
+              ],
+              [
+                "args::{impl#37}::has_subcommand",
+                "a08f814219b8848b24f6cf7ae3b43aa2"
+              ]
+            ],
+            [
+              "007cd284c5c7a7b6",
+              [
+                "version::_::{impl#0}::serialize",
+                "8722fd9c46e2c6ea9f386cc77d5a8988"
+              ],
+              [
+                "version::_::{impl#0}::serialize",
+                "bf7b13bd339930a32d0f7f0a33fec716"
+              ]
+            ]
+          ],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff",
+              "full": "473dfa46963b3bbfd8551a2e78faa636a4f073d404e23ff9c89ce3b2c1a909bb",
+              "global_hash": "2b23ce1d02d1f165d27effafb931085d",
+              "private": "5b56d689f086efc922324dedccbc8b02",
+              "public": "fa61224530b60c0f7d062288af6cdfd8",
+              "stable": "caa85bcd685a6273"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff",
+              "full": "e3da9e73f412b8cd7b008d944eef13e529d25be84d1d50adf8d9c57532a69dbb",
+              "global_hash": "1ecf4ff5ab012c47c7c075d1f743d810",
+              "private": "4d62d44edce895a022ca0477ad0eec19",
+              "public": "228714bfded3ff9411754dff7755cd74",
+              "stable": "caa85bcd685a6273"
+            }
+          ],
+          "row_counts": [
+            1582,
+            1582
+          ]
+        },
+        "ruff_graph": {
+          "changed_rows": 158,
+          "changed_upstream": [
+            "get_size2-4e2e941e34a5c2df",
+            "get_size_derive2-37f9424ce0ef3e13",
+            "ruff_db-74629849566f2308",
+            "ruff_diagnostics-ac3c235d0fac5ef2",
+            "ruff_index-38024f529f2f09c1",
+            "ruff_linter-d6d851bc7ad59663",
+            "ruff_notebook-f6276c26bd2bffb5",
+            "ruff_python_ast-41cee6c5c6fd3027",
+            "ruff_python_codegen-41444f7cdc053241",
+            "ruff_python_index-6fc4be88ea616f97",
+            "ruff_python_literal-06349a61632dd918",
+            "ruff_python_parser-5d772a38b02f709c",
+            "ruff_python_semantic-d1b565bdb972b722",
+            "ruff_python_trivia-d592ebf4c670b925",
+            "ruff_source_file-5a26b80884aef1fd",
+            "ruff_text_size-d2586339bb0b07ea",
+            "ty_python_semantic-8a119e04293a5f18"
+          ],
+          "first_changed_rows": [
+            [
+              "04464d549d931a24",
+              [
+                "collector::CollectedImport::ImportFrom",
+                "55e276a501ef1eaa2411a91ad5c20d06"
+              ],
+              [
+                "collector::CollectedImport::ImportFrom",
+                "bf404947b701656c61f590a80f2c80e2"
+              ]
+            ],
+            [
+              "0730a01db57fb049",
+              [
+                "db::{impl#5}::zalsa_register_downcaster",
+                "13632f736062153eff2fb2460ef5b33a"
+              ],
+              [
+                "db::{impl#5}::zalsa_register_downcaster",
+                "bd09e05ba6b8d7bbc60082c9b84dc02a"
+              ]
+            ]
+          ],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_graph",
+              "full": "53e7d6a35c761524c1382060456b650a59abafb778d228ad27eb7c375be04f77",
+              "global_hash": "afaf348e16b249e3df677293ec15dec0",
+              "private": "ee318e9e44de662ae2b4ba184c699597",
+              "public": "25f0d1314fd6774143cb4255ba9a9376",
+              "stable": "fd473d2d431d23db"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_graph",
+              "full": "11a93f3050f998ebd51041f045ded0b809187148e340420512e70934d402eb52",
+              "global_hash": "91ced84d4de26e475d836acf351a9138",
+              "private": "bf2dfa3e83eb9a904684dfee506c8f93",
+              "public": "0be1c1d495fb3a21701f949cb386a9ae",
+              "stable": "fd473d2d431d23db"
+            }
+          ],
+          "row_counts": [
+            296,
+            296
+          ]
+        },
+        "ruff_linter": {
+          "changed_rows": 28431,
+          "changed_upstream": [
+            "get_size2-4e2e941e34a5c2df",
+            "get_size_derive2-37f9424ce0ef3e13",
+            "ruff_db-74629849566f2308",
+            "ruff_diagnostics-ac3c235d0fac5ef2",
+            "ruff_index-38024f529f2f09c1",
+            "ruff_notebook-f6276c26bd2bffb5",
+            "ruff_python_ast-41cee6c5c6fd3027",
+            "ruff_python_codegen-41444f7cdc053241",
+            "ruff_python_index-6fc4be88ea616f97",
+            "ruff_python_literal-06349a61632dd918",
+            "ruff_python_parser-5d772a38b02f709c",
+            "ruff_python_semantic-d1b565bdb972b722",
+            "ruff_python_trivia-d592ebf4c670b925",
+            "ruff_source_file-5a26b80884aef1fd",
+            "ruff_text_size-d2586339bb0b07ea"
+          ],
+          "first_changed_rows": [
+            [
+              "0000c77daff585f1",
+              [
+                "codes::_::{impl#0}::deserialize::__Field::__field680::{ctor#0}",
+                "ce71eda696dc30a6c3d557ea640c4478"
+              ],
+              [
+                "codes::_::{impl#0}::deserialize::__Field::__field680::{ctor#0}",
+                "cdaeb20415974de0726728ad1244fa4a"
+              ]
+            ],
+            [
+              "00017ee5ccc882d4",
+              [
+                "rules::pydocstyle::rules::backslashes::{impl#0}",
+                "ce71eda696dc30a6c3d557ea640c4478"
+              ],
+              [
+                "rules::pydocstyle::rules::backslashes::{impl#0}",
+                "cdaeb20415974de0726728ad1244fa4a"
+              ]
+            ]
+          ],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_linter",
+              "full": "78c6d83b9d6f0455506b2aff55a1a67e083c51c722a0d1e361b3c0c14a217623",
+              "global_hash": "a9439cbd226cd9125e00fca73dea1993",
+              "private": "b823cf5c224188c5d5392863a3427bc6",
+              "public": "746140342d3a8a0c0a17050bfd3b5889",
+              "stable": "40b8e31a7580515f"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_linter",
+              "full": "c4b21f4df1725b430de72bb3a3b0e1cbd1c6a3d23221299873b1e07d0d109c7e",
+              "global_hash": "b9025d7997a3832d4650593668f76bae",
+              "private": "fd840cea8c5e6bc80028aa777e20ae9f",
+              "public": "5a905e43577f17dbfb3743df91f14102",
+              "stable": "40b8e31a7580515f"
+            }
+          ],
+          "row_counts": [
+            38075,
+            38075
+          ]
+        },
+        "ruff_server": {
+          "changed_rows": 1352,
+          "changed_upstream": [
+            "get_size2-4e2e941e34a5c2df",
+            "get_size_derive2-37f9424ce0ef3e13",
+            "ruff_db-74629849566f2308",
+            "ruff_diagnostics-ac3c235d0fac5ef2",
+            "ruff_formatter-e9eaf58f128c89ee",
+            "ruff_graph-4bff48523fb6231c",
+            "ruff_index-38024f529f2f09c1",
+            "ruff_linter-d6d851bc7ad59663",
+            "ruff_notebook-f6276c26bd2bffb5",
+            "ruff_python_ast-41cee6c5c6fd3027",
+            "ruff_python_codegen-41444f7cdc053241",
+            "ruff_python_formatter-d4bc41418c1e93a6",
+            "ruff_python_index-6fc4be88ea616f97",
+            "ruff_python_literal-06349a61632dd918",
+            "ruff_python_parser-5d772a38b02f709c",
+            "ruff_python_semantic-d1b565bdb972b722",
+            "ruff_python_trivia-d592ebf4c670b925",
+            "ruff_source_file-5a26b80884aef1fd",
+            "ruff_text_size-d2586339bb0b07ea",
+            "ruff_workspace-94194fb8d081c0ab",
+            "ty_python_semantic-8a119e04293a5f18"
+          ],
+          "first_changed_rows": [
+            [
+              "0016b6d7231968b4",
+              [
+                "session::request_queue::{impl#3}",
+                "5010e875d1efc5eed9f484211814dd6a"
+              ],
+              [
+                "session::request_queue::{impl#3}",
+                "d2c5ac1fcf49743cc15d69622bf43f48"
+              ]
+            ],
+            [
+              "0038fe74b9b7463d",
+              [
+                "session::options::_::{impl#0}::deserialize::{impl#2}::expecting",
+                "93d45e6e733b9a8e02976dea40cdd098"
+              ],
+              [
+                "session::options::_::{impl#0}::deserialize::{impl#2}::expecting",
+                "19f5ac6b6c49a577b8d11aad7a6df930"
+              ]
+            ]
+          ],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_server",
+              "full": "093cf754e55371b6351d7c45bd8e1cf4a78c05646670d446c71a6f69546747cf",
+              "global_hash": "833329321b2a692e83e214bd4a59f73a",
+              "private": "6cbee2d022847e063c8475bc9f1d48c6",
+              "public": "fd422a873cfb276b3786e4bfedf42006",
+              "stable": "97ac877a8ea23b44"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_server",
+              "full": "6d27ad72fd21e3d28d7822d76e77b6fc236e9a14eca6eff876670b9ab58bae48",
+              "global_hash": "2433db5d13c9b1e5d45d75a4688ae208",
+              "private": "7fdd8a345f9e3a284fb604d0362300bc",
+              "public": "7c63cd7fa3fc074ee5cb6858a6be1603",
+              "stable": "97ac877a8ea23b44"
+            }
+          ],
+          "row_counts": [
+            2265,
+            2265
+          ]
+        },
+        "ruff_workspace": {
+          "changed_rows": 2410,
+          "changed_upstream": [
+            "get_size2-4e2e941e34a5c2df",
+            "get_size_derive2-37f9424ce0ef3e13",
+            "ruff_db-74629849566f2308",
+            "ruff_diagnostics-ac3c235d0fac5ef2",
+            "ruff_formatter-e9eaf58f128c89ee",
+            "ruff_graph-4bff48523fb6231c",
+            "ruff_index-38024f529f2f09c1",
+            "ruff_linter-d6d851bc7ad59663",
+            "ruff_notebook-f6276c26bd2bffb5",
+            "ruff_python_ast-41cee6c5c6fd3027",
+            "ruff_python_codegen-41444f7cdc053241",
+            "ruff_python_formatter-d4bc41418c1e93a6",
+            "ruff_python_index-6fc4be88ea616f97",
+            "ruff_python_literal-06349a61632dd918",
+            "ruff_python_parser-5d772a38b02f709c",
+            "ruff_python_semantic-d1b565bdb972b722",
+            "ruff_python_trivia-d592ebf4c670b925",
+            "ruff_source_file-5a26b80884aef1fd",
+            "ruff_text_size-d2586339bb0b07ea",
+            "ty_python_semantic-8a119e04293a5f18"
+          ],
+          "first_changed_rows": [
+            [
+              "00351217e3a7e890",
+              [
+                "options::_::{impl#0}::deserialize::__Field::__field0",
+                "54a9d88fd4c8951aec1b47b753ee1889"
+              ],
+              [
+                "options::_::{impl#0}::deserialize::__Field::__field0",
+                "e04c380d174a9a6f521fc9fd0f29aa03"
+              ]
+            ],
+            [
+              "003589123b26a604",
+              [
+                "options::_::{impl#0}",
+                "c635e80fb0be40effd9e222957b5c3ee"
+              ],
+              [
+                "options::_::{impl#0}",
+                "981256b612c85ee177da34d3dcc664fa"
+              ]
+            ]
+          ],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_workspace",
+              "full": "8a27816870067fa7cf08305c24be67f0ad7ce3611d7a80f6a12e851b4f854ae9",
+              "global_hash": "f1267c7dc859554a1dd60717a66d9684",
+              "private": "11fafe2ec44a03ced115739eed4e9803",
+              "public": "be053197dbcd448b88856f8f6131cf52",
+              "stable": "f1a5847e387d6146"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_workspace",
+              "full": "9023705ee9fe132e0b280d95b3f56531f0c46247b54a0dfefecdebb96b57b71c",
+              "global_hash": "7aa0c69627c451b276f111509f20c1fe",
+              "private": "59d2dd86c62759b224b4f8f857103616",
+              "public": "f6e645a98d1f985fb0c9920b1c727e80",
+              "stable": "f1a5847e387d6146"
+            }
+          ],
+          "row_counts": [
+            4002,
+            4002
+          ]
+        },
+        "ty_python_semantic": {
+          "changed_rows": 12347,
+          "changed_upstream": [
+            "get_size2-4e2e941e34a5c2df",
+            "get_size_derive2-37f9424ce0ef3e13",
+            "ruff_db-74629849566f2308",
+            "ruff_diagnostics-ac3c235d0fac5ef2",
+            "ruff_index-38024f529f2f09c1",
+            "ruff_notebook-f6276c26bd2bffb5",
+            "ruff_python_ast-41cee6c5c6fd3027",
+            "ruff_python_literal-06349a61632dd918",
+            "ruff_python_parser-5d772a38b02f709c",
+            "ruff_python_trivia-d592ebf4c670b925",
+            "ruff_source_file-5a26b80884aef1fd",
+            "ruff_text_size-d2586339bb0b07ea"
+          ],
+          "first_changed_rows": [
+            [
+              "000490f21b86106c",
+              [
+                "semantic_index::definition::{impl#2}",
+                "6f8e6cf2e25440216fbc4fa97e033242"
+              ],
+              [
+                "semantic_index::definition::{impl#2}",
+                "005c5967402065a2fc8a8434b18516b5"
+              ]
+            ],
+            [
+              "000d2690180f2df4",
+              [
+                "types::{impl#23}",
+                "6f8e6cf2e25440216fbc4fa97e033242"
+              ],
+              [
+                "types::{impl#23}",
+                "005c5967402065a2fc8a8434b18516b5"
+              ]
+            ]
+          ],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ty_python_semantic",
+              "full": "afe3d25f01920b9327223fdfb876306029149aad6bc7db40af1cadedcb2aa2b6",
+              "global_hash": "edce2de41b43eda8cb1acb18314b22ef",
+              "private": "8d660884db7b99eb8cd4be850609490b",
+              "public": "525590942291b313e582d80660b82b01",
+              "stable": "e0468a554affd9a6"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ty_python_semantic",
+              "full": "d80ccb618c5f3ba09b404a7b15231e50bde568b56fc0671f69b1b6d8ecd59381",
+              "global_hash": "991c541ae23b8d32867acea36592b58f",
+              "private": "64009a30276bce6354182ac31fa0a6c8",
+              "public": "9b44ecd28a4f4560f037e42a3dfd641c",
+              "stable": "e0468a554affd9a6"
+            }
+          ],
+          "row_counts": [
+            20635,
+            20635
+          ]
+        }
+      },
+      "ordinary-edited/kernel-edited": {
+        "ruff": {
+          "changed_rows": 0,
+          "changed_upstream": [],
+          "first_changed_rows": [],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff",
+              "full": "473dfa46963b3bbfd8551a2e78faa636a4f073d404e23ff9c89ce3b2c1a909bb",
+              "global_hash": "2b23ce1d02d1f165d27effafb931085d",
+              "private": "5b56d689f086efc922324dedccbc8b02",
+              "public": "fa61224530b60c0f7d062288af6cdfd8",
+              "stable": "caa85bcd685a6273"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff",
+              "full": "473dfa46963b3bbfd8551a2e78faa636a4f073d404e23ff9c89ce3b2c1a909bb",
+              "global_hash": "2b23ce1d02d1f165d27effafb931085d",
+              "private": "5b56d689f086efc922324dedccbc8b02",
+              "public": "fa61224530b60c0f7d062288af6cdfd8",
+              "stable": "caa85bcd685a6273"
+            }
+          ],
+          "row_counts": [
+            1582,
+            1582
+          ]
+        },
+        "ruff_graph": {
+          "changed_rows": 0,
+          "changed_upstream": [],
+          "first_changed_rows": [],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_graph",
+              "full": "53e7d6a35c761524c1382060456b650a59abafb778d228ad27eb7c375be04f77",
+              "global_hash": "afaf348e16b249e3df677293ec15dec0",
+              "private": "ee318e9e44de662ae2b4ba184c699597",
+              "public": "25f0d1314fd6774143cb4255ba9a9376",
+              "stable": "fd473d2d431d23db"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_graph",
+              "full": "53e7d6a35c761524c1382060456b650a59abafb778d228ad27eb7c375be04f77",
+              "global_hash": "afaf348e16b249e3df677293ec15dec0",
+              "private": "ee318e9e44de662ae2b4ba184c699597",
+              "public": "25f0d1314fd6774143cb4255ba9a9376",
+              "stable": "fd473d2d431d23db"
+            }
+          ],
+          "row_counts": [
+            296,
+            296
+          ]
+        },
+        "ruff_linter": {
+          "changed_rows": 0,
+          "changed_upstream": [],
+          "first_changed_rows": [],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_linter",
+              "full": "78c6d83b9d6f0455506b2aff55a1a67e083c51c722a0d1e361b3c0c14a217623",
+              "global_hash": "a9439cbd226cd9125e00fca73dea1993",
+              "private": "b823cf5c224188c5d5392863a3427bc6",
+              "public": "746140342d3a8a0c0a17050bfd3b5889",
+              "stable": "40b8e31a7580515f"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_linter",
+              "full": "08482300c3ddffc89ad7659c5ca4e4f5a84d35c148ff36b5de9d31999340a699",
+              "global_hash": "a9439cbd226cd9125e00fca73dea1993",
+              "private": "868061176b40cadefe85e10e9645a192",
+              "public": "746140342d3a8a0c0a17050bfd3b5889",
+              "stable": "40b8e31a7580515f"
+            }
+          ],
+          "row_counts": [
+            38075,
+            38075
+          ]
+        },
+        "ruff_server": {
+          "changed_rows": 0,
+          "changed_upstream": [],
+          "first_changed_rows": [],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_server",
+              "full": "093cf754e55371b6351d7c45bd8e1cf4a78c05646670d446c71a6f69546747cf",
+              "global_hash": "833329321b2a692e83e214bd4a59f73a",
+              "private": "6cbee2d022847e063c8475bc9f1d48c6",
+              "public": "fd422a873cfb276b3786e4bfedf42006",
+              "stable": "97ac877a8ea23b44"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_server",
+              "full": "093cf754e55371b6351d7c45bd8e1cf4a78c05646670d446c71a6f69546747cf",
+              "global_hash": "833329321b2a692e83e214bd4a59f73a",
+              "private": "6cbee2d022847e063c8475bc9f1d48c6",
+              "public": "fd422a873cfb276b3786e4bfedf42006",
+              "stable": "97ac877a8ea23b44"
+            }
+          ],
+          "row_counts": [
+            2265,
+            2265
+          ]
+        },
+        "ruff_workspace": {
+          "changed_rows": 0,
+          "changed_upstream": [],
+          "first_changed_rows": [],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_workspace",
+              "full": "8a27816870067fa7cf08305c24be67f0ad7ce3611d7a80f6a12e851b4f854ae9",
+              "global_hash": "f1267c7dc859554a1dd60717a66d9684",
+              "private": "11fafe2ec44a03ced115739eed4e9803",
+              "public": "be053197dbcd448b88856f8f6131cf52",
+              "stable": "f1a5847e387d6146"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_workspace",
+              "full": "8a27816870067fa7cf08305c24be67f0ad7ce3611d7a80f6a12e851b4f854ae9",
+              "global_hash": "f1267c7dc859554a1dd60717a66d9684",
+              "private": "11fafe2ec44a03ced115739eed4e9803",
+              "public": "be053197dbcd448b88856f8f6131cf52",
+              "stable": "f1a5847e387d6146"
+            }
+          ],
+          "row_counts": [
+            4002,
+            4002
+          ]
+        },
+        "ty_python_semantic": {
+          "changed_rows": 0,
+          "changed_upstream": [],
+          "first_changed_rows": [],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ty_python_semantic",
+              "full": "afe3d25f01920b9327223fdfb876306029149aad6bc7db40af1cadedcb2aa2b6",
+              "global_hash": "edce2de41b43eda8cb1acb18314b22ef",
+              "private": "8d660884db7b99eb8cd4be850609490b",
+              "public": "525590942291b313e582d80660b82b01",
+              "stable": "e0468a554affd9a6"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ty_python_semantic",
+              "full": "afe3d25f01920b9327223fdfb876306029149aad6bc7db40af1cadedcb2aa2b6",
+              "global_hash": "edce2de41b43eda8cb1acb18314b22ef",
+              "private": "8d660884db7b99eb8cd4be850609490b",
+              "public": "525590942291b313e582d80660b82b01",
+              "stable": "e0468a554affd9a6"
+            }
+          ],
+          "row_counts": [
+            20635,
+            20635
+          ]
+        }
+      }
+    },
+    "P": {
+      "ordinary-buggy-cold/ordinary-edited": {
+        "ruff": {
+          "changed_rows": 1024,
+          "changed_upstream": [
+            "ruff_graph-2efdb4dae063b905",
+            "ruff_linter-d967b55195cd3a78",
+            "ruff_server-48e1202c73fbeabb",
+            "ruff_workspace-db0237444a7efdf0"
+          ],
+          "first_changed_rows": [
+            [
+              "00279c514372df15",
+              [
+                "args::{impl#37}::has_subcommand",
+                "a206393479390fada9ec5dcfbf16f3f2"
+              ],
+              [
+                "args::{impl#37}::has_subcommand",
+                "82887f7e024f141c0514e529b2ef34d5"
+              ]
+            ],
+            [
+              "007cd284c5c7a7b6",
+              [
+                "version::_::{impl#0}::serialize",
+                "9375f1173536a62803cd8256fa3ba123"
+              ],
+              [
+                "version::_::{impl#0}::serialize",
+                "d38098d56cb7c4c227b9ad75a8512c71"
+              ]
+            ]
+          ],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff",
+              "full": "c9104dd88e45530e53d769b902c2c6bf150ee3f329c3f06c18f275a9d9e72ca6",
+              "global_hash": "7ce1349054c12a9b12b9d77dfc33f226",
+              "private": "da099c36b4095de9997a3f1bbe66088d",
+              "public": "885e712e17a7f2fca6545bbae54d3b64",
+              "stable": "caa85bcd685a6273"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff",
+              "full": "1b712033832cfe97b730d103816675c52e0f57c2d4c34d65c663807f0360ecb6",
+              "global_hash": "7ce1349054c12a9b12b9d77dfc33f226",
+              "private": "522b6504783e744d3e58dda2ac920fd5",
+              "public": "2dc7a085d411b840c96bdde66a9b9b3d",
+              "stable": "caa85bcd685a6273"
+            }
+          ],
+          "row_counts": [
+            1582,
+            1582
+          ]
+        },
+        "ruff_graph": {
+          "changed_rows": 158,
+          "changed_upstream": [
+            "ruff_linter-d967b55195cd3a78"
+          ],
+          "first_changed_rows": [
+            [
+              "04464d549d931a24",
+              [
+                "collector::CollectedImport::ImportFrom",
+                "2d333ed80e8c1406af330f05bf7ca298"
+              ],
+              [
+                "collector::CollectedImport::ImportFrom",
+                "edf3582479c588ab19fac8292a9dfe45"
+              ]
+            ],
+            [
+              "0730a01db57fb049",
+              [
+                "db::{impl#5}::zalsa_register_downcaster",
+                "ea75e3e8368d2325ceea99cf8239181c"
+              ],
+              [
+                "db::{impl#5}::zalsa_register_downcaster",
+                "4ad6f00eeca9dd7703cef661b849c6f2"
+              ]
+            ]
+          ],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_graph",
+              "full": "cb076039169a0c53f4ec2402b0caa7551516d88a100a5cdfa2c4bb32fc0f25b8",
+              "global_hash": "fabb564a995b41493cdf69777f6e5035",
+              "private": "8f176028fb5e549986414a454a094eb2",
+              "public": "f3c2bd1550fc642af5779c3f4a5f015b",
+              "stable": "fd473d2d431d23db"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_graph",
+              "full": "c381f55009259de0c232ccf185cbb23e1536cc5dcaae38a7b956cf6fe95b5adb",
+              "global_hash": "fabb564a995b41493cdf69777f6e5035",
+              "private": "e004ee1e4c3afb701f582e1caea4a8f6",
+              "public": "c550fb5b3f3f85dc53ec070045484c7c",
+              "stable": "fd473d2d431d23db"
+            }
+          ],
+          "row_counts": [
+            296,
+            296
+          ]
+        },
+        "ruff_linter": {
+          "changed_rows": 28326,
+          "changed_upstream": [],
+          "first_changed_rows": [
+            [
+              "0000c77daff585f1",
+              [
+                "codes::_::{impl#0}::deserialize::__Field::__field680::{ctor#0}",
+                "4cf74b66693e70521d6c0820542a00ab"
+              ],
+              [
+                "codes::_::{impl#0}::deserialize::__Field::__field680::{ctor#0}",
+                "6cde7bd9f4482b00b7159ad9da509e5d"
+              ]
+            ],
+            [
+              "00017ee5ccc882d4",
+              [
+                "rules::pydocstyle::rules::backslashes::{impl#0}",
+                "4cf74b66693e70521d6c0820542a00ab"
+              ],
+              [
+                "rules::pydocstyle::rules::backslashes::{impl#0}",
+                "6cde7bd9f4482b00b7159ad9da509e5d"
+              ]
+            ]
+          ],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_linter",
+              "full": "d09f3577a94ed3a4be6b1dd6b0b22abf7899ed3875beeb47e43f0dda9ec49637",
+              "global_hash": "cd1a191cfd8683a4999d3ad3e4fdc336",
+              "private": "1cf4d389ab3e28d76c00fa1f4d719bb9",
+              "public": "9d58fc03abd632e43865ceb5e05be2ca",
+              "stable": "40b8e31a7580515f"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_linter",
+              "full": "5970710f03fbcb1f442c5bcc1dc27d866847fb6b4f4cf4ea5b6d9073dad9e7f4",
+              "global_hash": "cd1a191cfd8683a4999d3ad3e4fdc336",
+              "private": "85fb189e94b5946953f824219a78eab7",
+              "public": "228c130edf861052821d5978a402117b",
+              "stable": "40b8e31a7580515f"
+            }
+          ],
+          "row_counts": [
+            38075,
+            38075
+          ]
+        },
+        "ruff_server": {
+          "changed_rows": 1352,
+          "changed_upstream": [
+            "ruff_graph-2efdb4dae063b905",
+            "ruff_linter-d967b55195cd3a78",
+            "ruff_workspace-db0237444a7efdf0"
+          ],
+          "first_changed_rows": [
+            [
+              "0016b6d7231968b4",
+              [
+                "session::request_queue::{impl#3}",
+                "8c6125229fde399322d2cc64046754ab"
+              ],
+              [
+                "session::request_queue::{impl#3}",
+                "0ce64b5d3d56ec3fba84c1b5f3689b36"
+              ]
+            ],
+            [
+              "0038fe74b9b7463d",
+              [
+                "session::options::_::{impl#0}::deserialize::{impl#2}::expecting",
+                "47c81673dc07f67bdc2e45b405c6365a"
+              ],
+              [
+                "session::options::_::{impl#0}::deserialize::{impl#2}::expecting",
+                "c7558a24b76e0d82a34623a7d3cb0bfc"
+              ]
+            ]
+          ],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_server",
+              "full": "8841832704aaf02eb9699c6876aa029d0ab2f4fdf0a154f4f72641f56acd640c",
+              "global_hash": "58a0031d52c70bb2bd3a062c58a50fb3",
+              "private": "019485f8c51554ed869690c1df373ba5",
+              "public": "a7cdf7e3a6bd8ef62d7baf8d07be0d38",
+              "stable": "97ac877a8ea23b44"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_server",
+              "full": "79909ba8ebc1f6cbd3753fa6c090574d54ea66ed5e29c346282dfed2c8055630",
+              "global_hash": "58a0031d52c70bb2bd3a062c58a50fb3",
+              "private": "14ed71e57465370bd858bac7cbb3c9a1",
+              "public": "1a83711cb328cd7175194cca33686215",
+              "stable": "97ac877a8ea23b44"
+            }
+          ],
+          "row_counts": [
+            2265,
+            2265
+          ]
+        },
+        "ruff_workspace": {
+          "changed_rows": 2410,
+          "changed_upstream": [
+            "ruff_graph-2efdb4dae063b905",
+            "ruff_linter-d967b55195cd3a78"
+          ],
+          "first_changed_rows": [
+            [
+              "00351217e3a7e890",
+              [
+                "options::_::{impl#0}::deserialize::__Field::__field0",
+                "b62912206bb04b4623c753a977938714"
+              ],
+              [
+                "options::_::{impl#0}::deserialize::__Field::__field0",
+                "36e4c6519b770cffc5a054bf83083104"
+              ]
+            ],
+            [
+              "003589123b26a604",
+              [
+                "options::_::{impl#0}",
+                "c66b58d60df439daba38f04aa5f7ab49"
+              ],
+              [
+                "options::_::{impl#0}",
+                "86e91e08b4d71070b32056e65344f144"
+              ]
+            ]
+          ],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_workspace",
+              "full": "ad115c760217a9d426847f72f24858c0d6f6cc94f5f26292429bc58f0478eabd",
+              "global_hash": "27fb7c1700db67617ff8f22b196e62c2",
+              "private": "a18ce4d9371dabc852d77d5dd88dbb4c",
+              "public": "42fb6d41b743b0f125c08784a8c3729c",
+              "stable": "f1a5847e387d6146"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_workspace",
+              "full": "ee3f86dfeeda6413f41d2199e1be6c568c3fb03b729862beca3ca34a3d9d826d",
+              "global_hash": "27fb7c1700db67617ff8f22b196e62c2",
+              "private": "ce5977e98c8669feadbdea120ccc294a",
+              "public": "9f9a5972da538da4984a41da044cca29",
+              "stable": "f1a5847e387d6146"
+            }
+          ],
+          "row_counts": [
+            4002,
+            4002
+          ]
+        },
+        "ty_python_semantic": {
+          "changed_rows": 0,
+          "changed_upstream": [],
+          "first_changed_rows": [],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ty_python_semantic",
+              "full": "64764374798c394f85e8318a284f3101bd5de6b76629dc47db7d0a4a0b0699f2",
+              "global_hash": "9789e83a45a3df165281eb35e61d6ac8",
+              "private": "e7e156516a13325015b450ab6b3c0dbe",
+              "public": "be4e87a495ecd28da8a42af0bb5852e4",
+              "stable": "e0468a554affd9a6"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ty_python_semantic",
+              "full": "64764374798c394f85e8318a284f3101bd5de6b76629dc47db7d0a4a0b0699f2",
+              "global_hash": "9789e83a45a3df165281eb35e61d6ac8",
+              "private": "e7e156516a13325015b450ab6b3c0dbe",
+              "public": "be4e87a495ecd28da8a42af0bb5852e4",
+              "stable": "e0468a554affd9a6"
+            }
+          ],
+          "row_counts": [
+            20635,
+            20635
+          ]
+        }
+      },
+      "ordinary-edited/empty-edit": {
+        "ruff": {
+          "changed_rows": 1034,
+          "changed_upstream": [
+            "get_size2-4e2e941e34a5c2df",
+            "get_size_derive2-37f9424ce0ef3e13",
+            "ruff_db-15c83eb8e4a9b29f",
+            "ruff_diagnostics-f536e12295b21167",
+            "ruff_formatter-b1626fded8d4e14b",
+            "ruff_graph-2efdb4dae063b905",
+            "ruff_index-acec7fa1f4cb48ff",
+            "ruff_linter-d967b55195cd3a78",
+            "ruff_notebook-36671deac5e65fbc",
+            "ruff_python_ast-5a11fe46f8a68396",
+            "ruff_python_codegen-a40b6fe37b05c7e6",
+            "ruff_python_formatter-938713db8d3756ed",
+            "ruff_python_index-5516c4950df58c92",
+            "ruff_python_literal-6a0049c8e0bc8aea",
+            "ruff_python_parser-f9d26cef56c020ea",
+            "ruff_python_semantic-154bb922bb7c821a",
+            "ruff_python_trivia-545e249108254dbd",
+            "ruff_server-48e1202c73fbeabb",
+            "ruff_source_file-9ea08048306f332a",
+            "ruff_text_size-4f43681a606a463f",
+            "ruff_workspace-db0237444a7efdf0",
+            "ty_python_semantic-1604ddade4bf9222"
+          ],
+          "first_changed_rows": [
+            [
+              "00279c514372df15",
+              [
+                "args::{impl#37}::has_subcommand",
+                "82887f7e024f141c0514e529b2ef34d5"
+              ],
+              [
+                "args::{impl#37}::has_subcommand",
+                "427a6a64bc693bc182f026dad56e47de"
+              ]
+            ],
+            [
+              "007cd284c5c7a7b6",
+              [
+                "version::_::{impl#0}::serialize",
+                "d38098d56cb7c4c227b9ad75a8512c71"
+              ],
+              [
+                "version::_::{impl#0}::serialize",
+                "139ae1481050a6e2fc21f207a8383ac5"
+              ]
+            ]
+          ],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff",
+              "full": "1b712033832cfe97b730d103816675c52e0f57c2d4c34d65c663807f0360ecb6",
+              "global_hash": "7ce1349054c12a9b12b9d77dfc33f226",
+              "private": "522b6504783e744d3e58dda2ac920fd5",
+              "public": "2dc7a085d411b840c96bdde66a9b9b3d",
+              "stable": "caa85bcd685a6273"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff",
+              "full": "e912cb3cae178c6312ed277c9cad28b675915e2a55f079cf3826c4f44466a96b",
+              "global_hash": "56ddc23a7c9c7c2bb2ed8cca5f612b1f",
+              "private": "2fea57acfdb43fde8b491c790a968836",
+              "public": "b0d75251271abf19e6ce238c2a405693",
+              "stable": "caa85bcd685a6273"
+            }
+          ],
+          "row_counts": [
+            1582,
+            1582
+          ]
+        },
+        "ruff_graph": {
+          "changed_rows": 158,
+          "changed_upstream": [
+            "get_size2-4e2e941e34a5c2df",
+            "get_size_derive2-37f9424ce0ef3e13",
+            "ruff_db-15c83eb8e4a9b29f",
+            "ruff_diagnostics-f536e12295b21167",
+            "ruff_index-acec7fa1f4cb48ff",
+            "ruff_linter-d967b55195cd3a78",
+            "ruff_notebook-36671deac5e65fbc",
+            "ruff_python_ast-5a11fe46f8a68396",
+            "ruff_python_codegen-a40b6fe37b05c7e6",
+            "ruff_python_index-5516c4950df58c92",
+            "ruff_python_literal-6a0049c8e0bc8aea",
+            "ruff_python_parser-f9d26cef56c020ea",
+            "ruff_python_semantic-154bb922bb7c821a",
+            "ruff_python_trivia-545e249108254dbd",
+            "ruff_source_file-9ea08048306f332a",
+            "ruff_text_size-4f43681a606a463f",
+            "ty_python_semantic-1604ddade4bf9222"
+          ],
+          "first_changed_rows": [
+            [
+              "04464d549d931a24",
+              [
+                "collector::CollectedImport::ImportFrom",
+                "edf3582479c588ab19fac8292a9dfe45"
+              ],
+              [
+                "collector::CollectedImport::ImportFrom",
+                "dd1ae6e44f11a195fee63fb505c2742d"
+              ]
+            ],
+            [
+              "0730a01db57fb049",
+              [
+                "db::{impl#5}::zalsa_register_downcaster",
+                "4ad6f00eeca9dd7703cef661b849c6f2"
+              ],
+              [
+                "db::{impl#5}::zalsa_register_downcaster",
+                "3ae3cfe8cb3c251357c0f0d55e3fed8d"
+              ]
+            ]
+          ],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_graph",
+              "full": "c381f55009259de0c232ccf185cbb23e1536cc5dcaae38a7b956cf6fe95b5adb",
+              "global_hash": "fabb564a995b41493cdf69777f6e5035",
+              "private": "e004ee1e4c3afb701f582e1caea4a8f6",
+              "public": "c550fb5b3f3f85dc53ec070045484c7c",
+              "stable": "fd473d2d431d23db"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_graph",
+              "full": "e0baac6dad7d48aba23ef3bad62d85f312280ce792b617e39336694b71ea2eca",
+              "global_hash": "e1f4586101661841f1621c2cb250742b",
+              "private": "190ce63cc08a44865bd679c432023cb5",
+              "public": "79f9eacc6f6a140e1ada513c9df91aa5",
+              "stable": "fd473d2d431d23db"
+            }
+          ],
+          "row_counts": [
+            296,
+            296
+          ]
+        },
+        "ruff_linter": {
+          "changed_rows": 28297,
+          "changed_upstream": [
+            "get_size2-4e2e941e34a5c2df",
+            "get_size_derive2-37f9424ce0ef3e13",
+            "ruff_db-15c83eb8e4a9b29f",
+            "ruff_diagnostics-f536e12295b21167",
+            "ruff_index-acec7fa1f4cb48ff",
+            "ruff_notebook-36671deac5e65fbc",
+            "ruff_python_ast-5a11fe46f8a68396",
+            "ruff_python_codegen-a40b6fe37b05c7e6",
+            "ruff_python_index-5516c4950df58c92",
+            "ruff_python_literal-6a0049c8e0bc8aea",
+            "ruff_python_parser-f9d26cef56c020ea",
+            "ruff_python_semantic-154bb922bb7c821a",
+            "ruff_python_trivia-545e249108254dbd",
+            "ruff_source_file-9ea08048306f332a",
+            "ruff_text_size-4f43681a606a463f"
+          ],
+          "first_changed_rows": [
+            [
+              "0000c77daff585f1",
+              [
+                "codes::_::{impl#0}::deserialize::__Field::__field680::{ctor#0}",
+                "6cde7bd9f4482b00b7159ad9da509e5d"
+              ],
+              [
+                "codes::_::{impl#0}::deserialize::__Field::__field680::{ctor#0}",
+                "d439a630cc9cabdacac594ddd20caf41"
+              ]
+            ],
+            [
+              "00017ee5ccc882d4",
+              [
+                "rules::pydocstyle::rules::backslashes::{impl#0}",
+                "6cde7bd9f4482b00b7159ad9da509e5d"
+              ],
+              [
+                "rules::pydocstyle::rules::backslashes::{impl#0}",
+                "d439a630cc9cabdacac594ddd20caf41"
+              ]
+            ]
+          ],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_linter",
+              "full": "5970710f03fbcb1f442c5bcc1dc27d866847fb6b4f4cf4ea5b6d9073dad9e7f4",
+              "global_hash": "cd1a191cfd8683a4999d3ad3e4fdc336",
+              "private": "85fb189e94b5946953f824219a78eab7",
+              "public": "228c130edf861052821d5978a402117b",
+              "stable": "40b8e31a7580515f"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_linter",
+              "full": "d3258bbe2241a262d1e1567834c7b8efaf334bdd9a85aaecabd629aaa0e96943",
+              "global_hash": "f790bd5e0d492739e65cbb354c70eea8",
+              "private": "468f8dc7cbb333962790a81349d14f03",
+              "public": "abe49b2bede356476df033ac034339b4",
+              "stable": "40b8e31a7580515f"
+            }
+          ],
+          "row_counts": [
+            38075,
+            38075
+          ]
+        },
+        "ruff_server": {
+          "changed_rows": 1352,
+          "changed_upstream": [
+            "get_size2-4e2e941e34a5c2df",
+            "get_size_derive2-37f9424ce0ef3e13",
+            "ruff_db-15c83eb8e4a9b29f",
+            "ruff_diagnostics-f536e12295b21167",
+            "ruff_formatter-b1626fded8d4e14b",
+            "ruff_graph-2efdb4dae063b905",
+            "ruff_index-acec7fa1f4cb48ff",
+            "ruff_linter-d967b55195cd3a78",
+            "ruff_notebook-36671deac5e65fbc",
+            "ruff_python_ast-5a11fe46f8a68396",
+            "ruff_python_codegen-a40b6fe37b05c7e6",
+            "ruff_python_formatter-938713db8d3756ed",
+            "ruff_python_index-5516c4950df58c92",
+            "ruff_python_literal-6a0049c8e0bc8aea",
+            "ruff_python_parser-f9d26cef56c020ea",
+            "ruff_python_semantic-154bb922bb7c821a",
+            "ruff_python_trivia-545e249108254dbd",
+            "ruff_source_file-9ea08048306f332a",
+            "ruff_text_size-4f43681a606a463f",
+            "ruff_workspace-db0237444a7efdf0",
+            "ty_python_semantic-1604ddade4bf9222"
+          ],
+          "first_changed_rows": [
+            [
+              "0016b6d7231968b4",
+              [
+                "session::request_queue::{impl#3}",
+                "0ce64b5d3d56ec3fba84c1b5f3689b36"
+              ],
+              [
+                "session::request_queue::{impl#3}",
+                "3c634da4dfa80a4c5a8bd92f40adbbe6"
+              ]
+            ],
+            [
+              "0038fe74b9b7463d",
+              [
+                "session::options::_::{impl#0}::deserialize::{impl#2}::expecting",
+                "c7558a24b76e0d82a34623a7d3cb0bfc"
+              ],
+              [
+                "session::options::_::{impl#0}::deserialize::{impl#2}::expecting",
+                "57cd8ef99d6668a6835a6b15b9986c0c"
+              ]
+            ]
+          ],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_server",
+              "full": "79909ba8ebc1f6cbd3753fa6c090574d54ea66ed5e29c346282dfed2c8055630",
+              "global_hash": "58a0031d52c70bb2bd3a062c58a50fb3",
+              "private": "14ed71e57465370bd858bac7cbb3c9a1",
+              "public": "1a83711cb328cd7175194cca33686215",
+              "stable": "97ac877a8ea23b44"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_server",
+              "full": "4639f1510b30602954bcd9dd3abc0fdaaba9ee4facf729670ea64e24478eb73b",
+              "global_hash": "a190fb6f8d9482708144648b3bf55755",
+              "private": "3bbe10ae3960310265a1640b356d5ba3",
+              "public": "fc048c6b5330edff0303ae11ad8a351d",
+              "stable": "97ac877a8ea23b44"
+            }
+          ],
+          "row_counts": [
+            2265,
+            2265
+          ]
+        },
+        "ruff_workspace": {
+          "changed_rows": 2410,
+          "changed_upstream": [
+            "get_size2-4e2e941e34a5c2df",
+            "get_size_derive2-37f9424ce0ef3e13",
+            "ruff_db-15c83eb8e4a9b29f",
+            "ruff_diagnostics-f536e12295b21167",
+            "ruff_formatter-b1626fded8d4e14b",
+            "ruff_graph-2efdb4dae063b905",
+            "ruff_index-acec7fa1f4cb48ff",
+            "ruff_linter-d967b55195cd3a78",
+            "ruff_notebook-36671deac5e65fbc",
+            "ruff_python_ast-5a11fe46f8a68396",
+            "ruff_python_codegen-a40b6fe37b05c7e6",
+            "ruff_python_formatter-938713db8d3756ed",
+            "ruff_python_index-5516c4950df58c92",
+            "ruff_python_literal-6a0049c8e0bc8aea",
+            "ruff_python_parser-f9d26cef56c020ea",
+            "ruff_python_semantic-154bb922bb7c821a",
+            "ruff_python_trivia-545e249108254dbd",
+            "ruff_source_file-9ea08048306f332a",
+            "ruff_text_size-4f43681a606a463f",
+            "ty_python_semantic-1604ddade4bf9222"
+          ],
+          "first_changed_rows": [
+            [
+              "00351217e3a7e890",
+              [
+                "options::_::{impl#0}::deserialize::__Field::__field0",
+                "36e4c6519b770cffc5a054bf83083104"
+              ],
+              [
+                "options::_::{impl#0}::deserialize::__Field::__field0",
+                "564ff8d02e753201c569ec8ce534c65b"
+              ]
+            ],
+            [
+              "003589123b26a604",
+              [
+                "options::_::{impl#0}",
+                "86e91e08b4d71070b32056e65344f144"
+              ],
+              [
+                "options::_::{impl#0}",
+                "367e68a9b9068c441ee1d93fb2e439d0"
+              ]
+            ]
+          ],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_workspace",
+              "full": "ee3f86dfeeda6413f41d2199e1be6c568c3fb03b729862beca3ca34a3d9d826d",
+              "global_hash": "27fb7c1700db67617ff8f22b196e62c2",
+              "private": "ce5977e98c8669feadbdea120ccc294a",
+              "public": "9f9a5972da538da4984a41da044cca29",
+              "stable": "f1a5847e387d6146"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_workspace",
+              "full": "d93d2ead63644845735844da03c16526dbfd33475d8366e199f988f634bf1882",
+              "global_hash": "0728af01155b131f423a551864b0b382",
+              "private": "c7dbe0613c21b1014728a053871fd980",
+              "public": "84a2393b84c03940fc68a8ecfef69951",
+              "stable": "f1a5847e387d6146"
+            }
+          ],
+          "row_counts": [
+            4002,
+            4002
+          ]
+        },
+        "ty_python_semantic": {
+          "changed_rows": 12347,
+          "changed_upstream": [
+            "get_size2-4e2e941e34a5c2df",
+            "get_size_derive2-37f9424ce0ef3e13",
+            "ruff_db-15c83eb8e4a9b29f",
+            "ruff_diagnostics-f536e12295b21167",
+            "ruff_index-acec7fa1f4cb48ff",
+            "ruff_notebook-36671deac5e65fbc",
+            "ruff_python_ast-5a11fe46f8a68396",
+            "ruff_python_literal-6a0049c8e0bc8aea",
+            "ruff_python_parser-f9d26cef56c020ea",
+            "ruff_python_trivia-545e249108254dbd",
+            "ruff_source_file-9ea08048306f332a",
+            "ruff_text_size-4f43681a606a463f"
+          ],
+          "first_changed_rows": [
+            [
+              "000490f21b86106c",
+              [
+                "semantic_index::definition::{impl#2}",
+                "8ec94175d2c5c878f562d08d06830bfd"
+              ],
+              [
+                "semantic_index::definition::{impl#2}",
+                "a673317f34d94a28640ac8e22917e680"
+              ]
+            ],
+            [
+              "000d2690180f2df4",
+              [
+                "types::{impl#23}",
+                "8ec94175d2c5c878f562d08d06830bfd"
+              ],
+              [
+                "types::{impl#23}",
+                "a673317f34d94a28640ac8e22917e680"
+              ]
+            ]
+          ],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ty_python_semantic",
+              "full": "64764374798c394f85e8318a284f3101bd5de6b76629dc47db7d0a4a0b0699f2",
+              "global_hash": "9789e83a45a3df165281eb35e61d6ac8",
+              "private": "e7e156516a13325015b450ab6b3c0dbe",
+              "public": "be4e87a495ecd28da8a42af0bb5852e4",
+              "stable": "e0468a554affd9a6"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ty_python_semantic",
+              "full": "9b51aad6d0292fb0472f54372cc12f098f5deec2976a6d8f93d2dbc9527fc828",
+              "global_hash": "28c2027eb189f874faaa9aebce1ef3bd",
+              "private": "b47de205e1de484e10c8f336cce8aa3e",
+              "public": "93ee73cba33d273c2f6f84691fabfc02",
+              "stable": "e0468a554affd9a6"
+            }
+          ],
+          "row_counts": [
+            20635,
+            20635
+          ]
+        }
+      },
+      "ordinary-edited/kernel-edited": {
+        "ruff": {
+          "changed_rows": 0,
+          "changed_upstream": [],
+          "first_changed_rows": [],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff",
+              "full": "1b712033832cfe97b730d103816675c52e0f57c2d4c34d65c663807f0360ecb6",
+              "global_hash": "7ce1349054c12a9b12b9d77dfc33f226",
+              "private": "522b6504783e744d3e58dda2ac920fd5",
+              "public": "2dc7a085d411b840c96bdde66a9b9b3d",
+              "stable": "caa85bcd685a6273"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff",
+              "full": "1b712033832cfe97b730d103816675c52e0f57c2d4c34d65c663807f0360ecb6",
+              "global_hash": "7ce1349054c12a9b12b9d77dfc33f226",
+              "private": "522b6504783e744d3e58dda2ac920fd5",
+              "public": "2dc7a085d411b840c96bdde66a9b9b3d",
+              "stable": "caa85bcd685a6273"
+            }
+          ],
+          "row_counts": [
+            1582,
+            1582
+          ]
+        },
+        "ruff_graph": {
+          "changed_rows": 0,
+          "changed_upstream": [],
+          "first_changed_rows": [],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_graph",
+              "full": "c381f55009259de0c232ccf185cbb23e1536cc5dcaae38a7b956cf6fe95b5adb",
+              "global_hash": "fabb564a995b41493cdf69777f6e5035",
+              "private": "e004ee1e4c3afb701f582e1caea4a8f6",
+              "public": "c550fb5b3f3f85dc53ec070045484c7c",
+              "stable": "fd473d2d431d23db"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_graph",
+              "full": "c381f55009259de0c232ccf185cbb23e1536cc5dcaae38a7b956cf6fe95b5adb",
+              "global_hash": "fabb564a995b41493cdf69777f6e5035",
+              "private": "e004ee1e4c3afb701f582e1caea4a8f6",
+              "public": "c550fb5b3f3f85dc53ec070045484c7c",
+              "stable": "fd473d2d431d23db"
+            }
+          ],
+          "row_counts": [
+            296,
+            296
+          ]
+        },
+        "ruff_linter": {
+          "changed_rows": 0,
+          "changed_upstream": [],
+          "first_changed_rows": [],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_linter",
+              "full": "5970710f03fbcb1f442c5bcc1dc27d866847fb6b4f4cf4ea5b6d9073dad9e7f4",
+              "global_hash": "cd1a191cfd8683a4999d3ad3e4fdc336",
+              "private": "85fb189e94b5946953f824219a78eab7",
+              "public": "228c130edf861052821d5978a402117b",
+              "stable": "40b8e31a7580515f"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_linter",
+              "full": "51f5fa626d130de1e93ac0754655d01d401b4fc3823d92a96f466d9ad1aae359",
+              "global_hash": "cd1a191cfd8683a4999d3ad3e4fdc336",
+              "private": "023d011a72c134b97d60b5b85c5e6d65",
+              "public": "228c130edf861052821d5978a402117b",
+              "stable": "40b8e31a7580515f"
+            }
+          ],
+          "row_counts": [
+            38075,
+            38075
+          ]
+        },
+        "ruff_server": {
+          "changed_rows": 0,
+          "changed_upstream": [],
+          "first_changed_rows": [],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_server",
+              "full": "79909ba8ebc1f6cbd3753fa6c090574d54ea66ed5e29c346282dfed2c8055630",
+              "global_hash": "58a0031d52c70bb2bd3a062c58a50fb3",
+              "private": "14ed71e57465370bd858bac7cbb3c9a1",
+              "public": "1a83711cb328cd7175194cca33686215",
+              "stable": "97ac877a8ea23b44"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_server",
+              "full": "79909ba8ebc1f6cbd3753fa6c090574d54ea66ed5e29c346282dfed2c8055630",
+              "global_hash": "58a0031d52c70bb2bd3a062c58a50fb3",
+              "private": "14ed71e57465370bd858bac7cbb3c9a1",
+              "public": "1a83711cb328cd7175194cca33686215",
+              "stable": "97ac877a8ea23b44"
+            }
+          ],
+          "row_counts": [
+            2265,
+            2265
+          ]
+        },
+        "ruff_workspace": {
+          "changed_rows": 0,
+          "changed_upstream": [],
+          "first_changed_rows": [],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_workspace",
+              "full": "ee3f86dfeeda6413f41d2199e1be6c568c3fb03b729862beca3ca34a3d9d826d",
+              "global_hash": "27fb7c1700db67617ff8f22b196e62c2",
+              "private": "ce5977e98c8669feadbdea120ccc294a",
+              "public": "9f9a5972da538da4984a41da044cca29",
+              "stable": "f1a5847e387d6146"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ruff_workspace",
+              "full": "ee3f86dfeeda6413f41d2199e1be6c568c3fb03b729862beca3ca34a3d9d826d",
+              "global_hash": "27fb7c1700db67617ff8f22b196e62c2",
+              "private": "ce5977e98c8669feadbdea120ccc294a",
+              "public": "9f9a5972da538da4984a41da044cca29",
+              "stable": "f1a5847e387d6146"
+            }
+          ],
+          "row_counts": [
+            4002,
+            4002
+          ]
+        },
+        "ty_python_semantic": {
+          "changed_rows": 0,
+          "changed_upstream": [],
+          "first_changed_rows": [],
+          "headers": [
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ty_python_semantic",
+              "full": "64764374798c394f85e8318a284f3101bd5de6b76629dc47db7d0a4a0b0699f2",
+              "global_hash": "9789e83a45a3df165281eb35e61d6ac8",
+              "private": "e7e156516a13325015b450ab6b3c0dbe",
+              "public": "be4e87a495ecd28da8a42af0bb5852e4",
+              "stable": "e0468a554affd9a6"
+            },
+            {
+              "compiler": "rustc 1.99.0-dev (Ohm metadata 3)",
+              "crate": "ty_python_semantic",
+              "full": "64764374798c394f85e8318a284f3101bd5de6b76629dc47db7d0a4a0b0699f2",
+              "global_hash": "9789e83a45a3df165281eb35e61d6ac8",
+              "private": "e7e156516a13325015b450ab6b3c0dbe",
+              "public": "be4e87a495ecd28da8a42af0bb5852e4",
+              "stable": "e0468a554affd9a6"
+            }
+          ],
+          "row_counts": [
+            20635,
+            20635
+          ]
+        }
+      }
+    }
+  },
+  "scored_pairs": 0
+}
