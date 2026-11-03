@@ -33,10 +33,12 @@ cleanup() {
     exit_status=$?
 
     if [ -n "$alias_backup" ] && [ -L "$alias_backup" ]; then
-        alias_path=${alias_backup%.ohm-backup.*}
-        if [ ! -e "$alias_path" ] && [ ! -L "$alias_path" ]; then
-            mv "$alias_backup" "$alias_path" ||
-                printf 'ohm: could not restore the previous rustup alias\n' >&2
+        # A concurrent registration may have claimed the alias while rustup was running.
+        cp -RPn "$alias_backup" "$toolchains_directory/" 2>/dev/null || :
+        if [ ! -e "$toolchains_directory/ohm" ] && [ ! -L "$toolchains_directory/ohm" ]; then
+            printf 'ohm: could not restore the previous rustup alias from %s\n' "$alias_backup" >&2
+            # Keep the backup for manual recovery.
+            temporary_directory=
         fi
     fi
 
@@ -356,10 +358,8 @@ link_toolchain() {
         if [ "$toolchain_name" != ohm ]; then
             fail "refusing to replace an existing immutable rustup toolchain: $toolchain_name"
         fi
-        alias_backup=$link_path.ohm-backup.$$
-        [ ! -e "$alias_backup" ] && [ ! -L "$alias_backup" ] ||
-            fail 'an existing rustup alias backup prevents safe replacement'
-        mv "$link_path" "$alias_backup" ||
+        alias_backup=$temporary_directory/ohm
+        cp -P "$link_path" "$alias_backup" && [ -L "$alias_backup" ] ||
             fail 'could not preserve the previous custom rustup toolchain link'
     elif [ -e "$link_path" ]; then
         fail "refusing to replace an existing managed rustup toolchain: $toolchain_name"
@@ -376,19 +376,9 @@ link_toolchain() {
         return
     fi
 
-    if ! rustup toolchain link "$toolchain_name" "$installation_prefix"; then
-        if [ -n "$alias_backup" ]; then
-            mv "$alias_backup" "$link_path" ||
-                fail 'could not restore the previous custom rustup toolchain link'
-            alias_backup=
-        fi
+    rustup toolchain link "$toolchain_name" "$installation_prefix" ||
         fail "could not register rustup toolchain: $toolchain_name"
-    fi
-
-    if [ -n "$alias_backup" ]; then
-        rm -f "$alias_backup" || fail 'could not remove the previous rustup alias backup'
-        alias_backup=
-    fi
+    alias_backup=
 }
 
 info 'registering toolchains with rustup'

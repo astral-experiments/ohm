@@ -123,7 +123,16 @@ if [ "${1:-}" != "toolchain" ] || [ "${2:-}" != "link" ]; then
   exit 1
 fi
 
-if [ "$3" = ohm ] && [ "${OHM_TEST_RUSTUP_ALIAS_FAILURE:-0}" = 1 ]; then
+if [ "$3" = ohm ] && [ "${OHM_TEST_RUSTUP_ALIAS_FAILURE:-0}" != 0 ]; then
+  case "$OHM_TEST_RUSTUP_ALIAS_FAILURE" in
+    1) rm -f "$RUSTUP_HOME/toolchains/ohm" ;;
+    relink|interrupt-after-relink)
+      ln -sfn "$RUSTUP_HOME/winner" "$RUSTUP_HOME/toolchains/ohm"
+      if [ "$OHM_TEST_RUSTUP_ALIAS_FAILURE" = interrupt-after-relink ]; then
+        kill -TERM "$PPID"
+      fi
+      ;;
+  esac
   echo 'mock rustup alias registration failed' >&2
   exit 1
 fi
@@ -615,6 +624,20 @@ if [ ! -L "$failing_alias_directory/ohm" ] || \
   echo 'failed rustup registration replaced the existing Ohm alias' >&2
   exit 1
 fi
+
+for alias_failure in relink interrupt-after-relink; do
+  alias_home="$temporary_directory/cases/$alias_failure/rustup-home"
+  mkdir -p "$alias_home/previous" "$alias_home/winner" "$alias_home/toolchains"
+  ln -s "$alias_home/previous" "$alias_home/toolchains/ohm"
+  OHM_TEST_RUSTUP_ALIAS_FAILURE=$alias_failure run_case "$alias_failure" failure
+  if [ ! "$alias_home/toolchains/ohm" -ef "$alias_home/winner" ] || \
+     [ ! -L "$alias_home/toolchains/$version" ] || \
+     [ -n "$(find "$alias_home/winner" -mindepth 1 -print)" ] || \
+     [ -n "$(find "$alias_home/toolchains" -mindepth 1 ! -name ohm ! -name "$version" -print)" ]; then
+    echo 'alias rollback changed the winning registration or left a backup toolchain' >&2
+    exit 1
+  fi
+done
 
 managed_alias_directory="$temporary_directory/cases/managed-alias/rustup-home/toolchains/ohm"
 mkdir -p "$managed_alias_directory"
