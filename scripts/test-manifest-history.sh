@@ -22,13 +22,13 @@ git -C "$test_root" \
 base_revision="$(git -C "$test_root" rev-parse HEAD)"
 
 check_history() {
-  (cd -- "$test_root" && "$script_dir/check-manifest-history.sh" "$base_revision")
+  (cd -- "${1:-$test_root}" && "$script_dir/check-manifest-history.sh" "$base_revision")
 }
 
 expect_history_failure() {
   local description="$1"
 
-  if check_history >/dev/null 2>&1; then
+  if check_history "${2:-$test_root}" >/dev/null 2>&1; then
     echo "manifest history accepted $description" >&2
     exit 1
   fi
@@ -81,8 +81,13 @@ check_history
 release_tag="$(git -C "$test_root" show "$base_revision:$manifest_path" | jq -er '.release.toolchain_name')"
 git -C "$test_root" tag "$release_tag"
 expect_history_failure 'a published Rustfmt source revision change'
+expect_history_failure 'a published revision change from a subdirectory' "$test_root/toolchains/1.97.1"
+ln -s toolchains/1.97.1 "$test_root/nested"
+expect_history_failure 'a published revision change from a symlinked subdirectory' "$test_root/nested"
 
 git -C "$test_root" show "$base_revision:$manifest_path" > "$manifest"
 check_history
+
+check_history "$test_root/toolchains/1.97.1"
 
 echo 'manifest history tests passed'
