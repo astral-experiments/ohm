@@ -306,7 +306,9 @@ def build(workspace, root):
 
         if role == "C":
             fixture = "tests/incremental/upstream-monomorphization-buckets/main.rs"
-            test_cmd = argv[:argv.index("build")] + ["test", "--stage", "1", "-j8", fixture]
+            test_cmd = argv[:argv.index("build")] + [
+                "--set", "rust.verbose-tests=true", "test", "--stage", "1", "-j8", fixture,
+            ]
             test_log = root / "logs/upstream-owner-bucket-incremental-C.log"
             guarded(test_cmd, rust, env, test_log, root)
             log = test_log.read_text(errors="replace")
