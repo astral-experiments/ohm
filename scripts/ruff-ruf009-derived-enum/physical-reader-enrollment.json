@@ -1,0 +1,103 @@
+{
+ "confirmation_orders": [
+  "CP",
+  "CP",
+  "PC",
+  "PC",
+  "PC",
+  "PC",
+  "CP",
+  "CP"
+ ],
+ "factory": {
+  "branch": "charlie/qa-matched-check-derive-rc23-20261103",
+  "guard_archives": {
+   "C": "d49ada6c53c670458b63ee9efd8c8af53453f0c5aa4345e96908751090caa8ee",
+   "P": "67d2783d4d4f72ae10321a846b160e03acfa5acdd1491f93b1a2432a68b74cfc"
+  },
+  "head": "34e78f19c0d0c58c86e42d83e05a4dc6db6b0f6d",
+  "kit": [
+   "ohm-rc23-private-derive-stage1",
+   13208451923,
+   195806798,
+   "2730fc80c23d1369c5d0092627e556df129fe5c328b4a9933264a2542fec3d8a"
+  ],
+  "receipts": [
+   "ohm-rc23-private-derive-stage1-receipts",
+   13208168425,
+   418179,
+   "236662911485dceae7be0874c763438969182423be8dfbdb6018a4d175fed706"
+  ],
+  "run": 41586579473,
+  "source": {
+   "C": "16a25d901318369d5ff788dd5c6ac0656d6e0bd6",
+   "P": "d57fd1515986dccecdcece8da85e651bfb4b81f9"
+  }
+ },
+ "fixture_reader_projection_sha256": "b1a664be52433f1763c213f81a1937f84278412320d68e79181f3b86859c2ae5",
+ "local_gate_sha256": "958a683761735a8dd3952fb7d6ba7a3f7ca3d1d37945ddc0cae186c997ba4f2c",
+ "original_attempts": [
+  {
+   "run": 41583719013,
+   "sha256": "9783521a49fd0c5b29d05d007409dac505b604f8c03c1901f08d1aa7b9b48b3e",
+   "stage": "insufficient authentic upstream bootstrap history, before first compiler"
+  },
+  {
+   "run": 41584882417,
+   "sha256": "7dd39848d5db7cc457fb73064aa7b4299b114e428a3f1994b012042fb3ef1f6f",
+   "stage": "post-build nominal candidate dirty event asserted without a kernel observation"
+  }
+ ],
+ "original_unscored_registration": "1e399dcacda5359608d1be6b6a7b212a5c53f8cb",
+ "physical_factory_reopen_sha256": "0e15ec15ed28088bacc8ad974fa7f2ee85cafc1fcc9c94272928ed223d786ece",
+ "primary": [
+  "cargo",
+  "+ohm",
+  "check",
+  "-p",
+  "ruff",
+  "--bin",
+  "ruff",
+  "--locked",
+  "--offline",
+  "-j4",
+  "--message-format=json"
+ ],
+ "schema": "ruf009-before-pilot-physical-reader-v1",
+ "source_registration_sha256": "0bd91a6a2c27a80230a49cdde43f7b8b0842ecd883341494134a27556a51e646",
+ "thresholds": {
+  "confirmation_all_improve": true,
+  "confirmation_edited_median_reduction_min": 0.1,
+  "pilot_edited_reduction_min": 0.1,
+  "real_consumer_skips": 1
+ },
+ "verified_roles": {
+  "C": {
+   "driver": "0053133f2f66e364386fde6c3cf99327c6473d5d8d3870a36eadede0a0d54421",
+   "edited_cargo": [
+    "dep",
+    "app"
+   ],
+   "edited_real": [
+    "dep"
+   ],
+   "guard_sha256": "ddd73e4db04ed865d61cdebbba396ae734c1d115c87ac1b8d06ac8697a5ba529",
+   "independent_kernel": "def40af2b5454b689a87764306daf6320d24e6ea52e7354fa5feb2046e9d26d4",
+   "inventory_sha256": "2f1bacecc11f53262b27e5d0aaecfd8acbdfb263af904a9187f061db4ac808af"
+  },
+  "P": {
+   "driver": "b0c7882fb84d8924b99896dfe214c7dfb19bdfede83850a769956234c29a45fc",
+   "edited_cargo": [
+    "dep",
+    "app"
+   ],
+   "edited_real": [
+    "dep",
+    "app"
+   ],
+   "guard_sha256": "debe44815d2791b8d241256a129043d465b1a38c9ce683c260bb3f14a30d8e2c",
+   "independent_kernel": "6c37f87998bf7bc40c9d0080867e00ba0afc7993219597e855f332fd0c2d4fcb",
+   "inventory_sha256": "afddd6816e45c9dbfd3dacc4c04be6c21f03d94b7b4be973cbb743870907cf05"
+  }
+ }
+}

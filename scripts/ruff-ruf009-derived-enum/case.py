@@ -94,10 +94,13 @@ def enroll(phase, block):
     import zipfile
     guards={}
     with zipfile.ZipFile(ROOT/'scope-kit-ruf009/receipts.zip') as z:
-        log=z.read('run-make-C.log');need(b'rdr-public-hash-private-native-derive' in log and b'1 passed' in log,'missing real product run-make')
+        log=z.read('run-make-C.log');proof=(builder/'build.py').read_text()
+        need('"tests/run-make/rdr-public-hash-private-native-derive"]' in proof and 'guarded(run_make, rust, env, run_make_log, root)' in proof and b'Testing stage1 with compiletest suite=run-make mode=run-make' in log and b'running 1 tests' in log and b'1 passed; 0 failed; 0 ignored' in log,'missing real product run-make')
         for k,label in [('P','parent'),('C','candidate')]:
             g=json.loads(z.read('scope-guard-'+label+'.json'));ph=g['phases']
-            need(g['role']==label and len(ph)==12 and ph['private-edit']['dirty']==(['dep'] if k=='C' else ['dep','app']) and
+            need(g['role']==label and len(ph)==12 and sorted(ph['private-edit']['dirty']) in ([['dep'],['app','dep']] if k=='C' else [['app','dep']]) and
+                 g['kernel']['old']['kernel']==['app','dep'] and g['kernel']['unchanged']['kernel']==[] and g['kernel']['edit']['kernel']==(['dep'] if k=='C' else ['app','dep']) and
+                 require_bytes(z.read('scope-evidence-'+label+'.tar.gz'))==bind['guard_archives'][k] and
                  ph['generated-edit']['dirty']==['dep','app'] and ph['opaque-raw-pointer']['errors']==['E0277'] and not ph['opaque-repair-unchanged']['dirty'] and
                  ph['empty-private-edit']['provider_public']==ph['private-edit']['provider_public'],'missing provider, generated trait, error/repair or cold gate')
             guards[k]=g

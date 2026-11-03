@@ -15,6 +15,7 @@ import sys
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
 import metadata
+import output_binding
 
 REG=json.loads((HERE/'registration.json').read_bytes())
 PORT=json.loads((HERE/'port.json').read_bytes())
@@ -66,7 +67,7 @@ def block(base):
             need(dirty==got['dirty'] and (not valid or len(arts)==REG['unit_count']),'original typed roster')
             cmd=read(d/'command.json')
             need(cmd['exit']==(0 if valid else 101) and cmd['argv'][-len(REG['cargo_check']):]==REG['cargo_check'],'unexpected command/exit')
-            count=None
+            count=None;physical=None
             if stage.startswith('ordinary-'):
                 need(got['method']=='pmu' and Path(cmd['argv'][0]).name=='whole-count' and len(cmd['argv'])==len(REG['cargo_check'])+3,'counter scope')
                 h=read(d/'hardware.json')
@@ -75,7 +76,6 @@ def block(base):
             if got['method']=='trace':
                 tr=folder/(stage+'-observer');table=read(tr/'native-execs.json')
                 need(table['rustc']==kit['rustc'],'wrong physical frontend')
-                expected=sorted(dirty+([] if valid else [['ruff_linter','lib']]))
                 actual=[]
                 found=set()
                 for trace in tr.glob('trace.*.gz'):
@@ -95,7 +95,19 @@ def block(base):
                     kind=re.search(r'"--crate-type", "(lib|bin|proc-macro|rlib)"',item['argv'])
                     need(kind and '"--crate-name", "'+item['crate']+'"' in item['argv'],'bad physical argv')
                     actual.append([item['crate'],kind[1]])
-                need(sorted(actual)==expected,'kernel vs typed targets')
+                physical=sorted(actual)
+                before,after=[read(tr/('outputs-'+t+'.json')) for t in ('before','after')]
+                different=output_binding.reconcile(dirty,physical,before,after,not valid)
+                for crate,kind in different:
+                    k=crate+'/'+kind
+                    row,=[r for r in arts if r['target']['name']==crate and r['target']['kind']==[kind]]
+                    meta,=[Path(f) for f in row['filenames'] if f.endswith('.rmeta')]
+                    witness=after[k]
+                    need(str(meta)==witness['rmeta']['path'] and str(meta.with_name(meta.name.removeprefix('lib')).with_suffix('.d'))==witness['dep-info']['path'],'reported retained paths differ from Cargo')
+                    if valid and kind=='lib':need(witness['rmeta']['sha256']==got['metadata'][crate]['sha256'],'retained library metadata differs from raw snapshot')
+                    output_binding.check_stored(members,{k:before[k]})
+                need(got['physical']==physical and read(tr/'nominal-and-physical.json')==dict(cargo_dirty=dirty,rustc=physical,dirty_without_rustc=different),'different physical compiler membership')
+                if 'idle' in stage:need(not physical,'unchanged invocation of rustc')
             if not valid:
                 errors=[r['message'] for r in rows if r['reason']=='compiler-message' and r['message']['level']=='error']
                 need(len(errors)==1 and (errors[0].get('code') or {}).get('code')=='E0308' and any(s['is_primary'] and REG['path']==s['file_name'] and 'OHM_INVALID_CHECK_SENTINEL' in str(s['text']) for s in errors[0]['spans']),'different physical invalid verdict')
@@ -107,7 +119,7 @@ def block(base):
                     show=read(folder/(q['sha256']+'.display.json'))
                     need(show=={'body':q['sha256'],'raw_public':m['public'],'native':'Public hash: '+bytes.fromhex(m['public'])[::-1].hex()},'different native public hash display')
             need(set(snapshots)==(set(REG['observed_targets']) if valid else set()),'missing snapshots')
-            data[stage]=dict(dirty=dirty,instructions=count,meta=snapshots)
+            data[stage]=dict(dirty=dirty,physical=physical,instructions=count,meta=snapshots)
         for state,labels in [('buggy',['buggy-cold','buggy-idle1','buggy-idle2']),('fixed',['edited','fixed-idle1','fixed-idle2'])]:
             ref=data['ordinary-'+labels[0]]
             for name in ('ordinary-','kernel-'):
@@ -144,15 +156,15 @@ def block(base):
         need(baseline['private']!=edited['private'],'source body was not compiled')
         tables=[json.loads(gzip.decompress((members/(v['full']+'.rows.json.gz')).read_bytes()))for v in (baseline,edited)]
         diff=metadata.compare(*tables)
-        role_data[role]=dict(source=kit['config']['source'],driver=kit['driver'],dirty=data['ordinary-edited']['dirty'],cost={s:data['ordinary-'+s]['instructions'] for s in phases},
+        role_data[role]=dict(source=kit['config']['source'],driver=kit['driver'],dirty=data['ordinary-edited']['dirty'],physical=data['kernel-edited']['physical'],cost={s:data['ordinary-'+s]['instructions'] for s in phases},
             public=[baseline['public'],edited['public']],row_count=[baseline['definitions'],edited['definitions']],changed_rows=len(diff),row_changes_sha256=digest(json.dumps(diff,sort_keys=True).encode()),native={k:v['sha256']for k,v in native.items()},
             equivalence={label:{n:v['full']==data['ordinary-edited']['meta'][n]['full']for n,v in data[label]['meta'].items()} for label in ('repair','empty-edit')})
     p,c=role_data['P'],role_data['C']
     need(p['source']==REG['rust_parent'] and p['driver']!=c['driver'],'unmatched compiler pair')
     need(p['native']==c['native'],'cross-role complete native products differ; require independent classification')
-    ds=lambda data:set(map(tuple,data['dirty']))
+    ds=lambda data:set(map(tuple,data['physical']))
     skipped=sorted(ds(p)-ds(c))
-    shape=(p['dirty']==REG['observed_terminal_targets'] and ds(c)<=ds(p) and ('ruff_linter','lib')in ds(c) and any(tuple(s)!=('ruff_linter','lib') for s in skipped))
+    shape=(p['dirty']==p['physical']==REG['observed_terminal_targets'] and set(map(tuple,c['dirty']))<=set(map(tuple,p['dirty'])) and ds(c)<=ds(p) and ('ruff_linter','lib')in ds(c) and any(tuple(s)!=('ruff_linter','lib') for s in skipped))
     reduction=1-c['cost']['edited']/p['cost']['edited']
     return dict(worker=worker,roles=role_data,physical_skipped=skipped,eligible_shape=shape,reduction=reduction,pilot_admits=shape and reduction>=REG['gates']['pilot_edited_reduction_min'])
 

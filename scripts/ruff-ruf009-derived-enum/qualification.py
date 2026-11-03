@@ -13,7 +13,11 @@ sys.path.insert(0, str(HERE))
 from case import BASE, BUILD, CHECK, ERROR, PORT, REG, ROOT, env, fresh_state, need, observer, old, save, sha, source, w
 import metadata
 
+import output_binding
+
 MEMBERS=BASE/'members'
+outputs={}
+watch=set(map(tuple,REG['observed_terminal_targets']))
 
 
 def write_once(path, body):
@@ -65,6 +69,10 @@ def check(label,state,environment,version,method='ordinary',invalid=False):
     elif method=='pmu':
         argv=[ROOT/'whole-count',dest/'hardware.json',ROOT/'proxies/cargo',*CHECK]
     else:need(method=='ordinary','unknown measurement')
+    if label=='kernel-buggy-cold':outputs.clear()
+    present=lambda p:all(f.is_file() for f in p.values())
+    before=output_binding.snapshot({k:v for k,v in outputs.items() if present(v)},MEMBERS) if method=='trace' else {}
+    if method=='trace':save(trace/'outputs-before.json',before)
     f=w.SRC/REG['path'];original=f.read_bytes()
     if invalid:f.write_bytes(original+ERROR)
     try:
@@ -74,9 +82,10 @@ def check(label,state,environment,version,method='ordinary',invalid=False):
         if invalid:f.write_bytes(original)
     source(state)
     dirty=sorted([[r['target']['name'],r['target']['kind'][0]] for r in arts if not r['fresh']])
-    expected=dirty+([['ruff_linter','lib']] if invalid else [])
+    observed=None
+    if method=='trace' or label=='kernel-buggy-cold':outputs.update(output_binding.paths(arts,watch))
     if method=='trace':
-        actual=observer.traced(trace,[name.replace('-','_') for name,kind in expected])
+        observer.traced(trace,expected=None)
         native=json.loads((trace/'native-execs.json').read_bytes())
         kernel=[]
         for tid,v in native['actual'].items():
@@ -89,7 +98,11 @@ def check(label,state,environment,version,method='ordinary',invalid=False):
             need(maps, 'live executable driver mapping was not opened by '+tid)
             save(trace/('driver-'+tid+'.json'),dict(crate=v['crate'],pid=int(tid),sha256=sha(driver),maps=maps))
             kernel.append([v['crate'],kind[1]])
-        need(sorted(kernel)==sorted(expected),('wrong per-target physical cargo roster',kernel,expected))
+        observed=sorted(kernel)
+        after=output_binding.snapshot({k:v for k,v in outputs.items() if present(v)},MEMBERS)
+        save(trace/'outputs-after.json',after)
+        missing=output_binding.reconcile(dirty,observed,before,after,invalid)
+        save(trace/'nominal-and-physical.json',dict(cargo_dirty=dirty,rustc=observed,dirty_without_rustc=missing))
     instructions=None
     if method=='pmu':
         hw=json.loads((dest/'hardware.json').read_bytes())
@@ -100,7 +113,7 @@ def check(label,state,environment,version,method='ordinary',invalid=False):
         bindings=snap(arts,version,environment,method!='pmu')
     else:bindings={}
     roster=sorted([[r['package_id'],r['target']['name'],r['target']['kind'],sorted(r['features']),r['profile']['test']]for r in arts])
-    data=dict(state=state,dirty=dirty,source=hashlib.sha256(original+(ERROR if invalid else b'')).hexdigest(),units=roster,metadata=bindings,method=method,invalid=invalid,instructions=instructions)
+    data=dict(state=state,dirty=dirty,source=hashlib.sha256(original+(ERROR if invalid else b'')).hexdigest(),units=roster,metadata=bindings,method=method,physical=observed,invalid=invalid,instructions=instructions)
     save(dest/'check.json',data)
     return data
 

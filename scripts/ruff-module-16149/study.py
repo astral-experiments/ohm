@@ -72,7 +72,7 @@ def traced(dir,expected):
         packed=f.with_suffix(f.suffix+'.gz')
         with f.open('rb')as src,gzip.open(packed,'wb',compresslevel=2)as dest:shutil.copyfileobj(src,dest)
         f.unlink()
-    need(Counter(v['crate'] for v in actual.values())==Counter(expected), ('real compiler vs Cargo dirty rows',sorted(v['crate']for v in actual.values()),sorted(expected)))
+    if expected is not None:need(Counter(v['crate'] for v in actual.values())==Counter(expected), ('real compiler vs Cargo dirty rows',sorted(v['crate']for v in actual.values()),sorted(expected)))
     save(dir/'native-execs.json',dict(rustc=sha(w.SDK/'bin/rustc'),raw_lines=raw_count,actual=actual))
     return sorted(v['crate']for v in actual.values())
 
