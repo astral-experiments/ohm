@@ -118,7 +118,13 @@ def main():
                 need(native_identity(native["edit"][k])==native_identity(native["independent-clean"][k]),("clean original native archives differ",k))
             errors=list(map(json.loads,z.file.read(role+"/invalid/stdout.jsonl").splitlines()))
             need(any((r.get("message",{}).get("code")or{}).get("code")=="E0308" for r in errors if r["reason"]=="compiler-message") and errors[-1]=={"reason":"build-finished","success":False},"absent genuine Rust diagnostic")
-            observed=observation(diag,role,z.js(role+"/tools.json")) if diag is not None else None
+            tools=z.js(role+"/tools.json")
+            if diag is not None and "separate-source.json" in diag.file.namelist():
+                need(diag.js("separate-source.json")["ordinary"]==a.sha256,"different paired ordinary reference")
+                actual=diag.js(role+"/tools.json")
+                need(all(actual[k]["sha256"]==tools[k]["sha256"] for k in ("cargo","rustc","driver")),"different physical tools across workers")
+                tools=actual
+            observed=observation(diag,role,tools) if diag is not None else None
             need(accounts["edit"]==terminal["roles"][role]["primary"],"different complete Cargo accounting")
             if diag is not None:
                 need(observed["lifetime"]==diag.js("result.json")["roles"][role]["lifetimes"],"different selected compiler accounting")
