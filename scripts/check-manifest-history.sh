@@ -9,6 +9,17 @@ fi
 base_revision="$1"
 zero_revision="0000000000000000000000000000000000000000"
 
+path_to_root="$(git rev-parse --show-cdup)"
+cd -P -- "./$path_to_root"
+
+# Git stores a symlink as its target path, which is not the manifest JSON that jq reads.
+for manifest in toolchains/*/*.json; do
+  if [[ -L toolchains || -L "${manifest%/*}" || -L "$manifest" ]]; then
+    echo "toolchain manifest path contains a symlink: $manifest" >&2
+    exit 1
+  fi
+done
+
 if [[ -z "$base_revision" || "$base_revision" == "$zero_revision" ]]; then
   echo "no previous coordinator revision; all manifests are new"
   exit 0
@@ -18,9 +29,6 @@ if ! git cat-file -e "$base_revision^{commit}" 2>/dev/null; then
   echo "base revision is not available: $base_revision" >&2
   exit 1
 fi
-
-path_to_root="$(git rev-parse --show-cdup)"
-cd -P -- "./$path_to_root"
 
 while IFS= read -r manifest; do
   case "$manifest" in
