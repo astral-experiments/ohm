@@ -59,10 +59,17 @@ def inputs():
     assert w.git('rev-parse','HEAD')==NEW and w.hf(w.work/'Cargo.lock')==LOCKED
     pkgs=tomllib.loads((w.work/'Cargo.lock').read_text())['package']
     need=('ron','serde','serde_core','serde_derive','typeid','once_cell','unicode-ident','proc-macro2','quote','syn','bitflags')
+    def locked_dependency(parent,name):
+        stanza,=(x for x in pkgs if x['name']==parent)
+        text,=(d for d in stanza['dependencies'] if d.split()[0]==name)
+        part=text.split()
+        return part[1] if len(part)==2 else None
+    versions={'syn':locked_dependency('serde_derive','syn'),'bitflags':locked_dependency('ron','bitflags')}
+    assert versions=={'syn':'3.0.6','bitflags':'2.13.2'}
     picked={}
     V.mkdir(); W.mkdir();(W/'src').mkdir();(W/'.cargo').mkdir()
     for name in need:
-        matches=[p for p in pkgs if p['name']==name and (name!='bitflags'or p['version'].startswith('2.')) and(name!='syn'or p['version'].startswith('2.'))]
+        matches=[p for p in pkgs if p['name']==name and (not versions.get(name)or p['version']==versions[name])]
         pkg,=matches;label=name+'-'+pkg['version'];out=V/(label+'.crate')
         with urllib.request.urlopen('https://static.crates.io/crates/'+name+'/'+label+'.crate',timeout=60)as uf,out.open('wb')as f:shutil.copyfileobj(uf,f)
         assert w.hf(out)==pkg['checksum']
