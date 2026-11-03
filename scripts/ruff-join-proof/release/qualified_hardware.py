@@ -6,6 +6,8 @@ sys.path[:0]=[str(HERE),str(HERE.parent.parent/'ruff-foreign-span-observer'),str
 import worker as sdk
 import bundle, counter_argv, external_prefix, locked_git
 ORIGINAL='13217478384';BOOT_PLAN='45f061e7e3fc6e082ae3505e63c2d234c7370ded4377182391602f02f8e66cce'
+READER_ONLY=os.environ.get('OHM_PRICE_READER_ONLY')=='1'
+P_NAME='pre-reader' if READER_ONLY else 'release-parent'
 ROOTS=('ruff_linter','ruff_graph','ruff_workspace','ty_python_semantic')
 def check(c,why):
     if not c:raise ValueError(why)
@@ -20,7 +22,11 @@ def admit():
     p=json.loads((HERE/'hardware-plan.json').read_bytes());plan=json.loads((HERE/'plan.json').read_bytes());ids=p['sources']
     check(git('rev-parse','HEAD')==ids['Ruff_edit']and git('rev-parse','HEAD^')==ids['Ruff_old']and sdk.hf(sdk.work/'Cargo.lock')==ids['Ruff_lock']and not git('status','--porcelain'),'Ruff source or lock')
     check(sdk.hf(HERE/'whole_count.c')==p['counter_sha256']and sdk.hf(HERE/'counter_argv.py')==p['exec_boundary_source_sha256']and sdk.hf(HERE/'external_prefix.py')=='3893ab09b216967b53727b9faea7bcebd64fe610e808ddba8297c6873368ad75' and sdk.hf(HERE/'locked_git.py')=='4bf244c9d6010e0d35ee1f3da720a47c936a0c6c3dedf62ec5b7f0cda20d87e3','counter or registry receiver')
-    check(p['argv']==plan['primary']and p['order']==list('PCCP')and all(ids[k]==bundle.SOURCES[v][0]for k,v in [('P','release-parent'),('C','release-child')]),'Cargo command/source')
+    if READER_ONLY:
+        rp=json.loads((HERE/'reader-price-plan.json').read_bytes());check(rp['original_plan_sha256']==BOOT_PLAN and rp['order']==p['order'],'different marginal registration')
+        check((rp['P'],rp['P_elf_sha256'])==bundle.SOURCES['pre-reader'] and (rp['C'],rp['C_elf_sha256'])==bundle.SOURCES['release-child'],'different marginal source')
+        p['sources']['P']=rp['P'];p['marginal']=rp
+    check(p['argv']==plan['primary']and p['order']==list('PCCP')and all(ids[k]==bundle.SOURCES[v][0]for k,v in [('P',P_NAME),('C','release-child')]),'Cargo command/source')
     return p,plan
 def rcards(archive):
     api=['gh','api','repos/astral-experiments/ohm/actions/artifacts/'+ORIGINAL+'/zip']
@@ -29,7 +35,7 @@ def rcards(archive):
     bundle.admit(archive);bodies={}
     with zipfile.ZipFile(archive)as z:
         facts=json.loads(z.read('release-factories.json'));put(out/'cargo-source.json',facts)
-        for role,n in [('P','release-parent'),('C','release-child')]:
+        for role,n in [('P',P_NAME),('C','release-child')]:
             rev,sha=bundle.SOURCES[n];r=facts[n];d=trial/('cargo-'+role)
             with z.open('cargo-'+n)as a,d.open('xb')as b:shutil.copyfileobj(a,b)
             d.chmod(0o755);check(d.stat().st_size==r['bytes']and sdk.hf(d)==sha==r['sha256']and rev==r['cargo_source']and rev in subprocess.check_output([d,'-Vv'],text=True),'unregistered Cargo')
@@ -109,7 +115,7 @@ def altered(kind,src_bytes,old,new):
 def prep():
     global trial,out,frozen,plan,bodies,env,counter,selected,state,changed,primary
     sdk.guard();frozen,plan=admit();trial=sdk.root/'fixed-extern';trial.mkdir();out=sdk.proof/'fixed-extern';out.mkdir()
-    put(out/'registration.json',{'frozen':frozen,'current':{f.name:sdk.hf(f)for f in HERE.iterdir()if f.is_file()},'archive':bundle.FULL_SHA,'external_enrollment':'At most four independently empty seeds per role, alternating P/C. Stop at first hash match of all named native/compiler products and generated files. Every seed and refusal recorded before reading any command counter. All observed output and fingerprint files stay in the private state written by the owner Cargo. The selected P/C use the identical compiler and external products throughout, with independent empty Ruff inputs; fully empty new witness remains a separate observation.','boot':Path('/proc/sys/kernel/random/boot_id').read_text().strip()})
+    put(out/'registration.json',{'frozen':frozen,'current':{f.name:sdk.hf(f)for f in HERE.iterdir()if f.is_file()},'archive':bundle.FULL_SHA,'external_enrollment':frozen['marginal']['admit']if READER_ONLY else 'At most four independently empty seeds per role, alternating P/C. Stop at first hash match of all named native/compiler products and generated files. Every seed and refusal recorded before reading any command counter. All observed output and fingerprint files stay in the private state written by the owner Cargo. The selected P/C use the identical compiler and external products throughout, with independent empty Ruff inputs; fully empty new witness remains a separate observation.','boot':Path('/proc/sys/kernel/random/boot_id').read_text().strip()})
     bodies=rcards(trial/'signed-release-ctors.zip');e=sdk.install();box=trial/'sdk';(box/'bin').mkdir(parents=True)
     for f in sdk.sdk.iterdir():
         if f.name!='bin':(box/f.name).symlink_to(f)
@@ -149,6 +155,31 @@ def enroll():
             return matches
     raise ValueError('none of the preregistered fully native external-input seeds matched; no benchmark can begin')
 
+def enrolled_conversion():
+    git('switch','--detach',frozen['sources']['Ruff_old']);check(not git('status','--porcelain'),'dirty old')
+    lock=tomllib.loads((sdk.work/'Cargo.lock').read_text());pairs={}
+    for role in ('P','C'):
+        dest=out/('bounded-seed-'+role);select(role)
+        if role=='P':fresh_state()
+        else:
+            bank,pref,products=pairs['P'];check(not state.exists()and bank.parent==trial,'wrong source prefix')
+            command(['cp','-a','--reflink=auto','--',bank,state])
+            for rel,entry in pref.fixed.items():
+                a,b=bank/rel,state/rel;one,two=a.lstat(),b.lstat()
+                check((one.st_dev,one.st_ino)!=(two.st_dev,two.st_ino)and (one.st_mode,one.st_mtime_ns)==(two.st_mode,two.st_mtime_ns),'mutable alias or changed copy attributes')
+                if entry[3]=='regular':check(sdk.hf(b)==entry[-1]and one.st_size==two.st_size,'copied external body changed')
+                else:check(os.readlink(a)==os.readlink(b)==entry[-1],'copied external symlink changed')
+        execute([*primary,'--message-format=json'],dest,trace=True)
+        pr=external_products(dest);compressed(dest/'external-products.json.gz',pr)
+        pf=external_prefix.Prefix(state,sdk.work,sdk.home,dest/'registry-prefix',lock,{'check':dest})
+        bank=trial/('converted-'+role);state.rename(bank);pairs[role]=(bank,pf,pr)
+        print('complete conversion seed',role,len(pr),h(encode(pr)),flush=True)
+    pp=pairs['P'][2];cc=pairs['C'][2];diff=sorted(k for k in pp.keys()|cc.keys()if pp.get(k)!=cc.get(k))
+    put(out/'conversion.json',dict(differences=diff,p=h(encode(pp)),c=h(encode(cc)),counts=[len(pp),len(cc)]))
+    check(len(pp)==len(cc)==1322 and not diff and pairs['P'][1].source_fixed==pairs['C'][1].source_fixed and pairs['P'][1].archives==pairs['C'][1].archives,'actual conversion no longer has identical inputs; no price')
+    put(out/'selected.json',dict(sha256=h(encode(pp)),entries=len(pp),bytes=sum(x[0]for x in pp.values()),history='fully genuine earlier Cargo then independently owned normal v4→v5 conversion'))
+    return pairs
+
 def assess(role,j,package):
     bank,pref,pr=package;label=out/f'pair-{j}-{role}';select(role);check(not state.exists(),'unexpected inherited workspace')
     bank.rename(state);pref.verify('pre-'+str(j));git('switch','--detach',frozen['sources']['Ruff_old']);check(not git('status','--porcelain'),'dirty old tree')
@@ -179,7 +210,7 @@ def assess(role,j,package):
     return {k:v['hardware']['instructions']for k,v in rows.items()if'hardware'in v},sets[0]
 
 def main():
-    prep();p=enroll();results=[];identities=[]
+    prep();p=enrolled_conversion()if READER_ONLY else enroll();results=[];identities=[]
     for j,r in enumerate(frozen['order']):
         values,identity=assess(r,j,p[r]);results.append(values);identities.append(identity)
     check(all(i==identities[0]for i in identities),'cross-role consumer public bytes differ on fixed literal externals')

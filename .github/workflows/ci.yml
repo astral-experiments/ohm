@@ -7,7 +7,7 @@ on:
         description: Diagnostic fixtures or release-profile Ruff acceptance
         type: choice
         default: fixture
-        options: [fixture, reader, release-ruff, reader-ruff, fixed-extern-hardware]
+        options: [fixture, reader, release-ruff, reader-ruff, fixed-extern-hardware, reader-delta-hardware]
       reviewed_head:
         description: Exact reviewed nonrelease QA source
         required: true
@@ -37,7 +37,7 @@ jobs:
           path: accepted-source
           sparse-checkout: scripts/ohm-apple-zmij/cargo293
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        if: inputs.lane == 'release-ruff' || inputs.lane == 'reader-ruff' || inputs.lane == 'fixed-extern-hardware'
+        if: inputs.lane == 'release-ruff' || inputs.lane == 'reader-ruff' || inputs.lane == 'fixed-extern-hardware' || inputs.lane == 'reader-delta-hardware'
         with:
           repository: astral-sh/ruff
           ref: b00f68a23cedbd3a38fc25bac63638f0f11fc3f0
@@ -54,8 +54,9 @@ jobs:
           sudo sysctl -w kernel.perf_event_paranoid=-1 || true
           python3 -IB qa/scripts/ruff-join-proof/release/ruff.py
       - name: Check historical Ruff against paired release Cargo and identical true native dependencies
-        if: inputs.lane == 'fixed-extern-hardware'
+        if: inputs.lane == 'fixed-extern-hardware' || inputs.lane == 'reader-delta-hardware'
         env:
+          OHM_PRICE_READER_ONLY: ${{ inputs.lane == 'reader-delta-hardware' && '1' || '0' }}
           OHM_SDK_READ_TOKEN: ${{ github.token }}
         run: |
           command -v strace || (sudo apt-get -qq update && sudo apt-get -qq install -y --no-install-recommends strace zstd)
