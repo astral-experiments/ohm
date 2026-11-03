@@ -63,8 +63,8 @@ def kit(label, binding):
     manifest=m.reopen(receipt/'capsule',receipt/'reopened');w.save(w.OUT/('scope-kit-'+label+'.json'),dict(run=run,head=sha,entries=binding,qualified=accepted,manifest=manifest));return manifest
 
 
-def acquire():
-    bindings=json.loads((w.HERE/'scope-factory-bindings.json').read_bytes()); kits={label:kit(label,info)for label,info in bindings.items()}
+def acquire(filename='scope-factory-bindings.json'):
+    bindings=json.loads((w.HERE/filename).read_bytes()); kits={label:kit(label,info)for label,info in bindings.items()}
     cfg={}
     for label,man in kits.items():
         for role,variant in (('P','normal'),('C','defer')):
@@ -91,10 +91,11 @@ def study(role):
 
 def fixture(role):
     roles=json.loads((w.OUT/'scope-sdks.json').read_bytes());candidate=roles[role]
-    scope_fixture.fixture(Path(candidate['sdk']),w.ROOT/('scope-fixture-'+role),w.OUT/('fixture-'+role+'.json'),candidate['driver'])
+    scope_fixture.fixture(Path(candidate['sdk']),w.ROOT/('scope-fixture-'+role),w.OUT/('fixture-'+role+'.json'),candidate['driver'], inline_adt=role.startswith('inline-'))
 
 
 if __name__=='__main__':
     if sys.argv[1:]==['acquire']:acquire()
+    elif sys.argv[1:]==['acquire-adt']:acquire('scope-adt-factory.json')
     elif len(sys.argv)==3 and sys.argv[1] in ('study','fixture'):{'study':study,'fixture':fixture}[sys.argv[1]](sys.argv[2])
     else:raise ValueError('experiment or role')

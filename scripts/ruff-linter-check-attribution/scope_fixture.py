@@ -51,7 +51,7 @@ pub fn ordinary() -> u8 { scope_origin::read(&scope_origin::small()) }
 MAIN='''fn main() { println!("{} {} {} {}", core::any::type_name::<scope_relay::Token>(), core::mem::size_of::<scope_relay::Token>(), scope_relay::observed::<u8>(), scope_relay::ordinary()); }\n'''
 
 
-def fixture(sdk, root, output, expected_driver):
+def fixture(sdk, root, output, expected_driver, *, inline_adt=False):
     need(not root.exists() and not output.exists(),'fresh fixture root and receipt')
     root.mkdir(parents=True); sdk=sdk.resolve(strict=True)
     driver,=list((sdk/'lib').glob('librustc_driver-*.so'))
@@ -133,6 +133,9 @@ def fixture(sdk, root, output, expected_driver):
     need(any('cannot be used on modules' in e for e in attr_errors),'invalid module primitive accepted')
     origin.write_text(producer());relay.write_text(RELAY);repaired=state_output('repair',{});need(all(repaired[k]==out['original']['fresh'][k]for k in ('output','executables','rustdoc_json')),'stale repair')
     result=dict(driver=expected_driver,compiler=compiler,states=out,private=codes(errors),opaque=codes(opaque),invalid_module_attribute=attr_errors,type_error=codes(errors2),repair=repaired)
+    if inline_adt:
+        from scope_adt_traits import verify
+        result['exact_size_iterator'] = verify(root, ws, state, origin, relay, producer, cargo, cmd, codes)
     output.write_text(json.dumps(result,sort_keys=True,indent=2)+'\n');print('Verified actual visibility/value/generic/reexport/rustdoc states, private+type errors and repair',flush=True)
 
 
