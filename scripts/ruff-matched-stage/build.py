@@ -15,8 +15,8 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from capsule import HOST, REG, need, reopen, save, seal, sha
 
-BRANCH = "charlie/qa-matched-check-derive-rc23-20261103"
-BASE = "3a830cdc9f00b01c7110fac3653d8cd0b305c355"
+BRANCH = "charlie/qa-frozen-literal-stage-20261103"
+BASE = "34e78f19c0d0c58c86e42d83e05a4dc6db6b0f6d"
 
 
 def git(repo, *args):
@@ -305,10 +305,18 @@ def build(workspace, root):
 
         if role == "C":
             run_make = argv[:argv.index("build")] + ["test", "--stage", "1", "-j8",
-                                                      "tests/run-make/rdr-public-hash-private-native-derive"]
+                                                      "tests/run-make/incremental-large-byte-literal"]
             run_make_log = root / "logs/run-make-C.log"
             guarded(run_make, rust, env, run_make_log, root)
             need("1 passed; 0 failed; 0 ignored" in run_make_log.read_text(), "candidate regression did not run")
+            symbol = argv[:argv.index("build")] + [
+                "test", "--stage", "1", "-j8", "compiler/rustc_span", "--test-args",
+                "symbol::tests::large_strings_keep_their_bytes_and_share_symbol_ids",
+            ]
+            symbol_log = root / "logs/symbol-C.log"
+            guarded(symbol, rust, env, symbol_log, root)
+            need("large_strings_keep_their_bytes_and_share_symbol_ids" in symbol_log.read_text()
+                 and "1 passed; 0 failed" in symbol_log.read_text(), "candidate symbol test did not run")
 
         need(
             json.loads(json.dumps(layout.checked(rust, rev, desc["tree"], substitutions))) == full,
@@ -334,6 +342,11 @@ def build(workspace, root):
     from smoke import smoke
 
     smoke(root, manifest, env)
+    from epoch_guard import check as check_epochs
+
+    compiler_roots = {role: Path(manifest["arms"][name]["root"]) for role, name in (("P","normal"),("C","defer"))}
+    save(root / "logs" / "literal-epochs.json", check_epochs(root/"literal-epochs", compiler_roots, env,
+                                                           REG["literal_controls"]["epoch"]))
     for role in ("P", "C"):
         shutil.copy2(capsule / (role + ".json"), root / "logs" / (role + ".json"))
     for name in ("rustcs.json", "storage.json"):

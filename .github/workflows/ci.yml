@@ -1,5 +1,5 @@
-name: Build matched check-mode private derive compilers
-run-name: Matched private derive compilers ${{ inputs.reviewed_head }}
+name: Build matched frozen literal compilers
+run-name: Matched frozen literal compilers ${{ inputs.reviewed_head }}
 'on':
   workflow_dispatch:
     inputs:
@@ -9,11 +9,11 @@ run-name: Matched private derive compilers ${{ inputs.reviewed_head }}
         type: string
 permissions: {}
 concurrency:
-  group: ohm-rc23-private-derive-stage1-${{ github.sha }}
+  group: ohm-rc23-frozen-literal-stage1-${{ github.sha }}
   cancel-in-progress: false
 jobs:
   matched:
-    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-matched-check-derive-rc23-20261103'
+    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-frozen-literal-stage-20261103'
       && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 355
@@ -162,7 +162,7 @@ jobs:
     - name: Retain the matched compiler capsule
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: ohm-rc23-private-derive-stage1
+        name: ohm-rc23-frozen-literal-stage1
         path: ${{ runner.temp }}/ohm-branch-object-qa/matched-stage.tar.zst
         compression-level: 0
         retention-days: 7
@@ -172,7 +172,7 @@ jobs:
       run: |-
         set -euo pipefail
         study="$RUNNER_TEMP/ohm-branch-object-qa"
-        if test -s "$study/capsule/qualified.json" && ! test -f "$study/logs/accepted.json"; then
+        if test -s "$study/capsule/P.json" && test -s "$study/capsule/C.json" && ! test -f "$study/logs/accepted.json"; then
           tar --sort=name --numeric-owner --owner=0 --group=0 --mtime=@0 -C "$study" -cf - capsule | zstd -q -T4 -5 -o "$study/diagnostic-stage.tar.zst"
           (cd "$study" && sha256sum diagnostic-stage.tar.zst > logs/diagnostic-archive.sha256)
         fi
@@ -180,7 +180,7 @@ jobs:
       if: failure()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: ohm-rc23-private-derive-failed-diagnostic
+        name: ohm-rc23-frozen-literal-failed-diagnostic
         path: ${{ runner.temp }}/ohm-branch-object-qa/diagnostic-stage.tar.zst
         compression-level: 0
         retention-days: 2
@@ -189,7 +189,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: ohm-rc23-private-derive-stage1-receipts
+        name: ohm-rc23-frozen-literal-stage1-receipts
         path: ${{ runner.temp }}/ohm-branch-object-qa/logs
         retention-days: 7
         if-no-files-found: warn

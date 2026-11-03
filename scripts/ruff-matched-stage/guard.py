@@ -1,226 +1,135 @@
-"""Run the original two-crate Cargo check against an authenticated Ohm toolchain and reopen its rmeta."""
+"""Exercise the real compiler and ordinary Cargo across literal content and allocation boundaries."""
 import argparse
-import gzip
 import hashlib
 import json
 import os
 from pathlib import Path
 import re
-import sys
-import traceback
+import shutil
+import signal
 import subprocess
 import time
 
-arg = argparse.ArgumentParser()
-arg.add_argument('--rustup-home', required=True, type=Path)
-arg.add_argument('--out', required=True, type=Path)
-arg.add_argument('--role', required=True, choices=['parent','candidate'])
-arg.add_argument('--wait-for-reserve', action='store_true')
-arg.add_argument('--compiler-sha', required=True, help='SHA-256 of librustc_driver (both SDKs may identify as the same Rust commit).')
-a = arg.parse_args()
-out=a.out.resolve()
-out.mkdir(exist_ok=False,parents=True)
-w=out/'workspace'
-(w/'dep/src').mkdir(parents=True)
-(w/'app/src').mkdir(parents=True)
-(w/'Cargo.toml').write_text('[workspace]\nmembers = ["dep", "app"]\nresolver = "3"\n')
-(w/'dep/Cargo.toml').write_text('[package]\nname="dep"\nversion="0.0.0"\nedition="2024"\n')
-(w/'app/Cargo.toml').write_text('[package]\nname="app"\nversion="0.0.0"\nedition="2024"\n[dependencies]\ndep={path="../dep"}\n')
-(w/'Cargo.lock').write_text('version = 4\n\n[[package]]\nname = "app"\nversion = "0.0.0"\ndependencies = ["dep"]\n\n[[package]]\nname = "dep"\nversion = "0.0.0"\n')
-(w/'app/src/main.rs').write_text('fn needs_send<T: Send>(_: T) {}\nfn main() { needs_send(dep::observed!()); }\n')
-hidden = '''pub(super) fn classify(value: u8) -> bool { value == 0 }
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(super) enum Hidden { Value(u8) }
-'''
-moved = hidden.replace('value == 0 }\n','value == 1 }\n\n')
-interface='''#![allow(dead_code)]
-mod hidden;
-pub fn visible() -> impl std::fmt::Debug { 7u8 }
-#[macro_export]
-macro_rules! observed { () => { $crate::visible() }; }
-'''
-generated=interface+'''macro_rules! produce { () => {
-    #[macro_export] macro_rules! generated { () => { 7u8 }; }
-} }
-produce!();
-'''
-opaque=interface.replace('{ 7u8 }','{ hidden::Hidden::Value(Default::default()) }',1)
-env={**os.environ,'RUSTUP_HOME':str(a.rustup_home.resolve()),'CARGO_HOME':str(out/'cargo-home')}
-assert not any(env.get(k) for k in ('RUSTFLAGS','CARGO_ENCODED_RUSTFLAGS','RUSTC','RUSTC_WRAPPER','RUSTC_WORKSPACE_WRAPPER','CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST','CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST'))
-def invoke(argv,quiet=True):
-    return subprocess.run(argv,cwd=w,env=env,capture_output=quiet)
-def sha(p):
-    with p.open('rb') as src: return hashlib.file_digest(src,'sha256').hexdigest()
-rustc=Path(invoke(['rustup','which','--toolchain','ohm','rustc']).stdout.decode().strip()).resolve()
-driver,=list((rustc.parent.parent/'lib').glob('librustc_driver-*.so'))
-assert sha(driver)==a.compiler_sha
-def guard():
-    mem=int(re.search(r'^MemAvailable:\s*(\d+)',Path('/proc/meminfo').read_text(),re.M)[1])*1024
-    while a.wait_for_reserve and mem < (8<<30)+(256<<20):
-        time.sleep(10)
-        mem=int(re.search(r'^MemAvailable:\s*(\d+)',Path('/proc/meminfo').read_text(),re.M)[1])*1024
-    assert mem >= (8<<30)+(256<<20),f'host reserve: {mem} available; no compilation started'
-    st=os.statvfs(out)
-    assert st.f_bavail*st.f_frsize>=15<<30
-def save(p, value):
-    p.write_text(json.dumps(value, sort_keys=True, indent=2) + '\n')
+parser = argparse.ArgumentParser()
+parser.add_argument("--rustup-home", type=Path, required=True)
+parser.add_argument("--out", type=Path, required=True)
+parser.add_argument("--role", choices=["parent", "candidate"], required=True)
+parser.add_argument("--compiler-sha", required=True)
+parser.add_argument("--wait-for-reserve", action="store_true")
+args = parser.parse_args()
+here = Path(__file__).resolve().parent
+out = args.out.resolve()
+out.mkdir(parents=True, exist_ok=False)
+workspace = out / "workspace"
+base = {k: v for k, v in os.environ.items() if not k.startswith(("CARGO_", "RUST", "LD_PRELOAD"))}
+base.update(RUSTUP_HOME=str(args.rustup_home.resolve()), CARGO_HOME=str(out / "cargo-home"), CARGO_NET_OFFLINE="true")
+driver, = (args.rustup_home / "toolchains/ohm/lib").glob("librustc_driver-*.so")
+def sha(path):
+    with path.open("rb") as f:
+        return hashlib.file_digest(f, "sha256").hexdigest()
+def save(path, obj):
+    path.write_text(json.dumps(obj, sort_keys=True, indent=2) + "\n")
+def need(test, message):
+    if not test:
+        raise ValueError(message)
+need(sha(driver) == args.compiler_sha, "incorrect registered compiler")
+registration = json.loads((here / "registration.json").read_bytes())
+for name, expected in registration["literal_controls"]["fixture"].items():
+    clean = here / "literal-fixture" / name
+    raw = clean.read_bytes()
+    oid = hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest()
+    rust_path = "tests/run-make/incremental-large-byte-literal/" + name
+    need(sha(clean) == expected and registration["changed_sources"][rust_path]["C"] == oid, "unregistered fixture source")
 
-
-active_phase = out
-def retain_failure(ty, value, tb):
-    save(active_phase/'failure.json', {'type': ty.__name__, 'message': str(value),
-                                      'traceback': traceback.format_exception(ty, value, tb)})
-    sys.__excepthook__(ty, value, tb)
-sys.excepthook = retain_failure
-
-
-def stamp(path):
-    st=path.stat()
-    return {'path':str(path.resolve()), 'dev':st.st_dev, 'ino':st.st_ino, 'size':st.st_size,
-            'mtime_ns':st.st_mtime_ns, 'ctime_ns':st.st_ctime_ns, 'nlink':st.st_nlink}
-
-
-def output_snapshot(directory, paths):
-    directory.mkdir()
-    result={}
-    for name, outputs in paths.items():
-        result[name]={}
-        for kind, path in outputs.items():
-            if not path.exists():
-                result[name][kind]={'path':str(path),'missing':True}
-                continue
-            first=stamp(path); data=path.read_bytes()
-            assert first==stamp(path) and len(data)==first['size'], ('unstable output', path)
-            (directory/(name+'.'+kind)).write_bytes(data)
-            result[name][kind]={**first,'sha256':hashlib.sha256(data).hexdigest()}
-    save(directory/'outputs.json',result)
-    return result
-
-
-def owners(directory):
-    decoder=json.JSONDecoder()
-    result={'rustc':dict(stamp(rustc),sha256=sha(rustc)), 'driver':dict(stamp(driver),sha256=sha(driver)),
-            'compiles':[], 'other_rustc_execs':[], 'streams':{}}
-    for raw in sorted(directory.glob('exec.*')):
-        pid=int(raw.name.split('.')[-1])
-        data=raw.read_bytes(); lines=data.decode().splitlines()
-        result['streams'][str(pid)]=hashlib.sha256(data).hexdigest()
-        for line in lines:
-            if not line.startswith('execve(') or not line.endswith(' = 0'): continue
-            image,n=decoder.raw_decode(line[len('execve('):])
-            rest=line[len('execve(')+n:].lstrip(', ')
-            argv,_=decoder.raw_decode(rest)
-            if Path(image).name!='rustc' and '--crate-name' not in argv: continue
-            actual=Path(image).samefile(rustc)
-            entry={'pid':pid,'program':image,'argv':argv,'physical_rustc':actual}
-            if not actual:
-                assert Path(image).samefile(rustup_proxy), ('unknown rustc/proxy',entry)
-            if not actual or '--crate-name' not in argv or any(v=='--print' or v.startswith('--print=') for v in argv):
-                result['other_rustc_execs'].append(entry)
-                continue
-            crate=argv[argv.index('--crate-name')+1]
-            assert crate in ('app','dep') and '--emit=dep-info,metadata' in argv, ('unexpected physical compiler',entry)
-            assert argv[argv.index('--crate-type')+1]=={'app':'bin','dep':'lib'}[crate]
-            maps=[ln for ln in lines if ln.startswith('mmap(') and 'PROT_EXEC' in ln and
-                  '<'+str(driver.resolve())+'>' in ln and re.search(r' = 0x[0-9a-f]+$',ln)]
-            assert maps, ('missing actual executable driver mapping',pid,crate)
-            result['compiles'].append(dict(entry,crate=crate,executable_driver_maps=maps))
-        (directory/(raw.name+'.gz')).write_bytes(gzip.compress(data,compresslevel=1,mtime=0))
-        raw.unlink()
-    return result
-
-
-rustup_proxy=Path(invoke(['which','rustup']).stdout.decode().strip()).resolve(strict=True)
-known_outputs={}
-def phase(label,mode,src,success=True,clean=False,traced=False):
-    global active_phase
-    d=out/label;d.mkdir();active_phase=d
-    guard()
-    interface_path=w/'dep/src/lib.rs'; hidden_path=w/'dep/src/hidden.rs'
-    def replace(p,value):
-        if not p.exists() or p.read_text()!=value: p.write_text(value)
-    replace(interface_path,mode);replace(hidden_path,src)
-    target=str(out/('kernel' if traced else 'clean' if clean else 'ordinary'))
-    env.update(CARGO_BUILD_BUILD_DIR=target+'-build',CARGO_TARGET_DIR=target+'-target')
-    cmd=['cargo','+ohm','check','-p','app','--locked','--offline','-j1','--message-format=json']
-    argv=cmd
-    if traced:
-        trace=d/'trace';trace.mkdir()
-        argv=['/usr/bin/strace','-ff','-qq','-yy','-s','131072','-e','trace=execve,mmap','-o',str(trace/'exec'),*cmd]
-    paths=known_outputs.setdefault(target,{})
-    before=output_snapshot(d/'before',paths)
-    save(d/'invocation.json',{'argv':argv,'cargo':cmd,'expected_success':success,'target':target+'-target',
-                               'build':target+'-build','sources':{'lib.rs':sha(interface_path),'hidden.rs':sha(hidden_path)}})
-    run=invoke(argv);(d/'stdout').write_bytes(run.stdout);(d/'stderr').write_bytes(run.stderr)
-    save(d/'exit.json',{'returncode':run.returncode})
-    rows=[json.loads(s)for s in run.stdout.splitlines()]
-    assert rows[-1]=={'reason':'build-finished','success':success},(run.returncode,run.stderr)
-    assert run.returncode==(0 if success else 101)
-    artifacts=[r for r in rows if r['reason']=='compiler-artifact']
-    dirty=[r['target']['name'] for r in artifacts if not r['fresh']]
-    for artifact in artifacts:
-        name=artifact['target']['name']
-        assert name in ('app','dep')
-        meta,=[Path(s) for s in artifact['filenames'] if s.endswith('.rmeta')]
-        depinfo=meta.with_name(meta.name.removeprefix('lib')).with_suffix('.d')
-        assert meta.is_file() and depinfo.is_file(), ('missing physical compiler output',meta,depinfo)
-        paths[name]={'rmeta':meta,'d':depinfo}
-    after=output_snapshot(d/'after',paths)
-    kernel=None
-    if traced:
-        kernel=owners(trace)
-        save(d/'kernel.json',kernel)
-    meta=paths['dep']['rmeta']
-    status=invoke(['rustc','+ohm',str(meta),'-Zls=public_hash']);status.check_returncode()
-    fingerprint=status.stdout.decode().strip()
-    assert re.fullmatch(r'[a-f0-9]{16,64}',fingerprint.split()[-1]),fingerprint
-    errors=[r['message']for r in rows if r['reason']=='compiler-message' and r['message']['level']=='error']
-    if not success:
-        assert len(errors)==1 and errors[0]['code']['code']=='E0277' and 'Send' in errors[0]['rendered']
-        assert any(r['package_id'].endswith('/app#0.0.0') or 'app' in r['package_id'] for r in rows if r['reason']=='compiler-message' and r['message']['level']=='error')
-    result={'argv':cmd,'returncode':run.returncode,'dirty':dirty,'provider_public':fingerprint,
-            'provider_rmeta':sha(meta),'sources':{'lib.rs':sha(interface_path),'hidden.rs':sha(hidden_path)},
-            'before':before,'after':after,'kernel':None if kernel is None else sorted(v['crate'] for v in kernel['compiles']),
-            'errors':[m['code']['code']for m in errors]}
-    save(d/'readback.json',result)
-    return result
-book={}
-def get(label,*args,**kw):
-    book[label]=phase(label,*args,**kw);return book[label]
-old=get('private-old',interface,hidden)
-assert old['dirty']==['dep','app']
-assert not get('private-old-unchanged',interface,hidden)['dirty']
-edit=get('private-edit',interface,moved)
-assert not get('private-edit-unchanged',interface,moved)['dirty']
-repair=get('private-repair',interface,hidden)
-assert repair['provider_public']==old['provider_public']
-allow=a.role=='candidate'
-assert (old['provider_public']==edit['provider_public'])==allow
-gen=get('generated-old',generated,hidden)
-gen_move=get('generated-edit',generated,moved)
-assert gen['provider_public']!=gen_move['provider_public'] and gen_move['dirty']==['dep','app']
-good=get('opaque-old',opaque,moved)
-fail=get('opaque-raw-pointer',opaque,moved.replace('Value(u8)','Value(*const u8)'),False)
-assert good['provider_public']!=fail['provider_public']
-fix=get('opaque-repair',opaque,moved)
-assert fix['provider_public']==good['provider_public'] and not get('opaque-repair-unchanged',opaque,moved)['dirty']
-empty=get('empty-private-edit',interface,moved,clean=True)
-assert empty['provider_public']==edit['provider_public']
-kernel={}
-for name,old_phase,body in [('old','private-old',hidden),('unchanged','private-old-unchanged',hidden),('edit','private-edit',moved)]:
-    observed=phase('kernel-'+name,interface,body,traced=True)
-    original=book[old_phase]
-    assert all(observed[k]==original[k] for k in ('returncode','provider_public','errors','sources','dirty')), ('observer changed ordinary verdict, header or Cargo roster',name)
-    kernel[name]=observed
-assert set(kernel['old']['after'])==set(kernel['unchanged']['after'])==set(kernel['edit']['after'])=={'dep','app'}
-assert kernel['old']['kernel']==['app','dep'] and kernel['unchanged']['kernel']==[], 'cold or unchanged physical compiler roster'
-assert kernel['unchanged']['before']==kernel['old']['after'] and kernel['unchanged']['after']==kernel['edit']['before'], 'physical history changed between Cargo commands'
-assert kernel['unchanged']['after']==kernel['unchanged']['before'], 'unchanged Cargo rewrote physical outputs'
-assert kernel['edit']['kernel']==(['dep'] if allow else ['app','dep']), ('actual edited compiler roster',kernel['edit']['kernel'],edit['dirty'])
-assert sorted(edit['dirty']) in ([['dep'],['app','dep']] if allow else [['app','dep']]), ('unexpected typed roster',edit['dirty'])
-if allow:
-    for kind in ('rmeta','d'):
-        assert kernel['edit']['after']['app'][kind]['sha256']==kernel['edit']['before']['app'][kind]['sha256'], ('ungenerated consumer output content changed',kind)
-fact={'role':a.role,'rustc':invoke(['rustc','+ohm','-vV']).stdout.decode(),'driver':str(driver),'driver_sha256':a.compiler_sha,'phases':book,'kernel':kernel}
-(out/'accepted.json').write_text(json.dumps(fact,indent=2)+'\n')
-print(json.dumps({k:(v['dirty'],v['errors'],v['provider_public'])for k,v in book.items()},indent=2))
+def available():
+    return int(re.search(r"^MemAvailable:\s*(\d+)", Path("/proc/meminfo").read_text(), re.M)[1]) * 1024
+def cmd(argv, cwd, env, destination, code=0):
+    if args.wait_for_reserve:
+        while available() < (8 << 30) + (300 << 20):
+            time.sleep(3)
+        need(shutil.disk_usage(out).free >= (15 << 30) + (128 << 20), "disk admission")
+    destination.mkdir(exist_ok=False)
+    with (destination / "stdout").open("wb") as stdout, (destination / "stderr").open("wb") as stderr:
+        child = subprocess.Popen(argv, cwd=cwd, env=env, stdout=stdout, stderr=stderr, start_new_session=True)
+        while child.poll() is None:
+            if args.wait_for_reserve and available() < (8 << 30):
+                os.killpg(child.pid, signal.SIGKILL)
+                child.wait()
+                save(destination / "refused.json", {"argv":argv,"reason":"shared host RAM reserve"})
+                raise RuntimeError("shared host RAM reserve")
+            time.sleep(.025 if args.wait_for_reserve else .08)
+    save(destination / "command.json", {"argv":argv,"cwd":str(cwd),"exit":child.returncode})
+    need(child.returncode == code, (argv, child.returncode, (destination / "stderr").read_text()[-1500:]))
+    return (destination / "stdout").read_bytes()
+def write(path, text):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text)
+write(workspace / "Cargo.toml", '[workspace]\nmembers=["producer","app"]\nresolver="3"\n')
+write(workspace / "producer/Cargo.toml", '[package]\nname="producer"\nversion="0.0.0"\nedition="2024"\n')
+write(workspace / "app/Cargo.toml", '[package]\nname="literal_app"\nversion="0.0.0"\nedition="2024"\n[dependencies]\nproducer={path="../producer"}\n')
+for package, source in [("producer","lib.rs"),("app","main.rs")]:
+    p = workspace / package / "src" / source
+    p.parent.mkdir()
+    shutil.copyfile(here / "literal-fixture" / source, p)
+asset = workspace / "producer/src/asset"
+def set_asset(length, flag):
+    data = bytearray(b"a" * length)
+    data[length//2] = flag
+    asset.write_bytes(data)
+def env(history, incremental):
+    return base | {"CARGO_TARGET_DIR":str(out / (history + "-target")), "CARGO_BUILD_BUILD_DIR":str(out / (history + "-build")), "CARGO_INCREMENTAL":str(int(incremental))}
+cmd(["rustc","+ohm","-vV"],workspace,base,out/"version")
+cmd(["cargo","+ohm","generate-lockfile","--offline"],workspace,env("warm",True),out/"lock")
+records = {}
+def run(name, history, length, flag, incremental=True, invalid=False, change=True):
+    scope = out/name
+    if change:
+        set_asset(length,flag)
+    need(asset.stat().st_size == length and asset.read_bytes()[length//2] == flag, "wrong source bytes")
+    before = sha(asset)
+    e = env(history,incremental)
+    argv = ["cargo","+ohm","build","-p","literal_app","--locked","--offline","-j1","--message-format=json"]
+    raw = cmd(argv,workspace,e,scope,101 if invalid else 0)
+    rows = [json.loads(line) for line in raw.splitlines()]
+    need(rows[-1] == {"reason":"build-finished","success":not invalid}, (name, "incomplete Cargo rows"))
+    errs = [m["message"] for m in rows if m["reason"] == "compiler-message" and m["message"]["level"] == "error"]
+    dirty = [m["target"]["name"] for m in rows if m["reason"]=="compiler-artifact" and not m["fresh"]]
+    typed = [e["code"]["code"] for e in errs if e.get("code")]
+    fact = {"asset_bytes":length,"sha256":before,"middle":flag,"incremental":incremental,"compiler_artifacts_dirty":dirty,"errors":typed,"history":history}
+    if invalid:
+        need("E0080" in typed and all(c=="E0080" for c in typed), (name,typed))
+    else:
+        need(not errs, (name,errs))
+        binary, = [Path(m["executable"]) for m in rows if m["reason"]=="compiler-artifact" and m.get("executable") and m["target"]["name"]=="literal_app"]
+        need(binary.resolve().is_relative_to(out), ("unexpected executable",binary))
+        result = cmd([str(binary)],workspace,e,out/(name+"-native"))
+        expected = f"{flag} {19 if flag==97 else 83} 0\n".encode()
+        need(result == expected, (name,result,expected))
+        fact.update(stdout=result.decode(),elf_sha256=sha(binary))
+    need(sha(asset)==before, "compiler modified the source asset")
+    records[name]=fact
+    save(scope/"verdict.json",fact)
+for n in [65535,65536,65537]:
+    run("old-"+str(n),"warm",n,97)
+run("unchanged","warm",65537,97,change=False)
+run("middle-edit","warm",65537,98)
+run("clean-edit","empty",65537,98)
+run("uninitialized","warm",65537,33,invalid=True)
+run("repair","warm",65537,97)
+run("small-nonincremental","small",31,97,incremental=False)
+run("large-nonincremental","large",65537,98,incremental=False)
+need(records["middle-edit"]["stdout"]==records["clean-edit"]["stdout"] and records["repair"]["stdout"]==records["old-65537"]["stdout"],"independent reconstruction")
+# This nonincremental unit resolves thousands of different small literal addresses from CTFE.
+small = out / "common-lookups"
+small.mkdir()
+pieces = ["asset-%04x" % n for n in range(2048)]
+small_src = small / "lookup.rs"
+small_src.write_text("const A: &[&[u8]] = &[" + ",".join('b"' + word + '"' for word in pieces) + "];\n"
+    "const fn sum()->u32 {let mut i=0;let mut n=0;while i<A.len(){n+=A[i][9]as u32;i+=1;}n}\n"
+    "pub const SUM:u32=sum(); fn main(){println!(\"{}\",SUM);}")
+cmd(["rustc","+ohm",str(small_src),"-o",str(small/"case")],small,base,out/"common-compile")
+require_sum = sum(ord(p[-1]) for p in pieces)
+expected_small = str(require_sum).encode() + b"\n"
+need(cmd([str(small/"case")],small,base,out/"common-native")==expected_small,"small allocation lookup")
+save(out/"accepted.json",{"common_lookup":{"literal_count":len(pieces),"source_sha256":sha(small_src),"result":expected_small.decode()},"schema":"ohm-frozen-literal-ordinary-v1","role":args.role,"driver_sha256":args.compiler_sha,
+    "source_files":{s:sha(here/"literal-fixture"/s) for s in ("main.rs","lib.rs")},"cases":records})
