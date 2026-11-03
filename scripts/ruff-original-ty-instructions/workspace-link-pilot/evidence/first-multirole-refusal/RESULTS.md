@@ -11,3 +11,13 @@ The producer correction ignores the native private staging name only until the a
     python3 -IB verify.py /path/to/bounded-real-workspace-links-41732263858.zip | cmp - original.json
 
 [First original](https://github.com/astral-experiments/ohm/actions/runs/41732263858) · [Corrected -23 study](https://github.com/astral-experiments/ohm/actions/runs/41737649726) · [Separate -24 study](https://github.com/astral-experiments/ohm/actions/runs/41737656295)
+
+## Signed command work by actual process image
+
+The independent exec recording charged 59,100,330,955 instructions to the 48 eligible native roles on unchanged, against 80,018,842,003 whole. All 50 Wild execs together with their matching fork-inherited workers retired 62,154,680,913. The whole inherited counter exceeded the sum of disjoint image epochs by 4,614,736,619; those instructions remain unassigned.
+
+The forward-edit trace charged the same 48 roles 59,503,762,649 instructions out of 288,244,938,474 whole. All 57 Wild execs and their fork-inherited workers consumed 85,174,933,692. This trace left 1,365,380,230 outside the sum of image epochs. Even attributing the entire difference to those 48 native roles, the edited command cannot be halved by that intervention on this worker.
+
+The genuine lib-test compiler for ty_ide retired 60.416B and its library compiler 24.303B; their typed rustc argv contained the actual crate name and distinct test mode. Together they account for 29.4% of this observed edit, excluding the native linker processes. The next five were ty_server lib (19.654B), file_watching test (15.712B), ty_project test (13.575B), ty_project lib (12.347B) and e2e test (12.302B). The typed-compiler costs include all its observed threads and are disjoint from the GNU and Wild process domains.
+
+    python3 -IB ../../component_epochs.py ORIGINAL.zip d3e60812994bc68b823804060515b78fb041eb95f4ca9308fb70b9754b950ecc P-exec-warm P-exec-edit | cmp - <(gzip -dc component-counts.json.gz)
