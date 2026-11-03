@@ -9,8 +9,8 @@ def build_matched(sdk,environment,root,run):
     assert git('rev-parse','HEAD')==plan['diagnostic_child'] and sdk.hf(extra)==plan['bundle']
     git('fetch',str(extra),'HEAD:refs/qa/ci-correct-test')
     assert git('rev-parse',plan['child']+'^{tree}')==plan['tree']
-    delta=subprocess.check_output(['git','-C',root,'diff','--unified=0',plan['diagnostic_child'],plan['child']])
-    assert hashlib.sha256(delta).hexdigest()==plan['test_only_patch'] and git('merge-base',plan['diagnostic_child'],plan['child'])==plan['diagnostic_child']
+    delta=subprocess.check_output(['git','-C',root,'diff-tree','--no-commit-id','--raw','--no-abbrev','--no-renames','-r','-z',plan['diagnostic_child'],plan['child']])
+    assert hashlib.sha256(delta).hexdigest()==plan['test_only_delta_tree'] and git('merge-base',plan['diagnostic_child'],plan['child'])==plan['diagnostic_child']
     env={**environment,'CARGO_PROFILE_RELEASE_DEBUG':'0','CARGO_PROFILE_RELEASE_CODEGEN_UNITS':'1','CARGO_PROFILE_RELEASE_LTO':'thin','CARGO_INCREMENTAL':'0','CFG_RELEASE_CHANNEL':'dev'}
     argv=['cargo','+ohm','-Zohm-defaults=no','build','--locked','--release','-p','cargo','--bin','cargo','--features','ohm-defaults,all-static','-j8','--message-format=json-render-diagnostics']
     bodies={'signed':sdk.sdk/'bin/cargo'};receipts={}
