@@ -85,6 +85,18 @@ fi
 
 verify_sources=("$script_dir/verify-release-sources.sh" "$release_manifest" "$rust_checkout"
   "$cargo_checkout" "$clippy_checkout" "$rustfmt_checkout")
+pinned_tree="$(git -C "$cargo_checkout" rev-parse 'HEAD^{tree}')"
+printf 'replaced Cargo source\n' >> "$cargo_checkout/README.md"
+git -C "$cargo_checkout" add README.md
+replacement_tree="$(git -C "$cargo_checkout" write-tree)"
+git -C "$cargo_checkout" replace "$pinned_tree" "$replacement_tree"
+if "${verify_sources[@]}" >/dev/null 2>&1; then
+  echo 'source verification accepted a replacement tree' >&2
+  exit 1
+fi
+git -C "$cargo_checkout" replace -d "$pinned_tree" >/dev/null
+git -C "$cargo_checkout" restore --staged --worktree README.md
+
 for flag in assume-unchanged skip-worktree; do
   git -C "$cargo_checkout" update-index "--$flag" README.md
   flagged_entry="$(git -C "$cargo_checkout" ls-files -v -- README.md)"

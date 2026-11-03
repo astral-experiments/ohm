@@ -85,6 +85,12 @@ expect_history_failure 'a published revision change from a subdirectory' "$test_
 ln -s toolchains/1.97.1 "$test_root/nested"
 expect_history_failure 'a published revision change from a symlinked subdirectory' "$test_root/nested"
 
+published_blob="$(git -C "$test_root" rev-parse "$base_revision:$manifest_path")"
+changed_blob="$(git -C "$test_root" hash-object -w -- "$manifest")"
+git -C "$test_root" replace "$published_blob" "$changed_blob"
+expect_history_failure 'a published change hidden by a replacement object'
+git -C "$test_root" replace -d "$published_blob" >/dev/null
+
 git -C "$test_root" show "$base_revision:$manifest_path" > "$manifest"
 check_history
 

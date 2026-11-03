@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# Release revisions name the original objects, even in checkouts with replacement refs.
+export GIT_NO_REPLACE_OBJECTS=1
 unset CDPATH
 
 if [[ $# -ne 5 ]]; then
