@@ -2,6 +2,7 @@
 import hashlib,json,os,shutil,subprocess as sp,sys
 from pathlib import Path
 HERE=Path(__file__).resolve().parent;B=HERE.parent/"owner-buckets";sys.path.insert(0,str(B))
+from member_names import read_names, native_identity
 import pilot as old
 from kit import acquire
 sys.path.insert(0,str(HERE.parent/"source-pcs/verified-29697"))
@@ -71,7 +72,11 @@ def snapshot(gen,rows,td):
         for key in FOCUS:
             library=libs[key]["rlib"];counts=ar(library)
             names=sp.check_output(["ar","t",library]).decode().splitlines()
-            members[key]={"names":names,"native_content":sorted((sha,size,n)for (sha,size),n in counts.items())}
+            join=read_names(library,key)
+            need(names==[v[0]for v in join["metadata"]]+[v[0]for v in join["members"]],"literal archive names")
+            if key=="ty_ide":
+                need({v[2]+".o":(v[3],v[4])for v in join["members"]}=={n:(b["sha256"],b["bytes"])for n,b in o.items()},"named native objects differ from physical ty_ide session")
+            members[key]={"names":names,"native_content":sorted((sha,size,n)for (sha,size),n in counts.items()),"bijection":join}
     put(td/"native.json",{"session":str(base),"objects":o,"indices":idx,"outputs":hashed,"members":members});return o
 def main():
     need(os.environ["GITHUB_SHA"]==os.environ["REVIEWED_HEAD"] and os.environ["GITHUB_RUN_ATTEMPT"]=="1"and os.environ["GITHUB_REF_NAME"]=="charlie/qa-ruff-ty-ide-lib-29697-20261103","unregistered hosted target")
@@ -127,7 +132,9 @@ def main():
             confirmed=old.classifier(ob,oa);put(hist/"observed-retention.json",confirmed);co,_=phase("observed-unchanged",old.new,"trace");need(not co["dirty"] and not co["observed"]["real_execs"],"physical unchanged work")
             old.remove_outputs();fresh,fo=phase("independent-clean",old.new,snap=True,native=True)
             need(len(fresh["dirty"])==len(roster) and ae.keys()==fo.keys() and all(ae[n]["sha256"]==fo[n]["sha256"]for n in ae),"fresh physical standalone native output")
-            need(json.loads((hist/"edit/native.json").read_bytes())["members"]==json.loads((hist/"independent-clean/native.json").read_bytes())["members"],"actual native producer or consumer rlib members differ from independent empty")
+            warm=json.loads((hist/"edit/native.json").read_bytes())["members"];empty=json.loads((hist/"independent-clean/native.json").read_bytes())["members"]
+            for crate in sorted(FOCUS):
+                need(warm[crate]["native_content"]==empty[crate]["native_content"] and native_identity(warm[crate]["bijection"])==native_identity(empty[crate]["bijection"]),"actual named native members, link records, symbol maps or order differ from empty")
             need(updated["oracle"]["elf"]==repair["oracle"]["elf"]==fresh["oracle"]["elf"] and initial["oracle"]["elf"]!=updated["oracle"]["elf"],"complete standalone client differs from empty or repair")
             report={"role":role,"primary":updated["instructions"],"cold":initial["instructions"],"noop":noop["instructions"],"old":initial["oracle"]["elf"],"new":updated["oracle"]["elf"],"retained":len(contact["retained"]),"objects":len(ae),"units":len(roster),"same_observed_retention":contact==confirmed,"observed":oc["observed"]};put(hist/"qualified.json",report);records.append(report)
         finally:w.sdk.rename(roots[role])
