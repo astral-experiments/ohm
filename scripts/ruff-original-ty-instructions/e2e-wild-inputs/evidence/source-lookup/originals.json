@@ -1,0 +1,295 @@
+{
+  "final_verified_sha256": "479db1633bf67e8d14a54a22ae66aececca99714137fd59f31072143201e1b41",
+  "first_attempt_metadata_only_counterexample": [
+    {
+      "link": {
+        "elf": {
+          "bytes": 227979336,
+          "sha256": "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563"
+        },
+        "inputs": {
+          "/home/runner/work/_temp/ohm-foreign-join/target/debug/build/workspaces/f44635c822fcb5f3/v2-fbb2b684ab7d4930/ty_server/f5c6198f896cf7b0/out/rustcjxrUea/raw-dylibs/libutil.a": "29e79ae9e1294b485e0c5e2a1f394e235ef08a9522b742a3d3b34df969943aff",
+          "/home/runner/work/_temp/ohm-foreign-join/target/debug/build/workspaces/f44635c822fcb5f3/v2-fbb2b684ab7d4930/ty_server/f5c6198f896cf7b0/out/rustcjxrUea/symbols.o": "686f6a2749ab0d980e5627e5568850d2a8d8e79e480d6d62499241056036873d"
+        },
+        "returncode": 0
+      },
+      "nested": 7,
+      "rows": 409,
+      "sha": "89267a73a52fa94e68aa39a5d7ce12e6f518f386feed350bbfbd7e9b53a43659",
+      "unscoped": 82
+    },
+    {
+      "link": {
+        "elf": {
+          "bytes": 227979400,
+          "sha256": "8c579fff30074179355f18b92e83ef24ba7649894dfd6b456f11fe306873eeb6"
+        },
+        "inputs": {
+          "/home/runner/work/_temp/ohm-foreign-join/target/debug/build/workspaces/f44635c822fcb5f3/v2-fbb2b684ab7d4930/ty_server/f5c6198f896cf7b0/out/rustcjxrUea/raw-dylibs/libutil.a": "29e79ae9e1294b485e0c5e2a1f394e235ef08a9522b742a3d3b34df969943aff",
+          "/home/runner/work/_temp/ohm-foreign-join/target/debug/build/workspaces/f44635c822fcb5f3/v2-fbb2b684ab7d4930/ty_server/f5c6198f896cf7b0/out/rustcjxrUea/symbols.o": "734ae1ea4dfc14a6309dc5aef312030b6d924cdb3612428b457bf952bbd7d86b"
+        },
+        "returncode": 0
+      },
+      "nested": 7,
+      "rows": 409,
+      "sha": "89267a73a52fa94e68aa39a5d7ce12e6f518f386feed350bbfbd7e9b53a43659",
+      "unscoped": 82
+    }
+  ],
+  "first_attempt_semantic_cut": {
+    "src-four-byte": {
+      "all_kernel_and_source_enoent": 83,
+      "all_nested_kernel_sequences_match": true,
+      "explicit_root_requests_observed": 0,
+      "failed_descriptor_open": [],
+      "nested_requests": {
+        "/usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libc.so": [
+          [
+            "File",
+            "/lib/x86_64-linux-gnu/libc.so.6"
+          ],
+          [
+            "File",
+            "/usr/lib/x86_64-linux-gnu/libc_nonshared.a"
+          ],
+          [
+            "File",
+            "/lib64/ld-linux-x86-64.so.2"
+          ]
+        ],
+        "/usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libm.so": [
+          [
+            "File",
+            "/lib/x86_64-linux-gnu/libm.so.6"
+          ],
+          [
+            "File",
+            "/lib/x86_64-linux-gnu/libmvec.so.1"
+          ]
+        ],
+        "/usr/lib/gcc/x86_64-linux-gnu/13/libgcc_s.so": [
+          [
+            "File",
+            "libgcc_s.so.1"
+          ],
+          [
+            "Lib",
+            "gcc"
+          ]
+        ]
+      },
+      "of_which_output_probe": 1,
+      "probes_raw": 97,
+      "source_input_headers": 409,
+      "typed_context_absent_probes": 82
+    },
+    "src-malformed": {
+      "all_kernel_and_source_enoent": 138,
+      "all_nested_kernel_sequences_match": true,
+      "explicit_root_requests_observed": 0,
+      "failed_descriptor_open": [
+        [
+          "/home/runner/work/ohm/ohm/ruff/PROVIDER",
+          2
+        ],
+        [
+          "/home/runner/work/ohm/ohm/ruff/NATIVE",
+          2
+        ],
+        [
+          "/home/runner/work/ohm/ohm/ruff/MALFORMED",
+          2
+        ],
+        [
+          "/home/runner/work/ohm/ohm/ruff/DELIBERATELY",
+          2
+        ]
+      ],
+      "nested_requests": {
+        "/home/runner/work/_temp/ohm-foreign-join/target/debug/build/workspaces/f44635c822fcb5f3/v2-fbb2b684ab7d4930/ty_server/f5c6198f896cf7b0/out/rustcjxrUea/raw-dylibs/libutil.a": [
+          [
+            "File",
+            "DELIBERATELY"
+          ],
+          [
+            "File",
+            "MALFORMED"
+          ],
+          [
+            "File",
+            "NATIVE"
+          ],
+          [
+            "File",
+            "PROVIDER"
+          ]
+        ],
+        "/usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libc.so": [
+          [
+            "File",
+            "/lib/x86_64-linux-gnu/libc.so.6"
+          ],
+          [
+            "File",
+            "/usr/lib/x86_64-linux-gnu/libc_nonshared.a"
+          ],
+          [
+            "File",
+            "/lib64/ld-linux-x86-64.so.2"
+          ]
+        ],
+        "/usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libm.so": [
+          [
+            "File",
+            "/lib/x86_64-linux-gnu/libm.so.6"
+          ],
+          [
+            "File",
+            "/lib/x86_64-linux-gnu/libmvec.so.1"
+          ]
+        ],
+        "/usr/lib/gcc/x86_64-linux-gnu/13/libgcc_s.so": [
+          [
+            "File",
+            "libgcc_s.so.1"
+          ],
+          [
+            "Lib",
+            "gcc"
+          ]
+        ]
+      },
+      "of_which_output_probe": 0,
+      "probes_raw": 152,
+      "source_input_headers": 409,
+      "typed_context_absent_probes": 81
+    },
+    "src-observer": {
+      "all_kernel_and_source_enoent": 95,
+      "all_nested_kernel_sequences_match": true,
+      "explicit_root_requests_observed": 0,
+      "failed_descriptor_open": [],
+      "nested_requests": {
+        "/usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libc.so": [
+          [
+            "File",
+            "/lib/x86_64-linux-gnu/libc.so.6"
+          ],
+          [
+            "File",
+            "/usr/lib/x86_64-linux-gnu/libc_nonshared.a"
+          ],
+          [
+            "File",
+            "/lib64/ld-linux-x86-64.so.2"
+          ]
+        ],
+        "/usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libm.so": [
+          [
+            "File",
+            "/lib/x86_64-linux-gnu/libm.so.6"
+          ],
+          [
+            "File",
+            "/lib/x86_64-linux-gnu/libmvec.so.1"
+          ]
+        ],
+        "/usr/lib/gcc/x86_64-linux-gnu/13/libgcc_s.so": [
+          [
+            "File",
+            "libgcc_s.so.1"
+          ],
+          [
+            "Lib",
+            "gcc"
+          ]
+        ]
+      },
+      "of_which_output_probe": 1,
+      "probes_raw": 109,
+      "source_input_headers": 409,
+      "typed_context_absent_probes": 94
+    },
+    "src-shadow": {
+      "all_kernel_and_source_enoent": 83,
+      "all_nested_kernel_sequences_match": true,
+      "explicit_root_requests_observed": 0,
+      "failed_descriptor_open": [],
+      "nested_requests": {
+        "/usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libc.so": [
+          [
+            "File",
+            "/lib/x86_64-linux-gnu/libc.so.6"
+          ],
+          [
+            "File",
+            "/usr/lib/x86_64-linux-gnu/libc_nonshared.a"
+          ],
+          [
+            "File",
+            "/lib64/ld-linux-x86-64.so.2"
+          ]
+        ],
+        "/usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libm.so": [
+          [
+            "File",
+            "/lib/x86_64-linux-gnu/libm.so.6"
+          ],
+          [
+            "File",
+            "/lib/x86_64-linux-gnu/libmvec.so.1"
+          ]
+        ],
+        "/usr/lib/gcc/x86_64-linux-gnu/13/libgcc_s.so": [
+          [
+            "File",
+            "libgcc_s.so.1"
+          ],
+          [
+            "Lib",
+            "gcc"
+          ]
+        ]
+      },
+      "of_which_output_probe": 1,
+      "probes_raw": 97,
+      "source_input_headers": 409,
+      "typed_context_absent_probes": 82
+    }
+  },
+  "runs": [
+    {
+      "artifact": 13247182544,
+      "attempt": 1,
+      "conclusion": "success",
+      "decision": "Explicit typed CLI-root attribution gate refused. Top-level InputData::new bypassed load_input. All raw candidate errno events and every nested group matched the stock kernel. Source actors and full ELF controls passed. First attempt not replaced.",
+      "digest": "sha256:64456b5166ee3b4d36accaeba035966e97aa77798c2f9b5049389f914d6d69b4",
+      "head": "fa99e8c9d3e6189a2bcabcc35dcd1c0bed80e446",
+      "run": 41668727619,
+      "size": 3816447,
+      "url": "https://github.com/astral-experiments/ohm/actions/runs/41668727619"
+    },
+    {
+      "artifact": 13249170889,
+      "attempt": 1,
+      "conclusion": "failure",
+      "decision": "Candidate diagnostic refused by rustc E0599 at libwild/src/fs.rs:443. Stock built. Actual Ruff acquisition did not start.",
+      "digest": "sha256:3c2802747bb15accc609215981d56fa329cfc61e2f909dab41b2db71ce70251e",
+      "head": "285e3238806b2d8d8cc083bb43e4d38c1ad8204f",
+      "run": 41670776759,
+      "size": 5914,
+      "url": "https://github.com/astral-experiments/ohm/actions/runs/41670776759"
+    },
+    {
+      "artifact": 13248562636,
+      "attempt": 1,
+      "conclusion": "success",
+      "decision": "All complete source call/descriptor, signed kernel, real native and reader mutation gates passed.",
+      "digest": "sha256:1589f1657ff57aaa21c948afb840a01f902b751ade880e85c9c489dc4d533834",
+      "head": "87628d6a0d0aa96662df294ae6c0df75faf5bb54",
+      "run": 41671338175,
+      "size": 3883079,
+      "url": "https://github.com/astral-experiments/ohm/actions/runs/41671338175"
+    }
+  ]
+}
