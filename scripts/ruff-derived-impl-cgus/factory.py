@@ -87,6 +87,7 @@ def build():
     subprocess.run(["tar","--zstd","-cf",str(root/"sdk.tar.zst"),"-C",str(sdk),"bin","lib"],check=True)
     (root/"sdk-sha256").write_text(sha(root/"sdk.tar.zst")+"\n")
     subprocess.run([sys.executable,"-IB",here/"probe.py",root/"probes",role],env=e,check=True)
+    subprocess.run([sys.executable,"-IB",here/"caps.py",root/"probes",root/"caps","C" if role=="candidate" else "P"],env=e,check=True)
 
 if __name__=="__main__":
     {"source":prepare,"build":build}[sys.argv[1]]()
