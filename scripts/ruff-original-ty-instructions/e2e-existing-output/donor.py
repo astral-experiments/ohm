@@ -68,7 +68,7 @@ def outputs(before,tag,state,bin_path,successful):
     disk=full_b3(bin_path);assert disk==emit[3]
     return {'successful':True,'emitted':emit,'sha256':w.hf(bin_path),'n':len(frozen),'bytes':sum(v[0]for v in records.values()),'ordered_payload_root':b.sha(b''.join(struct.pack('<Q',int(v[1]))+bytes.fromhex(v[2])for v in used)),'mode_roster':sorted({r[3]for r in used})}
 
-def witness(state,mode,provider,binary):
+def witness(state,mode,provider,binary,symbol_input=None):
     mid=mode=='mid-read';ready=state/('read-first-half' if mid else 'entry-ready')
     deadline=time.monotonic()+120
     while not ready.exists():
@@ -82,7 +82,10 @@ def witness(state,mode,provider,binary):
         else:shutil.copyfile(provider,dest)
         record['provider']=w.hf(dest)
     if mode in ('mid-read','four'):
-        old=path.read_bytes();assert len(old)==39760 and old.count(b'\0main\0')==1
+        old=path.read_bytes();assert len(old)==(39760 if symbol_input is None else symbol_input[0]) and old.count(b'\0main\0')==1
+        if symbol_input is not None:
+            assert full_b3(path)==symbol_input[1]
+            record['genuine_symbols_input']=[len(old),symbol_input[1]]
         new=old.replace(b'\0main\0',b'\0zzQA\0');st=path.stat()
         path.write_bytes(new);os.utime(path,ns=(st.st_atime_ns,st.st_mtime_ns));t=path.stat()
         assert (t.st_dev,t.st_ino,t.st_size,t.st_mtime_ns)==(st.st_dev,st.st_ino,st.st_size,st.st_mtime_ns) and t.st_ctime_ns!=st.st_ctime_ns

@@ -7,7 +7,7 @@ jobs:
   inspect:
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1'
       && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head
-      && github.ref_name == 'charlie/qa-wild-workspace-reuse-29697-20261103'
+      && github.ref_name == 'charlie/qa-wild-workspace-reuse24-29697-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 120
     steps:
@@ -57,7 +57,7 @@ jobs:
         description: Independently selected full signed published SDK
         required: true
         type: choice
-        options: ['23']
+        options: ['24']
       reviewed_head:
         description: Exact reviewed nonrelease QA source
         required: true
