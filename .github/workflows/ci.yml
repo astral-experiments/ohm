@@ -54,15 +54,7 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
-        pair:
-        - '01'
-        - '02'
-        - '03'
-        - '04'
-        - '05'
-        - '06'
-        - '07'
-        - 08
+        pair: ${{ fromJSON(inputs.scope == 'pair-eight' && '["08"]' || '["01","02","03","04","05","06","07","08"]') }}
     name: Pair ${{ matrix.pair }}
 'on':
   workflow_dispatch:
@@ -71,3 +63,8 @@ jobs:
         description: Exact reviewed nonrelease QA source
         required: true
         type: string
+      scope:
+        description: All registered pairs or only the eighth worker
+        type: choice
+        options: [all, pair-eight]
+        default: all
