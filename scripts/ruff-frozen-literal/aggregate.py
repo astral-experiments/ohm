@@ -37,10 +37,11 @@ def intake(gh,slot,run,head):
     return dict(rank=slot,run=run,head=head,status=info["conclusion"],job=job["id"],job_status=job["conclusion"],runner=job["runner_name"],runner_id=job["runner_id"],artifact=artifact["id"],bytes=artifact["size_in_bytes"],sha256=artifact["digest"].split(":")[1],url=info["html_url"])
 
 def physical(gh,out,reg):
-    original=out/"original.zip";part=out/"original.zip.part"
+    original=out/"original.zip"
     if not original.exists():
-        with part.open("xb")as outp:
-            subprocess.run([gh,"api",REPO+f"actions/artifacts/{reg['artifact']}/zip","-H","Accept: application/octet-stream"],stdout=outp,check=True)
+        with tempfile.NamedTemporaryFile(prefix="download-",suffix=".part",dir=out,delete=False)as outp:
+            part=Path(outp.name)
+            subprocess.run([gh,"api",REPO+f"actions/artifacts/{reg['artifact']}/zip"],stdout=outp,check=True)
         with part.open("rb")as inp:
             need(hashlib.file_digest(inp,"sha256").hexdigest()==reg["sha256"] and part.stat().st_size==reg["bytes"],"invalid download")
         part.rename(original)

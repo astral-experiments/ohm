@@ -1,0 +1,1502 @@
+{
+  "estimators": {
+    "cold_cargo": {
+      "median": -0.00015042893721783912,
+      "median_interval_96_875": [
+        -0.00022198773711301634,
+        -0.00010655738475406906
+      ],
+      "reductions": [
+        -0.0001468061588134617,
+        -0.0001459145075282109,
+        -0.00010655738475406906,
+        -0.0001846371507023825,
+        -0.00022198773711301634,
+        -0.00015405171562221653
+      ],
+      "two_sided_sign_p": 0.03125
+    },
+    "edited_cargo": {
+      "median": 0.08270037236063954,
+      "median_interval_96_875": [
+        0.08249807913827356,
+        0.08281697722894132
+      ],
+      "reductions": [
+        0.08264814755835359,
+        0.08275259716292549,
+        0.08255544213955113,
+        0.08281697722894132,
+        0.08249807913827356,
+        0.0827646634197503
+      ],
+      "two_sided_sign_p": 0.03125
+    },
+    "edited_independent_cargo": {
+      "median": 0.08259770211055939,
+      "median_interval_96_875": [
+        0.08237186247395911,
+        0.08288845127221156
+      ],
+      "reductions": [
+        0.08288845127221156,
+        0.08256180609144392,
+        0.08263359812967486,
+        0.08254683426395282,
+        0.08237186247395911,
+        0.08279843981114943
+      ],
+      "two_sided_sign_p": 0.03125
+    },
+    "edited_rustc": {
+      "median": 0.32514636906988087,
+      "median_interval_96_875": [
+        0.32509559486459205,
+        0.3251493610225552
+      ],
+      "reductions": [
+        0.32509559486459205,
+        0.3251456591085966,
+        0.32514707903116513,
+        0.3251493610225552,
+        0.32514733109936633,
+        0.3251437893698711
+      ],
+      "two_sided_sign_p": 0.03125
+    },
+    "fixed_rustc": {
+      "median": 0.26591186187229404,
+      "median_interval_96_875": [
+        0.2639895056291539,
+        0.2668537982969539
+      ],
+      "reductions": [
+        0.26681891175798944,
+        0.2658936319469435,
+        0.2639895056291539,
+        0.2659300917976446,
+        0.26467460897269335,
+        0.2668537982969539
+      ],
+      "two_sided_sign_p": 0.03125
+    },
+    "nonincremental_rustc": {
+      "median": 0.10648399586676044,
+      "median_interval_96_875": [
+        0.10503223492633595,
+        0.10904340237187848
+      ],
+      "reductions": [
+        0.10904340237187848,
+        0.10590171934152903,
+        0.1070335129997736,
+        0.10503223492633595,
+        0.10752374976673684,
+        0.10593447873374728
+      ],
+      "two_sided_sign_p": 0.03125
+    },
+    "parser_cold": {
+      "median": -0.00035478284667811444,
+      "median_interval_96_875": [
+        -0.0004018939730761062,
+        -0.00024384173091518413
+      ],
+      "reductions": [
+        -0.0003599742795539207,
+        -0.0004018939730761062,
+        -0.0003916856253978196,
+        -0.0002944247203200412,
+        -0.00024384173091518413,
+        -0.0003495914138023082
+      ],
+      "two_sided_sign_p": 0.03125
+    },
+    "parser_rustc": {
+      "median": 0.0002463622965309664,
+      "median_interval_96_875": [
+        -0.0001871274036835402,
+        0.00038205992730178107
+      ],
+      "reductions": [
+        0.0002448047129370856,
+        7.237671595139439e-05,
+        0.00032930454543678156,
+        0.0002479198801248472,
+        0.00038205992730178107,
+        -0.0001871274036835402
+      ],
+      "two_sided_sign_p": 0.21875
+    },
+    "unchanged_cargo": {
+      "median": 0.00010011171180207556,
+      "median_interval_96_875": [
+        -0.00018968836443056247,
+        0.0003625341365153245
+      ],
+      "reductions": [
+        9.595846236609695e-05,
+        -0.00018968836443056247,
+        0.00010426496123805418,
+        -9.762252698464202e-05,
+        0.0003625341365153245,
+        0.00034948402624646047
+      ],
+      "two_sided_sign_p": 0.6875
+    }
+  },
+  "head": "33efaabc12503bdbe9765cd0b11f14f9c8286deb",
+  "qualified": true,
+  "scopes": [
+    {
+      "boot": "59835994-e07c-46f7-947d-8286c66716cc",
+      "fixed": [
+        {
+          "instructions": 210045962,
+          "metadata": "0c236d9446b9eb46f969c3b06572bfd48d19af5487b24cec9095785899f6716d",
+          "role": "P"
+        },
+        {
+          "instructions": 154001727,
+          "metadata": "3000926ad13a818d8e83019482c558bc8e3219ada5c3fbd2480f1e5bd3812dc7",
+          "role": "C"
+        },
+        {
+          "instructions": 210294744,
+          "metadata": "0c236d9446b9eb46f969c3b06572bfd48d19af5487b24cec9095785899f6716d",
+          "role": "P"
+        }
+      ],
+      "fixed_reduction": 0.26681891175798944,
+      "native": {
+        "C": {
+          "edit": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "fresh": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "old": "7a5d88f8fd9b542d41b55751a22b3a9592a95f887d03a06e6df70794c165ff2f"
+        },
+        "P": {
+          "edit": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "fresh": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "old": "7a5d88f8fd9b542d41b55751a22b3a9592a95f887d03a06e6df70794c165ff2f"
+        }
+      },
+      "nonincremental": [
+        {
+          "instructions": 131687816,
+          "metadata": "036a4e3c7cd10af2efe05fe93f1fc37dac0dc9bcb487a18d2fe2166582a70bb3",
+          "role": "P"
+        },
+        {
+          "instructions": 117322985,
+          "metadata": "51f231b0ae6fc3673b6fa5e8369e4aed42e46cc0a7af5f6bfbd1d50062142088",
+          "role": "C"
+        },
+        {
+          "instructions": 131682043,
+          "metadata": "036a4e3c7cd10af2efe05fe93f1fc37dac0dc9bcb487a18d2fe2166582a70bb3",
+          "role": "P"
+        }
+      ],
+      "nonincremental_reduction": 0.10904340237187848,
+      "order": "PC",
+      "pair": {
+        "gates": {
+          "edited_owner": true,
+          "independent_clock": true,
+          "parser": true,
+          "whole": true
+        },
+        "order": "PC",
+        "reductions": {
+          "cold": {
+            "plain": -0.0001468061588134617
+          },
+          "edit": {
+            "owner": 0.32509559486459205,
+            "plain": 0.08264814755835359,
+            "traced_whole": 0.08288845127221156
+          },
+          "new-idle": {
+            "plain": 9.595846236609695e-05,
+            "traced_whole": 0.0003233611508887124
+          },
+          "old-idle": {
+            "plain": -0.0002620126271506429,
+            "traced_whole": 1.4937723671004655e-05
+          },
+          "parser": {
+            "cold": -0.0003599742795539207,
+            "owner": 0.0002448047129370856,
+            "plain": -3.0409452040247587e-05,
+            "traced_whole": -0.00022544884292607925
+          }
+        }
+      },
+      "qualified": true,
+      "transport": {
+        "artifact": 13216726403,
+        "bytes": 37093367,
+        "head": "33efaabc12503bdbe9765cd0b11f14f9c8286deb",
+        "job": 125813025741,
+        "job_status": "success",
+        "rank": 0,
+        "run": 41605149392,
+        "runner": "nsc-runner-l6co9ksejsp64",
+        "runner_id": 1916,
+        "sha256": "8a52faa272fa607e596566343dad4aa81995cbff898a3c9e884241276c744eea",
+        "status": "success",
+        "url": "https://github.com/astral-experiments/ohm/actions/runs/41605149392"
+      },
+      "visits": [
+        {
+          "edited_metadata": "0c236d9446b9eb46f969c3b06572bfd48d19af5487b24cec9095785899f6716d",
+          "empty_new": {
+            "changed_required": [
+              "char_str-70e37b6c50169bb8",
+              "get_size2-c57b9295f41ebb86",
+              "get_size_derive2-8d31d0c9b7e31bb0",
+              "ruff_db-8624db050923a734",
+              "ruff_diagnostics-7ef4c33a72b558ce",
+              "ruff_memory_usage-8fb770dc5b0d4776",
+              "ruff_notebook-d33cecd49fd3175f",
+              "ruff_python_ast-fabccf09fb3395b1",
+              "ruff_python_parser-de18dd288ffad50f",
+              "ruff_python_trivia-62de3ba78fd4e98d",
+              "ruff_source_file-ada442c72eb033a6",
+              "ruff_text_size-d6470f147dd52f13"
+            ],
+            "different_externs": [
+              "ruff_db"
+            ],
+            "edited": "0c236d9446b9eb46f969c3b06572bfd48d19af5487b24cec9095785899f6716d",
+            "empty": "144a930330521169cee24924b10aa5f66964f40e668032013c9c11018291ec0a",
+            "equal": false,
+            "semantic_direct": [
+              "ruff_db"
+            ]
+          },
+          "prices": {
+            "cold": {
+              "plain": 355373939497
+            },
+            "edit": {
+              "owner": 171418204,
+              "plain": 675282189,
+              "traced_whole": 675268293
+            },
+            "new-idle": {
+              "owner": 0,
+              "plain": 285050420,
+              "traced_whole": 285062073
+            },
+            "old-idle": {
+              "owner": 0,
+              "plain": 285054964,
+              "traced_whole": 344095266
+            },
+            "parser": {
+              "cold": 184815629279,
+              "owner": 4871139880,
+              "plain": 5183223946,
+              "traced_whole": 5183379896
+            }
+          },
+          "role": "P",
+          "scope": "v2-2de9f329ca660b43"
+        },
+        {
+          "edited_metadata": "1d10e15f90af1337eb5e1265f6167065753b33bfc9650b7efd4a91bfd05ae7a1",
+          "empty_new": {
+            "changed_required": [
+              "char_str-70e37b6c50169bb8",
+              "get_size2-c57b9295f41ebb86",
+              "get_size_derive2-8d31d0c9b7e31bb0",
+              "ruff_db-8624db050923a734",
+              "ruff_diagnostics-7ef4c33a72b558ce",
+              "ruff_memory_usage-8fb770dc5b0d4776",
+              "ruff_notebook-d33cecd49fd3175f",
+              "ruff_python_ast-fabccf09fb3395b1",
+              "ruff_python_parser-de18dd288ffad50f",
+              "ruff_python_trivia-62de3ba78fd4e98d",
+              "ruff_source_file-ada442c72eb033a6",
+              "ruff_text_size-d6470f147dd52f13"
+            ],
+            "different_externs": [
+              "ruff_db"
+            ],
+            "edited": "1d10e15f90af1337eb5e1265f6167065753b33bfc9650b7efd4a91bfd05ae7a1",
+            "empty": "2ae7686b7793728e996b4a91717973d39f04315b5b44e3cadb9268350d3a1120",
+            "equal": false,
+            "semantic_direct": [
+              "ruff_db"
+            ]
+          },
+          "prices": {
+            "cold": {
+              "plain": 355426110580
+            },
+            "edit": {
+              "owner": 115690901,
+              "plain": 619471367,
+              "traced_whole": 619296350
+            },
+            "new-idle": {
+              "owner": 0,
+              "plain": 285023067,
+              "traced_whole": 284969895
+            },
+            "old-idle": {
+              "owner": 0,
+              "plain": 285129652,
+              "traced_whole": 344090126
+            },
+            "parser": {
+              "cold": 184882158152,
+              "owner": 4869947402,
+              "plain": 5183381565,
+              "traced_whole": 5184548483
+            }
+          },
+          "role": "C",
+          "scope": "v2-1b471ff950184c2b"
+        }
+      ],
+      "zip": {
+        "new": [
+          "c2f5402340a994e474ecb2b9ff046a0037ab2461108cd9d2e2ef8b948e601da9"
+        ],
+        "old": [
+          "a8f7556356bcd2c3c7996354dc7359c9b8da1a8b31c9fef6fbea0d43ca34cb64"
+        ]
+      }
+    },
+    {
+      "boot": "c040057f-cdc2-4efb-ab16-82a1059f74d5",
+      "fixed": [
+        {
+          "instructions": 209956762,
+          "metadata": "332b036881f8e237a3c8f633e660101aa64be64099f868fa85e0f6fadeaffe69",
+          "role": "P"
+        },
+        {
+          "instructions": 154130596,
+          "metadata": "5614991fd9a65e5e772d403ad78407cb0d339224b92dcf198798d8f95f02f43b",
+          "role": "C"
+        },
+        {
+          "instructions": 210108630,
+          "metadata": "332b036881f8e237a3c8f633e660101aa64be64099f868fa85e0f6fadeaffe69",
+          "role": "P"
+        }
+      ],
+      "fixed_reduction": 0.2658936319469435,
+      "native": {
+        "C": {
+          "edit": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "fresh": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "old": "7a5d88f8fd9b542d41b55751a22b3a9592a95f887d03a06e6df70794c165ff2f"
+        },
+        "P": {
+          "edit": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "fresh": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "old": "7a5d88f8fd9b542d41b55751a22b3a9592a95f887d03a06e6df70794c165ff2f"
+        }
+      },
+      "nonincremental": [
+        {
+          "instructions": 131350719,
+          "metadata": "94a6e1ee5dacb84847ce9c89fbd5312b95c78c929e460c372074fce2d20400d1",
+          "role": "P"
+        },
+        {
+          "instructions": 117394718,
+          "metadata": "f1865fe1657ea914390530294ae49390e343a7dde83f65bda966904eea9cb2da",
+          "role": "C"
+        },
+        {
+          "instructions": 131299568,
+          "metadata": "94a6e1ee5dacb84847ce9c89fbd5312b95c78c929e460c372074fce2d20400d1",
+          "role": "P"
+        }
+      ],
+      "nonincremental_reduction": 0.10590171934152903,
+      "order": "CP",
+      "pair": {
+        "gates": {
+          "edited_owner": true,
+          "independent_clock": true,
+          "parser": true,
+          "whole": true
+        },
+        "order": "CP",
+        "reductions": {
+          "cold": {
+            "plain": -0.0001459145075282109
+          },
+          "edit": {
+            "owner": 0.3251456591085966,
+            "plain": 0.08275259716292549,
+            "traced_whole": 0.08256180609144392
+          },
+          "new-idle": {
+            "plain": -0.00018968836443056247,
+            "traced_whole": -0.000566683710425897
+          },
+          "old-idle": {
+            "plain": 0.00029568406180968676,
+            "traced_whole": 0.00019094306202771527
+          },
+          "parser": {
+            "cold": -0.0004018939730761062,
+            "owner": 7.237671595139439e-05,
+            "plain": -0.00020919742772140815,
+            "traced_whole": 0.00027164202982121743
+          }
+        }
+      },
+      "qualified": true,
+      "transport": {
+        "artifact": 13216381967,
+        "bytes": 37093244,
+        "head": "33efaabc12503bdbe9765cd0b11f14f9c8286deb",
+        "job": 125813043430,
+        "job_status": "success",
+        "rank": 1,
+        "run": 41605154645,
+        "runner": "nsc-runner-gi1ot21699it6",
+        "runner_id": 1917,
+        "sha256": "1d9ca6e7ac0a50116c5f2b752eed2add8c269757826a90ed8ae0750fd84857fa",
+        "status": "success",
+        "url": "https://github.com/astral-experiments/ohm/actions/runs/41605154645"
+      },
+      "visits": [
+        {
+          "edited_metadata": "7a7efbf3806c2bbea4d01e0bbc895a03202b97fc6350154c646214b49fca99e0",
+          "empty_new": {
+            "changed_required": [
+              "char_str-70e37b6c50169bb8",
+              "get_size2-c57b9295f41ebb86",
+              "get_size_derive2-8d31d0c9b7e31bb0",
+              "ruff_db-8624db050923a734",
+              "ruff_diagnostics-7ef4c33a72b558ce",
+              "ruff_memory_usage-8fb770dc5b0d4776",
+              "ruff_notebook-d33cecd49fd3175f",
+              "ruff_python_ast-fabccf09fb3395b1",
+              "ruff_python_parser-de18dd288ffad50f",
+              "ruff_python_trivia-62de3ba78fd4e98d",
+              "ruff_source_file-ada442c72eb033a6",
+              "ruff_text_size-d6470f147dd52f13"
+            ],
+            "different_externs": [
+              "ruff_db"
+            ],
+            "edited": "7a7efbf3806c2bbea4d01e0bbc895a03202b97fc6350154c646214b49fca99e0",
+            "empty": "46a78c9d87b8a3a9fb9427bca708a1582564872d430c2699d8d6f0e19880aa70",
+            "equal": false,
+            "semantic_direct": [
+              "ruff_db"
+            ]
+          },
+          "prices": {
+            "cold": {
+              "plain": 355417497437
+            },
+            "edit": {
+              "owner": 115685225,
+              "plain": 619517252,
+              "traced_whole": 619518647
+            },
+            "new-idle": {
+              "owner": 0,
+              "plain": 285153275,
+              "traced_whole": 285184710
+            },
+            "old-idle": {
+              "owner": 0,
+              "plain": 285013922,
+              "traced_whole": 344115417
+            },
+            "parser": {
+              "cold": 184863553362,
+              "owner": 4870385186,
+              "plain": 5182691668,
+              "traced_whole": 5182046081
+            }
+          },
+          "role": "C",
+          "scope": "v2-866292022d5b8ff5"
+        },
+        {
+          "edited_metadata": "332b036881f8e237a3c8f633e660101aa64be64099f868fa85e0f6fadeaffe69",
+          "empty_new": {
+            "changed_required": [
+              "char_str-70e37b6c50169bb8",
+              "get_size2-c57b9295f41ebb86",
+              "get_size_derive2-8d31d0c9b7e31bb0",
+              "ruff_db-8624db050923a734",
+              "ruff_diagnostics-7ef4c33a72b558ce",
+              "ruff_memory_usage-8fb770dc5b0d4776",
+              "ruff_notebook-d33cecd49fd3175f",
+              "ruff_python_ast-fabccf09fb3395b1",
+              "ruff_python_parser-de18dd288ffad50f",
+              "ruff_python_trivia-62de3ba78fd4e98d",
+              "ruff_source_file-ada442c72eb033a6",
+              "ruff_text_size-d6470f147dd52f13"
+            ],
+            "different_externs": [
+              "ruff_db"
+            ],
+            "edited": "332b036881f8e237a3c8f633e660101aa64be64099f868fa85e0f6fadeaffe69",
+            "empty": "5a0e0745df3738d81f9434d7b0d9849e59a28d30c4b23cb777b30788c231e5ed",
+            "equal": false,
+            "semantic_direct": [
+              "ruff_db"
+            ]
+          },
+          "prices": {
+            "cold": {
+              "plain": 355365644434
+            },
+            "edit": {
+              "owner": 171422510,
+              "plain": 675409110,
+              "traced_whole": 675270172
+            },
+            "new-idle": {
+              "owner": 0,
+              "plain": 285099195,
+              "traced_whole": 285023192
+            },
+            "old-idle": {
+              "owner": 0,
+              "plain": 285098221,
+              "traced_whole": 344181136
+            },
+            "parser": {
+              "cold": 184789287661,
+              "owner": 4870737714,
+              "plain": 5181607689,
+              "traced_whole": 5183454125
+            }
+          },
+          "role": "P",
+          "scope": "v2-d70d42117af8d7cc"
+        }
+      ],
+      "zip": {
+        "new": [
+          "c2f5402340a994e474ecb2b9ff046a0037ab2461108cd9d2e2ef8b948e601da9"
+        ],
+        "old": [
+          "a8f7556356bcd2c3c7996354dc7359c9b8da1a8b31c9fef6fbea0d43ca34cb64"
+        ]
+      }
+    },
+    {
+      "boot": "69a95b18-de27-4cd1-82d6-9de4c3b81496",
+      "fixed": [
+        {
+          "instructions": 209836686,
+          "metadata": "9f93164a8e8e3b88cc7684515c301e8797118b0f8faf77377b5eb818e3679a34",
+          "role": "P"
+        },
+        {
+          "instructions": 154442003,
+          "metadata": "648b9183b562d61b50d8cb5177452eab2d343b09a77371d07dd5fea6cb321dc0",
+          "role": "C"
+        },
+        {
+          "instructions": 209893187,
+          "metadata": "9f93164a8e8e3b88cc7684515c301e8797118b0f8faf77377b5eb818e3679a34",
+          "role": "P"
+        }
+      ],
+      "fixed_reduction": 0.2639895056291539,
+      "native": {
+        "C": {
+          "edit": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "fresh": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "old": "7a5d88f8fd9b542d41b55751a22b3a9592a95f887d03a06e6df70794c165ff2f"
+        },
+        "P": {
+          "edit": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "fresh": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "old": "7a5d88f8fd9b542d41b55751a22b3a9592a95f887d03a06e6df70794c165ff2f"
+        }
+      },
+      "nonincremental": [
+        {
+          "instructions": 131348403,
+          "metadata": "890fb09dfd95653897cdfedc5a0e1f504a502322bf5a2ecc593f8639b831d03f",
+          "role": "P"
+        },
+        {
+          "instructions": 117289722,
+          "metadata": "aa13ef8f7ab0282c8829c98c59701a82b0fef04055118d73736544bcb1c60d6b",
+          "role": "C"
+        },
+        {
+          "instructions": 131545238,
+          "metadata": "890fb09dfd95653897cdfedc5a0e1f504a502322bf5a2ecc593f8639b831d03f",
+          "role": "P"
+        }
+      ],
+      "nonincremental_reduction": 0.1070335129997736,
+      "order": "PC",
+      "pair": {
+        "gates": {
+          "edited_owner": true,
+          "independent_clock": true,
+          "parser": true,
+          "whole": true
+        },
+        "order": "PC",
+        "reductions": {
+          "cold": {
+            "plain": -0.00010655738475406906
+          },
+          "edit": {
+            "owner": 0.32514707903116513,
+            "plain": 0.08255544213955113,
+            "traced_whole": 0.08263359812967486
+          },
+          "new-idle": {
+            "plain": 0.00010426496123805418,
+            "traced_whole": -1.0881147120667123e-05
+          },
+          "old-idle": {
+            "plain": 0.00014282188792935635,
+            "traced_whole": -0.00032969002283356197
+          },
+          "parser": {
+            "cold": -0.0003916856253978196,
+            "owner": 0.00032930454543678156,
+            "plain": -0.00011448906346700483,
+            "traced_whole": 0.000280525383856145
+          }
+        }
+      },
+      "qualified": true,
+      "transport": {
+        "artifact": 13216491983,
+        "bytes": 35897202,
+        "head": "33efaabc12503bdbe9765cd0b11f14f9c8286deb",
+        "job": 125813063548,
+        "job_status": "success",
+        "rank": 2,
+        "run": 41605160162,
+        "runner": "nsc-runner-8c5vhtfh8knfk",
+        "runner_id": 1918,
+        "sha256": "7fa8978fb6f552fb0f15327f98b8bacab27002b42db6bdb362a69c33915a68bf",
+        "status": "success",
+        "url": "https://github.com/astral-experiments/ohm/actions/runs/41605160162"
+      },
+      "visits": [
+        {
+          "edited_metadata": "9f93164a8e8e3b88cc7684515c301e8797118b0f8faf77377b5eb818e3679a34",
+          "empty_new": {
+            "changed_required": [
+              "char_str-70e37b6c50169bb8",
+              "get_size2-c57b9295f41ebb86",
+              "get_size_derive2-8d31d0c9b7e31bb0",
+              "ruff_db-8624db050923a734",
+              "ruff_diagnostics-7ef4c33a72b558ce",
+              "ruff_memory_usage-8fb770dc5b0d4776",
+              "ruff_notebook-d33cecd49fd3175f",
+              "ruff_python_ast-fabccf09fb3395b1",
+              "ruff_python_parser-de18dd288ffad50f",
+              "ruff_python_trivia-62de3ba78fd4e98d",
+              "ruff_source_file-ada442c72eb033a6",
+              "ruff_text_size-d6470f147dd52f13"
+            ],
+            "different_externs": [
+              "ruff_db"
+            ],
+            "edited": "9f93164a8e8e3b88cc7684515c301e8797118b0f8faf77377b5eb818e3679a34",
+            "empty": "4f0ea7ab7409a44f83c4f8654348afc25b8814d66fbf2f70642c57c45a699f49",
+            "equal": false,
+            "semantic_direct": [
+              "ruff_db"
+            ]
+          },
+          "prices": {
+            "cold": {
+              "plain": 355382323688
+            },
+            "edit": {
+              "owner": 171418895,
+              "plain": 675184937,
+              "traced_whole": 675209228
+            },
+            "new-idle": {
+              "owner": 0,
+              "plain": 285129344,
+              "traced_whole": 285080237
+            },
+            "old-idle": {
+              "owner": 0,
+              "plain": 285131366,
+              "traced_whole": 344153575
+            },
+            "parser": {
+              "cold": 184796661676,
+              "owner": 4871502754,
+              "plain": 5182171834,
+              "traced_whole": 5184040674
+            }
+          },
+          "role": "P",
+          "scope": "v2-001d376679848bcb"
+        },
+        {
+          "edited_metadata": "dd79ea5a15e428bf90f1d0db64f781467c0102bf7035197a6ad39214e8fc4230",
+          "empty_new": {
+            "different_externs": [
+              "ruff_db"
+            ],
+            "equal": true
+          },
+          "prices": {
+            "cold": {
+              "plain": 355420192299
+            },
+            "edit": {
+              "owner": 115682542,
+              "plain": 619444746,
+              "traced_whole": 619414260
+            },
+            "new-idle": {
+              "owner": 0,
+              "plain": 285099615,
+              "traced_whole": 285083339
+            },
+            "old-idle": {
+              "owner": 0,
+              "plain": 285090643,
+              "traced_whole": 344267039
+            },
+            "parser": {
+              "cold": 184869043872,
+              "owner": 4869898546,
+              "plain": 5182765136,
+              "traced_whole": 5182586419
+            }
+          },
+          "role": "C",
+          "scope": "v2-81b94688da2c13fa"
+        }
+      ],
+      "zip": {
+        "new": [
+          "c2f5402340a994e474ecb2b9ff046a0037ab2461108cd9d2e2ef8b948e601da9"
+        ],
+        "old": [
+          "a8f7556356bcd2c3c7996354dc7359c9b8da1a8b31c9fef6fbea0d43ca34cb64"
+        ]
+      }
+    },
+    {
+      "boot": "15f1107d-94a4-492b-af78-c6ef42e4d16f",
+      "fixed": [
+        {
+          "instructions": 210223481,
+          "metadata": "2f4306a916728e75f4c627d809eaafcace9884a5ad231ef4fc0fa960c66b712e",
+          "role": "P"
+        },
+        {
+          "instructions": 154208375,
+          "metadata": "74788078a3ab5c27724259df14cd94d7449575017a1a0f37993f7a4af98feed8",
+          "role": "C"
+        },
+        {
+          "instructions": 210073146,
+          "metadata": "2f4306a916728e75f4c627d809eaafcace9884a5ad231ef4fc0fa960c66b712e",
+          "role": "P"
+        }
+      ],
+      "fixed_reduction": 0.2659300917976446,
+      "native": {
+        "C": {
+          "edit": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "fresh": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "old": "7a5d88f8fd9b542d41b55751a22b3a9592a95f887d03a06e6df70794c165ff2f"
+        },
+        "P": {
+          "edit": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "fresh": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "old": "7a5d88f8fd9b542d41b55751a22b3a9592a95f887d03a06e6df70794c165ff2f"
+        }
+      },
+      "nonincremental": [
+        {
+          "instructions": 131317657,
+          "metadata": "0706abe2d66e079c5970fd9eaa4339578183802cf025c902576d0a0c9bb03a22",
+          "role": "P"
+        },
+        {
+          "instructions": 117525070,
+          "metadata": "5725a822d8c8f9fea1fc0ffcf1041b700365ff6dc86be7e66481e3cd690a9d75",
+          "role": "C"
+        },
+        {
+          "instructions": 131689602,
+          "metadata": "0706abe2d66e079c5970fd9eaa4339578183802cf025c902576d0a0c9bb03a22",
+          "role": "P"
+        }
+      ],
+      "nonincremental_reduction": 0.10503223492633595,
+      "order": "CP",
+      "pair": {
+        "gates": {
+          "edited_owner": true,
+          "independent_clock": true,
+          "parser": true,
+          "whole": true
+        },
+        "order": "CP",
+        "reductions": {
+          "cold": {
+            "plain": -0.0001846371507023825
+          },
+          "edit": {
+            "owner": 0.3251493610225552,
+            "plain": 0.08281697722894132,
+            "traced_whole": 0.08254683426395282
+          },
+          "new-idle": {
+            "plain": -9.762252698464202e-05,
+            "traced_whole": 0.0005582157206929228
+          },
+          "old-idle": {
+            "plain": -0.0003760955677116762,
+            "traced_whole": 0.00033815253458235883
+          },
+          "parser": {
+            "cold": -0.0002944247203200412,
+            "owner": 0.0002479198801248472,
+            "plain": -0.00018994018938323087,
+            "traced_whole": 0.00027094863741605746
+          }
+        }
+      },
+      "qualified": true,
+      "transport": {
+        "artifact": 13216616899,
+        "bytes": 35897096,
+        "head": "33efaabc12503bdbe9765cd0b11f14f9c8286deb",
+        "job": 125813079281,
+        "job_status": "success",
+        "rank": 3,
+        "run": 41605165765,
+        "runner": "nsc-runner-nids815iujs1c",
+        "runner_id": 1919,
+        "sha256": "f67558169e6454254ac1e446e72d3e002dd1a89b86a0b69cb0db85aa2b7ebdd3",
+        "status": "success",
+        "url": "https://github.com/astral-experiments/ohm/actions/runs/41605165765"
+      },
+      "visits": [
+        {
+          "edited_metadata": "90002ce3a36551ef894af96caef9d34aacefe36744df69cd844f9ca97a706501",
+          "empty_new": {
+            "different_externs": [
+              "ruff_db"
+            ],
+            "equal": true
+          },
+          "prices": {
+            "cold": {
+              "plain": 355421664329
+            },
+            "edit": {
+              "owner": 115682935,
+              "plain": 619450026,
+              "traced_whole": 619431418
+            },
+            "new-idle": {
+              "owner": 0,
+              "plain": 284951806,
+              "traced_whole": 284952845
+            },
+            "old-idle": {
+              "owner": 0,
+              "plain": 285063999,
+              "traced_whole": 344189730
+            },
+            "parser": {
+              "cold": 184856229653,
+              "owner": 4869430516,
+              "plain": 5183805414,
+              "traced_whole": 5182666480
+            }
+          },
+          "role": "C",
+          "scope": "v2-95920f4627fd9e85"
+        },
+        {
+          "edited_metadata": "2f4306a916728e75f4c627d809eaafcace9884a5ad231ef4fc0fa960c66b712e",
+          "empty_new": {
+            "changed_required": [
+              "char_str-70e37b6c50169bb8",
+              "get_size2-c57b9295f41ebb86",
+              "get_size_derive2-8d31d0c9b7e31bb0",
+              "ruff_db-8624db050923a734",
+              "ruff_diagnostics-7ef4c33a72b558ce",
+              "ruff_memory_usage-8fb770dc5b0d4776",
+              "ruff_notebook-d33cecd49fd3175f",
+              "ruff_python_ast-fabccf09fb3395b1",
+              "ruff_python_parser-de18dd288ffad50f",
+              "ruff_python_trivia-62de3ba78fd4e98d",
+              "ruff_source_file-ada442c72eb033a6",
+              "ruff_text_size-d6470f147dd52f13"
+            ],
+            "different_externs": [
+              "ruff_db"
+            ],
+            "edited": "2f4306a916728e75f4c627d809eaafcace9884a5ad231ef4fc0fa960c66b712e",
+            "empty": "3b0337b85af36fcefb4c4e126efc6d13e2dfbb15c7beccea65c5f906e91408ba",
+            "equal": false,
+            "semantic_direct": [
+              "ruff_db"
+            ]
+          },
+          "prices": {
+            "cold": {
+              "plain": 355356052400
+            },
+            "edit": {
+              "owner": 171420057,
+              "plain": 675383223,
+              "traced_whole": 675164075
+            },
+            "new-idle": {
+              "owner": 0,
+              "plain": 284923991,
+              "traced_whole": 285111999
+            },
+            "old-idle": {
+              "owner": 0,
+              "plain": 284956828,
+              "traced_whole": 344306158
+            },
+            "parser": {
+              "cold": 184801819429,
+              "owner": 4870638044,
+              "plain": 5182820988,
+              "traced_whole": 5184071097
+            }
+          },
+          "role": "P",
+          "scope": "v2-c66145dff0c8ca37"
+        }
+      ],
+      "zip": {
+        "new": [
+          "c2f5402340a994e474ecb2b9ff046a0037ab2461108cd9d2e2ef8b948e601da9"
+        ],
+        "old": [
+          "a8f7556356bcd2c3c7996354dc7359c9b8da1a8b31c9fef6fbea0d43ca34cb64"
+        ]
+      }
+    },
+    {
+      "boot": "5b62db56-b6ad-40af-a322-f5966fbfc9f7",
+      "fixed": [
+        {
+          "instructions": 209957259,
+          "metadata": "e82e2e0fd5a3e0de8a3925df2ab7f5cb07ec10e19fc17a948115ba550fafa9a9",
+          "role": "P"
+        },
+        {
+          "instructions": 154333316,
+          "metadata": "87a82e20d6c633838b72d3908709e8f77ccd76f731a90605eaca516fb411eb7f",
+          "role": "C"
+        },
+        {
+          "instructions": 209884383,
+          "metadata": "e82e2e0fd5a3e0de8a3925df2ab7f5cb07ec10e19fc17a948115ba550fafa9a9",
+          "role": "P"
+        }
+      ],
+      "fixed_reduction": 0.26467460897269335,
+      "native": {
+        "C": {
+          "edit": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "fresh": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "old": "7a5d88f8fd9b542d41b55751a22b3a9592a95f887d03a06e6df70794c165ff2f"
+        },
+        "P": {
+          "edit": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "fresh": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "old": "7a5d88f8fd9b542d41b55751a22b3a9592a95f887d03a06e6df70794c165ff2f"
+        }
+      },
+      "nonincremental": [
+        {
+          "instructions": 131665041,
+          "metadata": "65d4ff07410843b0d4c97b4fd14dec54325b3ce1d7e027f7eede62eb06816795",
+          "role": "P"
+        },
+        {
+          "instructions": 117258815,
+          "metadata": "af9308073ad3333492fa741517f7d6110c432b4324c8ded68d2368364b76cdb2",
+          "role": "C"
+        },
+        {
+          "instructions": 131385922,
+          "metadata": "65d4ff07410843b0d4c97b4fd14dec54325b3ce1d7e027f7eede62eb06816795",
+          "role": "P"
+        }
+      ],
+      "nonincremental_reduction": 0.10752374976673684,
+      "order": "PC",
+      "pair": {
+        "gates": {
+          "edited_owner": true,
+          "independent_clock": true,
+          "parser": true,
+          "whole": true
+        },
+        "order": "PC",
+        "reductions": {
+          "cold": {
+            "plain": -0.00022198773711301634
+          },
+          "edit": {
+            "owner": 0.32514733109936633,
+            "plain": 0.08249807913827356,
+            "traced_whole": 0.08237186247395911
+          },
+          "new-idle": {
+            "plain": 0.0003625341365153245,
+            "traced_whole": 0.00011657025081868166
+          },
+          "old-idle": {
+            "plain": 0.0001521195763033445,
+            "traced_whole": 0.00022996044915013503
+          },
+          "parser": {
+            "cold": -0.00024384173091518413,
+            "owner": 0.00038205992730178107,
+            "plain": -0.0004587831660483044,
+            "traced_whole": 0.0003507404052616181
+          }
+        }
+      },
+      "qualified": true,
+      "transport": {
+        "artifact": 13215879810,
+        "bytes": 37093384,
+        "head": "33efaabc12503bdbe9765cd0b11f14f9c8286deb",
+        "job": 125813100499,
+        "job_status": "success",
+        "rank": 4,
+        "run": 41605171418,
+        "runner": "nsc-runner-8j6faqdfo4i84",
+        "runner_id": 1920,
+        "sha256": "746fe861181ddb614945501135dacbacae89ada5048dffa536b1395992599431",
+        "status": "success",
+        "url": "https://github.com/astral-experiments/ohm/actions/runs/41605171418"
+      },
+      "visits": [
+        {
+          "edited_metadata": "e82e2e0fd5a3e0de8a3925df2ab7f5cb07ec10e19fc17a948115ba550fafa9a9",
+          "empty_new": {
+            "changed_required": [
+              "char_str-70e37b6c50169bb8",
+              "get_size2-c57b9295f41ebb86",
+              "get_size_derive2-8d31d0c9b7e31bb0",
+              "ruff_db-8624db050923a734",
+              "ruff_diagnostics-7ef4c33a72b558ce",
+              "ruff_memory_usage-8fb770dc5b0d4776",
+              "ruff_notebook-d33cecd49fd3175f",
+              "ruff_python_ast-fabccf09fb3395b1",
+              "ruff_python_parser-de18dd288ffad50f",
+              "ruff_python_trivia-62de3ba78fd4e98d",
+              "ruff_source_file-ada442c72eb033a6",
+              "ruff_text_size-d6470f147dd52f13"
+            ],
+            "different_externs": [
+              "ruff_db"
+            ],
+            "edited": "e82e2e0fd5a3e0de8a3925df2ab7f5cb07ec10e19fc17a948115ba550fafa9a9",
+            "empty": "ac172eaee2e00db220c0ca3b34f1c1a21d4ab9e023042a2abbe1143d091e42b5",
+            "equal": false,
+            "semantic_direct": [
+              "ruff_db"
+            ]
+          },
+          "prices": {
+            "cold": {
+              "plain": 355358642896
+            },
+            "edit": {
+              "owner": 171420020,
+              "plain": 675048590,
+              "traced_whole": 675179416
+            },
+            "new-idle": {
+              "owner": 0,
+              "plain": 285140045,
+              "traced_whole": 285021262
+            },
+            "old-idle": {
+              "owner": 0,
+              "plain": 285176971,
+              "traced_whole": 344207016
+            },
+            "parser": {
+              "cold": 184823651107,
+              "owner": 4870817029,
+              "plain": 5180595488,
+              "traced_whole": 5184070534
+            }
+          },
+          "role": "P",
+          "scope": "v2-51cf511b993c2a60"
+        },
+        {
+          "edited_metadata": "b6c57852e8ac2578dfc379ac92fb76d63cca0a116d863926b2233087aaa3463b",
+          "empty_new": {
+            "changed_required": [
+              "char_str-70e37b6c50169bb8",
+              "get_size2-c57b9295f41ebb86",
+              "get_size_derive2-8d31d0c9b7e31bb0",
+              "ruff_db-8624db050923a734",
+              "ruff_diagnostics-7ef4c33a72b558ce",
+              "ruff_memory_usage-8fb770dc5b0d4776",
+              "ruff_notebook-d33cecd49fd3175f",
+              "ruff_python_ast-fabccf09fb3395b1",
+              "ruff_python_parser-de18dd288ffad50f",
+              "ruff_python_trivia-62de3ba78fd4e98d",
+              "ruff_source_file-ada442c72eb033a6",
+              "ruff_text_size-d6470f147dd52f13"
+            ],
+            "different_externs": [
+              "ruff_db"
+            ],
+            "edited": "b6c57852e8ac2578dfc379ac92fb76d63cca0a116d863926b2233087aaa3463b",
+            "empty": "b1a4a89227882d0fb85e9f647f64414263507c83a4524eecfb5509a6ca787968",
+            "equal": false,
+            "semantic_direct": [
+              "ruff_db"
+            ]
+          },
+          "prices": {
+            "cold": {
+              "plain": 355437528157
+            },
+            "edit": {
+              "owner": 115683258,
+              "plain": 619358378,
+              "traced_whole": 619563630
+            },
+            "new-idle": {
+              "owner": 0,
+              "plain": 285036672,
+              "traced_whole": 284988037
+            },
+            "old-idle": {
+              "owner": 0,
+              "plain": 285133590,
+              "traced_whole": 344127862
+            },
+            "parser": {
+              "cold": 184868718826,
+              "owner": 4868956085,
+              "plain": 5182972258,
+              "traced_whole": 5182252271
+            }
+          },
+          "role": "C",
+          "scope": "v2-e064b77fbe54820c"
+        }
+      ],
+      "zip": {
+        "new": [
+          "c2f5402340a994e474ecb2b9ff046a0037ab2461108cd9d2e2ef8b948e601da9"
+        ],
+        "old": [
+          "a8f7556356bcd2c3c7996354dc7359c9b8da1a8b31c9fef6fbea0d43ca34cb64"
+        ]
+      }
+    },
+    {
+      "boot": "9da8f647-4996-4550-8980-3ef7d9e3a3b6",
+      "fixed": [
+        {
+          "instructions": 210012461,
+          "metadata": "33bd99e331e214c210c4b890bb00d05089233670ab9185f7d4dda8c24c4a0a8e",
+          "role": "P"
+        },
+        {
+          "instructions": 153894456,
+          "metadata": "ad5caccf22b3d6d650faa760e3969ec56d0827d976bd12a324407b69bae38951",
+          "role": "C"
+        },
+        {
+          "instructions": 209909641,
+          "metadata": "33bd99e331e214c210c4b890bb00d05089233670ab9185f7d4dda8c24c4a0a8e",
+          "role": "P"
+        }
+      ],
+      "fixed_reduction": 0.2668537982969539,
+      "native": {
+        "C": {
+          "edit": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "fresh": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "old": "7a5d88f8fd9b542d41b55751a22b3a9592a95f887d03a06e6df70794c165ff2f"
+        },
+        "P": {
+          "edit": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "fresh": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+          "old": "7a5d88f8fd9b542d41b55751a22b3a9592a95f887d03a06e6df70794c165ff2f"
+        }
+      },
+      "nonincremental": [
+        {
+          "instructions": 131323042,
+          "metadata": "940a544b4c6079c45bc517c966e4de6d8ca7d617a79ac003f4b8ed6a5936ee58",
+          "role": "P"
+        },
+        {
+          "instructions": 117411404,
+          "metadata": "d736c07d7ed5fdab64113a8296f54af4caedc371f23cb4568b806c0a89f39ee1",
+          "role": "C"
+        },
+        {
+          "instructions": 131515523,
+          "metadata": "940a544b4c6079c45bc517c966e4de6d8ca7d617a79ac003f4b8ed6a5936ee58",
+          "role": "P"
+        }
+      ],
+      "nonincremental_reduction": 0.10593447873374728,
+      "order": "CP",
+      "pair": {
+        "gates": {
+          "edited_owner": true,
+          "independent_clock": true,
+          "parser": true,
+          "whole": true
+        },
+        "order": "CP",
+        "reductions": {
+          "cold": {
+            "plain": -0.00015405171562221653
+          },
+          "edit": {
+            "owner": 0.3251437893698711,
+            "plain": 0.0827646634197503,
+            "traced_whole": 0.08279843981114943
+          },
+          "new-idle": {
+            "plain": 0.00034948402624646047,
+            "traced_whole": -6.025520578445409e-05
+          },
+          "old-idle": {
+            "plain": -0.00046453080720398887,
+            "traced_whole": -1.4819397742282803e-06
+          },
+          "parser": {
+            "cold": -0.0003495914138023082,
+            "owner": -0.0001871274036835402,
+            "plain": 0.00023291538885839014,
+            "traced_whole": 8.153890646678263e-05
+          }
+        }
+      },
+      "qualified": true,
+      "transport": {
+        "artifact": 13217245606,
+        "bytes": 37092952,
+        "head": "33efaabc12503bdbe9765cd0b11f14f9c8286deb",
+        "job": 125813123006,
+        "job_status": "success",
+        "rank": 5,
+        "run": 41605178214,
+        "runner": "nsc-runner-elu02en9q6pr8",
+        "runner_id": 1921,
+        "sha256": "19244feda1cb984f7e45613169e2619f24399615f1e84967a98ebc1470e9448a",
+        "status": "success",
+        "url": "https://github.com/astral-experiments/ohm/actions/runs/41605178214"
+      },
+      "visits": [
+        {
+          "edited_metadata": "caacdabb705646a7c632d25357226536b711e4cadaa9e9760758aa9612651ae7",
+          "empty_new": {
+            "changed_required": [
+              "char_str-70e37b6c50169bb8",
+              "get_size2-c57b9295f41ebb86",
+              "get_size_derive2-8d31d0c9b7e31bb0",
+              "ruff_db-8624db050923a734",
+              "ruff_diagnostics-7ef4c33a72b558ce",
+              "ruff_memory_usage-8fb770dc5b0d4776",
+              "ruff_notebook-d33cecd49fd3175f",
+              "ruff_python_ast-fabccf09fb3395b1",
+              "ruff_python_parser-de18dd288ffad50f",
+              "ruff_python_trivia-62de3ba78fd4e98d",
+              "ruff_source_file-ada442c72eb033a6",
+              "ruff_text_size-d6470f147dd52f13"
+            ],
+            "different_externs": [
+              "ruff_db"
+            ],
+            "edited": "caacdabb705646a7c632d25357226536b711e4cadaa9e9760758aa9612651ae7",
+            "empty": "d45f9c10cefb3f1bf532fa9e61406575b26992dad0bd209aac53c1045ab8b39d",
+            "equal": false,
+            "semantic_direct": [
+              "ruff_db"
+            ]
+          },
+          "prices": {
+            "cold": {
+              "plain": 355434859230
+            },
+            "edit": {
+              "owner": 115683388,
+              "plain": 619265536,
+              "traced_whole": 619331464
+            },
+            "new-idle": {
+              "owner": 0,
+              "plain": 285009241,
+              "traced_whole": 285154370
+            },
+            "old-idle": {
+              "owner": 0,
+              "plain": 285192092,
+              "traced_whole": 344144050
+            },
+            "parser": {
+              "cold": 184868658439,
+              "owner": 4870059026,
+              "plain": 5182829585,
+              "traced_whole": 5183568827
+            }
+          },
+          "role": "C",
+          "scope": "v2-739bb4f0c27b574f"
+        },
+        {
+          "edited_metadata": "33bd99e331e214c210c4b890bb00d05089233670ab9185f7d4dda8c24c4a0a8e",
+          "empty_new": {
+            "changed_required": [
+              "char_str-70e37b6c50169bb8",
+              "get_size2-c57b9295f41ebb86",
+              "get_size_derive2-8d31d0c9b7e31bb0",
+              "ruff_db-8624db050923a734",
+              "ruff_diagnostics-7ef4c33a72b558ce",
+              "ruff_memory_usage-8fb770dc5b0d4776",
+              "ruff_notebook-d33cecd49fd3175f",
+              "ruff_python_ast-fabccf09fb3395b1",
+              "ruff_python_parser-de18dd288ffad50f",
+              "ruff_python_trivia-62de3ba78fd4e98d",
+              "ruff_source_file-ada442c72eb033a6",
+              "ruff_text_size-d6470f147dd52f13"
+            ],
+            "different_externs": [
+              "ruff_db"
+            ],
+            "edited": "33bd99e331e214c210c4b890bb00d05089233670ab9185f7d4dda8c24c4a0a8e",
+            "empty": "afed1646e9588e2caf1fd7b9d28049fc4d0e53672c74c3ebdf7555d8b0b4b861",
+            "equal": false,
+            "semantic_direct": [
+              "ruff_db"
+            ]
+          },
+          "prices": {
+            "cold": {
+              "plain": 355380112314
+            },
+            "edit": {
+              "owner": 171419313,
+              "plain": 675143566,
+              "traced_whole": 675240308
+            },
+            "new-idle": {
+              "owner": 0,
+              "plain": 285108882,
+              "traced_whole": 285137189
+            },
+            "old-idle": {
+              "owner": 0,
+              "plain": 285059673,
+              "traced_whole": 344143540
+            },
+            "parser": {
+              "cold": 184804052529,
+              "owner": 4869147875,
+              "plain": 5184037027,
+              "traced_whole": 5183991524
+            }
+          },
+          "role": "P",
+          "scope": "v2-cfccdc7488d887da"
+        }
+      ],
+      "zip": {
+        "new": [
+          "c2f5402340a994e474ecb2b9ff046a0037ab2461108cd9d2e2ef8b948e601da9"
+        ],
+        "old": [
+          "a8f7556356bcd2c3c7996354dc7359c9b8da1a8b31c9fef6fbea0d43ca34cb64"
+        ]
+      }
+    }
+  ],
+  "source": {
+    "branch": "charlie/qa-frozen-literal-stage-20261103",
+    "head": "f1af047a36a1a7ea0fce11ddae61a4028d5e7582",
+    "kit": [
+      "ohm-rc23-frozen-literal-stage1",
+      13211728232,
+      195869088,
+      "ac0ff99c939274aa2715ed090746f21ac00af5e669d59f706d316a66bdf09d61"
+    ],
+    "receipts": [
+      "ohm-rc23-frozen-literal-stage1-receipts",
+      13212082839,
+      79873,
+      "c308bbd3599fb2cd1e1de8b34ca80dc267fb69f18d3d8fd6c3c1742abfb463a6"
+    ],
+    "run": 41595501573,
+    "source": {
+      "C": "7a4e5b8dbf109e1d11bceb29c63fdefb08492f7e",
+      "P": "d57fd1515986dccecdcece8da85e651bfb4b81f9"
+    }
+  },
+  "spec": {
+    "aggregate": "Select slots 0\u20135 before any outputs, in the fixed order schedule. Six unique run IDs, pre-recorded workflow head and input slot, distinct jobs, runner IDs, boot IDs, first attempt, original archive digest, exact signed sources, and same full native/ZIP originals. For each endpoint report the six signed reductions; exact two-sided sign p and median interval covering 96.875% with the six minimum/maximum for continuous paired improvements. Retain all original failed or missing slots.",
+    "pilot": {
+      "artifact": 13216495367,
+      "bytes": 47769864,
+      "head": "e27b29fadf6d68526591f863cd724c22d530d403",
+      "native": {
+        "edit": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+        "fresh": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+        "old": "7a5d88f8fd9b542d41b55751a22b3a9592a95f887d03a06e6df70794c165ff2f"
+      },
+      "run": 41603258212,
+      "sha256": "dd07d63702049b4b3e209cc6b2fca75429b2ccb623d33617eefdae125e2aa933",
+      "zip": {
+        "new": [
+          "c2f5402340a994e474ecb2b9ff046a0037ab2461108cd9d2e2ef8b948e601da9"
+        ],
+        "old": [
+          "a8f7556356bcd2c3c7996354dc7359c9b8da1a8b31c9fef6fbea0d43ca34cb64"
+        ]
+      }
+    },
+    "primary": "One ordinary edited Rust compiler per compiler role per independent fresh kernel boot, counting total retired user instructions over that actual family. Retain the literal untraced whole Cargo and separately traced whole Cargo, old/edited/unchanged, E0308+repair, independent empty B and same-input package clean, typed native discriminator and full ZIPs.",
+    "quantitative": "Require >=20% fewer ordinary edited rustc instructions and >=20% fewer same-operand direct rustc instructions, no >1% whole edit regression, and no >2% symbol-heavy parser regression (cold, isolated whole and physical owner). Allow maximum 3% discrepancy between original independent whole-Cargo counters on each edit. Also require no >2% regression when removing exactly the incremental codegen option (and no other argv) from each P/C/P stable-input Rust compiler; record instruction counts and identical complete parent output. Never mask or rescale clocks.",
+    "ranks": [
+      "PC",
+      "CP",
+      "PC",
+      "CP",
+      "PC",
+      "CP"
+    ],
+    "safeguards": "Without any changed source, no new output cache. Both complete genuine native ELFs in each role/boot must exactly match the prior authentic pilot originals. Preserve individual raw incoming metadata and command; a per-role full build under the same dependency bytes must emit identical metadata. Keep the original independently empty metadata if upstream hashes differ.",
+    "version": "six-independent-ty-vendored-v1"
+  }
+}
