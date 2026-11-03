@@ -1,12 +1,13 @@
 {
-  "bundle": "95ff414588d9aa4f3eed1bad4cdfb77679c5ff8f649023cbf8fea88a21de6266",
-  "candidate": "dda36b958be0f0c393c22039fb2f53c0ff436968",
-  "candidate_tree": "ff7b8023f28d9ee6b7121944b97ef5b58cbb0322",
+  "bundle": "92fe89f034715ae582a1748335983d8354cfb6ef78ffbc7e8e30518d315a44e6",
+  "candidate": "8574afc64801c199c8d090e3e0e013adf6ccd496",
+  "candidate_tree": "69e168ef2d18cb0b9f8ee6589d006e5ed4303283",
   "cargo": "abc70d60a6fd89c10d5f65cf85820d9b78d5affe",
   "compiler_commits": [
     "a60f4f4476d4819b62730e92ea07c1343f8e6dac",
     "2bc7e7b7c898e7fa82a1dde03978c59263d8167d",
-    "dda36b958be0f0c393c22039fb2f53c0ff436968"
+    "dda36b958be0f0c393c22039fb2f53c0ff436968",
+    "8574afc64801c199c8d090e3e0e013adf6ccd496"
   ],
   "criterion": "20% fewer instructions in a full affected compiler or 2x across a real ordinary command; no PR from the factory alone.",
   "initial_build": {
@@ -32,6 +33,7 @@
     "compiler/rustc_mir_build/src/thir/cx/expr.rs",
     "compiler/rustc_mir_build/src/thir/pattern/check_match.rs",
     "compiler/rustc_mir_build/src/thir/print.rs",
+    "compiler/rustc_parse/src/parser/expr.rs",
     "compiler/rustc_ty_utils/src/consts.rs"
   ],
   "priced_parent": {
@@ -57,5 +59,17 @@
   "release_sha256": "ecde6809d7f1fc1966798198479867c4a49bdf7a51f3873336d23a40fabce453",
   "ruff_new": "88a50d695c1142294bb4c780fad47d3306173885",
   "ruff_old": "276832aa91f2086a6ec880884fcdd987991cddf2",
-  "source_recovery": "5ad861aa628d029d91d80c888b40d9908989ede2"
+  "source_recovery": "5ad861aa628d029d91d80c888b40d9908989ede2",
+  "typed_result": {
+    "decision": "below the preregistered 20% edited-rustc threshold on both independent hardware workers",
+    "primary_percent_saved": [
+      17.25,
+      17.29
+    ],
+    "run": 41732997557,
+    "secondary_build": [
+      16.42,
+      16.45
+    ]
+  }
 }
