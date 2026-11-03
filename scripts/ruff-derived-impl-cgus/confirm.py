@@ -12,7 +12,8 @@ plan=json.loads(plan_file.read_bytes())
 root=Path(os.environ['GITHUB_WORKSPACE']).resolve(strict=True)
 frozen=root/'original-receiver'
 head=subprocess.check_output(['git','-C',frozen,'rev-parse','HEAD'],text=True).strip()
-assert head==plan['primary_receiver_commit']=='453a3893b5844334a5b7f1c770c14e94ad1a34f8'
+assert head==plan['primary_receiver_commit']=='2672756eb5b9d4e890b678d439dc6c40a29a4008'
+assert hashlib.sha256((frozen/'scripts/ruff-derived-impl-cgus/paired.py').read_bytes()).hexdigest()==plan['canonical_receiver_sha256']
 assert os.environ['RUFF_CASE']=='28392' and os.environ['GITHUB_RUN_ATTEMPT']=='1'
 slot=int(os.environ['BOOT_SLOT']);assert 0<=slot<6 and str(slot)==os.environ['BOOT_SLOT']
 sys.path.insert(0,str(frozen/'scripts/ruff-derived-impl-cgus'))
