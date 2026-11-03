@@ -17,3 +17,5 @@ The first worker stopped on its second independent history, before a full panel.
 ## Independent signed −22 replication
 
 The second host uses the unchanged numerical protocol and the complementary arm order in `replication.json`. It excludes the first host and all 28 earlier boots. Both current-release checks bind the same immutable signed −22 GNU artifact. `native_reader.py` verifies 48 raw blocking-clock intervals in their physical order. The explicit `--reference-41531636175` option reopens the authenticated first host for an offline CLI regression test.
+
+The first replication attempt reached SDK admission and stopped before calibration. The retry records its runner identity after setup has validated the empty results directory, and excludes the earlier runner and boot. Both runs use the same source inputs, pair orders and numerical rules. [Original attempt](https://github.com/astral-experiments/ohm/actions/runs/41562486393)

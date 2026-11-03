@@ -9,6 +9,9 @@ raw = (HERE / 'replication.json').read_bytes()
 assert hashlib.sha256(raw).hexdigest() == REGISTRATION_SHA
 PLAN = json.loads(raw)
 FIRST = json.loads((HERE / 'first-host.json').read_bytes())
+refused_bytes = (HERE / 'refused-start.json').read_bytes()
+assert hashlib.sha256(refused_bytes).hexdigest() == '0397572adcf0a620edd3aca1843b5e5d850a14ea10e732fcaca31a4cd16468ed'
+REFUSED = json.loads(refused_bytes)
 assert all(FIRST[a] == PLAN['first'][b] for a,b in (
     ('run','run'), ('job','job'), ('runner_id','runner'), ('boot','boot')))
 assert FIRST['final_artifact']['inner_sha256'] == PLAN['first']['inner']
@@ -22,7 +25,8 @@ def ordered(protocol, original_orders):
 
 def excluded(prior):
     assert len(prior) == len(set(prior)) == 28 and FIRST['boot'] not in prior
-    return [*prior,FIRST['boot']]
+    assert REFUSED['boot'] not in [*prior,FIRST['boot']]
+    return [*prior,FIRST['boot'],REFUSED['boot']]
 
 def release(raw,lock):
     assert raw['id'] == lock['release_id'] == PLAN['first']['release_id']
@@ -49,6 +53,8 @@ def native(root, *, reference=False):
     job = host['job']
     assert job['head_sha'] == transport['new_head'] and str(job['run_id']) == str(transport['run_id'])
     assert job['id'] != FIRST['job'] and job['run_id'] != FIRST['run']
+    assert job['id'] != REFUSED['job'] and job['run_id'] != REFUSED['run']
+    assert job['runner_id'] != REFUSED['runner_id'] and job['runner_name'] != REFUSED['runner_name']
     assert job['runner_id'] > 0 and job['runner_id'] != FIRST['runner_id'] and job['runner_name'] != FIRST['runner_name']
     assert host['previous'] == FIRST
     for filename in ('fresh-publication.json','fresh-publication-after.json'):
