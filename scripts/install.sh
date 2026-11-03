@@ -189,16 +189,9 @@ case "$installation_prefix" in
         fail 'refusing to install into a broad or managed directory'
         ;;
 esac
-printf '%s\n' "$installation_prefix" | awk '
-    {
-        count = split($0, components, "/")
-        for (component_number = 1; component_number <= count; component_number++) {
-            if (components[component_number] == "." || components[component_number] == "..") {
-                exit 1
-            }
-        }
-    }
-' || fail 'OHM_INSTALL_DIR must not contain relative path components'
+case "$installation_prefix/" in
+    */./*|*/../*) fail 'OHM_INSTALL_DIR must not contain relative path components' ;;
+esac
 
 info 'verifying archive checksum'
 if command -v sha256sum >/dev/null 2>&1; then
@@ -300,13 +293,19 @@ else
     info 'extracting toolchain'
     tar --no-same-owner -xf "$archive_path" -C "$extracted_directory" ||
         fail 'could not extract the archive'
-    inner_installer=$extracted_directory/$archive_root/install.sh
-    [ -f "$inner_installer" ] && [ ! -L "$inner_installer" ] ||
+    inner_installer=extracted/$archive_root/install.sh
+    [ -f "$temporary_directory/$inner_installer" ] && [ ! -L "$temporary_directory/$inner_installer" ] ||
         fail 'the archive does not contain a regular Rust installation script'
     staged_prefix=$staging_directory/toolchain
     info 'installing toolchain components'
-    sh "$inner_installer" --prefix="$staged_prefix" --disable-ldconfig ||
-        fail 'the Rust distribution installer failed'
+    # The distribution installer reparses its arguments and the path to its script.
+    # Keep both paths simple while staging the toolchain on its destination filesystem.
+    (
+        CDPATH='' cd "$temporary_directory" &&
+            mkdir "$staged_prefix" &&
+            ln -s "$staged_prefix" toolchain &&
+            sh "$inner_installer" --prefix=toolchain --disable-ldconfig
+    ) || fail 'the Rust distribution installer failed'
     verify_installation "$staged_prefix"
     printf '%s\n' "$version" > "$staged_prefix/.ohm-version"
 
@@ -338,10 +337,7 @@ link_toolchain() {
     link_path=$toolchains_directory/$toolchain_name
 
     if [ -L "$link_path" ]; then
-        current_destination=$(cd "$link_path" 2>/dev/null && pwd -P) || current_destination=
-        desired_destination=$(cd "$installation_prefix" && pwd -P) ||
-            fail 'could not resolve the installed toolchain path'
-        if [ "$current_destination" = "$desired_destination" ]; then
+        if [ "$link_path" -ef "$installation_prefix" ]; then
             return
         fi
         if [ "$toolchain_name" != ohm ]; then
@@ -354,6 +350,17 @@ link_toolchain() {
             fail 'could not preserve the previous custom rustup toolchain link'
     elif [ -e "$link_path" ]; then
         fail "refusing to replace an existing managed rustup toolchain: $toolchain_name"
+    fi
+
+    if [ "$toolchain_name" = "$version" ]; then
+        RUSTUP_HOME="$temporary_directory/rustup" rustup toolchain link "$version" "$installation_prefix" ||
+            fail "could not register rustup toolchain: $version"
+        # Copy the symlink without replacing a competing registration. cp -n's
+        # exit status for an existing file varies by platform, so check the link.
+        cp -RPn "$temporary_directory/rustup/toolchains/$version" "$toolchains_directory/" 2>/dev/null || :
+        [ -L "$link_path" ] && [ "$link_path" -ef "$installation_prefix" ] ||
+            fail "could not register immutable rustup toolchain: $version"
+        return
     fi
 
     if ! rustup toolchain link "$toolchain_name" "$installation_prefix"; then

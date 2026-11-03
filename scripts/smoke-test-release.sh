@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
+unset CDPATH
 
 if [[ $# -ne 4 ]]; then
   echo "usage: smoke-test-release.sh RELEASE_DIRECTORY TOOLCHAIN TARGET CLIPPY_REVISION" >&2
   exit 2
 fi
-RELEASE_DIRECTORY="$(cd -- "$1" && pwd)"
+IFS= read -r -d '' RELEASE_DIRECTORY < <(cd -- "$1" && printf '%s\0' "$PWD")
 OHM_TOOLCHAIN=$2
 OHM_TARGET=$3
 CLIPPY_REVISION=$4
@@ -25,6 +26,8 @@ esac
   grep '  ohm-installer\.sh$' SHA256SUMS | shasum -a 256 --check
 )
 
+# Install the test toolchain with permissions that allow its native link driver to run.
+umask 077
 smoke_root="$(mktemp -d "${RUNNER_TEMP:-${TMPDIR:-/tmp}}/ohm-smoke.XXXXXX")"
 trap 'rm -rf "$smoke_root"' EXIT
 
@@ -226,6 +229,32 @@ env -u RUST_SRC_PATH RUSTUP_TOOLCHAIN="$OHM_TOOLCHAIN" \
   "${RUST_ANALYZER:?set RUST_ANALYZER to the stock rust-analyzer executable}" \
   diagnostics "$smoke_crate"
 
+if jq -e '.release | ((.upstream_rust_version | split(".") | map(tonumber)) + [.ohm_revision]) >= [1, 99, 0, 23]' \
+    "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN.json" >/dev/null; then
+  cat > "$smoke_crate/src/lib.rs" <<'EOF'
+/// ```
+/// assert_eq!(ohm_smoke::answer(), 42);
+/// ```
+pub fn answer() -> u32 {
+    42
+}
+EOF
+  for pass in cold warm; do
+    log="$smoke_root/doctests-$pass.log"
+    cargo +"$OHM_TOOLCHAIN" test --doc --offline --manifest-path "$smoke_crate/Cargo.toml" -v \
+      2>&1 | tee "$log"
+    grep -F 'test result: ok. 1 passed' "$log" >/dev/null
+  done
+  grep -F -- '--output-format=doctest' "$smoke_root/doctests-cold.log" >/dev/null
+  if grep -E -- '--output-format=doctest|--test-run-directory' "$smoke_root/doctests-warm.log"; then
+    echo 'warm doctest did not use the cached harness' >&2
+    exit 1
+  fi
+  cargo +"$OHM_TOOLCHAIN" -Zohm-cached-doctests=no test --doc --offline \
+    --manifest-path "$smoke_crate/Cargo.toml" -v 2>&1 | tee "$smoke_root/doctests-disabled.log"
+  grep -F -- '--test-run-directory' "$smoke_root/doctests-disabled.log" >/dev/null
+fi
+
 # Exercise cache admission with the installed compiler, without a wrapper.
 registry_crate="$smoke_root/registry-crate"
 mkdir -p "$registry_crate/src"
@@ -275,8 +304,9 @@ EOF
   if grep -E '(Checking|Compiling) itoa ' "$smoke_root/registry-check.log"; then
     exit 1
   fi
-  if find "$CARGO_BUILD_BUILD_DIR/debug/build/workspaces" \
-    -name '.ohm-worktree-seed-deny-v7' | grep .; then
+  deny_markers="$(find "$CARGO_BUILD_BUILD_DIR" -name '.ohm-worktree-seed-deny-v7')"
+  if [[ -n "$deny_markers" ]]; then
+    printf '%s\n' "$deny_markers" >&2
     exit 1
   fi
 )

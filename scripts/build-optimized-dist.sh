@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
+unset CDPATH
+# Bootstrap and collect profiles from the requested checkout, even inside a Git hook.
+unset GIT_DIR GIT_WORK_TREE GIT_COMMON_DIR
+unset GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_QUARANTINE_PATH
 
 if [[ $# -ne 4 ]]; then
   echo 'usage: build-optimized-dist.sh TARGET TOOLCHAIN RUST_CHECKOUT BOOTSTRAP_CONFIG' >&2
@@ -35,12 +39,12 @@ if [[ ! -f "$bootstrap_config" ]]; then
   exit 1
 fi
 
-rust_checkout="$(cd -- "$rust_checkout" && pwd -P)"
+# A NUL delimiter preserves trailing newlines in the physical directory name.
+IFS= read -r -d '' rust_checkout < <(cd -P -- "$rust_checkout" && printf '%s\0' "$PWD")
 script_directory="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-bootstrap_config="$(
-  cd -- "$(dirname -- "$bootstrap_config")"
-  printf '%s/%s\n' "$PWD" "$(basename -- "$bootstrap_config")"
-)"
+if [[ "$bootstrap_config" != /* ]]; then
+  bootstrap_config="$PWD/$bootstrap_config"
+fi
 
 # Older immutable Rust source revisions only train rustc. Detect the explicit
 # component-training contract before bootstrapping so those releases remain
@@ -69,7 +73,7 @@ if [[ "$use_bolt" == true ]]; then
     exit 1
   fi
 
-  bolt_llvm_dir="$(cd -- "$OHM_BOLT_LLVM_DIR" && pwd -P)"
+  IFS= read -r -d '' bolt_llvm_dir < <(cd -P -- "$OHM_BOLT_LLVM_DIR" && printf '%s\0' "$PWD")
   for bolt_binary in llvm-bolt merge-fdata; do
     if [[ ! -x "$bolt_llvm_dir/bin/$bolt_binary" ]]; then
       echo "required LLVM BOLT executable not found: $bolt_llvm_dir/bin/$bolt_binary" >&2
@@ -111,6 +115,9 @@ if ! awk -v toolchain="$toolchain" -v use_mimalloc="$use_mimalloc" '
 fi
 
 export RUST_BOOTSTRAP_CONFIG="$release_config"
+if [[ -n "${TMPDIR:-}" && "$TMPDIR" != /* ]]; then
+  export TMPDIR="$PWD/$TMPDIR"
+fi
 cd -- "$rust_checkout"
 
 # `opt-dist` is a bootstrap-only tool and does not itself require LLVM. Ask for
@@ -241,11 +248,43 @@ if [[ "$use_bolt" == true ]]; then
   opt_dist_arguments+=(--use-bolt)
 fi
 
+release_name="${toolchain#ohm-}"
+manifest="$script_directory/../toolchains/${release_name%-*}/${release_name##*-}.json"
+prepare_relocated_dependencies=false
+if [[ -f "$manifest" ]]; then
+  prepare_relocated_dependencies="$(jq -r '.prepare_relocated_pgo_dependencies // false' "$manifest")"
+fi
+if [[ "$prepare_relocated_dependencies" == true ]]; then
+  # rustc-perf moves each benchmark after preparing its dependencies. A build
+  # script can embed that original path. Prepare the moved dependencies before
+  # the profiler starts, keeping the upstream collector and the Rust checkout intact.
+  perf_path=src/tools/rustc-perf
+  perf_revision="$(git -C "$rust_checkout" rev-parse "HEAD:$perf_path")"
+  perf_source="$rust_checkout/$perf_path"
+  perf_checkout="$(mktemp -d "${TMPDIR:-/tmp}/ohm-rustc-perf.XXXXXX")"
+  trap 'rm -rf -- "$perf_checkout"' EXIT
+  if [[ ! -e "$perf_source/.git" ]]; then
+    # Read the committed gitlink even if the caller staged a different revision or removal.
+    (
+      export GIT_INDEX_FILE="$perf_checkout/index"
+      git -C "$rust_checkout" read-tree HEAD
+      git -C "$rust_checkout" submodule update --init --checkout --depth 1 -- "$perf_path"
+    )
+    rm -- "$perf_checkout/index"
+  fi
+  if ! git -C "$perf_source" cat-file -e "$perf_revision^{commit}" 2>/dev/null; then
+    # Supply the revision on stdin so Git selects the checkout's usual fetch remote.
+    git -C "$perf_source" fetch --depth 1 --no-tags --no-write-fetch-head --stdin <<< "$perf_revision"
+  fi
+  git -C "$perf_source" archive "$perf_revision" | tar -x -C "$perf_checkout"
+  patch -d "$perf_checkout" -t -N -F 0 -p1 -i "$script_directory/../release/rustc-perf-relocated-dependencies.patch"
+  opt_dist_arguments+=(--rustc-perf-checkout-dir "$perf_checkout")
+fi
+
 # This compiler rechecks dependencies with native inputs. rustc-perf expects
 # the selected crate to be the only one compiled during each training run.
 case "$toolchain" in
   ohm-1.99.0-20 | ohm-1.99.0-21)
-    manifest="$script_directory/../toolchains/1.99.0/${toolchain##*-}.json"
     pinned_rust="$(jq -er '.sources.rust.revision' "$manifest")"
     if [[ "$(git -C "$rust_checkout" rev-parse --verify HEAD)" == "$pinned_rust" ]]; then
       opt_dist_arguments+=(--benchmark-cargo-config unstable.ohm-defaults=false)
