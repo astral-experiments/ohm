@@ -30,14 +30,15 @@ class PrepareWildTests(unittest.TestCase):
                     archive.addfile(member, io.BytesIO(data))
         return payload.getvalue()
 
-    def prepare(self, payload, checksum=None):
+    def prepare(self, payload, checksum=None, output=None):
         manifest = {"bundled_tools": {"wild": {
             "version": "0.10.0",
             "sha256": checksum or hashlib.sha256(payload).hexdigest(),
         }}}
-        temporary = tempfile.TemporaryDirectory()
-        self.addCleanup(temporary.cleanup)
-        output = pathlib.Path(temporary.name) / "wild"
+        if output is None:
+            temporary = tempfile.TemporaryDirectory()
+            self.addCleanup(temporary.cleanup)
+            output = pathlib.Path(temporary.name) / "wild"
         with patch.object(module.urllib.request, "urlopen", return_value=io.BytesIO(payload)):
             return module.prepare(manifest, module.TARGET, output)
 
@@ -52,6 +53,21 @@ class PrepareWildTests(unittest.TestCase):
             self.prepare(self.archive(), "0" * 64)
         with self.assertRaisesRegex(ValueError, "unsafe"):
             self.prepare(self.archive(unsafe=True))
+
+    def test_existing_destination_is_preserved(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = pathlib.Path(temporary)
+            empty = root / "empty"
+            empty.mkdir()
+            link = root / "link"
+            target = root / "missing"
+            link.symlink_to(target, target_is_directory=True)
+            for path in (empty, link):
+                with self.subTest(path=path), self.assertRaises(FileExistsError):
+                    self.prepare(self.archive(), output=path)
+            self.assertEqual(list(empty.iterdir()), [])
+            self.assertTrue(link.is_symlink())
+            self.assertFalse(target.exists())
 
     def test_old_manifests_and_other_platforms_do_not_download(self):
         with patch.object(module.urllib.request, "urlopen") as download:

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+unset CDPATH
 
 require_pinned=false
 if [[ "${1:-}" == "--require-pinned" ]]; then
@@ -7,7 +8,7 @@ if [[ "${1:-}" == "--require-pinned" ]]; then
   shift
 fi
 
-manifest="${1:-toolchains/1.99.0/14.json}"
+manifest="${1:-toolchains/1.99.0/21.json}"
 if [[ $# -gt 1 ]]; then
   echo "usage: validate-release-manifest.sh [--require-pinned] [MANIFEST]" >&2
   exit 2
@@ -24,8 +25,9 @@ if [[ ! -f "$manifest" ]]; then
 fi
 
 check_jsonschema_version="0.37.4"
-manifest_directory="$(cd -- "$(dirname -- "$manifest")" && pwd)"
-schema="$manifest_directory/../manifest.schema.json"
+manifest_name="${manifest##*/}"
+manifest_directory="${manifest%"$manifest_name"}"
+schema="${manifest_directory}../manifest.schema.json"
 
 if [[ ! -f "$schema" ]]; then
   echo "release manifest schema does not exist: $schema" >&2
@@ -80,15 +82,14 @@ clippy_revision="$(jq -er '.sources.clippy.revision' "$manifest")"
 rustfmt_revision="$(jq -r '.sources.rustfmt.revision // empty' "$manifest")"
 zero_revision="0000000000000000000000000000000000000000"
 expected_toolchain_name="ohm-$rust_version-$ohm_revision"
-path_rust_version="$(basename -- "$(dirname -- "$manifest")")"
-path_revision="$(basename -- "$manifest" .json)"
+path_revision="${manifest_name%.json}"
 
 if [[ "$toolchain_name" != "$expected_toolchain_name" ]]; then
   echo "toolchain name $toolchain_name does not match $expected_toolchain_name" >&2
   exit 1
 fi
 
-if [[ "$path_rust_version" != "$rust_version" || "$path_revision" != "$ohm_revision" ]]; then
+if [[ ! "/$manifest" =~ /"$rust_version"/+[^/]+$ || "$path_revision" != "$ohm_revision" ]]; then
   echo "$manifest does not match release $rust_version revision $ohm_revision" >&2
   exit 1
 fi

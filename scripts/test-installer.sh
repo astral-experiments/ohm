@@ -32,6 +32,14 @@ if [ -z "$prefix" ]; then
   exit 1
 fi
 
+# The distribution installer splits its script path and evaluates --prefix.
+case "$0:$prefix" in
+  *[[:space:]]*|*'$('*)
+    echo 'unsafe characters in the distribution installer arguments' >&2
+    exit 1
+    ;;
+esac
+
 mkdir -p "$prefix/bin"
 for binary in rustc rustdoc cargo cargo-clippy clippy-driver rustfmt cargo-fmt; do
   if [ "$binary" = rustdoc ] && [ "${OHM_TEST_RUSTDOC:-present}" = missing ]; then
@@ -121,7 +129,10 @@ if [ "$3" = ohm ] && [ "${OHM_TEST_RUSTUP_ALIAS_FAILURE:-0}" = 1 ]; then
 fi
 
 mkdir -p "$RUSTUP_HOME/toolchains"
-ln -s "$4" "$RUSTUP_HOME/toolchains/$3"
+if [ -n "${OHM_TEST_RUSTUP_RACER:-}" ] && [ "$3" = "$OHM_TEST_VERSION" ]; then
+  ln -s "$OHM_TEST_RUSTUP_RACER/other" "$OHM_TEST_RUSTUP_RACER/rustup-home/toolchains/$3"
+fi
+ln -sfn "$4" "$RUSTUP_HOME/toolchains/$3"
 EOF
 
 cat > "$mock_directory/curl" <<'EOF'
@@ -271,6 +282,9 @@ assert_no_links() {
     exit 1
   fi
 }
+
+mkdir -p "$temporary_directory/back\\slash"
+TMPDIR="$temporary_directory/back\\slash" run_case escaped-tempdir success
 
 run_case help success --help
 assert_contains "$temporary_directory/cases/help/output.log" 'Usage: install.sh'
@@ -451,6 +465,31 @@ run_case unsafe-prefix failure
 unset OHM_TEST_INSTALL_DIR
 assert_no_links unsafe-prefix
 
+OHM_TEST_INSTALL_DIR="$temporary_directory/cases/multiline-dot-component/"$'line\n..'"/toolchain"
+run_case multiline-dot-component success
+unset OHM_TEST_INSTALL_DIR
+
+mkdir -p "$temporary_directory/temp with spaces"
+TMPDIR="$temporary_directory/temp with spaces" \
+  OHM_TEST_INSTALL_DIR="$temporary_directory/cases/space in parent/\$(false)/toolchain" \
+  run_case literal-staging-path success
+
+for component in . ..; do
+  OHM_TEST_INSTALL_DIR="$temporary_directory/cases/relative-component/$component"
+  run_case relative-component failure
+  assert_contains "$output" 'OHM_INSTALL_DIR must not contain relative path components'
+done
+unset OHM_TEST_INSTALL_DIR
+
+mkdir "$temporary_directory/local release%"
+cp "$release_directory/$archive_name" "$temporary_directory/local release%/$archive_name"
+OHM_TEST_DOWNLOAD_URL="file://$temporary_directory/local%20release%25"
+run_case encoded-file-url success
+OHM_TEST_DOWNLOAD_URL="file://$temporary_directory/local%00%20release%25"
+run_case encoded-nul-file-url failure
+assert_no_links encoded-nul-file-url
+unset OHM_TEST_DOWNLOAD_URL
+
 for unsafe_url in http://example.invalid file://example.invalid/archive ftp://example.invalid; do
   OHM_TEST_DOWNLOAD_URL=$unsafe_url
   run_case unsafe-download-url failure
@@ -536,18 +575,33 @@ if [ ! -f "$activation_race_prefix/race-marker" ] || \
   exit 1
 fi
 
+race_directory="$temporary_directory/cases/immutable-link-race"
+mkdir -p "$race_directory/other"
+OHM_TEST_RUSTUP_RACER="$race_directory" run_case immutable-link-race failure
+if [ ! "$race_directory/rustup-home/toolchains/$version" -ef "$race_directory/other" ]; then
+  echo 'installer replaced the concurrently registered version' >&2
+  exit 1
+fi
+
 existing_alias_directory="$temporary_directory/cases/replace-alias/rustup-home/toolchains"
-existing_alias_target="$temporary_directory/cases/replace-alias/previous-toolchain"
+# Command substitution strips trailing newlines from a path printed by pwd.
+existing_alias_target="$temporary_directory/cases/replace-alias/toolchain"$'\n'
 mkdir -p "$existing_alias_directory" "$existing_alias_target"
 ln -s "$existing_alias_target" "$existing_alias_directory/ohm"
 run_case replace-alias success
 assert_contains "$temporary_directory/cases/replace-alias/rustup.log" \
   'toolchain link ohm '
-if [ "$(readlink "$existing_alias_directory/ohm")" != \
-     "$temporary_directory/cases/replace-alias/toolchain" ]; then
+if [ ! "$existing_alias_directory/ohm" -ef "$temporary_directory/cases/replace-alias/toolchain" ]; then
   echo 'existing custom rustup alias was not updated to the new Ohm toolchain' >&2
   exit 1
 fi
+
+conflicting_version_directory="$temporary_directory/cases/conflicting-version/rustup-home/toolchains"
+conflicting_version_target="$temporary_directory/cases/conflicting-version/toolchain"$'\n'
+mkdir -p "$conflicting_version_directory" "$conflicting_version_target"
+ln -s "$conflicting_version_target" "$conflicting_version_directory/$version"
+run_case conflicting-version failure
+assert_no_links conflicting-version
 
 failing_alias_directory="$temporary_directory/cases/failed-alias/rustup-home/toolchains"
 failing_alias_target="$temporary_directory/cases/failed-alias/previous-toolchain"

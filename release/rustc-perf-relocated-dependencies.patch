@@ -1,0 +1,17 @@
+--- a/collector/src/compile/benchmark/mod.rs
++++ b/collector/src/compile/benchmark/mod.rs
+@@ -454,8 +454,14 @@
+                 // Don't delete the directory on error.
+                 let timing_dir = ManuallyDrop::new(self.make_temp_dir(benchmark_dir.dir.path())?);
+                 let cwd = timing_dir.path();
+
++                // A dependency can embed the absolute path to its generated files.
++                // Prepare it at the final path before the profiler isolates the selected crate.
++                self.mk_cargo_process(toolchain, cwd, profile, backend, target, frontend_threads)
++                    .run_rustc(false)
++                    .await?;
++
+                 // A full non-incremental build.
+                 if scenarios.contains(&Scenario::Full) {
+                     self.mk_cargo_process(
+                         toolchain,

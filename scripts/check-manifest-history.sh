@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# Release revisions name the original objects, even in checkouts with replacement refs.
+export GIT_NO_REPLACE_OBJECTS=1
 
 if [[ $# -ne 1 ]]; then
   echo "usage: check-manifest-history.sh BASE_REVISION" >&2
@@ -8,6 +10,17 @@ fi
 
 base_revision="$1"
 zero_revision="0000000000000000000000000000000000000000"
+
+path_to_root="$(git rev-parse --show-cdup)"
+cd -P -- "./$path_to_root"
+
+# Git stores a symlink as its target path, which is not the manifest JSON that jq reads.
+for manifest in toolchains/*/*.json; do
+  if [[ -L toolchains || -L "${manifest%/*}" || -L "$manifest" ]]; then
+    echo "toolchain manifest path contains a symlink: $manifest" >&2
+    exit 1
+  fi
+done
 
 if [[ -z "$base_revision" || "$base_revision" == "$zero_revision" ]]; then
   echo "no previous coordinator revision; all manifests are new"
@@ -19,7 +32,7 @@ if ! git cat-file -e "$base_revision^{commit}" 2>/dev/null; then
   exit 1
 fi
 
-while IFS= read -r manifest; do
+git ls-tree -r --name-only "$base_revision" -- toolchains | while IFS= read -r manifest; do
   case "$manifest" in
     toolchains/*/*.json) ;;
     *) continue ;;
@@ -90,6 +103,6 @@ while IFS= read -r manifest; do
       exit 1
       ;;
   esac
-done < <(git ls-tree -r --name-only "$base_revision" -- toolchains)
+done
 
 echo "verified toolchain manifest history against $base_revision"

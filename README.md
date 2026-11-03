@@ -5,8 +5,8 @@
 
 An experimental fork of the Rust toolchain, designed for fast, highly parallel local development.
 
-With Ohm, incremental builds can be up to 27× faster, replayed development sessions take around
-47% less time, and `target/` disk usage decreases by around 55%.
+With Ohm, incremental builds can be up to 33× faster, replayed development sessions take around
+48% less time, and `target/` disk usage decreases by around 55%.
 
 Comparing stock Rust and Ohm on replayed development sessions:
 
@@ -14,17 +14,17 @@ Comparing stock Rust and Ohm on replayed development sessions:
 
 | Scope                                      | Rust 1.99.0 | Ohm      | Time saved |
 | ------------------------------------------ | ----------- | -------- | ---------- |
-| Ruff session                               | 532.27 s    | 294.83 s | 44.61%     |
-| uv session                                 | 210.78 s    | 123.91 s | 41.21%     |
-| Codex session                              | 791.24 s    | 385.35 s | 51.30%     |
-| ty session                                 | 348.66 s    | 195.53 s | 43.92%     |
-| All sessions                               | 1,882.94 s  | 999.61 s | 46.91%     |
-| `cargo check`                              | 218.69 s    | 64.54 s  | 70.49%     |
-| `cargo test`, `cargo nextest`, `just test` | 1,053.46 s  | 700.50 s | 33.51%     |
-| `cargo clippy`                             | 554.50 s    | 199.53 s | 64.02%     |
-| `cargo fmt`                                | 20.25 s     | 12.79 s  | 36.85%     |
-| Other commands                             | 33.36 s     | 18.62 s  | 44.18%     |
-| All commands                               | 1,880.26 s  | 995.98 s | 47.03%     |
+| Ruff session                               | 546.95 s    | 299.86 s | 45.18%     |
+| uv session                                 | 188.32 s    | 95.87 s  | 49.09%     |
+| Codex session                              | 808.41 s    | 395.81 s | 51.04%     |
+| ty session                                 | 340.75 s    | 191.72 s | 43.73%     |
+| All sessions                               | 1,884.42 s  | 983.26 s | 47.82%     |
+| `cargo check`                              | 208.14 s    | 62.31 s  | 70.07%     |
+| `cargo test`, `cargo nextest`, `just test` | 1,056.55 s  | 687.91 s | 34.89%     |
+| `cargo clippy`                             | 563.94 s    | 198.82 s | 64.74%     |
+| `cargo fmt`                                | 20.87 s     | 12.37 s  | 40.76%     |
+| Other commands                             | 32.66 s     | 19.02 s  | 41.77%     |
+| All commands                               | 1,882.15 s  | 980.42 s | 47.91%     |
 
 <!-- /benchmark:sessions -->
 
@@ -119,9 +119,8 @@ To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS
 - Use `cargo +ohm <command>` for all local Cargo commands, including `check`, `test`, `clippy`,
   `fmt`, `metadata`, and external subcommands. Use `rustc +ohm` for direct compiler calls and
   `RUSTUP_TOOLCHAIN=ohm just <recipe>` for task runners.
-- Ohm automatically enables `-Zrelink-only`, `-Zpublic-api-hash`, `-Zcache-proc-macros`, and
-  `-Zthreads=8` when compiling. Do not inject these flags manually or through `RUSTFLAGS`; direct
-  `rustc +ohm` does not receive Cargo's defaults.
+- Ohm automatically enables `-Zrelink-only`, `-Zpublic-api-hash`, and `-Zthreads=8` when compiling.
+  Cargo supplies these flags for you. Direct `rustc +ohm` uses its own defaults.
 - Keep a stable, distinct `CARGO_TARGET_DIR` for each worktree. Set `CARGO_BUILD_BUILD_DIR` to a
   separate shared path for all trusted local projects and worktrees using the same Ohm toolchain.
   Keep the shared build directory separate from every worktree target directory, and do not delete
@@ -147,25 +146,22 @@ sequence preserves its build artifacts between commands; each repetition starts 
 Times are medians of four runs, with each toolchain pair measured on the same host. See the
 [benchmark guide](BENCHMARKS.md) for details.
 
+The Ohm 1.99.0-17 developer table covers Ruff/ty and uv. Codex’s developer suite is still incomplete and is omitted; its individual-command benchmarks and session replays appear in their respective tables.
+
 <!-- benchmark:developer-workflows -->
 
-| Project | Workflow                          | Rust 1.99.0 | Ohm 1.99.0-14 | Time saved |
+| Project | Workflow                          | Rust 1.99.0 | Ohm 1.99.0-17 | Time saved |
 | ------- | --------------------------------- | ----------- | ------------- | ---------- |
-| Ruff/ty | Edit → focused test               | 17.01 s     | 14.59 s       | 14.21%     |
-| Ruff/ty | Edit dependency → downstream test | 17.30 s     | 3.91 s        | 77.42%     |
-| Ruff/ty | Edit → check → test → check       | 25.11 s     | 23.11 s       | 7.95%      |
-| Ruff/ty | Check → build → check             | 95.33 s     | 60.97 s       | 36.05%     |
-| Ruff/ty | Edit → fmt → clippy → test        | 33.71 s     | 24.22 s       | 28.17%     |
-| uv      | Edit → focused test               | 27.03 s     | 11.46 s       | 57.62%     |
-| uv      | Edit dependency → downstream test | 30.17 s     | 3.88 s        | 87.14%     |
-| uv      | Edit → check → test → check       | 30.47 s     | 15.34 s       | 49.67%     |
-| uv      | Check → build → check             | 161.68 s    | 84.99 s       | 47.43%     |
-| uv      | Edit → fmt → clippy → test        | 34.05 s     | 17.90 s       | 47.44%     |
-| Codex   | Edit → focused test               | 40.77 s     | 31.53 s       | 22.66%     |
-| Codex   | Edit dependency → downstream test | 73.28 s     | 5.72 s        | 92.19%     |
-| Codex   | Edit → check → test → check       | 52.41 s     | 35.95 s       | 31.40%     |
-| Codex   | Check → build → check             | 233.43 s    | 143.12 s      | 38.69%     |
-| Codex   | Edit → fmt → clippy → test        | 54.66 s     | 36.32 s       | 33.55%     |
+| Ruff/ty | Edit → focused test               | 16.92 s     | 12.91 s       | 23.73%     |
+| Ruff/ty | Edit dependency → downstream test | 17.07 s     | 13.14 s       | 23.02%     |
+| Ruff/ty | Edit → check → test → check       | 25.54 s     | 20.80 s       | 18.59%     |
+| Ruff/ty | Check → build → check             | 95.97 s     | 61.01 s       | 36.43%     |
+| Ruff/ty | Edit → fmt → clippy → test        | 33.24 s     | 22.14 s       | 33.41%     |
+| uv      | Edit → focused test               | 19.96 s     | 8.08 s        | 59.50%     |
+| uv      | Edit dependency → downstream test | 23.98 s     | 2.84 s        | 88.16%     |
+| uv      | Edit → check → test → check       | 23.84 s     | 11.23 s       | 52.88%     |
+| uv      | Check → build → check             | 140.54 s    | 69.97 s       | 50.21%     |
+| uv      | Edit → fmt → clippy → test        | 28.39 s     | 13.32 s       | 53.09%     |
 
 <!-- /benchmark:developer-workflows -->
 
@@ -173,14 +169,14 @@ Times are medians of four runs, with each toolchain pair measured on the same ho
 
 <!-- benchmark:direct -->
 
-| Project | Workflow               | Edited crate | Rust 1.99.0 | Ohm 1.99.0-14 | Speedup |
+| Project | Workflow               | Edited crate | Rust 1.99.0 | Ohm 1.99.0-17 | Speedup |
 | ------- | ---------------------- | ------------ | ----------- | ------------- | ------- |
-| uv      | `cargo check`          | `uv`         | 5.52 s      | 5.07 s        | 1.09×   |
-| uv      | `cargo clippy`         | `uv`         | 8.06 s      | 6.67 s        | 1.21×   |
-| uv      | `cargo test --test it` | `uv`         | 94.03 s     | 17.77 s       | 5.29×   |
-| Codex   | `cargo check`          | `codex-core` | 9.93 s      | 8.13 s        | 1.22×   |
-| Codex   | `just clippy`          | `codex-core` | 56.14 s     | 39.39 s       | 1.43×   |
-| Codex   | `just test`            | `codex-core` | 62.21 s     | 44.36 s       | 1.40×   |
+| uv      | `cargo check`          | `uv`         | 2.52 s      | 2.26 s        | 1.12×   |
+| uv      | `cargo clippy`         | `uv`         | 4.03 s      | 3.00 s        | 1.34×   |
+| uv      | `cargo test --test it` | `uv`         | 22.95 s     | 8.77 s        | 2.62×   |
+| Codex   | `cargo check`          | `codex-core` | 5.58 s      | 5.16 s        | 1.08×   |
+| Codex   | `just clippy`          | `codex-core` | 27.38 s     | 17.47 s       | 1.57×   |
+| Codex   | `just test`            | `codex-core` | 42.24 s     | 34.97 s       | 1.21×   |
 
 <!-- /benchmark:direct -->
 
@@ -189,14 +185,14 @@ avoid rebuilding unchanged dependents:
 
 <!-- benchmark:dependency -->
 
-| Project | Workflow               | Edited dependency    | Rust 1.99.0 | Ohm 1.99.0-14 | Speedup |
+| Project | Workflow               | Edited dependency    | Rust 1.99.0 | Ohm 1.99.0-17 | Speedup |
 | ------- | ---------------------- | -------------------- | ----------- | ------------- | ------- |
-| uv      | `cargo check`          | `uv-normalize`       | 19.92 s     | 1.53 s        | 13.03×  |
-| uv      | `cargo clippy`         | `uv-normalize`       | 27.25 s     | 1.68 s        | 16.18×  |
-| uv      | `cargo test --test it` | `uv-normalize`       | 67.83 s     | 6.35 s        | 10.69×  |
-| Codex   | `cargo check`          | `codex-utils-string` | 33.07 s     | 2.05 s        | 16.16×  |
-| Codex   | `just clippy`          | `codex-utils-string` | 101.50 s    | 3.65 s        | 27.84×  |
-| Codex   | `just test`            | `codex-utils-string` | 127.39 s    | 7.62 s        | 16.71×  |
+| uv      | `cargo check`          | `uv-normalize`       | 11.26 s     | 0.61 s        | 18.48×  |
+| uv      | `cargo clippy`         | `uv-normalize`       | 16.33 s     | 0.57 s        | 28.54×  |
+| uv      | `cargo test --test it` | `uv-normalize`       | 26.62 s     | 2.86 s        | 9.32×   |
+| Codex   | `cargo check`          | `codex-utils-string` | 22.70 s     | 0.91 s        | 24.91×  |
+| Codex   | `just clippy`          | `codex-utils-string` | 55.42 s     | 1.63 s        | 33.90×  |
+| Codex   | `just test`            | `codex-utils-string` | 78.22 s     | 4.74 s        | 16.51×  |
 
 <!-- /benchmark:dependency -->
 
@@ -206,14 +202,14 @@ avoid rebuilding unchanged dependents:
 
 | Project | Workflow                 | Package              | Rust 1.99.0 | Ohm     | Speedup |
 | ------- | ------------------------ | -------------------- | ----------- | ------- | ------- |
-| uv      | Check after build        | `uv`                 | 90.47 s     | 18.93 s | 4.78×   |
-| uv      | Shared-worktree build    | `uv-normalize`       | 12.87 s     | 1.42 s  | 9.04×   |
-| Codex   | Check after build        | `codex-core`         | 203.21 s    | 49.56 s | 4.10×   |
-| Codex   | No-op formatting         | Workspace            | 17.50 s     | 0.45 s  | 38.65×  |
-| Codex   | Formatting after an edit | `codex-core`         | 18.02 s     | 0.53 s  | 34.11×  |
-| Codex   | Shared-worktree build    | `codex-utils-string` | 5.27 s      | 2.23 s  | 2.36×   |
-| ty      | Worktree startup (ext4)  | `ty_python_semantic` | 117.00 s    | 62.64 s | 1.87×   |
-| ty      | Worktree startup (Btrfs) | `ty_python_semantic` | 117.67 s    | 11.66 s | 10.09×  |
+| uv      | Check after build        | `uv`                 | 75.94 s     | 16.11 s | 4.71×   |
+| uv      | Shared-worktree build    | `uv-normalize`       | 9.96 s      | 0.78 s  | 12.82×  |
+| Codex   | Check after build        | `codex-core`         | 149.05 s    | 36.90 s | 4.04×   |
+| Codex   | No-op formatting         | Workspace            | 15.17 s     | 0.25 s  | 61.74×  |
+| Codex   | Formatting after an edit | `codex-core`         | 15.14 s     | 0.28 s  | 53.55×  |
+| Codex   | Shared-worktree build    | `codex-utils-string` | 3.99 s      | 0.77 s  | 5.16×   |
+| ty      | Worktree startup (ext4)  | `ty_python_semantic` | 118.82 s    | 61.65 s | 1.93×   |
+| ty      | Worktree startup (Btrfs) | `ty_python_semantic` | 129.01 s    | 11.93 s | 10.81×  |
 
 <!-- /benchmark:features -->
 
@@ -271,7 +267,6 @@ At present, Ohm includes the following optimizations, all enabled by default:
 - Avoid duplicate builds when concurrent Cargo invocations need the same registry library with no
   dependencies.
 - Format individual changed modules when rustfmt can verify the module graph.
-- Cache procedural-macro expansions (`rustc -Zcache-proc-macros`).
 - Combine Clippy lint passes and backport faster redundant-clone checks.
 
 Ohm is exclusively intended for local development: never use it for production builds or releases,

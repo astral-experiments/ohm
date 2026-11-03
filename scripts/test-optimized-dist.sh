@@ -8,7 +8,7 @@ trap 'rm -rf -- "$test_directory"' EXIT
 
 rust_checkout="$test_directory/rust checkout"
 bolt_directory="$test_directory/llvm bolt"
-bootstrap_config="$test_directory/bootstrap.toml"
+bootstrap_config="$test_directory/bootstrap.toml"$'\n'
 toolchain='ohm-1.97.1-16'
 trace="$rust_checkout/commands.jsonl"
 
@@ -66,6 +66,12 @@ import sys
 
 checkout = pathlib.Path(__file__).resolve().parents[3]
 arguments = sys.argv[1:]
+if "--rustc-perf-checkout-dir" in arguments:
+    perf = pathlib.Path(arguments[arguments.index("--rustc-perf-checkout-dir") + 1])
+    collector = (perf / "collector/src/compile/benchmark/mod.rs").read_text()
+    if ".run_rustc(false)" not in collector or "local edit" in collector:
+        raise SystemExit("expected the prepared copy of the pinned collector")
+
 artifact_directory = checkout / arguments[arguments.index("--artifact-dir") + 1]
 artifact_directory.mkdir(parents=True, exist_ok=True)
 
@@ -218,9 +224,10 @@ assert_optimized_build() {
   local expect_bolt="$3"
   local component_pgo="$4"
   local output="$5"
+  local training="${6:-upstream}"
 
   python3 - "$trace" "$bootstrap_config" "$rust_checkout" "$toolchain" \
-    "$target" "$expected_llvm_directory" "$expect_bolt" "$component_pgo" "$output" <<'PY'
+    "$target" "$expected_llvm_directory" "$expect_bolt" "$component_pgo" "$output" "$training" <<'PY'
 import json
 import pathlib
 import sys
@@ -236,6 +243,7 @@ import tomllib
     expect_bolt,
     component_pgo,
     output_path,
+    training,
 ) = sys.argv[1:]
 checkout = pathlib.Path(checkout).resolve()
 generated_config = checkout / "build" / "ohm-release-bootstrap.toml"
@@ -360,11 +368,25 @@ if option(pipeline_arguments, "--llvm-shared") != "false":
     raise SystemExit("opt-dist must not override downloaded CI LLVM settings")
 if ("--use-bolt" in pipeline_arguments) != (expect_bolt == "true"):
     raise SystemExit(f"incorrect target-specific BOLT selection: {pipeline_arguments}")
-for unsupported_argument in (
-    "--run-tests",
-    "--rustc-perf-checkout-dir",
-    "--benchmark-cargo-config",
+config_flag = "--benchmark-cargo-config"
+training_configs = [
+    option(pipeline_arguments[i:], config_flag)
+    for i, argument in enumerate(pipeline_arguments)
+    if argument == config_flag or argument.startswith(config_flag + "=")
+]
+if training_configs != (["unstable.ohm-defaults=false"] if training == "isolate" else []):
+    raise SystemExit(f"unexpected Cargo config for rustc-perf: {training_configs}")
+if (
+    "unstable.ohm-defaults=false" in bootstrap_arguments + distribution_arguments
+    or "CARGO_UNSTABLE_OHM_DEFAULTS" in optimized["environment"]
 ):
+    raise SystemExit("the training override escaped into the release build")
+perf_flag = "--rustc-perf-checkout-dir"
+if training == "relocated":
+    if pathlib.Path(option(pipeline_arguments, perf_flag)).exists():
+        raise SystemExit("the temporary profile-training checkout was not removed")
+unsupported = ["--run-tests"] if training == "relocated" else ["--run-tests", perf_flag]
+for unsupported_argument in unsupported:
     if any(
         argument == unsupported_argument
         or argument.startswith(f"{unsupported_argument}=")
@@ -456,20 +478,89 @@ assert_optimized_build \
 mkdir -p "$(dirname -- "$component_pgo_marker")"
 printf '%s\n' 'fixture component-specific PGO capability' > "$component_pgo_marker"
 
-: > "$trace"
-linux_output="$test_directory/linux-output.log"
-run_optimized_build "$linux_target" "$linux_output"
-assert_optimized_build "$linux_target" "$bolt_directory" true true "$linux_output"
+# The release workflow checks out the exact manifest revision with a detached HEAD.
+git init --quiet "$rust_checkout"
+for revision in 20 21; do
+  toolchain="ohm-1.99.0-$revision"
+  jq -er '.sources.rust.revision' "$repository_root/toolchains/1.99.0/$revision.json" > "$rust_checkout/.git/HEAD"
 
+  : > "$trace"
+  linux_output="$test_directory/linux-$revision-output.log"
+  run_optimized_build "$linux_target" "$linux_output"
+  assert_optimized_build "$linux_target" "$bolt_directory" true true "$linux_output" isolate
+
+  : > "$trace"
+  macos_output="$test_directory/macos-$revision-output.log"
+  run_optimized_build "$macos_target" "$macos_output"
+  assert_optimized_build \
+    "$macos_target" \
+    "$rust_checkout/build/$macos_target/ci-llvm" \
+    false \
+    true \
+    "$macos_output" isolate
+done
+
+# The collector fixture starts with the upstream context used by the release patch.
+perf_remote="$test_directory/perf fixture"
+perf_source="$rust_checkout/src/tools/rustc-perf"
+collector_path=collector/src/compile/benchmark/mod.rs
+mkdir -p "$perf_remote/$(dirname -- "$collector_path")"
+cat > "$perf_remote/$collector_path" <<'RS'
+                // Don't delete the directory on error.
+                let timing_dir = ManuallyDrop::new(self.make_temp_dir(benchmark_dir.dir.path())?);
+                let cwd = timing_dir.path();
+
+                // A full non-incremental build.
+                if scenarios.contains(&Scenario::Full) {
+                    self.mk_cargo_process(
+                        toolchain,
+RS
+(
+  export GIT_AUTHOR_NAME=fixture GIT_COMMITTER_NAME=fixture
+  export GIT_AUTHOR_EMAIL=fixture@example.com GIT_COMMITTER_EMAIL=fixture@example.com
+  git init --quiet "$perf_remote"
+  git -C "$perf_remote" add "$collector_path"
+  git -C "$perf_remote" commit --quiet -m collector
+  git -C "$rust_checkout" symbolic-ref HEAD refs/heads/fixture
+  git -C "$rust_checkout" -c protocol.file.allow=always submodule add --quiet "$perf_remote" src/tools/rustc-perf
+  git -C "$rust_checkout" commit --quiet -m 'Pin collector'
+  printf '%s\n' '// local commit' >> "$perf_source/$collector_path"
+  git -C "$perf_source" commit --quiet -am 'Local collector change'
+)
+original_head="$(git -C "$perf_source" rev-parse HEAD)"
+original_collector="$perf_source/$collector_path"
+printf '%s\n' '// local edit' >> "$original_collector"
+toolchain=ohm-1.99.0-23
 : > "$trace"
-macos_output="$test_directory/macos-output.log"
-run_optimized_build "$macos_target" "$macos_output"
-assert_optimized_build \
-  "$macos_target" \
-  "$rust_checkout/build/$macos_target/ci-llvm" \
-  false \
-  true \
-  "$macos_output"
+relocated_output="$test_directory/relocated-output.log"
+mkdir -p "$test_directory/profile tmp"
+(
+  cd -- "$test_directory"
+  rust_checkout="${rust_checkout##*/}" run_optimized_build "$linux_target" "$relocated_output" TMPDIR="profile tmp" CDPATH=.
+)
+assert_optimized_build "$linux_target" "$bolt_directory" true true "$relocated_output" relocated
+[[ "$(git -C "$perf_source" rev-parse HEAD)" == "$original_head" ]]
+grep -qx '// local edit' "$original_collector"
+if grep -Fq '.run_rustc(false)' "$original_collector"; then
+  echo 'profile training modified the original collector' >&2
+  exit 1
+fi
+staged_checkout="$test_directory/staged-checkout"
+cp -R "$rust_checkout" "$staged_checkout"
+git -C "$staged_checkout" submodule deinit --quiet -f -- src/tools/rustc-perf
+git -C "$staged_checkout" update-index --force-remove -- src/tools/rustc-perf
+# Receive hooks set both repository paths and a quarantine for incoming objects.
+hook_repo="$test_directory/hook.git"
+git init --bare --quiet "$hook_repo"
+quarantine="$(mktemp -d "$hook_repo/objects/incoming.XXXXXX")"
+rust_checkout="$staged_checkout" run_optimized_build "$macos_target" "$test_directory/staged-checkout.log" \
+  "GIT_DIR=$hook_repo" "GIT_COMMON_DIR=$hook_repo" "GIT_WORK_TREE=$test_directory" \
+  "GIT_OBJECT_DIRECTORY=$quarantine" "GIT_ALTERNATE_OBJECT_DIRECTORIES=$hook_repo/objects" "GIT_QUARANTINE_PATH=$quarantine"
+[[ -z "$(git -C "$staged_checkout" ls-files -- src/tools/rustc-perf)" ]]
+
+toolchain=ohm-1.99.0-21
+
+jq -er '.sources.rust.revision' "$repository_root/toolchains/1.99.0/19.json" > "$rust_checkout/.git/HEAD"
 
 allocator_marker="$rust_checkout/compiler/rustc/mimalloc-v1"
 mkdir -p "$(dirname -- "$allocator_marker")"

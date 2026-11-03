@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
+unset CDPATH
 
 if [[ $# -ne 4 ]]; then
   echo "usage: smoke-test-release.sh RELEASE_DIRECTORY TOOLCHAIN TARGET CLIPPY_REVISION" >&2
   exit 2
 fi
-RELEASE_DIRECTORY="$(cd -- "$1" && pwd)"
+IFS= read -r -d '' RELEASE_DIRECTORY < <(cd -- "$1" && printf '%s\0' "$PWD")
 OHM_TOOLCHAIN=$2
 OHM_TARGET=$3
 CLIPPY_REVISION=$4
@@ -25,6 +26,8 @@ esac
   grep '  ohm-installer\.sh$' SHA256SUMS | shasum -a 256 --check
 )
 
+# Install the test toolchain with permissions that allow its native link driver to run.
+umask 077
 smoke_root="$(mktemp -d "${RUNNER_TEMP:-${TMPDIR:-/tmp}}/ohm-smoke.XXXXXX")"
 trap 'rm -rf "$smoke_root"' EXIT
 
@@ -63,6 +66,10 @@ rustc +"$OHM_TOOLCHAIN" -Z help \
 rustdoc +"$OHM_TOOLCHAIN" --version
 cargo +"$OHM_TOOLCHAIN" -Z help \
   | grep -F 'relink-only' >/dev/null
+if jq -e '.release | ((.upstream_rust_version | split(".") | map(tonumber)) + [.ohm_revision]) >= [1, 99, 0, 20]' \
+    "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN.json" >/dev/null; then
+  bash "$(dirname -- "${BASH_SOURCE[0]}")/smoke-test-relink.sh" "$OHM_TOOLCHAIN" "$smoke_root/relink"
+fi
 clippy_revision="${CLIPPY_REVISION:0:10}"
 "$toolchain_root/bin/cargo-clippy" --version \
   | grep -F "$clippy_revision" >/dev/null
@@ -129,7 +136,7 @@ for argument in "$@"; do
   fi
   case "$argument" in
     -Zpublic-api-hash) has_public_api_hash=true ;;
-    -Zcache-proc-macros) has_proc_macro_cache=true ;;
+    -Zcache-proc-macros|-Zcache-proc-macros=yes) has_proc_macro_cache=true ;;
   esac
   previous_argument="$argument"
 done
@@ -137,8 +144,12 @@ done
 if [[ "$crate_name" == "ohm_smoke" ]]; then
   case "${OHM_EXPECT_DEFAULTS:?}" in
     enabled)
-      if [[ "$has_public_api_hash" != true || "$has_proc_macro_cache" != true ]]; then
+      if [[ "$has_public_api_hash" != true ]]; then
         echo "Ohm defaults missing from ohm_smoke rustc invocation" >&2
+        exit 1
+      fi
+      if [[ "$has_proc_macro_cache" != "${OHM_EXPECT_PROC_MACRO_CACHE:?}" ]]; then
+        echo "unexpected proc-macro cache setting in ohm_smoke rustc invocation" >&2
         exit 1
       fi
       ;;
@@ -162,7 +173,11 @@ chmod +x "$rustc_wrapper"
 
 unset CARGO_BUILD_RUSTFLAGS CARGO_ENCODED_RUSTFLAGS RUSTFLAGS RUSTC_WORKSPACE_WRAPPER
 defaults_log="$smoke_root/defaults-rustc-args"
+expect_proc_macro_cache="$(jq -r '
+  .release | ((.upstream_rust_version | split(".") | map(tonumber)) + [.ohm_revision]) < [1, 99, 0, 18]
+' "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN.json")"
 OHM_EXPECT_DEFAULTS=enabled \
+  OHM_EXPECT_PROC_MACRO_CACHE="$expect_proc_macro_cache" \
   OHM_RUSTC_LOG="$defaults_log" \
   RUSTC_WRAPPER="$rustc_wrapper" \
   CARGO_TARGET_DIR="$smoke_root/defaults-target" \
@@ -214,6 +229,32 @@ env -u RUST_SRC_PATH RUSTUP_TOOLCHAIN="$OHM_TOOLCHAIN" \
   "${RUST_ANALYZER:?set RUST_ANALYZER to the stock rust-analyzer executable}" \
   diagnostics "$smoke_crate"
 
+if jq -e '.release | ((.upstream_rust_version | split(".") | map(tonumber)) + [.ohm_revision]) >= [1, 99, 0, 23]' \
+    "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN.json" >/dev/null; then
+  cat > "$smoke_crate/src/lib.rs" <<'EOF'
+/// ```
+/// assert_eq!(ohm_smoke::answer(), 42);
+/// ```
+pub fn answer() -> u32 {
+    42
+}
+EOF
+  for pass in cold warm; do
+    log="$smoke_root/doctests-$pass.log"
+    cargo +"$OHM_TOOLCHAIN" test --doc --offline --manifest-path "$smoke_crate/Cargo.toml" -v \
+      2>&1 | tee "$log"
+    grep -F 'test result: ok. 1 passed' "$log" >/dev/null
+  done
+  grep -F -- '--output-format=doctest' "$smoke_root/doctests-cold.log" >/dev/null
+  if grep -E -- '--output-format=doctest|--test-run-directory' "$smoke_root/doctests-warm.log"; then
+    echo 'warm doctest did not use the cached harness' >&2
+    exit 1
+  fi
+  cargo +"$OHM_TOOLCHAIN" -Zohm-cached-doctests=no test --doc --offline \
+    --manifest-path "$smoke_crate/Cargo.toml" -v 2>&1 | tee "$smoke_root/doctests-disabled.log"
+  grep -F -- '--test-run-directory' "$smoke_root/doctests-disabled.log" >/dev/null
+fi
+
 # Exercise cache admission with the installed compiler, without a wrapper.
 registry_crate="$smoke_root/registry-crate"
 mkdir -p "$registry_crate/src"
@@ -263,8 +304,9 @@ EOF
   if grep -E '(Checking|Compiling) itoa ' "$smoke_root/registry-check.log"; then
     exit 1
   fi
-  if find "$CARGO_BUILD_BUILD_DIR/debug/build/workspaces" \
-    -name '.ohm-worktree-seed-deny-v7' | grep .; then
+  deny_markers="$(find "$CARGO_BUILD_BUILD_DIR" -name '.ohm-worktree-seed-deny-v7')"
+  if [[ -n "$deny_markers" ]]; then
+    printf '%s\n' "$deny_markers" >&2
     exit 1
   fi
 )

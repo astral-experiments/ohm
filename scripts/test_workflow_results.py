@@ -169,6 +169,26 @@ class WorkflowReportTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     workflow_results.validate(report)
 
+    def test_missing_projects_require_an_explicit_reason(self):
+        runs = [
+            run
+            for run in synthetic_runs()
+            if "codex" not in run["configuration"]["projects"]
+        ]
+        report = workflow_results.build_report(
+            runs, omitted_projects={"codex": "Host activity stopped the developer suite."}
+        )
+        self.assertEqual(len(workflow_results.table_rows(report)), 10)
+        for omissions in (
+            {},
+            {"codex": ""},
+            {"codex": 1},
+            {"ruff": "Stopped"},
+            {"other": "Stopped"},
+        ):
+            with self.subTest(omissions=omissions), self.assertRaises(ValueError):
+                workflow_results.build_report(runs, omitted_projects=omissions)
+
     def test_unreleased_build_must_match_its_source_revision(self):
         for build, label, cargo_revision in (
             ("workflow-cache-fix", "fix", None),
