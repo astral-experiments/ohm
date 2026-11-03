@@ -1,56 +1,45 @@
-name: 'Read actual rustc partition eligibility on the normal Ruff edit'
-run-name: Ruff 29697 existing compiler split eligibility
+name: 'Qualify the native hardware self-profiler threading boundary'
+run-name: Exact Rust 1.99, Ohm -23 and original #329 profiler controls
 permissions:
   contents: read
   actions: read
-jobs:
-  inspect:
-    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head
-      && github.ref_name == 'charlie/qa-ruff-ty-ide-lib-residual-29697-20261103'
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 165
-    steps:
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        ref: ${{ inputs.reviewed_head }}
-        path: qa
-        persist-credentials: false
-        sparse-checkout: 'scripts/ruff-foreign-span-observer
-
-          scripts/ruff-original-ty-instructions
-
-          '
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        repository: astral-sh/ruff
-        ref: bfa2407e98ee1343caeefd02b4b69043509baa8c
-        fetch-depth: 2
-        path: ruff
-        persist-credentials: false
-    - name: Read the exact nonrelease compiler source constructor
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        ref: 3166ffe9aa98befcb452cc25af269af53578604c
-        path: factory-src
-        persist-credentials: false
-        sparse-checkout: scripts/ruff-matched-stage
-    - name: Check the real build and read its original guarded CGU partition sizes
-      env:
-        REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-        OHM_SDK_READ_TOKEN: ${{ github.token }}
-      run: python3 -IB qa/scripts/ruff-original-ty-instructions/standalone-buckets/residual/eligibility/eligibility.py
-    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-      if: always()
-      with:
-        name: ruff-ty-project-partition-${{ github.run_id }}
-        path: ${{ runner.temp }}/ohm-foreign-join/published/
-        retention-days: 21
-        if-no-files-found: error
-    name: One unscored compiler partition diagnostic
 'on':
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Exact reviewed nonrelease QA source
+        description: Registered controls and source SHA
         required: true
         type: string
+jobs:
+  native:
+    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-rc23-self-profile-thread-controls-20261103'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ inputs.reviewed_head }}
+          path: qa
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/rc23-self-profile-threads
+            scripts/ruff-original-ty-instructions/owner-buckets
+            scripts/ruff-foreign-span-observer
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: 3166ffe9aa98befcb452cc25af269af53578604c
+          path: factory-src
+          persist-credentials: false
+          sparse-checkout: scripts/ruff-matched-stage
+      - name: Observe all ordinary, wall, and instruction controls
+        env:
+          OHM_SDK_READ_TOKEN: ${{ github.token }}
+          REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+        run: python3 -IB qa/scripts/rc23-self-profile-threads/run.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: native-self-profile-controls-${{ github.run_id }}
+          path: ${{ runner.temp }}/ohm-foreign-join/published/
+          if-no-files-found: error
+          retention-days: 14

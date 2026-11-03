@@ -1,0 +1,14 @@
+{
+  "branch": "charlie/qa-rc23-self-profile-thread-controls-20261103",
+  "original_job": "41671764437/126041714405",
+  "factory": 41624273152,
+  "roles": {
+    "stock": ["b940084d7eb6a299eb4bfeb8e34901bc051e7ac4", "f3834d26669b03f6855fa54bd2381443123e860167bc0c7a8dd137e5cf6e5e4f", "f45c41337f1516bb9f4d504a2a507202a01c431fc2063334913dde5480ffee03"],
+    "signed23": ["d57fd1515986dccecdcece8da85e651bfb4b81f9", "6842898bafad7cf932fea14bd8915a0adff0eecdc03bee91f589ac95a89743dd", "53aecb7726b1863849a89c4260c169132f98d0d33ba62e0892a06739b6e32e52"],
+    "pr329": ["5c5af1a053326e6ce5df048c4dcb30b53e01a069", "8bfdc9779937e9cd2c9ef5db9f50cee9aab03ddec5672b37a3a3c9278cf1f5d0", "11b12c572f2b101d7c23eb0678d842f14fb9956b9543b0baa43fdff1bb387691"]
+  },
+  "controls": "On one namespace-profile-ubuntu-24-04-16 boot run all ordinary/wall and 3 fresh instruction-profiled native compiles at each threads=1/8, paired by role. Add all three metadata-only controls with one frontend thread. Retain every failure. The same first assertion in a stock opt worker dropping a TimingGuard proves this reduced failure happens upstream. Without it leave exact provenance unresolved. A successful instruction exit alone does not establish measurement accuracy.",
+  "fixture": "48 normal native Rust modules with five component functions each, 32 codegen units, O1, line tables, private empty incremental paths. Every successful native library must link into and pass an ordinary independent executable on two fixed inputs. Retain and compare all ordinary and wall rosters, reports, archives, profile files and stderr.",
+  "events": "generic-activity,artifact-sizes",
+  "minimum_free": {"disk_gib": 15, "mem_gib": 8}
+}
