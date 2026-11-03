@@ -17,7 +17,7 @@ import release23 as rel
 REPO = "astral-experiments/ohm"
 REPO_ID = 1319437234
 BRANCH = "charlie/codex-22536-signed23-split-projection"
-BASE = "df9de15a3d84ba45f1799b2aa835c6f613818af5"
+BASE = "15ed863f6a232b3995c89bd5c637927ef869c09d"
 PRIMARY_BASE = "8b2ffa46cb0b3d37188f7c286048865237ff6128"
 PAIRED = "eight-real-session-pairs"
 COORDINATOR_KIT = "scripts/uv-check-22536"
@@ -85,8 +85,28 @@ def active_binding():
     assert source["input_sha256"] == filehash(HERE / "release23-inputs.json")
     assert source["primary_lock"] == active["primary_lock_sha256"] and source["primary_choice"] == active["primary_choice_sha256"]
     primary_pair(active, source)
+    prior = source["precalibration_refusal"]
+    failed_job = {"run":41579999965, "job":125732345562, "head":BASE, "runner_id":1856, "runner_name":"nsc-runner-q2388j465toa0"}
+    assert prior == {"assignment":failed_job, "actions_artifact":13206335009, "archive_sha256":"e2a489bad8babc37a0aa64ede1363d6902eb5b41c52e87cb8029663920dcd2c2", "boot":None, "pairs":0}
+    assert source["excluded_jobs"].count(failed_job)==1 and len(source["excluded_jobs"])==9 and len(active["excluded"])==35
     assert source["completed_22_sha256"] == "a35ca64f0b2bc928a66cc4ecdaead56345ea454e1a2f1abbe5e21bc90cc9b21a"
     return active, source
+
+
+def verify_workflow(co, enrollment, primary, disabled_sha256):
+    """Bind the enabled and disabled workflow bytes without fetching a historical blob."""
+    path = ".github/workflows/ci.yml"
+    current = (co / path).read_bytes()
+    closed = b"github.run_attempt == 1 && false"
+    opened = ("github.run_attempt == 1 && inputs.enrollment_sha == '" + enrollment
+              + "' && inputs.primary_head == '" + primary + "'").encode("ascii")
+    assert current.count(opened) == 1 and closed not in current
+    disabled = current.replace(opened, closed)
+    assert hashlib.sha256(disabled).hexdigest() == disabled_sha256
+    for rev, data in (("HEAD", current), ("HEAD^", disabled)):
+        header = ("blob " + str(len(data))).encode("ascii") + b"\0"
+        oid = hashlib.sha1(header + data).hexdigest()
+        assert git(co, "ls-tree", rev, "--", path) == "100644 blob " + oid + "\t" + path
 
 
 def scope(active, source):
@@ -100,10 +120,7 @@ def scope(active, source):
     assert HERE == co / COORDINATOR_KIT and e["REVIEWED_HEAD"] == git(co, "rev-parse", "HEAD") == e["GITHUB_SHA"]
     assert git(co, "rev-parse", "HEAD^") == source["carrier"] and git(co, "rev-parse", "HEAD^^") == BASE
     assert set(git(co, "diff", "--name-only", "--no-renames", "HEAD^", "HEAD").splitlines()) == DYNAMIC
-    original=git(co,"show","HEAD^:.github/workflows/ci.yml")
-    closed="github.run_attempt == 1 && false"
-    enabled="github.run_attempt == 1 && inputs.enrollment_sha == '"+e["ENROLLMENT_SHA"]+"' && inputs.primary_head == '"+e["PRIMARY_HEAD"]+"'"
-    assert original.count(closed)==1 and git(co,"show","HEAD:.github/workflows/ci.yml")==original.replace(closed,enabled)
+    verify_workflow(co, e["ENROLLMENT_SHA"], e["PRIMARY_HEAD"], source["disabled_workflow_sha256"])
     assert not git(co, "status", "--porcelain", "--untracked-files=no")
     assert filehash(HERE / "hosted-inputs.json") == e["ENROLLMENT_SHA"]
     assert e["PRIMARY_HEAD"] == source["primary_head"] == git(other, "rev-parse", "HEAD")
