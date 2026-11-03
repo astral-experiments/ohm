@@ -1,5 +1,5 @@
 name: Qualify the -23 Cargo and Rust regression fixes together
-run-name: Integrated metadata stub, checksum and doctest regressions ${{ inputs.reviewed_head
+run-name: Integrated metadata stub, coverage, checksum and doctest fixes ${{ inputs.reviewed_head
   }}
 permissions:
   contents: read
@@ -14,7 +14,7 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         persist-credentials: false
-        ref: 634d090f0f565936996a817bcb884c64cbe7e6cc
+        ref: b4dab2cbe352ee63daffbeda179f77f061137049
     - name: Check out the signed -23 source manifest
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
@@ -185,6 +185,13 @@ jobs:
         retention-days: 1
         compression-level: 0
         if-no-files-found: error
+    - name: Install the upstream LLVM 23.1.1 reporting tools
+      shell: bash
+      run: |
+        export RUSTUP_HOME="$RUNNER_TEMP/coverage-rustup"
+        rustup toolchain install 1.99.0 --profile minimal --component llvm-tools-preview --no-self-update
+        stock="$RUSTUP_HOME/toolchains/1.99.0-$OHM_TARGET"
+        LD_LIBRARY_PATH="$stock/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" DYLD_LIBRARY_PATH="$stock/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" "$stock/lib/rustlib/$OHM_TARGET/bin/llvm-cov" --version | grep -F '23.1.1'
     - name: Verify checked inputs, ordinary doctests, native archive edits and Git
         ownership
       run: python3 -IB qa-code/scripts/ruff-combined-apple/qualify.py exercise

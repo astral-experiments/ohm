@@ -8,6 +8,7 @@ import shutil
 import subprocess as sp
 import sys
 import tarfile
+import traceback
 
 host = os.environ["OHM_TARGET"]
 root = Path(os.environ["RUNNER_TEMP"]) / "combined"
@@ -28,6 +29,7 @@ import matched_paths
 import macho
 import release_cases
 import stub_cases
+import coverage_cases
 
 def git_sha(path, expr):
     return sp.check_output(["git", "-C", path, "rev-parse", expr], text=True).strip()
@@ -59,7 +61,7 @@ def check_cargo_files():
 
 def check_sources():
     check_cargo_files()
-    for repo, ref, tree in ((src, "2aae181b1f409979528d9f4432310c242c76b177", "d9db9fc931a987a96bcd3a716edf45086f66b5fa"), (cargo, "d5185be60b88e36ffb5e9daeb543b9f14d077a37", "4b9a4d7ca2e5abb29c307fa501ec6a437e30dea3"), (workspace/"fixtures", "5b47d5755bd515e61a98b9f85eca3af0aaf7c137", "d22f09981bdd81fc892fd47d894233639d0f3dab")):
+    for repo, ref, tree in ((src, "c3aa3a605e56878669c745a9dd3ba09c9ccfa1ef", "14360661a7c5954793b95499b5e86027d2d23c6f"), (cargo, "abc70d60a6fd89c10d5f65cf85820d9b78d5affe", "68e5a1e9b52324ad2e6fb8382eaa7cf53428f97d"), (workspace/"fixtures", "5b47d5755bd515e61a98b9f85eca3af0aaf7c137", "d22f09981bdd81fc892fd47d894233639d0f3dab")):
         assert git_sha(repo, "HEAD") == ref and git_sha(repo, "HEAD^{tree}") == tree
         if repo!=src:
             sp.run(["git", "-C", repo, "diff", "--exit-code", "HEAD", "--"], check=True)
@@ -98,6 +100,16 @@ def source():
     assert git_sha(cargo,"FETCH_HEAD")=="d5185be60b88e36ffb5e9daeb543b9f14d077a37"
     sp.run(["git","-C",cargo,"checkout","--quiet","--detach","FETCH_HEAD"],check=True)
     assert [git_sha(cargo,r) for r in ("HEAD^1","HEAD^2")]==["4a6de7858c60e579fc30e01f5b60ddcaa84c2e30","aee854cc8cc48194c5cb4e240fd944e2fdd14bce"]
+    coverage = Path(__file__).resolve().with_name("coverage-cargo.bundle")
+    assert smoke.sha(coverage) == "8b12a30cbeed608458b3fb008e1dd3406180e50af2126d36231ba2a62e2fa25d"
+    sp.run(["git", "-C", cargo, "bundle", "verify", coverage], check=True)
+    sp.run(["git", "-C", cargo, "fetch", "--no-tags", coverage, "refs/heads/charlie/qa-rc23-inputs-doctests-coverage-20261103"], check=True)
+    assert [git_sha(cargo, r) for r in ("FETCH_HEAD", "FETCH_HEAD^1", "FETCH_HEAD^2", "FETCH_HEAD^2^")] == [
+        "abc70d60a6fd89c10d5f65cf85820d9b78d5affe", git_sha(cargo, "HEAD"),
+        "1ed5c9aa4f6b0f649d6287fef86386a1393cec02", "630dc1396e3cce879a259fff9aeb5b2b46a3f4b0"]
+    assert sp.check_output(["git", "-C", cargo, "diff", "--name-only", "HEAD", "FETCH_HEAD"]).splitlines() == [
+        b"src/compiler/mod.rs", b"tests/testsuite/ohm_worktree.rs", b"tests/testsuite/rustflags.rs"]
+    sp.run(["git", "-C", cargo, "checkout", "--quiet", "--detach", "FETCH_HEAD"], check=True)
     pin=Path(__file__).resolve().with_name("qualified-rust-pin.bundle")
     assert smoke.sha(pin)=="7b13e8af3f6aa8caba3de87ab6b4e801c533b1d25d1f14e0b6ce325e5e2abf77" and git_sha(src,"HEAD")=="d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2"
     sp.run(["git","-C",src,"bundle","verify",pin],check=True)
@@ -114,6 +126,13 @@ def source():
     assert sp.check_output(["git", "-C", src, "diff", "--name-only", "HEAD", "FETCH_HEAD"]).splitlines() == [
         b"compiler/rustc_metadata/src/rmeta/encoder.rs", b"tests/run-make/embed-metadata/rmake.rs"]
     sp.run(["git", "-C", src, "checkout", "--quiet", "--no-recurse-submodules", "--detach", "FETCH_HEAD"], check=True)
+    latest = Path(__file__).resolve().with_name("coverage-rust-pin.bundle")
+    assert smoke.sha(latest) == "16f2a83ba234a11ad8efd6a1dfd6a92aa8e79414b5dc0126b51969d58a55c819"
+    sp.run(["git", "-C", src, "bundle", "verify", latest], check=True)
+    sp.run(["git", "-C", src, "fetch", "--no-tags", "--no-recurse-submodules", latest, "refs/heads/charlie/qa-rc23-green-stub-and-coverage-20261103"], check=True)
+    assert git_sha(src, "FETCH_HEAD") == "c3aa3a605e56878669c745a9dd3ba09c9ccfa1ef" and git_sha(src, "FETCH_HEAD^") == git_sha(src, "HEAD")
+    assert sp.check_output(["git", "-C", src, "diff", "--name-only", "HEAD", "FETCH_HEAD"]).splitlines() == [b"src/tools/cargo"]
+    sp.run(["git", "-C", src, "checkout", "--quiet", "--detach", "--no-recurse-submodules", "FETCH_HEAD"], check=True)
     nested=src/"src/tools/cargo"
     if (nested/".git").exists():
         sp.run(["git","-C",nested,"fetch","--no-tags",cargo,git_sha(cargo,"HEAD")],check=True)
@@ -130,10 +149,11 @@ def source():
     canonical=root/"source-proof/toolchains"
     proof=canonical/"1.99.0/24.json"
     proof.parent.mkdir(parents=True)
-    (canonical/"manifest.schema.json").write_bytes(sp.check_output(["git","-C",coordinator,"show","HEAD:toolchains/manifest.schema.json"]))
+    assert git_sha(workspace, "HEAD") == "b4dab2cbe352ee63daffbeda179f77f061137049"
+    (canonical/"manifest.schema.json").write_bytes(sp.check_output(["git","-C",workspace,"show","HEAD:toolchains/manifest.schema.json"]))
     smoke.save(proof,manifest)
     shutil.copyfile(proof,logs/"source-manifest-for-qa.json")
-    verifier=coordinator/"scripts/verify-release-sources.sh"
+    verifier=workspace/"scripts/verify-release-sources.sh"
     verified=sp.run(["bash",verifier,proof,src,nested,src/"src/tools/clippy",src/"src/tools/rustfmt"],stdout=sp.PIPE,stderr=sp.STDOUT)
     (logs/"release-source-verifier.stdout").write_bytes(verified.stdout)
     print(verified.stdout.decode(),flush=True)
@@ -173,7 +193,7 @@ def build():
     candidate = root/"cargo-target/release/cargo"
     assert candidate.is_file()
     output = root/"rust-build"
-    args = [sys.executable,"-IB","x.py","--ci","false","--build-dir",str(output),"--set","build.submodules=false","--set","rust.debug-assertions=false","--set","rust.lto=off","--set","llvm.download-ci-llvm=true","--set","rust.download-rustc=false","build","--stage","1","-j6","compiler/rustc","library","src/tools/rustdoc"]
+    args = [sys.executable,"-IB","x.py","--ci","false","--build-dir",str(output),"--set","build.submodules=false","--set","build.profiler=true","--set","rust.debug-assertions=false","--set","rust.lto=off","--set","llvm.download-ci-llvm=true","--set","rust.download-rustc=false","build","--stage","1","-j6","compiler/rustc","library","src/tools/rustdoc"]
     sp.run(args, env=env, cwd=src, check=True)
     check_sources()
     shutil.copytree(output/host/"stage1", fixed, symlinks=False)
@@ -244,7 +264,13 @@ def exercise():
     check_sources()
     before = {"P":tools(normal),"C":tools(fixed)}
     base = dict(clean_env(), RUSTUP_HOME=str(ru), CARGO_HOME=str(root/"unused-cargo-home"), RUSTUP_TOOLCHAIN="ohm")
-    stub_cases.qualify(root, normal, fixed, base, logs, host)
+    failures = {}
+    for name, check in (("metadata-stub", stub_cases.qualify), ("coverage", coverage_cases.run)):
+        try:
+            check(root, normal, fixed, base, logs, host)
+        except Exception:
+            failures[name] = traceback.format_exc()
+            (logs / (name + "-failure.txt")).write_text(failures[name])
     comparisons = matched_paths.histories(root, normal, fixed, base)
     for role,sdk in (("signed",normal),("fixed",fixed)):
         prerequisite(role,sdk,base)
@@ -267,6 +293,7 @@ def exercise():
     assert len(native)==8
     smoke.save(logs/"native-comparisons.json",native)
     release_cases.run(root,normal,fixed,base,logs)
+    assert not failures, failures
     assert before=={"P":tools(normal),"C":tools(fixed)}
     smoke.save(logs/"accepted-combined.json", {"rust":git_sha(src,"HEAD"),"cargo":git_sha(cargo,"HEAD"),"summaries":smoke.sha(logs/"smoke.json"),"tools":before,"prerequisite_commands":14})
 

@@ -17,9 +17,9 @@ def archive_image(product, logs, name):
     canonical = body
     names = []
     for member in objects:
-        match = re.fullmatch(rb'(green_native_stub-[a-z0-9]+\.[a-z0-9]+\.)([a-z0-9]{7})(\.rcgu\.o)', member)
+        match = re.fullmatch(rb'(green_native_stub-[a-z0-9]+\.[a-z0-9]+)(?:\.([a-z0-9]{7}))?(\.rcgu\.o)', member)
         assert match and canonical.count(member) >= 1, member
-        stable = match[1] + b'0000000' + match[3]
+        stable = match[1] + b'.0000000' + match[3] if match[2] else member
         names.append([member.decode(), stable.decode(), canonical.count(member)])
         canonical = canonical.replace(member, stable)
     return {'raw': hashlib.sha256(body).hexdigest(), 'canonical': hashlib.sha256(canonical).hexdigest(),
