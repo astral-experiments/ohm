@@ -1,0 +1,4890 @@
+{
+  "acquisition_errors": [],
+  "archive_sha256": "2560c343601f78dba0aa777ca2af304ba849e835da58495c7db3436ec8355886",
+  "comparisons": {
+    "P/fully-empty-buggy cross C/fully-empty-buggy": {
+      "elf": {
+        "changed_headers_and_bodies": {
+          ".debug_info": {
+            "sha256": [
+              "642dfc9bb839ead2d3f8578f59b297255b9d53822167b0130de85f55979d3399",
+              "5bbda465e54796bc6d69a277da5fa6204f499757ae215853a4f6350583f45518"
+            ]
+          },
+          ".debug_macro": {
+            "sha256": [
+              "290a99a0c8a13ba379c801f6e9d44a9f4e100cee7c756968f7cf4b36f1e4808e",
+              "391f1017a4c5ea9871f3a826b4b15323ca827837dd437484d0523346aa917f34"
+            ]
+          },
+          ".debug_str": {
+            "sha256": [
+              "bb7971cbb1ab3b04ac6d435849db6816349632d750cebef58500f899091a0503",
+              "5d94ccf4f3795c8f9f45ecf5552fdd8f0e6ee9808f298746496e2e37e76af1c2"
+            ]
+          },
+          ".note.gnu.build-id": {
+            "sha256": [
+              "4a8b63d805c95477348a030e4c0315ca3ad2cf76597e36f6a29ac04bacf805b5",
+              "b9d6291818f97166055bdab8a46f079597b3a6c591a1b23ea2ae86aeedc65b52"
+            ]
+          }
+        },
+        "changed_payloads": [
+          ".debug_info",
+          ".debug_macro",
+          ".debug_str",
+          ".note.gnu.build-id"
+        ],
+        "loadable_except_id_equal": true,
+        "size": [
+          167920136,
+          167920136
+        ]
+      }
+    },
+    "P/fully-empty-fixed cross C/fully-empty-fixed": {
+      "elf": {
+        "changed_headers_and_bodies": {
+          ".debug_info": {
+            "sha256": [
+              "e7c9e3c4ea2765d5c0e257ead907afe7439f50566019634ad1722f2a47e47b39",
+              "0905df33ef43e15cfbf7bb66a625ad7fd218e6601f5666fe4b34a37e95d86649"
+            ]
+          },
+          ".debug_macro": {
+            "sha256": [
+              "290a99a0c8a13ba379c801f6e9d44a9f4e100cee7c756968f7cf4b36f1e4808e",
+              "391f1017a4c5ea9871f3a826b4b15323ca827837dd437484d0523346aa917f34"
+            ]
+          },
+          ".debug_str": {
+            "sha256": [
+              "bb7971cbb1ab3b04ac6d435849db6816349632d750cebef58500f899091a0503",
+              "5d94ccf4f3795c8f9f45ecf5552fdd8f0e6ee9808f298746496e2e37e76af1c2"
+            ]
+          },
+          ".note.gnu.build-id": {
+            "sha256": [
+              "1319688322b3dbc51ea7224d349c2933efa56f86a57447aaa21f9635fc87ac70",
+              "35778cadc8470f0ba87985a2f5a4fdab4237044b1b57c2291590b848a5c2ab55"
+            ]
+          }
+        },
+        "changed_payloads": [
+          ".debug_info",
+          ".debug_macro",
+          ".debug_str",
+          ".note.gnu.build-id"
+        ],
+        "loadable_except_id_equal": true,
+        "size": [
+          167920480,
+          167920480
+        ]
+      }
+    }
+  },
+  "declared": true,
+  "dep_info": {
+    "C/edited": {
+      "portable_atomic": [
+        12981,
+        "a8c0178c2eec3774ffb25fddbf9df5b42b7e4a98013c2d25d63db2f8db404f72",
+        97,
+        "ffc9e632155e2eaade4194d1277961ca1ee852e72c481d7b9e11792d634daae8",
+        0
+      ],
+      "salsa": [
+        33121,
+        "fcefc6d6d2fa74243450a06eb4024a472090d619853db333ad0d45f56f09188f",
+        14,
+        "fd037d91f7fc9eface8316b71b539f18d45f3a4fe8b7d18bf4676d80599047c0",
+        0
+      ]
+    },
+    "C/fully-empty-buggy": {
+      "portable_atomic": [
+        12981,
+        "a8c0178c2eec3774ffb25fddbf9df5b42b7e4a98013c2d25d63db2f8db404f72",
+        97,
+        "ffc9e632155e2eaade4194d1277961ca1ee852e72c481d7b9e11792d634daae8",
+        0
+      ],
+      "salsa": [
+        33121,
+        "fcefc6d6d2fa74243450a06eb4024a472090d619853db333ad0d45f56f09188f",
+        14,
+        "fd037d91f7fc9eface8316b71b539f18d45f3a4fe8b7d18bf4676d80599047c0",
+        0
+      ]
+    },
+    "C/fully-empty-fixed": {
+      "portable_atomic": [
+        12981,
+        "a8c0178c2eec3774ffb25fddbf9df5b42b7e4a98013c2d25d63db2f8db404f72",
+        97,
+        "ffc9e632155e2eaade4194d1277961ca1ee852e72c481d7b9e11792d634daae8",
+        0
+      ],
+      "salsa": [
+        33121,
+        "fcefc6d6d2fa74243450a06eb4024a472090d619853db333ad0d45f56f09188f",
+        14,
+        "fd037d91f7fc9eface8316b71b539f18d45f3a4fe8b7d18bf4676d80599047c0",
+        0
+      ]
+    },
+    "C/repaired": {
+      "portable_atomic": [
+        12981,
+        "a8c0178c2eec3774ffb25fddbf9df5b42b7e4a98013c2d25d63db2f8db404f72",
+        97,
+        "ffc9e632155e2eaade4194d1277961ca1ee852e72c481d7b9e11792d634daae8",
+        0
+      ],
+      "salsa": [
+        33121,
+        "fcefc6d6d2fa74243450a06eb4024a472090d619853db333ad0d45f56f09188f",
+        14,
+        "fd037d91f7fc9eface8316b71b539f18d45f3a4fe8b7d18bf4676d80599047c0",
+        0
+      ]
+    },
+    "C/reverse": {
+      "portable_atomic": [
+        12981,
+        "a8c0178c2eec3774ffb25fddbf9df5b42b7e4a98013c2d25d63db2f8db404f72",
+        97,
+        "ffc9e632155e2eaade4194d1277961ca1ee852e72c481d7b9e11792d634daae8",
+        0
+      ],
+      "salsa": [
+        33121,
+        "fcefc6d6d2fa74243450a06eb4024a472090d619853db333ad0d45f56f09188f",
+        14,
+        "fd037d91f7fc9eface8316b71b539f18d45f3a4fe8b7d18bf4676d80599047c0",
+        0
+      ]
+    },
+    "C/settled-fixed": {
+      "portable_atomic": [
+        12981,
+        "a8c0178c2eec3774ffb25fddbf9df5b42b7e4a98013c2d25d63db2f8db404f72",
+        97,
+        "ffc9e632155e2eaade4194d1277961ca1ee852e72c481d7b9e11792d634daae8",
+        0
+      ],
+      "salsa": [
+        33121,
+        "fcefc6d6d2fa74243450a06eb4024a472090d619853db333ad0d45f56f09188f",
+        14,
+        "fd037d91f7fc9eface8316b71b539f18d45f3a4fe8b7d18bf4676d80599047c0",
+        0
+      ]
+    },
+    "P/edited": {
+      "portable_atomic": [
+        12981,
+        "21bf9679f6fb09fb3aa1c311ba590fdbe9cb4be4625c23e15542d08fd8e2a279",
+        97,
+        "ffc9e632155e2eaade4194d1277961ca1ee852e72c481d7b9e11792d634daae8",
+        0
+      ],
+      "salsa": [
+        33121,
+        "b3a52d1a40f929d9d8fb276cd7e01a33f0dc189045517324f742841f010c3588",
+        14,
+        "fd037d91f7fc9eface8316b71b539f18d45f3a4fe8b7d18bf4676d80599047c0",
+        0
+      ]
+    },
+    "P/fully-empty-buggy": {
+      "portable_atomic": [
+        12981,
+        "21bf9679f6fb09fb3aa1c311ba590fdbe9cb4be4625c23e15542d08fd8e2a279",
+        97,
+        "ffc9e632155e2eaade4194d1277961ca1ee852e72c481d7b9e11792d634daae8",
+        0
+      ],
+      "salsa": [
+        33121,
+        "b3a52d1a40f929d9d8fb276cd7e01a33f0dc189045517324f742841f010c3588",
+        14,
+        "fd037d91f7fc9eface8316b71b539f18d45f3a4fe8b7d18bf4676d80599047c0",
+        0
+      ]
+    },
+    "P/fully-empty-fixed": {
+      "portable_atomic": [
+        12981,
+        "21bf9679f6fb09fb3aa1c311ba590fdbe9cb4be4625c23e15542d08fd8e2a279",
+        97,
+        "ffc9e632155e2eaade4194d1277961ca1ee852e72c481d7b9e11792d634daae8",
+        0
+      ],
+      "salsa": [
+        33121,
+        "b3a52d1a40f929d9d8fb276cd7e01a33f0dc189045517324f742841f010c3588",
+        14,
+        "fd037d91f7fc9eface8316b71b539f18d45f3a4fe8b7d18bf4676d80599047c0",
+        0
+      ]
+    },
+    "P/repaired": {
+      "portable_atomic": [
+        12981,
+        "21bf9679f6fb09fb3aa1c311ba590fdbe9cb4be4625c23e15542d08fd8e2a279",
+        97,
+        "ffc9e632155e2eaade4194d1277961ca1ee852e72c481d7b9e11792d634daae8",
+        0
+      ],
+      "salsa": [
+        33121,
+        "b3a52d1a40f929d9d8fb276cd7e01a33f0dc189045517324f742841f010c3588",
+        14,
+        "fd037d91f7fc9eface8316b71b539f18d45f3a4fe8b7d18bf4676d80599047c0",
+        0
+      ]
+    },
+    "P/reverse": {
+      "portable_atomic": [
+        12981,
+        "21bf9679f6fb09fb3aa1c311ba590fdbe9cb4be4625c23e15542d08fd8e2a279",
+        97,
+        "ffc9e632155e2eaade4194d1277961ca1ee852e72c481d7b9e11792d634daae8",
+        0
+      ],
+      "salsa": [
+        33121,
+        "b3a52d1a40f929d9d8fb276cd7e01a33f0dc189045517324f742841f010c3588",
+        14,
+        "fd037d91f7fc9eface8316b71b539f18d45f3a4fe8b7d18bf4676d80599047c0",
+        0
+      ]
+    },
+    "P/settled-fixed": {
+      "portable_atomic": [
+        12981,
+        "21bf9679f6fb09fb3aa1c311ba590fdbe9cb4be4625c23e15542d08fd8e2a279",
+        97,
+        "ffc9e632155e2eaade4194d1277961ca1ee852e72c481d7b9e11792d634daae8",
+        0
+      ],
+      "salsa": [
+        33121,
+        "b3a52d1a40f929d9d8fb276cd7e01a33f0dc189045517324f742841f010c3588",
+        14,
+        "fd037d91f7fc9eface8316b71b539f18d45f3a4fe8b7d18bf4676d80599047c0",
+        0
+      ]
+    }
+  },
+  "invalid": {
+    "C": "E0308",
+    "P": "E0308"
+  },
+  "native_distinct": 4,
+  "native_stages": {
+    "C/edited": "637b417391939e86cef1074a6dba003556037601a92e781f8a34f5d5de0e2f8a",
+    "C/fully-empty-buggy": "f058a81e22278be7b1da982ceb36e97fb58fbd5439a39616bdcb4174ed7c1046",
+    "C/fully-empty-fixed": "637b417391939e86cef1074a6dba003556037601a92e781f8a34f5d5de0e2f8a",
+    "C/repaired": "637b417391939e86cef1074a6dba003556037601a92e781f8a34f5d5de0e2f8a",
+    "C/reverse": "f058a81e22278be7b1da982ceb36e97fb58fbd5439a39616bdcb4174ed7c1046",
+    "C/settled-fixed": "637b417391939e86cef1074a6dba003556037601a92e781f8a34f5d5de0e2f8a",
+    "P/edited": "6a9d1f5630e617b115a57c921e5d7f95c2c330712d7a78f75ebd8014ca9064ea",
+    "P/fully-empty-buggy": "35ef8e091d8474cd53b3394949c2ab8e106ad7a9946049a8592e19773ae50167",
+    "P/fully-empty-fixed": "6a9d1f5630e617b115a57c921e5d7f95c2c330712d7a78f75ebd8014ca9064ea",
+    "P/repaired": "6a9d1f5630e617b115a57c921e5d7f95c2c330712d7a78f75ebd8014ca9064ea",
+    "P/reverse": "35ef8e091d8474cd53b3394949c2ab8e106ad7a9946049a8592e19773ae50167",
+    "P/settled-fixed": "6a9d1f5630e617b115a57c921e5d7f95c2c330712d7a78f75ebd8014ca9064ea"
+  },
+  "raw_owners": {
+    "C/edited": [
+      "ty_python_semantic",
+      "ruff_linter",
+      "ruff"
+    ],
+    "C/reverse": [
+      "ruff_linter",
+      "ty_python_semantic",
+      "ruff"
+    ],
+    "C/settled-fixed": [
+      "ty_python_semantic",
+      "ruff"
+    ],
+    "P/edited": [
+      "ty_python_semantic",
+      "ruff_linter",
+      "ruff"
+    ],
+    "P/reverse": [
+      "ruff_linter",
+      "ty_python_semantic",
+      "ruff"
+    ],
+    "P/settled-fixed": [
+      "ty_python_semantic",
+      "ruff"
+    ]
+  },
+  "refusals": [],
+  "sections": {
+    "35ef8e091d8474cd53b3394949c2ab8e106ad7a9946049a8592e19773ae50167": {
+      "build_id": "5049205a17a4eb715b540b606d7d6e21244b4e00c6f5fc7ba61159c9161fbde8",
+      "loads": [
+        {
+          "program": [
+            1,
+            4,
+            0,
+            0,
+            0,
+            14831690,
+            14831690,
+            4096
+          ],
+          "sha256": "bd75d4709ee2962491dba6cfd7ce9c319b1e3e3560900258122fc1c6299fd0b4",
+          "without_build_id": "67944c0b66eedc67754546684ef53a2a176157f8b39994e4750308156153d165"
+        },
+        {
+          "program": [
+            1,
+            5,
+            14831696,
+            14835792,
+            14835792,
+            38359792,
+            38359792,
+            4096
+          ],
+          "sha256": "4af2ea279d436811518ff1b432edb15c834a6de27ebde50ac314561442bdfcae",
+          "without_build_id": "4af2ea279d436811518ff1b432edb15c834a6de27ebde50ac314561442bdfcae"
+        },
+        {
+          "program": [
+            1,
+            6,
+            53191488,
+            53199680,
+            53199680,
+            2149384,
+            2149568,
+            4096
+          ],
+          "sha256": "7b423fafdae649c64354dcb9f0144ef95e161b589e130d89c6463141b3aab75b",
+          "without_build_id": "7b423fafdae649c64354dcb9f0144ef95e161b589e130d89c6463141b3aab75b"
+        },
+        {
+          "program": [
+            1,
+            6,
+            55340896,
+            55353184,
+            55353184,
+            11656,
+            2160493,
+            4096
+          ],
+          "sha256": "009254f9778fe00a13da5dfd19dc5cf8d5dee95d4744c7cb0cd57cfa603d5343",
+          "without_build_id": "009254f9778fe00a13da5dfd19dc5cf8d5dee95d4744c7cb0cd57cfa603d5343"
+        }
+      ],
+      "sections": {
+        "": {
+          "header": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        ".bss": {
+          "header": [
+            322,
+            8,
+            3,
+            55364864,
+            55352552,
+            2148813,
+            0,
+            0,
+            128,
+            0
+          ],
+          "sha256": null
+        },
+        ".comment": {
+          "header": [
+            418,
+            1,
+            48,
+            0,
+            130315805,
+            135,
+            0,
+            0,
+            1,
+            1
+          ],
+          "sha256": "f341e34fdc9217825578ef281b0cc425dc1a8b816ca6025aa1bef8ab31917f87"
+        },
+        ".data": {
+          "header": [
+            300,
+            1,
+            3,
+            55353184,
+            55340896,
+            11654,
+            0,
+            0,
+            32,
+            0
+          ],
+          "sha256": "d298f47f51a85d16a8f8ab6437c1423562ace99511cbafa1221f15fbfd9bb23d"
+        },
+        ".data.rel.ro": {
+          "header": [
+            258,
+            1,
+            3,
+            53202688,
+            53194496,
+            1401736,
+            0,
+            0,
+            32,
+            0
+          ],
+          "sha256": "c58c3ed304689fc6f33afb8530667d9a6bedfa992d7d1ec7f3e5cddaabae984a"
+        },
+        ".debug_abbrev": {
+          "header": [
+            327,
+            1,
+            0,
+            0,
+            55352552,
+            432961,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "6320f1fcd562083b27d2ea5b2271ade6bf739b8df0cc9da1abe8b7e61e9ad014"
+        },
+        ".debug_aranges": {
+          "header": [
+            353,
+            1,
+            0,
+            0,
+            71274406,
+            4105120,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "7ad6676ce71f342a6bb2270d2c46d901e559b118768c73b584a81e23be61f5c5"
+        },
+        ".debug_gdb_scripts": {
+          "header": [
+            175,
+            1,
+            50,
+            14831656,
+            14831656,
+            34,
+            0,
+            0,
+            1,
+            1
+          ],
+          "sha256": "90b05a6111bee6fd5b996298dba2fda834c39fb2709fd7f2377455c439f84eee"
+        },
+        ".debug_info": {
+          "header": [
+            341,
+            1,
+            0,
+            0,
+            55785513,
+            15488893,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "642dfc9bb839ead2d3f8578f59b297255b9d53822167b0130de85f55979d3399"
+        },
+        ".debug_line": {
+          "header": [
+            379,
+            1,
+            0,
+            0,
+            96751178,
+            27004073,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "d6a919185fefdcee63b4f805ed738ec3e0110dd2a4a7268664bb6e5bedbb56cc"
+        },
+        ".debug_macro": {
+          "header": [
+            405,
+            1,
+            0,
+            0,
+            130053939,
+            261866,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "290a99a0c8a13ba379c801f6e9d44a9f4e100cee7c756968f7cf4b36f1e4808e"
+        },
+        ".debug_ranges": {
+          "header": [
+            391,
+            1,
+            0,
+            0,
+            123755251,
+            6298688,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "c993f4906bf4c3008410fb76816d7d1a73810b471e0e26a2650eb93b6be3b724"
+        },
+        ".debug_str": {
+          "header": [
+            368,
+            1,
+            48,
+            0,
+            75379526,
+            21371652,
+            0,
+            0,
+            1,
+            1
+          ],
+          "sha256": "bb7971cbb1ab3b04ac6d435849db6816349632d750cebef58500f899091a0503"
+        },
+        ".dynamic": {
+          "header": [
+            271,
+            6,
+            3,
+            54604424,
+            54596232,
+            752,
+            7,
+            0,
+            8,
+            16
+          ],
+          "sha256": "6c7bb653c22db9a2d283546dd54ae9b8b36ff7ccb7d2210696ac2be083ba224c"
+        },
+        ".dynstr": {
+          "header": [
+            79,
+            3,
+            2,
+            5488,
+            5488,
+            2786,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "27010df96f204773d895698decd21c84b91eda4a2a0c4e4dc2e4690bd736278b"
+        },
+        ".dynsym": {
+          "header": [
+            71,
+            11,
+            2,
+            1024,
+            1024,
+            4464,
+            7,
+            1,
+            8,
+            24
+          ],
+          "sha256": "050a83fe5d84f15af6f91a58c3ca711e20c247700a54c2bc804eaf0d1a756d95"
+        },
+        ".eh_frame": {
+          "header": [
+            147,
+            1,
+            2,
+            9204536,
+            9204536,
+            4478128,
+            0,
+            0,
+            8,
+            0
+          ],
+          "sha256": "fa3eb9f0d4bb7b9bdb96de5b41d0e3babd61a54658e85e7b4ae29fd63d425668"
+        },
+        ".eh_frame_hdr": {
+          "header": [
+            133,
+            1,
+            2,
+            7874284,
+            7874284,
+            1330252,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "b5af3da63fd4cc11aebdb656d9ec2cbbc77f0f2d42c92fb6053b97322e707042"
+        },
+        ".fini": {
+          "header": [
+            209,
+            1,
+            6,
+            14836812,
+            14832716,
+            13,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "6a4f3e5efc7c1f7ee7d6f21afd9ed040ba1d7f0b97bb12b016f5b176cc558bd8"
+        },
+        ".fini_array": {
+          "header": [
+            246,
+            15,
+            3,
+            53202664,
+            53194472,
+            8,
+            0,
+            0,
+            8,
+            8
+          ],
+          "sha256": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc"
+        },
+        ".gcc_except_table": {
+          "header": [
+            157,
+            1,
+            2,
+            13682664,
+            13682664,
+            1148992,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "763f9284a24a67e9d50c62615a95c69c0d3947665c24212cc29b0449e86f64c4"
+        },
+        ".gnu.hash": {
+          "header": [
+            61,
+            1879048182,
+            2,
+            992,
+            992,
+            28,
+            6,
+            0,
+            8,
+            0
+          ],
+          "sha256": "708b3ea84995669314e3c583774d6fcec65190833f8621e356182e6d392f3f59"
+        },
+        ".gnu.version": {
+          "header": [
+            87,
+            1879048191,
+            2,
+            8274,
+            8274,
+            372,
+            6,
+            0,
+            2,
+            2
+          ],
+          "sha256": "436163bda5afb52b6ec7f8602ab5d7d84171799504706d430750e7bcabac95e4"
+        },
+        ".gnu.version_r": {
+          "header": [
+            100,
+            1879048190,
+            2,
+            8648,
+            8648,
+            480,
+            7,
+            3,
+            8,
+            0
+          ],
+          "sha256": "f5dee196d480f18ae37f2286f5e6ff28976426eaafc9e62ba2b0999ba2c1d7e7"
+        },
+        ".got": {
+          "header": [
+            280,
+            1,
+            3,
+            54605176,
+            54596984,
+            743888,
+            0,
+            0,
+            8,
+            8
+          ],
+          "sha256": "b473bd7d1e451bc02b212486685db372415e29c38ef5c03f44e99608564aa5dc"
+        },
+        ".init": {
+          "header": [
+            203,
+            1,
+            6,
+            14836784,
+            14832688,
+            27,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "9c23b7db748fd2a96ca7b550fa68a458b02d52ed873e13e8fa68a46ebd78f6ab"
+        },
+        ".init_array": {
+          "header": [
+            234,
+            14,
+            3,
+            53202640,
+            53194448,
+            24,
+            0,
+            0,
+            8,
+            8
+          ],
+          "sha256": "9d908ecfb6b256def8b49a7c504e6c889c4b0e41fe6ce3e01863dd7b61a20aa0"
+        },
+        ".interp": {
+          "header": [
+            39,
+            1,
+            2,
+            928,
+            928,
+            28,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "9097c98ea70f6f3b01d50145eb72bf55ad1f4e9713bccf27bd6405d6254eed00"
+        },
+        ".note.ABI-tag": {
+          "header": [
+            47,
+            7,
+            2,
+            956,
+            956,
+            32,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "6e48317ad93a8ac2dc04321465ede06d1274543fc8ab172e68171a9d684bb313"
+        },
+        ".note.gnu.build-id": {
+          "header": [
+            20,
+            7,
+            2,
+            880,
+            880,
+            48,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "4a8b63d805c95477348a030e4c0315ca3ad2cf76597e36f6a29ac04bacf805b5"
+        },
+        ".note.gnu.property": {
+          "header": [
+            1,
+            7,
+            2,
+            848,
+            848,
+            32,
+            0,
+            0,
+            8,
+            0
+          ],
+          "sha256": "5978480398fc48bfa6c56246117c5bc1a40145463a2faca541e5e91d5067ff79"
+        },
+        ".plt.got": {
+          "header": [
+            194,
+            1,
+            6,
+            14835792,
+            14831696,
+            992,
+            0,
+            0,
+            16,
+            16
+          ],
+          "sha256": "3c71a92e95d6dd8ac99a0b389c10f4f3813009604b1fc0a8cab935a3a6079867"
+        },
+        ".rela.dyn": {
+          "header": [
+            115,
+            4,
+            2,
+            9128,
+            9128,
+            3757176,
+            6,
+            0,
+            8,
+            24
+          ],
+          "sha256": "3496390ea62a806a0d7965e40db74285097ff7a1a19e3af2421116b738c9d91c"
+        },
+        ".relro_padding": {
+          "header": [
+            285,
+            8,
+            3,
+            55349064,
+            55340872,
+            184,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": null
+        },
+        ".rodata": {
+          "header": [
+            125,
+            1,
+            50,
+            3766400,
+            3766400,
+            4107884,
+            0,
+            0,
+            128,
+            0
+          ],
+          "sha256": "c4d4b45289b14de3d6542ae146539634ffff87f4226d64f52bdd28598c9eeb3f"
+        },
+        ".shstrtab": {
+          "header": [
+            427,
+            3,
+            0,
+            0,
+            130315940,
+            453,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "4112a3066b29160f52f29f662fba197f91b90ae992c1f29318610eaa169314a6"
+        },
+        ".strtab": {
+          "header": [
+            445,
+            3,
+            0,
+            0,
+            134969688,
+            32947760,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "a9e5ffdbe42d0e87b1009e9e5cbbaa71013cd9b04907731a0654b16ca3066106"
+        },
+        ".symtab": {
+          "header": [
+            437,
+            2,
+            0,
+            0,
+            130316400,
+            4653288,
+            41,
+            60034,
+            8,
+            24
+          ],
+          "sha256": "6e243c45b81fdcd15ea6291ea7e906a148e8800f1a36a51cdb0bff54789748f3"
+        },
+        ".tbss": {
+          "header": [
+            228,
+            8,
+            1027,
+            53202640,
+            53194445,
+            1073,
+            0,
+            0,
+            8,
+            0
+          ],
+          "sha256": null
+        },
+        ".tdata": {
+          "header": [
+            221,
+            1,
+            1027,
+            53199680,
+            53191488,
+            2957,
+            0,
+            0,
+            8,
+            0
+          ],
+          "sha256": "4c967e539182022b6cd86d304244548559f0aa27c10f3520f95ca74e5545f115"
+        },
+        ".text": {
+          "header": [
+            215,
+            1,
+            6,
+            14836832,
+            14832736,
+            38358752,
+            0,
+            0,
+            16,
+            0
+          ],
+          "sha256": "7ae9324af06446a75e74e9bbf3264f3b982953bd2d9ea3a4b6c9e02057b51dfe"
+        },
+        ".tm_clone_table": {
+          "header": [
+            306,
+            1,
+            3,
+            55364840,
+            55352552,
+            0,
+            0,
+            0,
+            8,
+            0
+          ],
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "size": 167920136
+    },
+    "637b417391939e86cef1074a6dba003556037601a92e781f8a34f5d5de0e2f8a": {
+      "build_id": "6168915f55a1b5f9567d593e2343b0d6ab160e87de1e4c08b1de7cefa343c84d",
+      "loads": [
+        {
+          "program": [
+            1,
+            4,
+            0,
+            0,
+            0,
+            14831706,
+            14831706,
+            4096
+          ],
+          "sha256": "0d1eebc6e070976ff6657d55f9952173b9597b87fd4fff95f938268e19165aa1",
+          "without_build_id": "e31a8b792746600e6a4b5b540434ebcaffd1b317b87462be7fea2369cdea7b77"
+        },
+        {
+          "program": [
+            1,
+            5,
+            14831712,
+            14835808,
+            14835808,
+            38360048,
+            38360048,
+            4096
+          ],
+          "sha256": "4ba741742eb517679fee88d574874369248286f90c06ca4c7eda23c2ff701593",
+          "without_build_id": "4ba741742eb517679fee88d574874369248286f90c06ca4c7eda23c2ff701593"
+        },
+        {
+          "program": [
+            1,
+            6,
+            53191760,
+            53199952,
+            53199952,
+            2149368,
+            2153392,
+            4096
+          ],
+          "sha256": "ce4b1934f7946dbc3b8c1e03c87b8537be45894c7776a384bfe437fd4e25f625",
+          "without_build_id": "ce4b1934f7946dbc3b8c1e03c87b8537be45894c7776a384bfe437fd4e25f625"
+        },
+        {
+          "program": [
+            1,
+            6,
+            55341152,
+            55353440,
+            55353440,
+            11656,
+            2160493,
+            4096
+          ],
+          "sha256": "009254f9778fe00a13da5dfd19dc5cf8d5dee95d4744c7cb0cd57cfa603d5343",
+          "without_build_id": "009254f9778fe00a13da5dfd19dc5cf8d5dee95d4744c7cb0cd57cfa603d5343"
+        }
+      ],
+      "sections": {
+        "": {
+          "header": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        ".bss": {
+          "header": [
+            322,
+            8,
+            3,
+            55365120,
+            55352808,
+            2148813,
+            0,
+            0,
+            128,
+            0
+          ],
+          "sha256": null
+        },
+        ".comment": {
+          "header": [
+            418,
+            1,
+            48,
+            0,
+            130316153,
+            135,
+            0,
+            0,
+            1,
+            1
+          ],
+          "sha256": "f341e34fdc9217825578ef281b0cc425dc1a8b816ca6025aa1bef8ab31917f87"
+        },
+        ".data": {
+          "header": [
+            300,
+            1,
+            3,
+            55353440,
+            55341152,
+            11654,
+            0,
+            0,
+            32,
+            0
+          ],
+          "sha256": "d298f47f51a85d16a8f8ab6437c1423562ace99511cbafa1221f15fbfd9bb23d"
+        },
+        ".data.rel.ro": {
+          "header": [
+            258,
+            1,
+            3,
+            53202944,
+            53194752,
+            1401736,
+            0,
+            0,
+            32,
+            0
+          ],
+          "sha256": "5f897bf1ba63a773c22c4175f1028d78e1596c0428cf6c0ee6e41c6b5116fa55"
+        },
+        ".debug_abbrev": {
+          "header": [
+            327,
+            1,
+            0,
+            0,
+            55352808,
+            432961,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "6320f1fcd562083b27d2ea5b2271ade6bf739b8df0cc9da1abe8b7e61e9ad014"
+        },
+        ".debug_aranges": {
+          "header": [
+            353,
+            1,
+            0,
+            0,
+            71274662,
+            4105120,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "2e933c6044fce1611419f1fc1f537a2b13fbe1f02f2f7c0d164567d6588458a3"
+        },
+        ".debug_gdb_scripts": {
+          "header": [
+            175,
+            1,
+            50,
+            14831672,
+            14831672,
+            34,
+            0,
+            0,
+            1,
+            1
+          ],
+          "sha256": "90b05a6111bee6fd5b996298dba2fda834c39fb2709fd7f2377455c439f84eee"
+        },
+        ".debug_info": {
+          "header": [
+            341,
+            1,
+            0,
+            0,
+            55785769,
+            15488893,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "0905df33ef43e15cfbf7bb66a625ad7fd218e6601f5666fe4b34a37e95d86649"
+        },
+        ".debug_line": {
+          "header": [
+            379,
+            1,
+            0,
+            0,
+            96751434,
+            27004165,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "c30c0f28b2eeec056c30c39fe47647f5808e592de4db49df3544da57b7182c6e"
+        },
+        ".debug_macro": {
+          "header": [
+            405,
+            1,
+            0,
+            0,
+            130054287,
+            261866,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "391f1017a4c5ea9871f3a826b4b15323ca827837dd437484d0523346aa917f34"
+        },
+        ".debug_ranges": {
+          "header": [
+            391,
+            1,
+            0,
+            0,
+            123755599,
+            6298688,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "e9d0158d9c572957f01c6f6eaedef374f1d911c2a0202d5066f5a453ab74ecbb"
+        },
+        ".debug_str": {
+          "header": [
+            368,
+            1,
+            48,
+            0,
+            75379782,
+            21371652,
+            0,
+            0,
+            1,
+            1
+          ],
+          "sha256": "5d94ccf4f3795c8f9f45ecf5552fdd8f0e6ee9808f298746496e2e37e76af1c2"
+        },
+        ".dynamic": {
+          "header": [
+            271,
+            6,
+            3,
+            54604680,
+            54596488,
+            752,
+            7,
+            0,
+            8,
+            16
+          ],
+          "sha256": "fc1d032050182386cf7e8c00a19d79791d68ae36828554fb44d89eb9b5670f4c"
+        },
+        ".dynstr": {
+          "header": [
+            79,
+            3,
+            2,
+            5488,
+            5488,
+            2786,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "27010df96f204773d895698decd21c84b91eda4a2a0c4e4dc2e4690bd736278b"
+        },
+        ".dynsym": {
+          "header": [
+            71,
+            11,
+            2,
+            1024,
+            1024,
+            4464,
+            7,
+            1,
+            8,
+            24
+          ],
+          "sha256": "050a83fe5d84f15af6f91a58c3ca711e20c247700a54c2bc804eaf0d1a756d95"
+        },
+        ".eh_frame": {
+          "header": [
+            147,
+            1,
+            2,
+            9204552,
+            9204552,
+            4478128,
+            0,
+            0,
+            8,
+            0
+          ],
+          "sha256": "956e8eace00e99546e608c5f2b8f2b4066872148361bd388f05df4a985808bc5"
+        },
+        ".eh_frame_hdr": {
+          "header": [
+            133,
+            1,
+            2,
+            7874300,
+            7874300,
+            1330252,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "9de2eb1ccbc7117b43f868a7a75909711cccecf2036cb507e66eb4660adc39b8"
+        },
+        ".fini": {
+          "header": [
+            209,
+            1,
+            6,
+            14836828,
+            14832732,
+            13,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "6a4f3e5efc7c1f7ee7d6f21afd9ed040ba1d7f0b97bb12b016f5b176cc558bd8"
+        },
+        ".fini_array": {
+          "header": [
+            246,
+            15,
+            3,
+            53202936,
+            53194744,
+            8,
+            0,
+            0,
+            8,
+            8
+          ],
+          "sha256": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc"
+        },
+        ".gcc_except_table": {
+          "header": [
+            157,
+            1,
+            2,
+            13682680,
+            13682680,
+            1148992,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "5715cb2c30fdccb659d470d2dfab2ec88e924becfcdd7095febaadd2980732bc"
+        },
+        ".gnu.hash": {
+          "header": [
+            61,
+            1879048182,
+            2,
+            992,
+            992,
+            28,
+            6,
+            0,
+            8,
+            0
+          ],
+          "sha256": "708b3ea84995669314e3c583774d6fcec65190833f8621e356182e6d392f3f59"
+        },
+        ".gnu.version": {
+          "header": [
+            87,
+            1879048191,
+            2,
+            8274,
+            8274,
+            372,
+            6,
+            0,
+            2,
+            2
+          ],
+          "sha256": "436163bda5afb52b6ec7f8602ab5d7d84171799504706d430750e7bcabac95e4"
+        },
+        ".gnu.version_r": {
+          "header": [
+            100,
+            1879048190,
+            2,
+            8648,
+            8648,
+            480,
+            7,
+            3,
+            8,
+            0
+          ],
+          "sha256": "f5dee196d480f18ae37f2286f5e6ff28976426eaafc9e62ba2b0999ba2c1d7e7"
+        },
+        ".got": {
+          "header": [
+            280,
+            1,
+            3,
+            54605432,
+            54597240,
+            743888,
+            0,
+            0,
+            8,
+            8
+          ],
+          "sha256": "b473bd7d1e451bc02b212486685db372415e29c38ef5c03f44e99608564aa5dc"
+        },
+        ".init": {
+          "header": [
+            203,
+            1,
+            6,
+            14836800,
+            14832704,
+            27,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "497f0b957253c421e00fd60b6b61a25dabfb51ce13c3f4e31c1eaffb1252a238"
+        },
+        ".init_array": {
+          "header": [
+            234,
+            14,
+            3,
+            53202912,
+            53194720,
+            24,
+            0,
+            0,
+            8,
+            8
+          ],
+          "sha256": "9d908ecfb6b256def8b49a7c504e6c889c4b0e41fe6ce3e01863dd7b61a20aa0"
+        },
+        ".interp": {
+          "header": [
+            39,
+            1,
+            2,
+            928,
+            928,
+            28,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "9097c98ea70f6f3b01d50145eb72bf55ad1f4e9713bccf27bd6405d6254eed00"
+        },
+        ".note.ABI-tag": {
+          "header": [
+            47,
+            7,
+            2,
+            956,
+            956,
+            32,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "6e48317ad93a8ac2dc04321465ede06d1274543fc8ab172e68171a9d684bb313"
+        },
+        ".note.gnu.build-id": {
+          "header": [
+            20,
+            7,
+            2,
+            880,
+            880,
+            48,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "35778cadc8470f0ba87985a2f5a4fdab4237044b1b57c2291590b848a5c2ab55"
+        },
+        ".note.gnu.property": {
+          "header": [
+            1,
+            7,
+            2,
+            848,
+            848,
+            32,
+            0,
+            0,
+            8,
+            0
+          ],
+          "sha256": "5978480398fc48bfa6c56246117c5bc1a40145463a2faca541e5e91d5067ff79"
+        },
+        ".plt.got": {
+          "header": [
+            194,
+            1,
+            6,
+            14835808,
+            14831712,
+            992,
+            0,
+            0,
+            16,
+            16
+          ],
+          "sha256": "3ae4e28ad54d78bce82d4bd4e6b0116d63d12305c74cbba4092bc75aa468bec4"
+        },
+        ".rela.dyn": {
+          "header": [
+            115,
+            4,
+            2,
+            9128,
+            9128,
+            3757176,
+            6,
+            0,
+            8,
+            24
+          ],
+          "sha256": "616016a41b3cfdae551e1f20323f3e073b5e0baa65fd2e5d617ae1af54509748"
+        },
+        ".relro_padding": {
+          "header": [
+            285,
+            8,
+            3,
+            55349320,
+            55341128,
+            4024,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": null
+        },
+        ".rodata": {
+          "header": [
+            125,
+            1,
+            50,
+            3766400,
+            3766400,
+            4107900,
+            0,
+            0,
+            128,
+            0
+          ],
+          "sha256": "9a24cfa21c70922b45d68f5d1120c89c2e461554f6c4e489a5ced12b76b2dcd1"
+        },
+        ".shstrtab": {
+          "header": [
+            427,
+            3,
+            0,
+            0,
+            130316288,
+            453,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "4112a3066b29160f52f29f662fba197f91b90ae992c1f29318610eaa169314a6"
+        },
+        ".strtab": {
+          "header": [
+            445,
+            3,
+            0,
+            0,
+            134970032,
+            32947760,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "a9e5ffdbe42d0e87b1009e9e5cbbaa71013cd9b04907731a0654b16ca3066106"
+        },
+        ".symtab": {
+          "header": [
+            437,
+            2,
+            0,
+            0,
+            130316744,
+            4653288,
+            41,
+            60034,
+            8,
+            24
+          ],
+          "sha256": "a3a09adc9992d9127f6fc9df99ecb095a99a6d5953c7059073ff368732903905"
+        },
+        ".tbss": {
+          "header": [
+            228,
+            8,
+            1027,
+            53202912,
+            53194717,
+            1073,
+            0,
+            0,
+            8,
+            0
+          ],
+          "sha256": null
+        },
+        ".tdata": {
+          "header": [
+            221,
+            1,
+            1027,
+            53199952,
+            53191760,
+            2957,
+            0,
+            0,
+            8,
+            0
+          ],
+          "sha256": "4c967e539182022b6cd86d304244548559f0aa27c10f3520f95ca74e5545f115"
+        },
+        ".text": {
+          "header": [
+            215,
+            1,
+            6,
+            14836848,
+            14832752,
+            38359008,
+            0,
+            0,
+            16,
+            0
+          ],
+          "sha256": "7b6282d28e52ed904cde3ccb345397f22062458f420a83f9f47297179e0b7e2a"
+        },
+        ".tm_clone_table": {
+          "header": [
+            306,
+            1,
+            3,
+            55365096,
+            55352808,
+            0,
+            0,
+            0,
+            8,
+            0
+          ],
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "size": 167920480
+    },
+    "6a9d1f5630e617b115a57c921e5d7f95c2c330712d7a78f75ebd8014ca9064ea": {
+      "build_id": "fbf13d312a08d6f00535b1e659013a544322772de78d14a0fcde6263be7d97ed",
+      "loads": [
+        {
+          "program": [
+            1,
+            4,
+            0,
+            0,
+            0,
+            14831706,
+            14831706,
+            4096
+          ],
+          "sha256": "5f663d4ee893a3a5cad151c88d5c3fa2ffe702f83a82ce2be0b97170860ff8eb",
+          "without_build_id": "e31a8b792746600e6a4b5b540434ebcaffd1b317b87462be7fea2369cdea7b77"
+        },
+        {
+          "program": [
+            1,
+            5,
+            14831712,
+            14835808,
+            14835808,
+            38360048,
+            38360048,
+            4096
+          ],
+          "sha256": "4ba741742eb517679fee88d574874369248286f90c06ca4c7eda23c2ff701593",
+          "without_build_id": "4ba741742eb517679fee88d574874369248286f90c06ca4c7eda23c2ff701593"
+        },
+        {
+          "program": [
+            1,
+            6,
+            53191760,
+            53199952,
+            53199952,
+            2149368,
+            2153392,
+            4096
+          ],
+          "sha256": "ce4b1934f7946dbc3b8c1e03c87b8537be45894c7776a384bfe437fd4e25f625",
+          "without_build_id": "ce4b1934f7946dbc3b8c1e03c87b8537be45894c7776a384bfe437fd4e25f625"
+        },
+        {
+          "program": [
+            1,
+            6,
+            55341152,
+            55353440,
+            55353440,
+            11656,
+            2160493,
+            4096
+          ],
+          "sha256": "009254f9778fe00a13da5dfd19dc5cf8d5dee95d4744c7cb0cd57cfa603d5343",
+          "without_build_id": "009254f9778fe00a13da5dfd19dc5cf8d5dee95d4744c7cb0cd57cfa603d5343"
+        }
+      ],
+      "sections": {
+        "": {
+          "header": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        ".bss": {
+          "header": [
+            322,
+            8,
+            3,
+            55365120,
+            55352808,
+            2148813,
+            0,
+            0,
+            128,
+            0
+          ],
+          "sha256": null
+        },
+        ".comment": {
+          "header": [
+            418,
+            1,
+            48,
+            0,
+            130316153,
+            135,
+            0,
+            0,
+            1,
+            1
+          ],
+          "sha256": "f341e34fdc9217825578ef281b0cc425dc1a8b816ca6025aa1bef8ab31917f87"
+        },
+        ".data": {
+          "header": [
+            300,
+            1,
+            3,
+            55353440,
+            55341152,
+            11654,
+            0,
+            0,
+            32,
+            0
+          ],
+          "sha256": "d298f47f51a85d16a8f8ab6437c1423562ace99511cbafa1221f15fbfd9bb23d"
+        },
+        ".data.rel.ro": {
+          "header": [
+            258,
+            1,
+            3,
+            53202944,
+            53194752,
+            1401736,
+            0,
+            0,
+            32,
+            0
+          ],
+          "sha256": "5f897bf1ba63a773c22c4175f1028d78e1596c0428cf6c0ee6e41c6b5116fa55"
+        },
+        ".debug_abbrev": {
+          "header": [
+            327,
+            1,
+            0,
+            0,
+            55352808,
+            432961,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "6320f1fcd562083b27d2ea5b2271ade6bf739b8df0cc9da1abe8b7e61e9ad014"
+        },
+        ".debug_aranges": {
+          "header": [
+            353,
+            1,
+            0,
+            0,
+            71274662,
+            4105120,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "2e933c6044fce1611419f1fc1f537a2b13fbe1f02f2f7c0d164567d6588458a3"
+        },
+        ".debug_gdb_scripts": {
+          "header": [
+            175,
+            1,
+            50,
+            14831672,
+            14831672,
+            34,
+            0,
+            0,
+            1,
+            1
+          ],
+          "sha256": "90b05a6111bee6fd5b996298dba2fda834c39fb2709fd7f2377455c439f84eee"
+        },
+        ".debug_info": {
+          "header": [
+            341,
+            1,
+            0,
+            0,
+            55785769,
+            15488893,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "e7c9e3c4ea2765d5c0e257ead907afe7439f50566019634ad1722f2a47e47b39"
+        },
+        ".debug_line": {
+          "header": [
+            379,
+            1,
+            0,
+            0,
+            96751434,
+            27004165,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "c30c0f28b2eeec056c30c39fe47647f5808e592de4db49df3544da57b7182c6e"
+        },
+        ".debug_macro": {
+          "header": [
+            405,
+            1,
+            0,
+            0,
+            130054287,
+            261866,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "290a99a0c8a13ba379c801f6e9d44a9f4e100cee7c756968f7cf4b36f1e4808e"
+        },
+        ".debug_ranges": {
+          "header": [
+            391,
+            1,
+            0,
+            0,
+            123755599,
+            6298688,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "e9d0158d9c572957f01c6f6eaedef374f1d911c2a0202d5066f5a453ab74ecbb"
+        },
+        ".debug_str": {
+          "header": [
+            368,
+            1,
+            48,
+            0,
+            75379782,
+            21371652,
+            0,
+            0,
+            1,
+            1
+          ],
+          "sha256": "bb7971cbb1ab3b04ac6d435849db6816349632d750cebef58500f899091a0503"
+        },
+        ".dynamic": {
+          "header": [
+            271,
+            6,
+            3,
+            54604680,
+            54596488,
+            752,
+            7,
+            0,
+            8,
+            16
+          ],
+          "sha256": "fc1d032050182386cf7e8c00a19d79791d68ae36828554fb44d89eb9b5670f4c"
+        },
+        ".dynstr": {
+          "header": [
+            79,
+            3,
+            2,
+            5488,
+            5488,
+            2786,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "27010df96f204773d895698decd21c84b91eda4a2a0c4e4dc2e4690bd736278b"
+        },
+        ".dynsym": {
+          "header": [
+            71,
+            11,
+            2,
+            1024,
+            1024,
+            4464,
+            7,
+            1,
+            8,
+            24
+          ],
+          "sha256": "050a83fe5d84f15af6f91a58c3ca711e20c247700a54c2bc804eaf0d1a756d95"
+        },
+        ".eh_frame": {
+          "header": [
+            147,
+            1,
+            2,
+            9204552,
+            9204552,
+            4478128,
+            0,
+            0,
+            8,
+            0
+          ],
+          "sha256": "956e8eace00e99546e608c5f2b8f2b4066872148361bd388f05df4a985808bc5"
+        },
+        ".eh_frame_hdr": {
+          "header": [
+            133,
+            1,
+            2,
+            7874300,
+            7874300,
+            1330252,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "9de2eb1ccbc7117b43f868a7a75909711cccecf2036cb507e66eb4660adc39b8"
+        },
+        ".fini": {
+          "header": [
+            209,
+            1,
+            6,
+            14836828,
+            14832732,
+            13,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "6a4f3e5efc7c1f7ee7d6f21afd9ed040ba1d7f0b97bb12b016f5b176cc558bd8"
+        },
+        ".fini_array": {
+          "header": [
+            246,
+            15,
+            3,
+            53202936,
+            53194744,
+            8,
+            0,
+            0,
+            8,
+            8
+          ],
+          "sha256": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc"
+        },
+        ".gcc_except_table": {
+          "header": [
+            157,
+            1,
+            2,
+            13682680,
+            13682680,
+            1148992,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "5715cb2c30fdccb659d470d2dfab2ec88e924becfcdd7095febaadd2980732bc"
+        },
+        ".gnu.hash": {
+          "header": [
+            61,
+            1879048182,
+            2,
+            992,
+            992,
+            28,
+            6,
+            0,
+            8,
+            0
+          ],
+          "sha256": "708b3ea84995669314e3c583774d6fcec65190833f8621e356182e6d392f3f59"
+        },
+        ".gnu.version": {
+          "header": [
+            87,
+            1879048191,
+            2,
+            8274,
+            8274,
+            372,
+            6,
+            0,
+            2,
+            2
+          ],
+          "sha256": "436163bda5afb52b6ec7f8602ab5d7d84171799504706d430750e7bcabac95e4"
+        },
+        ".gnu.version_r": {
+          "header": [
+            100,
+            1879048190,
+            2,
+            8648,
+            8648,
+            480,
+            7,
+            3,
+            8,
+            0
+          ],
+          "sha256": "f5dee196d480f18ae37f2286f5e6ff28976426eaafc9e62ba2b0999ba2c1d7e7"
+        },
+        ".got": {
+          "header": [
+            280,
+            1,
+            3,
+            54605432,
+            54597240,
+            743888,
+            0,
+            0,
+            8,
+            8
+          ],
+          "sha256": "b473bd7d1e451bc02b212486685db372415e29c38ef5c03f44e99608564aa5dc"
+        },
+        ".init": {
+          "header": [
+            203,
+            1,
+            6,
+            14836800,
+            14832704,
+            27,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "497f0b957253c421e00fd60b6b61a25dabfb51ce13c3f4e31c1eaffb1252a238"
+        },
+        ".init_array": {
+          "header": [
+            234,
+            14,
+            3,
+            53202912,
+            53194720,
+            24,
+            0,
+            0,
+            8,
+            8
+          ],
+          "sha256": "9d908ecfb6b256def8b49a7c504e6c889c4b0e41fe6ce3e01863dd7b61a20aa0"
+        },
+        ".interp": {
+          "header": [
+            39,
+            1,
+            2,
+            928,
+            928,
+            28,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "9097c98ea70f6f3b01d50145eb72bf55ad1f4e9713bccf27bd6405d6254eed00"
+        },
+        ".note.ABI-tag": {
+          "header": [
+            47,
+            7,
+            2,
+            956,
+            956,
+            32,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "6e48317ad93a8ac2dc04321465ede06d1274543fc8ab172e68171a9d684bb313"
+        },
+        ".note.gnu.build-id": {
+          "header": [
+            20,
+            7,
+            2,
+            880,
+            880,
+            48,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "1319688322b3dbc51ea7224d349c2933efa56f86a57447aaa21f9635fc87ac70"
+        },
+        ".note.gnu.property": {
+          "header": [
+            1,
+            7,
+            2,
+            848,
+            848,
+            32,
+            0,
+            0,
+            8,
+            0
+          ],
+          "sha256": "5978480398fc48bfa6c56246117c5bc1a40145463a2faca541e5e91d5067ff79"
+        },
+        ".plt.got": {
+          "header": [
+            194,
+            1,
+            6,
+            14835808,
+            14831712,
+            992,
+            0,
+            0,
+            16,
+            16
+          ],
+          "sha256": "3ae4e28ad54d78bce82d4bd4e6b0116d63d12305c74cbba4092bc75aa468bec4"
+        },
+        ".rela.dyn": {
+          "header": [
+            115,
+            4,
+            2,
+            9128,
+            9128,
+            3757176,
+            6,
+            0,
+            8,
+            24
+          ],
+          "sha256": "616016a41b3cfdae551e1f20323f3e073b5e0baa65fd2e5d617ae1af54509748"
+        },
+        ".relro_padding": {
+          "header": [
+            285,
+            8,
+            3,
+            55349320,
+            55341128,
+            4024,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": null
+        },
+        ".rodata": {
+          "header": [
+            125,
+            1,
+            50,
+            3766400,
+            3766400,
+            4107900,
+            0,
+            0,
+            128,
+            0
+          ],
+          "sha256": "9a24cfa21c70922b45d68f5d1120c89c2e461554f6c4e489a5ced12b76b2dcd1"
+        },
+        ".shstrtab": {
+          "header": [
+            427,
+            3,
+            0,
+            0,
+            130316288,
+            453,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "4112a3066b29160f52f29f662fba197f91b90ae992c1f29318610eaa169314a6"
+        },
+        ".strtab": {
+          "header": [
+            445,
+            3,
+            0,
+            0,
+            134970032,
+            32947760,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "a9e5ffdbe42d0e87b1009e9e5cbbaa71013cd9b04907731a0654b16ca3066106"
+        },
+        ".symtab": {
+          "header": [
+            437,
+            2,
+            0,
+            0,
+            130316744,
+            4653288,
+            41,
+            60034,
+            8,
+            24
+          ],
+          "sha256": "a3a09adc9992d9127f6fc9df99ecb095a99a6d5953c7059073ff368732903905"
+        },
+        ".tbss": {
+          "header": [
+            228,
+            8,
+            1027,
+            53202912,
+            53194717,
+            1073,
+            0,
+            0,
+            8,
+            0
+          ],
+          "sha256": null
+        },
+        ".tdata": {
+          "header": [
+            221,
+            1,
+            1027,
+            53199952,
+            53191760,
+            2957,
+            0,
+            0,
+            8,
+            0
+          ],
+          "sha256": "4c967e539182022b6cd86d304244548559f0aa27c10f3520f95ca74e5545f115"
+        },
+        ".text": {
+          "header": [
+            215,
+            1,
+            6,
+            14836848,
+            14832752,
+            38359008,
+            0,
+            0,
+            16,
+            0
+          ],
+          "sha256": "7b6282d28e52ed904cde3ccb345397f22062458f420a83f9f47297179e0b7e2a"
+        },
+        ".tm_clone_table": {
+          "header": [
+            306,
+            1,
+            3,
+            55365096,
+            55352808,
+            0,
+            0,
+            0,
+            8,
+            0
+          ],
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "size": 167920480
+    },
+    "f058a81e22278be7b1da982ceb36e97fb58fbd5439a39616bdcb4174ed7c1046": {
+      "build_id": "7dc1f5ea2ccbc438b0d48785d26d718927bf937d315b1aea8f6d91c3282eec78",
+      "loads": [
+        {
+          "program": [
+            1,
+            4,
+            0,
+            0,
+            0,
+            14831690,
+            14831690,
+            4096
+          ],
+          "sha256": "44fc24366c3e234a9c95ad45a1a7a6b38a48265ca5692ea969638437ee73c0f8",
+          "without_build_id": "67944c0b66eedc67754546684ef53a2a176157f8b39994e4750308156153d165"
+        },
+        {
+          "program": [
+            1,
+            5,
+            14831696,
+            14835792,
+            14835792,
+            38359792,
+            38359792,
+            4096
+          ],
+          "sha256": "4af2ea279d436811518ff1b432edb15c834a6de27ebde50ac314561442bdfcae",
+          "without_build_id": "4af2ea279d436811518ff1b432edb15c834a6de27ebde50ac314561442bdfcae"
+        },
+        {
+          "program": [
+            1,
+            6,
+            53191488,
+            53199680,
+            53199680,
+            2149384,
+            2149568,
+            4096
+          ],
+          "sha256": "7b423fafdae649c64354dcb9f0144ef95e161b589e130d89c6463141b3aab75b",
+          "without_build_id": "7b423fafdae649c64354dcb9f0144ef95e161b589e130d89c6463141b3aab75b"
+        },
+        {
+          "program": [
+            1,
+            6,
+            55340896,
+            55353184,
+            55353184,
+            11656,
+            2160493,
+            4096
+          ],
+          "sha256": "009254f9778fe00a13da5dfd19dc5cf8d5dee95d4744c7cb0cd57cfa603d5343",
+          "without_build_id": "009254f9778fe00a13da5dfd19dc5cf8d5dee95d4744c7cb0cd57cfa603d5343"
+        }
+      ],
+      "sections": {
+        "": {
+          "header": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        ".bss": {
+          "header": [
+            322,
+            8,
+            3,
+            55364864,
+            55352552,
+            2148813,
+            0,
+            0,
+            128,
+            0
+          ],
+          "sha256": null
+        },
+        ".comment": {
+          "header": [
+            418,
+            1,
+            48,
+            0,
+            130315805,
+            135,
+            0,
+            0,
+            1,
+            1
+          ],
+          "sha256": "f341e34fdc9217825578ef281b0cc425dc1a8b816ca6025aa1bef8ab31917f87"
+        },
+        ".data": {
+          "header": [
+            300,
+            1,
+            3,
+            55353184,
+            55340896,
+            11654,
+            0,
+            0,
+            32,
+            0
+          ],
+          "sha256": "d298f47f51a85d16a8f8ab6437c1423562ace99511cbafa1221f15fbfd9bb23d"
+        },
+        ".data.rel.ro": {
+          "header": [
+            258,
+            1,
+            3,
+            53202688,
+            53194496,
+            1401736,
+            0,
+            0,
+            32,
+            0
+          ],
+          "sha256": "c58c3ed304689fc6f33afb8530667d9a6bedfa992d7d1ec7f3e5cddaabae984a"
+        },
+        ".debug_abbrev": {
+          "header": [
+            327,
+            1,
+            0,
+            0,
+            55352552,
+            432961,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "6320f1fcd562083b27d2ea5b2271ade6bf739b8df0cc9da1abe8b7e61e9ad014"
+        },
+        ".debug_aranges": {
+          "header": [
+            353,
+            1,
+            0,
+            0,
+            71274406,
+            4105120,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "7ad6676ce71f342a6bb2270d2c46d901e559b118768c73b584a81e23be61f5c5"
+        },
+        ".debug_gdb_scripts": {
+          "header": [
+            175,
+            1,
+            50,
+            14831656,
+            14831656,
+            34,
+            0,
+            0,
+            1,
+            1
+          ],
+          "sha256": "90b05a6111bee6fd5b996298dba2fda834c39fb2709fd7f2377455c439f84eee"
+        },
+        ".debug_info": {
+          "header": [
+            341,
+            1,
+            0,
+            0,
+            55785513,
+            15488893,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "5bbda465e54796bc6d69a277da5fa6204f499757ae215853a4f6350583f45518"
+        },
+        ".debug_line": {
+          "header": [
+            379,
+            1,
+            0,
+            0,
+            96751178,
+            27004073,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "d6a919185fefdcee63b4f805ed738ec3e0110dd2a4a7268664bb6e5bedbb56cc"
+        },
+        ".debug_macro": {
+          "header": [
+            405,
+            1,
+            0,
+            0,
+            130053939,
+            261866,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "391f1017a4c5ea9871f3a826b4b15323ca827837dd437484d0523346aa917f34"
+        },
+        ".debug_ranges": {
+          "header": [
+            391,
+            1,
+            0,
+            0,
+            123755251,
+            6298688,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "c993f4906bf4c3008410fb76816d7d1a73810b471e0e26a2650eb93b6be3b724"
+        },
+        ".debug_str": {
+          "header": [
+            368,
+            1,
+            48,
+            0,
+            75379526,
+            21371652,
+            0,
+            0,
+            1,
+            1
+          ],
+          "sha256": "5d94ccf4f3795c8f9f45ecf5552fdd8f0e6ee9808f298746496e2e37e76af1c2"
+        },
+        ".dynamic": {
+          "header": [
+            271,
+            6,
+            3,
+            54604424,
+            54596232,
+            752,
+            7,
+            0,
+            8,
+            16
+          ],
+          "sha256": "6c7bb653c22db9a2d283546dd54ae9b8b36ff7ccb7d2210696ac2be083ba224c"
+        },
+        ".dynstr": {
+          "header": [
+            79,
+            3,
+            2,
+            5488,
+            5488,
+            2786,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "27010df96f204773d895698decd21c84b91eda4a2a0c4e4dc2e4690bd736278b"
+        },
+        ".dynsym": {
+          "header": [
+            71,
+            11,
+            2,
+            1024,
+            1024,
+            4464,
+            7,
+            1,
+            8,
+            24
+          ],
+          "sha256": "050a83fe5d84f15af6f91a58c3ca711e20c247700a54c2bc804eaf0d1a756d95"
+        },
+        ".eh_frame": {
+          "header": [
+            147,
+            1,
+            2,
+            9204536,
+            9204536,
+            4478128,
+            0,
+            0,
+            8,
+            0
+          ],
+          "sha256": "fa3eb9f0d4bb7b9bdb96de5b41d0e3babd61a54658e85e7b4ae29fd63d425668"
+        },
+        ".eh_frame_hdr": {
+          "header": [
+            133,
+            1,
+            2,
+            7874284,
+            7874284,
+            1330252,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "b5af3da63fd4cc11aebdb656d9ec2cbbc77f0f2d42c92fb6053b97322e707042"
+        },
+        ".fini": {
+          "header": [
+            209,
+            1,
+            6,
+            14836812,
+            14832716,
+            13,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "6a4f3e5efc7c1f7ee7d6f21afd9ed040ba1d7f0b97bb12b016f5b176cc558bd8"
+        },
+        ".fini_array": {
+          "header": [
+            246,
+            15,
+            3,
+            53202664,
+            53194472,
+            8,
+            0,
+            0,
+            8,
+            8
+          ],
+          "sha256": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc"
+        },
+        ".gcc_except_table": {
+          "header": [
+            157,
+            1,
+            2,
+            13682664,
+            13682664,
+            1148992,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "763f9284a24a67e9d50c62615a95c69c0d3947665c24212cc29b0449e86f64c4"
+        },
+        ".gnu.hash": {
+          "header": [
+            61,
+            1879048182,
+            2,
+            992,
+            992,
+            28,
+            6,
+            0,
+            8,
+            0
+          ],
+          "sha256": "708b3ea84995669314e3c583774d6fcec65190833f8621e356182e6d392f3f59"
+        },
+        ".gnu.version": {
+          "header": [
+            87,
+            1879048191,
+            2,
+            8274,
+            8274,
+            372,
+            6,
+            0,
+            2,
+            2
+          ],
+          "sha256": "436163bda5afb52b6ec7f8602ab5d7d84171799504706d430750e7bcabac95e4"
+        },
+        ".gnu.version_r": {
+          "header": [
+            100,
+            1879048190,
+            2,
+            8648,
+            8648,
+            480,
+            7,
+            3,
+            8,
+            0
+          ],
+          "sha256": "f5dee196d480f18ae37f2286f5e6ff28976426eaafc9e62ba2b0999ba2c1d7e7"
+        },
+        ".got": {
+          "header": [
+            280,
+            1,
+            3,
+            54605176,
+            54596984,
+            743888,
+            0,
+            0,
+            8,
+            8
+          ],
+          "sha256": "b473bd7d1e451bc02b212486685db372415e29c38ef5c03f44e99608564aa5dc"
+        },
+        ".init": {
+          "header": [
+            203,
+            1,
+            6,
+            14836784,
+            14832688,
+            27,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "9c23b7db748fd2a96ca7b550fa68a458b02d52ed873e13e8fa68a46ebd78f6ab"
+        },
+        ".init_array": {
+          "header": [
+            234,
+            14,
+            3,
+            53202640,
+            53194448,
+            24,
+            0,
+            0,
+            8,
+            8
+          ],
+          "sha256": "9d908ecfb6b256def8b49a7c504e6c889c4b0e41fe6ce3e01863dd7b61a20aa0"
+        },
+        ".interp": {
+          "header": [
+            39,
+            1,
+            2,
+            928,
+            928,
+            28,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "9097c98ea70f6f3b01d50145eb72bf55ad1f4e9713bccf27bd6405d6254eed00"
+        },
+        ".note.ABI-tag": {
+          "header": [
+            47,
+            7,
+            2,
+            956,
+            956,
+            32,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "6e48317ad93a8ac2dc04321465ede06d1274543fc8ab172e68171a9d684bb313"
+        },
+        ".note.gnu.build-id": {
+          "header": [
+            20,
+            7,
+            2,
+            880,
+            880,
+            48,
+            0,
+            0,
+            4,
+            0
+          ],
+          "sha256": "b9d6291818f97166055bdab8a46f079597b3a6c591a1b23ea2ae86aeedc65b52"
+        },
+        ".note.gnu.property": {
+          "header": [
+            1,
+            7,
+            2,
+            848,
+            848,
+            32,
+            0,
+            0,
+            8,
+            0
+          ],
+          "sha256": "5978480398fc48bfa6c56246117c5bc1a40145463a2faca541e5e91d5067ff79"
+        },
+        ".plt.got": {
+          "header": [
+            194,
+            1,
+            6,
+            14835792,
+            14831696,
+            992,
+            0,
+            0,
+            16,
+            16
+          ],
+          "sha256": "3c71a92e95d6dd8ac99a0b389c10f4f3813009604b1fc0a8cab935a3a6079867"
+        },
+        ".rela.dyn": {
+          "header": [
+            115,
+            4,
+            2,
+            9128,
+            9128,
+            3757176,
+            6,
+            0,
+            8,
+            24
+          ],
+          "sha256": "3496390ea62a806a0d7965e40db74285097ff7a1a19e3af2421116b738c9d91c"
+        },
+        ".relro_padding": {
+          "header": [
+            285,
+            8,
+            3,
+            55349064,
+            55340872,
+            184,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": null
+        },
+        ".rodata": {
+          "header": [
+            125,
+            1,
+            50,
+            3766400,
+            3766400,
+            4107884,
+            0,
+            0,
+            128,
+            0
+          ],
+          "sha256": "c4d4b45289b14de3d6542ae146539634ffff87f4226d64f52bdd28598c9eeb3f"
+        },
+        ".shstrtab": {
+          "header": [
+            427,
+            3,
+            0,
+            0,
+            130315940,
+            453,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "4112a3066b29160f52f29f662fba197f91b90ae992c1f29318610eaa169314a6"
+        },
+        ".strtab": {
+          "header": [
+            445,
+            3,
+            0,
+            0,
+            134969688,
+            32947760,
+            0,
+            0,
+            1,
+            0
+          ],
+          "sha256": "a9e5ffdbe42d0e87b1009e9e5cbbaa71013cd9b04907731a0654b16ca3066106"
+        },
+        ".symtab": {
+          "header": [
+            437,
+            2,
+            0,
+            0,
+            130316400,
+            4653288,
+            41,
+            60034,
+            8,
+            24
+          ],
+          "sha256": "6e243c45b81fdcd15ea6291ea7e906a148e8800f1a36a51cdb0bff54789748f3"
+        },
+        ".tbss": {
+          "header": [
+            228,
+            8,
+            1027,
+            53202640,
+            53194445,
+            1073,
+            0,
+            0,
+            8,
+            0
+          ],
+          "sha256": null
+        },
+        ".tdata": {
+          "header": [
+            221,
+            1,
+            1027,
+            53199680,
+            53191488,
+            2957,
+            0,
+            0,
+            8,
+            0
+          ],
+          "sha256": "4c967e539182022b6cd86d304244548559f0aa27c10f3520f95ca74e5545f115"
+        },
+        ".text": {
+          "header": [
+            215,
+            1,
+            6,
+            14836832,
+            14832736,
+            38358752,
+            0,
+            0,
+            16,
+            0
+          ],
+          "sha256": "7ae9324af06446a75e74e9bbf3264f3b982953bd2d9ea3a4b6c9e02057b51dfe"
+        },
+        ".tm_clone_table": {
+          "header": [
+            306,
+            1,
+            3,
+            55364840,
+            55352552,
+            0,
+            0,
+            0,
+            8,
+            0
+          ],
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "size": 167920136
+    }
+  },
+  "typed": {
+    "C/edited": {
+      "exits": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "external_nonfresh": [],
+      "state": "fixed",
+      "true_empty": false
+    },
+    "C/fully-empty-buggy": {
+      "exits": [
+        1,
+        0,
+        0,
+        1
+      ],
+      "external_nonfresh": [
+        "aho_corasick",
+        "allocator_api2",
+        "annotate_snippets",
+        "anstream",
+        "anstyle",
+        "anstyle_parse",
+        "anstyle_query",
+        "anyhow",
+        "arc_swap",
+        "argfile",
+        "attribute_derive",
+        "attribute_derive_macro",
+        "autocfg",
+        "bincode",
+        "bincode_derive",
+        "bitflags",
+        "bitflags",
+        "boxcar",
+        "bstr",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "byteorder",
+        "cachedir",
+        "camino",
+        "castaway",
+        "cc",
+        "cfg_aliases",
+        "cfg_if",
+        "chrono",
+        "clap",
+        "clap_builder",
+        "clap_complete",
+        "clap_complete_command",
+        "clap_complete_nushell",
+        "clap_derive",
+        "clap_lex",
+        "clearscreen",
+        "collection_literals",
+        "colorchoice",
+        "colored",
+        "compact_str",
+        "countme",
+        "crc32fast",
+        "crossbeam",
+        "crossbeam_channel",
+        "crossbeam_deque",
+        "crossbeam_epoch",
+        "crossbeam_queue",
+        "crossbeam_utils",
+        "darling",
+        "darling_core",
+        "darling_macro",
+        "dashmap",
+        "derive_where",
+        "dirs",
+        "dirs_sys",
+        "displaydoc",
+        "drop_bomb",
+        "dunce",
+        "dyn_clone",
+        "either",
+        "env_home",
+        "equivalent",
+        "etcetera",
+        "fastrand",
+        "fern",
+        "filetime",
+        "fnv",
+        "foldhash",
+        "form_urlencoded",
+        "fs_err",
+        "get_size2",
+        "get_size_derive2",
+        "getopts",
+        "getrandom",
+        "getrandom",
+        "glob",
+        "globset",
+        "globwalk",
+        "hashbrown",
+        "hashbrown",
+        "hashlink",
+        "heck",
+        "home",
+        "iana_time_zone",
+        "icu_collections",
+        "icu_locale_core",
+        "icu_normalizer",
+        "icu_normalizer_data",
+        "icu_properties",
+        "icu_properties_data",
+        "icu_provider",
+        "ident_case",
+        "idna",
+        "idna_adapter",
+        "ignore",
+        "imperative",
+        "indexmap",
+        "inotify",
+        "inotify_sys",
+        "interpolator",
+        "intrusive_collections",
+        "is_docker",
+        "is_macro",
+        "is_terminal_polyfill",
+        "is_wsl",
+        "itertools",
+        "itertools",
+        "itoa",
+        "jiff",
+        "jod_thread",
+        "lazy_static",
+        "libc",
+        "libc",
+        "libcst_derive",
+        "libcst_native",
+        "linux_raw_sys",
+        "litemap",
+        "lock_api",
+        "log",
+        "log",
+        "lsp_server",
+        "lsp_types",
+        "manyhow",
+        "manyhow_macros",
+        "matchers",
+        "matches",
+        "matchit",
+        "memchr",
+        "memoffset",
+        "minimal_lexical",
+        "mio",
+        "natord",
+        "newtype_uuid",
+        "nix",
+        "nom",
+        "notify",
+        "notify_types",
+        "nu_ansi_term",
+        "num_traits",
+        "once_cell",
+        "option_ext",
+        "ordermap",
+        "os_str_bytes",
+        "overload",
+        "papaya",
+        "parking_lot",
+        "parking_lot_core",
+        "paste",
+        "path_absolutize",
+        "path_dedot",
+        "path_slash",
+        "pathdiff",
+        "peg",
+        "peg_macros",
+        "peg_runtime",
+        "peg_runtime",
+        "pep440_rs",
+        "pep508_rs",
+        "percent_encoding",
+        "phf",
+        "phf_codegen",
+        "phf_generator",
+        "phf_shared",
+        "phf_shared",
+        "pin_project_lite",
+        "portable_atomic",
+        "potential_utf",
+        "ppv_lite86",
+        "proc_macro2",
+        "proc_macro_utils",
+        "pyproject_toml",
+        "quick_junit",
+        "quick_xml",
+        "quote",
+        "quote_use",
+        "quote_use_macros",
+        "rand",
+        "rand",
+        "rand_chacha",
+        "rand_chacha",
+        "rand_core",
+        "rand_core",
+        "rayon",
+        "rayon_core",
+        "regex",
+        "regex_automata",
+        "regex_automata",
+        "regex_syntax",
+        "regex_syntax",
+        "rust_stemmers",
+        "rustc_hash",
+        "rustix",
+        "rustversion",
+        "ryu",
+        "salsa",
+        "salsa_macro_rules",
+        "salsa_macros",
+        "same_file",
+        "schemars",
+        "schemars_derive",
+        "scopeguard",
+        "seahash",
+        "seize",
+        "serde",
+        "serde_derive",
+        "serde_derive_internals",
+        "serde_json",
+        "serde_repr",
+        "serde_spanned",
+        "serde_with",
+        "serde_with_macros",
+        "sharded_slab",
+        "shellexpand",
+        "shlex",
+        "similar",
+        "siphasher",
+        "smallvec",
+        "smallvec",
+        "stable_deref_trait",
+        "static_assertions",
+        "strip_ansi_escapes",
+        "strsim",
+        "strum",
+        "strum_macros",
+        "syn",
+        "synstructure",
+        "tempfile",
+        "terminal_size",
+        "terminfo",
+        "test_case",
+        "test_case_core",
+        "test_case_macros",
+        "thin_vec",
+        "thiserror",
+        "thiserror",
+        "thiserror_impl",
+        "thiserror_impl",
+        "thread_local",
+        "tikv_jemalloc_sys",
+        "tikv_jemallocator",
+        "tinystr",
+        "tinyvec",
+        "tinyvec_macros",
+        "toml",
+        "toml_datetime",
+        "toml_edit",
+        "toml_write",
+        "tracing",
+        "tracing_attributes",
+        "tracing_core",
+        "tracing_log",
+        "tracing_subscriber",
+        "typed_arena",
+        "unic_char_property",
+        "unic_char_range",
+        "unic_common",
+        "unic_ucd_category",
+        "unic_ucd_version",
+        "unicode_ident",
+        "unicode_names2",
+        "unicode_names2_generator",
+        "unicode_normalization",
+        "unicode_width",
+        "unicode_width",
+        "unscanny",
+        "unty",
+        "url",
+        "urlencoding",
+        "utf8_iter",
+        "utf8parse",
+        "uuid",
+        "uuid_macro_internal",
+        "version_ranges",
+        "virtue",
+        "vte",
+        "walkdir",
+        "which",
+        "wild",
+        "winnow",
+        "writeable",
+        "yoke",
+        "yoke_derive",
+        "zerocopy",
+        "zerofrom",
+        "zerofrom_derive",
+        "zerotrie",
+        "zerovec",
+        "zerovec_derive",
+        "zip"
+      ],
+      "state": "buggy",
+      "true_empty": true
+    },
+    "C/fully-empty-fixed": {
+      "exits": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "external_nonfresh": [
+        "aho_corasick",
+        "allocator_api2",
+        "annotate_snippets",
+        "anstream",
+        "anstyle",
+        "anstyle_parse",
+        "anstyle_query",
+        "anyhow",
+        "arc_swap",
+        "argfile",
+        "attribute_derive",
+        "attribute_derive_macro",
+        "autocfg",
+        "bincode",
+        "bincode_derive",
+        "bitflags",
+        "bitflags",
+        "boxcar",
+        "bstr",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "byteorder",
+        "cachedir",
+        "camino",
+        "castaway",
+        "cc",
+        "cfg_aliases",
+        "cfg_if",
+        "chrono",
+        "clap",
+        "clap_builder",
+        "clap_complete",
+        "clap_complete_command",
+        "clap_complete_nushell",
+        "clap_derive",
+        "clap_lex",
+        "clearscreen",
+        "collection_literals",
+        "colorchoice",
+        "colored",
+        "compact_str",
+        "countme",
+        "crc32fast",
+        "crossbeam",
+        "crossbeam_channel",
+        "crossbeam_deque",
+        "crossbeam_epoch",
+        "crossbeam_queue",
+        "crossbeam_utils",
+        "darling",
+        "darling_core",
+        "darling_macro",
+        "dashmap",
+        "derive_where",
+        "dirs",
+        "dirs_sys",
+        "displaydoc",
+        "drop_bomb",
+        "dunce",
+        "dyn_clone",
+        "either",
+        "env_home",
+        "equivalent",
+        "etcetera",
+        "fastrand",
+        "fern",
+        "filetime",
+        "fnv",
+        "foldhash",
+        "form_urlencoded",
+        "fs_err",
+        "get_size2",
+        "get_size_derive2",
+        "getopts",
+        "getrandom",
+        "getrandom",
+        "glob",
+        "globset",
+        "globwalk",
+        "hashbrown",
+        "hashbrown",
+        "hashlink",
+        "heck",
+        "home",
+        "iana_time_zone",
+        "icu_collections",
+        "icu_locale_core",
+        "icu_normalizer",
+        "icu_normalizer_data",
+        "icu_properties",
+        "icu_properties_data",
+        "icu_provider",
+        "ident_case",
+        "idna",
+        "idna_adapter",
+        "ignore",
+        "imperative",
+        "indexmap",
+        "inotify",
+        "inotify_sys",
+        "interpolator",
+        "intrusive_collections",
+        "is_docker",
+        "is_macro",
+        "is_terminal_polyfill",
+        "is_wsl",
+        "itertools",
+        "itertools",
+        "itoa",
+        "jiff",
+        "jod_thread",
+        "lazy_static",
+        "libc",
+        "libc",
+        "libcst_derive",
+        "libcst_native",
+        "linux_raw_sys",
+        "litemap",
+        "lock_api",
+        "log",
+        "log",
+        "lsp_server",
+        "lsp_types",
+        "manyhow",
+        "manyhow_macros",
+        "matchers",
+        "matches",
+        "matchit",
+        "memchr",
+        "memoffset",
+        "minimal_lexical",
+        "mio",
+        "natord",
+        "newtype_uuid",
+        "nix",
+        "nom",
+        "notify",
+        "notify_types",
+        "nu_ansi_term",
+        "num_traits",
+        "once_cell",
+        "option_ext",
+        "ordermap",
+        "os_str_bytes",
+        "overload",
+        "papaya",
+        "parking_lot",
+        "parking_lot_core",
+        "paste",
+        "path_absolutize",
+        "path_dedot",
+        "path_slash",
+        "pathdiff",
+        "peg",
+        "peg_macros",
+        "peg_runtime",
+        "peg_runtime",
+        "pep440_rs",
+        "pep508_rs",
+        "percent_encoding",
+        "phf",
+        "phf_codegen",
+        "phf_generator",
+        "phf_shared",
+        "phf_shared",
+        "pin_project_lite",
+        "portable_atomic",
+        "potential_utf",
+        "ppv_lite86",
+        "proc_macro2",
+        "proc_macro_utils",
+        "pyproject_toml",
+        "quick_junit",
+        "quick_xml",
+        "quote",
+        "quote_use",
+        "quote_use_macros",
+        "rand",
+        "rand",
+        "rand_chacha",
+        "rand_chacha",
+        "rand_core",
+        "rand_core",
+        "rayon",
+        "rayon_core",
+        "regex",
+        "regex_automata",
+        "regex_automata",
+        "regex_syntax",
+        "regex_syntax",
+        "rust_stemmers",
+        "rustc_hash",
+        "rustix",
+        "rustversion",
+        "ryu",
+        "salsa",
+        "salsa_macro_rules",
+        "salsa_macros",
+        "same_file",
+        "schemars",
+        "schemars_derive",
+        "scopeguard",
+        "seahash",
+        "seize",
+        "serde",
+        "serde_derive",
+        "serde_derive_internals",
+        "serde_json",
+        "serde_repr",
+        "serde_spanned",
+        "serde_with",
+        "serde_with_macros",
+        "sharded_slab",
+        "shellexpand",
+        "shlex",
+        "similar",
+        "siphasher",
+        "smallvec",
+        "smallvec",
+        "stable_deref_trait",
+        "static_assertions",
+        "strip_ansi_escapes",
+        "strsim",
+        "strum",
+        "strum_macros",
+        "syn",
+        "synstructure",
+        "tempfile",
+        "terminal_size",
+        "terminfo",
+        "test_case",
+        "test_case_core",
+        "test_case_macros",
+        "thin_vec",
+        "thiserror",
+        "thiserror",
+        "thiserror_impl",
+        "thiserror_impl",
+        "thread_local",
+        "tikv_jemalloc_sys",
+        "tikv_jemallocator",
+        "tinystr",
+        "tinyvec",
+        "tinyvec_macros",
+        "toml",
+        "toml_datetime",
+        "toml_edit",
+        "toml_write",
+        "tracing",
+        "tracing_attributes",
+        "tracing_core",
+        "tracing_log",
+        "tracing_subscriber",
+        "typed_arena",
+        "unic_char_property",
+        "unic_char_range",
+        "unic_common",
+        "unic_ucd_category",
+        "unic_ucd_version",
+        "unicode_ident",
+        "unicode_names2",
+        "unicode_names2_generator",
+        "unicode_normalization",
+        "unicode_width",
+        "unicode_width",
+        "unscanny",
+        "unty",
+        "url",
+        "urlencoding",
+        "utf8_iter",
+        "utf8parse",
+        "uuid",
+        "uuid_macro_internal",
+        "version_ranges",
+        "virtue",
+        "vte",
+        "walkdir",
+        "which",
+        "wild",
+        "winnow",
+        "writeable",
+        "yoke",
+        "yoke_derive",
+        "zerocopy",
+        "zerofrom",
+        "zerofrom_derive",
+        "zerotrie",
+        "zerovec",
+        "zerovec_derive",
+        "zip"
+      ],
+      "state": "fixed",
+      "true_empty": true
+    },
+    "C/repaired": {
+      "exits": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "external_nonfresh": [],
+      "state": "fixed",
+      "true_empty": false
+    },
+    "C/reverse": {
+      "exits": [
+        1,
+        0,
+        0,
+        1
+      ],
+      "external_nonfresh": [],
+      "state": "buggy",
+      "true_empty": false
+    },
+    "C/settled-fixed": {
+      "exits": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "external_nonfresh": [],
+      "state": "fixed",
+      "true_empty": false
+    },
+    "P/edited": {
+      "exits": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "external_nonfresh": [],
+      "state": "fixed",
+      "true_empty": false
+    },
+    "P/fully-empty-buggy": {
+      "exits": [
+        1,
+        0,
+        0,
+        1
+      ],
+      "external_nonfresh": [
+        "aho_corasick",
+        "allocator_api2",
+        "annotate_snippets",
+        "anstream",
+        "anstyle",
+        "anstyle_parse",
+        "anstyle_query",
+        "anyhow",
+        "arc_swap",
+        "argfile",
+        "attribute_derive",
+        "attribute_derive_macro",
+        "autocfg",
+        "bincode",
+        "bincode_derive",
+        "bitflags",
+        "bitflags",
+        "boxcar",
+        "bstr",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "byteorder",
+        "cachedir",
+        "camino",
+        "castaway",
+        "cc",
+        "cfg_aliases",
+        "cfg_if",
+        "chrono",
+        "clap",
+        "clap_builder",
+        "clap_complete",
+        "clap_complete_command",
+        "clap_complete_nushell",
+        "clap_derive",
+        "clap_lex",
+        "clearscreen",
+        "collection_literals",
+        "colorchoice",
+        "colored",
+        "compact_str",
+        "countme",
+        "crc32fast",
+        "crossbeam",
+        "crossbeam_channel",
+        "crossbeam_deque",
+        "crossbeam_epoch",
+        "crossbeam_queue",
+        "crossbeam_utils",
+        "darling",
+        "darling_core",
+        "darling_macro",
+        "dashmap",
+        "derive_where",
+        "dirs",
+        "dirs_sys",
+        "displaydoc",
+        "drop_bomb",
+        "dunce",
+        "dyn_clone",
+        "either",
+        "env_home",
+        "equivalent",
+        "etcetera",
+        "fastrand",
+        "fern",
+        "filetime",
+        "fnv",
+        "foldhash",
+        "form_urlencoded",
+        "fs_err",
+        "get_size2",
+        "get_size_derive2",
+        "getopts",
+        "getrandom",
+        "getrandom",
+        "glob",
+        "globset",
+        "globwalk",
+        "hashbrown",
+        "hashbrown",
+        "hashlink",
+        "heck",
+        "home",
+        "iana_time_zone",
+        "icu_collections",
+        "icu_locale_core",
+        "icu_normalizer",
+        "icu_normalizer_data",
+        "icu_properties",
+        "icu_properties_data",
+        "icu_provider",
+        "ident_case",
+        "idna",
+        "idna_adapter",
+        "ignore",
+        "imperative",
+        "indexmap",
+        "inotify",
+        "inotify_sys",
+        "interpolator",
+        "intrusive_collections",
+        "is_docker",
+        "is_macro",
+        "is_terminal_polyfill",
+        "is_wsl",
+        "itertools",
+        "itertools",
+        "itoa",
+        "jiff",
+        "jod_thread",
+        "lazy_static",
+        "libc",
+        "libc",
+        "libcst_derive",
+        "libcst_native",
+        "linux_raw_sys",
+        "litemap",
+        "lock_api",
+        "log",
+        "log",
+        "lsp_server",
+        "lsp_types",
+        "manyhow",
+        "manyhow_macros",
+        "matchers",
+        "matches",
+        "matchit",
+        "memchr",
+        "memoffset",
+        "minimal_lexical",
+        "mio",
+        "natord",
+        "newtype_uuid",
+        "nix",
+        "nom",
+        "notify",
+        "notify_types",
+        "nu_ansi_term",
+        "num_traits",
+        "once_cell",
+        "option_ext",
+        "ordermap",
+        "os_str_bytes",
+        "overload",
+        "papaya",
+        "parking_lot",
+        "parking_lot_core",
+        "paste",
+        "path_absolutize",
+        "path_dedot",
+        "path_slash",
+        "pathdiff",
+        "peg",
+        "peg_macros",
+        "peg_runtime",
+        "peg_runtime",
+        "pep440_rs",
+        "pep508_rs",
+        "percent_encoding",
+        "phf",
+        "phf_codegen",
+        "phf_generator",
+        "phf_shared",
+        "phf_shared",
+        "pin_project_lite",
+        "portable_atomic",
+        "potential_utf",
+        "ppv_lite86",
+        "proc_macro2",
+        "proc_macro_utils",
+        "pyproject_toml",
+        "quick_junit",
+        "quick_xml",
+        "quote",
+        "quote_use",
+        "quote_use_macros",
+        "rand",
+        "rand",
+        "rand_chacha",
+        "rand_chacha",
+        "rand_core",
+        "rand_core",
+        "rayon",
+        "rayon_core",
+        "regex",
+        "regex_automata",
+        "regex_automata",
+        "regex_syntax",
+        "regex_syntax",
+        "rust_stemmers",
+        "rustc_hash",
+        "rustix",
+        "rustversion",
+        "ryu",
+        "salsa",
+        "salsa_macro_rules",
+        "salsa_macros",
+        "same_file",
+        "schemars",
+        "schemars_derive",
+        "scopeguard",
+        "seahash",
+        "seize",
+        "serde",
+        "serde_derive",
+        "serde_derive_internals",
+        "serde_json",
+        "serde_repr",
+        "serde_spanned",
+        "serde_with",
+        "serde_with_macros",
+        "sharded_slab",
+        "shellexpand",
+        "shlex",
+        "similar",
+        "siphasher",
+        "smallvec",
+        "smallvec",
+        "stable_deref_trait",
+        "static_assertions",
+        "strip_ansi_escapes",
+        "strsim",
+        "strum",
+        "strum_macros",
+        "syn",
+        "synstructure",
+        "tempfile",
+        "terminal_size",
+        "terminfo",
+        "test_case",
+        "test_case_core",
+        "test_case_macros",
+        "thin_vec",
+        "thiserror",
+        "thiserror",
+        "thiserror_impl",
+        "thiserror_impl",
+        "thread_local",
+        "tikv_jemalloc_sys",
+        "tikv_jemallocator",
+        "tinystr",
+        "tinyvec",
+        "tinyvec_macros",
+        "toml",
+        "toml_datetime",
+        "toml_edit",
+        "toml_write",
+        "tracing",
+        "tracing_attributes",
+        "tracing_core",
+        "tracing_log",
+        "tracing_subscriber",
+        "typed_arena",
+        "unic_char_property",
+        "unic_char_range",
+        "unic_common",
+        "unic_ucd_category",
+        "unic_ucd_version",
+        "unicode_ident",
+        "unicode_names2",
+        "unicode_names2_generator",
+        "unicode_normalization",
+        "unicode_width",
+        "unicode_width",
+        "unscanny",
+        "unty",
+        "url",
+        "urlencoding",
+        "utf8_iter",
+        "utf8parse",
+        "uuid",
+        "uuid_macro_internal",
+        "version_ranges",
+        "virtue",
+        "vte",
+        "walkdir",
+        "which",
+        "wild",
+        "winnow",
+        "writeable",
+        "yoke",
+        "yoke_derive",
+        "zerocopy",
+        "zerofrom",
+        "zerofrom_derive",
+        "zerotrie",
+        "zerovec",
+        "zerovec_derive",
+        "zip"
+      ],
+      "state": "buggy",
+      "true_empty": true
+    },
+    "P/fully-empty-fixed": {
+      "exits": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "external_nonfresh": [
+        "aho_corasick",
+        "allocator_api2",
+        "annotate_snippets",
+        "anstream",
+        "anstyle",
+        "anstyle_parse",
+        "anstyle_query",
+        "anyhow",
+        "arc_swap",
+        "argfile",
+        "attribute_derive",
+        "attribute_derive_macro",
+        "autocfg",
+        "bincode",
+        "bincode_derive",
+        "bitflags",
+        "bitflags",
+        "boxcar",
+        "bstr",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "byteorder",
+        "cachedir",
+        "camino",
+        "castaway",
+        "cc",
+        "cfg_aliases",
+        "cfg_if",
+        "chrono",
+        "clap",
+        "clap_builder",
+        "clap_complete",
+        "clap_complete_command",
+        "clap_complete_nushell",
+        "clap_derive",
+        "clap_lex",
+        "clearscreen",
+        "collection_literals",
+        "colorchoice",
+        "colored",
+        "compact_str",
+        "countme",
+        "crc32fast",
+        "crossbeam",
+        "crossbeam_channel",
+        "crossbeam_deque",
+        "crossbeam_epoch",
+        "crossbeam_queue",
+        "crossbeam_utils",
+        "darling",
+        "darling_core",
+        "darling_macro",
+        "dashmap",
+        "derive_where",
+        "dirs",
+        "dirs_sys",
+        "displaydoc",
+        "drop_bomb",
+        "dunce",
+        "dyn_clone",
+        "either",
+        "env_home",
+        "equivalent",
+        "etcetera",
+        "fastrand",
+        "fern",
+        "filetime",
+        "fnv",
+        "foldhash",
+        "form_urlencoded",
+        "fs_err",
+        "get_size2",
+        "get_size_derive2",
+        "getopts",
+        "getrandom",
+        "getrandom",
+        "glob",
+        "globset",
+        "globwalk",
+        "hashbrown",
+        "hashbrown",
+        "hashlink",
+        "heck",
+        "home",
+        "iana_time_zone",
+        "icu_collections",
+        "icu_locale_core",
+        "icu_normalizer",
+        "icu_normalizer_data",
+        "icu_properties",
+        "icu_properties_data",
+        "icu_provider",
+        "ident_case",
+        "idna",
+        "idna_adapter",
+        "ignore",
+        "imperative",
+        "indexmap",
+        "inotify",
+        "inotify_sys",
+        "interpolator",
+        "intrusive_collections",
+        "is_docker",
+        "is_macro",
+        "is_terminal_polyfill",
+        "is_wsl",
+        "itertools",
+        "itertools",
+        "itoa",
+        "jiff",
+        "jod_thread",
+        "lazy_static",
+        "libc",
+        "libc",
+        "libcst_derive",
+        "libcst_native",
+        "linux_raw_sys",
+        "litemap",
+        "lock_api",
+        "log",
+        "log",
+        "lsp_server",
+        "lsp_types",
+        "manyhow",
+        "manyhow_macros",
+        "matchers",
+        "matches",
+        "matchit",
+        "memchr",
+        "memoffset",
+        "minimal_lexical",
+        "mio",
+        "natord",
+        "newtype_uuid",
+        "nix",
+        "nom",
+        "notify",
+        "notify_types",
+        "nu_ansi_term",
+        "num_traits",
+        "once_cell",
+        "option_ext",
+        "ordermap",
+        "os_str_bytes",
+        "overload",
+        "papaya",
+        "parking_lot",
+        "parking_lot_core",
+        "paste",
+        "path_absolutize",
+        "path_dedot",
+        "path_slash",
+        "pathdiff",
+        "peg",
+        "peg_macros",
+        "peg_runtime",
+        "peg_runtime",
+        "pep440_rs",
+        "pep508_rs",
+        "percent_encoding",
+        "phf",
+        "phf_codegen",
+        "phf_generator",
+        "phf_shared",
+        "phf_shared",
+        "pin_project_lite",
+        "portable_atomic",
+        "potential_utf",
+        "ppv_lite86",
+        "proc_macro2",
+        "proc_macro_utils",
+        "pyproject_toml",
+        "quick_junit",
+        "quick_xml",
+        "quote",
+        "quote_use",
+        "quote_use_macros",
+        "rand",
+        "rand",
+        "rand_chacha",
+        "rand_chacha",
+        "rand_core",
+        "rand_core",
+        "rayon",
+        "rayon_core",
+        "regex",
+        "regex_automata",
+        "regex_automata",
+        "regex_syntax",
+        "regex_syntax",
+        "rust_stemmers",
+        "rustc_hash",
+        "rustix",
+        "rustversion",
+        "ryu",
+        "salsa",
+        "salsa_macro_rules",
+        "salsa_macros",
+        "same_file",
+        "schemars",
+        "schemars_derive",
+        "scopeguard",
+        "seahash",
+        "seize",
+        "serde",
+        "serde_derive",
+        "serde_derive_internals",
+        "serde_json",
+        "serde_repr",
+        "serde_spanned",
+        "serde_with",
+        "serde_with_macros",
+        "sharded_slab",
+        "shellexpand",
+        "shlex",
+        "similar",
+        "siphasher",
+        "smallvec",
+        "smallvec",
+        "stable_deref_trait",
+        "static_assertions",
+        "strip_ansi_escapes",
+        "strsim",
+        "strum",
+        "strum_macros",
+        "syn",
+        "synstructure",
+        "tempfile",
+        "terminal_size",
+        "terminfo",
+        "test_case",
+        "test_case_core",
+        "test_case_macros",
+        "thin_vec",
+        "thiserror",
+        "thiserror",
+        "thiserror_impl",
+        "thiserror_impl",
+        "thread_local",
+        "tikv_jemalloc_sys",
+        "tikv_jemallocator",
+        "tinystr",
+        "tinyvec",
+        "tinyvec_macros",
+        "toml",
+        "toml_datetime",
+        "toml_edit",
+        "toml_write",
+        "tracing",
+        "tracing_attributes",
+        "tracing_core",
+        "tracing_log",
+        "tracing_subscriber",
+        "typed_arena",
+        "unic_char_property",
+        "unic_char_range",
+        "unic_common",
+        "unic_ucd_category",
+        "unic_ucd_version",
+        "unicode_ident",
+        "unicode_names2",
+        "unicode_names2_generator",
+        "unicode_normalization",
+        "unicode_width",
+        "unicode_width",
+        "unscanny",
+        "unty",
+        "url",
+        "urlencoding",
+        "utf8_iter",
+        "utf8parse",
+        "uuid",
+        "uuid_macro_internal",
+        "version_ranges",
+        "virtue",
+        "vte",
+        "walkdir",
+        "which",
+        "wild",
+        "winnow",
+        "writeable",
+        "yoke",
+        "yoke_derive",
+        "zerocopy",
+        "zerofrom",
+        "zerofrom_derive",
+        "zerotrie",
+        "zerovec",
+        "zerovec_derive",
+        "zip"
+      ],
+      "state": "fixed",
+      "true_empty": true
+    },
+    "P/repaired": {
+      "exits": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "external_nonfresh": [],
+      "state": "fixed",
+      "true_empty": false
+    },
+    "P/reverse": {
+      "exits": [
+        1,
+        0,
+        0,
+        1
+      ],
+      "external_nonfresh": [],
+      "state": "buggy",
+      "true_empty": false
+    },
+    "P/settled-fixed": {
+      "exits": [
+        0,
+        1,
+        0,
+        1
+      ],
+      "external_nonfresh": [],
+      "state": "fixed",
+      "true_empty": false
+    }
+  },
+  "worker": {
+    "block": 0,
+    "boot": "f550969e-23dd-4c71-813f-96bd786f1d13",
+    "factory": {
+      "branch": "charlie/qa-derive-sete-consumed-rust-20261103",
+      "guard_archives": {
+        "C": "b6e814f1cb84a055c6ff0018e7185113a07cc62dc98b8aaa481fce2ac8cc36a3",
+        "P": "350bc58da2008038a9acc2d4a31e6b750ed90d6049264139a672a4f51169c303"
+      },
+      "head": "6250ceba040bc15c2a296ae7ee1e5c6897f3ff06",
+      "kit": [
+        "ohm-rc23-consumed-sete-private-derive-v2-stage1",
+        13225235255,
+        195782873,
+        "2fe4343814e6efbd5d5cb909219859ba96be7adf9ca0e849f1af38f17402393f"
+      ],
+      "receipts": [
+        "ohm-rc23-consumed-sete-private-derive-v2-stage1-receipts",
+        13224790813,
+        430618,
+        "d50c707c9bbca85d5dd4e633ad10a481c5559330f5763db98c67b52e24acd9d5"
+      ],
+      "run": 41621745224,
+      "source": {
+        "C": "e157d8912adcdae91bd43df88959f3a510bfa34a",
+        "P": "dad5fae340339ea631fdafc3ef27956df1ffb81a"
+      }
+    },
+    "job": 125882062270,
+    "order": "CP",
+    "phase": "native-cold",
+    "port": {
+      "buggy": "0f09a385d22bce626cf1e6c19e217917020e3e6dbc40c4fcc30c569c1617d525",
+      "fixed": "cd0dea4fc382d445b69fe3057dc5e393fe87519c995a0410e3ba77faeacd1d67",
+      "path": "crates/ruff_linter/src/rules/ruff/helpers.rs",
+      "revisions": {
+        "buggy": {
+          "commit": "710c60f7135879b05f6c05a34085cd7af5c19e7f",
+          "files": {
+            "crates/ruff_linter/resources/test/fixtures/ruff/RUF009_attrs.py": {
+              "blob": "8f2a5c9fdd73f5ce6ab2cd1524b65b4f79121c61",
+              "sha256": "51acbda839a1e746021df479bd9c643b9833d09cf84815d8bf4e4b8c079c93dc"
+            },
+            "crates/ruff_linter/src/rules/ruff/helpers.rs": {
+              "blob": "c1426de616f7ea2997f5522ceab6c989cd780172",
+              "sha256": "0f09a385d22bce626cf1e6c19e217917020e3e6dbc40c4fcc30c569c1617d525"
+            },
+            "crates/ruff_linter/src/rules/ruff/snapshots/ruff_linter__rules__ruff__tests__RUF009_RUF009_attrs.py.snap": {
+              "blob": "58cadaeeb2130c9a198445d917112cc9bddad096",
+              "sha256": "fec7a8e38321b61c120c6cb9647cb45f71e64ab8ae383c2f328a2c24b1f2889f"
+            }
+          },
+          "tree": "80168786b1a6e114b0ef8f25c8e4a80b5adf05e7"
+        },
+        "fixed": {
+          "commit": "b00f68a23cedbd3a38fc25bac63638f0f11fc3f0",
+          "files": {
+            "crates/ruff_linter/resources/test/fixtures/ruff/RUF009_attrs.py": {
+              "blob": "526c12ab88e994b38567ab3dd635341111e54119",
+              "sha256": "2807da974586f4815069423e2f7394d8ac5ec3b72f80ba85bf808508200486e4"
+            },
+            "crates/ruff_linter/src/rules/ruff/helpers.rs": {
+              "blob": "535492816bb4adb5edde0113f8255c8788bc1bce",
+              "sha256": "cd0dea4fc382d445b69fe3057dc5e393fe87519c995a0410e3ba77faeacd1d67"
+            },
+            "crates/ruff_linter/src/rules/ruff/snapshots/ruff_linter__rules__ruff__tests__RUF009_RUF009_attrs.py.snap": {
+              "blob": "08faee3866e7336a80fe5238c6d7fd5671d211fb",
+              "sha256": "77652cfb5068c5633d22239a6eed09379bb891467dd35e79d1a7e7603858ec0c"
+            }
+          },
+          "tree": "340e19d75043166840a7b9f61807d9d5606299d2"
+        }
+      },
+      "schema": 2,
+      "source": "Unmodified Ruff #19021: actual three complete committed blobs restored together under the unchanged original OLD checkout, the ordinary precommit source edit."
+    },
+    "recipe": "7e407151912185af4aaa46ad307100f5d65f4cbcd1320fb9732472a9136e7d0f",
+    "run": 41625608181,
+    "runner": 2016,
+    "sha": "6cfeb854f07e6e24bfbe450cca8b79fdc7afd583",
+    "source": {
+      "allocation_uniform_rank_of_70": 67,
+      "available_oracle": "Unscored signed release and historical old compiler runs 41590898520 and 41606912972. Each final role requires newly independently empty native and metadata controls.",
+      "base": "710c60f7135879b05f6c05a34085cd7af5c19e7f",
+      "cargo_check": [
+        "cargo",
+        "+ohm",
+        "check",
+        "-p",
+        "ruff",
+        "--bin",
+        "ruff",
+        "--locked",
+        "--offline",
+        "-j4",
+        "--message-format=json"
+      ],
+      "checked_client": "0617e34321cf33fcce38904d066f0d4981b79f752896d37b97d1aed1fbddc48f",
+      "confirm_orders": [
+        "CP",
+        "CP",
+        "CP",
+        "PC",
+        "PC",
+        "CP",
+        "PC",
+        "PC"
+      ],
+      "counter_sha256": "096b9e9efb7457ff4c2fd194985f18c4e05520fce46c85e5919b084ae3d823ce",
+      "edition": "2024",
+      "excluded": [
+        "Signed -23 timing, 41590898520 mechanism, both modern trial refusals, historical 41606912972 and all corrected-source compatibility runs. No prior sample scores."
+      ],
+      "factory_binding": "ca865b52bb6714b12468e5397e4d14c3fee16563e71782e77a10a3ab56e92786",
+      "factory_branch": "charlie/qa-derive-sete-consumed-rust-20261103",
+      "gates": {
+        "confirmation_all_improve": true,
+        "confirmation_edited_median_reduction_min": 0.1,
+        "pilot_edited_reduction_min": 0.1,
+        "real_consumer_skips": 1
+      },
+      "git_checkouts": {
+        "3512a9f33eadc5402cfab1b8f7340824c8ca1439": {
+          "physical_files": 47,
+          "physical_sha256": "563b58656483f386f239c865875750db0c2a48430555a3de62e8517402433a40",
+          "tree": "ee717e01608bb1e9d61fbeaeba9586249167b92a"
+        },
+        "fc00eba89e5dcaa5edba51c41aa5f309b5cb126b": {
+          "physical_files": 352,
+          "physical_sha256": "0ddb0bed545d963e19929a5e00d4de959b7c6162cbb95b2cc918ef5bd4515fe0",
+          "tree": "d48ef0a25f09f2613d0098665bfc729ccd523ae5"
+        }
+      },
+      "independence": {
+        "external_products": "Each role seeds its own external inputs through normal Cargo check and build. Only physically identified registry/Git outputs survive resets. Every external body, Cargo.lock archive, Git checkout and declared build output is checked; the actual proc-macro section is retained. The additional fully empty native reference receives no compiled input from a seed.",
+        "history": "A fresh worker, fresh role-specific external seed and independent workspace histories per role. Both prior metadata refusals, the signed discovery, all earlier historical workers and the pilot contribute zero scored pairs.",
+        "invalid": "Real invalid historical source must produce E0308, distinct native RUF009 regressions/repairs must match separate clean reference. No CI trust override.",
+        "kernel": "Count true checked crates, all real compiler capability probes and executable maps independently of nominal Cargo units; whole command includes every probe.",
+        "metadata": "Verify the complete physical .rmeta, public hashes, per-definition public rows and dependency graph for every enrolled owner. A same-role same-source ruff_linter producer difference is allowed only when the stable opaque-lifetime keys biject, forward+reverse lookups and full identifier/source spans map exactly, every other byte is accounted, and public rows, expansion and dependency sets agree. Settled repeats still require raw identity. All other unexplained differences refuse the worker.",
+        "native": "Every successful native CLI tested on four checked diagnostics. All same-role whole ELF and all public metadata rows required. Cross-role full ELF or only the historically qualified true native compiler source dir/build ID (including all decoded DWARF and nonallowed bytes).",
+        "release": "Additional alias/checksum Cargo compatibility under separate qualification; this isolated exact-stack pilot does not qualify a release.",
+        "sources": "Freshly fetched locked registry and Git objects only. Independently empty local and third-party products in each full history; no uploaded or prebuilt dependency prefix.",
+        "statistics": "Eight separate hosts, 4 PC/4 CP, drawn uniformly once before any pricing. All eight reductions positive and median at least 10%. Primary blocked assignment p from all 70 allocations; independently exchangeable paired signs have one-sided 1/256 if all eight improve. Exact sample counts and ratios reported."
+      },
+      "kernel_negotiation": "Require the actual loaded P2 or Q2 driver, an actual v2 sysroot capability probe and never the stale v1 option, a checksum-eligible Ruff library, a physically distinct result on the genuine initial consumer, and every real old/fixed Rust closure. PMU counts all ordinary descendants.",
+      "lock": {
+        "git": {
+          "lsp-types": "git+https://github.com/astral-sh/lsp-types.git?rev=3512a9f#3512a9f33eadc5402cfab1b8f7340824c8ca1439",
+          "salsa": "git+https://github.com/salsa-rs/salsa?rev=fc00eba89e5dcaa5edba51c41aa5f309b5cb126b#fc00eba89e5dcaa5edba51c41aa5f309b5cb126b",
+          "salsa-macro-rules": "git+https://github.com/salsa-rs/salsa?rev=fc00eba89e5dcaa5edba51c41aa5f309b5cb126b#fc00eba89e5dcaa5edba51c41aa5f309b5cb126b",
+          "salsa-macros": "git+https://github.com/salsa-rs/salsa?rev=fc00eba89e5dcaa5edba51c41aa5f309b5cb126b#fc00eba89e5dcaa5edba51c41aa5f309b5cb126b"
+        },
+        "registry_archives": 445,
+        "sha256": "47d65136d6cf3743b88970429f5e3bf39e788afe8c35ca5ce2f94939648086eb"
+      },
+      "matched_signed_cargo": {
+        "asset": {
+          "id": 704038224,
+          "name": "ohm-1.99.0-23-x86_64-unknown-linux-gnu.tar.gz",
+          "sha256": "fc85a2ca6d47711058cd89c790c8e57f1799472e38f0ee0a08b0a51d06c1ee7b",
+          "size": 359921838
+        },
+        "members": {
+          "bin/cargo": [
+            "rust-1.99.0-dev-x86_64-unknown-linux-gnu/cargo/bin/cargo",
+            493,
+            39238824,
+            "f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee"
+          ],
+          "lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd": [
+            "rust-1.99.0-dev-x86_64-unknown-linux-gnu/rustc/lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd",
+            493,
+            10319072,
+            "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
+          ]
+        },
+        "revision": "7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed",
+        "tag": "ohm-1.99.0-23"
+      },
+      "matched_sources": {
+        "C": {
+          "compiler": "8520bd9252ee498acc8fbc1f97dc607f78894c96",
+          "revision": "e157d8912adcdae91bd43df88959f3a510bfa34a",
+          "tree": "c998e9949b409ae7ece9020e6dff2a300882176b"
+        },
+        "P": {
+          "compiler": "9bbc8e8744d531901ba6b7a919fb77677e30f94a",
+          "revision": "dad5fae340339ea631fdafc3ef27956df1ffb81a",
+          "tree": "73fdba95d4282b3b4b30601b537307f304658d49"
+        }
+      },
+      "native_admission": {
+        "artifact": 13219668603,
+        "bytes": 4220495,
+        "head": "f1b6f2078088c5ee6beb035c7a9678711ccf588a",
+        "independent": "a00c47bb8e53bc230a5df7c364afa59b8733f382e00c4a8fc96f60cff16ff0a4",
+        "run": 41613048377,
+        "terminal": "b9b5cdb92680413423f36cce701bd08406e500f4c71dd4bf8a09be2f9aa43db0",
+        "zip": "0fa482d3626b2999467671573bfcfa27b97f3f031360f6ad0565086580de3fc8"
+      },
+      "native_unit_count": 350,
+      "observed_targets": [
+        "ruff",
+        "ruff_graph",
+        "ruff_linter",
+        "ruff_server",
+        "ruff_workspace",
+        "ty_python_semantic"
+      ],
+      "observed_terminal_targets": [
+        [
+          "ruff",
+          "bin"
+        ],
+        [
+          "ruff",
+          "lib"
+        ],
+        [
+          "ruff_graph",
+          "lib"
+        ],
+        [
+          "ruff_linter",
+          "lib"
+        ],
+        [
+          "ruff_server",
+          "lib"
+        ],
+        [
+          "ruff_workspace",
+          "lib"
+        ],
+        [
+          "ty_python_semantic",
+          "lib"
+        ]
+      ],
+      "opaque_reader_controls": {
+        "artifact": 13211442403,
+        "bytes": 219777140,
+        "negative_controls": [
+          "wrong stable reverse lookup",
+          "wrong entire native source/identifier span",
+          "wrong published per-definition row",
+          "unregistered tail byte"
+        ],
+        "role_cases": {
+          "C": [
+            21,
+            636
+          ],
+          "P": [
+            16,
+            436
+          ]
+        },
+        "run": 41592345431,
+        "sha256": "bc07c2c6da80d237c4571f093fab893639fd0d8414dca09593ed3e9d680d3f2b"
+      },
+      "oracle_signed_run": 41590898520,
+      "original_source": {
+        "buggy": "0f09a385d22bce626cf1e6c19e217917020e3e6dbc40c4fcc30c569c1617d525",
+        "fixed": "cd0dea4fc382d445b69fe3057dc5e393fe87519c995a0410e3ba77faeacd1d67",
+        "path": "crates/ruff_linter/src/rules/ruff/helpers.rs",
+        "revisions": {
+          "buggy": {
+            "commit": "710c60f7135879b05f6c05a34085cd7af5c19e7f",
+            "files": {
+              "crates/ruff_linter/resources/test/fixtures/ruff/RUF009_attrs.py": {
+                "blob": "8f2a5c9fdd73f5ce6ab2cd1524b65b4f79121c61",
+                "sha256": "51acbda839a1e746021df479bd9c643b9833d09cf84815d8bf4e4b8c079c93dc"
+              },
+              "crates/ruff_linter/src/rules/ruff/helpers.rs": {
+                "blob": "c1426de616f7ea2997f5522ceab6c989cd780172",
+                "sha256": "0f09a385d22bce626cf1e6c19e217917020e3e6dbc40c4fcc30c569c1617d525"
+              },
+              "crates/ruff_linter/src/rules/ruff/snapshots/ruff_linter__rules__ruff__tests__RUF009_RUF009_attrs.py.snap": {
+                "blob": "58cadaeeb2130c9a198445d917112cc9bddad096",
+                "sha256": "fec7a8e38321b61c120c6cb9647cb45f71e64ab8ae383c2f328a2c24b1f2889f"
+              }
+            },
+            "tree": "80168786b1a6e114b0ef8f25c8e4a80b5adf05e7"
+          },
+          "fixed": {
+            "commit": "b00f68a23cedbd3a38fc25bac63638f0f11fc3f0",
+            "files": {
+              "crates/ruff_linter/resources/test/fixtures/ruff/RUF009_attrs.py": {
+                "blob": "526c12ab88e994b38567ab3dd635341111e54119",
+                "sha256": "2807da974586f4815069423e2f7394d8ac5ec3b72f80ba85bf808508200486e4"
+              },
+              "crates/ruff_linter/src/rules/ruff/helpers.rs": {
+                "blob": "535492816bb4adb5edde0113f8255c8788bc1bce",
+                "sha256": "cd0dea4fc382d445b69fe3057dc5e393fe87519c995a0410e3ba77faeacd1d67"
+              },
+              "crates/ruff_linter/src/rules/ruff/snapshots/ruff_linter__rules__ruff__tests__RUF009_RUF009_attrs.py.snap": {
+                "blob": "08faee3866e7336a80fe5238c6d7fd5671d211fb",
+                "sha256": "77652cfb5068c5633d22239a6eed09379bb891467dd35e79d1a7e7603858ec0c"
+              }
+            },
+            "tree": "340e19d75043166840a7b9f61807d9d5606299d2"
+          }
+        },
+        "schema": 2,
+        "source": "Unmodified Ruff #19021: actual three complete committed blobs restored together under the unchanged original OLD checkout, the ordinary precommit source edit."
+      },
+      "path": "crates/ruff_linter/src/rules/ruff/helpers.rs",
+      "physical_scope": "The actual unported #19021 checkout compiled and checked by real Cargo. The primary endpoint counts every retired user instruction in the ordinary edit command and descendants. A separate trace attributes the real kernel roster. Tempered comparisons of traced counts never enter the estimate.",
+      "pilot_order": "CP",
+      "pre_counter_reader_amendment": {
+        "measured_hardware_files": 0,
+        "phase": "First role, after the real 0.5.1 dependency seed, before the first subject counter.",
+        "prior_archive": 13221686588,
+        "prior_run": 41616388897,
+        "prior_sha": "e5948a26c8c24018c1af84f217b293caf26e08f4",
+        "prior_sha256": "845925c07e53666566d19b36165c68770996f83f390a3a2b9989669386e26d6f",
+        "scope": "Decode genuine derive panic help and spans on the historical get-size-derive2 macro, retain exact valid expansion bytes and two E0433 diagnostics from the intentionally unlinked expanded-only probe. Before the workload both signed-source stage1 roles must distinguish actual ordered results on four archived genuine plugin binaries and agree on each. The confirmation admission pins the frozen registered branch. Same case, native images, order, counter and all thresholds."
+      },
+      "prefix_provenance": {
+        "cross_role": "Every external product must be identical to its own seed throughout ordinary, traced and independently Ruff-empty histories. Each role must additionally build the whole native graph entirely empty, and match its fully cold executable. Cross-role all loadable/executable/native bytes and decoded debug must pass the complete existing ELF verifier.",
+        "enrolled_helper_file_sha256": "0cbc8078e658aaf5749014e060a577a6639f04e406479af43af28a54f7b50195",
+        "git_manifest_proof_sha256": "a7ed17f8a591f68ca6c5225993db68da47d971452cb6832fad5a8e8253c1513c",
+        "locked_git.py": "4bf244c9d6010e0d35ee1f3da720a47c936a0c6c3dedf62ec5b7f0cda20d87e3",
+        "offline_git": "All 11 original Git commit/tree/manifest objects reopen the four exact manifest paths from the Ruff lock and typed Cargo stream. The collector also checks every physical tracked file and mode in both actual checkouts.",
+        "parent_helper_file_sha256": "3893ab09b216967b53727b9faea7bcebd64fe610e808ddba8297c6873368ad75",
+        "prerequisite_workflow": "ordinary role-private Cargo check and build of original pre-edit Ruff, independent of every timing installation",
+        "source": "7a8775afbca6bf2b901e543d1d031bd47155de67"
+      },
+      "qa_branch": "charlie/qa-ruf009-empty-native-20261103",
+      "qa_parent": "ddfeceeb6fd33fdea233a39a3d59ab523f5ab170",
+      "rust_parent": "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2",
+      "settled": [
+        [
+          "ty_python_semantic",
+          "lib"
+        ]
+      ],
+      "settled_nominal": [
+        [
+          "ruff",
+          "bin"
+        ],
+        [
+          "ruff",
+          "lib"
+        ],
+        [
+          "ruff_graph",
+          "lib"
+        ],
+        [
+          "ruff_server",
+          "lib"
+        ],
+        [
+          "ruff_workspace",
+          "lib"
+        ],
+        [
+          "ty_python_semantic",
+          "lib"
+        ]
+      ],
+      "source_sha256": "0f948ebe6c4b513a1575756b25fd0737a26dc6347d63a51cbe8f4cea7c353069",
+      "tree": "80168786b1a6e114b0ef8f25c8e4a80b5adf05e7",
+      "unit_count": 360
+    }
+  }
+}

@@ -1,0 +1,237 @@
+{
+  "all_original_ELFs": {
+    "C/edited": "637b417391939e86cef1074a6dba003556037601a92e781f8a34f5d5de0e2f8a",
+    "C/fully-empty-buggy": "f058a81e22278be7b1da982ceb36e97fb58fbd5439a39616bdcb4174ed7c1046",
+    "C/fully-empty-fixed": "637b417391939e86cef1074a6dba003556037601a92e781f8a34f5d5de0e2f8a",
+    "C/repaired": "637b417391939e86cef1074a6dba003556037601a92e781f8a34f5d5de0e2f8a",
+    "C/reverse": "f058a81e22278be7b1da982ceb36e97fb58fbd5439a39616bdcb4174ed7c1046",
+    "C/settled-fixed": "637b417391939e86cef1074a6dba003556037601a92e781f8a34f5d5de0e2f8a",
+    "P/edited": "6a9d1f5630e617b115a57c921e5d7f95c2c330712d7a78f75ebd8014ca9064ea",
+    "P/fully-empty-buggy": "35ef8e091d8474cd53b3394949c2ab8e106ad7a9946049a8592e19773ae50167",
+    "P/fully-empty-fixed": "6a9d1f5630e617b115a57c921e5d7f95c2c330712d7a78f75ebd8014ca9064ea",
+    "P/repaired": "6a9d1f5630e617b115a57c921e5d7f95c2c330712d7a78f75ebd8014ca9064ea",
+    "P/reverse": "35ef8e091d8474cd53b3394949c2ab8e106ad7a9946049a8592e19773ae50167",
+    "P/settled-fixed": "6a9d1f5630e617b115a57c921e5d7f95c2c330712d7a78f75ebd8014ca9064ea"
+  },
+  "compact_native_observations": "73e4c6beffb9d8d0a811d7488b02e5b82992e927a05841eb32a7f3531dfc6990",
+  "cross_role": {
+    "fully-empty-buggy": {
+      "build_ids": [
+        "5049205a17a4eb715b540b606d7d6e21244b4e00c6f5fc7ba61159c9161fbde8",
+        "7dc1f5ea2ccbc438b0d48785d26d718927bf937d315b1aea8f6d91c3282eec78"
+      ],
+      "debug_string_offsets": {
+        ".debug_info": {
+          "authenticated_strp_words": 29267,
+          "different_bytes": 45312
+        },
+        ".debug_macro": {
+          "authenticated_strp_words": 1546,
+          "different_bytes": 2407
+        }
+      },
+      "dirs": [
+        "/home/runner/work/_temp/ohm-ruf009/state/build/debug/build/registries/v2-9434f2195b2d10b5/tikv-jemalloc-sys/f7699fed2dafcfcb/out/build",
+        "/home/runner/work/_temp/ohm-ruf009/state/build/debug/build/registries/v2-d4149ada9cb20418/tikv-jemalloc-sys/f7699fed2dafcfcb/out/build"
+      ],
+      "dwarf": {
+        "info": [
+          {
+            "bytes": 475931952,
+            "canonical": "3be531ac2134e28ae9b03054535b055652a0bef695375f62b54050a9268461a5",
+            "lines": 7580377,
+            "raw": "bb32bf51eaccb695c9cf74016fe863ed9a164863bf199046ddcbe63c0b66c750",
+            "replacements": 95836,
+            "tool": "07cf5eb367dcf51a8f462e046b08409fbe4a6fe60506fb0d4e5604db024873a1"
+          },
+          {
+            "bytes": 475931952,
+            "canonical": "3be531ac2134e28ae9b03054535b055652a0bef695375f62b54050a9268461a5",
+            "lines": 7580377,
+            "raw": "f269320d2251f821b246a8d5778c98abe99ff8ffbd9ef72f6daa5c5decec21c5",
+            "replacements": 95836,
+            "tool": "07cf5eb367dcf51a8f462e046b08409fbe4a6fe60506fb0d4e5604db024873a1"
+          }
+        ],
+        "macro": [
+          {
+            "bytes": 4252975,
+            "canonical": "4c14e29cdcae9d7d14f7fed193655bd4199a7f20f431e8c099c9814fc18d44de",
+            "lines": 70509,
+            "raw": "e49f3fdaccf087c226a8d7c5fcf60bd5ff96ccf76a0e78d4d0183f42f83b6545",
+            "replacements": 0,
+            "tool": "07cf5eb367dcf51a8f462e046b08409fbe4a6fe60506fb0d4e5604db024873a1"
+          },
+          {
+            "bytes": 4252975,
+            "canonical": "4c14e29cdcae9d7d14f7fed193655bd4199a7f20f431e8c099c9814fc18d44de",
+            "lines": 70509,
+            "raw": "2c8420d30d8ffe3b540a1555402eedf797afb1b4c7ea878c6ae710d624cf0d11",
+            "replacements": 0,
+            "tool": "07cf5eb367dcf51a8f462e046b08409fbe4a6fe60506fb0d4e5604db024873a1"
+          }
+        ]
+      },
+      "full_raw_sha256": [
+        "35ef8e091d8474cd53b3394949c2ab8e106ad7a9946049a8592e19773ae50167",
+        "f058a81e22278be7b1da982ceb36e97fb58fbd5439a39616bdcb4174ed7c1046"
+      ],
+      "identical": false,
+      "load_segments": [
+        [
+          0,
+          14831690,
+          4,
+          "67944c0b66eedc67754546684ef53a2a176157f8b39994e4750308156153d165"
+        ],
+        [
+          14831696,
+          38359792,
+          5,
+          "4af2ea279d436811518ff1b432edb15c834a6de27ebde50ac314561442bdfcae"
+        ],
+        [
+          53191488,
+          2149384,
+          6,
+          "7b423fafdae649c64354dcb9f0144ef95e161b589e130d89c6463141b3aab75b"
+        ],
+        [
+          55340896,
+          11656,
+          6,
+          "009254f9778fe00a13da5dfd19dc5cf8d5dee95d4744c7cb0cd57cfa603d5343"
+        ]
+      ],
+      "outside": "687ea23896aae0565cf9d0f553bd705994116785c833a82866817d008c8d2a57"
+    },
+    "fully-empty-fixed": {
+      "build_ids": [
+        "fbf13d312a08d6f00535b1e659013a544322772de78d14a0fcde6263be7d97ed",
+        "6168915f55a1b5f9567d593e2343b0d6ab160e87de1e4c08b1de7cefa343c84d"
+      ],
+      "debug_string_offsets": {
+        ".debug_info": {
+          "authenticated_strp_words": 29267,
+          "different_bytes": 45312
+        },
+        ".debug_macro": {
+          "authenticated_strp_words": 1546,
+          "different_bytes": 2407
+        }
+      },
+      "dirs": [
+        "/home/runner/work/_temp/ohm-ruf009/state/build/debug/build/registries/v2-9434f2195b2d10b5/tikv-jemalloc-sys/f7699fed2dafcfcb/out/build",
+        "/home/runner/work/_temp/ohm-ruf009/state/build/debug/build/registries/v2-d4149ada9cb20418/tikv-jemalloc-sys/f7699fed2dafcfcb/out/build"
+      ],
+      "dwarf": {
+        "info": [
+          {
+            "bytes": 475931952,
+            "canonical": "766829fac707b694fffff695645c0f0c2fab4acd563bf48cb3d4894787dee2bc",
+            "lines": 7580377,
+            "raw": "5a4206e45899bc088fa2c2acecab281929b74c9037bf9dd6ddfe1814ff021aa4",
+            "replacements": 95836,
+            "tool": "07cf5eb367dcf51a8f462e046b08409fbe4a6fe60506fb0d4e5604db024873a1"
+          },
+          {
+            "bytes": 475931952,
+            "canonical": "766829fac707b694fffff695645c0f0c2fab4acd563bf48cb3d4894787dee2bc",
+            "lines": 7580377,
+            "raw": "5a56f3b8c57535ae685ebb5d246d0f8d74f82895c4632592bd4a67132f3ffa4b",
+            "replacements": 95836,
+            "tool": "07cf5eb367dcf51a8f462e046b08409fbe4a6fe60506fb0d4e5604db024873a1"
+          }
+        ],
+        "macro": [
+          {
+            "bytes": 4252975,
+            "canonical": "4c14e29cdcae9d7d14f7fed193655bd4199a7f20f431e8c099c9814fc18d44de",
+            "lines": 70509,
+            "raw": "2c11b7ef3bee79622515b5375e662192a423998c74dd72ccb82e06e9f80a86f4",
+            "replacements": 0,
+            "tool": "07cf5eb367dcf51a8f462e046b08409fbe4a6fe60506fb0d4e5604db024873a1"
+          },
+          {
+            "bytes": 4252975,
+            "canonical": "4c14e29cdcae9d7d14f7fed193655bd4199a7f20f431e8c099c9814fc18d44de",
+            "lines": 70509,
+            "raw": "f0c664988cd5db01303c43fce6f3143fa9e3c8eecfce33d16b8c726a6760660c",
+            "replacements": 0,
+            "tool": "07cf5eb367dcf51a8f462e046b08409fbe4a6fe60506fb0d4e5604db024873a1"
+          }
+        ]
+      },
+      "full_raw_sha256": [
+        "6a9d1f5630e617b115a57c921e5d7f95c2c330712d7a78f75ebd8014ca9064ea",
+        "637b417391939e86cef1074a6dba003556037601a92e781f8a34f5d5de0e2f8a"
+      ],
+      "identical": false,
+      "load_segments": [
+        [
+          0,
+          14831706,
+          4,
+          "e31a8b792746600e6a4b5b540434ebcaffd1b317b87462be7fea2369cdea7b77"
+        ],
+        [
+          14831712,
+          38360048,
+          5,
+          "4ba741742eb517679fee88d574874369248286f90c06ca4c7eda23c2ff701593"
+        ],
+        [
+          53191760,
+          2149368,
+          6,
+          "ce4b1934f7946dbc3b8c1e03c87b8537be45894c7776a384bfe437fd4e25f625"
+        ],
+        [
+          55341152,
+          11656,
+          6,
+          "009254f9778fe00a13da5dfd19dc5cf8d5dee95d4744c7cb0cd57cfa603d5343"
+        ]
+      ],
+      "outside": "76ea60c996366e710119f3074c2da2baa8c5f3ffe009d4e87a6a4e2a2d9d6d65"
+    }
+  },
+  "invalid": {
+    "C": "E0308",
+    "P": "E0308"
+  },
+  "native_runtime": 48,
+  "native_visits": 12,
+  "owners": {
+    "C/edited": [
+      "ty_python_semantic",
+      "ruff_linter",
+      "ruff"
+    ],
+    "C/reverse": [
+      "ruff_linter",
+      "ty_python_semantic",
+      "ruff"
+    ],
+    "C/settled-fixed": [
+      "ty_python_semantic",
+      "ruff"
+    ],
+    "P/edited": [
+      "ty_python_semantic",
+      "ruff_linter",
+      "ruff"
+    ],
+    "P/reverse": [
+      "ruff_linter",
+      "ty_python_semantic",
+      "ruff"
+    ],
+    "P/settled-fixed": [
+      "ty_python_semantic",
+      "ruff"
+    ]
+  },
+  "raw_acquisition": "2560c343601f78dba0aa777ca2af304ba849e835da58495c7db3436ec8355886",
+  "sha256_standalone_admission": "f46f9a3f1517062d29d718b3a8e187a445b7e5006441b5ee6324ee7e15b10d6a"
+}
