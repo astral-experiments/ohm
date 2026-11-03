@@ -481,6 +481,15 @@ for component in . ..; do
 done
 unset OHM_TEST_INSTALL_DIR
 
+mkdir "$temporary_directory/local release%"
+cp "$release_directory/$archive_name" "$temporary_directory/local release%/$archive_name"
+OHM_TEST_DOWNLOAD_URL="file://$temporary_directory/local%20release%25"
+run_case encoded-file-url success
+OHM_TEST_DOWNLOAD_URL="file://$temporary_directory/local%00%20release%25"
+run_case encoded-nul-file-url failure
+assert_no_links encoded-nul-file-url
+unset OHM_TEST_DOWNLOAD_URL
+
 for unsafe_url in http://example.invalid file://example.invalid/archive ftp://example.invalid; do
   OHM_TEST_DOWNLOAD_URL=$unsafe_url
   run_case unsafe-download-url failure
