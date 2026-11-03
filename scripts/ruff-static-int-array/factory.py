@@ -33,7 +33,8 @@ def prepare():
     assert git("bundle", "list-heads", bundle).split() == [register["candidate"], register["ref"]]
     git("bundle", "verify", bundle)
     git("fetch", "--no-tags", "--no-recurse-submodules", bundle, register["ref"])
-    assert git("rev-parse", "FETCH_HEAD^") == register["parent"]
+    assert git("rev-list", "--reverse", register["parent"] + "..FETCH_HEAD").splitlines() == register["compiler_commits"]
+    assert git("rev-parse", register["compiler_commits"][0] + "^") == register["parent"]
     assert git("rev-parse", "FETCH_HEAD^{tree}") == register["candidate_tree"]
     assert git("diff", "--name-only", "HEAD", "FETCH_HEAD").splitlines() == register["paths"]
     if role == "candidate":

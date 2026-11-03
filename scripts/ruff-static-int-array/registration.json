@@ -1,9 +1,19 @@
 {
-  "bundle": "ddef03150431193ce4444b5f8142778a2d48020951856dee3ccc9903a953ca4c",
-  "candidate": "a60f4f4476d4819b62730e92ea07c1343f8e6dac",
-  "candidate_tree": "090d5a6e4bf0059354bb0aee1a0371651fa8d2dc",
+  "bundle": "0c2ee470c597fd6b5f3c53568777ae461f5fe10cad066c01c2ce0845f659b874",
+  "candidate": "2bc7e7b7c898e7fa82a1dde03978c59263d8167d",
+  "candidate_tree": "428a2eac5b7b5481835ac224696ca8728f1b1fde",
   "cargo": "abc70d60a6fd89c10d5f65cf85820d9b78d5affe",
+  "compiler_commits": [
+    "a60f4f4476d4819b62730e92ea07c1343f8e6dac",
+    "2bc7e7b7c898e7fa82a1dde03978c59263d8167d"
+  ],
   "criterion": "20% fewer instructions in a full affected compiler or 2x across a real ordinary command; no PR from the factory alone.",
+  "initial_build": {
+    "candidate": "a60f4f4476d4819b62730e92ea07c1343f8e6dac",
+    "error": "two non-exhaustive THIR consumers",
+    "parent_unchanged": "f5a51d8cc3e76236c2d0f17d495d59ebb03306e4",
+    "run": 41724354025
+  },
   "parent": "f5a51d8cc3e76236c2d0f17d495d59ebb03306e4",
   "parent_tree": "b4f0ad237b667d5227e63b44f6e8d3ba885bf7a1",
   "paths": [
@@ -17,6 +27,7 @@
     "compiler/rustc_mir_build/src/builder/scope.rs",
     "compiler/rustc_mir_build/src/check_unsafety.rs",
     "compiler/rustc_mir_build/src/thir/cx/expr.rs",
+    "compiler/rustc_mir_build/src/thir/pattern/check_match.rs",
     "compiler/rustc_mir_build/src/thir/print.rs",
     "compiler/rustc_ty_utils/src/consts.rs"
   ],
