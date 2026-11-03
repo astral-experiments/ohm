@@ -147,6 +147,20 @@ jobs:
         python3 -IB qa-code/scripts/ruff-combined-apple/qualify.py build
 
         '
+    - name: Preserve the original native compiler for independent replay
+      shell: bash
+      run: |
+        set -euo pipefail
+        cd "$RUNNER_TEMP/combined"
+        tar -czf fixed-sdk.tar.gz -C reopened defer
+        shasum -a 256 fixed-sdk.tar.gz > logs/fixed-sdk.sha256
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: combined-checksums-macos-sdk-${{ github.run_id }}
+        path: ${{ runner.temp }}/combined/fixed-sdk.tar.gz
+        compression-level: 0
+        retention-days: 7
+        if-no-files-found: error
     - name: Exercise signed, upgraded and clean Cargo verdicts
       run: python3 -IB qa-code/scripts/ruff-combined-apple/qualify.py exercise
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

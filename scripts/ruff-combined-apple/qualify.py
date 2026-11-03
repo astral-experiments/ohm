@@ -23,6 +23,8 @@ src = workspace / "source/rust"
 cargo = workspace / "cargo-src"
 sys.path.insert(0, str(workspace / "fixtures/scripts/ruff-matched-stage"))
 import smoke
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import matched_paths
 
 def git_sha(path, expr):
     return sp.check_output(["git", "-C", path, "rev-parse", expr], text=True).strip()
@@ -160,10 +162,11 @@ def exercise():
     check_sources()
     before = {"P":tools(normal),"C":tools(fixed)}
     base = dict(clean_env(), RUSTUP_HOME=str(ru), CARGO_HOME=str(root/"unused-cargo-home"), RUSTUP_TOOLCHAIN="ohm")
-    smoke.smoke(root, {"arms":{"normal":{"root":str(normal)}, "defer":{"root":str(fixed)}}}, base)
+    comparisons = matched_paths.histories(root, normal, fixed, base)
     for role,sdk in (("signed",normal),("fixed",fixed)):
         prerequisite(role,sdk,base)
     assert before=={"P":tools(normal),"C":tools(fixed)}
+    assert all(len(set(group)) == 1 for group in comparisons), comparisons
     smoke.save(logs/"accepted-combined.json", {"rust":git_sha(src,"HEAD"),"cargo":git_sha(cargo,"HEAD"),"summaries":smoke.sha(logs/"smoke.json"),"tools":before,"prerequisite_commands":14})
 
 if __name__=="__main__":
