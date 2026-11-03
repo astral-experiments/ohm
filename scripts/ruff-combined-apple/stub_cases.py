@@ -5,6 +5,7 @@ import os
 import re
 from pathlib import Path
 import subprocess
+import traceback
 
 
 def archive_image(product, logs, name):
@@ -38,7 +39,13 @@ def cargo_history(work, env, logs, role, explicit):
     lib = work / 'src/lib.rs'
     lib.write_text('pub fn value() -> u32 { 17 }\n')
     (work / 'src/main.rs').write_text('fn main() { println!("{}", green_native_stub::value()); }\n')
-    (work / 'build.rs').write_text('fn main() { println!("cargo::rerun-if-changed=gate.txt"); }\n')
+    (work / 'build.rs').write_text(
+        'fn main() {\n'
+        '    println!("cargo::rerun-if-changed=gate.txt");\n'
+        '    let gate = std::fs::read_to_string("gate.txt").unwrap();\n'
+        '    println!("cargo::rustc-env=GREEN_STUB_INPUT={}", gate.trim());\n'
+        '}\n'
+    )
     (work / 'gate.txt').write_text('old\n')
     target, shared = work / 'target', work / 'shared'
     env = dict(env, CARGO_HOME=str(work / 'cargo-home'), CARGO_TARGET_DIR=str(target),
@@ -51,12 +58,15 @@ def cargo_history(work, env, logs, role, explicit):
     def build(tag, expected=0, error=None, fresh=False):
         result = call(work, env, logs, tag, cmd + ['build', '--lib', '--locked', '--offline', '-vv', '--message-format=json'])
         lines = result.stdout.splitlines()
-        build_script = b'[green_native_stub 0.1.0] cargo::rerun-if-changed=gate.txt'
-        assert all(line.startswith(b'{') or line == build_script for line in lines)
+        outputs = {b'[green_native_stub 0.1.0] cargo::rerun-if-changed=gate.txt',
+                   b'[green_native_stub 0.1.0] cargo::rustc-env=GREEN_STUB_INPUT=' + (work / 'gate.txt').read_bytes().strip()}
+        assert all(line.startswith(b'{') or line in outputs for line in lines)
         messages = [json.loads(line) for line in lines if line.startswith(b'{')]
         errors = [m['message'] for m in messages if m['reason'] == 'compiler-message' and m['message']['level'] == 'error']
         rows = [m for m in messages if m['reason'] == 'compiler-artifact' and m['target']['name'] == 'green_native_stub' and 'lib' in m['target']['kind']]
         drivers = [line for line in result.stderr.decode().splitlines() if 'Running ' in line and '--crate-name green_native_stub ' in line]
+        if tag == 'real-build-script-input-edit':
+            assert any(m['reason'] == 'build-script-executed' and ['GREEN_STUB_INPUT', 'changed'] in m['env'] for m in messages)
         assert result.returncode == expected and len(drivers) == int(not fresh), (tag, result.returncode, errors, drivers)
         if drivers:
             assert 'incremental=' in drivers[0] and ('embed-metadata=no' in drivers[0]) == explicit
@@ -69,28 +79,33 @@ def cargo_history(work, env, logs, role, explicit):
 
     def execute(tag, value):
         result = call(work, env, logs, tag, cmd + ['run', '--locked', '--offline', '--quiet'])
-        if affected:
-            assert result.returncode == 101 and b'failed to create encoded metadata from file' in result.stderr, (tag, result.stderr)
+        if affected and result.returncode == 101:
+            assert b'failed to create encoded metadata from file' in result.stderr, (tag, result.stderr)
         else:
             assert result.returncode == 0 and result.stdout == f'{value}\n'.encode(), (tag, result.stderr)
         steps[tag] = {'rc': result.returncode, 'stdout': result.stdout.decode(), 'stderr': result.stderr.decode()}
 
     product, = build('cold')
     build('unchanged', fresh=True)
-    execute('cold-binary', 17)
-    (work / 'gate.txt').write_text('changed\n')
     expected = 101 if affected else 0
     error = 'failed to create encoded metadata from file' if affected else None
-    build('real-build-script-input-edit', expected, error)
-    # Preserve the old query graph, and remove every hard-link alias of this requested archive.
-    identity = product.stat()
+    # Cargo can clone a unit output into the top-level target. Hold all copies of this library
+    # while preserving its metadata, incremental graph, and native object work products.
     held = work / 'held'; held.mkdir()
-    leaves = [p for area in (target, shared) for p in area.rglob('*.rlib')
-              if p.is_file() and os.path.samestat(identity, p.stat())]
+    leaves = sorted(p for area in (target, shared) for p in area.rglob('libgreen_native_stub*.rlib') if p.is_file())
     assert product in leaves
     for i, leaf in enumerate(leaves):
         leaf.rename(held / f'{i}-{leaf.name}')
+    assert not any(p.is_file() for area in (target, shared) for p in area.rglob('libgreen_native_stub*.rlib'))
     build('missing-product', expected, error)
+    # Start the independent build-script history with an empty donor and all requested outputs.
+    target.rename(work / 'missing-case-target')
+    shared.rename(work / 'missing-case-shared')
+    product, = build('cold-before-input-edit')
+    build('fresh-before-input-edit', fresh=True)
+    (work / 'gate.txt').write_text('changed\n')
+    build('real-build-script-input-edit', expected, error)
+    execute('cold-binary', 17)
     lib.write_text('pub fn value() -> u32 { 29 }\n')
     product, = build('real-native-edit')
     execute('edited-binary', 29)
@@ -140,6 +155,7 @@ def native(work, env, logs, kind, role, sdk, host):
 
 def qualify(root, signed, fixed, env, logs, host):
     out = {}
+    failed = {}
     for role, sdk in [('signed', signed), ('fixed', fixed)]:
         ru = root / ('stub-' + role + '-rustup') / 'toolchains'; ru.mkdir(parents=True)
         (ru / 'ohm').symlink_to(sdk, target_is_directory=True)
@@ -147,13 +163,20 @@ def qualify(root, signed, fixed, env, logs, host):
         for tool in ['cargo', 'rustc']:
             actual = subprocess.check_output(['rustup', 'which', '--toolchain', 'ohm', tool], env=own, text=True).strip()
             assert Path(actual).samefile(sdk / 'bin' / tool)
-        for label in ['default', 'explicit', 'rlib', 'dylib']:
+        for label in ['rlib', 'dylib', 'explicit', 'default']:
             key = 'stub-' + role + '-' + label
             dest = logs / key; dest.mkdir()
-            if label in ['rlib', 'dylib']:
-                result = native(root / key, own, dest, label, role, sdk, host)
-            else:
-                result = cargo_history(root / key, own, dest, role, label == 'explicit')
+            try:
+                if label in ['rlib', 'dylib']:
+                    result = native(root / key, own, dest, label, role, sdk, host)
+                else:
+                    result = cargo_history(root / key, own, dest, role, label == 'explicit')
+            except Exception:
+                failed[key] = traceback.format_exc()
+                (dest / 'failure.txt').write_text(failed[key])
+                continue
             out[key] = result
             (dest / 'verified.json').write_text(json.dumps(result, indent=2) + '\n')
     (logs / 'green-stub.json').write_text(json.dumps(out, indent=2) + '\n')
+    if failed:
+        raise RuntimeError(failed)
