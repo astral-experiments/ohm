@@ -14,6 +14,7 @@ sys.path.insert(0,str(legacy));sys.path.insert(0,str(legacy/'evidence-release-24
 import common as b
 import scope_rdr as md
 import re
+import traceback
 
 b.OLD='03f787e51e94999977b9a5a32b0153d82d7e2142';b.NEW='fa4a7bca2db70229710892c97b26ea6fb046cfc4'
 b.SRCS={b.OLD:'09af3d91c8734ba18e61d7db1b122695bf0327ec14c1aaa40ecda26d1ca59d54',b.NEW:'9aadd1de37c76267ce65f9cf022a89f1b443a6a57aa484489968d0cd76d4d726'}
@@ -86,9 +87,12 @@ def epochs(path):
 FINGERPRINT_TRACE=False
 def command(dst,args,observer=False,expected=0):
     dst.mkdir();kd=dst/'kernel';kd.mkdir();env=b.env()
-    if FINGERPRINT_TRACE:env['CARGO_LOG']='cargo::core::compiler::fingerprint=trace'
-    if observer:env.update(LD_PRELOAD=str(b.ROOT/'observe.so'),OHM_GRAPH_RUSTC=str(b.SDK/'bin/rustc'),OHM_GRAPH_DIR=str(dst))
+    if FINGERPRINT_TRACE:
+        graph=b.ROOT/'graph-current';graph.mkdir(exist_ok=True);b.need(not any(graph.iterdir()),'unconsumed private graph');env.update(CARGO_LOG='cargo::core::compiler::fingerprint=trace',LD_PRELOAD=str(b.ROOT/'observe.so'),OHM_GRAPH_RUSTC=str(b.SDK/'bin/rustc'),OHM_GRAPH_DIR=str(graph))
     with (dst/'stdout').open('xb')as out,(dst/'stderr').open('xb')as err:p=sp.run([b.ROOT/'exec_count',kd,'cargo','+ohm','build',*args],env=env,cwd=b.WORK,stdout=out,stderr=err)
+    if FINGERPRINT_TRACE:
+        for wire in graph.iterdir():
+            b.need(wire.is_file()and not wire.is_symlink() and wire.name in ('payload.bin','register.bin','graph.bin'),'unregistered native graph output');wire.rename(dst/wire.name)
     b.need(p.returncode==expected,(dst.name,p.returncode,(dst/'stderr').read_text()[-800:]));rows=epochs(kd);b.put(dst/'real-compiler.json',rows);return rows
 def deps(a):
     return [a[i+1] if v=='--extern' else v.removeprefix('--extern=') for i,v in enumerate(a[:-1])if v=='--extern' or v.startswith('--extern=')]
@@ -139,7 +143,13 @@ def run_lane(lane,consumer,client,prod,observe):
     global FINGERPRINT_TRACE
     FINGERPRINT_TRACE=observe
     folder=OUT/lane;folder.mkdir();b.select(b.OLD);b.prepare();old=folder/'initial-consumer';r=command(old,client,observe);files=selected(r,consumer);snapshot(old,files,False);orig=verdict(old,consumer);footprint(old)
-    no=folder/'settled-original';assert not command(no,client);assert verdict(no,consumer)==orig
+    def settled(label,expected):
+        dst=folder/label;rs=command(dst,client)
+        work=sorted((x['crate'],x['kind'],any(a in ('link-only','-Zlink-only')for a in x['argv']))for x in rs)
+        floor=[]if consumer=='ruff'else[('ruff_dev','bin',True),('ty_python_semantic','lib',False)]
+        b.put(dst/'physical-floor.json',dict(observed=work,expected=floor));b.need(work==floor,('different settled baseline',label,work))
+        b.need(verdict(dst,consumer)==expected,('different settled complete ELF and help',label))
+    settled('settled-original',orig);settled('settled-original-again',orig)
     b.select(b.NEW);d=folder/'producer-NEW';r=command(d,prod,observe);b.need(any(x['crate']=='ruff'and x['kind']in('lib','rlib')for x in r)and not any(x['kind']=='bin'and x['crate']==consumer for x in r),'wrong changed producer roster');snapshot(d,files,True)
     saved=b.SRC.read_bytes()
     try:
@@ -150,7 +160,7 @@ def run_lane(lane,consumer,client,prod,observe):
     d=folder/'producer-REPAIR';command(d,prod,observe);snapshot(d,files,True)
     b.select(b.OLD);back=folder/'producer-OLD';r=command(back,prod,observe);b.need(not any(x['kind']=='bin'and x['crate']==consumer for x in r),'consumer executed before its actual witness');snapshot(back,files,False);footprint(back)
     w=folder/'unchanged-consumer';rows=command(w,client);snap=verdict(w,consumer);footprint(w);snapshot(w,files,False)
-    again=folder/'settled-after';assert not command(again,client);assert verdict(again,consumer)==snap
+    settled('settled-after',snap);settled('settled-after-again',snap)
     sy,tabs=try_schema();a=rows_at(old,sy,tabs);bb=rows_at(back,sy,tabs)
     changed={k:{'identity':a[1].get(k,bb[1].get(k)),'before':a[2].get(k),'after':bb[2].get(k)}for k in a[2].keys()|bb[2].keys()if a[2].get(k)!=bb[2].get(k)}
     substitutions=collections.Counter((v['before'],v['after'])for v in changed.values())
@@ -178,6 +188,6 @@ def main():
             clear();result=run_lane(label,*args,observer);b.put(OUT/(label+'-summary.json'),result)
             if observer:
                 b.put(OUT/'observed-comparison.json',{'changed_public_rows_match':result['changed_public_rows']==len(normal['rows']),'native_work_matches':result['downstream_actual']==list(map(tuple,normal['rustcs']['unchanged-consumer'])),'native_help_matches':result['initial_native']['help']==normal['consumer_programs']['initial-consumer']['help'] and result['final_native']['help']==normal['consumer_programs']['unchanged-consumer']['help']})
-        except Exception as e:failures[label]=repr(e);b.put(OUT/'refusals.json',failures);print(label,repr(e),flush=True)
+        except Exception as e:failures[label]=traceback.format_exc();b.put(OUT/'refusals.json',failures);print(label,failures[label],flush=True)
     if failures:raise RuntimeError(failures)
 if __name__=='__main__':main()
