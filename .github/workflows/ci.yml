@@ -1,5 +1,5 @@
-name: Refresh the released Ohm 23 baseline for the real Ruff 27470 check
-run-name: Ruff 27470 published Ohm 23 ownership ${{ inputs.reviewed_head }}
+name: Sample the shipped ty_python_semantic compiler on Ruff 27470
+run-name: Ruff 27470 signed ty_python_semantic source PC ${{ inputs.reviewed_head }}
 
 on:
   workflow_dispatch:
@@ -14,8 +14,8 @@ permissions:
 
 jobs:
   profile:
-    name: Verify the newly released SDK and the actual historical check
-    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-27470-signed23-20261103' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+    name: Profile the one real signed compiler after the historical edit
+    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-27470-signed23-source-pcs-20261103' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 90
     permissions:
@@ -68,15 +68,15 @@ jobs:
         run: python3 -IB qa/scripts/ruff-linter-check-attribution/worker.py acquire
       - name: Fetch the exact registry closure without compiling
         run: python3 -IB qa/scripts/ruff-linter-check-attribution/worker.py prefetch
-      - name: Calibrate kernel exec-stop ownership and run the sole signed release history
+      - name: Collect one source-PC profile in the seven native control stages
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends strace zstd
-          python3 -IB qa/scripts/ruff-linter-check-attribution/owners.py
+          sudo apt-get install -y --no-install-recommends strace zstd llvm-18
+          python3 -IB qa/scripts/ruff-linter-check-attribution/profile_semantic.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: ruff-27470-signed23-owners-${{ github.run_id }}
+          name: ruff-27470-signed23-semantic-pcs-${{ github.run_id }}
           path: ${{ runner.temp }}/ohm-ruff-visibility/receipt
           if-no-files-found: error
           compression-level: 1

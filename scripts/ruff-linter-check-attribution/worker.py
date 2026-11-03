@@ -28,7 +28,7 @@ FILES = ['crates/ruff_annotate_snippets/src/renderer/render.rs', SOURCE]
 SOURCE_HASH = {OLD:'cef48ab7234b39d4c15ad512de6496ce65e45b981fe85a4fbbb3737c73e6568f', NEW:'272e25a6d121c3c57112e53e6ad9de3abc7ff88658008dbf4a9299b3399a7943'}
 LOCK = '26d7be8317b0e44be0d60b31f6660dd4e07ed4c19be4e6748124d07068fd7fa7'
 RUST = 'd57fd1515986dccecdcece8da85e651bfb4b81f9'
-BRANCH = 'charlie/qa-ruff-27470-signed23-20261103'
+BRANCH = 'charlie/qa-ruff-27470-signed23-source-pcs-20261103'
 DONOR = 'bd7b58765ae44b21a1c9273b3ff0be8e923adc47'
 REPO = 'astral-experiments/ohm'
 CMD = ['cargo','+ohm','check','-p','ty_server','--lib','--locked','--offline','--message-format=json']
@@ -77,7 +77,7 @@ def acquire():
     jobs = json.loads(subprocess.check_output(gh(f'actions/runs/{run}/attempts/1/jobs?per_page=100')))
     need(info['head_sha'] == os.environ['REVIEWED_HEAD'] and info['head_branch'] == BRANCH and info['run_attempt'] == 1 and info['event'] == 'workflow_dispatch' and jobs['total_count'] == len(jobs['jobs']) == 1, 'hosted run identity')
     job, = [j for j in jobs['jobs'] if j['runner_name'] == os.environ['RUNNER_NAME'] and j['runner_id'] > 0]
-    name = 'Verify the newly released SDK and the actual historical check'
+    name = 'Profile the one real signed compiler after the historical edit'
     need(job['name'] == name and job['status']=='in_progress', 'worker identity')
     save(OUT/'worker.json',dict(run=run,job=job['id'],head=info['head_sha'],runner=job['runner_name'],runner_id=job['runner_id'],boot=Path('/proc/sys/kernel/random/boot_id').read_text().strip(),source=TREES,lock=LOCK,resources=resources()))
     sys.path.insert(0,str(WS/'donor/scripts/ruff-default-owner-pmu'))
