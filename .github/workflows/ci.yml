@@ -59,7 +59,7 @@ jobs:
       - name: Reopen the pinned compiler and price complete ordinary Ruff commands
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 -IB qa/scripts/ruff-frozen-literal/study.py
+        run: python3 -IB qa/scripts/ruff-frozen-literal/enrolled.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

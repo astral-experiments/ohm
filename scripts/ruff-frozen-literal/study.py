@@ -108,8 +108,8 @@ def calibration():
     save(base/"closed.json",data)
 
 
-def physical(role):
-    actual=p.activate(role); d,=(w.SDK/"lib").glob("librustc_driver-*.so")
+def physical(role,activate=p.activate):
+    actual=activate(role); d,=(w.SDK/"lib").glob("librustc_driver-*.so")
     def inode(path):
         st=path.stat();return [st.st_dev,st.st_ino]
     # Overlayfs can report the overlay device for stat(2) and the backing device for

@@ -71,6 +71,23 @@ def activity(stage):
     return sorted((m[1],m[2])for line in (stage/"stderr").read_text().splitlines()if (m:=re.match(r"^\s*(Checking|Compiling)\s+([^ ]+)",line)))
 
 
+def same_activity(first,second,identity):
+    a,b=activity(first),activity(second)
+    if a==b:return True
+    from collections import Counter
+    need(Counter(k for _,k in a)==Counter(k for _,k in b),"different set of dirtied Cargo packages")
+    differing={k for _,k in (Counter(a)-Counter(b))+(Counter(b)-Counter(a))}
+    ims,_,_=counted(second.with_suffix(".epochs"))
+    for package in differing:
+        emissions=set()
+        for im in ims.values():
+            av=im["argv"]
+            if im["trigger"]=="exec" and [im["dev"],im["ino"]]==identity["rustc_inode"] and "--crate-name"in av and av[av.index("--crate-name")+1]==package.replace("-","_"):
+                emissions.update(x for x in av if x.startswith("--emit="))
+        need({"--emit=dep-info,metadata","--emit=dep-info,metadata,link"}<=emissions,"unexplained different Cargo status verb")
+    return True
+
+
 def metrics(stage,identity,name,argv,required,repo):
     logs=stage.with_suffix(".epochs"); obs=owner(logs,identity,name,repo)
     need(obs==load(stage/"physical.json"),"physical rows differ on independent replay")
@@ -87,7 +104,7 @@ def complete(root):
         need(len(body)==m["bytes"] and all((objects/d["sha256"]).is_file()for d in row["dep_info"]),"missing original metadata or dep-info")
         if not parser:
             z=row["archive"];raw=(objects/z["sha256"]).read_bytes();need(len(raw)==z["bytes"] and body.count(raw)==1,"recorded rustc output does not contain registered entire data")
-            need(any(any(name.encode()in(objects[d["sha256"]]).read_bytes()for name in z["paths"])for d in row["dep_info"]),"input dep-info archive")
+            need(any(any(name.encode()in(objects/d["sha256"]).read_bytes()for name in z["paths"])for d in row["dep_info"]),"input dep-info archive")
             if(z["sha256"],state)not in cache:verify_zip(raw,state);cache[z["sha256"],state]=True
             zips[state].add(z["sha256"])
         return m["sha256"]
@@ -114,7 +131,7 @@ def complete(root):
         need(len(ms)==1,"genuine package not found in Cargo human output");repo=Path(ms[0]).parent.parent
         prices={};delivered={"old":[],"new":[]}
         for name,state,dirty in (("cold","old",1),("old-idle","old",0),("edit","new",1),("new-idle","new",0)):
-            first,second=base/"whole"/name,base/"exec"/name;need(activity(first)==activity(second),"whole vs traced dirty Cargo package roster")
+            first,second=base/"whole"/name,base/"exec"/name;need(same_activity(first,second,ident),"whole vs traced dirty Cargo package roster")
             val=metrics(second,ident,"ty_vendored",REG["target"],dirty,repo); val["whole"]=hw(first);prices[name]=val
             if name=="edit":need(any("ty_vendored" in r["exe"].replace("-","_") and r["instructions"]>0 for r in val["build_scripts"]),"physical trusted generator did not execute on the genuine changed source")
             if not dirty:need(not val["build_scripts"],"unchanged source reran a native build script")
@@ -124,7 +141,7 @@ def complete(root):
         err=[r["message"]for r in failures if r["reason"]=="compiler-message" and r["message"]["level"]=="error"]
         need([r["code"]["code"]for r in err]==["E0308"] and any(s["is_primary"]and s["file_name"].endswith("crates/ty_vendored/src/lib.rs") and any("OHM_FROZEN_LITERAL_INVALID"in v["text"]for v in s["text"])for s in err[0]["spans"]) and [r["success"]for r in failures if r["reason"]=="build-finished"]==[False],"stale or changed failure")
         need(all(len(set(v))==1 for v in delivered.values()) and delivered["new"][0]!=delivered["old"][0],"edited/fresh/repaired full package metadata")
-        one,two=base/"parser-whole",base/"parser-exec";need(activity(one)==activity(two) and physical(one,"new",True)==physical(two,"new",True),"parser source/output or dirtiness")
+        one,two=base/"parser-whole",base/"parser-exec";need(same_activity(one,two,ident) and physical(one,"new",True)==physical(two,"new",True),"parser source/output or dirtiness")
         prices["parser"]=metrics(two,ident,"ruff_python_parser",REG["common_symbol_guard"],1,repo)|dict(whole=hw(one))
         native_data={}
         if i in (1,2):
