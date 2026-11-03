@@ -110,6 +110,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 -IB qa/scripts/ruff-ruf009-derived-enum/case.py "$PHASE" "$BLOCK"
+      - name: Verify the historical macro reader against four original get-size plugin images on both compilers
+        run: python3 -IB qa/scripts/ruff-ruf009-derived-enum/historical_macro_controls.py
       - name: Run both roles with independent physical targets and source transitions
         run: python3 -IB qa/scripts/ruff-ruf009-derived-enum/qualification.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

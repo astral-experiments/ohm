@@ -54,7 +54,7 @@ def pilot_gate(root):
     expected=json.loads((path/'admitted-pilot.json').read_bytes())
     run=expected['run'];head=expected['head']
     live=api(f'actions/runs/{run}')
-    need(live['head_sha']==head and live['head_branch']=='charlie/qa-ruf009-derived-enum-check-20261103' and live['event']=='workflow_dispatch' and live['run_attempt']==1 and live['conclusion']=='success','pilot provenance')
+    need(live['head_sha']==head and live['head_branch']==json.loads((path/'registration.json').read_bytes())['qa_branch'] and live['event']=='workflow_dispatch' and live['run_attempt']==1 and live['conclusion']=='success','pilot provenance')
     with tempfile.TemporaryDirectory(dir=root)as temp:
         files,identity=download(run,f'ruf009-reviewed-{run}',Path(temp))
         need(identity==expected['reader'],'different independently reviewed pilot')

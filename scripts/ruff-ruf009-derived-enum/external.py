@@ -40,14 +40,33 @@ def read_expansion(d):
     c=read(d/'command.json');need(c['exit']==1 and c['source']==digest(PROBE.encode()) and c['argv'][:2]==['rustc','+ohm'] and
         c['argv'][2:9]==['--edition=2024','--crate-type=lib','--crate-name','ordered_attributes','--error-format=json','--extern',c['argv'][-3]] and len(c['argv'])==11 and c['argv'][-3].startswith('get_size_derive2=/') and c['argv'][-1]=='-Zunpretty=expanded','unrecognized expansion contact')
     raw=(d/'stdout').read_bytes();stderr=(d/'stderr').read_bytes()
-    need(b'get_heap_size_with_tracker' in raw and b'total += 2usize;' in raw,'compiler did not expand the valid registered derive')
-    rows=[json.loads(l) for l in stderr.splitlines()]
-    errors=[j for j in rows if j.get('level')=='error' and j.get('spans')]
-    got=[(j['message'],next(s['line_start']for s in j['spans'] if s['is_primary']))for j in errors]
-    choices=['`ignore` conflicts with mutually exclusive `size_fn`','`size` conflicts with mutually exclusive `size_fn`','`ignore` conflicts with mutually exclusive `size`']
-    need(len(got)==4 and got[0][0] in choices and [x[1]for x in got]==[2,4,6,8] and
-         [x[0]for x in got[1:]]==[choices[2],choices[1],choices[0]],'different ordered macro rule or syntax')
-    return {'macro':c['macro'],'expanded':digest(raw),'errors':got,'stderr':digest(stderr)}
+    need(digest(raw)=='858c08e42ca3fc6c4a9d79592fcf4e7be4b068c302807c95a7b4314a28f544bf',
+         'different get-size-derive2 0.5.1 expansion of the registered valid and invalid attributes')
+    rows=[json.loads(line) for line in stderr.splitlines()]
+    need(len(rows)==8 and [r['level'] for r in rows]==['error']*7+['failure-note'],'different diagnostic count')
+    # The locked source declares every pair in both directions. Preserve the actual wording.
+    pairs=[('size','ignore'),('size','size_fn'),('size_fn','ignore')]
+    def messages(a,b):
+        return {f'`{x}` conflicts with mutually exclusive `{y}`' for x,y in ((a,b),(b,a))}
+    choices=set.union(*(messages(*pair) for pair in pairs))
+    errors=[]
+    for i,(line,offset) in enumerate([(1,9),(3,111),(5,200),(7,294),(9,388),(9,388)]):
+        row=rows[i]
+        span,=row['spans']
+        need(span['is_primary'] and span['file_name']==c['argv'][-2] and
+             (span['line_start'],span['line_end'],span['byte_start'],span['byte_end'],span['column_start'],span['column_end'])==(line,line,offset,offset+25,10,35),
+             'wrong original derive span')
+        if i<4:
+            need(row['message']=='proc-macro derive panicked' and row['code'] is None,'different 0.5.1 derive panic')
+            child,=row['children']
+            allowed={f'message: Could not parse attributes.: Error("{msg}")':msg for msg in choices}
+            need(child['level']=='help'and not child['spans']and not child['children']and child['message']in allowed,'missing genuine ordered conflict')
+            errors.append([allowed[child['message']],line])
+        else:
+            expected=["cannot find `get_size2` in the list of imported crates","cannot find module or crate `get_size2` in this scope"][i-4]
+            need(all(errors[i+1][0] in messages(*pair) for i,pair in enumerate(pairs)),'different two-attribute conflict order')
+    need(rows[6]['message']=='aborting due to 6 previous errors'and not rows[6]['spans'] and rows[7]['message']=="For more information about this error, try `rustc --explain E0433`.",'unexpected terminal diagnostics')
+    return {'macro':c['macro'],'expanded':digest(raw),'errors':errors,'stderr':digest(stderr)}
 
 
 def local_owners(rows,workspace):

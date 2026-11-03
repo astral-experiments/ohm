@@ -36,6 +36,9 @@ def semantic(d):return (d['public'],d['stable'],d['global_hash'],d['rows'],d['re
 
 
 def block(base):
+    import historical_macro_controls
+    macro_rows=historical_macro_controls.classify(base)
+    need(macro_rows==read(base/'prior-get-size-0.5.1-controls/verified.json'),'disagreement with separately reopened historical macro precedence')
     worker=read(base/'worker.json')
     need(worker['source']==REG and worker['port']==PORT,'different enrollment')
     need(worker['order']==(REG['pilot_order'] if worker['phase']=='pilot' and worker['block']==0 else REG['confirm_orders'][worker['block']-1]),'wrong order')
@@ -228,7 +231,7 @@ def block(base):
     skipped=sorted(ds(p)-ds(c))
     shape=(p['dirty']==p['physical']==REG['observed_terminal_targets'] and set(map(tuple,c['dirty']))<=set(map(tuple,p['dirty'])) and ds(c)<=ds(p) and ('ruff_linter','lib')in ds(c) and any(tuple(s)!=('ruff_linter','lib') for s in skipped))
     reduction=1-c['cost']['edited']/p['cost']['edited']
-    return dict(worker=worker,roles=role_data,within_role_opaque_lifetime_bijections=list(representation.values()),cross_native=cross,physical_skipped=skipped,eligible_shape=shape,reduction=reduction,pilot_admits=shape and reduction>=REG['gates']['pilot_edited_reduction_min'])
+    return dict(worker=worker,historical_macro_controls=macro_rows,roles=role_data,within_role_opaque_lifetime_bijections=list(representation.values()),cross_native=cross,physical_skipped=skipped,eligible_shape=shape,reduction=reduction,pilot_admits=shape and reduction>=REG['gates']['pilot_edited_reduction_min'])
 
 
 def aggregate(rows):
