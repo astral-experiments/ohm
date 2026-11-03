@@ -1,0 +1,54 @@
+{
+ "bytes": 162671488,
+ "distinct_symbols": 7516,
+ "driver": "lib/librustc_driver-b03bf00bec23bb9a.so",
+ "modifications": 8733,
+ "modified_file_bytes": 102816,
+ "modified_rela_array": {
+  "bytes": 2758896,
+  "start": 3242456
+ },
+ "name_bytes_over_modified_rows": 1187500,
+ "older_experiment": "78d0e829e1058530d84d845879e76118da3824c810d873865f43ab22f70693cf",
+ "only_other_field_changed": "8-byte DT_RELACOUNT",
+ "original": "53aecb7726b1863849a89c4260c169132f98d0d33ba62e0892a06739b6e32e52",
+ "original_reconstructed": true,
+ "positions": {
+  "all_distinct_output_ranges_at_least_eight_bytes": true,
+  "all_relocation_kinds": {
+   "1": 3834,
+   "6": 9972,
+   "7": 318,
+   "8": 100902,
+   "16": 7,
+   "17": 6,
+   "18": 233
+  },
+  "all_selected_addends_in_executable_text_disjoint_from_every_write": true,
+  "all_unique_destinations_all_tables": 115272,
+  "count_field_file_offset": 91538200,
+  "native_dso_has_irelative_or_elf_ifunc_relocands": false,
+  "new_prefix": 109635,
+  "newly_converted": 8733,
+  "old_prefix": 100902
+ },
+ "predicate": "same-driver defined STB_GLOBAL STT_FUNC STV_DEFAULT _R Rust V0; at least one actual rustc_* crate disambiguator; no allocator/runtime hook; only non-PLT 64/GLOB_DAT slots in .got or .data.rel.ro; same CPU code, export, version, RELRO, binding and data. This binds internal references and can change deliberately preloaded overrides.",
+ "prototype": "1e74533c72891d0c2b41ffdde1944ad0d4e8637309fdaa0bd14bfd471cbdbeb2",
+ "rows": "30f9354014de7bde692f31fc3ad5ed4be57093acf88b926e26fef8c30c1bfdd5",
+ "sections_unchanged_except_rela_dyn": false,
+ "signed_lld_fixture": {
+  "original": {
+   "DT_RELACOUNT": null,
+   "prefix": 0,
+   "sha256": "12fea00ee54efb44943a9f7f54387928954b88daf43f8a2b5510519f82f259e6"
+  },
+  "selected": {
+   "DT_RELACOUNT": 1,
+   "prefix": 1,
+   "sha256": "df3114070486216edafaba0113c99f41f760c328516295219095da05b79eaf8b"
+  }
+ },
+ "symbols_unchanged": true,
+ "unchanged_non_relative_order": true,
+ "uncompressed_rows": "c9324c70e4dd483e7ba9dbf7c6bb81e2e18ac2efdb992796c3e5bba26f12c423"
+}
