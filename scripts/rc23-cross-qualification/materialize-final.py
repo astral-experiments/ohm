@@ -13,7 +13,7 @@ evidence = work / "cross-evidence"
 evidence.mkdir(exist_ok=True)
 plan = json.loads((here / "protocol.json").read_bytes())
 assert os.environ["GITHUB_REPOSITORY"] == "astral-experiments/ohm"
-assert os.environ["GITHUB_REF"] == "refs/heads/charlie/codex-rc23-qualify-cached-doctests-v2"
+assert os.environ["GITHUB_REF"] == "refs/heads/charlie/codex-22958-production23-r2"
 assert os.environ["GITHUB_EVENT_NAME"] == "workflow_dispatch"
 
 def git(repo, *args):

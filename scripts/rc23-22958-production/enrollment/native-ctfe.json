@@ -1,0 +1,280 @@
+{
+  "checks": {
+    "A_differs_from_B": true,
+    "B_warm_equals_cold": false,
+    "C_warm_equals_cold": true,
+    "pointer_switch_changes_public_hash": true
+  },
+  "matches_official_regression": false,
+  "rustc_launcher_sha256": "6842898bafad7cf932fea14bd8915a0adff0eecdc03bee91f589ac95a89743dd",
+  "rustc_verbose": "rustc 1.99.0-dev (d57fd1515 2026-11-02) (ohm-1.99.0-23)\nbinary: rustc\ncommit-hash: d57fd1515986dccecdcece8da85e651bfb4b81f9\ncommit-date: 2026-11-02\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0-dev\nLLVM version: 23.1.1\n",
+  "source_blobs": {
+    "lib.rs": "85fe829d8474b6cfce28c0f7c483b6f75ddd85fd",
+    "main.rs": "b77c91d6d0203aba236987a6bc9f9fa85c7715a2",
+    "right.rs": "0f2bb7d7f6da8a0d7221796bfd8ad0bd4a8c7a2c",
+    "rmake.rs": "0567540a4eea5724ead25d17d098dfd3877a7795"
+  },
+  "source_commit": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+  "visits": {
+    "A-cold": {
+      "commands": [
+        {
+          "argv": [
+            "/dev/shm/ohm-signed23-native-gate/verify-xjhqsf17/sdk/bin/rustc",
+            "lib.rs",
+            "--crate-name",
+            "dep",
+            "--crate-type=rlib",
+            "-Cincremental=cache",
+            "-Copt-level=1",
+            "-Zpublic-api-hash",
+            "-Zassert-incr-state=not-loaded"
+          ],
+          "err": "",
+          "exit": 0,
+          "out": ""
+        },
+        {
+          "argv": [
+            "/dev/shm/ohm-signed23-native-gate/verify-xjhqsf17/sdk/bin/rustc",
+            "main.rs",
+            "--extern",
+            "dep=libdep.rlib"
+          ],
+          "err": "",
+          "exit": 0,
+          "out": ""
+        },
+        {
+          "argv": [
+            "/dev/shm/ohm-signed23-native-gate/verify-xjhqsf17/ohm-ctfe-mnvaslh9/main"
+          ],
+          "err": "",
+          "exit": 0,
+          "out": "Or Or true 17\n"
+        },
+        {
+          "argv": [
+            "/dev/shm/ohm-signed23-native-gate/verify-xjhqsf17/sdk/bin/rustc",
+            "-Zls=public_hash",
+            "libdep.rlib"
+          ],
+          "err": "",
+          "exit": 0,
+          "out": "Public hash: 1e8fe44af95c768f00794a2bf24097f7\n\n"
+        }
+      ],
+      "linked_binary_sha256": "046b10307a5fd4f60af586ff224995931f09f3e7d718f8e86c4658abe7c06ab1",
+      "public_hash": "Public hash: 1e8fe44af95c768f00794a2bf24097f7\n\n",
+      "rlib_sha256": "44a984c5673b127846d4e6d53de6104a83efefb074a3d23a89aeb01b7c70672b"
+    },
+    "B-first-warm": {
+      "commands": [
+        {
+          "argv": [
+            "/dev/shm/ohm-signed23-native-gate/verify-xjhqsf17/sdk/bin/rustc",
+            "lib.rs",
+            "--crate-name",
+            "dep",
+            "--crate-type=rlib",
+            "-Cincremental=cache",
+            "-Copt-level=1",
+            "-Zpublic-api-hash",
+            "-Zassert-incr-state=loaded"
+          ],
+          "err": "",
+          "exit": 0,
+          "out": ""
+        },
+        {
+          "argv": [
+            "/dev/shm/ohm-signed23-native-gate/verify-xjhqsf17/sdk/bin/rustc",
+            "main.rs",
+            "--extern",
+            "dep=libdep.rlib"
+          ],
+          "err": "",
+          "exit": 0,
+          "out": ""
+        },
+        {
+          "argv": [
+            "/dev/shm/ohm-signed23-native-gate/verify-xjhqsf17/ohm-ctfe-mnvaslh9/main"
+          ],
+          "err": "",
+          "exit": 0,
+          "out": "LShift Or true 17\n"
+        },
+        {
+          "argv": [
+            "/dev/shm/ohm-signed23-native-gate/verify-xjhqsf17/sdk/bin/rustc",
+            "-Zls=public_hash",
+            "libdep.rlib"
+          ],
+          "err": "",
+          "exit": 0,
+          "out": "Public hash: 621436a87b64d794c9c10c9133a31f2c\n\n"
+        }
+      ],
+      "linked_binary_sha256": "b3aed6fe2c422af8f51736485a8b2b2c0b89c222fa1198cbce4ecc9eb429eb13",
+      "public_hash": "Public hash: 621436a87b64d794c9c10c9133a31f2c\n\n",
+      "rlib_sha256": "f6fb2562e6573ddf850e8ebf4410f9e339d836c5952196d067d4296b66f8a572"
+    },
+    "B-independent-cold": {
+      "commands": [
+        {
+          "argv": [
+            "/dev/shm/ohm-signed23-native-gate/verify-xjhqsf17/sdk/bin/rustc",
+            "lib.rs",
+            "--crate-name",
+            "dep",
+            "--crate-type=rlib",
+            "-Cincremental=cache",
+            "-Copt-level=1",
+            "-Zpublic-api-hash",
+            "-Zassert-incr-state=not-loaded"
+          ],
+          "err": "",
+          "exit": 0,
+          "out": ""
+        },
+        {
+          "argv": [
+            "/dev/shm/ohm-signed23-native-gate/verify-xjhqsf17/sdk/bin/rustc",
+            "main.rs",
+            "--extern",
+            "dep=libdep.rlib"
+          ],
+          "err": "",
+          "exit": 0,
+          "out": ""
+        },
+        {
+          "argv": [
+            "/dev/shm/ohm-signed23-native-gate/verify-xjhqsf17/ohm-ctfe-mnvaslh9/main"
+          ],
+          "err": "",
+          "exit": 0,
+          "out": "LShift Or true 17\n"
+        },
+        {
+          "argv": [
+            "/dev/shm/ohm-signed23-native-gate/verify-xjhqsf17/sdk/bin/rustc",
+            "-Zls=public_hash",
+            "libdep.rlib"
+          ],
+          "err": "",
+          "exit": 0,
+          "out": "Public hash: ab70a86d9277ec2a7c9442921a8e84f0\n\n"
+        }
+      ],
+      "linked_binary_sha256": "b3aed6fe2c422af8f51736485a8b2b2c0b89c222fa1198cbce4ecc9eb429eb13",
+      "public_hash": "Public hash: ab70a86d9277ec2a7c9442921a8e84f0\n\n",
+      "rlib_sha256": "8cce128be6e1977e6fe350e41cb3e391f20f782270bde351833f7602b5b6824a"
+    },
+    "C-first-warm": {
+      "commands": [
+        {
+          "argv": [
+            "/dev/shm/ohm-signed23-native-gate/verify-xjhqsf17/sdk/bin/rustc",
+            "lib.rs",
+            "--crate-name",
+            "dep",
+            "--crate-type=rlib",
+            "-Cincremental=cache",
+            "-Copt-level=1",
+            "-Zpublic-api-hash",
+            "-Zassert-incr-state=loaded"
+          ],
+          "err": "",
+          "exit": 0,
+          "out": ""
+        },
+        {
+          "argv": [
+            "/dev/shm/ohm-signed23-native-gate/verify-xjhqsf17/sdk/bin/rustc",
+            "main.rs",
+            "--extern",
+            "dep=libdep.rlib"
+          ],
+          "err": "",
+          "exit": 0,
+          "out": ""
+        },
+        {
+          "argv": [
+            "/dev/shm/ohm-signed23-native-gate/verify-xjhqsf17/ohm-ctfe-mnvaslh9/main"
+          ],
+          "err": "",
+          "exit": 0,
+          "out": "LShift Or false 17\n"
+        },
+        {
+          "argv": [
+            "/dev/shm/ohm-signed23-native-gate/verify-xjhqsf17/sdk/bin/rustc",
+            "-Zls=public_hash",
+            "libdep.rlib"
+          ],
+          "err": "",
+          "exit": 0,
+          "out": "Public hash: 95a945a24e8c7f7d8288a51632f12735\n\n"
+        }
+      ],
+      "linked_binary_sha256": "ce6e210101e5391bf3bd2fa26376310188e156951bd3b6dcc896eed92e379955",
+      "public_hash": "Public hash: 95a945a24e8c7f7d8288a51632f12735\n\n",
+      "rlib_sha256": "c415368e489056792e69d8b187e55e4c0763dd1a0c05dce8f19b817faca80a5a"
+    },
+    "C-independent-cold": {
+      "commands": [
+        {
+          "argv": [
+            "/dev/shm/ohm-signed23-native-gate/verify-xjhqsf17/sdk/bin/rustc",
+            "lib.rs",
+            "--crate-name",
+            "dep",
+            "--crate-type=rlib",
+            "-Cincremental=cache",
+            "-Copt-level=1",
+            "-Zpublic-api-hash",
+            "-Zassert-incr-state=not-loaded"
+          ],
+          "err": "",
+          "exit": 0,
+          "out": ""
+        },
+        {
+          "argv": [
+            "/dev/shm/ohm-signed23-native-gate/verify-xjhqsf17/sdk/bin/rustc",
+            "main.rs",
+            "--extern",
+            "dep=libdep.rlib"
+          ],
+          "err": "",
+          "exit": 0,
+          "out": ""
+        },
+        {
+          "argv": [
+            "/dev/shm/ohm-signed23-native-gate/verify-xjhqsf17/ohm-ctfe-mnvaslh9/main"
+          ],
+          "err": "",
+          "exit": 0,
+          "out": "LShift Or false 17\n"
+        },
+        {
+          "argv": [
+            "/dev/shm/ohm-signed23-native-gate/verify-xjhqsf17/sdk/bin/rustc",
+            "-Zls=public_hash",
+            "libdep.rlib"
+          ],
+          "err": "",
+          "exit": 0,
+          "out": "Public hash: 95a945a24e8c7f7d8288a51632f12735\n\n"
+        }
+      ],
+      "linked_binary_sha256": "ce6e210101e5391bf3bd2fa26376310188e156951bd3b6dcc896eed92e379955",
+      "public_hash": "Public hash: 95a945a24e8c7f7d8288a51632f12735\n\n",
+      "rlib_sha256": "c7d44cd31733e79db32d1663a5b8e82a3635b3d9364fb346eab16588ae23bd48"
+    }
+  }
+}
