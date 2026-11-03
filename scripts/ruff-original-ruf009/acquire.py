@@ -7,6 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "ruff-ruf009-der
 import case
 case.w.BRANCH = "charlie/qa-ruf009-historical-check-20261103"
 case.ROOT.mkdir()
+case.BASE.mkdir()
 case.w.checked_head()
 config = json.loads((case.HERE / "factory.json").read_text())
 kit = case.old.scope_matched.kit("ruf009", config)
