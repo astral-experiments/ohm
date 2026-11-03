@@ -26,7 +26,7 @@ def kit(label, binding):
     code=w.WS/('scope-'+label)/'scripts/ruff-matched-stage'; receipt=w.ROOT/('scope-kit-'+label); receipt.mkdir()
     sha=binding['head']; run=binding['run']; run_info=api(f'actions/runs/{run}')
     w.need(w.git(code, 'rev-parse','HEAD')==sha and w.git(code,'status','--porcelain','--untracked-files=all')=='','wrong builder checkout')
-    w.need((run_info['head_sha'],run_info['head_repository']['full_name'],run_info['head_branch'],run_info['event'],run_info['run_attempt'],run_info['conclusion'])==(sha,w.REPO,'charlie/qa-rdr-visibility-scope-20261103','workflow_dispatch',1,'success'),'unregistered factory')
+    w.need((run_info['head_sha'],run_info['head_repository']['full_name'],run_info['head_branch'],run_info['event'],run_info['run_attempt'],run_info['conclusion'])==(sha,w.REPO,binding.get('branch','charlie/qa-rdr-visibility-scope-20261103'),'workflow_dispatch',1,'success'),'unregistered factory')
     assets={v['name']:v for v in api(f'actions/runs/{run}/artifacts')['artifacts']}; blobs={}
     for key in ('receipts','kit'):
         name,num,size,digest=binding[key]; live=assets[name]

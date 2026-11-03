@@ -1,0 +1,125 @@
+{
+  "allocation_uniform_rank_of_70": 55,
+  "base": "3f5e494bd24671d346d3ebbae49c0be275d77e26",
+  "buggy_patch": "e15d2b69497628458fe0f85b797b4c207899caedc6ab818a49c0bad79463e496",
+  "cargo_check": [
+    "cargo",
+    "+ohm",
+    "check",
+    "-p",
+    "ruff",
+    "--bin",
+    "ruff",
+    "--locked",
+    "--offline",
+    "-j4",
+    "--message-format=json"
+  ],
+  "confirm_orders": [
+    "CP",
+    "CP",
+    "PC",
+    "PC",
+    "PC",
+    "PC",
+    "CP",
+    "CP"
+  ],
+  "counter_sha256": "096b9e9efb7457ff4c2fd194985f18c4e05520fce46c85e5919b084ae3d823ce",
+  "edition": "2024",
+  "factory_binding": "factory.json (must be source bound and separately enrolled before dispatch)",
+  "factory_branch": "charlie/qa-matched-check-derive-rc23-20261103",
+  "gates": {
+    "confirmation_all_improve": true,
+    "confirmation_edited_median_reduction_min": 0.1,
+    "pilot_edited_reduction_min": 0.1,
+    "real_consumer_skips": 1
+  },
+  "lock": {
+    "git": {},
+    "registry_archives": 505,
+    "sha256": "31a82b40c2870014aa6ae8f187a59c36137029c5bea2846a36b9b0135c449fed"
+  },
+  "matched_signed_cargo": {
+    "asset": {
+      "id": 704038224,
+      "name": "ohm-1.99.0-23-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "fc85a2ca6d47711058cd89c790c8e57f1799472e38f0ee0a08b0a51d06c1ee7b",
+      "size": 359921838
+    },
+    "members": {
+      "bin/cargo": [
+        "rust-1.99.0-dev-x86_64-unknown-linux-gnu/cargo/bin/cargo",
+        493,
+        39238824,
+        "f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee"
+      ],
+      "lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd": [
+        "rust-1.99.0-dev-x86_64-unknown-linux-gnu/rustc/lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd",
+        493,
+        10319072,
+        "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
+      ]
+    },
+    "revision": "7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed",
+    "tag": "ohm-1.99.0-23"
+  },
+  "matched_sources": {
+    "C": {
+      "compiler": "00242f37d22326f470500b2b531d0eeb704ec542",
+      "revision": "16a25d901318369d5ff788dd5c6ac0656d6e0bd6",
+      "tree": "f1517182df5dfbb4425689d27bd6168eea6ebe1b"
+    },
+    "P": {
+      "compiler": "01614e1dbcdedca33c620ad320c07b30207e256e",
+      "revision": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+      "tree": "f5bf03d73f71243fb88e34ecb0b155ef11e99a47"
+    }
+  },
+  "observed_targets": [
+    "ruff_linter",
+    "ruff_graph",
+    "ruff_workspace",
+    "ruff_markdown",
+    "ruff_server",
+    "ruff"
+  ],
+  "observed_terminal_targets": [
+    [
+      "ruff",
+      "bin"
+    ],
+    [
+      "ruff",
+      "lib"
+    ],
+    [
+      "ruff_graph",
+      "lib"
+    ],
+    [
+      "ruff_linter",
+      "lib"
+    ],
+    [
+      "ruff_markdown",
+      "lib"
+    ],
+    [
+      "ruff_server",
+      "lib"
+    ],
+    [
+      "ruff_workspace",
+      "lib"
+    ]
+  ],
+  "path": "crates/ruff_linter/src/rules/ruff/helpers.rs",
+  "pilot_order": "PC",
+  "port_sha256": "ac613880a016abee097e7b1fc81169265ab1489c3be715dd924ad24b653d5324",
+  "qa_branch": "charlie/qa-ruf009-derived-enum-check-20261103",
+  "qa_parent": "f5762487f0c452dee89899943dbe7bf4a2eec740",
+  "rust_parent": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+  "tree": "41a6b33b7b2f61f9a718106cc0679633c3deea74",
+  "unit_count": 374
+}
