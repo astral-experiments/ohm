@@ -111,8 +111,10 @@ def attest(out, tmp):
             actual.add(v["id"])
     require(actual == {v["run"] for v in prior}, "missing actual earlier allocation, including repeats")
     hist = read(HERE / "known-boots.json")
-    boots = set(hist)
-    runner_ids = {v["runner_id"] for v in hist.values() if v.get("runner_id")}
+    retired = read(HERE / "retired-placements.json")
+    historical_boots = set(hist) | {r["boot"] for r in retired if r["boot"]}
+    boots = set(historical_boots)
+    runner_ids = {v["runner_id"] for v in hist.values() if v.get("runner_id")} | {r["runner_id"] for r in retired}
     added = []
     for item in sorted(prior, key=lambda x: PRIMARY.index(x["label"])):
         r, j = service(item["run"], head)
@@ -152,7 +154,8 @@ def attest(out, tmp):
             and p["runner_id"] == j["runner_id"]
             and p["boot"] not in boots
             and valid_uuid(p["boot"])
-            and set(hist) <= set(p["excluded"])
+            and historical_boots <= set(p["excluded"])
+            and p["retired_placements"] == sha(HERE / "retired-placements.json")
             and all(len(p[k]) == 64 for k in ("inherited", "threads", "blocking")),
             "unverified earlier calibration",
         )
@@ -165,6 +168,7 @@ def attest(out, tmp):
         valid_uuid(boot)
         and boot not in boots
         and j["runner_id"] not in runner_ids
+        and j["runner_name"] not in {r["runner_name"] for r in retired}
         and j["runner_name"] == e["RUNNER_NAME"],
         "fresh calibrated VM assignment",
     )
@@ -181,6 +185,7 @@ def attest(out, tmp):
         "excluded": sorted(boots),
         "prior_early": added,
         "historical": sha(HERE / "known-boots.json"),
+        "retired_placements": sha(HERE / "retired-placements.json"),
         "same_head_earlier_runs": sorted(actual),
         "service_skipped_no_runner": sorted(skipped),
     }

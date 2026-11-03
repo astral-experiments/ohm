@@ -4,6 +4,7 @@ from pathlib import Path
 import gzip, hashlib, os, runpy, shutil, struct, subprocess, sys, tarfile, tempfile
 from common import ENV, HERE, P, ROOT, RUSTC, S, SCRIPTS, blob, git, read, require, save, sha
 import dispatch_wire as wire
+import private_wire
 
 SPEC = read(HERE / "physical-oracles.json")
 
@@ -175,7 +176,7 @@ def compare_owners(a, b, c, role):
             )
 
 
-def compare_native(left, right, store, decoder, r, headers):
+def compare_native(left, right, store, decoder, r, headers, role):
     require(
         left["sidecars"] == right["sidecars"] and left["rmeta"].keys() == right["rmeta"].keys(),
         "incompatible native product set or public hash",
@@ -217,19 +218,25 @@ def compare_native(left, right, store, decoder, r, headers):
             header.append(hashlib.sha256(raw.stdout).hexdigest())
         require(header[0] == header[1], "native crate header")
         supplemental = None
-        if not v["exact_complete_bytes"]:
-            if v["physical_moved"]:
-                require(
-                    name in SPEC["known_differing"]
-                    and set(v["physical_moved"]) <= set(SPEC["known_differing"][name]),
-                    "unregistered private layout: " + name,
-                )
-            else:
+        moved = set(v["physical_moved"])
+        registered = bool(moved) and moved <= set(SPEC["known_differing"].get(name, ()))
+        if not v["exact_complete_bytes"] and not registered:
+            if not moved:
                 require(name == "uv_dispatch", "unexplained wire changed: " + name)
+            if not moved and role == "F":
                 supplemental = [wire.convert(imgs[0], imgs[1]), wire.convert(imgs[1], imgs[0])]
                 require(
                     supplemental[0]["reconstructed"] == b[1] and supplemental[1]["reconstructed"] == a[1],
                     "incomplete wire proof",
+                )
+            else:
+                tables = decoder["L"]["M"]
+                supplemental = private_wire.both(*imgs, decoder["Z"]["ROOT"], tables["di"], tables["keys"])
+                require(
+                    supplemental["crate"] == name
+                    and supplemental["raw"] == [{"bytes": size, "sha256": digest} for size, digest in (a, b)]
+                    and [row["reconstructed_sha256"] for row in supplemental["both_directions"]] == [b[1], a[1]],
+                    "incomplete bidirectional native metadata proof: " + name,
                 )
         out[pair] = {"crate": name, "typed": v, "native_header": header[0], "exact_wire": supplemental}
     return {"all_public": len(left["sidecars"]), "all_metadata": len(left["rmeta"]), "nonliteral": out}

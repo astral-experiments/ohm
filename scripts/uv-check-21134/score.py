@@ -78,6 +78,31 @@ def validate_scoped(tree, result, forms, compiler_id):
     return bound
 
 
+def check_native(proof, warm, cold, role):
+    require(warm["sidecars"] == cold["sidecars"] and warm["rmeta"].keys() == cold["rmeta"].keys(), "native product set")
+    require(proof["all_public"] == len(warm["sidecars"]) and proof["all_metadata"] == len(warm["rmeta"]), "native path counts")
+    pairs = {
+        a[1] + "." + cold["rmeta"][path][1]: (a, cold["rmeta"][path])
+        for path, a in warm["rmeta"].items() if a != cold["rmeta"][path]
+    }
+    require(pairs.keys() == proof["nonliteral"].keys(), "skipped nonliteral native product")
+    known = read(HERE / "physical-oracles.json")["known_differing"]
+    for pair, (a, b) in pairs.items():
+        row = proof["nonliteral"][pair]
+        typed = row["typed"]
+        require(len(typed["checks"]) == 9 and all(typed["checks"].values()) and len(row["native_header"]) == 64, "native typed or header refusal")
+        moved = set(typed["physical_moved"])
+        if typed["exact_complete_bytes"] or moved and moved <= set(known.get(row["crate"], ())):
+            continue
+        wire = row["exact_wire"]
+        if not moved and role == "F" and row["crate"] == "uv_dispatch":
+            require([leg["reconstructed"] for leg in wire] == [b[1], a[1]], "original dispatch proof")
+        else:
+            require(wire["crate"] == row["crate"] and (moved or row["crate"] == "uv_dispatch"), "unexpected reconstruction class")
+            require(wire["raw"] == [{"bytes": size, "sha256": digest} for size, digest in (a, b)], "native source images")
+            require([leg["reconstructed_sha256"] for leg in wire["both_directions"]] == [b[1], a[1]], "incomplete native reconstruction")
+
+
 def replay(src):
     f = Files(src)
     boot = f.get("boot-attestation.json")
@@ -91,6 +116,11 @@ def replay(src):
         and boot["boot"] not in boot["excluded"],
         "wrong series or host",
     )
+    retired = read(HERE / "retired-placements.json")
+    require(boot["retired_placements"] == sha(HERE / "retired-placements.json")
+            and boot["runner_id"] not in {r["runner_id"] for r in retired}
+            and boot["runner_name"] not in {r["runner_name"] for r in retired}
+            and {r["boot"] for r in retired if r["boot"]} <= set(boot["excluded"]), "retired host or changed receipt")
     require(control == "F" and role == "marginal", "the signed R arm failed native admission on this edit")
     require(
         boot["protocol"] == sha(HERE / "protocol.json") and idx["orders"] == P["orders"][mode],
@@ -122,6 +152,7 @@ def replay(src):
             and len(o["owners"]) == 3,
             "opening/native outcome",
         )
+        check_native(o["typed"], f.get(where + "first-B/products.json"), f.get(where + "fresh-B/products.json"), label)
         ref[label] = f.get(where + "first-B/observed.json")["forms"]
     from cold import validate as cold_validate
 
@@ -153,6 +184,7 @@ def replay(src):
                 and a["complete_separate_visits"],
                 "native warm/fresh gate",
             )
+            check_native(a["full_typed"], f.get(d + "first-B/products.json"), f.get(d + "independent-cold-B/products.json"), label)
             require(
                 fi["forms"] == ref[label] and set(fi["forms"]) == set(S["observed_F_dirty_libs"]),
                 "actual first-edit scopes",

@@ -1,7 +1,7 @@
 """Read the original signed release from Releases and original G/F production ZIPs from Actions."""
 
 from pathlib import Path
-import hashlib, json, os, shutil, subprocess, sys, zipfile
+import hashlib, json, os, re, shutil, subprocess, sys, zipfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import *
@@ -28,6 +28,14 @@ def gh(*args):
     return subprocess.run(["gh", *args], check=True, stdout=subprocess.PIPE).stdout
 
 
+def download_args(endpoint):
+    prefix = f"repos/{REPO}/"
+    if re.fullmatch(prefix + r"actions/artifacts/[1-9][0-9]*/zip", endpoint):
+        return ["api", endpoint]
+    require(re.fullmatch(prefix + r"releases/assets/[1-9][0-9]*", endpoint), "unknown binary API route")
+    return ["api", "-H", "Accept: application/octet-stream", endpoint]
+
+
 class Transport:
     @staticmethod
     def gh_json(*args):
@@ -38,9 +46,7 @@ class Transport:
         require(os.environ.get("GITHUB_ACTIONS") == "true", "hosted binary transport only")
         require(not target.exists(), "immutable raw service file")
         with target.open("xb") as out:
-            subprocess.run(
-                ["gh", "api", "-H", "Accept: application/octet-stream", endpoint], stdout=out, check=True
-            )
+            subprocess.run(["gh", *download_args(endpoint)], stdout=out, check=True)
         require(blob(target) == [size, sha256], "wrong Actions ZIP or release asset")
 
 

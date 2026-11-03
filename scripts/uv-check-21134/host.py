@@ -120,6 +120,12 @@ def main(mode):
     if mode == "start":
         require(not out.exists(), "required-empty result site")
         out.mkdir()
+        save(out / "attempt.json", {
+            "head": head,
+            "run": int(os.environ["GITHUB_RUN_ID"]),
+            "runner_name": os.environ["RUNNER_NAME"],
+            "boot": Path("/proc/sys/kernel/random/boot_id").read_text().strip(),
+        })
         placement.attest(out, tmp)
         release(out, "before")
         return

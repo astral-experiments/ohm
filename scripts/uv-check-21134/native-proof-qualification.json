@@ -1,0 +1,130 @@
+{
+  "G_lock": "93ccf2a0ece38faa3ef8be91a112d7834af58211b01b4f736085261b5a8effa9",
+  "frozen_source": "5fec633959ab2ad1f0c4e8fdbcb68356853d6b3dcb428dad5b6abc6458801cb3",
+  "known_F_G_wire": "Keep the original nine typed/CTFE checks, native rustc header equality and previously registered named private DefIndex families. Otherwise reconstruct both complete physical images. A new metadata difference that cannot be reconstructed refuses the visit. The F-only map reader remains live on the original F class.",
+  "old_worker": "5fbeea6b0e9908ba95e9915bdd1a593ab9c34156",
+  "retained_controls": {
+    "composition-controls.json": "1f9bd702e9ad303b618b2049ec57cc68869a2afe35826ee0fc4bd8eae93b5d8c",
+    "confirmed.json": "0c9115568c149d70e41f913c809e5a7d0a12a19fb80ffccc90524a8f8fe9cab1",
+    "native-SF-full.json": "94abf4ffeb0bbda4000d74310bef28db274acb6e44069edfdf1849430678b704",
+    "native-extension-controls.json": "143bf68b3f9442a628fcb79ad7759d517088e37e797797bbf53e9a4ad646c464",
+    "prior-controls.json": "05c348d6cde0869e90958e789c0c603f6f1e0335e3e2d6616c6f12d21e6cf38b"
+  },
+  "runtime": {
+    "coroutine_rows.py": "adefa686283ecd95307490904afb4bc545ea784cd30f5279831b7624c5788ca1",
+    "dispatch_map.py": "90a7849b903bd632e69df0f95d0a4c624237c18d78549e4058131bff09b6c067",
+    "metadata_refs.py": "28adf941a7b7cf6deb9ca356b47102eff1a6b7cc47206c0976cd1895a9881313",
+    "odht_wire.py": "180c90e5c71ec463e282baa1984bac0061156e1eee63609fbf3b10c13e23fb09",
+    "private_wire.py": "4a3ed1b1ffbe7f3eef3f2a98afc0f2e347cbfb3fbcd674e71628b037b141ab5a",
+    "proof.py": "743af9ce3c79afc5f5ffa338324a8dabb698a923f1526ec2659add3fa491899c"
+  },
+  "score_review": "All five actual worker outputs passed the score reader. Each rejected a missing pair, a missing sidecar roster and substitution of a reconstructed SHA-256.",
+  "scored": false,
+  "v3_openings": {
+    "F-run-03": {
+      "distinct_pairs": 14,
+      "metadata": 657,
+      "public": 525,
+      "worker": "0090e2d2cd203d491349f76c3446c069e6cadf4a66cb3f5e0fd830146aa52407"
+    },
+    "F-run-04": {
+      "distinct_pairs": 11,
+      "metadata": 657,
+      "public": 525,
+      "worker": "3b44a5cf4c25df9372a826237efd6c80c36effe558436b256b924ebb6e676bbf"
+    },
+    "G1-known-01": {
+      "classification": [
+        [
+          "old refused",
+          "new two-way exact",
+          5
+        ],
+        [
+          "old exact wire",
+          "new two-way exact",
+          3
+        ],
+        [
+          "old registered typed class",
+          "new two-way exact",
+          3
+        ],
+        [
+          "old registered typed class",
+          "new refused",
+          2
+        ]
+      ],
+      "differing_paths": 35,
+      "distinct_pairs": 13,
+      "matching_public": 525,
+      "method": "5fec633959ab2ad1f0c4e8fdbcb68356853d6b3dcb428dad5b6abc6458801cb3",
+      "qualification": "f5123b6cda2a93284058960a7a2a143465d3bbff0d32ef051d52b6b1b1d3497a",
+      "total_metadata": 657,
+      "worker": "0bad1a59f04788b41a6c074e7650fcca0e941b7fc3abfdbe061f0ea53b835a29"
+    },
+    "G2-known-01": {
+      "classification": [
+        [
+          "old registered typed class",
+          "new two-way exact",
+          4
+        ],
+        [
+          "old registered typed class",
+          "new refused",
+          3
+        ],
+        [
+          "old refused",
+          "new two-way exact",
+          6
+        ],
+        [
+          "old exact wire",
+          "new two-way exact",
+          1
+        ]
+      ],
+      "differing_paths": 40,
+      "distinct_pairs": 14,
+      "matching_public": 525,
+      "method": "5fec633959ab2ad1f0c4e8fdbcb68356853d6b3dcb428dad5b6abc6458801cb3",
+      "qualification": "efeac78c21f1c2f6d031e3bafe37ee2dfe7a6d3a45991cb0008508ef66981af9",
+      "total_metadata": 657,
+      "worker": "f334d3ba99e502e1c134e649e63c324b9cac4134fb720dc91cae9b10c0f50008"
+    },
+    "G3-virgin-01": {
+      "classification": [
+        [
+          "old refused",
+          "new two-way exact",
+          8
+        ],
+        [
+          "old registered typed class",
+          "new refused",
+          3
+        ],
+        [
+          "old registered typed class",
+          "new two-way exact",
+          4
+        ],
+        [
+          "old exact wire",
+          "new two-way exact",
+          1
+        ]
+      ],
+      "differing_paths": 46,
+      "distinct_pairs": 16,
+      "matching_public": 525,
+      "method": "5fec633959ab2ad1f0c4e8fdbcb68356853d6b3dcb428dad5b6abc6458801cb3",
+      "qualification": "80de2695ba6acae6285d5528fb94c797b54a79d19d3282d056a659aef6fadde7",
+      "total_metadata": 657,
+      "worker": "d85e77a19890044678dec789acd7174db3d5e85d0f7d1c392c621e9e388297d5"
+    }
+  }
+}
