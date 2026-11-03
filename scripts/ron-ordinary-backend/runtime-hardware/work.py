@@ -47,7 +47,8 @@ def reference(env,graph,label, *, strict):
                         fields=line.split(None,5)
                         if len(fields)!=6 or 'x'not in fields[1] or not fields[5].startswith('/'):continue
                         path=Path(fields[5]);st=path.stat()
-                        assert st.st_ino==int(fields[4])
+                        if st.st_ino!=int(fields[4]):
+                            errors.append([str(path),int(fields[4]),st.st_ino]);return
                         actual_dev=[int(v,16)for v in fields[3].split(':')]
                         named_dev=[os.major(st.st_dev),os.minor(st.st_dev)]
                         devices[str(path)]={'mapped':actual_dev,'named':named_dev,'inode':st.st_ino}
@@ -207,7 +208,12 @@ def in_namespace():
                                  mountinfo=Path('/proc/self/mountinfo').read_text()))
     env=ctx['cargo'];graph=json.loads(gzip.decompress((P/'cargo-graph.json.gz').read_bytes()));snap=ctx['archive'];good=ctx['oracle']
     cap,calibrated,base=reference(env,graph,'private-ordinary-census',strict=True)
-    assert {r[0]for r in calibrated}=={r['name'] for r in rows[:13]}
+    selected=set()
+    for actual in calibrated:
+        declared,=[r for r in rows[:13] if os.path.samefile(actual[0],r['name'])]
+        assert actual[2]==declared['ino'] and actual[8]==declared['sha256']
+        selected.add(declared['name'])
+    assert selected=={r['name'] for r in rows[:13]}
     previous=P/'untouched-real-census/ron-visit'
     assert (cap/'cargo-argv.nul').read_bytes()==(previous/'cargo-argv.nul').read_bytes()
     role=prepare.cargo_role(cap,w.sdk);argv=role['argv']
