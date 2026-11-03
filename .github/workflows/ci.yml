@@ -6,7 +6,7 @@ on:
       lane:
         type: choice
         default: ordinary
-        options: [ordinary, runtime-hardware]
+        options: [ordinary, runtime-hardware, topology]
       reviewed_head:
         required: true
         description: Exact reviewed nonrelease QA commit
@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        block: [PC, CP]
+        block: ${{ fromJSON(inputs.lane == 'topology' && '["PC"]' || '["PC","CP"]') }}
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 180
     steps:
@@ -59,7 +59,9 @@ jobs:
           RON_BLOCK: ${{ matrix.block }}
           OHM_SDK_READ_TOKEN: ${{ github.token }}
         run: |
-          if [ '${{ inputs.lane }}' = runtime-hardware ]; then
+          if [ '${{ inputs.lane }}' = topology ]; then
+            python3 -IB qa/scripts/ron-ordinary-backend/runtime-hardware/topology.py
+          elif [ '${{ inputs.lane }}' = runtime-hardware ]; then
             python3 -IB qa/scripts/ron-ordinary-backend/runtime-hardware/work.py
           else
             python3 -IB qa/scripts/ron-ordinary-backend/ordinary.py
