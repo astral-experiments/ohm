@@ -24,8 +24,9 @@ rust_version="$(jq -er '.release.upstream_rust_version' "$manifest")"
 expected_cargo_repository="$(jq -er '.sources.cargo.repository' "$manifest")"
 
 for checkout in "$rust_checkout" "$cargo_checkout" "$clippy_checkout" "$rustfmt_checkout"; do
-  if ! git -C "$checkout" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    echo "not a Git checkout: $checkout" >&2
+  if ! git -C "$checkout" rev-parse --show-toplevel >/dev/null 2>&1 ||
+    [[ -n "$(git -C "$checkout" rev-parse --show-prefix)" ]]; then
+    echo "not the root of a Git worktree: $checkout" >&2
     exit 1
   fi
 
