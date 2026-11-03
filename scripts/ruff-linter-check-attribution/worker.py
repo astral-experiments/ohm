@@ -28,7 +28,7 @@ FILES = ['crates/ruff_annotate_snippets/src/renderer/render.rs', SOURCE]
 SOURCE_HASH = {OLD:'cef48ab7234b39d4c15ad512de6496ce65e45b981fe85a4fbbb3737c73e6568f', NEW:'272e25a6d121c3c57112e53e6ad9de3abc7ff88658008dbf4a9299b3399a7943'}
 LOCK = '26d7be8317b0e44be0d60b31f6660dd4e07ed4c19be4e6748124d07068fd7fa7'
 RUST = '008a21ac0d750dc9a1c18b7959d7e7984c03d887'
-BRANCH = 'charlie/qa-ruff-visibility-heldout-20261103'
+BRANCH = 'charlie/qa-ruff-27470-crate-instructions-20261103'
 DONOR = 'bd7b58765ae44b21a1c9273b3ff0be8e923adc47'
 REPO = 'astral-experiments/ohm'
 CMD = ['cargo','+ohm','check','-p','ty_server','--lib','--locked','--offline','--message-format=json']
