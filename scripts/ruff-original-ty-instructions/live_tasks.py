@@ -1,6 +1,7 @@
 """Count a conservative subset of instructions in a selected compiler process."""
 import ctypes
 import errno
+import json
 import os
 from pathlib import Path
 import struct
@@ -41,15 +42,6 @@ def matching_driver(process, driver):
                 return True
     return False
 
-def children(task):
-    pids = set()
-    for thread in (task / 'task').iterdir():
-        try:
-            pids.update(map(int, (thread / 'children').read_text().split()))
-        except (FileNotFoundError, ProcessLookupError):
-            pass
-    return pids
-
 def observe(command, *, library, sdk, dst, cwd, env, stdout, stderr):
     cargo = sdk / 'bin/cargo'
     rustc = sdk / 'bin/rustc'
@@ -57,30 +49,40 @@ def observe(command, *, library, sdk, dst, cwd, env, stdout, stderr):
     driver = driver.stat()
     fds = {}
     programs = {}
+    images = {}
+    attempts = 0
     procfs = Path('/proc')
-    with subprocess.Popen(command, cwd=cwd, env=env, stdout=stdout, stderr=stderr) as proc:
+    with subprocess.Popen(command, cwd=cwd, env=env, stdout=stdout, stderr=stderr, start_new_session=True) as proc:
         try:
             while proc.poll() is None:
-                candidates = set(programs)
-                try:
-                    for cargo_pid in children(procfs / str(proc.pid)):
-                        cargo_task = procfs / str(cargo_pid)
-                        if cargo.samefile(cargo_task / 'exe'):
-                            candidates.update(children(cargo_task))
-                except (FileNotFoundError, ProcessLookupError):
-                    pass
-                for pid in candidates:
-                    task = procfs / str(pid)
+                attempts += 1
+                for pid_name in os.listdir(procfs):
+                    if not pid_name.isdecimal():
+                        continue
+                    pid = int(pid_name)
+                    task = procfs / pid_name
                     try:
                         if pid not in programs:
-                            if not rustc.samefile(task / 'exe'):
+                            if os.getpgid(pid) != proc.pid:
                                 continue
                             fields = (task / 'stat').read_bytes().rsplit(b')', 1)[1].split()
-                            if not cargo.samefile(procfs / fields[1].decode() / 'exe'):
+                            ppid = int(fields[1])
+                            exe = (task / 'exe').readlink()
+                            image = images.setdefault((pid, str(exe)), {'pid': pid, 'ppid': ppid, 'exe': str(exe)})
+                            if not rustc.samefile(task / 'exe'):
+                                continue
+                            image['is_rustc'] = True
+                            image['parent'] = str((procfs / str(ppid) / 'exe').readlink())
+                            if not cargo.samefile(procfs / str(ppid) / 'exe'):
                                 continue
                             argv = list(map(os.fsdecode, (task / 'cmdline').read_bytes().rstrip(b'\0').split(b'\0')))
                             if '--crate-name' not in argv or argv[argv.index('--crate-name')+1] != 'ty_python_semantic':
                                 continue
+                            image['cargo_child_ty'] = True
+                            if 'driver_seen' not in image:
+                                maps = [line for line in (task / 'maps').read_text().splitlines() if 'librustc_driver-' in line]
+                                if maps:
+                                    image['driver_seen'] = maps
                             if not any(arg == '--emit' or arg.startswith('--emit=') for arg in argv) or not matching_driver(task, driver):
                                 continue
                             programs[pid] = {'argv': argv, 'start': task_id(task), 'cargo_pid': int(fields[1])}
@@ -111,5 +113,7 @@ def observe(command, *, library, sdk, dst, cwd, env, stdout, stderr):
             assert len({row['tid'] for row in rows}) == len(rows)
             return {'processes': programs, 'threads': rows, 'instructions': sum(r['instructions'] for r in rows)}
         finally:
+            (dst/'observed-images.json').write_text(json.dumps({'polls':attempts,'observer_pid':proc.pid,'images':list(images.values()),
+                'driver':{'inode':driver.st_ino,'major':os.major(driver.st_dev),'minor':os.minor(driver.st_dev)}},indent=2)+'\n')
             for fd in fds.values():
                 os.close(fd)

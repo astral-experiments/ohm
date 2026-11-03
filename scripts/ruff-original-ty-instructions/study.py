@@ -114,7 +114,7 @@ def run_phase(mode,label,method):
 assert w.git('rev-parse','HEAD')==w.NEW and w.git('rev-parse','HEAD^')==w.OLD and w.hf(w.work/'Cargo.lock')==w.OLDLOCK and not w.git('status','--porcelain')
 assert os.environ['GITHUB_RUN_ATTEMPT']=='1' and os.environ['GITHUB_SHA']==os.environ['REVIEWED_HEAD'] and os.uname().machine=='x86_64'
 pre={'source':[w.OLD,w.NEW],'lock':w.OLDLOCK,'order':order,'modes':schedule,'sdk_manifest':w.hf(w.src/'sdk.json'),
-     'counter_sha256':{p.name:w.hf(p)for p in here.glob('*.c')},'purpose':'unscored stock work attribution, simultaneous inherited whole counter and lower bound on ty tasks; no candidate or speedup claim',
+     'counter_sha256':{p.name:w.hf(p)for p in here.glob('*.c')},'live_observer_sha256':w.hf(here/'live_tasks.py'),'purpose':'unscored stock work attribution, simultaneous inherited whole counter and lower bound on ty tasks; no candidate or speedup claim',
      'admit':'identical settled source, artifacts, rosters, original RUF009 verdicts, fully scheduled user counters, one live rustc with authenticated executable, driver, Cargo parent and ty argv for each concurrent observation; non-inherited counters opened on its live verified threads only. Require a majority in every run to call this a possible 2x instruction opportunity. Always preserve four independent control totals and their range.'}
 save(tree/'registered.json',pre)
 env=w.install()
@@ -145,6 +145,14 @@ for method in ('whole','tasks'):
             code='import threading;t=threading.Thread(target=lambda:'+part+');t.start();t.join()' if kind=='thread' else 'import sys,subprocess;subprocess.run([sys.executable,"-IB","-c",'+repr(part)+'],check=True)'
             vals.append(capture(['/usr/bin/python3','-IB','-c',code],method,tree/f'calibrate-{method}-{kind}-{int(heavy)}',env,w.work))
         assert vals[1]>vals[0]+10000000
+# Check the live detector on this worker's procfs before fetching Ruff dependencies.
+fixture=w.root/'live-detector-fixture'
+(fixture/'src').mkdir(parents=True)
+(fixture/'Cargo.toml').write_text('[package]\nname="ty_python_semantic"\nversion="0.1.0"\nedition="2024"\n')
+(fixture/'src/lib.rs').write_text(''.join(f'pub fn f{i}(v:u64)->u64{{v.wrapping_add({i})}}\n' for i in range(8000)))
+test_output=tree/'detector-calibration'
+test_total=capture(['cargo','+ohm','check','--offline','-j1'],'simultaneous',test_output,dict(env,CARGO_TARGET_DIR=str(fixture/'target')),fixture)
+assert 0<json.loads((test_output/'live-threads.json').read_text())['instructions']<=test_total
 w.git('switch','--detach',w.OLD)
 subprocess.run(['cargo','+ohm','fetch','--locked','--target','x86_64-unknown-linux-gnu'],env=env,cwd=w.work,check=True)
 env['CARGO_NET_OFFLINE']='true'
