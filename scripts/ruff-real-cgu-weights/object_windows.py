@@ -29,7 +29,7 @@ def ordinary_execs(trace, pattern):
                     continue
                 match = pattern.fullmatch(line)
                 require(match, ("invalid successful strace exec", line[:150]))
-                exe, args, _ = (ast.literal_eval(v) for v in match.groups())
+                exe, args = map(ast.literal_eval, match.groups()[:2])
                 # The kernel exposes the executable identity after resolving the cargo symlink.
                 st = Path(exe).stat()
                 result.append((st.st_dev, st.st_ino, tuple(args)))
@@ -42,10 +42,17 @@ def observed_execs(custody, *, read_counters=True):
     totals = Counter()
     unusable = set()
     images = {}
+    monitor_pid = None
     for line in (custody / "epochs.tsv").read_text().splitlines():
         v = line.split()
-        if v[0] == "I":
+        if v[0] == "M":
+            _, pid, started = map_record(v)
+            require(monitor_pid is None and not images and pid > 0 and started > 0, "invalid observer identity")
+            monitor_pid = pid
+        elif v[0] == "I":
             _, ident, group, tid, at, role = v
+            require(monitor_pid is not None and int(group) != monitor_pid and int(ident) not in images,
+                    "tracee image collides with an earlier image or the observer")
             raw = (custody / f"{int(ident):05}.nul").read_bytes().split(b"\0")
             require(raw[-1] == b"" and int(raw[0]) == int(group), "wrong kernel argv image")
             args = tuple(os.fsdecode(s) for s in raw[4:-1])
@@ -62,6 +69,7 @@ def observed_execs(custody, *, read_counters=True):
                 totals[ident, group, tid] += value
         else:
             raise ValueError(("unknown custody record", v[0]))
+    require(monitor_pid is not None and images, "missing observer or tracee")
     return result, totals, images, unusable
 
 
@@ -88,7 +96,7 @@ def prices(custody, expected, owner_identity, library_refs):
     events = table(custody / "windows.tsv")
     by = defaultdict(dict)
     for event in events:
-        require(int(event["tgid"]) == pid, "window from another process")
+        require((int(event["image"]), int(event["tgid"])) == (image, pid), "window from another compiler image")
         key = int(event["id"])
         require(event["event"] not in by[key], "duplicate window transition")
         by[key][event["event"]] = event
@@ -100,15 +108,17 @@ def prices(custody, expected, owner_identity, library_refs):
     for key, phases in sorted(by.items()):
         enter = phases["open-enter"]
         opened = phases["open-exit"]
+        require(all(all(row[k] == enter[k] for k in ("kind", "path_hex", "flags", "dirfd", "base_hex"))
+                    for row in phases.values()), "open/close path or mode changed")
         if int(opened["result"]) < 0:
             require(set(phases) == {"open-enter","open-exit"} and key not in digests_by_id, "failed open produced an object")
             continue
         if enter["kind"] in {"llvm","driver"}:
             file = Path(path_value(opened, "resolved_hex"))
             want = library_refs[enter["kind"]]
-            if (int(opened["dev"]),int(opened["ino"])) == tuple(want["id"][:2]):
-                require(str(file) == want["opened"], "different library path from the qualified run")
-                refs.add(enter["kind"])
+            require((int(opened["dev"]), int(opened["ino"])) == tuple(want["id"][:2]) and
+                    str(file) == want["opened"], "different successful compiler library open")
+            refs.add(enter["kind"])
             continue
         require(enter["kind"] == "object", "unknown traced opening")
         require(set(phases) == {"open-enter","open-exit","close-enter","close-exit"}, "incomplete object interval")
@@ -117,7 +127,9 @@ def prices(custody, expected, owner_identity, library_refs):
         tid = int(enter["tid"])
         require(all(int(x["tid"]) == tid and int(x["image"]) == image for x in transitions), "object crosses tasks or images")
         require(all(int(b["monotonic_ns"]) >= int(a["monotonic_ns"]) for a,b in zip(transitions,transitions[1:])), "nonmonotonic transitions")
-        require(int(opened["result"]) == int(closing["fd"]) and int(closed["result"]) == 0, "unsuccessful object close")
+        require(int(opened["result"]) == int(opened["fd"]) and int(closed["result"]) == 0, "unsuccessful object open or close")
+        require(all(all(row[k] == opened[k] for k in ("fd", "dev", "ino", "resolved_hex"))
+                    for row in (closing, closed)), "object descriptor or identity changed")
         raw_path = Path(path_value(opened,"resolved_hex"))
         ds = digests_by_id.pop(key)
         require((int(ds["dev"]),int(ds["ino"])) == (int(opened["dev"]),int(opened["ino"])) and int(ds["bytes"]) > 0, "file changed during object interval")
@@ -157,8 +169,11 @@ def calibrate(binary, out, save):
     exe = root / "calibration"
     subprocess.run(["/usr/bin/cc","-std=gnu11","-O2","-Wall","-Wextra","-Werror","-pthread",
                     HERE/"calibrate-windows.c","-o",exe], check=True)
-    subprocess.run([binary,logs,"--owner-exe",exe,"--crate-name","window_calibration","--",exe,
-                    "--crate-name","window_calibration",root], check=True, timeout=45)
+    try:
+        subprocess.run([binary,logs,"--owner-exe",exe,"--crate-name","window_calibration","--",exe,
+                        "--crate-name","window_calibration",root], check=True, timeout=45)
+    finally:
+        archive_custody(logs,out/"calibration-custody.tar.gz")
     st = exe.stat()
     expected = {k:H((root/(k+".o")).read_bytes()) for k in ("window_short","window_long")}
     rows = prices(logs,expected,(st.st_dev,st.st_ino),{})
@@ -170,7 +185,6 @@ def calibrate(binary, out, save):
             "failed calibration write was lost")
     save(out/"calibration.json",{"rows":rows,"ratio":ratio,"observer":H(binary.read_bytes()),
                                 "observer_source":H(OBS.read_bytes()),"calibration":H(exe.read_bytes())})
-    archive_custody(logs,out/"calibration-custody.tar.gz")
 
 
 def prepare(out, save):
@@ -214,8 +228,7 @@ def observe(prior, kit, loc, work, repo, env, cmd, suite, graph, which, extras, 
             if kind not in ("driver","llvm") or row["event"] != "open-exit" or int(row["result"]) < 0:
                 continue
             target = kit.refs[kit.active][kind]
-            if (int(row["dev"]), int(row["ino"])) != tuple(target["id"][:2]):
-                continue
+            require((int(row["dev"]), int(row["ino"])) == tuple(target["id"][:2]), "unexpected compiler library inode")
             path = Path(path_value(row,"resolved_hex"))
             state = path.stat()
             require((state.st_dev,state.st_ino)==tuple(target["id"][:2]) and H(path.read_bytes())==target["sha"], "different signed library body")
