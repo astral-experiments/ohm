@@ -26,6 +26,12 @@ jobs:
         ref: ${{ inputs.reviewed_head }}
         sparse-checkout: scripts/ruff-derived-impl-cgus
         persist-credentials: false
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: e48abf3b09f415b296d0ee2e8ec81c0de7b50611
+        path: schema
+        sparse-checkout: scripts/ruff-clap-config-help/evidence-release-24
+        persist-credentials: false
     - name: Independently open original archives, native objects, ELFs and true PMU controls
       env:
         GH_TOKEN: ${{ github.token }}

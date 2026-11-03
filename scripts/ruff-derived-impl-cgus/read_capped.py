@@ -25,6 +25,9 @@ with zipfile.ZipFile(out/'raw-hardware-and-controls.zip','x',compression=zipfile
    assert {'P/edit/hardware.json','C/edit/hardware.json','P/caps/caps.json','C/caps/caps.json'}<=set(ns);assert sum(z.getinfo(n).file_size for n in ns)<32*2**20
    for n in sorted(ns):
     e=zipfile.ZipInfo(key+'/'+n,(1980,1,1,0,0,0));e.compress_type=zipfile.ZIP_DEFLATED;raw.writestr(e,z.read(n))
+  from metadata_controls import read as meta_read
+  legacy=Path(os.environ['GITHUB_WORKSPACE'])/'schema/scripts/ruff-clap-config-help/evidence-release-24'
+  put(key+'-typed-metadata.json',meta_read(a,legacy))
   results[key]=x;a.unlink()
 if kind=='pilots':
  assert len({x['boot']for x in results.values()})==2;primary=results['28392'];decision=(primary['library_rustc_reduction_pct']>=20 or primary['whole_reduction_pct']['edit']>=50)and all(x['whole_reduction_pct']['edit']>0 for x in results.values());put('decision.json',{'registered_two_edit_gate':decision,'cases':{k:{'first_whole_reduction':v['whole_reduction_pct']['edit'],'repeat_whole_reduction':v['whole_reduction_pct']['observed-edit'],'library_rustc_reduction_secondary':v['library_rustc_reduction_pct'],'second_forward_same_metadata':{r:x['independent_forward_proof']for r,x in v['roles'].items()}}for k,v in results.items()}})
