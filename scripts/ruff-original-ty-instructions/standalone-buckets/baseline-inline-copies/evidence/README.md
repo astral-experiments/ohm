@@ -1,0 +1,14 @@
+# The existing-owner optimization has no eligible function on these three Ruff edits
+
+The parent compiler for the two ordinary ty_ide library builds emitted the following native ty_project populations after the source edit. Both OLD populations gave the same counts for those affected object names.
+
+| Ruff edit | Objects in rlib | Regenerated | All outlined function bytes in regenerated objects | Identical private functions also in an unchanged object | Private functions with *any* same-name exported definition elsewhere in the rlib |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| #29697 | 245 | 4 | 119,151 | 49 functions, 6,523 bytes | 0 |
+| #29604 | 246 | 5 | 208,634 | 61 functions, 8,045 bytes | 0 |
+
+The separate historical #28106 edit yielded 14,167 real LLVM function definitions across 21 generated ruff_workspace modules. Of the 11,155 internal/private definitions, **zero** had the LLVM noinline function attribute before optimization. The recorder also checked the exact post-O1 attribute, symbol and native binding in all 125 archive objects, and regenerated every complete post-optimization bitstream with the original signed LLVM. Its typed positive and negative controls exercised both the function attribute and linkage API. The conservative candidate therefore owns zero of 120,906,271,208 measured backend guest instructions. There are 36 other named private functions with equal outlined bodies and resolved relocations elsewhere in the archive. Their 15 enclosing codegen units account for 117.63B guest instructions. The recorded units include every other function in them, and these 36 functions remain eligible for inlining.
+
+The compiler already places ordinary non-inlinable functions and generic functions explicitly marked inline(never) into GloballyShared codegen. Its mono collector also checks for an eligible upstream export before instantiating a foreign item. Ohm's existing [#108](https://github.com/astral-experiments/ohm-rust/pull/108) runs the LLVM merge-functions pass within a module. [#59](https://github.com/astral-experiments/ohm-rust/pull/59) places selected upstream generic instantiations with their local callers. Giving current private functions a new linkable owner would require a separate cross-unit linkage and runtime-quality design. These measurements do not justify it.
+
+The two original ZIPs and their authenticated GitHub metadata are included here. Run `python3 -IB verify.py` and compare the result with `verified.json`. The full original sources and complete in-order archive reader are in the parent of this directory. The [native ty_project census](https://github.com/astral-experiments/ohm/actions/runs/41712530243) and [typed ruff_workspace census](https://github.com/astral-experiments/ohm/actions/runs/41713889167) were independent read-only artifact jobs.
