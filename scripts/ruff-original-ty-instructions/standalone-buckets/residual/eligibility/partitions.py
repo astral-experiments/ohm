@@ -23,13 +23,13 @@ def cache(z,state):
     check(len(b)==q['bytes']and hashlib.sha256(b).hexdigest()==q['sha256'],'unbound ordinary query cache')
     check(b[:6]==b'RSIC'+(24450).to_bytes(2,'little')and b[7:7+b[6]]==b'1.99.0-dev'and b[-13:]==b'rust-end-file','wrong compiler format')
     return b,record
-def table(b,rec,version):
-    names=sorted(n[:-2]for n in rec['objects']);check(len(names)==245 and len(set(names))==245,'physical WIPs')
+def table(b,rec,version,expected_count=245):
+    names=sorted(n[:-2]for n in rec['objects']);check(len(names)==expected_count and len(set(names))==expected_count,'physical WIPs')
     starts=[];offsets={}
     for name in names:
         raw=name.encode();hits=[];p=-1
         while (p:=b.find(raw,p+1))>=0:hits.append(p)
-        check(len(hits)==version+1,(name,hits));offsets[name]=hits;starts.append(hits[-1])
+        check(bool(hits) and (version is None or len(hits)==version+1),(name,hits));offsets[name]=hits;starts.append(hits[-1])
     check(starts==sorted(starts),'missing serialized order')
     first=starts[0]-2;n,beg=preceding(b,first);check(n==len(names),'missing actual vector count')
     tagged=[]

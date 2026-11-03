@@ -1,13 +1,21 @@
-name: 'Read actual rustc partition eligibility on the normal Ruff edit'
-run-name: Ruff 29697 existing compiler split eligibility
+name: 'Exercise source-owned compiler partitions on two real Ruff edits'
+run-name: Unscored two-edit Ruff source-owned partition pilot
 permissions:
   contents: read
   actions: read
 jobs:
   inspect:
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head
-      && github.ref_name == 'charlie/qa-ruff-ty-ide-lib-residual-29697-20261103'
+      && github.ref_name == 'charlie/qa-ruff-root-owner-lanes-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - case: '29697'
+            revision: bfa2407e98ee1343caeefd02b4b69043509baa8c
+          - case: '29604'
+            revision: dfe14506d23010aa5dbc4ff6fea702a22ba312bd
     timeout-minutes: 165
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -23,30 +31,31 @@ jobs:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         repository: astral-sh/ruff
-        ref: bfa2407e98ee1343caeefd02b4b69043509baa8c
+        ref: ${{ matrix.revision }}
         fetch-depth: 2
         path: ruff
         persist-credentials: false
     - name: Read the exact nonrelease compiler source constructor
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
-        ref: 3166ffe9aa98befcb452cc25af269af53578604c
+        ref: df534d61d22a8876e13f57f6033f2f11768a4a60
         path: factory-src
         persist-credentials: false
         sparse-checkout: scripts/ruff-matched-stage
-    - name: Check the real build and read its original guarded CGU partition sizes
+    - name: Compare the complete normal Cargo edit and qualify both actual native clients
       env:
         REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+        OHM_OWNER_CASE: ${{ matrix.case }}
         OHM_SDK_READ_TOKEN: ${{ github.token }}
-      run: python3 -IB qa/scripts/ruff-original-ty-instructions/standalone-buckets/residual/eligibility/eligibility.py
+      run: python3 -IB qa/scripts/ruff-original-ty-instructions/standalone-buckets/owner-lanes/actor.py
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: ruff-ty-project-partition-${{ github.run_id }}
+        name: ruff-root-owner-lanes-${{ matrix.case }}-${{ github.run_id }}
         path: ${{ runner.temp }}/ohm-foreign-join/published/
         retention-days: 21
         if-no-files-found: error
-    name: One unscored compiler partition diagnostic
+    name: Unscored source edit ${{ matrix.case }}
 'on':
   workflow_dispatch:
     inputs:
