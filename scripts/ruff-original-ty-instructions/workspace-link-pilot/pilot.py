@@ -11,6 +11,7 @@ sys.path[:0] = [
     str(HERE.parent / "workspace-link-proof"),
     str(HERE.parent / "e2e-existing-output"),
 ]
+import native_fallback
 import audit, meter_fixture, multi_source
 
 b, w, P = audit.b, audit.w, audit.P
@@ -441,6 +442,15 @@ def main():
         for i in range(1, 4):
             out = run(arm + "-warm" + str(i), arm)
         out = run(arm + "-exec-warm", arm, trace=True)
+        # Tracing changes the inherited jobserver-fd spelling. Retain that first transition,
+        # then observe a second genuinely unchanged invocation in the same trace context.
+        out = run(arm + "-exec-warm-stable", arm, trace=True)
+        b.select(b.OLD)
+        out = run(arm + "-ordinary-repeat-old", arm)
+        b.select(b.NEW)
+        assert b.verdict(out, arm + "-withheld-ordinary-repeat-old", env, 101) == audit.contact.LITERALS["list"]
+        out = run(arm + "-ordinary-repeat-edit", arm)
+
         b.select(b.OLD)
         out = run(arm + "-reverse-old", arm)
         b.select(b.NEW)
@@ -493,16 +503,14 @@ def main():
             )
             mutation = edit.result(timeout=135)
         put(tag + "-actual-change.json", mutation)
-        if mode == "earlier":
-            changed = read(P / tag / "physical-decisions.json")["actors"][E2E]
-            assert changed["action"] == "full" and changed["response"] == "full"
-        if mode == "four":
-            changed = read(P / tag / "physical-decisions.json")["actors"][E2E]
-            assert (
-                changed["action"] == "full"
-                and changed["response"] == "full"
-                and len(mutation["changed_offsets"]) == 4
+        if mode in ("earlier", "four"):
+            proof = native_fallback.on_worker(
+                P / tag, E2E, mutation, provider, current,
+                results["C-exec-edit"]["published"][E2E], results[tag]["published"][E2E],
+                w.hf, audit.donor.full_b3,
             )
+            put(tag + "-full-output.json", proof)
+        if mode == "four":
             ret = subprocess.run(
                 [current, "--list"],
                 cwd=w.work / "crates/ty_server",
@@ -522,8 +530,17 @@ def main():
             (state / f).unlink(missing_ok=True)
         out = run(tag + "-repair", "C")
     out = run("C-before-output-control-1", "C")
-    out = run("C-before-output-control-2", "C")
-    assert E2E in results["C-before-output-control-2"]["fresh_roles"]
+    wanted = {E2E} | {k for k in ACCEPTED if k.startswith("/ty_ide/") and k.split("/")[-1].startswith("ty_ide-")}
+    assert len(wanted) == 2
+    for attempt in range(2, 7):
+        before_corruption = "C-before-output-control-" + str(attempt)
+        out = run(before_corruption, "C")
+        if wanted <= set(results[before_corruption]["fresh_roles"]):
+            break
+    else:
+        raise AssertionError("Two true unchanged existing-output admissions required before corruption")
+    put("before-output-selection.json", {"phase": before_corruption, "targets": sorted(wanted)})
+
     targets = {E2E: out}
     if release == 24:
         (ide,) = [
@@ -533,7 +550,7 @@ def main():
         ]
         inv = json.loads(
             gzip.decompress(
-                (P / "C-before-output-control-2" / "inventory.json.gz").read_bytes()
+                (P / before_corruption / "inventory.json.gz").read_bytes()
             )
         )
         paths = rolemap(inv)
@@ -572,7 +589,7 @@ def main():
                 os.close(fd)
         put("actual-canonical-OPATHs.json", controls)
     for key, path in targets.items():
-        old_ref = results["C-before-output-control-2"]["published"][key]
+        old_ref = results[before_corruption]["published"][key]
         put(
             "corrupted-existing-" + key.split("/")[-1] + ".json",
             audit.witness.corrupt_text(path, audit.donor.text_flip, old_ref),
