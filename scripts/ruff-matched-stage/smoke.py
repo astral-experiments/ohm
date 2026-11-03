@@ -88,6 +88,24 @@ def history(work, env, mode, candidate):
     return rows
 
 
+def mixed_alias(work, env, candidate):
+    seed(work)
+    macros = SAVE.replace("        let temp = root.join", "        let before = std::fs::metadata(&path).unwrap().modified().unwrap();\n        let temp = root.join")
+    macros = macros.replace("rename(temp, path).unwrap();", "rename(temp, &path).unwrap();\n        std::fs::File::options().write(true).open(path).unwrap().set_modified(before).unwrap();")
+    (work / "saver/src/lib.rs").write_text(macros)
+    main = MAIN + '\nconst ALSO: &[u8] = include_bytes!("./payload.bin");\nconst _: [(); 29] = [(); ALSO[0] as usize];\n'
+    (work / "src/main.rs").write_text(main)
+    stamp = (work / "src/payload.bin").stat().st_mtime_ns
+    first = run(work, env, "check", "", "during-save", 0)
+    assert first["before"] == OLD.hex() and first["after"] == NEW.hex() and (work / "src/payload.bin").stat().st_mtime_ns == stamp
+    (work / "armed").unlink()
+    unchanged = run(work, env, "check", "", "unchanged", 101 if candidate else 0)
+    if not candidate:
+        assert unchanged["fresh"] == [True]
+    clean = run(work, env, "check", "-clean", "independent-clean", 101)
+    return [first, unchanged, clean]
+
+
 def repair(work, env, mode):
     (work / "src/payload.bin").write_bytes(OLD)
     repaired = run(work, env, mode, "", "repair", 0)
@@ -116,6 +134,7 @@ def smoke(root, manifest, base):
         for tool in ("rustc","cargo","rustdoc"):
             path = subprocess.check_output(["rustup","which","--toolchain","ohm",tool], env=env, text=True).strip()
             need(Path(path).samefile(target / "bin" / tool), ("wrong tool", tool))
+        rows += mixed_alias(root / (role + "-mixed-alias"), env, role == "C")
         for mode in ("check", "build", "test"):
             work = root / (role + "-" + mode)
             rows += history(work, env, mode, role == "C")
@@ -124,5 +143,5 @@ def smoke(root, manifest, base):
                 stale = root / ("P-" + mode)
                 rows.append(run(stale, env, mode, "", "upgrade", 101))
                 rows += repair(stale, env, mode)
-            save(root / "logs/consumed-input-progress.json", rows)
+            save(root / "logs" / (role + "-" + mode + "-histories.json"), rows)
     save(root / "logs/smoke.json", {"schema":1, "ordinary_cargo_histories":rows})
