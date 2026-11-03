@@ -1,0 +1,71 @@
+{
+  "fresh_directory_verifier": "d28c084ce656efa066eb916ff7687c94c57576795c1ccd8097e4820d3db57315",
+  "isolation": "Fresh directory with only the checksum-listed files. Python ran -ISB with a cleared environment and denied socket events and opens outside the new checkout, the interpreter, /usr, and /dev/null. The only executable child of either Python reader was local zstd.",
+  "outcomes": {
+    "marginal-primary": {
+      "archive": "754dbec35fb52f0538c84509d2f3fab6aef0efc02ff9e1b7e5222419227569e8",
+      "boot": "3d9acb92-dad6-4dff-9b65-0e9940a9b46d",
+      "external_repeat_verdict": null,
+      "job": 125725681959,
+      "run": 41577930987,
+      "runner_id": 1852
+    },
+    "marginal-repeat": {
+      "archive": "7fad3abd427e05f3eb86fb10636ff25d88f45c5762740d78ddaa022241883d1a",
+      "boot": "023e7142-c7e7-4722-b380-99d58f44b963",
+      "external_repeat_verdict": "51b4604c5b20b1c956fd902e507a4d650c758983fbd424115e9a881a69433b55",
+      "job": 125730979115,
+      "run": 41579572319,
+      "runner_id": 1854
+    },
+    "signed-primary": {
+      "archive": "d1bd1467a1d197ce55df0aadfd64fc79a80096d1505a4fc65f509b5a6c724326",
+      "boot": "187fefcc-f6b6-4263-804d-82c938d4d32a",
+      "external_repeat_verdict": null,
+      "job": 125726368044,
+      "run": 41578145223,
+      "runner_id": 1853
+    },
+    "signed-repeat": {
+      "archive": "77711733f9dac5ad8cc454e014f1d8d69f0535d4451f40f700211dc15a5766f2",
+      "boot": "c9fb48af-4e9f-416d-87aa-d25701341731",
+      "external_repeat_verdict": "1400b5996b45d48c6eb9f8125959ecc47972eb669cad3fb9bfd35a9ba1f38300",
+      "job": 125731344652,
+      "run": 41579685157,
+      "runner_id": 1855
+    }
+  },
+  "published_inputs": 46,
+  "python": "3.12.3",
+  "recomputed_per_host_kernel_compilers": [
+    68,
+    68,
+    68,
+    68
+  ],
+  "recomputed_per_host_kernel_traces": [
+    38,
+    38,
+    38,
+    38
+  ],
+  "scope_of_payload_digest": "sha256 of the exact SHA256SUMS lines excluding only independent-replay.json; that receipt is included by the final SHA256SUMS",
+  "sha256sum_and_both_python_readers_succeeded": true,
+  "stdout_and_adverse_control_result": [
+    "Verified 4 original Actions ZIPs, 128 per-rustc PMU records, 64 inherited whole-Cargo PMUs and 64 bare wall clocks.",
+    "marginal-primary 41577930987 3d9acb92-dad6-4dff-9b65-0e9940a9b46d {\"named\": [\"sum_two\", \"uv_client\"], \"wall\": false}",
+    "signed-primary 41578145223 187fefcc-f6b6-4263-804d-82c938d4d32a {\"named\": [\"sum_two\", \"uv_client\"], \"wall\": false}",
+    "marginal-repeat 41579572319 023e7142-c7e7-4722-b380-99d58f44b963 {\"external_sha256\": \"51b4604c5b20b1c956fd902e507a4d650c758983fbd424115e9a881a69433b55\", \"named\": [\"sum_two\", \"uv_client\"], \"wall\": false}",
+    "signed-repeat 41579685157 c9fb48af-4e9f-416d-87aa-d25701341731 {\"external_sha256\": \"1400b5996b45d48c6eb9f8125959ecc47972eb669cad3fb9bfd35a9ba1f38300\", \"named\": [\"sum_two\", \"uv_client\"], \"wall\": false}",
+    "Passed 8 adverse service, PID, counter, clock and decision checks.",
+    "F PID 19201: 3 typeck_root calls and 2165658021 total guest instructions",
+    "R PID 19162: 77 typeck_root calls and 3045425242 total guest instructions"
+  ],
+  "tested_commands": [
+    "sha256sum --strict --quiet -c SHA256SUMS",
+    "python3 -ISB replay.py --controls",
+    "python3 -ISB mechanism/replay.py (stdout byte-compared with mechanism/result.json)"
+  ],
+  "verified_payload_sha256sums": "2dc97496c101f1a34abf9ea4d6a99f3eef1e4a6b07f1bebedd32422e9319d315",
+  "zstd": "*** Zstandard CLI (64-bit) v1.5.5, by Yann Collet ***"
+}

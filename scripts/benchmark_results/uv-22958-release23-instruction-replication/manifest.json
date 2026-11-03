@@ -1,0 +1,102 @@
+{
+  "runs": {
+    "marginal-primary": {
+      "compressed_sha256": "8a28e6e2ccfc3742db8a9ab89d6c39fe909bc07d6ffc4e09765050afff78a44b",
+      "original": {
+        "bytes": 129334471,
+        "id": 13204093863,
+        "name": "uv-22958-release23-marginal-wall-eight-pairs",
+        "sha256": "754dbec35fb52f0538c84509d2f3fab6aef0efc02ff9e1b7e5222419227569e8"
+      },
+      "parts": [
+        {
+          "bytes": 50069467,
+          "path": "originals/marginal-primary.zip.zst.01",
+          "sha256": "a406541ee6413fdc042761ea15f48dde05c39ca2397281afd0c42eb5461bcc78"
+        },
+        {
+          "bytes": 50069467,
+          "path": "originals/marginal-primary.zip.zst.02",
+          "sha256": "f59e56596d98780197fbabe59566010f33f52a4713d5fc50389a9c85d364cee6"
+        }
+      ],
+      "receipt": {
+        "bytes": 15394,
+        "path": "receipts/marginal-primary.zip",
+        "sha256": "3ea3ff82e2a91b9784c7fd4fdaa9e7ad64307c71783aafa81533c8b9835aebbd"
+      },
+      "reference": null,
+      "run": 41577930987
+    },
+    "marginal-repeat": {
+      "compressed_sha256": "6b525e9f7b1d2a3140a257a204a94fe67e51548c5f8c886c6ece810e9faf7229",
+      "original": {
+        "bytes": 131333974,
+        "id": 13206425517,
+        "name": "uv-22958-release23-marginal-wall-eight-pairs",
+        "sha256": "7fad3abd427e05f3eb86fb10636ff25d88f45c5762740d78ddaa022241883d1a"
+      },
+      "parts": [
+        {
+          "bytes": 32714094,
+          "path": "originals/marginal-repeat.zip.zst",
+          "sha256": "6b525e9f7b1d2a3140a257a204a94fe67e51548c5f8c886c6ece810e9faf7229"
+        }
+      ],
+      "receipt": {
+        "bytes": 21137,
+        "path": "receipts/marginal-repeat.zip",
+        "sha256": "851a1f1a9c46b97e93b0e4d1b19223185be8259357a4da9e9c7b45dbaa69999f"
+      },
+      "reference": "marginal-primary",
+      "run": 41579572319
+    },
+    "signed-primary": {
+      "compressed_sha256": "162d155952a43c4b6f169a0af59c169d1aa3331726b9aaf68a835a8fb351caff",
+      "original": {
+        "bytes": 126741986,
+        "id": 13203889386,
+        "name": "uv-22958-release23-signed-wall-eight-pairs",
+        "sha256": "d1bd1467a1d197ce55df0aadfd64fc79a80096d1505a4fc65f509b5a6c724326"
+      },
+      "parts": [
+        {
+          "bytes": 66217153,
+          "path": "originals/signed-primary.zip.zst",
+          "sha256": "162d155952a43c4b6f169a0af59c169d1aa3331726b9aaf68a835a8fb351caff"
+        }
+      ],
+      "receipt": {
+        "bytes": 16300,
+        "path": "receipts/signed-primary.zip",
+        "sha256": "a8f116fb296edb29d2f4ab4c58d7fc6aed409dafca807a7bc5bbe598e12b932b"
+      },
+      "reference": "marginal-primary",
+      "run": 41578145223
+    },
+    "signed-repeat": {
+      "compressed_sha256": "1ba9bb07e18be3d0275ae7a29d071b89112b42e60adf2f1e55cb5b89066f3a4e",
+      "original": {
+        "bytes": 129351730,
+        "id": 13206285942,
+        "name": "uv-22958-release23-signed-wall-eight-pairs",
+        "sha256": "77711733f9dac5ad8cc454e014f1d8d69f0535d4451f40f700211dc15a5766f2"
+      },
+      "parts": [
+        {
+          "bytes": 31543799,
+          "path": "originals/signed-repeat.zip.zst",
+          "sha256": "1ba9bb07e18be3d0275ae7a29d071b89112b42e60adf2f1e55cb5b89066f3a4e"
+        }
+      ],
+      "receipt": {
+        "bytes": 22619,
+        "path": "receipts/signed-repeat.zip",
+        "sha256": "9256a261efb525823c2964e81156745b1437d9fe6ea0fcdd2894ce1b864d788c"
+      },
+      "reference": "signed-primary",
+      "run": 41579685157
+    }
+  },
+  "version": 1
+}

@@ -1,0 +1,106 @@
+{
+  "already_in_release": [
+    275,
+    278,
+    296,
+    306
+  ],
+  "argv": [
+    "cargo",
+    "check",
+    "-p",
+    "uv-client",
+    "--locked",
+    "--offline",
+    "-j8"
+  ],
+  "baseline_selection": [
+    "Verify the published signed release and native archive, actual commit, Cargo, driver, sysroot, BOLT and release build recipe first. A changed pin requires a new source registration before measurement.",
+    "Run the original five-visit CTFE regression and the normal edited-uv native checks on the signed stock compiler.",
+    "If the signed build passes the native checks, use it as the published baseline, with the identical signed Cargo on both arms.",
+    "If the specific cache-identity regression reproduces, preserve its full raw failure, run the real #318 port on both compiler sources with the same -23 release recipe and signed Cargo, and label the matched comparison corrected -23. Any other failure remains unscored.",
+    "Reserve and verify the final combined incremental namespace before producing any child binary; compare role-specific cold/warm, migration and typed rmeta results using the actual binaries."
+  ],
+  "canonical_native_regression": {
+    "original_pr": 318,
+    "source_check": "91ad411d555592b9fd7bf590a238a6041d53def3e03ad95670c364ec5f3c8cdc",
+    "workload": "all five actual linked/public-hash visits in rdr-public-hash-ctfe-literal-identity"
+  },
+  "cohort": {
+    "authentic": "Validate the new signed Cargo actual -23 graph, all eight source files, true A/index first B, typed 39-product warm-vs-independent-cold and prior B/no-op native outputs; refuse unexpected dirty jobs or changes in companion correctness.",
+    "case_dirty_rustcs": [
+      "uv_configuration",
+      "uv_client"
+    ],
+    "holds": [
+      4,
+      4
+    ],
+    "independent_cold_A_per_compiler": 8,
+    "orders": [
+      [
+        "S",
+        "F"
+      ],
+      [
+        "F",
+        "S"
+      ],
+      [
+        "F",
+        "S"
+      ],
+      [
+        "S",
+        "F"
+      ],
+      [
+        "F",
+        "S"
+      ],
+      [
+        "S",
+        "F"
+      ],
+      [
+        "S",
+        "F"
+      ],
+      [
+        "F",
+        "S"
+      ]
+    ],
+    "ordinary_public_sidecars": 423,
+    "pairs": 8,
+    "visits": "Unwrapped blocking Cargo first-B. Restore each exact pristine cold-A state separately for whole-tree PMU and actual per-rustc PMU.",
+    "workspace_artifacts": 39
+  },
+  "coordinator": "97357b6ccd87013863af8ba773d8ccb9edd82b7e",
+  "excludes_unqualified_change": "e4ed and all speculative followups are outside the three-PR residual stack.",
+  "fixed_legacy_reference_sha256": "0a798a5154cc5653ac2bf445fe24437b0c359ab950ed6b6e406209fe34edd00e",
+  "input": {
+    "A": "8ca75796365f348e25d3f7bea9daa1440218d40b",
+    "B": "362613dbf38f60fe285cdd6bca53641149a23c04",
+    "HEAD_and_index": "A even on first B",
+    "exact_complete_file_count": 8,
+    "registry": "f79a0fed892bc3a1b906b6afebfb7f3ede0ba47621a1ff082048c2a7f32a1c85",
+    "source_sha256": "5a9c3a28eb8c7dba3a68cdcab9a668a0bfe76bd1895b525acee350a66d38bd5d",
+    "tag": "0.13.6"
+  },
+  "logical_question": "How much of the independently replicated uv #22958 ordinary cargo check speedup remains over the actual Ohm -23 line?",
+  "release_cargo": "4109dd69209a642f309555cac0cee8b05e18f0ea",
+  "release_pin": "a21de69d085aa07b3b5ac94058bac9e5aed482b4",
+  "remaining_performance_prs": {
+    "327": "d8355eb34cccba66f529d8e4a6372651be324c52",
+    "328": "ff15b3d90bde1efba6b49f1b49670e76630a2aeb",
+    "336": "c430e3f63e363c5251c95632832412a91b043d29"
+  },
+  "report": {
+    "instructions": "Report both per-rustc retired counts and their sum from hardware separately. For a named 20% cut require 5*child <= 4*parent in all eight pairs and both hold medians.",
+    "other": "Preserve and report a miss and any regression. Report corrected-release and signed-release evidence separately.",
+    "wall": "All eight paired bare clocks, per-hold median, full median ratio. An eight-of-eight result strictly over 2x must repeat on a separately enrolled independent machine before a twofold claim."
+  },
+  "source_projection_sha256": "7c8be6fcecf4b7736724ee36cad867b8019cab9c3ef9aadeb5aba2ba8451b089",
+  "status": "Prospective source registration; requires actual Ohm -23 binaries and all physical gates"
+}

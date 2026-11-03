@@ -1,0 +1,73 @@
+{
+ "F": {
+  "accepted": "a9ab23fe3b949f7c340e85c36f713549569e468028d61510b4a78b34ddd65b77",
+  "argv": "8c69b123d9875bf19ea754b10f32f83036644392e462803def7f515670e2a52b",
+  "callers": [
+   [
+    "rustc_query_impl::execution::try_execute_query::<rustc_data_structures::vec_cache::VecCache<rustc_span::def_id::LocalDefId, rustc_middle::query::erase::ErasedData<[u8; 8]>, rustc_middle::dep_graph::graph::DepNodeIndex>, true>",
+    "rustc_query_impl::query_vtables::typeck_root::invoke_provider_fn::__rust_begin_short_backtrace",
+    6118762,
+    2
+   ],
+   [
+    "rustc_query_impl::execution::try_execute_query::<rustc_data_structures::vec_cache::VecCache<rustc_span::def_id::LocalDefId, rustc_middle::query::erase::ErasedData<[u8; 8]>, rustc_middle::dep_graph::graph::DepNodeIndex>, true>'2",
+    "rustc_query_impl::query_vtables::typeck_root::invoke_provider_fn::__rust_begin_short_backtrace",
+    27677809,
+    1
+   ]
+  ],
+  "native_sibling_externs": 30,
+  "native_symbol_variants": [
+   "rustc_query_impl::query_vtables::typeck_root::invoke_provider_fn::__rust_begin_short_backtrace"
+  ],
+  "physical": "8f3fad5704195a5c969ea73d4261028bcc97f456fe8c00128a56a0da240e9c79",
+  "pid": 19201,
+  "provider_calls": 3,
+  "provider_inclusive_guest_Ir": 33796571,
+  "provider_self_guest_Ir": 33,
+  "raw": {
+   "bytes": 8971317,
+   "original": "guest/raw/raw.19201.2",
+   "sha256": "5460cd0d5ff15caff6bfb9eac33ae92dd46d254d5d69d24ba85ef4fa05f99ddb"
+  },
+  "selected_exact_entry": "rustc_query_impl::query_vtables::typeck_root::invoke_provider_fn::__rust_begin_short_backtrace",
+  "selected_externs": 64,
+  "total_guest_Ir": 2165658021
+ },
+ "R": {
+  "accepted": "616d7ef089752dde404289fbc396f08cb4ccc295f51489151d751541fb009fe0",
+  "argv": "8c69b123d9875bf19ea754b10f32f83036644392e462803def7f515670e2a52b",
+  "callers": [
+   [
+    "rustc_query_impl::execution::try_execute_query::<rustc_data_structures::vec_cache::VecCache<rustc_span::def_id::LocalDefId, rustc_middle::query::erase::ErasedData<[u8; 8]>, rustc_middle::dep_graph::graph::DepNodeIndex>, true>",
+    "rustc_query_impl::query_vtables::typeck_root::invoke_provider_fn::__rust_begin_short_backtrace",
+    733105327,
+    76
+   ],
+   [
+    "rustc_query_impl::execution::try_execute_query::<rustc_data_structures::vec_cache::VecCache<rustc_span::def_id::LocalDefId, rustc_middle::query::erase::ErasedData<[u8; 8]>, rustc_middle::dep_graph::graph::DepNodeIndex>, true>'2",
+    "rustc_query_impl::query_vtables::typeck_root::invoke_provider_fn::__rust_begin_short_backtrace",
+    8579901,
+    1
+   ]
+  ],
+  "native_sibling_externs": 30,
+  "native_symbol_variants": [
+   "rustc_query_impl::query_vtables::typeck_root::invoke_provider_fn::__rust_begin_short_backtrace"
+  ],
+  "physical": "1e859f0f0d4b4fc4c07dd36e656d91975d57209db08d9fdf44afac1bc73e9eb0",
+  "pid": 19162,
+  "provider_calls": 77,
+  "provider_inclusive_guest_Ir": 741685228,
+  "provider_self_guest_Ir": 847,
+  "raw": {
+   "bytes": 9486595,
+   "gzip": "uv_client.callgrind.gz",
+   "gzip_sha256": "09bcef2e54c0b4b9245f6dc573690e469c73d4f027cb313a1f8354c99bdbdc48",
+   "sha256": "58de632bdddbdf35d73ffe36afd12f9016d18a4ef287f35b83a4601944610b65"
+  },
+  "selected_exact_entry": "rustc_query_impl::query_vtables::typeck_root::invoke_provider_fn::__rust_begin_short_backtrace",
+  "selected_externs": 64,
+  "total_guest_Ir": 3045425242
+ }
+}

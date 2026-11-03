@@ -1,0 +1,1311 @@
+{
+  "marginal-primary": {
+    "archives": {
+      "boot": {
+        "bytes": 1416,
+        "id": 13204427412,
+        "name": "uv-22958-release23-marginal-runner-boot",
+        "sha256": "45e83ee4ab0e8d5ef4357668e1d5438f0bc16f9725a08072ed663709a0da4751"
+      },
+      "original": {
+        "bytes": 129334471,
+        "id": 13204093863,
+        "name": "uv-22958-release23-marginal-wall-eight-pairs",
+        "sha256": "754dbec35fb52f0538c84509d2f3fab6aef0efc02ff9e1b7e5222419227569e8"
+      }
+    },
+    "attempt": "primary",
+    "boot": "3d9acb92-dad6-4dff-9b65-0e9940a9b46d",
+    "compiler_executions": 68,
+    "compiler_traces": 38,
+    "contrast": "marginal",
+    "control": "S",
+    "independent_histories": 16,
+    "job": 125725681959,
+    "medians": {
+      "sum_two": {
+        "control": 4404996226.0,
+        "paired_median_reduction_pct": 23.642215045699476,
+        "paired_median_speedup": 1.3096241602595287,
+        "treatment": 3363551490.0
+      },
+      "uv_client": {
+        "control": 2942924410.0,
+        "paired_median_reduction_pct": 29.162900702874907,
+        "paired_median_speedup": 1.4116896512898016,
+        "treatment": 2084684313.5
+      },
+      "uv_configuration": {
+        "control": 1462058630.0,
+        "paired_median_reduction_pct": 12.530437195362776,
+        "paired_median_speedup": 1.1432548283057717,
+        "treatment": 1278838263.0
+      },
+      "wall": {
+        "control": 790041317.0,
+        "paired_median_reduction_pct": 21.283531573217584,
+        "paired_median_speedup": 1.270439556511658,
+        "treatment": 622329876.0
+      },
+      "whole": {
+        "control": 5248814910.5,
+        "paired_median_reduction_pct": 19.84119524737096,
+        "paired_median_speedup": 1.2475235915730303,
+        "treatment": 4207412220.0
+      }
+    },
+    "native": {
+      "F": {
+        "different_all_recorded": 6,
+        "different_workspace": 5,
+        "fixed_input_owners": [
+          "uv_client",
+          "uv_extract"
+        ],
+        "raw_all_exact": false
+      },
+      "S": {
+        "different_all_recorded": 4,
+        "different_workspace": 4,
+        "fixed_input_owners": [
+          "uv_client"
+        ],
+        "raw_all_exact": false
+      }
+    },
+    "order": [
+      [
+        "S",
+        "F"
+      ],
+      [
+        "F",
+        "S"
+      ],
+      [
+        "F",
+        "S"
+      ],
+      [
+        "S",
+        "F"
+      ],
+      [
+        "F",
+        "S"
+      ],
+      [
+        "S",
+        "F"
+      ],
+      [
+        "S",
+        "F"
+      ],
+      [
+        "F",
+        "S"
+      ]
+    ],
+    "raw": {
+      "sum_two": [
+        [
+          4405069578,
+          3363441058
+        ],
+        [
+          4405006728,
+          3363568025
+        ],
+        [
+          4404985724,
+          3363547066
+        ],
+        [
+          4408192985,
+          3363555914
+        ],
+        [
+          4404964288,
+          3363570535
+        ],
+        [
+          4404966982,
+          3363568281
+        ],
+        [
+          4405042612,
+          3363471005
+        ],
+        [
+          4404810739,
+          3363515081
+        ]
+      ],
+      "uv_client": [
+        [
+          2942937641,
+          2084622474
+        ],
+        [
+          2942949018,
+          2084665013
+        ],
+        [
+          2942911179,
+          2084712952
+        ],
+        [
+          2946163178,
+          2084703544
+        ],
+        [
+          2942910017,
+          2084728123
+        ],
+        [
+          2942907432,
+          2084685205
+        ],
+        [
+          2942943548,
+          2084680898
+        ],
+        [
+          2942791779,
+          2084683422
+        ]
+      ],
+      "uv_configuration": [
+        [
+          1462131937,
+          1278818584
+        ],
+        [
+          1462057710,
+          1278903012
+        ],
+        [
+          1462074545,
+          1278834114
+        ],
+        [
+          1462029807,
+          1278852370
+        ],
+        [
+          1462054271,
+          1278842412
+        ],
+        [
+          1462059550,
+          1278883076
+        ],
+        [
+          1462099064,
+          1278790107
+        ],
+        [
+          1462018960,
+          1278831659
+        ]
+      ],
+      "wall": [
+        [
+          794385131,
+          636837538
+        ],
+        [
+          791152823,
+          611413745
+        ],
+        [
+          788159288,
+          616242366
+        ],
+        [
+          828999648,
+          612496897
+        ],
+        [
+          782632626,
+          620200323
+        ],
+        [
+          802036142,
+          624459429
+        ],
+        [
+          788929811,
+          628989887
+        ],
+        [
+          776951042,
+          633610706
+        ]
+      ],
+      "whole": [
+        [
+          5248832031,
+          4207415601
+        ],
+        [
+          5248823171,
+          4207379336
+        ],
+        [
+          5248806650,
+          4207396843
+        ],
+        [
+          5252150634,
+          4207430081
+        ],
+        [
+          5248773186,
+          4207468122
+        ],
+        [
+          5248718912,
+          4207409781
+        ],
+        [
+          5248916952,
+          4207414659
+        ],
+        [
+          5248741563,
+          4207294373
+        ]
+      ]
+    },
+    "replicated": null,
+    "run": 41577930987,
+    "runner_id": 1852,
+    "runner_name": "nsc-runner-g2pbp7r6ct02s",
+    "treatment": "F",
+    "verdict": {
+      "hold_wall_speedups": [
+        1.2864745295424778,
+        1.2580917806280614
+      ],
+      "instruction_declarations": {
+        "sum_two": {
+          "hold_cut_percent": [
+            23.644200915614242,
+            23.64141546814453
+          ],
+          "median_cut_percent": 23.642215045699473,
+          "pairs_at_least_20_percent": 8,
+          "qualifies_20_percent": true
+        },
+        "uv_client": {
+          "hold_cut_percent": [
+            29.164665776256964,
+            29.161694800943273
+          ],
+          "median_cut_percent": 29.162900702874907,
+          "pairs_at_least_20_percent": 8,
+          "qualifies_20_percent": true
+        },
+        "uv_configuration": {
+          "hold_cut_percent": [
+            12.530943598895908,
+            12.530437195362776
+          ],
+          "median_cut_percent": 12.530437195362776,
+          "pairs_at_least_20_percent": 0,
+          "qualifies_20_percent": false
+        }
+      },
+      "median_wall_speedup": 1.270439556511658,
+      "pairs_strictly_above_2x": 0,
+      "qualifies_2x_on_this_host": false
+    }
+  },
+  "marginal-repeat": {
+    "archives": {
+      "boot": {
+        "bytes": 1420,
+        "id": 13204544937,
+        "name": "uv-22958-release23-marginal-runner-boot",
+        "sha256": "469a638025303005d9c548428419679cde4388f9893aaea8075721f21f7a5ac6"
+      },
+      "original": {
+        "bytes": 131333974,
+        "id": 13206425517,
+        "name": "uv-22958-release23-marginal-wall-eight-pairs",
+        "sha256": "7fad3abd427e05f3eb86fb10636ff25d88f45c5762740d78ddaa022241883d1a"
+      }
+    },
+    "attempt": "repeat",
+    "boot": "023e7142-c7e7-4722-b380-99d58f44b963",
+    "compiler_executions": 68,
+    "compiler_traces": 38,
+    "contrast": "marginal",
+    "control": "S",
+    "independent_histories": 16,
+    "job": 125730979115,
+    "medians": {
+      "sum_two": {
+        "control": 4405040966.5,
+        "paired_median_reduction_pct": 23.643483545752986,
+        "paired_median_speedup": 1.3096459169658712,
+        "treatment": 3363550487.5
+      },
+      "uv_client": {
+        "control": 2942982866.0,
+        "paired_median_reduction_pct": 29.16395580878992,
+        "paired_median_speedup": 1.4117106785623008,
+        "treatment": 2084696473.5
+      },
+      "uv_configuration": {
+        "control": 1462048752.5,
+        "paired_median_reduction_pct": 12.53083309184917,
+        "paired_median_speedup": 1.1432600027537232,
+        "treatment": 1278848065.5
+      },
+      "wall": {
+        "control": 895237230.5,
+        "paired_median_reduction_pct": 20.58205354075804,
+        "paired_median_speedup": 1.259352297017674,
+        "treatment": 677225004.0
+      },
+      "whole": {
+        "control": 5248908824.0,
+        "paired_median_reduction_pct": 19.840905591668857,
+        "paired_median_speedup": 1.2475190836253711,
+        "treatment": 4207398762.0
+      }
+    },
+    "native": {
+      "F": {
+        "different_all_recorded": 4,
+        "different_workspace": 4,
+        "fixed_input_owners": [
+          "uv_client",
+          "uv_extract"
+        ],
+        "raw_all_exact": false
+      },
+      "S": {
+        "different_all_recorded": 6,
+        "different_workspace": 5,
+        "fixed_input_owners": [
+          "uv_client",
+          "uv_extract"
+        ],
+        "raw_all_exact": false
+      }
+    },
+    "order": [
+      [
+        "S",
+        "F"
+      ],
+      [
+        "F",
+        "S"
+      ],
+      [
+        "F",
+        "S"
+      ],
+      [
+        "S",
+        "F"
+      ],
+      [
+        "F",
+        "S"
+      ],
+      [
+        "S",
+        "F"
+      ],
+      [
+        "S",
+        "F"
+      ],
+      [
+        "F",
+        "S"
+      ]
+    ],
+    "raw": {
+      "sum_two": [
+        [
+          4405125239,
+          3363537961
+        ],
+        [
+          4405083775,
+          3363538354
+        ],
+        [
+          4404998158,
+          3363569026
+        ],
+        [
+          4405172105,
+          3363562621
+        ],
+        [
+          4403885978,
+          3363595663
+        ],
+        [
+          4403939545,
+          3363619833
+        ],
+        [
+          4408429238,
+          3363455863
+        ],
+        [
+          4404961983,
+          3363505684
+        ]
+      ],
+      "uv_client": [
+        [
+          2943084953,
+          2084742271
+        ],
+        [
+          2943026556,
+          2084684335
+        ],
+        [
+          2942931978,
+          2084685352
+        ],
+        [
+          2943105865,
+          2084707595
+        ],
+        [
+          2941876007,
+          2084741683
+        ],
+        [
+          2941869963,
+          2084777682
+        ],
+        [
+          2946393105,
+          2084673734
+        ],
+        [
+          2942939176,
+          2084684381
+        ]
+      ],
+      "uv_configuration": [
+        [
+          1462040286,
+          1278795690
+        ],
+        [
+          1462057219,
+          1278854019
+        ],
+        [
+          1462066180,
+          1278883674
+        ],
+        [
+          1462066240,
+          1278855026
+        ],
+        [
+          1462009971,
+          1278853980
+        ],
+        [
+          1462069582,
+          1278842151
+        ],
+        [
+          1462036133,
+          1278782129
+        ],
+        [
+          1462022807,
+          1278821303
+        ]
+      ],
+      "wall": [
+        [
+          806234580,
+          632408396
+        ],
+        [
+          960750345,
+          617827342
+        ],
+        [
+          801563690,
+          649841925
+        ],
+        [
+          842273239,
+          693475311
+        ],
+        [
+          972203188,
+          781613856
+        ],
+        [
+          939086945,
+          660974697
+        ],
+        [
+          875569389,
+          728224543
+        ],
+        [
+          914905072,
+          698212217
+        ]
+      ],
+      "whole": [
+        [
+          5249009271,
+          4207567900
+        ],
+        [
+          5248995831,
+          4207368969
+        ],
+        [
+          5248790084,
+          4207415621
+        ],
+        [
+          5249008255,
+          4207344979
+        ],
+        [
+          5247861510,
+          4207399091
+        ],
+        [
+          5247857176,
+          4207462803
+        ],
+        [
+          5252269399,
+          4207258906
+        ],
+        [
+          5248821817,
+          4207398433
+        ]
+      ]
+    },
+    "replicated": {
+      "external_sha256": "51b4604c5b20b1c956fd902e507a4d650c758983fbd424115e9a881a69433b55",
+      "named": [
+        "sum_two",
+        "uv_client"
+      ],
+      "wall": false
+    },
+    "run": 41579572319,
+    "runner_id": 1854,
+    "runner_name": "nsc-runner-kouur76ch3d7k",
+    "treatment": "F",
+    "verdict": {
+      "hold_wall_speedups": [
+        1.2541693468606674,
+        1.2770973186262629
+      ],
+      "instruction_declarations": {
+        "sum_two": {
+          "hold_cut_percent": [
+            23.64453210518516,
+            23.632639103822804
+          ],
+          "median_cut_percent": 23.64348354575298,
+          "pairs_at_least_20_percent": 8,
+          "qualifies_20_percent": true
+        },
+        "uv_client": {
+          "hold_cut_percent": [
+            29.16500818136978,
+            29.149411140667244
+          ],
+          "median_cut_percent": 29.16395580878992,
+          "pairs_at_least_20_percent": 8,
+          "qualifies_20_percent": true
+        },
+        "uv_configuration": {
+          "hold_cut_percent": [
+            12.530743626812232,
+            12.531373360755486
+          ],
+          "median_cut_percent": 12.530833091849164,
+          "pairs_at_least_20_percent": 0,
+          "qualifies_20_percent": false
+        }
+      },
+      "median_wall_speedup": 1.259352297017674,
+      "pairs_strictly_above_2x": 0,
+      "qualifies_2x_on_this_host": false
+    }
+  },
+  "signed-primary": {
+    "archives": {
+      "boot": {
+        "bytes": 1708,
+        "id": 13204416805,
+        "name": "uv-22958-release23-signed-runner-boot",
+        "sha256": "2d3050589c819a534dc9d6a6d5624d9651e48661cacac01b53ddbefa1ba4c6ac"
+      },
+      "original": {
+        "bytes": 126741986,
+        "id": 13203889386,
+        "name": "uv-22958-release23-signed-wall-eight-pairs",
+        "sha256": "d1bd1467a1d197ce55df0aadfd64fc79a80096d1505a4fc65f509b5a6c724326"
+      }
+    },
+    "attempt": "primary",
+    "boot": "187fefcc-f6b6-4263-804d-82c938d4d32a",
+    "compiler_executions": 68,
+    "compiler_traces": 38,
+    "contrast": "signed",
+    "control": "R",
+    "independent_histories": 16,
+    "job": 125726368044,
+    "medians": {
+      "sum_two": {
+        "control": 4404830553.5,
+        "paired_median_reduction_pct": 23.639084785684815,
+        "paired_median_speedup": 1.3095704860706587,
+        "treatment": 3363557711.5
+      },
+      "uv_client": {
+        "control": 2942562374.5,
+        "paired_median_reduction_pct": 29.152242262189365,
+        "paired_median_speedup": 1.4114772992480182,
+        "treatment": 2084716344.5
+      },
+      "uv_configuration": {
+        "control": 1462279693.5,
+        "paired_median_reduction_pct": 12.544956688539399,
+        "paired_median_speedup": 1.1434446341238926,
+        "treatment": 1278837612.5
+      },
+      "wall": {
+        "control": 883554059.5,
+        "paired_median_reduction_pct": 22.542136636581056,
+        "paired_median_speedup": 1.2910334446753131,
+        "treatment": 686928828.0
+      },
+      "whole": {
+        "control": 5248706408.5,
+        "paired_median_reduction_pct": 19.840412339157453,
+        "paired_median_speedup": 1.2475114125783833,
+        "treatment": 4207455513.5
+      }
+    },
+    "native": {
+      "F": {
+        "different_all_recorded": 5,
+        "different_workspace": 5,
+        "fixed_input_owners": [
+          "uv_client",
+          "uv_extract"
+        ],
+        "raw_all_exact": false
+      },
+      "R": {
+        "different_all_recorded": 6,
+        "different_workspace": 5,
+        "fixed_input_owners": [
+          "uv_extract"
+        ],
+        "raw_all_exact": false
+      }
+    },
+    "order": [
+      [
+        "R",
+        "F"
+      ],
+      [
+        "F",
+        "R"
+      ],
+      [
+        "F",
+        "R"
+      ],
+      [
+        "R",
+        "F"
+      ],
+      [
+        "F",
+        "R"
+      ],
+      [
+        "R",
+        "F"
+      ],
+      [
+        "R",
+        "F"
+      ],
+      [
+        "F",
+        "R"
+      ]
+    ],
+    "raw": {
+      "sum_two": [
+        [
+          4405311496,
+          3363608826
+        ],
+        [
+          4405320104,
+          3363456728
+        ],
+        [
+          4404234912,
+          3363560846
+        ],
+        [
+          4404294355,
+          3363545517
+        ],
+        [
+          4404378859,
+          3363589689
+        ],
+        [
+          4405347392,
+          3363554577
+        ],
+        [
+          4405266909,
+          3363591262
+        ],
+        [
+          4404394198,
+          3363546525
+        ]
+      ],
+      "uv_client": [
+        [
+          2943013845,
+          2084767525
+        ],
+        [
+          2943033930,
+          2084655692
+        ],
+        [
+          2941957071,
+          2084697383
+        ],
+        [
+          2942026775,
+          2084713717
+        ],
+        [
+          2942125719,
+          2084718972
+        ],
+        [
+          2943065824,
+          2084720653
+        ],
+        [
+          2942999030,
+          2084773033
+        ],
+        [
+          2942112652,
+          2084696551
+        ]
+      ],
+      "uv_configuration": [
+        [
+          1462297651,
+          1278841301
+        ],
+        [
+          1462286174,
+          1278801036
+        ],
+        [
+          1462277841,
+          1278863463
+        ],
+        [
+          1462267580,
+          1278831800
+        ],
+        [
+          1462253140,
+          1278870717
+        ],
+        [
+          1462281568,
+          1278833924
+        ],
+        [
+          1462267879,
+          1278818229
+        ],
+        [
+          1462281546,
+          1278849974
+        ]
+      ],
+      "wall": [
+        [
+          963571980,
+          725691033
+        ],
+        [
+          882382993,
+          721018565
+        ],
+        [
+          882921666,
+          676747897
+        ],
+        [
+          892328784,
+          678909867
+        ],
+        [
+          887663859,
+          689374358
+        ],
+        [
+          871490975,
+          690195238
+        ],
+        [
+          884186453,
+          683070122
+        ],
+        [
+          867165671,
+          684483298
+        ]
+      ],
+      "whole": [
+        [
+          5249262344,
+          4207509694
+        ],
+        [
+          5249089734,
+          4207248300
+        ],
+        [
+          5248050567,
+          4207480617
+        ],
+        [
+          5248323083,
+          4207311449
+        ],
+        [
+          5248189756,
+          4207558734
+        ],
+        [
+          5249301310,
+          4207318460
+        ],
+        [
+          5249190818,
+          4207430410
+        ],
+        [
+          5248163025,
+          4207519675
+        ]
+      ]
+    },
+    "replicated": null,
+    "run": 41578145223,
+    "runner_id": 1853,
+    "runner_name": "nsc-runner-n76qadf17ts6s",
+    "treatment": "F",
+    "verdict": {
+      "hold_wall_speedups": [
+        1.309504514991803,
+        1.277263905334929
+      ],
+      "instruction_declarations": {
+        "sum_two": {
+          "hold_cut_percent": [
+            23.638417664238872,
+            23.639084785684815
+          ],
+          "median_cut_percent": 23.639084785684815,
+          "pairs_at_least_20_percent": 8,
+          "qualifies_20_percent": true
+        },
+        "uv_client": {
+          "hold_cut_percent": [
+            29.151188250083703,
+            29.152242262189365
+          ],
+          "median_cut_percent": 29.152242262189365,
+          "pairs_at_least_20_percent": 8,
+          "qualifies_20_percent": true
+        },
+        "uv_configuration": {
+          "hold_cut_percent": [
+            12.545185381344094,
+            12.54475289808634
+          ],
+          "median_cut_percent": 12.5449566885394,
+          "pairs_at_least_20_percent": 0,
+          "qualifies_20_percent": false
+        }
+      },
+      "median_wall_speedup": 1.291033444675313,
+      "pairs_strictly_above_2x": 0,
+      "qualifies_2x_on_this_host": false
+    }
+  },
+  "signed-repeat": {
+    "archives": {
+      "boot": {
+        "bytes": 1713,
+        "id": 13204009521,
+        "name": "uv-22958-release23-signed-runner-boot",
+        "sha256": "bef20b17eccbb1f51c1c07eb0ebec3e691233b322ebaf593545181d5915f090f"
+      },
+      "original": {
+        "bytes": 129351730,
+        "id": 13206285942,
+        "name": "uv-22958-release23-signed-wall-eight-pairs",
+        "sha256": "77711733f9dac5ad8cc454e014f1d8d69f0535d4451f40f700211dc15a5766f2"
+      }
+    },
+    "attempt": "repeat",
+    "boot": "c9fb48af-4e9f-416d-87aa-d25701341731",
+    "compiler_executions": 68,
+    "compiler_traces": 38,
+    "contrast": "signed",
+    "control": "R",
+    "independent_histories": 16,
+    "job": 125731344652,
+    "medians": {
+      "sum_two": {
+        "control": 4407032376.0,
+        "paired_median_reduction_pct": 23.677301351842406,
+        "paired_median_speedup": 1.3102263676345567,
+        "treatment": 3363568295.0
+      },
+      "uv_client": {
+        "control": 2944727258.5,
+        "paired_median_reduction_pct": 29.204130007663064,
+        "paired_median_speedup": 1.4125121838413215,
+        "treatment": 2084729498.0
+      },
+      "uv_configuration": {
+        "control": 1462278450.0,
+        "paired_median_reduction_pct": 12.544760708139858,
+        "paired_median_speedup": 1.143442071755517,
+        "treatment": 1278840969.0
+      },
+      "wall": {
+        "control": 788185703.0,
+        "paired_median_reduction_pct": 22.059873905409688,
+        "paired_median_speedup": 1.2830385308439074,
+        "treatment": 615396382.0
+      },
+      "whole": {
+        "control": 5250967395.0,
+        "paired_median_reduction_pct": 19.870214116613518,
+        "paired_median_speedup": 1.2479754880064076,
+        "treatment": 4207518268.5
+      }
+    },
+    "native": {
+      "F": {
+        "different_all_recorded": 4,
+        "different_workspace": 4,
+        "fixed_input_owners": [],
+        "raw_all_exact": false
+      },
+      "R": {
+        "different_all_recorded": 5,
+        "different_workspace": 4,
+        "fixed_input_owners": [
+          "uv_client",
+          "uv_extract"
+        ],
+        "raw_all_exact": false
+      }
+    },
+    "order": [
+      [
+        "R",
+        "F"
+      ],
+      [
+        "F",
+        "R"
+      ],
+      [
+        "F",
+        "R"
+      ],
+      [
+        "R",
+        "F"
+      ],
+      [
+        "F",
+        "R"
+      ],
+      [
+        "R",
+        "F"
+      ],
+      [
+        "R",
+        "F"
+      ],
+      [
+        "F",
+        "R"
+      ]
+    ],
+    "raw": {
+      "sum_two": [
+        [
+          4408698411,
+          3363521674
+        ],
+        [
+          4405489294,
+          3363563608
+        ],
+        [
+          4408749285,
+          3363568942
+        ],
+        [
+          4408728313,
+          3363595298
+        ],
+        [
+          4405335104,
+          3363617693
+        ],
+        [
+          4405250892,
+          3363516304
+        ],
+        [
+          4408575458,
+          3363567648
+        ],
+        [
+          4404380458,
+          3363569032
+        ]
+      ],
+      "uv_client": [
+        [
+          2946364466,
+          2084709895
+        ],
+        [
+          2943152734,
+          2084751294
+        ],
+        [
+          2946478999,
+          2084700364
+        ],
+        [
+          2946479024,
+          2084757647
+        ],
+        [
+          2943056876,
+          2084773406
+        ],
+        [
+          2942972220,
+          2084668978
+        ],
+        [
+          2946301783,
+          2084738070
+        ],
+        [
+          2942073727,
+          2084720926
+        ]
+      ],
+      "uv_configuration": [
+        [
+          1462333945,
+          1278811779
+        ],
+        [
+          1462336560,
+          1278812314
+        ],
+        [
+          1462270286,
+          1278868578
+        ],
+        [
+          1462249289,
+          1278837651
+        ],
+        [
+          1462278228,
+          1278844287
+        ],
+        [
+          1462278672,
+          1278847326
+        ],
+        [
+          1462273675,
+          1278829578
+        ],
+        [
+          1462306731,
+          1278848106
+        ]
+      ],
+      "wall": [
+        [
+          789712374,
+          616339718
+        ],
+        [
+          779853476,
+          611566396
+        ],
+        [
+          794880025,
+          611048545
+        ],
+        [
+          783000676,
+          609441929
+        ],
+        [
+          799702634,
+          614947563
+        ],
+        [
+          800217137,
+          618183855
+        ],
+        [
+          782355323,
+          620330949
+        ],
+        [
+          786659032,
+          615845201
+        ]
+      ],
+      "whole": [
+        [
+          5252466102,
+          4207362176
+        ],
+        [
+          5249468688,
+          4208160984
+        ],
+        [
+          5252617981,
+          4207567997
+        ],
+        [
+          5252586134,
+          4207512634
+        ],
+        [
+          5249144180,
+          4207460535
+        ],
+        [
+          5249114883,
+          4207340973
+        ],
+        [
+          5252513872,
+          4207590862
+        ],
+        [
+          5248382275,
+          4207523903
+        ]
+      ]
+    },
+    "replicated": {
+      "external_sha256": "1400b5996b45d48c6eb9f8125959ecc47972eb669cad3fb9bfd35a9ba1f38300",
+      "named": [
+        "sum_two",
+        "uv_client"
+      ],
+      "wall": false
+    },
+    "run": 41579685157,
+    "runner_id": 1855,
+    "runner_name": "nsc-runner-v3ve8epkaedla",
+    "treatment": "F",
+    "verdict": {
+      "hold_wall_speedups": [
+        1.2830385308439074,
+        1.2859147570982978
+      ],
+      "instruction_declarations": {
+        "sum_two": {
+          "hold_cut_percent": [
+            23.706477670818092,
+            23.64714447257425
+          ],
+          "median_cut_percent": 23.677301351842402,
+          "pairs_at_least_20_percent": 8,
+          "qualifies_20_percent": true
+        },
+        "uv_client": {
+          "hold_cut_percent": [
+            29.2452353482169,
+            29.163748337669784
+          ],
+          "median_cut_percent": 29.20413000766306,
+          "pairs_at_least_20_percent": 8,
+          "qualifies_20_percent": true
+        },
+        "uv_configuration": {
+          "hold_cut_percent": [
+            12.546533018525427,
+            12.54476070813985
+          ],
+          "median_cut_percent": 12.54476070813985,
+          "pairs_at_least_20_percent": 0,
+          "qualifies_20_percent": false
+        }
+      },
+      "median_wall_speedup": 1.2830385308439074,
+      "pairs_strictly_above_2x": 0,
+      "qualifies_2x_on_this_host": false
+    }
+  }
+}
