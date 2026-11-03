@@ -1,12 +1,12 @@
-name: 'Confirm the Ruff #29697 editor build on six fresh boots'
-run-name: Six admitted source-matched Ruff 29697 pairs ${{ inputs.reviewed_head }}
+name: Qualify the normal Ruff ty_ide library build
+run-name: Ruff 29697 direct ty_ide build P/C ${{ inputs.reviewed_head }}
 permissions:
   contents: read
   actions: read
 jobs:
   inspect:
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha
-      == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruff-ty-ide-profile-29697-20261103'
+      == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruff-ty-ide-lib-29697-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 165
     steps:
@@ -34,38 +34,19 @@ jobs:
         path: factory-src
         persist-credentials: false
         sparse-checkout: scripts/ruff-matched-stage
-    - name: Run the source-matched owner bucket pilot and check the real native e2e
+    - name: Build and inspect both normal ty_ide library histories
       env:
         REVIEWED_HEAD: ${{ inputs.reviewed_head }}
         OHM_SDK_READ_TOKEN: ${{ github.token }}
-      run: python3 -IB qa/scripts/ruff-original-ty-instructions/owner-buckets/pilot.py
+      run: python3 -IB qa/scripts/ruff-original-ty-instructions/standalone-buckets/study.py
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: matched-ty-ide-bucket-confirm-${{ github.run_id }}-${{ matrix.slot }}
+        name: matched-ty-ide-library-first-${{ github.run_id }}
         path: ${{ runner.temp }}/ohm-foreign-join/published/
         retention-days: 21
         if-no-files-found: error
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-        - slot: 0
-          order: PC
-        - slot: 1
-          order: CP
-        - slot: 2
-          order: CP
-        - slot: 3
-          order: PC
-        - slot: 4
-          order: PC
-        - slot: 5
-          order: CP
-    name: 'Ruff #29697 ${{ matrix.slot }} ${{ matrix.order }}'
-    env:
-      OHM_29697_SLOT: ${{ matrix.slot }}
-      OHM_29697_ORDER: ${{ matrix.order }}
+    name: First ordinary ty_ide P/C pair
 'on':
   workflow_dispatch:
     inputs:
