@@ -1,11 +1,12 @@
 {
-  "bundle": "0c2ee470c597fd6b5f3c53568777ae461f5fe10cad066c01c2ce0845f659b874",
-  "candidate": "2bc7e7b7c898e7fa82a1dde03978c59263d8167d",
-  "candidate_tree": "428a2eac5b7b5481835ac224696ca8728f1b1fde",
+  "bundle": "95ff414588d9aa4f3eed1bad4cdfb77679c5ff8f649023cbf8fea88a21de6266",
+  "candidate": "dda36b958be0f0c393c22039fb2f53c0ff436968",
+  "candidate_tree": "ff7b8023f28d9ee6b7121944b97ef5b58cbb0322",
   "cargo": "abc70d60a6fd89c10d5f65cf85820d9b78d5affe",
   "compiler_commits": [
     "a60f4f4476d4819b62730e92ea07c1343f8e6dac",
-    "2bc7e7b7c898e7fa82a1dde03978c59263d8167d"
+    "2bc7e7b7c898e7fa82a1dde03978c59263d8167d",
+    "dda36b958be0f0c393c22039fb2f53c0ff436968"
   ],
   "criterion": "20% fewer instructions in a full affected compiler or 2x across a real ordinary command; no PR from the factory alone.",
   "initial_build": {
@@ -17,6 +18,8 @@
   "parent": "f5a51d8cc3e76236c2d0f17d495d59ebb03306e4",
   "parent_tree": "b4f0ad237b667d5227e63b44f6e8d3ba885bf7a1",
   "paths": [
+    "compiler/rustc_hir_typeck/src/expr.rs",
+    "compiler/rustc_hir_typeck/src/writeback.rs",
     "compiler/rustc_middle/src/thir.rs",
     "compiler/rustc_middle/src/thir/visit.rs",
     "compiler/rustc_mir_build/src/builder/expr/as_constant.rs",
@@ -31,6 +34,13 @@
     "compiler/rustc_mir_build/src/thir/print.rs",
     "compiler/rustc_ty_utils/src/consts.rs"
   ],
+  "priced_parent": {
+    "artifact": 13274919319,
+    "run": 41727547021,
+    "source": "f5a51d8cc3e76236c2d0f17d495d59ebb03306e4",
+    "tar": "135b203802b810b96301a965e916296d9cea5ad9425ce6f306c07818521072bc",
+    "zip": "de89166137076bfa80a1e103006e377a0765605454cae35d69c5d7f728030e60"
+  },
   "ref": "refs/heads/charlie/qa-compact-integer-arrays-20261103",
   "release_members": {
     "bin/cargo": {
