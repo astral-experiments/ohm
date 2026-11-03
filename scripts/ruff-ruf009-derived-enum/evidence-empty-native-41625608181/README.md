@@ -20,3 +20,10 @@ python3 -IB scripts/ruff-ruf009-derived-enum/evidence-empty-native-41625608181/v
 ```
 
 The fixed-name verifier checks its own SHA table, reconstructs and hashes every ELF, and reopens the native verdicts, kernel argv and decoded sections. It records the SHA of each complete unnormalized decoded stream under a stable filename. For comparison to the original random temporary filenames it separately checks the first filename line printed by llvm-dwarfdump, every subsequent canonical byte, and the exact raw byte count after accounting for the filename length. The native bytes are compared directly throughout.
+
+A second command executes the four reconstructed Linux x86-64 binaries locally on all 16 distinct (compiler, source, input) combinations. It uses the original literal CLI flags and stdin and compares the complete formatted diagnostic after verifying the current checkout's emitted filename.
+
+```sh
+python3 -IB scripts/ruff-ruf009-derived-enum/evidence-empty-native-41625608181/replay-runtime.py > /tmp/ruf009-native-executed.json
+cmp /tmp/ruf009-native-executed.json scripts/ruff-ruf009-derived-enum/evidence-empty-native-41625608181/native-executed.json
+```
