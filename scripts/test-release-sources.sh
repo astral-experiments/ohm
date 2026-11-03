@@ -83,6 +83,25 @@ fi
 "$script_dir/verify-release-sources.sh" \
   "$release_manifest" "$rust_checkout" "$cargo_checkout" "$clippy_checkout" "$rustfmt_checkout"
 
+verify_sources=("$script_dir/verify-release-sources.sh" "$release_manifest" "$rust_checkout"
+  "$cargo_checkout" "$clippy_checkout" "$rustfmt_checkout")
+for flag in assume-unchanged skip-worktree; do
+  git -C "$cargo_checkout" update-index "--$flag" README.md
+  flagged_entry="$(git -C "$cargo_checkout" ls-files -v -- README.md)"
+  "${verify_sources[@]}"
+  printf 'uncommitted Cargo source\n' >> "$cargo_checkout/README.md"
+  if "${verify_sources[@]}" >/dev/null 2>&1; then
+    echo "source verification accepted an edit hidden by $flag" >&2
+    exit 1
+  fi
+  if [[ "$(git -C "$cargo_checkout" ls-files -v -- README.md)" != "$flagged_entry" ]]; then
+    echo "source verification changed the $flag index bit" >&2
+    exit 1
+  fi
+  git -C "$cargo_checkout" update-index "--no-$flag" README.md
+  git -C "$cargo_checkout" restore README.md
+done
+
 mkdir "$cargo_checkout/nested"
 if "$script_dir/verify-release-sources.sh" \
   "$release_manifest" "$rust_checkout" "$cargo_checkout/nested" "$clippy_checkout" "$rustfmt_checkout" \
