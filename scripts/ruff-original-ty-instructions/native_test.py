@@ -1,5 +1,6 @@
 """One unscored P/C admission on Ruff #19021's ordinary test-build command."""
 import collections
+import gzip
 import hashlib
 import json
 import os
@@ -18,6 +19,7 @@ import native_asm as kit
 
 w = kit.w
 REG = json.loads((HERE / 'native-test-registration.json').read_bytes())
+CONFIRM = json.loads((HERE / 'native-test-confirmation.json').read_bytes())
 CMD = REG['command']
 PLATFORM = 'x86_64-unknown-linux-gnu'
 PKG = w.work / 'crates/ruff_linter'
@@ -58,10 +60,11 @@ def command(argv, cwd, env, dst):
     return child.returncode
 
 
-def artifacts():
+def artifacts(destination):
     """Measure physical stored files once per inode, excluding the separate QA archives."""
     out = collections.defaultdict(lambda: [0, 0])
     seen = set()
+    ledger = []
     for root in (w.target, w.shared):
         for parent, dirs, files in os.walk(root):
             for file in files:
@@ -73,6 +76,8 @@ def artifacts():
                 groups = out[path.suffix if path.suffix in ('.o', '.rlib', '.rmeta', '.rlink') else 'other']
                 groups[0] += 1
                 groups[1] += st.st_size
+                ledger.append([str(path.relative_to(w.root)), st.st_dev, st.st_ino, st.st_size, st.st_blocks * 512])
+    (destination / 'stored-files.json.gz').write_bytes(gzip.compress(json.dumps(ledger, separators=(',', ':')).encode(), mtime=0))
     return dict(out)
 
 
@@ -227,7 +232,7 @@ def phase(role, name, env, mode, negative=False):
         result['binary'] = kit.preserve(exe)
         result['portable'] = marker()
         if name in ('old', 'warm2', 'clean'):
-            result['stored_native'] = artifacts()
+            result['stored_native'] = artifacts(dest)
     write(dest / 'result.json', result)
     print(role, name, 'verdict', result['harness']['code'], 'elf', result['elf'], 'nominal', len(result['nominal']), 'hardware', 'saved' if mode == 'whole' else mode, flush=True)
     return result
@@ -250,7 +255,10 @@ def main():
     TOOLS.mkdir()
     for name in ('whole_count', 'exec_count'):
         subprocess.run(['cc', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', HERE/(name+'.c'), '-o', TOOLS/name], check=True)
-    info = dict(registration=REG, sdk=kit.R, head=os.environ['GITHUB_SHA'], run=os.environ['GITHUB_RUN_ID'],
+    rank = int(os.environ['CONFIRM_RANK'])
+    assert 0 <= rank < 6 and len(CONFIRM['roles']) == 6
+    order = CONFIRM['roles'][rank]
+    info = dict(registration=REG, confirmation=CONFIRM, rank=rank, order=order, sdk=kit.R, head=os.environ['GITHUB_SHA'], run=os.environ['GITHUB_RUN_ID'],
                 boot=Path('/proc/sys/kernel/random/boot_id').read_text().strip(), runner=os.environ['RUNNER_NAME'], cpu=os.uname().machine,
                 affinity=sorted(os.sched_getaffinity(0)), kernel=os.uname().release)
     write(w.proof / 'enrollment.json', info)
@@ -260,7 +268,7 @@ def main():
     write(w.proof / 'cargo-environment.json', env)
     (w.ru/'toolchains').mkdir(parents=True); (w.ru/'toolchains/ohm').symlink_to(w.sdk, True)
     histories = {}
-    for role in REG['order']:
+    for role in order:
         arm = mani['arms']['normal' if role == 'P' else 'defer']; ordinary = Path(arm['root'])
         ordinary.rename(w.sdk)
         tools = {}
@@ -310,6 +318,19 @@ def main():
         if 'clock' in p:
             data[label] = dict(P=p['clock']['instructions'], C=c['clock']['instructions'])
     gates['warm-price-room'] = all(data[tag]['C'] <= 0.80 * data[tag]['P'] for tag in ('first','warm0','warm1','warm2'))
+    expected = {'full': [('full', 'portable_atomic'), ('full', 'ruff_db'), ('full', 'salsa'), ('test', 'ruff_linter')], 'one': [('test', 'ruff_linter')], 'zero': []}
+    for role, hist in histories.items():
+        gates[role+'/frozen-binaries-and-names'] = all(x['elf'] == CONFIRM['sources']['old' if x['state'] == w.OLD else 'new']
+            and x['harness']['inventory'] == CONFIRM['inventory'] and x['harness']['name'] == CONFIRM['named']
+            and x['harness']['count'] == CONFIRM['test_count'] for x in hist.values())
+        for label in ('census-edit','census-warm'):
+            census = hist[label]['roster']
+            actual = sorted((x['mode'], x['crate']) for x in census if x['role'] == 'rustc' and x['mode'] != 'config')
+            selection = 'full' if role == 'P' else 'one' if label == 'census-edit' else 'zero'
+            gates[role+'/'+label+'/selected-processes'] = actual == expected[selection] and sum(x['role'] == 'wild' for x in census) == int(selection != 'zero')
+    gates['genuine-edit-improves'] = data['edit']['C'] < data['edit']['P']
+    gates['cold-guards'] = all(data[tag]['C'] <= 1.02 * data[tag]['P'] for tag in ('old','clean'))
+    gates['stored-native-products'] = all(histories['P']['warm2']['stored_native'][ext] == histories['C']['warm2']['stored_native'][ext] for ext in ('.o','.rlib','.rmeta')) and all(histories[r]['warm2']['stored_native']['.rlink'][0] == 1 for r in ('P','C'))
     write(w.proof / 'decision.json', {'gates':gates, 'counts':data, 'admitted':all(gates.values())})
     assert all(gates.values()), [k for k,v in gates.items() if not v]
 
