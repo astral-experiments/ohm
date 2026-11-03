@@ -1,52 +1,73 @@
-name: Qualify register-equality assembly on an unchanged Ruff native build
-run-name: Historical Ruff native register-equality pilot ${{ inputs.reviewed_head }}
-on:
+name: Confirm register-only equality on the historical Ruff build
+run-name: Eight paired historical Ruff native builds ${{ inputs.reviewed_head }}
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect:
+    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head &&
+      github.ref_name == 'charlie/qa-historical-ruff-sete-confirm-20261103'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 55
+    steps:
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: ${{ inputs.reviewed_head }}
+        path: qa
+        persist-credentials: false
+        sparse-checkout: 'scripts/ruff-foreign-span-observer
+
+          scripts/ruff-original-ty-instructions
+
+          '
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        repository: astral-sh/ruff
+        ref: b00f68a23cedbd3a38fc25bac63638f0f11fc3f0
+        fetch-depth: 2
+        path: ruff
+        persist-credentials: false
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 059b4e3f0205cf449d3e9e56b8b1872f9108f930
+        path: factory
+        persist-credentials: false
+        sparse-checkout: scripts/ruff-matched-stage
+    - name: Set up the independent DWARF decoder
+      run: test -x /usr/bin/llvm-dwarfdump-18 || { sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends llvm-18; }
+    - name: Measure both native compilers on the historical Ruff edit
+      env:
+        REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+        OHM_SDK_READ_TOKEN: ${{ github.token }}
+        OHM_PAIRED_WORKER: ${{ matrix.pair }}
+      run: 'python3 -IB qa/scripts/ruff-original-ty-instructions/native_asm.py
+
+        '
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      if: always()
+      with:
+        name: matched-sete-native-${{ github.run_id }}-${{ matrix.pair }}
+        path: ${{ runner.temp }}/ohm-foreign-join/published/
+        retention-days: 7
+        if-no-files-found: error
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        pair:
+        - '01'
+        - '02'
+        - '03'
+        - '04'
+        - '05'
+        - '06'
+        - '07'
+        - 08
+    name: Pair ${{ matrix.pair }}
+'on':
   workflow_dispatch:
     inputs:
       reviewed_head:
         description: Exact reviewed nonrelease QA source
         required: true
         type: string
-permissions:
-  contents: read
-  actions: read
-jobs:
-  inspect:
-    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-historical-ruff-sete-native-20261103'
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 55
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: ${{ inputs.reviewed_head }}
-          path: qa
-          persist-credentials: false
-          sparse-checkout: |
-            scripts/ruff-foreign-span-observer
-            scripts/ruff-original-ty-instructions
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          repository: astral-sh/ruff
-          ref: b00f68a23cedbd3a38fc25bac63638f0f11fc3f0
-          fetch-depth: 2
-          path: ruff
-          persist-credentials: false
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: 059b4e3f0205cf449d3e9e56b8b1872f9108f930
-          path: factory
-          persist-credentials: false
-          sparse-checkout: scripts/ruff-matched-stage
-      - name: Measure both native compilers on the historical Ruff edit
-        env:
-          REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-          OHM_SDK_READ_TOKEN: ${{ github.token }}
-        run: |
-          python3 -IB qa/scripts/ruff-original-ty-instructions/native_asm.py
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        if: always()
-        with:
-          name: matched-sete-native-${{ github.run_id }}
-          path: ${{ runner.temp }}/ohm-foreign-join/published/
-          retention-days: 15
-          if-no-files-found: error

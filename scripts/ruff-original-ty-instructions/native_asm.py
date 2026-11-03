@@ -122,14 +122,15 @@ def phase(role,label,kind):
         hw=json.loads((dst/'hardware.json').read_bytes());assert hw['instructions']>0 and hw['enabled']==hw['running']>0 and hw['status']==0
         obj['instructions']=hw['instructions']
     if kind=='census':
-        roster=[];rustc_stat=(w.sdk/'bin/rustc').stat()
+        roster=[];links=0;wild=(w.sdk/'lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd').stat();rustc_stat=(w.sdk/'bin/rustc').stat()
         for row in (dst/'tasks/epochs.tsv').read_text().splitlines():
             if not row.startswith('I ') or not row.endswith(' exec'):continue
             seq=int(row.split()[1]);fields=(dst/'tasks'/f'{seq:05}.nul').read_bytes().split(b'\0')
             path=Path(os.fsdecode(fields[3]));argv=list(map(os.fsdecode,fields[4:-1]))
+            if (int(fields[1]),int(fields[2]))==(wild.st_dev,wild.st_ino):links+=1
             if (int(fields[1]),int(fields[2]))==(rustc_stat.st_dev,rustc_stat.st_ino) and '--crate-name' in argv:
                 assert path.samefile(w.sdk/'bin/rustc');roster.append(argv[argv.index('--crate-name')+1])
-        obj['typed_execs']=sorted(roster)
+        obj['typed_execs']=sorted(roster);obj['wild_execs']=links
     (dst/'result.json').write_text(json.dumps(obj,indent=1,sort_keys=True)+'\n')
     print(role,label,'instructions',obj.get('instructions'), 'nominal-dirty',len(obj['dirty']), 'portable marker',obj['owners']['portable_atomic']['marker'],flush=True)
     return obj
@@ -187,7 +188,12 @@ def park(role, kind):
         path.rename(held/(role+'-'+kind+'-'+path.name))
 assert w.git('rev-parse','HEAD')==w.NEW and w.git('rev-parse','HEAD^')==w.OLD and w.hf(w.work/'Cargo.lock')==w.OLDLOCK and not w.git('status','--porcelain')
 assert os.environ['GITHUB_SHA']==os.environ['REVIEWED_HEAD'] and os.environ['GITHUB_RUN_ATTEMPT']=='1' and os.uname().machine=='x86_64'
+sys.path.insert(0,str(HERE))
+from native_qualification import admit
 save('registered.json',R); manif=intake()
+os.environ.pop('OHM_SDK_READ_TOKEN',None)
+pair=os.environ['OHM_PAIRED_WORKER'];assert pair in R['pairs']
+save('boot.json',{'pair':pair,'order':R['pairs'][pair],'boot_id':Path('/proc/sys/kernel/random/boot_id').read_text().strip(),'machine':os.uname().machine,'cpu':next(x for x in Path('/proc/cpuinfo').read_text().splitlines()if x.startswith('model name')),'run':os.environ['GITHUB_RUN_ID'],'attempt':os.environ['GITHUB_RUN_ATTEMPT'],'head':os.environ['GITHUB_SHA']})
 env={k:os.environ[k]for k in ('PATH','HOME','LANG','USER')if k in os.environ}
 env.update(RUSTUP_HOME=str(w.ru),RUSTUP_TOOLCHAIN='ohm',CARGO_HOME=str(w.home),CARGO_TARGET_DIR=str(w.target),CARGO_BUILD_BUILD_DIR=str(w.shared),CARGO_NET_GIT_FETCH_WITH_CLI='true',LD_LIBRARY_PATH=str(w.sdk/'lib'))
 (w.ru/'toolchains').mkdir(parents=True);(w.ru/'toolchains/ohm').symlink_to(w.sdk,True)
@@ -195,7 +201,11 @@ whole=w.root/'whole_count';tasks=w.root/'exec_count'
 for exe in (whole,tasks):
     sp.run(['/usr/bin/cc','-Wall','-Wextra','-Werror','-O2',str(HERE/(exe.name+'.c')),'-o',str(exe)],check=True)
 receipts={};safety={}
-for role in R['order']:
+for code,name in ((0,'true'),(1,'false')):
+    path=shutil.which(name,path=env['PATH']);dst=w.proof/('calibration-'+name+'.json')
+    cal=sp.run([whole,dst,path,name],env=env);cnt=json.loads(dst.read_bytes())
+    assert cal.returncode==code and os.waitstatus_to_exitcode(cnt['status'])==code and cnt['instructions']>0 and cnt['running']==cnt['enabled']>0
+for role in R['pairs'][pair]:
     label={'P':'normal','C':'defer'}[role];original=Path(manif['arms'][label]['root']);original.rename(w.sdk)
     for name in ('cargo','rustc','rustdoc'):
         actual=Path(sp.check_output(['rustup','which','--toolchain','ohm',name],env=env,text=True).strip())
@@ -217,7 +227,9 @@ for label in receipts['P']:
     summary[label]={'same_units':p['units']==c['units'],'same_verdicts':p['probes']==c['probes'],'same_elf':p['elf']==c['elf'],
                     'P':p.get('instructions'),'C':c.get('instructions'),'P_actual':p.get('typed_execs'),'C_actual':c.get('typed_execs')}
 save('summary.json',summary);assert all(safety.values()),safety
-assert all(x['same_units']and x['same_verdicts'] and x['same_elf']for x in summary.values()),summary
+assert all(x['same_units']and x['same_verdicts'] for x in summary.values()),summary
 for role,h in receipts.items():
     assert h['old']['elf']!=h['edit']['elf'] and len({x['elf']for k,x in h.items()if k!='old'})==1
     assert all(row['owners']['portable_atomic']['marker']==(role=='P') for row in h.values())
+
+admit(w.proof,w.root/'admitted-bodies',receipts,pair,probe)
