@@ -1,0 +1,23 @@
+{
+  "refused": {
+    "attempt": 1,
+    "candidate": "bda205d80135686b13271360017cce554b79e09d",
+    "changed_standard_library": 53,
+    "diagnostic_archive": "8d15c519fb31eb87558ff01313c84aacaa6412d5efc3813c798230a7608cb521",
+    "diagnostic_zip": "e55457fe1ba4a90af287fa12adfc5d806431ae5678dda2ee2ca877aebba35891",
+    "gate": "Both Rust compilers and the candidate run-make passed. All 53 mandatory common standard-library members differed with the option disabled.",
+    "independent_comparison": "fbaf2ac2c434184918b4d74d5b6ebba5d82d6744d13943cf85ba90b5a6b1d3f9",
+    "qa": "1ddfd65aa449d586fd0b551d09edfbd5930c0b0b",
+    "receipts_zip": "bba721381c4a9bd7b6f6247581277ba531b0a883bed758ca4d01754b3c3f9225",
+    "run": 41596716882,
+    "same_parent_members": 64,
+    "step": "compare common runtime before running ordinary Cargo"
+  },
+  "successor": {
+    "candidate": "800fcd497d67c2e0926f26ecbfe12b8837013637",
+    "cause": "[TRACKED] put the disabled flag in both incremental and crate hash input maps. The new boolean enters those same maps only when true.",
+    "independent_macro_probe_sha256": "c35165b7c32bec50708ceeb80f5bd63f5a5843b79b7a3089ce3084289afabb5a",
+    "required": "Every original common SDK byte must match, and unmodified release Cargo must retain the original physical app/dep roster on both compilers.",
+    "source": "compiler/rustc_session/src/options.rs"
+  }
+}
