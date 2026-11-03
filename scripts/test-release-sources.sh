@@ -19,7 +19,15 @@ rustfmt_checkout="$test_root/rustfmt"
 rust_checkout="$test_root/rust"$'\n'
 mkdir -p "$cargo_checkout" "$clippy_checkout" "$rustfmt_checkout" "$rust_checkout"
 
+dependency="$test_root/dependency"
+git init --quiet "$dependency"
+printf 'pub const VALUE: u8 = 1;\n' > "$dependency/lib.rs"
+git -C "$dependency" add lib.rs
+commit_fixture "$dependency" -m 'Add source dependency'
+
 git -C "$cargo_checkout" init --quiet
+git -C "$cargo_checkout" -c protocol.file.allow=always submodule add --quiet \
+  --name fixture "$dependency" 'vendor/fixture code'
 printf 'fixture cargo\n' > "$cargo_checkout/README.md"
 git -C "$cargo_checkout" add README.md
 commit_fixture "$cargo_checkout" -m 'Add Cargo fixture'
@@ -53,7 +61,7 @@ git -C "$rust_checkout" update-index --add \
   --cacheinfo "160000,$cargo_revision,src/tools/cargo"
 commit_fixture "$rust_checkout" -m 'Add Rust fixture'
 rust_revision="$(git -C "$rust_checkout" rev-parse HEAD)"
-git clone --quiet "$cargo_checkout" "$rust_checkout/src/tools/cargo"
+git -c protocol.file.allow=always clone --quiet --recurse-submodules "$cargo_checkout" "$rust_checkout/src/tools/cargo"
 
 manifest_directory="$test_root/toolchains/1.97.1"
 mkdir -p "$manifest_directory"
@@ -85,6 +93,26 @@ fi
 
 verify_sources=("$script_dir/verify-release-sources.sh" "$release_manifest" "$rust_checkout"
   "$cargo_checkout" "$clippy_checkout" "$rustfmt_checkout")
+embedded_cargo="$rust_checkout/src/tools/cargo"
+nested_dependency="$embedded_cargo/vendor/fixture code"
+git -C "$rust_checkout" config submodule.src/tools/cargo.ignore all
+git -C "$embedded_cargo" config submodule.fixture.ignore all
+for source in "$embedded_cargo/README.md" "$nested_dependency/lib.rs"; do
+  printf '// uncommitted edit\n' >> "$source"
+  if "${verify_sources[@]}" >/dev/null 2>&1; then
+    echo "source verification accepted an ignored submodule edit in $source" >&2
+    exit 1
+  fi
+  git -C "${source%/*}" restore -- "${source##*/}"
+done
+commit_fixture "$nested_dependency" --allow-empty -m 'Change the submodule revision'
+if "${verify_sources[@]}" >/dev/null 2>&1; then
+  echo 'source verification accepted an ignored nested submodule revision' >&2
+  exit 1
+fi
+git -C "$nested_dependency" checkout --quiet --detach "$(git -C "$dependency" rev-parse HEAD)"
+"${verify_sources[@]}"
+
 pinned_tree="$(git -C "$cargo_checkout" rev-parse 'HEAD^{tree}')"
 printf 'replaced Cargo source\n' >> "$cargo_checkout/README.md"
 git -C "$cargo_checkout" add README.md
