@@ -89,7 +89,24 @@ def main():
     assert sorted(graph['workspace_default_members'])==sorted(graph['workspace_members'])
     assert sorted(x['name'] for x in graph['packages']if x['id']in graph['workspace_default_members'])==b.SPEC['default_members']
     b.write(P/'cargo-metadata.json.gz',graph)
-    old=b.inventory('ordinary-empty-old',env,graph)
+    actor=w.root/'native-actor';saved=w.root/'ron-snapshots';saved.mkdir()
+    snapshots={}
+    bodies=P/'ron-native-objects';bodies.mkdir()
+    def env_for(label,mode):
+        visit=P/label/'ron-visit'
+        return dict(env,LD_PRELOAD=str(shim),OHM_CAPTURE_DISPATCH=str(shim),OHM_CAPTURE_RECEIVER=str(HERE/'receiver.py'),OHM_CAPTURE_CARGO=str(w.sdk/'bin/cargo'),OHM_CAPTURE_ACTION=mode,OHM_CAPTURE_ACTOR=str(actor),OHM_CAPTURE_VISIT=str(visit))
+    def note(label,inventory):
+        dest=saved/label;dest.mkdir()
+        logical=[k for k in inventory['workspace_artifacts_and_ron']if Path(k).name.startswith('libron-') and Path(k).suffix in ('.rlib','.rmeta')]
+        assert sorted(Path(k).suffix for k in logical)==['.rlib','.rmeta'],logical
+        for rel in logical:
+            f=w.root/rel;shutil.copyfile(f,dest/f.name);assert w.hf(dest/f.name)==inventory['workspace_artifacts_and_ron'][rel][1]
+        for item in dest.iterdir():
+            seal=bodies/(w.hf(item)+'.zst')
+            if not seal.exists():
+                with seal.open('xb')as output:sp.run(['zstd','-q','-3','-c',item],stdout=output,check=True)
+        snapshots[label]=dest
+    old=b.inventory('ordinary-empty-old',env,graph);note('ordinary-empty-old',old)
     good=b.verdict(w.root/old['binary'],'old-verdict',env,0);oldelf=w.root/'old-before-edit';shutil.copy2(w.root/old['binary'],oldelf)
     # This off-clock kernel census is the one phase where the external sampler also reads live maps.
     stop=threading.Event();maps={};sampling=[]
@@ -112,7 +129,8 @@ def main():
                 except (OSError,IndexError):continue
             stop.wait(0.03)
     thread=threading.Thread(target=watch);thread.start()
-    try:normal=b.inventory('ordinary-repeat',env,graph,'census')
+    try:
+        normal=b.inventory('ordinary-repeat',env,graph,'census');note('ordinary-repeat',normal)
     finally:stop.set();thread.join()
     for key,attr in maps.items():
         f=Path(key[0]);a=f.stat();assert a.st_ino==key[2] and a.st_size==attr[0]
@@ -125,19 +143,7 @@ def main():
         b.write(P/'decision.json',{'ordinary':initial,'outcome':'published compiler already avoids this role; stop','qualified':False})
         return
     assert len(ron)==1 and tally.get('Wild',0)>0 and sampling
-    actor=w.root/'native-actor';saved=w.root/'ron-snapshots';saved.mkdir()
-    snapshots={}
-    def env_for(label,mode):
-        visit=P/label/'ron-visit'
-        return dict(env,LD_PRELOAD=str(shim),OHM_CAPTURE_DISPATCH=str(shim),OHM_CAPTURE_RECEIVER=str(HERE/'receiver.py'),OHM_CAPTURE_CARGO=str(w.sdk/'bin/cargo'),OHM_CAPTURE_ACTION=mode,OHM_CAPTURE_ACTOR=str(actor),OHM_CAPTURE_VISIT=str(visit))
-    def note(label,inventory):
-        dest=saved/label;dest.mkdir()
-        logical=[k for k in inventory['workspace_artifacts_and_ron']if Path(k).name.startswith('libron-') and Path(k).suffix in ('.rlib','.rmeta')]
-        assert sorted(Path(k).suffix for k in logical)==['.rlib','.rmeta'],logical
-        for rel in logical:
-            f=w.root/rel;shutil.copyfile(f,dest/f.name);assert w.hf(dest/f.name)==inventory['workspace_artifacts_and_ron'][rel][1]
-        snapshots[label]=dest
-    sham=b.inventory('kernel-sham',env_for('kernel-sham','observe'),graph,'census')
+    sham=b.inventory('kernel-sham',env_for('kernel-sham','observe'),graph,'census');note('kernel-sham',sham)
     sh_ron,sh_roster,sh_tally=census('kernel-sham');assert len(sh_ron)==1 and [r for r in sh_roster if r[0]!='link-only']==[r for r in roster if r[0]!='link-only']
     assert Counter((r[0],r[1])for r in sh_roster)==Counter((r[0],r[1])for r in roster) and sh_tally['Wild']==tally['Wild']
     cap=P/'kernel-sham/ron-visit'; bound=prepare.build(actor,w.sdk,cap);b.write(P/'bound-actor.json',bound)
@@ -145,7 +151,6 @@ def main():
     rx=(P/'ordinary-repeat/tasks'/ron[0]['argv']).read_bytes().split(b'\0')
     dispatch=(cap/'cargo-argv.nul').read_bytes().split(b'\0')[1:]
     assert rx[5:]==dispatch[1:] and Path(os.fsdecode(rx[4])).samefile(w.sdk/'bin/rustc')
-    for row,label in [(old,'ordinary-empty-old'),(normal,'ordinary-repeat'),(sham,'kernel-sham')]:note(label,row)
     seen={}
     def candidate(label,mode,kind='whole'):
         out=b.inventory(label,env_for(label,mode),graph,kind);note(label,out)
@@ -206,7 +211,7 @@ def main():
     all_slots={'old':old,'normal-repeat':normal,'sham':sham,'candidate':cp,'edited':edit,'edited-repeat':ed_warm,'clean':clean}
     b.write(P/'native-comparisons.json',{k:{n:r['elf']['sha256']for n,r in s['executables'].items()}for k,s in all_slots.items()})
     assert oldexe!=newexe and newexe==cleanexe and w.hf(next(snapshots['actual-edit'].glob('*.rlib')))==w.hf(next(snapshots['independent-new'].glob('*.rlib')))
-    objects=P/'ron-native-objects';objects.mkdir()
+    objects=P/'ron-native-objects';assert objects.is_dir()
     for f in [*saved.glob('*/*'),*list((w.root/'readers').glob('*/reader'))]:
         dst=objects/(w.hf(f)+'.zst')
         if not dst.exists():
