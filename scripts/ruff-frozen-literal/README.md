@@ -54,3 +54,20 @@ Cargo scopes incorporate the authenticated compiler and driver file identities.
 Within each role every metered command must use identical original arguments and
 physical upstream metadata. Across roles the only admitted argument difference is
 the one independently identified, compiler-scoped Cargo path component.
+
+The completed fixed-input pilot ran both PC and CP on one physical runner. The
+edited compiler used 32.515% and 32.512% fewer instructions. The entire ordinary
+ty_vendored check used 8.264% and 8.257% fewer. A separate fresh parent/candidate/
+parent rustc comparison, holding the original parent dependencies and command
+fixed in place, used 209,835,652 / 154,580,156 / 210,218,051 instructions. All
+819 ZIP entries and both independently compiled, executed native consumers agree
+across compiler roles. The two complete distinct binaries have the old and new
+behavior respectively. `pilot-41603258212.json` records the original archive and
+both orders. The six independent confirmation slots, including the parser and
+nonincremental checks, are preregistered in `confirmation.json`.
+
+Run `python3 -IB scripts/ruff-frozen-literal/aggregate.py ROSTER.json NEW_DIRECTORY`
+to authenticate each original six-run archive and reopen its physical counts, source
+and native output. Each slot has one whole ordinary PC or CP pair, one genuine
+fixed-input P/C/P comparison, and another P/C/P in the same actual root changing
+only the rustc incremental option. The confirmation retains every observed direction.

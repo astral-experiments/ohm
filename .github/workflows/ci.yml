@@ -1,8 +1,13 @@
 name: Qualify immutable rustc literal bytes on a real Ruff typeshed edit
-run-name: Ruff literal discovery ${{ inputs.reviewed_head }}
+run-name: Ruff literal confirmation ${{ inputs.rank }} ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
+      rank:
+        description: Frozen independent pair
+        required: true
+        type: choice
+        options: ['0', '1', '2', '3', '4', '5']
       reviewed_head:
         description: Full frozen nonrelease QA commit
         required: true
@@ -17,6 +22,7 @@ jobs:
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 180
     env:
+      CONFIRMATION_RANK: ${{ inputs.rank }}
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       PYTHONDONTWRITEBYTECODE: '1'
     steps:

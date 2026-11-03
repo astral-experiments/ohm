@@ -11,6 +11,8 @@ HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
 import read as old
 import tree_clock as t
+from fixed_args import without_incremental
+from confirmation_plan import registration
 sys.path.insert(0,str(HERE.parent/"ruff-module-16149"))
 import scope_rdr
 
@@ -21,8 +23,14 @@ need=old.need
 def run(root):
     worker,registry=old.inputs(root);obj=root/"objects"
     need(old.load(root/"inherited-enrollment.json")==protocol and old.load(root/"complete.json")["protocol"]==protocol and not (root/"refused.txt").exists(),"incomplete fixed-input registration")
+    conf=None;order=reg["order"]
+    if (root/"confirmation-enrollment.json").is_file():
+        conf=old.load(root/"confirmation-enrollment.json")
+        need(conf==registration(conf["rank"]) and old.load(root/"complete.json")["rank"]==conf["rank"],"unexpected independent rank")
+        order=conf["order"]
+    need(old.load(root/"complete.json")["order"]==order,"different chronological compiler roles")
     schemas=json.loads(gzip.decompress((HERE.parent/"ruff-module-16149/schema.json.gz").read_bytes()))
-    archives={"old":set(),"new":set()};decoded={};visits=[];stats={};sigs={};native={};fixed=[]
+    archives={"old":set(),"new":set()};decoded={};visits=[];stats={};sigs={};native={};fixed=[];nonincremental=[]
     def state(d,which,parser=False):
         r=old.load(d/"products.json");m=r["metadata"];raw=(obj/m["sha256"]).read_bytes()
         need(m["bytes"]==len(raw) and all((obj/f["sha256"]).is_file()for f in r["dep_info"]),"root rmeta/dep-info")
@@ -80,7 +88,7 @@ def run(root):
             need((dst/"stdout").read_bytes()==(d0/"stdout").read_bytes() and len(obs["owner_tasks"])==3 and obs["tasks"]>=4,"inherited native control")
             if mode!="roster":tmp[mode]=obs["instructions"]
         if label=="large":need(plain>50_000_000 and all(abs(x-plain)/min(x,plain)<.01 for x in tmp.values()),"lost real child/thread instructions")
-    for index,role in enumerate(reg["order"],1):
+    for index,role in enumerate(order,1):
         d=root/f"visit-{index}-{role}";ident=old.load(d/"identity.json");cfg=registry["inline-"+role];physical=old.load(d/"sdk-file-stats.json")
         need(ident["role"]==role and ident["source"]==cfg["source"]==factory["source"][role] and all(ident[k]==cfg[k]for k in ("driver","rustc","cargo")) and stats.setdefault(role,physical)==physical,"SDK stat or verified contents changed across visits")
         need(ident["mapped_driver_inode"][1]==int(ident["mapped_driver_row"].split(None,5)[4]) and ident["mapped_driver_row"].split(None,5)[5]==ident["driver_path"],"incorrect authenticated fd mapping")
@@ -118,14 +126,22 @@ def run(root):
             av=v["argv"];out=av[av.index("--out-dir")+1];scope,=re.findall(r"/(v2-[0-9a-f]{16})/",out)
             need(sigs.setdefault(role,scope)==scope and all(set(re.findall(r"/(v2-[0-9a-f]{16})/",a))<={scope}for a in av),"unbound scoped Cargo namespace")
             v["normalized"]=[a.replace("/"+scope+"/","/<authenticated-sdk>/")for a in av]
-        if index==1:
+        if role=="P" and not fixed:
             base=d/"fixed-operand";ref=old.load(base/"source.json")
             need(ref["argv"]==cal["argv"] and ref["extern"]==cal["extern"] and ref["archive"]in archives["new"],"unregistered fixed donor")
             for i,k in enumerate("PCP",1):
                 path=base/(str(i)+k);deployed=old.load(path/"identity.json")
-                obs=clock(path/"run","owner",deployed,"ty_vendored",None,True,False)
-                need(deployed["driver"]==registry["inline-"+k]["driver"]and obs["argv"]==ref["argv"],"different exact independent physical driver or command")
-                fixed.append(dict(role=k,instructions=obs["instructions"],metadata=state(path/"run","new")))
+                arms=[("run",ref["argv"],fixed)]
+                if conf:
+                    arms.append(("nonincremental",without_incremental(ref["argv"]),nonincremental))
+                donor=(d/"same-deps-clean/check.epochs"/f"{cal['owner']:05}.env").read_bytes()
+                need(hashlib.sha256(donor).hexdigest()==ref["original_env"],"not the normal parent environment")
+                expected=[v for v in donor.split(b"\0")[:-1]if v.split(b"=",1)[0]not in(b"CARGO_MAKEFLAGS",b"MAKEFLAGS",b"MFLAGS")]
+                for label,command,dest in arms:
+                    obs=clock(path/label,"owner",deployed,"ty_vendored",None,True,False)
+                    live=(path/(label+".epochs")/f"{obs['owner']:05}.env").read_bytes().split(b"\0")
+                    need(live==expected+[b""] and deployed["driver"]==registry["inline-"+k]["driver"]and obs["argv"]==command,"different exact compiler environment, driver or command")
+                    dest.append(dict(role=k,instructions=obs["instructions"],metadata=state(path/label,"new")))
             need(fixed[0]["metadata"]==fixed[2]["metadata"] and abs(fixed[0]["instructions"]-fixed[2]["instructions"])/min(fixed[0]["instructions"],fixed[2]["instructions"])<.02,"opposite fixed parent repetitions disagree")
         if index<=2:
             n={}
@@ -139,14 +155,23 @@ def run(root):
         visits.append(dict(role=role,index=index,prices=prices,extern={k:v["extern"]for k,v in raws.items()},argv={k:v["normalized"]for k,v in raws.items()},scope=sigs[role],empty_new=cold_control,edited_metadata=out_digests["edit"]))
     need(native["P"]==native["C"] and len(archives["old"])==len(archives["new"])==1 and archives["old"]!=archives["new"],"different genuine data or complete native binary across roles")
     all_pairs=[]
-    for pair in (visits[:2],visits[2:]):
+    for index in range(0,len(visits),2):
+        pair=visits[index:index+2]
         parent,candidate=sorted(pair,key=lambda v:v["role"],reverse=True)
         need(parent["role"]=="P"and candidate["role"]=="C"and parent["argv"]==candidate["argv"],"different cross-role native flags besides the independently authenticated Cargo namespace")
         delta={phase:{meter:1-candidate["prices"][phase][meter]/val for meter,val in fields.items()if val>0}for phase,fields in parent["prices"].items()}
         controls=dict(edited_owner=delta["edit"]["owner"]>=.20,whole=delta["edit"]["plain"]>=-.01,parser=all(delta["parser"][k]>=-.02 for k in("cold","owner","plain")),independent_clock=all(abs(v["prices"]["edit"]["plain"]-v["prices"]["edit"]["traced_whole"])/min(v["prices"]["edit"]["plain"],v["prices"]["edit"]["traced_whole"])<=.03 for v in pair))
         all_pairs.append(dict(order="".join(v["role"]for v in pair),reductions=delta,gates=controls))
     fixed_delta=min(1-fixed[1]["instructions"]/fixed[x]["instructions"]for x in(0,2))
-    return dict(worker=worker,factory=factory,protocol=protocol,visits=visits,pairs=all_pairs,zip={k:sorted(v)for k,v in archives.items()},native=native,fixed=fixed,fixed_reduction=fixed_delta,eligible_for_confirmation=fixed_delta>=.20 and all(all(p["gates"].values())for p in all_pairs))
+    result=dict(worker=worker,factory=factory,protocol=protocol,visits=visits,pairs=all_pairs,zip={k:sorted(v)for k,v in archives.items()},native=native,fixed=fixed,fixed_reduction=fixed_delta,eligible_for_confirmation=fixed_delta>=.20 and all(all(p["gates"].values())for p in all_pairs))
+    if conf:
+        need(native["P"]==conf["spec"]["pilot"]["native"] and result["zip"]==conf["spec"]["pilot"]["zip"],"complete outputs differ from registered independent pilot originals")
+        need(len(nonincremental)==3 and nonincremental[0]["metadata"]==nonincremental[2]["metadata"],"nonincremental parent output")
+        p0,c,p1=[v["instructions"]for v in nonincremental]
+        need(abs(p0-p1)/min(p0,p1)<.02,"unstable nonincremental exact input")
+        reduction=min(1-c/p0,1-c/p1)
+        result.update(rank=conf["rank"],nonincremental=nonincremental,nonincremental_reduction=reduction,qualified=result["eligible_for_confirmation"] and reduction>=-.02)
+    return result
 
 
 if __name__=="__main__":

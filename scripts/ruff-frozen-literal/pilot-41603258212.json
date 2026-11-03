@@ -1,0 +1,365 @@
+{
+  "eligible": true,
+  "fixed": [
+    {
+      "instructions": 209835652,
+      "metadata": "948e3132c64e651ddcbd3c6387ff5576996fff74084df980ee5febaf6515c798",
+      "role": "P"
+    },
+    {
+      "instructions": 154580156,
+      "metadata": "e5f2da713edd71fbaa1e8a165bd4bcf57fa78034fa31537d882ec30ca4310501",
+      "role": "C"
+    },
+    {
+      "instructions": 210218051,
+      "metadata": "948e3132c64e651ddcbd3c6387ff5576996fff74084df980ee5febaf6515c798",
+      "role": "P"
+    }
+  ],
+  "fixed_reduction": 0.263327492127029,
+  "native": {
+    "C": {
+      "edit": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+      "fresh": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+      "old": "7a5d88f8fd9b542d41b55751a22b3a9592a95f887d03a06e6df70794c165ff2f"
+    },
+    "P": {
+      "edit": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+      "fresh": "1852c11a90a12b274cfbc27869c9a876cfa70ee4504f848cf573c513dabfe134",
+      "old": "7a5d88f8fd9b542d41b55751a22b3a9592a95f887d03a06e6df70794c165ff2f"
+    }
+  },
+  "original": {
+    "branch": "charlie/qa-frozen-literal-stage-20261103",
+    "head": "f1af047a36a1a7ea0fce11ddae61a4028d5e7582",
+    "kit": [
+      "ohm-rc23-frozen-literal-stage1",
+      13211728232,
+      195869088,
+      "ac0ff99c939274aa2715ed090746f21ac00af5e669d59f706d316a66bdf09d61"
+    ],
+    "receipts": [
+      "ohm-rc23-frozen-literal-stage1-receipts",
+      13212082839,
+      79873,
+      "c308bbd3599fb2cd1e1de8b34ca80dc267fb69f18d3d8fd6c3c1742abfb463a6"
+    ],
+    "run": 41595501573,
+    "source": {
+      "C": "7a4e5b8dbf109e1d11bceb29c63fdefb08492f7e",
+      "P": "d57fd1515986dccecdcece8da85e651bfb4b81f9"
+    }
+  },
+  "pairs": [
+    {
+      "gates": {
+        "edited_owner": true,
+        "independent_clock": true,
+        "parser": true,
+        "whole": true
+      },
+      "order": "PC",
+      "reductions": {
+        "cold": {
+          "plain": -0.00014440508480983993
+        },
+        "edit": {
+          "owner": 0.32514549152803407,
+          "plain": 0.08263882074385553,
+          "traced_whole": 0.0824341171918026
+        },
+        "new-idle": {
+          "plain": -0.00011887518280850884,
+          "traced_whole": 0.00013251057119678666
+        },
+        "old-idle": {
+          "plain": -0.00020292330929327917,
+          "traced_whole": 0.00014785626429247856
+        },
+        "parser": {
+          "cold": -0.00045230279154262476,
+          "owner": -0.0001979346757374767,
+          "plain": -0.00047723876615490823,
+          "traced_whole": -0.00042886107793327355
+        }
+      }
+    },
+    {
+      "gates": {
+        "edited_owner": true,
+        "independent_clock": true,
+        "parser": true,
+        "whole": true
+      },
+      "order": "CP",
+      "reductions": {
+        "cold": {
+          "plain": -0.00015399414609706952
+        },
+        "edit": {
+          "owner": 0.32512107771142573,
+          "plain": 0.08257151048212696,
+          "traced_whole": 0.08299934932128461
+        },
+        "new-idle": {
+          "plain": 2.2286863326281825e-05,
+          "traced_whole": -0.00016675355482065335
+        },
+        "old-idle": {
+          "plain": -0.0010803425717604842,
+          "traced_whole": -0.0009501986504723003
+        },
+        "parser": {
+          "cold": -0.00029955752839527783,
+          "owner": -0.00018859156239892094,
+          "plain": 0.000243183229837296,
+          "traced_whole": 0.0005651866506605208
+        }
+      }
+    }
+  ],
+  "roles": [
+    {
+      "edited_metadata": "948e3132c64e651ddcbd3c6387ff5576996fff74084df980ee5febaf6515c798",
+      "empty_new": {
+        "changed_required": [
+          "char_str-70e37b6c50169bb8",
+          "get_size2-c57b9295f41ebb86",
+          "get_size_derive2-8d31d0c9b7e31bb0",
+          "ruff_db-8624db050923a734",
+          "ruff_diagnostics-7ef4c33a72b558ce",
+          "ruff_memory_usage-8fb770dc5b0d4776",
+          "ruff_notebook-d33cecd49fd3175f",
+          "ruff_python_ast-fabccf09fb3395b1",
+          "ruff_python_parser-de18dd288ffad50f",
+          "ruff_python_trivia-62de3ba78fd4e98d",
+          "ruff_source_file-ada442c72eb033a6",
+          "ruff_text_size-d6470f147dd52f13"
+        ],
+        "different_externs": [
+          "ruff_db"
+        ],
+        "edited": "948e3132c64e651ddcbd3c6387ff5576996fff74084df980ee5febaf6515c798",
+        "empty": "dfdbac891edb690476a6c514abfd7ab294e8185ecbf230b52928195208ab00e3",
+        "equal": false,
+        "semantic_direct": [
+          "ruff_db"
+        ]
+      },
+      "prices": {
+        "cold": {
+          "plain": 355365221852
+        },
+        "edit": {
+          "owner": 171419775,
+          "plain": 675193904,
+          "traced_whole": 675286106
+        },
+        "new-idle": {
+          "owner": 0,
+          "plain": 285080529,
+          "traced_whole": 285086689
+        },
+        "old-idle": {
+          "owner": 0,
+          "plain": 285092926,
+          "traced_whole": 344205910
+        },
+        "parser": {
+          "cold": 184805394888,
+          "owner": 4869485331,
+          "plain": 5182468767,
+          "traced_whole": 5182020739
+        }
+      },
+      "role": "P"
+    },
+    {
+      "edited_metadata": "93c8b37762a127d280e84d099c2694dae5b14d840144c4709f25538c1c9b689b",
+      "empty_new": {
+        "changed_required": [
+          "char_str-70e37b6c50169bb8",
+          "get_size2-c57b9295f41ebb86",
+          "get_size_derive2-8d31d0c9b7e31bb0",
+          "ruff_db-8624db050923a734",
+          "ruff_diagnostics-7ef4c33a72b558ce",
+          "ruff_memory_usage-8fb770dc5b0d4776",
+          "ruff_notebook-d33cecd49fd3175f",
+          "ruff_python_ast-fabccf09fb3395b1",
+          "ruff_python_parser-de18dd288ffad50f",
+          "ruff_python_trivia-62de3ba78fd4e98d",
+          "ruff_source_file-ada442c72eb033a6",
+          "ruff_text_size-d6470f147dd52f13"
+        ],
+        "different_externs": [
+          "ruff_db"
+        ],
+        "edited": "93c8b37762a127d280e84d099c2694dae5b14d840144c4709f25538c1c9b689b",
+        "empty": "8a4ca9673e85ae9ebf30e4f483772aec78127185b77ddc434ba71b988394f546",
+        "equal": false,
+        "semantic_direct": [
+          "ruff_db"
+        ]
+      },
+      "prices": {
+        "cold": {
+          "plain": 355416538397
+        },
+        "edit": {
+          "owner": 115683408,
+          "plain": 619396676,
+          "traced_whole": 619619492
+        },
+        "new-idle": {
+          "owner": 0,
+          "plain": 285114418,
+          "traced_whole": 285048912
+        },
+        "old-idle": {
+          "owner": 0,
+          "plain": 285150778,
+          "traced_whole": 344155017
+        },
+        "parser": {
+          "cold": 184888982884,
+          "owner": 4870449171,
+          "plain": 5184942042,
+          "traced_whole": 5184243106
+        }
+      },
+      "role": "C"
+    },
+    {
+      "edited_metadata": "8a4ca9673e85ae9ebf30e4f483772aec78127185b77ddc434ba71b988394f546",
+      "empty_new": {
+        "changed_required": [
+          "char_str-70e37b6c50169bb8",
+          "get_size2-c57b9295f41ebb86",
+          "get_size_derive2-8d31d0c9b7e31bb0",
+          "ruff_db-8624db050923a734",
+          "ruff_diagnostics-7ef4c33a72b558ce",
+          "ruff_memory_usage-8fb770dc5b0d4776",
+          "ruff_notebook-d33cecd49fd3175f",
+          "ruff_python_ast-fabccf09fb3395b1",
+          "ruff_python_parser-de18dd288ffad50f",
+          "ruff_python_trivia-62de3ba78fd4e98d",
+          "ruff_source_file-ada442c72eb033a6",
+          "ruff_text_size-d6470f147dd52f13"
+        ],
+        "different_externs": [
+          "ruff_db"
+        ],
+        "edited": "8a4ca9673e85ae9ebf30e4f483772aec78127185b77ddc434ba71b988394f546",
+        "empty": "ca96d2812aa74c134d92fdd078ac3743cb89b37d338f5b99b73bbf0cdf2842c1",
+        "equal": false,
+        "semantic_direct": [
+          "ruff_db"
+        ]
+      },
+      "prices": {
+        "cold": {
+          "plain": 355424856753
+        },
+        "edit": {
+          "owner": 115687236,
+          "plain": 619529759,
+          "traced_whole": 619367037
+        },
+        "new-idle": {
+          "owner": 0,
+          "plain": 285004594,
+          "traced_whole": 285120920
+        },
+        "old-idle": {
+          "owner": 0,
+          "plain": 285355496,
+          "traced_whole": 344542464
+        },
+        "parser": {
+          "cold": 184882558992,
+          "owner": 4870940138,
+          "plain": 5183348346,
+          "traced_whole": 5181627808
+        }
+      },
+      "role": "C"
+    },
+    {
+      "edited_metadata": "e72cad61d15356ea54a8a10f17ff34f84cac750011b727c977523b2e97caeda7",
+      "empty_new": {
+        "changed_required": [
+          "char_str-70e37b6c50169bb8",
+          "get_size2-c57b9295f41ebb86",
+          "get_size_derive2-8d31d0c9b7e31bb0",
+          "ruff_db-8624db050923a734",
+          "ruff_diagnostics-7ef4c33a72b558ce",
+          "ruff_memory_usage-8fb770dc5b0d4776",
+          "ruff_notebook-d33cecd49fd3175f",
+          "ruff_python_ast-fabccf09fb3395b1",
+          "ruff_python_parser-de18dd288ffad50f",
+          "ruff_python_trivia-62de3ba78fd4e98d",
+          "ruff_source_file-ada442c72eb033a6",
+          "ruff_text_size-d6470f147dd52f13"
+        ],
+        "different_externs": [
+          "ruff_db"
+        ],
+        "edited": "e72cad61d15356ea54a8a10f17ff34f84cac750011b727c977523b2e97caeda7",
+        "empty": "dfdbac891edb690476a6c514abfd7ab294e8185ecbf230b52928195208ab00e3",
+        "equal": false,
+        "semantic_direct": [
+          "ruff_db"
+        ]
+      },
+      "prices": {
+        "cold": {
+          "plain": 355370131833
+        },
+        "edit": {
+          "owner": 171419246,
+          "plain": 675289427,
+          "traced_whole": 675427042
+        },
+        "new-idle": {
+          "owner": 0,
+          "plain": 285010946,
+          "traced_whole": 285073383
+        },
+        "old-idle": {
+          "owner": 0,
+          "plain": 285047547,
+          "traced_whole": 344215391
+        },
+        "parser": {
+          "cold": 184827192615,
+          "owner": 4870021693,
+          "plain": 5184609156,
+          "traced_whole": 5184558051
+        }
+      },
+      "role": "P"
+    }
+  ],
+  "transport": {
+    "artifact": 13216495367,
+    "boot": "0f3218f8-b9c8-459a-8278-a27bb99a2a15",
+    "head": "e27b29fadf6d68526591f863cd724c22d530d403",
+    "job": 125806800370,
+    "members": 4055,
+    "refusal": null,
+    "run": 41603258212,
+    "runner_id": 1911,
+    "sha256": "dd07d63702049b4b3e209cc6b2fca75429b2ccb623d33617eefdae125e2aa933",
+    "size": 47769864,
+    "status": "success"
+  },
+  "zip": {
+    "new": [
+      "c2f5402340a994e474ecb2b9ff046a0037ab2461108cd9d2e2ef8b948e601da9"
+    ],
+    "old": [
+      "a8f7556356bcd2c3c7996354dc7359c9b8da1a8b31c9fef6fbea0d43ca34cb64"
+    ]
+  }
+}

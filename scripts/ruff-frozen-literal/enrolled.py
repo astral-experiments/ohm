@@ -12,6 +12,7 @@ sys.path.insert(0,str(HERE))
 import study as s
 import prep as p
 import tree_clock
+from fixed_args import without_incremental
 
 if any(Path(module.__file__).resolve()!=HERE/name for module,name in ((s,"study.py"),(p,"prep.py"),(tree_clock,"tree_clock.py"))):
     raise RuntimeError("different authenticated worker module")
@@ -153,7 +154,7 @@ def safety(dest,ident):
     p.source(B);d=dest/"repair";obs=image_clock(d,"roster",ident,"ty_vendored",p.CHECK,True);s.capture(d,"new",obs)
 
 
-def fixed_inputs(base,source_dir,main,switch):
+def fixed_inputs(base,source_dir,main,switch,include_nonincremental):
     # Supplemental genuine rustc, separate from the ordinary Cargo measurements. Reuse the
     # physical P provider metadata, original generator output and exact native compiler argv.
     base.mkdir();trace=source_dir.with_suffix(".epochs");av=main["argv"]
@@ -174,14 +175,20 @@ def fixed_inputs(base,source_dir,main,switch):
         root_caches=[c for c in incs[0].iterdir() if c.name.startswith("ty_vendored-")]
         need(root_caches,"physical target-specific incremental state")
         for cache in root_caches:discard(cache)
-        discard(output);output.mkdir()
-        logs=dst/"run.epochs";logs.mkdir();w.run([ROOT/"target-count","owner",logs,w.SDK/"bin/rustc","ty_vendored",*av],envs,dst/"run")
-        info,_=tree_clock.decode(logs,"owner",ident,"ty_vendored");need(info["argv"]==av and info["status"]==0 and p.sha(arc)==before and tree_clock.externs(av)==main["extern"],"changed fixed inputs")
-        save(dst/"run/physical.json",info);s.capture(dst/"run","new",info)
+        arms=[("run",av)]
+        if include_nonincremental:
+            arms.append(("nonincremental",without_incremental(av)))
+        for label,command in arms:
+            discard(output);output.mkdir()
+            logs=dst/(label+".epochs");logs.mkdir()
+            w.run([ROOT/"target-count","owner",logs,w.SDK/"bin/rustc","ty_vendored",*command],envs,dst/label)
+            info,_=tree_clock.decode(logs,"owner",ident,"ty_vendored")
+            need(info["argv"]==command and info["status"]==0 and p.sha(arc)==before and tree_clock.externs(command)==main["extern"],"changed fixed inputs")
+            save(dst/label/"physical.json",info);s.capture(dst/label,"new",info)
     need(switch.current=="P","failed to restore ordinary source compiler")
 
 
-def target_history(base,ident,switch,with_fixed):
+def target_history(base,ident,switch,with_fixed,confirmation):
     p.source(A);s.fresh();cold=base/"cold";s.whole(cold,ROOT/"proxies/cargo",p.CHECK);s.capture(cold,"old")
     after=Checkpoint("target",A,base/"target-checkpoint.json")
     for mode in ("plain","owner","whole"):
@@ -201,7 +208,7 @@ def target_history(base,ident,switch,with_fixed):
     need(not seen,"ordinary package clean kept the root metadata: "+repr(seen[:2]))
     obs=image_clock(d/"check","roster",ident,"ty_vendored",p.CHECK,True);s.capture(d/"check","new",obs)
     need(all(n[0]in("ty_vendored","build_script_build")for n in obs["compilers"]),"clean root replaced another dependency")
-    if with_fixed:fixed_inputs(base/"fixed-operand",d/"check",obs,switch)
+    if with_fixed:fixed_inputs(base/"fixed-operand",d/"check",obs,switch,confirmation)
     safety(base/"safety",ident);discard(after.snapshot)
 
 
@@ -219,13 +226,16 @@ def parser_history(base,ident):
 
 
 def main():
-    p.acquire();save(BASE/"inherited-enrollment.json",REG);s.primary_inputs();s.fresh();controls();switch=Switch();seen=set()
-    for i,role in enumerate(p.REG["order"],1):
+    from confirmation_plan import enrollment
+    schedule=enrollment()
+    p.acquire();save(BASE/"confirmation-enrollment.json",schedule);save(BASE/"inherited-enrollment.json",REG)
+    s.primary_inputs();s.fresh();controls();switch=Switch();seen=set()
+    for i,role in enumerate(schedule["order"],1):
         base=BASE/f"visit-{i}-{role}";base.mkdir();ident=s.physical(role,switch.activate);save(base/"identity.json",ident);save(base/"sdk-file-stats.json",switch.states[role]);live_guard(base,ident)
-        target_history(base,ident,switch,i==1);parser_history(base,ident)
+        target_history(base,ident,switch,role=="P",True);parser_history(base,ident)
         if role not in seen:s.native(base/"native");seen.add(role)
         print("Finished fixed-input visit",i,role,flush=True)
-    p.source(B);save(BASE/"complete.json",dict(order=p.REG["order"],native=["P","C"],source=B,protocol=REG,original_source_clean=True,final_resources=w.resources()))
+    p.source(B);save(BASE/"complete.json",dict(order=schedule["order"],rank=schedule["rank"],native=["P","C"],source=B,protocol=REG,original_source_clean=True,final_resources=w.resources()))
 
 
 if __name__=="__main__":
