@@ -1,5 +1,5 @@
 """Physical outputs for the unmodified historical help edit on Linux."""
-import hashlib,json,os,shutil,subprocess as sp,sys
+import hashlib,json,os,re,shutil,subprocess as sp,sys,time
 from pathlib import Path
 HERE=Path(__file__).resolve().parent
 ROOT=Path(os.environ['RUNNER_TEMP']).resolve(strict=True)/'ohm-clap-cli'
@@ -31,6 +31,8 @@ def env():
              CARGO_NET_GIT_FETCH_WITH_CLI='true',CARGO_BUILD_JOBS='4',CARGO_NET_OFFLINE='true',CARGO_TERM_COLOR='never')
     return e
 def prepare():
+    marker=ROOT/'selected-binary-input.json'
+    if marker.is_file():marker.unlink()
     need(not any(q.exists() for q in (TARGET,BUILD,HOME)),'previous outputs survived fresh setup')
     e=env();e.pop('CARGO_NET_OFFLINE')
     sp.run(['cargo','+ohm','fetch','--locked','--target','x86_64-unknown-linux-gnu'],cwd=WORK,env=e,check=True)
@@ -40,17 +42,61 @@ def zsave(p,base):
     if not dest.exists():
         with dest.open('xb')as f:sp.run(['zstd','-q','-3','-c',p],stdout=f,check=True)
     return digest
-def artifact_paths():
-    # The dedicated unit test of the library is never requested. Reject a second real candidate.
-    by={}
-    for base in (TARGET,BUILD):
-        for pattern,kind in [('libruff-*.rmeta','rmeta'),('libruff-*.rlib','rlib')]:
-            for p in base.glob('**/deps/'+pattern):
-                if p.is_file() and p.stat().st_size:by.setdefault(kind,[]).append(p)
-    for kind,paths in by.items():
-        need(len({(p.stat().st_dev,p.stat().st_ino)for p in paths})==1,(kind,'ambiguously selected Ruff product',list(map(str,paths))))
-    need('rmeta' in by,'unseen Ruff library metadata')
-    return {kind:paths[0] for kind,paths in by.items()}
+def crate_arg(argv,flag):
+    for i,arg in enumerate(argv):
+        if arg==flag and i+1<len(argv):return argv[i+1]
+        if arg.startswith(flag+'='):return arg[len(flag)+1:]
+    return None
+def see_rustcs(seen,records,identity):
+    for entry in os.scandir('/proc'):
+        if not entry.name.isdigit() or entry.name in seen:continue
+        q=Path(entry.path)
+        try:
+            st=(q/'exe').stat()
+            if (st.st_dev,st.st_ino)!=identity:continue
+            args=[os.fsdecode(v)for v in (q/'cmdline').read_bytes().split(b'\0')if v]
+            seen.add(entry.name)
+            if crate_arg(args,'--crate-name')!='ruff':continue
+            cwd=Path(os.readlink(q/'cwd'));selected=[]
+            for i,arg in enumerate(args):
+                b=args[i+1] if arg=='--extern'and i+1<len(args)else arg.removeprefix('--extern=')if arg.startswith('--extern=')else ''
+                name,eq,path=b.partition('=')
+                if eq and name.split(':')[-1]=='ruff':selected.append(str((cwd/path).absolute()))
+            records.append({'pid':int(entry.name),'identity':list(identity),'cwd':str(cwd),'argv':args,
+                            'kind':crate_arg(args,'--crate-type'),'out':crate_arg(args,'--out-dir'),'consumer_inputs':selected})
+        except (FileNotFoundError,ProcessLookupError,PermissionError):continue
+def source_files(directory):
+    observations=json.loads((directory/'real-ruff-rustcs.json').read_bytes())
+    selected={Path(s)for row in observations if row['kind']=='bin'for s in row['consumer_inputs']}
+    marker=ROOT/'selected-binary-input.json'
+    if not selected and marker.is_file():
+        selected={Path(s)for s in json.loads(marker.read_bytes())}
+    if not selected:
+        # A very fast binary rustc can finish between reads. Restrict enumeration to a
+        # real complete producer's actual --out-dir, checking the actual crate identity.
+        possible=set()
+        for row in observations:
+            if row['kind'] in ('lib','rlib') and row['out']:
+                o=(Path(row['cwd'])/row['out']).resolve(strict=True)
+                for p in o.iterdir():
+                    if re.fullmatch(r'libruff(?:-[a-zA-Z0-9_]+)?\.'+('rlib'if MODE=='build'else 'rmeta'),p.name):
+                        possible.add(p)
+        selected=possible
+    if not selected:
+        files=[]
+        for root in (TARGET,BUILD,HOME,WORK/'target'):
+            if root.exists():
+                for directory_name,dirs,names in os.walk(root):
+                    for name in names:
+                        if re.match(r'(?:lib)?ruff(?:[-.]|$)',name)and name.endswith(('.rmeta','.rlib')):files.append(str(Path(directory_name)/name))
+        put(directory/'unresolved-native-layout.json',{'path_candidates':files,'actual_rustcs':observations})
+    need(len(selected)==1,('ambiguous actual ruff consumer input',list(map(str,selected))))
+    selected,=selected;need(selected.is_file()and selected.stat().st_size>0,('missing true input',str(selected)))
+    # rustc paths can be symlink aliases through the per-worktree artifact directory.
+    real=selected.resolve(strict=True);allowed=any(real.is_relative_to(root.resolve())for root in (TARGET,BUILD,HOME))
+    need(allowed,('dependency outside enrolled independent Cargo roots',str(selected),str(real)))
+    put(marker,[str(selected)]);put(directory/'selected-artifact.json',{'lexical':str(selected),'canonical':str(real)})
+    return selected
 def verdict(exe,directory,state):
     e=env()|{'NO_COLOR':'1','COLUMNS':'240','LC_ALL':'C','TERM':'dumb','RUFF_NO_CACHE':'true'}
     expected=b'lint.line-length = 100' if state==OLD else b'line-length = 100'
@@ -73,8 +119,20 @@ def verdict(exe,directory,state):
     need(bool(matches),('no true global config help',state))
     return {'cases':result,'show_example':matches}
 def observe_products(directory,state):
-    p=artifact_paths();base=PUB/'bodies'
-    data={name:{'name':v.name,'size':v.stat().st_size,'sha256':zsave(v,base)if name=='rmeta' else hf(v)}for name,v in p.items()}
+    selected=source_files(directory);base=PUB/'bodies'
+    if MODE=='check':
+        need(selected.suffix=='.rmeta','binary type checker selected an unexpected dependency')
+        data={'rmeta':{'name':selected.name,'size':selected.stat().st_size,'sha256':zsave(selected,base)}}
+    else:
+        need(selected.suffix=='.rlib','binary linked an unexpected Rust dependency')
+        import member_names
+        ledger=member_names.read_names(selected,'ruff');put(directory/'selected-ruff-members.json',ledger)
+        meta=directory/'embedded-rust-metadata'
+        with meta.open('xb')as f:sp.run(['ar','p',selected,'lib.rmeta'],stdout=f,check=True)
+        need(meta.stat().st_size>0,'missing selected native metadata')
+        data={'rlib':{'name':selected.name,'size':selected.stat().st_size,'sha256':hf(selected)},
+              'embedded_rmeta':{'size':meta.stat().st_size,'sha256':zsave(meta,base)}}
+        meta.unlink()
     if MODE=='build':
         exe=TARGET/'debug/ruff';need(exe.is_file(),'missing native CLI')
         data['elf']={'size':exe.stat().st_size,'sha256':zsave(exe,base)}
@@ -82,5 +140,12 @@ def observe_products(directory,state):
     return data
 def command(directory,actual,expected=0):
     directory.mkdir()
-    with (directory/'stdout').open('xb')as out,(directory/'stderr').open('xb')as err:p=sp.run(actual,env=env(),cwd=WORK,stdout=out,stderr=err)
+    physical=(SDK/'bin/rustc').stat();identity=(physical.st_dev,physical.st_ino)
+    seen=set();records=[]
+    with (directory/'stdout').open('xb')as out,(directory/'stderr').open('xb')as err:
+        p=sp.Popen(actual,env=env(),cwd=WORK,stdout=out,stderr=err)
+        while p.poll()is None:
+            see_rustcs(seen,records,identity)
+            time.sleep(.012)
+    put(directory/'real-ruff-rustcs.json',records)
     need(p.returncode==expected,(directory.name,p.returncode,(directory/'stderr').read_text(errors='replace')[-800:]))
