@@ -202,6 +202,18 @@ def finish(text, parsed, response, old, hashed, tag):
     }
 
 
+def ready_pids(state, seen, skipped):
+    """Wait for the atomic rename exposing a complete native request."""
+    for notice in sorted(state.glob("ready-*")):
+        match = re.fullmatch(r"ready-([1-9][0-9]*)(\.pending)?", notice.name)
+        assert match is not None, notice.name
+        pid, staging = match.groups()
+        if staging or pid in seen or pid in skipped:
+            continue
+        assert notice.read_bytes() == b"complete\n", notice.name
+        yield pid
+
+
 def main():
     state, report, image, llvm, tag, kind, memory, release, real, *command = sys.argv[
         1:
@@ -252,11 +264,7 @@ def main():
     roles_seen = set()
     adopted = 0
     while True:
-        for notice in sorted(state.glob("ready-*")):
-            pid = notice.name[6:]
-            if pid in seen or pid in skipped:
-                continue
-            assert pid.isdecimal() and notice.read_bytes() == b"complete\n"
+        for pid in ready_pids(state, seen, skipped):
             named = state / ("actor-" + pid + ".tsv")
             action = "full\n"
             try:
