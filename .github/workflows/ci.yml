@@ -1530,6 +1530,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           (cd scripts/ruff-source-placement-c3b && sha256sum --check --strict --quiet factory.sha256 native.sha256 triple.sha256)
+          (cd scripts/ruff-source-placement-stock-writer-fix && sha256sum --check --strict --quiet score.sha256 original-readback.sha256)
           python3 -IB scripts/ruff-source-placement-stock-writer-fix/stock_original_reader.py certify "$RUNNER_TEMP/admission.json"
 
   stock-ordinary-score:
@@ -1613,6 +1614,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          (cd enrolled/scripts/ruff-source-placement-stock-writer-fix && sha256sum --check --strict --quiet score.sha256 original-readback.sha256)
           python3 -IB enrolled/scripts/ruff-source-placement-stock-writer-fix/stock_original_reader.py certify "$RUNNER_TEMP/native-gate.json"
           python3 -IB enrolled/scripts/ruff-source-placement-stock-writer-fix/stock_kits.py "$RUNNER_TEMP/placement-qualified-sdks" with-prior
           cp "$RUNNER_TEMP/native-gate.json" "$RUNNER_TEMP/placement-qualified-sdks/native-gate.json"
