@@ -1,5 +1,5 @@
-name: Measure signed normal Ron phase frontiers
-run-name: Measure signed Ron through the native boundary ${{ inputs.reviewed_head }}
+name: Observe the actual split metadata work product
+run-name: Reopen signed compiler green metadata outputs ${{ inputs.reviewed_head }}
 permissions:
   contents: read
   actions: read
@@ -29,16 +29,16 @@ jobs:
         path: ruff
         persist-credentials: false
     - name: Provision the signed Cargo record checksum and debugger
-      run: sudo apt-get update -qq && sudo apt-get install -qy b3sum gdb libunwind-dev liblzma-dev
-    - name: Price true normal compilation and the stock incremental session
+      run: sudo apt-get update -qq && sudo apt-get install -qy b3sum gdb libunwind-dev liblzma-dev strace
+    - name: Trace the genuine incremental metadata and native outputs
       env:
         REVIEWED_HEAD: ${{ inputs.reviewed_head }}
         OHM_SDK_READ_TOKEN: ${{ github.token }}
-      run: python3 -IB qa/scripts/ruff-original-ty-instructions/ron_normal_boundary.py
+      run: python3 -IB qa/scripts/ruff-original-ty-instructions/ron_missing_stub.py
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: workspace-ron-normal-boundary-29697-${{ github.run_id }}
+        name: workspace-ron-metadata-stub-29697-${{ github.run_id }}
         path: ${{ runner.temp }}/ohm-foreign-join/published/
         retention-days: 10
         if-no-files-found: error
