@@ -1,7 +1,7 @@
 """Accept the actual marked and compiled Ruff units with signed and matched release-profile Cargo."""
 from pathlib import Path
 import collections,hashlib,json,os,re,shutil,signal,subprocess,sys,time,traceback
-src=Path(__file__).resolve().parent;sys.path[:0]=[str(src.parent/'fix'),str(src.parent.parent/'ruff-foreign-span-observer')]
+src=Path(__file__).resolve().parent;sys.path[:0]=[str(src),str(src.parent/'fix'),str(src.parent.parent/'ruff-foreign-span-observer')]
 import worker as sdk
 import build
 plan=json.loads((src/'plan.json').read_bytes());w=sdk.work;out=sdk.proof
