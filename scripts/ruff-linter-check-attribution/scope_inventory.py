@@ -52,6 +52,7 @@ def check(name, rev, env, trace=False):
     cmd = CHECK
     if trace:
         executable = shutil.which('strace'); w.need(executable is not None,'strace absent')
+        w.save(w.OUT/'scope-tracer.json', dict(path=executable, sha256=w.sha(Path(executable)),version=subprocess.check_output([executable,'--version'],text=True)))
         cmd = [executable,'-f','-qq','-z','-s','131072','-e','trace=execve','-o',str(w.OUT/'scope-execs.private'),*CHECK]
     w.run(cmd,env,out)
     roster, root, search = w.cargo_result(out)

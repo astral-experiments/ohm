@@ -68,6 +68,12 @@ jobs:
       - name: Compare the fixed ordinary check with one recompiled native macro
         if: inputs.experiment == 'macro-host-o1'
         run: python3 -IB qa/scripts/ruff-linter-check-attribution/macro_host.py
+      - name: Install the off-clock native process reader
+        if: inputs.experiment == 'visibility-scope'
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get install -y --no-install-recommends strace
+          strace --version
       - name: Check the actual downstream closure and run Ruff's native diagnostic
         if: inputs.experiment == 'visibility-scope'
         run: |
