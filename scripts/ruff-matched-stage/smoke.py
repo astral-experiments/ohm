@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import sys
 import subprocess
 
 from capsule import REG, HOST, need, save, sha
@@ -65,7 +66,7 @@ def smoke(root, manifest, base):
             ver[tool] = execute([tool, "+ohm", "-vV"], work, env).stdout.decode()
         need(
             REG["signed_cargo"]["revision"] in ver["cargo"]
-            and "ohm-1.99.0-22" in ver["cargo"]
+            and REG["signed_cargo"]["tag"] in ver["cargo"]
             and "host: " + HOST in ver["rustc"]
             and "LLVM version:" in ver["rustc"],
             "foreign compiler/Cargo",
@@ -205,6 +206,15 @@ def smoke(root, manifest, base):
         )
         for n, key in manifest["arms"][label]["files"].items():
             need(sha(target / n) == key, ("smoke changed installed compiler", n))
+        role = "parent" if label == "normal" else "candidate"
+        guard_dir = root / ("scope-guard-" + role)
+        guarded_env = dict(env)
+        guarded_env.pop("RUSTC")
+        driver, = (target / "lib").glob("librustc_driver-*.so")
+        execute([sys.executable, "-IB", Path(__file__).resolve().parent / "guard.py",
+                 "--rustup-home", base["RUSTUP_HOME"], "--out", guard_dir,
+                 "--role", role, "--compiler-sha", sha(driver)], work, guarded_env)
+        shutil.copyfile(guard_dir / "accepted.json", root / "logs" / ("scope-guard-" + role + ".json"))
         all_rows[label] = {
             "versions": ver,
             "loaded": libtrace,

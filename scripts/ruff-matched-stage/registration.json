@@ -16,39 +16,32 @@
     "rust.download-rustc=false"
   ],
   "bundle": {
-    "baseline_commits": [
-      "0a38b3aa6d1bbb55ec5e8c01c9e88d1cf0f9f118",
-      "f12924d918dbc66898325531940a20aa8cf4f5fc",
-      "330c6efbef5fd49b2797c8f1f084630343cd117d",
-      "203c98e2df20b6afff4b0f512896c14c44942b82",
-      "764eb1cd92bb67b2f9a88eb17ba67766569ab2f3",
-      "dc0db7275adb2dbe921ce5df0811108e84d6408d",
-      "5c3cea67eca46acbb95bf62a97485200f6c00c44",
-      "c6b5bef8a0b36608968c568637529c68069d494f",
-      "a3fc6da13921586bc374586dee00883e9210aecd",
-      "259ad7069e47eaf08cf106f187b2b6393f7fd7c2"
-    ],
-    "branch": "refs/heads/charlie/experiment-rdr-inline-adt-visibility-20261103",
-    "bytes": 22583,
-    "prerequisite": "28b64bc39032c1786908d98ea2df92f855226d0f",
-    "sha256": "af243dcdea3b9507f87746dc1c5c14472272190236ca882b7bc744b605a39de3"
+    "baseline_commits": [],
+    "branch": "refs/heads/charlie/check-private-builtin-derives",
+    "bytes": 2869,
+    "prerequisite": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+    "sha256": "d383ce91fcf93d26fbc481e0864a339bf24681074646bbfe20aa6c88c87651fc"
   },
   "changed_sources": {
     "compiler/rustc_incremental/src/persist/file_format.rs": {
-      "C": "b31bf7174b5c9a4189d670ffbe347d9205bbfb70",
-      "P": "f1cc605908e55162469ad0dfd0c0efb0b2c8c238"
+      "C": "81ce0d310326b2f381fb244b9c97c7f4e62291e0",
+      "P": "f96e27d853eaf23289d72479b990780eda43eacc"
     },
     "compiler/rustc_metadata/src/rmeta/encoder.rs": {
-      "C": "e6a2e44c5814881adbfdb126a1a33a955ca49c46",
+      "C": "cebe55432abd77ccf04e95ae1c2b1e8443484f33",
       "P": "2b2f08dbca687cd0352adeeffe80d38fb1a06a50"
     },
-    "compiler/rustc_middle/src/ty/codec.rs": {
-      "C": "c966d75deb89f5e4beecff5e64c4448000181435",
-      "P": "342fb9b6bfa06ec900163747fe280c78306ffc33"
+    "tests/run-make/rdr-public-hash-private-native-derive/dep.rs": {
+      "C": "43cd74a57bfa7d9a2e415d4f8c14a5120514d0e9",
+      "P": "81febc630f3d5923456a1ac93bd72c20e5f9b82e"
     },
-    "compiler/rustc_middle/src/ty/mod.rs": {
-      "C": "44fc2f371b683aa60e84e873bc0a059b72c11851",
-      "P": "b2d12c787168515fb7f37feab5fe0d0d6e021284"
+    "tests/run-make/rdr-public-hash-private-native-derive/rmake.rs": {
+      "C": "ddb8113ee775fa031f5343414c67bd585786d90d",
+      "P": "08e37538012b212cee347cb5710774cfe961c510"
+    },
+    "tests/run-make/rdr-public-hash-private-native-derive/send.rs": {
+      "C": "6e0c4d65bbce160c5ac63130d5cc2f1b8cac8634",
+      "P": null
     }
   },
   "kit": {
@@ -58,30 +51,30 @@
   },
   "roles": {
     "C": {
-      "compiler": "5622581ec0c2d61f1b238a0769686c1cac9c6345",
-      "revision": "a7fc5bc7f90966e6e9a92f9239e3e304e79b2f3f",
-      "tree": "0b5a8ed185c5fb6f7368b100b145cd9a74cfcc5b"
+      "compiler": "00242f37d22326f470500b2b531d0eeb704ec542",
+      "revision": "16a25d901318369d5ff788dd5c6ac0656d6e0bd6",
+      "tree": "f1517182df5dfbb4425689d27bd6168eea6ebe1b"
     },
     "P": {
-      "compiler": "d0262da6fe48ab665147e0e12014d92574897bdc",
-      "revision": "259ad7069e47eaf08cf106f187b2b6393f7fd7c2",
-      "tree": "2583ceb1254796772d3ae9099ed07a8a53747d2b"
+      "compiler": "01614e1dbcdedca33c620ad320c07b30207e256e",
+      "revision": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+      "tree": "f5bf03d73f71243fb88e34ecb0b155ef11e99a47"
     }
   },
   "schema": "ohm-remat-builder-registration-v1",
   "signed_cargo": {
     "asset": {
-      "id": 698533704,
-      "name": "ohm-1.99.0-22-x86_64-unknown-linux-gnu.tar.gz",
-      "sha256": "bcf21a3bcdfedd7174ef56ae17a5511fa5b2b6a0afff4b725bed6c5da50194d7",
-      "size": 359852703
+      "id": 704038224,
+      "name": "ohm-1.99.0-23-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "fc85a2ca6d47711058cd89c790c8e57f1799472e38f0ee0a08b0a51d06c1ee7b",
+      "size": 359921838
     },
     "members": {
       "bin/cargo": [
         "rust-1.99.0-dev-x86_64-unknown-linux-gnu/cargo/bin/cargo",
         493,
-        39041072,
-        "3ce4e300d4463dfc769b6c18e138d1c951b02dfb15416a39cb5301303d168871"
+        39238824,
+        "f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee"
       ],
       "lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd": [
         "rust-1.99.0-dev-x86_64-unknown-linux-gnu/rustc/lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd",
@@ -90,9 +83,9 @@
         "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
       ]
     },
-    "revision": "ed0ae15d22da9a0af9afb3d0fdeb4ceb8a71b770",
-    "tag": "ohm-1.99.0-22"
+    "revision": "7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed",
+    "tag": "ohm-1.99.0-23"
   },
-  "source_epoch": 1793555546,
+  "source_epoch": 1793652622,
   "target": "x86_64-unknown-linux-gnu"
 }

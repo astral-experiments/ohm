@@ -15,8 +15,8 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from capsule import HOST, REG, need, reopen, save, seal, sha
 
-BRANCH = "charlie/qa-rdr-visibility-scope-20261103"
-BASE = "00f4192b5507f8c028898ce5bd66958d20f341c5"
+BRANCH = "charlie/qa-matched-check-derive-rc23-20261103"
+BASE = "3a830cdc9f00b01c7110fac3653d8cd0b305c355"
 
 
 def git(repo, *args):
@@ -231,9 +231,9 @@ def build(workspace, root):
         "missing authenticated complete composite",
     )
     bundle(rust)
-    reg = json.loads((workspace / "qa-code/scripts/rc23-expanded-inputs/registration.json").read_bytes())
+    pins = json.loads((HERE / "canonical-pins/pins.json").read_bytes())
     substitutions = {
-        "src/tools/" + n: (reg["sources"][n]["end"], reg["sources"][n]["tree"]) for n in ("clippy", "rustfmt")
+        "src/tools/" + n: (pins[n]["after"], pins[n]["tree"]) for n in ("clippy", "rustfmt")
     }
     (root / "capsule/objects").mkdir(parents=True)
     original_tools = signed_tools(root)
@@ -286,6 +286,12 @@ def build(workspace, root):
         )
         print("Starting clean stage1", role, rev, flush=True)
         guarded(argv, rust, env, root / "logs" / ("build-" + role + ".log"), root)
+        if role == "C":
+            run_make = argv[:argv.index("build")] + ["test", "--stage", "1", "-j8",
+                                                      "tests/run-make/rdr-public-hash-private-native-derive"]
+            run_make_log = root / "logs/run-make-C.log"
+            guarded(run_make, rust, env, run_make_log, root)
+            need("1 passed; 0 failed; 0 ignored" in run_make_log.read_text(), "candidate regression did not run")
         stage = directory / HOST / "stage1"
         kit.freeze(stage, role, rev)
         # Keep the rustdoc built against this exact driver. Cargo authenticates it
