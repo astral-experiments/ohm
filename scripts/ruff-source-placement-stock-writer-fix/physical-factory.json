@@ -1,0 +1,117 @@
+{
+  "archive": {
+    "digest": "sha256:99211df7459c882db9521310dcecf72a5e0a340941f8a76cfe70b3c217e1e206",
+    "id": 13174041121,
+    "name": "placement-stock-fix-matched-stage",
+    "size_in_bytes": 204801462
+  },
+  "factory": 41510486074,
+  "job": 125500784670,
+  "native_originals": {
+    "bytes": 79036,
+    "id": 13174465138,
+    "sha256": "bfa206f644b0eedf9a7d99e2b4c3493e5d63ff06a6c0cca990d9a784730dbaaa"
+  },
+  "observed": {
+    "C": {
+      "native": "0a3f98010a1e0c9ca412895272a5e77cb767df4adb295df7ee0d6370e6a3bfc5",
+      "observed_source": "a77736dfe65c89b92ff6f316f56a31cf54efb60a6480011a9e7954f520fef077",
+      "real_crates": [
+        "rustc_codegen_llvm",
+        "rustc_codegen_ssa",
+        "rustc_incremental",
+        "rustc_llvm",
+        "rustc_middle"
+      ],
+      "rustdoc_html": "a8597f634e1a957792357783d41f16206bff925639a73241a9e1a071bed79de3"
+    },
+    "P": {
+      "native": "ab5ea727bb49316ac2df15aed9e3b59cccd510bf5ece83669c5f33bc1f319f42",
+      "observed_source": null,
+      "real_crates": [
+        "rustc_codegen_llvm",
+        "rustc_codegen_ssa",
+        "rustc_incremental",
+        "rustc_llvm",
+        "rustc_middle"
+      ],
+      "rustdoc_html": "a8597f634e1a957792357783d41f16206bff925639a73241a9e1a071bed79de3"
+    }
+  },
+  "physical": {
+    "C": {
+      "driver": {
+        "member": "lib/librustc_driver-fa217dfcec654979.so",
+        "sha256": "a0c65aae4a6fda526e81427e66c84a0e1c153127496f70253d325a1bba98b12f"
+      },
+      "frontend": {
+        "member": "bin/rustc",
+        "sha256": "8bfdc9779937e9cd2c9ef5db9f50cee9aab03ddec5672b37a3a3c9278cf1f5d0"
+      }
+    },
+    "P": {
+      "driver": {
+        "member": "lib/librustc_driver-fa217dfcec654979.so",
+        "sha256": "cb6bd1e8074cfb4c092b270fa1450fcbf59941315615a5af48d537edeaf1933b"
+      },
+      "frontend": {
+        "member": "bin/rustc",
+        "sha256": "8bfdc9779937e9cd2c9ef5db9f50cee9aab03ddec5672b37a3a3c9278cf1f5d0"
+      }
+    }
+  },
+  "physical_factory": {
+    "docs": {
+      "C": [
+        "335506d6cd55da3cec920aa29961e1c2157eaaf95c4ce066eb90a531fc4bb242",
+        14707520,
+        493
+      ],
+      "P": [
+        "9fd31f1ff7127b8374c88d5b50b5e085b01f1e54eb35453f37e038dfdb35f579",
+        14707528,
+        493
+      ]
+    },
+    "physical": {
+      "C": {
+        "driver": {
+          "member": "lib/librustc_driver-fa217dfcec654979.so",
+          "sha256": "a0c65aae4a6fda526e81427e66c84a0e1c153127496f70253d325a1bba98b12f"
+        },
+        "frontend": {
+          "member": "bin/rustc",
+          "sha256": "8bfdc9779937e9cd2c9ef5db9f50cee9aab03ddec5672b37a3a3c9278cf1f5d0"
+        }
+      },
+      "P": {
+        "driver": {
+          "member": "lib/librustc_driver-fa217dfcec654979.so",
+          "sha256": "cb6bd1e8074cfb4c092b270fa1450fcbf59941315615a5af48d537edeaf1933b"
+        },
+        "frontend": {
+          "member": "bin/rustc",
+          "sha256": "8bfdc9779937e9cd2c9ef5db9f50cee9aab03ddec5672b37a3a3c9278cf1f5d0"
+        }
+      }
+    },
+    "qualified": "d73916211e9989d939f2e5d04d61868617c15a34c4e901f7d0914eae59cc2c26",
+    "registration": "f9eb07da19fefbb70242445791d04754caf15dbfd649069dd9dca463892cc005",
+    "roles": {
+      "C": {
+        "compiler": "98da2a45bd6a96a615e644e1acd97f369739e62c",
+        "revision": "fba2663650927209e3589fdc807194f66271bd5a",
+        "tree": "2dcf7a694435c94e78994fedfde224964d9d8c40"
+      },
+      "P": {
+        "compiler": "2a47fea6f16cf23729168513509540abc4db4056",
+        "revision": "531eb1980c08c75ccbf3f6b77adbee53cd9b8bd5",
+        "tree": "e23fcbbde57dc251d92d3b052c8f7d088eac1ea9"
+      }
+    }
+  },
+  "qa": "5347d68cabde42923d550beb5947ae04360c23b6",
+  "schema": "physical-source-bound-stock-writer-1",
+  "source": "fba2663650927209e3589fdc807194f66271bd5a",
+  "source_receipt": "5fa5918ddba913edb00c20939354dd9c98f367fbfd511b3ab6e914cc575e34a5"
+}

@@ -6,7 +6,7 @@ on:
       mode:
         description: One signed release or two independent builds on one boot
         type: choice
-        options: [single-22, paired-18-22, source-bisect-330, constructors-implicit-input, constructors-wild-preflight, native-guard-ioctl, ldv-pilot, ldv-needed-admit, ldv-needed-score, ldv-physical-stage, ldv-physical-docs, ldv-cached-stderr, ldv-physical-reopen, ldv-source-admit, ldv-source-score, ldv-source-layout, ldv-placement-factory, ldv-placement-c3b-factory, ldv-placement-stock-fix-factory, ldv-placement-c3b-admit, ldv-placement-three-score, ldv-placement-admit, ldv-placement-reopen, ldv-placement-score]
+        options: [single-22, paired-18-22, source-bisect-330, constructors-implicit-input, constructors-wild-preflight, native-guard-ioctl, ldv-pilot, ldv-needed-admit, ldv-needed-score, ldv-physical-stage, ldv-physical-docs, ldv-cached-stderr, ldv-physical-reopen, ldv-source-admit, ldv-source-score, ldv-source-layout, ldv-placement-factory, ldv-placement-c3b-factory, ldv-placement-stock-fix-factory, ldv-placement-stock-fix-admit, ldv-placement-stock-fix-score, ldv-placement-c3b-admit, ldv-placement-three-score, ldv-placement-admit, ldv-placement-reopen, ldv-placement-score]
         default: single-22
       ldv_admission:
         description: Same-commit successful wrapper-free native workflow run ID for scoring
@@ -1138,10 +1138,10 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-  c3b-admission:
-    if: inputs.mode == 'ldv-placement-c3b-admit' && github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-placement-c3b-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head && inputs.placement_source == 'ed0262f9bdc384576925229764971f23a141c95f'
+  stock-admission:
+    if: inputs.mode == 'ldv-placement-stock-fix-admit' && github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-placement-stock-writer-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head && inputs.placement_source == 'fba2663650927209e3589fdc807194f66271bd5a'
     runs-on: namespace-profile-ubuntu-24-04-16
-    name: Actual guarded C3b ordinary native history ${{ matrix.slot }}
+    name: Actual selected writer ordinary native history ${{ matrix.slot }}
     timeout-minutes: 260
     strategy:
       fail-fast: false
@@ -1151,7 +1151,7 @@ jobs:
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       PLACEMENT_SOURCE: ${{ inputs.placement_source }}
-      PLACEMENT_FACTORY: '41492092582'
+      PLACEMENT_FACTORY: '41510486074'
       ADMISSION_RUN: ${{ inputs.ldv_admission }}
       STAGE: admit
     steps:
@@ -1162,6 +1162,8 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             .github/workflows
+            scripts/ruff-source-placement-stock-writer-fix
+            scripts/ruff-source-placement-stock-writer
             scripts/ruff-source-placement-c3b
             scripts/ruff-source-placement
             scripts/ruff-ldv-physical-stage
@@ -1204,6 +1206,7 @@ jobs:
           (cd scripts/ruff-source-placement-c3b && sha256sum --check --strict --quiet native.sha256)
           python3 -IB scripts/ruff-source-placement-c3b/test_native.py
           python3 -IB scripts/ruff-source-placement-c3b/exact_stats.py
+          (cd scripts/ruff-source-placement-stock-writer-fix && sha256sum --check --strict --quiet factory.sha256 run.sha256)
       - name: Install native tracing and source-certificate verifier
         run: |
           sudo apt-get update -qq
@@ -1213,24 +1216,24 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          python3 -IB enrolled/scripts/ruff-source-placement-c3b/kits.py C3b "$RUNNER_TEMP/placement-qualified-sdks"
+          python3 -IB enrolled/scripts/ruff-source-placement-stock-writer-fix/stock_kits.py "$RUNNER_TEMP/placement-qualified-sdks"
       - name: Run only the enrolled ordinary historical Ruff workflows on separate targets
-        run: python3 -IB -u enrolled/scripts/ruff-source-placement-c3b/admit.py "${{ matrix.slot }}" "$GITHUB_WORKSPACE/ruff-option" "$GITHUB_WORKSPACE/ruff-e2e"
+        run: python3 -IB -u enrolled/scripts/ruff-source-placement-stock-writer-fix/stock_admit.py "${{ matrix.slot }}" "$GITHUB_WORKSPACE/ruff-option" "$GITHUB_WORKSPACE/ruff-e2e"
       - name: Retain original file traces, every complete checkout, native/diagnostic and counter verdict
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: placement-c3b-admission-raw-${{ matrix.slot }}
+          name: placement-stock-admission-raw-${{ matrix.slot }}
           path: ${{ runner.temp }}/ohm-ruff-whole-census/evidence
           if-no-files-found: warn
           compression-level: 5
           retention-days: 7
 
 
-  c3b-admission-readback:
-    needs: c3b-admission
-    if: inputs.mode == 'ldv-placement-c3b-admit' && needs.c3b-admission.result == 'success' && github.ref == 'refs/heads/charlie/qa-ruff-placement-c3b-20261102' && github.sha == inputs.reviewed_head && inputs.placement_source == 'ed0262f9bdc384576925229764971f23a141c95f'
-    name: Independently reopen guarded C3b ordinary native history ${{ matrix.slot }}
+  stock-admission-readback:
+    needs: stock-admission
+    if: inputs.mode == 'ldv-placement-stock-fix-admit' && needs.stock-admission.result == 'success' && github.ref == 'refs/heads/charlie/qa-ruff-placement-stock-writer-20261102' && github.sha == inputs.reviewed_head && inputs.placement_source == 'fba2663650927209e3589fdc807194f66271bd5a'
+    name: Independently reopen selected writer ordinary native history ${{ matrix.slot }}
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 180
     strategy:
@@ -1249,6 +1252,8 @@ jobs:
           ref: ${{ github.sha }}
           persist-credentials: false
           sparse-checkout: |
+            scripts/ruff-source-placement-stock-writer-fix
+            scripts/ruff-source-placement-stock-writer
             scripts/ruff-source-placement-c3b
             scripts/ruff-source-placement
             scripts/ruff-ldv-physical-stage
@@ -1271,19 +1276,174 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends b3sum
           (cd scripts/ruff-source-placement-c3b && sha256sum --check --strict --quiet native.sha256)
+          (cd scripts/ruff-source-placement-stock-writer-fix && sha256sum --check --strict --quiet factory.sha256 run.sha256)
+          python3 -IB scripts/ruff-source-placement-stock-writer-fix/test_selected.py
           python3 -IB scripts/ruff-source-placement-c3b/test_native.py
           python3 -IB scripts/ruff-source-placement/reader_tests.py
-          python3 -IB -u scripts/ruff-source-placement-c3b/admit_reader.py "${{ matrix.slot }}" "$RUNNER_TEMP/reopened.json"
+          python3 -IB -u scripts/ruff-source-placement-stock-writer-fix/stock_admit_reader.py "${{ matrix.slot }}" "$RUNNER_TEMP/reopened.json"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: placement-c3b-admission-verified-${{ matrix.slot }}
+          name: placement-stock-admission-verified-${{ matrix.slot }}
           path: ${{ runner.temp }}/reopened.json
           if-no-files-found: error
           retention-days: 14
 
-  c3b-three-native-prerequisite:
-    if: inputs.mode == 'ldv-placement-three-score' && github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-placement-c3b-20261102' && github.sha == inputs.reviewed_head && inputs.placement_source == 'ed0262f9bdc384576925229764971f23a141c95f' && github.run_attempt == '1'
-    name: Require both independently accepted real native C3b histories before enrolling a PMU host
+  stock-migration:
+    needs: stock-admission-readback
+    if: needs.stock-admission-readback.result == 'success' && inputs.mode == 'ldv-placement-stock-fix-admit' && github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-placement-stock-writer-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head && inputs.placement_source == 'fba2663650927209e3589fdc807194f66271bd5a'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    name: Authentic cross-version placement records on ordinary Ruff 1
+    timeout-minutes: 260
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        slot: [1]
+    env:
+      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      PLACEMENT_SOURCE: ${{ inputs.placement_source }}
+      PLACEMENT_FACTORY: '41510486074'
+      ADMISSION_RUN: ${{ inputs.ldv_admission }}
+      STAGE: admit
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.sha }}
+          path: enrolled
+          persist-credentials: false
+          sparse-checkout: |
+            .github/workflows
+            scripts/ruff-source-placement-stock-writer-fix
+            scripts/ruff-source-placement-stock-writer
+            scripts/ruff-source-placement-c3b
+            scripts/ruff-source-placement
+            scripts/ruff-ldv-physical-stage
+            scripts/ruff-ldv-physical-workflow
+            scripts/ruff-ldv-needed
+            scripts/ruff-ldv-pilot
+            scripts/ruff-default-owner-pmu
+            scripts/ruff-workspace-link-census
+            scripts/ruff-workspace-remat
+            scripts/ruff-workspace-option-edit
+            scripts/ruff-cgu-inputs
+            scripts/ruff-repair-tables-pilot
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: astral-sh/ruff
+          ref: 088b7b5f77fcb05994fd2a17cbc940cd9edb341a
+          path: ruff-option
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: astral-sh/ruff
+          ref: f9115b8deefa56b18b79449f8acafe25475c54d3
+          path: ruff-e2e
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Check source, graph, interpreter entry and corruption sentinels
+        working-directory: enrolled
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$REVIEWED_HEAD"
+          test -z "$(git status --porcelain=v1 --untracked-files=all)"
+          (cd scripts/ruff-source-placement && sha256sum --strict --quiet -c factory.sha256 && sha256sum --strict --quiet -c worker.sha256)
+          (cd scripts/ruff-ldv-physical-stage && sha256sum --strict --quiet -c SHA256SUMS)
+          (cd scripts/ruff-ldv-physical-workflow && sha256sum --strict --quiet -c SHA256SUMS)
+          python3 -IB scripts/ruff-source-placement/tests.py
+          (cd scripts/ruff-source-placement-c3b && sha256sum --check --strict --quiet native.sha256)
+          python3 -IB scripts/ruff-source-placement-c3b/test_native.py
+          python3 -IB scripts/ruff-source-placement-c3b/exact_stats.py
+          (cd scripts/ruff-source-placement-stock-writer-fix && sha256sum --check --strict --quiet factory.sha256 run.sha256)
+      - name: Install native tracing and source-certificate verifier
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends b3sum binutils build-essential libssl-dev pkg-config strace zstd
+      - name: Reopen the two physically attested compiler, std, LLVM, native-link and rustdoc kits
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 -IB enrolled/scripts/ruff-source-placement-stock-writer-fix/stock_kits.py "$RUNNER_TEMP/placement-qualified-sdks" with-prior
+      - name: Run only the enrolled ordinary historical Ruff workflows on separate targets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB -u enrolled/scripts/ruff-source-placement-stock-writer-fix/stock_migration.py "$GITHUB_WORKSPACE/ruff-option"
+      - name: Retain original file traces, every complete checkout, native/diagnostic and counter verdict
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: placement-stock-migration-raw-1
+          path: ${{ runner.temp }}/ohm-ruff-whole-census/evidence
+          if-no-files-found: warn
+          compression-level: 5
+          retention-days: 7
+
+
+  stock-migration-readback:
+    needs: stock-migration
+    if: inputs.mode == 'ldv-placement-stock-fix-admit' && needs.stock-migration.result == 'success' && github.ref == 'refs/heads/charlie/qa-ruff-placement-stock-writer-20261102' && github.sha == inputs.reviewed_head && inputs.placement_source == 'fba2663650927209e3589fdc807194f66271bd5a'
+    name: Independently reopen both genuine placement migrations 1
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        slot: [1]
+    env:
+      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      PLACEMENT_SOURCE: ${{ inputs.placement_source }}
+      STAGE: ${{ inputs.mode == 'ldv-placement-score' && 'score' || 'admit' }}
+      READ_FROZEN_NATIVE: ${{ inputs.mode == 'ldv-placement-reopen' && 'yes' || 'no' }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ruff-source-placement-stock-writer-fix
+            scripts/ruff-source-placement-stock-writer
+            scripts/ruff-source-placement-c3b
+            scripts/ruff-source-placement
+            scripts/ruff-ldv-physical-stage
+            scripts/ruff-ldv-physical-workflow
+            scripts/ruff-ldv-needed
+            scripts/ruff-ldv-pilot
+            scripts/ruff-default-owner-pmu
+            scripts/ruff-workspace-link-census
+            scripts/ruff-workspace-remat
+            scripts/ruff-workspace-option-edit
+            scripts/ruff-cgu-inputs
+            scripts/ruff-repair-tables-pilot
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Reopen complete raw source, code, memory, allocation, failure and counter evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends b3sum
+          (cd scripts/ruff-source-placement-c3b && sha256sum --check --strict --quiet native.sha256)
+          (cd scripts/ruff-source-placement-stock-writer-fix && sha256sum --check --strict --quiet factory.sha256 run.sha256)
+          python3 -IB scripts/ruff-source-placement-stock-writer-fix/test_selected.py
+          python3 -IB scripts/ruff-source-placement-c3b/test_native.py
+          python3 -IB scripts/ruff-source-placement/reader_tests.py
+          python3 -IB -u scripts/ruff-source-placement-stock-writer-fix/stock_migration_reader.py "$RUNNER_TEMP/reopened.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: placement-stock-migration-verified-1
+          path: ${{ runner.temp }}/reopened.json
+          if-no-files-found: error
+          retention-days: 14
+
+  stock-native-prerequisite:
+    if: inputs.mode == 'ldv-placement-stock-fix-score' && github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-placement-stock-writer-20261102' && github.sha == inputs.reviewed_head && inputs.placement_source == 'fba2663650927209e3589fdc807194f66271bd5a' && github.run_attempt == '1'
+    name: Require the selected compiler native and migration controls
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 30
     env:
@@ -1296,6 +1456,8 @@ jobs:
           ref: ${{ github.sha }}
           persist-credentials: false
           sparse-checkout: |
+            scripts/ruff-source-placement-stock-writer-fix
+            scripts/ruff-source-placement-stock-writer
             scripts/ruff-source-placement-c3b
             scripts/ruff-source-placement
             scripts/ruff-ldv-physical-stage
@@ -1316,23 +1478,23 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           (cd scripts/ruff-source-placement-c3b && sha256sum --check --strict --quiet factory.sha256 native.sha256 triple.sha256)
-          python3 -IB scripts/ruff-source-placement-c3b/gate.py "$RUNNER_TEMP/admission.json"
+          python3 -IB scripts/ruff-source-placement-stock-writer-fix/stock_gate.py "$RUNNER_TEMP/admission.json"
 
-  c3b-three-score:
-    needs: c3b-three-native-prerequisite
-    if: inputs.mode == 'ldv-placement-three-score' && github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-placement-c3b-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head && inputs.placement_source == 'ed0262f9bdc384576925229764971f23a141c95f'
+  stock-ordinary-score:
+    needs: stock-native-prerequisite
+    if: inputs.mode == 'ldv-placement-stock-fix-score' && github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-placement-stock-writer-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head && inputs.placement_source == 'fba2663650927209e3589fdc807194f66271bd5a'
     runs-on: namespace-profile-ubuntu-24-04-16
-    name: Three physical compiler roles in one fresh boot ${{ matrix.slot }}
+    name: Three ordinary physical writer roles in a clean boot ${{ matrix.slot }}
     timeout-minutes: 260
     strategy:
       fail-fast: false
-      max-parallel: 6
+      max-parallel: 2
       matrix:
-        slot: [1,2,3,4,5,6]
+        slot: [1,2]
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       PLACEMENT_SOURCE: ${{ inputs.placement_source }}
-      PLACEMENT_FACTORY: '41492092582'
+      PLACEMENT_FACTORY: '41510486074'
       ADMISSION_RUN: ${{ inputs.ldv_admission }}
       STAGE: score
     steps:
@@ -1343,6 +1505,8 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             .github/workflows
+            scripts/ruff-source-placement-stock-writer-fix
+            scripts/ruff-source-placement-stock-writer
             scripts/ruff-source-placement-c3b
             scripts/ruff-source-placement
             scripts/ruff-ldv-physical-stage
@@ -1385,6 +1549,7 @@ jobs:
           (cd scripts/ruff-source-placement-c3b && sha256sum --check --strict --quiet native.sha256)
           python3 -IB scripts/ruff-source-placement-c3b/test_native.py
           python3 -IB scripts/ruff-source-placement-c3b/exact_stats.py
+          (cd scripts/ruff-source-placement-stock-writer-fix && sha256sum --check --strict --quiet factory.sha256 run.sha256)
           (cd scripts/ruff-source-placement-c3b && sha256sum --check --strict --quiet triple.sha256)
           python3 -IB scripts/ruff-source-placement-c3b/test_three.py
       - name: Install native tracing and source-certificate verifier
@@ -1396,17 +1561,16 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          python3 -IB enrolled/scripts/ruff-source-placement-c3b/gate.py "$RUNNER_TEMP/native-gate.json"
-          env PLACEMENT_FACTORY=41475100027 python3 -IB enrolled/scripts/ruff-source-placement-c3b/kits.py C2 "$RUNNER_TEMP/placement-previous-sdks"
-          python3 -IB enrolled/scripts/ruff-source-placement-c3b/kits.py C3b "$RUNNER_TEMP/placement-qualified-sdks"
+          python3 -IB enrolled/scripts/ruff-source-placement-stock-writer-fix/stock_gate.py "$RUNNER_TEMP/native-gate.json"
+          python3 -IB enrolled/scripts/ruff-source-placement-stock-writer-fix/stock_kits.py "$RUNNER_TEMP/placement-qualified-sdks" with-prior
           cp "$RUNNER_TEMP/native-gate.json" "$RUNNER_TEMP/placement-qualified-sdks/native-gate.json"
       - name: Run only the enrolled ordinary historical Ruff workflows on separate targets
-        run: python3 -IB -u enrolled/scripts/ruff-source-placement-c3b/three_acquire.py "${{ matrix.slot }}" "$GITHUB_WORKSPACE/ruff-option" "$GITHUB_WORKSPACE/ruff-e2e"
+        run: python3 -IB -u enrolled/scripts/ruff-source-placement-stock-writer-fix/stock_acquire.py "${{ matrix.slot }}" "$GITHUB_WORKSPACE/ruff-option" "$GITHUB_WORKSPACE/ruff-e2e"
       - name: Retain original file traces, every complete checkout, native/diagnostic and counter verdict
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: placement-three-raw-${{ matrix.slot }}
+          name: placement-stock-survey-raw-${{ matrix.slot }}
           path: ${{ runner.temp }}/ohm-ruff-whole-census/evidence
           if-no-files-found: warn
           compression-level: 5
@@ -1414,17 +1578,17 @@ jobs:
 
 
 
-  c3b-three-score-readback:
-    needs: c3b-three-score
-    if: inputs.mode == 'ldv-placement-three-score' && needs.c3b-three-score.result == 'success' && github.ref == 'refs/heads/charlie/qa-ruff-placement-c3b-20261102' && github.sha == inputs.reviewed_head && inputs.placement_source == 'ed0262f9bdc384576925229764971f23a141c95f'
-    name: Reopen all original three-role observations from one boot ${{ matrix.slot }}
+  stock-ordinary-score-readback:
+    needs: stock-ordinary-score
+    if: inputs.mode == 'ldv-placement-stock-fix-score' && needs.stock-ordinary-score.result == 'success' && github.ref == 'refs/heads/charlie/qa-ruff-placement-stock-writer-20261102' && github.sha == inputs.reviewed_head && inputs.placement_source == 'fba2663650927209e3589fdc807194f66271bd5a'
+    name: Reopen the original selected-writer counts from one boot ${{ matrix.slot }}
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 180
     strategy:
       fail-fast: false
-      max-parallel: 6
+      max-parallel: 2
       matrix:
-        slot: [1,2,3,4,5,6]
+        slot: [1,2]
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       PLACEMENT_SOURCE: ${{ inputs.placement_source }}
@@ -1436,6 +1600,8 @@ jobs:
           ref: ${{ github.sha }}
           persist-credentials: false
           sparse-checkout: |
+            scripts/ruff-source-placement-stock-writer-fix
+            scripts/ruff-source-placement-stock-writer
             scripts/ruff-source-placement-c3b
             scripts/ruff-source-placement
             scripts/ruff-ldv-physical-stage
@@ -1458,22 +1624,24 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends b3sum
           (cd scripts/ruff-source-placement-c3b && sha256sum --check --strict --quiet native.sha256)
+          (cd scripts/ruff-source-placement-stock-writer-fix && sha256sum --check --strict --quiet factory.sha256 run.sha256)
+          python3 -IB scripts/ruff-source-placement-stock-writer-fix/test_selected.py
           python3 -IB scripts/ruff-source-placement-c3b/test_native.py
           (cd scripts/ruff-source-placement-c3b && sha256sum --check --strict --quiet triple.sha256)
           python3 -IB scripts/ruff-source-placement-c3b/test_three.py
           python3 -IB scripts/ruff-source-placement/reader_tests.py
-          python3 -IB -u scripts/ruff-source-placement-c3b/three_reader.py "${{ matrix.slot }}" "$RUNNER_TEMP/reopened.json"
+          python3 -IB -u scripts/ruff-source-placement-stock-writer-fix/stock_reader.py "${{ matrix.slot }}" "$RUNNER_TEMP/reopened.json"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: placement-three-verified-${{ matrix.slot }}
+          name: placement-stock-survey-verified-${{ matrix.slot }}
           path: ${{ runner.temp }}/reopened.json
           if-no-files-found: error
           retention-days: 14
 
-  c3b-three-decision:
-    needs: c3b-three-score-readback
-    if: needs.c3b-three-score-readback.result == 'success' && inputs.mode == 'ldv-placement-three-score' && github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-placement-c3b-20261102' && github.sha == inputs.reviewed_head && inputs.placement_source == 'ed0262f9bdc384576925229764971f23a141c95f' && github.run_attempt == '1'
-    name: Recompute all 108 complete whole-Cargo counters, exact inference and cold, edit and unchanged costs
+  stock-ordinary-decision:
+    needs: stock-ordinary-score-readback
+    if: needs.stock-ordinary-score-readback.result == 'success' && inputs.mode == 'ldv-placement-stock-fix-score' && github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-placement-stock-writer-20261102' && github.sha == inputs.reviewed_head && inputs.placement_source == 'fba2663650927209e3589fdc807194f66271bd5a' && github.run_attempt == '1'
+    name: Reopen all 36 selected whole-Cargo cold, edit and unchanged observations
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 30
     env:
@@ -1486,6 +1654,8 @@ jobs:
           ref: ${{ github.sha }}
           persist-credentials: false
           sparse-checkout: |
+            scripts/ruff-source-placement-stock-writer-fix
+            scripts/ruff-source-placement-stock-writer
             scripts/ruff-source-placement-c3b
             scripts/ruff-source-placement
             scripts/ruff-ldv-physical-stage
@@ -1501,16 +1671,16 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Independently reopen all six real source-bound triplets
+      - name: Independently reopen both source-bound triplets
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           (cd scripts/ruff-source-placement-c3b && sha256sum --check --strict --quiet factory.sha256 native.sha256 triple.sha256)
           python3 -IB scripts/ruff-source-placement-c3b/test_three.py
-          python3 -IB -u scripts/ruff-source-placement-c3b/three_decision.py "$RUNNER_TEMP/decision.json"
+          python3 -IB -u scripts/ruff-source-placement-stock-writer-fix/stock_decision.py "$RUNNER_TEMP/decision.json"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: placement-three-final
+          name: placement-stock-survey-final
           path: ${{ runner.temp }}/decision.json
           if-no-files-found: error
           retention-days: 14
