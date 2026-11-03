@@ -4,7 +4,9 @@ permissions:
   contents: read
 jobs:
   apple:
-    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-combined-input-checksums-darwin-20261103'
+    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1'
+      && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-combined-input-checksums-darwin-20261103'
+      && !inputs.verify_archive
     runs-on: namespace-profile-macos-15
     timeout-minutes: 115
     steps:
@@ -124,23 +126,27 @@ jobs:
 
         mkdir -p "$RUNNER_TEMP/ohm-branch-object-qa/logs" "$RUNNER_TEMP/combined/logs"
 
-        python3 -IB qa-code/scripts/rc23-expanded-inputs/materialize.py --workspace "$GITHUB_WORKSPACE" --rust "$GITHUB_WORKSPACE/source/rust" --out "$RUNNER_TEMP/ohm-branch-object-qa/logs/source-precursor.json"
+        python3 -IB qa-code/scripts/rc23-expanded-inputs/materialize.py --workspace
+        "$GITHUB_WORKSPACE" --rust "$GITHUB_WORKSPACE/source/rust" --out "$RUNNER_TEMP/ohm-branch-object-qa/logs/source-precursor.json"
 
         python3 -IB qa-code/scripts/ruff-matched-stage/signed_source.py
 
-        python3 -IB reader-source/scripts/ruff-join-proof/fix/materialize.py --prior-pack accepted-source/scripts/ohm-apple-zmij/cargo293/source.pack --dest "$GITHUB_WORKSPACE/cargo-src"
+        python3 -IB reader-source/scripts/ruff-join-proof/fix/materialize.py --prior-pack
+        accepted-source/scripts/ohm-apple-zmij/cargo293/source.pack --dest "$GITHUB_WORKSPACE/cargo-src"
 
         python3 -IB qa-code/scripts/ruff-combined-apple/qualify.py source'
     - name: Install the signed parent distribution
       env:
         GH_TOKEN: ${{ github.token }}
-      run: 'gh release download ohm-1.99.0-23 -R astral-experiments/ohm -p ohm-1.99.0-23-aarch64-apple-darwin.tar.gz --dir "$RUNNER_TEMP/combined"
+      run: 'gh release download ohm-1.99.0-23 -R astral-experiments/ohm -p ohm-1.99.0-23-aarch64-apple-darwin.tar.gz
+        --dir "$RUNNER_TEMP/combined"
 
         python3 -IB qa-code/scripts/ruff-combined-apple/qualify.py install
 
         '
     - name: Build the two precise product heads
-      run: 'test -f source/rust/library/backtrace/Cargo.toml || git -C source/rust submodule update --init library/backtrace
+      run: 'test -f source/rust/library/backtrace/Cargo.toml || git -C source/rust
+        submodule update --init library/backtrace
 
         command -v ninja || brew install ninja
 
@@ -149,11 +155,15 @@ jobs:
         '
     - name: Preserve the original native compiler for independent replay
       shell: bash
-      run: |
-        set -euo pipefail
+      run: 'set -euo pipefail
+
         cd "$RUNNER_TEMP/combined"
+
         tar -czf fixed-sdk.tar.gz -C reopened defer
+
         shasum -a 256 fixed-sdk.tar.gz > logs/fixed-sdk.sha256
+
+        '
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       with:
         name: combined-checksums-macos-sdk-${{ github.run_id }}
@@ -174,6 +184,43 @@ jobs:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       OHM_TARGET: aarch64-apple-darwin
       PYTHONDONTWRITEBYTECODE: '1'
+  originals:
+    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1'
+      && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-combined-input-checksums-darwin-20261103'
+      && inputs.verify_archive
+    runs-on: namespace-profile-macos-15
+    timeout-minutes: 20
+    permissions:
+      actions: read
+      contents: read
+    steps:
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: ${{ github.sha }}
+        persist-credentials: false
+        sparse-checkout: scripts/ruff-combined-apple
+    - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+      with:
+        python-version: '3.13'
+    - name: Reopen the 75 original commands and verify and execute all 16 native programs
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: 'set -euo pipefail
+
+        cd "$RUNNER_TEMP"
+
+        gh api repos/astral-experiments/ohm/actions/artifacts/13219493172/zip > original.zip
+
+        python3 -IB "$GITHUB_WORKSPACE/scripts/ruff-combined-apple/reopen_archive.py"
+        original.zip accepted.json --execute
+
+        '
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: combined-cargo-rust-original-macos-verdict-${{ github.run_id }}
+        path: ${{ runner.temp }}/accepted.json
+        if-no-files-found: error
+        retention-days: 30
 'on':
   workflow_dispatch:
     inputs:
@@ -181,3 +228,8 @@ jobs:
         required: true
         type: string
         description: Exact QA source commit
+      verify_archive:
+        description: Replay the immutable artifact and execute the original native
+          binaries
+        type: boolean
+        default: false
