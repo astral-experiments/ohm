@@ -62,7 +62,10 @@ def execute(args,d,*,meter=False,bad=False,trace=True):
     put(d/'record.json',r);return r
 
 def select(role):
-    incoming=trial/'new-cargo';os.link(bodies[role],incoming);os.replace(incoming,selected)
+    incoming=trial/'new-cargo';check(not incoming.exists(),'dangling selection handoff')
+    if not selected.samefile(bodies[role]):
+        os.link(bodies[role],incoming);os.replace(incoming,selected)
+    check(not incoming.exists(),'incomplete Cargo selection')
     which=Path(subprocess.check_output(['rustup','which','--toolchain','ohm','cargo'],env=env,text=True).strip())
     check(which.samefile(selected)and selected.samefile(bodies[role])and frozen['sources'][role] in subprocess.check_output(['cargo','+ohm','-Vv'],env=env,text=True),'private Cargo selection')
 def external_products(d):
