@@ -11,6 +11,7 @@ permissions:
   contents: read
 jobs:
   native-owner:
+    name: native-owner-0
     if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-ruf009-portable-owner-20261103' && github.event_name == 'workflow_dispatch' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 60
