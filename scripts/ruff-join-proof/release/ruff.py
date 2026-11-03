@@ -13,6 +13,7 @@ git=lambda *args:subprocess.check_output(['git','-C',w,*args],text=True).strip()
 assert git('rev-parse','HEAD')==plan['ruff_new']and git('rev-parse','HEAD^')==plan['ruff_old'] and sdk.hf(w/'Cargo.lock')==plan['ruff_lock'] and not git('status','--porcelain')
 assert sdk.hf(src/'whole_count.c')==plan['counter']
 sdk.put(out/'release-registration.json',{'plan':plan,'inputs':{p.name:sdk.hf(p)for p in src.iterdir()if p.is_file()},'kernel':os.uname().release})
+if reader:reader_factory.acquire(sdk)
 e=sdk.install();bodies=build.setup(sdk,e,release=True)
 trial=sdk.root/'ruff-comparison';trial.mkdir();tgt=trial/'target';shared=trial/'shared';box=trial/'sdk';(box/'bin').mkdir(parents=True)
 for p in sdk.sdk.iterdir():
