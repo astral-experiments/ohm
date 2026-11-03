@@ -1,12 +1,12 @@
 name: Qualify the -23 Cargo and Rust regression fixes together
-run-name: Integrated native checksum, doctest and Git regressions ${{ inputs.reviewed_head
+run-name: Integrated metadata stub, checksum and doctest regressions ${{ inputs.reviewed_head
   }}
 permissions:
   contents: read
 jobs:
   qualify:
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1'
-      && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-rc23-integrated-inputs-and-doctests-20261103'
+      && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-rc23-integrated-green-stub-20261103'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     steps:

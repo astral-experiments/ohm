@@ -27,6 +27,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import matched_paths
 import macho
 import release_cases
+import stub_cases
 
 def git_sha(path, expr):
     return sp.check_output(["git", "-C", path, "rev-parse", expr], text=True).strip()
@@ -58,7 +59,7 @@ def check_cargo_files():
 
 def check_sources():
     check_cargo_files()
-    for repo, ref, tree in ((src, "364b82f01c52f77e870cdb1bb5b9f66e2fa89694", "531c5eefa10de5179d81207bdd50f4246dc725b9"), (cargo, "d5185be60b88e36ffb5e9daeb543b9f14d077a37", "4b9a4d7ca2e5abb29c307fa501ec6a437e30dea3"), (workspace/"fixtures", "5b47d5755bd515e61a98b9f85eca3af0aaf7c137", "d22f09981bdd81fc892fd47d894233639d0f3dab")):
+    for repo, ref, tree in ((src, "2aae181b1f409979528d9f4432310c242c76b177", "d9db9fc931a987a96bcd3a716edf45086f66b5fa"), (cargo, "d5185be60b88e36ffb5e9daeb543b9f14d077a37", "4b9a4d7ca2e5abb29c307fa501ec6a437e30dea3"), (workspace/"fixtures", "5b47d5755bd515e61a98b9f85eca3af0aaf7c137", "d22f09981bdd81fc892fd47d894233639d0f3dab")):
         assert git_sha(repo, "HEAD") == ref and git_sha(repo, "HEAD^{tree}") == tree
         if repo!=src:
             sp.run(["git", "-C", repo, "diff", "--exit-code", "HEAD", "--"], check=True)
@@ -104,6 +105,15 @@ def source():
     assert git_sha(src,"FETCH_HEAD")=="364b82f01c52f77e870cdb1bb5b9f66e2fa89694" and git_sha(src,"FETCH_HEAD^")==git_sha(src,"HEAD")
     assert sp.check_output(["git","-C",src,"diff","--name-only","HEAD","FETCH_HEAD","--"])==b"src/tools/cargo\n"
     sp.run(["git","-C",src,"checkout","--quiet","--no-recurse-submodules","--detach","FETCH_HEAD"],check=True)
+    stub = Path(__file__).resolve().with_name("metadata-stub.bundle")
+    assert smoke.sha(stub) == "2f4ebfe8ff7221dd1f083ade611909838ad7a0cd4e0471b381c52cc2251059ce"
+    sp.run(["git", "-C", src, "bundle", "verify", stub], check=True)
+    sp.run(["git", "-C", src, "fetch", "--no-tags", "--no-recurse-submodules", stub, "refs/heads/charlie/qa-rc23-stub-doctest-inputs-20261103"], check=True)
+    assert git_sha(src, "FETCH_HEAD") == "2aae181b1f409979528d9f4432310c242c76b177"
+    assert git_sha(src, "FETCH_HEAD^") == git_sha(src, "HEAD")
+    assert sp.check_output(["git", "-C", src, "diff", "--name-only", "HEAD", "FETCH_HEAD"]).splitlines() == [
+        b"compiler/rustc_metadata/src/rmeta/encoder.rs", b"tests/run-make/embed-metadata/rmake.rs"]
+    sp.run(["git", "-C", src, "checkout", "--quiet", "--no-recurse-submodules", "--detach", "FETCH_HEAD"], check=True)
     nested=src/"src/tools/cargo"
     if (nested/".git").exists():
         sp.run(["git","-C",nested,"fetch","--no-tags",cargo,git_sha(cargo,"HEAD")],check=True)
@@ -234,6 +244,7 @@ def exercise():
     check_sources()
     before = {"P":tools(normal),"C":tools(fixed)}
     base = dict(clean_env(), RUSTUP_HOME=str(ru), CARGO_HOME=str(root/"unused-cargo-home"), RUSTUP_TOOLCHAIN="ohm")
+    stub_cases.qualify(root, normal, fixed, base, logs, host)
     comparisons = matched_paths.histories(root, normal, fixed, base)
     for role,sdk in (("signed",normal),("fixed",fixed)):
         prerequisite(role,sdk,base)
