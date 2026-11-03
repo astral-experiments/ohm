@@ -1,63 +1,52 @@
-name: Census ordinary Ohm Ruff CLI help edits
-run-name: 'Ruff #28392 check and native build source attribution'
-permissions:
-  contents: read
-  actions: read
-jobs:
-  inspect:
-    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head &&
-      github.ref_name == 'charlie/qa-ruff-clap-config-help-20261103'
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 95
-    steps:
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        ref: ${{ inputs.reviewed_head }}
-        path: qa
-        persist-credentials: false
-        sparse-checkout: scripts/ruff-clap-config-help
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        repository: astral-sh/ruff
-        ref: d136bd8d002a648de5f344df602e492658306f1e
-        fetch-depth: 2
-        path: ruff
-        persist-credentials: false
-    - name: Authenticate -24 original source and native kit
-      run: python3 -IB qa/scripts/ruff-clap-config-help/setup.py
-      env:
-        GH_TOKEN: ${{ github.token }}
-    - name: Ordinary command, raw hardware, source, clean and incorrect-program controls
-      run: python3 -IB qa/scripts/ruff-clap-config-help/ordinary.py
-    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-      if: always()
-      with:
-        name: ruff-28392-ordinary-${{ matrix.mode }}-${{ github.run_id }}
-        path: ${{ runner.temp }}/ohm-clap-cli/ordinary
-        retention-days: 14
-        if-no-files-found: error
-    - name: Qualify real rustc and linker lifetimes, plus source-bound instruction samples
-      run: python3 -IB qa/scripts/ruff-clap-config-help/profile.py
-    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-      if: always()
-      with:
-        name: ruff-28392-diagnostic-${{ matrix.mode }}-${{ github.run_id }}
-        path: ${{ runner.temp }}/ohm-clap-cli/diagnostic
-        retention-days: 14
-        if-no-files-found: error
-    strategy:
-      fail-fast: false
-      matrix:
-        mode:
-        - build
-    name: Ordinary Ruff CLI ${{ matrix.mode }}
-    env:
-      OHM_STUDY_MODE: ${{ matrix.mode }}
-      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+name: Diagnose the published Ruff CLI metadata after a reverse edit
+run-name: Signed Ohm 24, actual Ruff library and unchanged consumer
 'on':
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Exact reviewed nonrelease QA source
         required: true
         type: string
+permissions:
+  contents: read
+  actions: read
+jobs:
+  study:
+    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruff-clap-reverse-metadata-20261103'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 100
+    env:
+      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+      PYTHONDONTWRITEBYTECODE: '1'
+      OHM_STUDY_MODE: build
+    steps:
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: ${{ inputs.reviewed_head }}
+        path: meta
+        sparse-checkout: scripts/ruff-clap-reverse-metadata
+        persist-credentials: false
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: e48abf3b09f415b296d0ee2e8ec81c0de7b50611
+        path: legacy
+        sparse-checkout: scripts/ruff-clap-config-help
+        persist-credentials: false
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        repository: astral-sh/ruff
+        ref: fa4a7bca2db70229710892c97b26ea6fb046cfc4
+        fetch-depth: 2
+        path: ruff
+        persist-credentials: false
+    - name: Compare real type and downstream build outcomes on the verified release
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: python3 -IB meta/scripts/ruff-clap-reverse-metadata/study.py
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      if: always()
+      with:
+        name: ruff-actual-reverse-metadata-${{ github.run_id }}
+        path: ${{ runner.temp }}/reverse-metadata-raw
+        compression-level: 1
+        retention-days: 14
+        if-no-files-found: error
