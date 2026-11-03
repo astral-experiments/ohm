@@ -1,7 +1,7 @@
 //! Narrow single-link research gate. The private coordinator knows the receipt from the previous
 //! full Cargo invocation. The program rereads both native inputs and the existing executable.
 use std::fs::File;
-use std::io::Write as _;
+use std::io::{Read as _, Write as _};
 use std::os::unix::fs::{FileExt as _, MetadataExt as _, OpenOptionsExt as _};
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
@@ -40,7 +40,12 @@ fn image() -> Option<String> {
     let mut f=File::open("/proc/self/exe").ok()?;
     if f.metadata().ok()?.len() > 32<<20 {return None;}
     let mut hash=blake3::Hasher::new();
-    std::io::copy(&mut f,&mut hash).ok()?;
+    let mut block=[0;32768];
+    loop {
+        let n=f.read(&mut block).ok()?;
+        if n==0 {break;}
+        hash.update(&block[..n]);
+    }
     Some(hash.finalize().to_string())
 }
 
