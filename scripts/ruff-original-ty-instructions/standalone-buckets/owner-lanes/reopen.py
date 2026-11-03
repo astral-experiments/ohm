@@ -34,10 +34,17 @@ def materialize(archive,ref,path):
 def observation(z,role):
     root=role+"/observed-edit/tasks/";tools=z.js(role+"/tools.json")
     rust=(tools["rustc"]["dev"],tools["rustc"]["ino"])
-    owners={};by=Counter();execs=[];no_clock=Counter()
+    owners={};by=Counter();execs=[];no_clock=Counter();monitor=None;whole=None
     for line in z.file.read(root+"epochs.tsv").splitlines():
         fields=line.split();tag=fields[0]
-        if tag==b"I":
+        if tag==b"M":
+            need(monitor is None and not owners and len(fields)==3 and all(int(x)>0 for x in fields[1:]),"wrong monitor origin")
+            monitor=int(fields[1])
+        elif tag==b"W":
+            need(whole is None and monitor is not None and len(fields)==5,"wrong final command journal")
+            whole,enabled,active,status=map(int,fields[1:])
+            need(whole>0 and enabled==active>0 and status==0,"incomplete observer")
+        elif tag==b"I":
             index=int(fields[1]);parts=z.file.read(root+f"{index:05}.nul").split(b"\0")
             need(parts.pop()==b"" and parts[0]==fields[2] and index not in owners,"different task image")
             owner=Path(os.fsdecode(parts[3])).name;pair=tuple(map(int,parts[1:3]));args=parts[4:]
@@ -53,7 +60,8 @@ def observation(z,role):
     receipt=z.js(role+"/observed-edit/result.json")["observed"]
     need(dict(by)==receipt["process_instructions"] and execs==receipt["real_execs"] and dict(no_clock)==receipt["positive_instructions_without_clock"],"different hardware attribution")
     need(by["rustc:ty_project"]>0 and not no_clock["rustc:ty_project"],"no qualified affected compiler")
-    return {"commands":execs,"instructions":by}
+    need(monitor is not None and whole is not None,"missing process boundaries")
+    return {"commands":execs,"instructions":by,"observed_command":whole}
 
 def main():
     p=argparse.ArgumentParser();p.add_argument("archive",type=Path);p.add_argument("--sha256",required=True);p.add_argument("--case",choices=["29697","29604"],required=True)
