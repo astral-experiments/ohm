@@ -1,3 +1,4 @@
+#include "fd-contract.h"
 // Genuine file-backed PT_LOAD intervals of the running front end, driver and LLVM
 // must resolve to the three immutable-for-this-visit descriptions inherited from the verifier.
 #include <algorithm>
@@ -50,7 +51,7 @@ extern "C" bool check_held_software() {
     if(sscanf(line,"%lx-%lx %4s %lx %x:%x %lu",&row.start,&row.end,prot,&row.offset,&row.ma,&row.mi,&row.inode)==7)v.maps.push_back(row);
   }
   free(line);fclose(f);
-  for(int i=0;i<3;++i) if(fstat(190+i,&v.actual[i]) || fcntl(190+i,F_GETLEASE)!=F_RDLCK)v.good=false;
+  for(int i=0;i<3;++i) if(fstat(ron_contact_fd("OHM_RON_ROLE_FDS",i),&v.actual[i]) || fcntl(ron_contact_fd("OHM_RON_ROLE_FDS",i),F_GETLEASE)!=F_RDLCK)v.good=false;
   if(v.good)dl_iterate_phdr(match,&v);
   for(int j=0;j<3;++j) if(v.seen[j]!=1||!v.intervals[j])v.good=false;
   auto file=getenv("OHM_RON_BINDING");
@@ -61,5 +62,5 @@ extern "C" bool check_held_software() {
          (unsigned long)v.actual[j].st_ino,(long long)v.actual[j].st_size,v.seen[j],v.intervals[j]);
   close(log);
   const char result=v.good?'B':'F';
-  return write(193,&result,1)==1 && v.good;
+  return write(ron_contact_fd("OHM_RON_NOTIFY_FD"),&result,1)==1 && v.good;
 }

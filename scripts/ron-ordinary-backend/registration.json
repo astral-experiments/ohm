@@ -20,6 +20,12 @@
   ],
   "counter": "inherited PERF_COUNT_HW_INSTRUCTIONS, userspace only, enabled=running; ordinary whole Cargo root and descendants once. Separate census and direct Callgrind units are never summed.",
   "entry_bytes": 48318382080,
+  "fd_handoff_amendment": {
+    "change": "The kernel allocates genuinely new descriptors by open and pipe; no pre-existing Cargo descriptor is overwritten. The diagnostic child receives their actual numbers and rechecks the same physical FDs and leases. The next cohort acquires all slots from fresh workspaces.",
+    "parent": "2e47f5587fcaea02db45a42a23d89eb7b0df9250",
+    "refused": 41722651807,
+    "signed_inputs_and_numerical_gates_unchanged": true
+  },
   "independent_scope": "9 other runtime executable mappings and native component price examined in separate full-identity lease experiment. No product, shared storage or statistical release claim.",
   "memory_bytes": 8589934592,
   "reference": "a95a505d25b0f7839a6104ff1514ed9a4ddf9f90",

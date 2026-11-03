@@ -30,16 +30,19 @@ int main(int argc,char**argv) {
   if(!active)held.release();
   std::vector<string> stable;std::vector<char*> env;int pipefd[2]{-1,-1};
   if(active){
-    check(pipe2(pipefd,O_CLOEXEC)==0);check(fcntl(193,F_GETFD)==-1&&errno==EBADF);
-    check(dup2(pipefd[1],193)==193);close(pipefd[1]);
-    for(auto e=environ;*e;++e){string v=*e;if(v.rfind("LD_PRELOAD=",0)!=0&&v.rfind("OHM_RON_TOOL=",0)!=0&&v.rfind("OHM_RON_MODE=",0)!=0)stable.push_back(std::move(v));}
+    check(pipe2(pipefd,O_CLOEXEC)==0 && ron_inherit_new_fd(pipefd[1]));
+    string numbers;
+    for(int fd:held.fds){if(!numbers.empty())numbers+=',';numbers+=std::to_string(fd);}
+    stable.push_back("OHM_RON_ROLE_FDS="+numbers);
+    stable.push_back("OHM_RON_NOTIFY_FD="+std::to_string(pipefd[1]));
+    for(auto e=environ;*e;++e){string v=*e;if(v.rfind("OHM_RON_ROLE_FDS=",0)!=0&&v.rfind("OHM_RON_NOTIFY_FD=",0)!=0&&v.rfind("LD_PRELOAD=",0)!=0&&v.rfind("OHM_RON_TOOL=",0)!=0&&v.rfind("OHM_RON_MODE=",0)!=0)stable.push_back(std::move(v));}
     stable.push_back(string("LD_PRELOAD=")+getenv("OHM_RON_PAID_PLUGIN"));stable.push_back("OHM_RON_MODE=reuse");stable.push_back("OHM_RON_TOOL="+token);
     for(auto& e:stable)env.push_back(e.data());env.push_back(nullptr);
   }
   pid_t child;long rss=0; int rc=launch(argv+2,active?&env:nullptr,child,rss,active?&held:nullptr);
   pid_t first=child;char marked=0;
   if(active){
-    close(193);ssize_t n=read(pipefd[0],&marked,1);close(pipefd[0]);if(n!=1)marked=0;
+    close(pipefd[1]);ssize_t n=read(pipefd[0],&marked,1);close(pipefd[0]);if(n!=1)marked=0;
     bool still_held=held.valid();
     if(!still_held || (marked=='B' && !held.still_named())) {
       held.why=still_held?"renamed-during-compile":"writer-during-compile";held.release();active=false;

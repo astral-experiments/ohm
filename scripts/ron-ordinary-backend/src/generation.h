@@ -1,5 +1,6 @@
 // All leases are private, read-only, generation-bound and limited to this process invocation.
 #include "blake3.h"
+#include "fd-contract.h"
 #include <cerrno>
 #include <csignal>
 #include <poll.h>
@@ -24,8 +25,8 @@ struct Held {
       if(fstat(raw,&before)||!S_ISREG(before.st_mode)||before.st_uid!=getuid()||before.st_nlink!=1){
         close(raw);why="outside-private-eligible-install";return false;
       }
-      if(fcntl(190+i,F_GETFD)!=-1||errno!=EBADF || dup2(raw,190+i)!=190+i){close(raw);why="occupied-descriptor";return false;}
-      close(raw);int fd=fds[i]=190+i;
+      if(!ron_inherit_new_fd(raw)){close(raw);why="no-inheritable-descriptor";return false;}
+      int fd=fds[i]=raw;
       if(fcntl(fd,F_SETOWN,getpid())||fcntl(fd,F_SETLEASE,F_RDLCK)){why="writer-or-lease-unavailable";return false;}
       blake3_hasher hash;blake3_hasher_init(&hash);size_t total=0;ssize_t n=0;
       for(;;){

@@ -2,6 +2,8 @@
 """Handle precisely one real Cargo invocation, recording the unchanged argv and original jobserver."""
 from pathlib import Path
 import json
+import fcntl
+import resource
 import os
 import re
 import sys
@@ -15,6 +17,12 @@ raw("cargo-argv.nul",b"\0".join(map(os.fsencode,[file,*argv]))+b"\0")
 raw("cwd",os.fsencode(os.getcwd()));raw("jobserver",os.fsencode(os.environ["CARGO_MAKEFLAGS"]))
 m=re.search(r"--jobserver-(?:auth|fds)=(\d+),(\d+)",os.environ["CARGO_MAKEFLAGS"]);assert m
 assert all(os.get_inheritable(int(v)) for v in m.groups())
+# Report the actual old reserved numbers without opening, closing or publishing their contents.
+status={}
+for fd in sorted({*range(190,212),*(int(s)for s in m.groups())}):
+    try:status[fd]=[fcntl.fcntl(fd,fcntl.F_GETFD),os.fstat(fd).st_mode,os.fstat(fd).st_ino]
+    except OSError as problem:status[fd]=[problem.errno]
+raw("inherited-fd-status.json",json.dumps({"descriptors":status,"limit":resource.getrlimit(resource.RLIMIT_NOFILE)},sort_keys=True).encode())
 raw("loader-environment.json",json.dumps({k:os.environ.get(k) for k in ("LD_LIBRARY_PATH","LD_AUDIT","LD_PRELOAD","LD_PROFILE","LD_DEBUG","LLVM_PROFILE_FILE")},sort_keys=True).encode())
 mode=os.environ["OHM_CAPTURE_ACTION"]
 if mode=="observe":

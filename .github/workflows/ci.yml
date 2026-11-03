@@ -3,6 +3,10 @@ run-name: Published -24 Ron backend normal Cargo ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
+      lane:
+        type: choice
+        default: ordinary
+        options: [ordinary, runtime-hardware]
       reviewed_head:
         required: true
         description: Exact reviewed nonrelease QA commit
@@ -48,17 +52,22 @@ jobs:
           cd qa/scripts/ron-ordinary-backend
           sha256sum -c SHA256SUMS
           sudo apt-get update -qq
-          sudo apt-get install -qy --no-install-recommends clang libssl-dev zstd
+          sudo apt-get install -qy --no-install-recommends clang libssl-dev zstd busybox-static file
       - name: Independently empty native history and whole-Ruff instruction pair
         env:
           REVIEWED_HEAD: ${{ inputs.reviewed_head }}
           RON_BLOCK: ${{ matrix.block }}
           OHM_SDK_READ_TOKEN: ${{ github.token }}
-        run: python3 -IB qa/scripts/ron-ordinary-backend/ordinary.py
+        run: |
+          if [ '${{ inputs.lane }}' = runtime-hardware ]; then
+            python3 -IB qa/scripts/ron-ordinary-backend/runtime-hardware/work.py
+          else
+            python3 -IB qa/scripts/ron-ordinary-backend/ordinary.py
+          fi
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: full-ron-published-24-${{ matrix.block }}-${{ github.run_id }}
+          name: full-ron-published-24-${{ inputs.lane }}-${{ matrix.block }}-${{ github.run_id }}
           path: ${{ runner.temp }}/ohm-foreign-join/published/
           retention-days: 15
           if-no-files-found: error

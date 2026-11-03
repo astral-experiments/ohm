@@ -18,3 +18,5 @@ gh-auto workflow run ci.yml --repo astral-experiments/ohm --ref charlie/qa-ron-c
 The exact reference helper commit is in `registration.json`. LLVM public headers and the BLAKE3 reference C/assembly are bundled with member-by-member hashes in `components.json`. LLVM and BLAKE3 retain their respective upstream Apache-2.0-with-LLVM-exceptions and CC0/Apache-2.0 licensing.
 
 The original two workers stopped before either treatment ran. Their first worktree snapshot was taken after a later same-source compiler had replaced the standalone Ron metadata at that path. The raw phase digests and native rosters are preserved in `refused-41719994394.json`. The new enrollment copies and validates each source-phase body before the next command.
+
+On the next two independent hosts the real compiler finished normally and the diagnostic refused its reserved FD before LLVM interception. The observer now sends the actual numbers returned by open/pipe to its child. Existing Cargo descriptors are preserved for their original owners. Both earlier jobs and their native generations are recorded separately.
