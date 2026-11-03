@@ -5,7 +5,7 @@ permissions:
   actions: read
 jobs:
   price:
-    name: 'Ruff Unicode edit ${{ matrix.block }}'
+    name: 'Ruff Unicode ${{ matrix.fixture }} edit ${{ matrix.block }}'
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head &&
       github.ref_name == 'charlie/qa-rc24-static-cost-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
@@ -13,9 +13,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        block:
-        - PC
-        - CP
+        include:
+        - {block: PC, fixture: loose}
+        - {block: CP, fixture: loose}
+        - {block: CP, fixture: aliases}
     steps:
     - name: Read this immutable measurement
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -29,19 +30,20 @@ jobs:
       with:
         repository: astral-sh/ruff
         ref: 88a50d695c1142294bb4c780fad47d3306173885
-        fetch-depth: 2
+        fetch-depth: 3
         path: ruff
         persist-credentials: false
     - name: Measure both source-built rustc programs on the same Ruff edit
       env:
         PRICE_BLOCK: ${{ matrix.block }}
+        ARRAY_CASE: ${{ matrix.fixture }}
         GH_TOKEN: ${{ github.token }}
       run: python3 -IB qa/scripts/ruff-static-array-cost/price.py
     - name: Preserve the original counters, inventories and refusals
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: unicode-price-${{ matrix.block }}-${{ github.run_id }}
+        name: unicode-price-${{ matrix.fixture }}-${{ matrix.block }}-${{ github.run_id }}
         path: ${{ runner.temp }}/unicode-price/proof
         retention-days: 7
         compression-level: 6

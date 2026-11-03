@@ -26,7 +26,9 @@ shared=work/"shared"
 boot=Path("/proc/sys/kernel/random/boot_id").read_text().strip()
 block=os.environ["PRICE_BLOCK"]
 order=reg["orders"][block]
-old,new=reg["old"],reg["new"]
+case=os.environ["ARRAY_CASE"]
+fixture=reg["cases"][case]
+old,new=fixture["old"],fixture["new"]
 sha=transport.sha
 put=transport.jsonfile
 rustc=sdk/"bin/rustc"
@@ -49,7 +51,7 @@ def ident(path):
     s=path.stat();return (s.st_dev,s.st_ino)
 def enroll():
     proof.mkdir(parents=True)
-    assert git("rev-parse",new+"^")==old and git("diff","--name-only",old,new).splitlines()==reg["paths"]
+    assert git("rev-parse",new+"^")==old and git("diff","--name-only",old,new).splitlines()==fixture["paths"]
     assert sha(gitroot/"Cargo.lock")==reg["lock"] and not git("status","--porcelain")
     for name,spec in reg["sources"].items():assert sha(kit/name)==spec["sha256"]
     for name in ("whole_count","exec_count","calibrate"):
@@ -60,7 +62,7 @@ def enroll():
         sp.run([work/"whole_count",log,work/"calibrate",work/"calibrate",mode],check=True)
         readings[mode]=hw(log)
     assert 1.99<readings["fork"]/readings["single"]<2.01
-    put(proof/"host.json",{"boot":boot,"order":order,"head":os.environ["GITHUB_SHA"],"target_case":[old,new],
+    put(proof/"host.json",{"boot":boot,"order":order,"head":os.environ["GITHUB_SHA"],"case":case,"target_case":[old,new],
         "cpuinfo":Path("/proc/cpuinfo").read_text().split("\n\n")[0],"affinity":sorted(os.sched_getaffinity(0)),
         "registration_sha256":sha(kit/"registration.json"),"transports_sha256":sha(kit/"transports.json")})
     cases={}
@@ -136,13 +138,14 @@ def object_payloads(lib):
     return {"physical":rows,"verified_renames":checked}
 def reader(at,artifacts,lib,commit):
     dirs={str(Path(f).parent) for a in artifacts for f in a["filenames"] if f.endswith((".rlib",".rmeta",".so"))}
-    argv=["rustc","+ohm","--edition=2024",kit/"reader.rs","--extern","unicode_names2="+str(lib)]
+    reader_source=kit/fixture["reader"]
+    assert sha(reader_source)==fixture["reader_sha256"]
+    argv=["rustc","+ohm","--edition=2024",reader_source,"--extern","unicode_names2="+str(lib)]
     for path in sorted(dirs):argv+=["-L","dependency="+path]
     argv+=["-o",at/"reader"]
     sp.run(argv,cwd=gitroot,env=standard(),check=True,stdout=sp.DEVNULL)
     output=sp.check_output([at/"reader"],cwd=gitroot,env=standard(),text=True)
-    first=["latinsmalllettera=Some(97)","Black_Star=Some(9733)"] if commit==old else ["latinsmalllettera=None","Black_Star=None"]
-    assert output.splitlines()==first+["latin SMALL letter A=Some(97)","BLACK STAR=Some(9733)","SNOWMAN=Some(9731)","NO SUCH CODE POINT=None"]
+    assert output==fixture["old_stdout" if commit==old else "new_stdout"]
     return {"stdout":output,"elf":sha(at/"reader")}
 def visit(role,mode,label,commit,trace=False,invalid_at=None):
     at=proof/role/mode/label
@@ -174,7 +177,7 @@ def visit(role,mode,label,commit,trace=False,invalid_at=None):
     gens=[Path(m["out_dir"]) for m in msgs if m["reason"]=="build-script-executed" and "/ruff_unicode_names2#" in m["package_id"]]
     assert len(gens)==1,gens
     generated={p.name:sha(p) for p in gens[0].glob("generated*.rs")}
-    assert set(generated)=={"generated.rs","generated_phf.rs","generated_alias.rs"}
+    assert generated==fixture["old_generated" if commit==old else "new_generated"]
     rec={"commit":commit,"command":args,"dirty":sorted(a["target"]["name"] for a in artifacts if not a["fresh"]),
          "hardware":hw(at/"hardware.json"),"wall_ns":elapsed,"generated":generated,"product_sha256":sha(lib),"unit_count":len(artifacts)}
     if mode=="build":rec.update(native=reader(at,artifacts,lib,commit),members=object_payloads(lib))
@@ -217,14 +220,19 @@ def trial(role,mode):
     clean=visit(role,mode,"empty-new",new)
     assert len(clean["dirty"])==20 and clean["generated"]==edit["generated"]
     matches.append(clean)
+    stash(role+"-"+mode+"-empty")
+    shutil.copytree(work/"enrolled-cargo-home",home)
+    clean_trace=visit(role,mode,"observed-empty-new",new,trace=True)
+    assert clean_trace["dirty"]==clean["dirty"] and clean_trace["generated"]==clean["generated"]
+    matches.append(clean_trace)
     if mode=="build":
         for r in matches:
             assert r["native"]==clean["native"] and r["members"]["verified_renames"]==clean["members"]["verified_renames"]
     else:assert all(r["product_sha256"]==clean["product_sha256"] for r in matches)
-    stash(role+"-"+mode+"-empty")
+    stash(role+"-"+mode+"-observed-empty")
     return {"cold":cold["hardware"],"whole_edit":edit["hardware"],"target_rustc":actual["lifetime"]["target_rustc"],
             "observed_whole":actual["hardware"],"unchanged":warm["hardware"],"empty":clean["hardware"],
-            "whole_native":clean.get("native"),"all_products_checked":True}
+            "empty_target_rustc":clean_trace["lifetime"]["target_rustc"],"whole_native":clean.get("native"),"all_products_checked":True}
 def main():
     sdks=enroll()
     results={}

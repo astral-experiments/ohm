@@ -1,4 +1,5 @@
 {
+  "additional_price": "separate physical lifetime of the selected new-source rustc on an independently empty target, shared build and Cargo home",
   "archives": {
     "adler2-2.0.1.crate": "320119579fcad9c21884f5c4861d16174d0e06250625266f50fe6898340abefa",
     "aho-corasick-1.1.5.crate": "c982642fa9e8606056828ee9a8505737230110bb1099153c79efe865c59d12ba",
@@ -506,9 +507,58 @@
     "zstd-safe-7.2.4.crate": "8f49c4d5f0abb602a93fb8736af2a4f4dd9512e36f7f570d66e65ff867ed3b9d",
     "zstd-sys-2.0.16+zstd.1.5.7.crate": "91e19ebc2adc8f83e43039e79776e3fda8ca919132d68a1fed6a5faca2683748"
   },
-  "candidate": "dda36b958be0f0c393c22039fb2f53c0ff436968",
-  "candidate_tree": "ff7b8023f28d9ee6b7121944b97ef5b58cbb0322",
+  "candidate": "8574afc64801c199c8d090e3e0e013adf6ccd496",
+  "candidate_tree": "69e168ef2d18cb0b9f8ee6589d006e5ed4303283",
   "cargo": "abc70d60a6fd89c10d5f65cf85820d9b78d5affe",
+  "cases": {
+    "aliases": {
+      "lock": "e4886c7f2ec2b52cc7bf90b183b620800dd81a9c615d68dea1d83ea995ba3d1b",
+      "new": "276832aa91f2086a6ec880884fcdd987991cddf2",
+      "new_generated": {
+        "generated.rs": "1a9e0c4caff1b7fbc056124fac571c8b07d05eba5a4e3dc7d04ca017ac7398f7",
+        "generated_alias.rs": "9f5a28cda43b481b11d8dc6e1bf0f7579cacdf9489e3166ce6e3144a5d017e9f",
+        "generated_phf.rs": "fdc588df40e6e6dba443fefe641f36426a80a71a540a3642cf852342d42ef854"
+      },
+      "new_stdout": "CARRIAGE RETURN=None\ncarriage_return=None\nFORM FEED=None\nCHARACTER TABULATION WITH JUSTIFICATION=None\nNEWLINE=None\nBLACK STAR=Some(9733)\nNO SUCH CODE POINT=None\n",
+      "old": "26911caa2800758779965510d2f222b438abbb38",
+      "old_generated": {
+        "generated.rs": "1a9e0c4caff1b7fbc056124fac571c8b07d05eba5a4e3dc7d04ca017ac7398f7",
+        "generated_alias.rs": "3b559f642866f9052205e9cc58c1f138cea468a021440247f5949c106a5ca4e2",
+        "generated_phf.rs": "fdc588df40e6e6dba443fefe641f36426a80a71a540a3642cf852342d42ef854"
+      },
+      "old_stdout": "CARRIAGE RETURN=Some(13)\ncarriage_return=Some(13)\nFORM FEED=Some(12)\nCHARACTER TABULATION WITH JUSTIFICATION=Some(137)\nNEWLINE=Some(10)\nBLACK STAR=Some(9733)\nNO SUCH CODE POINT=None\n",
+      "paths": [
+        "crates/ruff_unicode_names2/src/lib.rs",
+        "crates/ruff_unicode_names2_generator/src/lib.rs"
+      ],
+      "reader": "alias_reader.rs",
+      "reader_sha256": "8e5f8624e35d77c55298390bac5839c07bec8c8b211ff31c597fd5d81f05cb6f",
+      "signed_linux_sdk": "ecde6809d7f1fc1966798198479867c4a49bdf7a51f3873336d23a40fabce453"
+    },
+    "loose": {
+      "new": "88a50d695c1142294bb4c780fad47d3306173885",
+      "new_generated": {
+        "generated.rs": "337cd41c2b1e0b598f77d80a016e1fb14f0048d6ed387f6cb5fbc08b959c2f25",
+        "generated_alias.rs": "9f5a28cda43b481b11d8dc6e1bf0f7579cacdf9489e3166ce6e3144a5d017e9f",
+        "generated_phf.rs": "e9de8e6b482267e9c62b72e79a17424fc57b32aa913498d96875dd8e41c794ab"
+      },
+      "new_stdout": "latinsmalllettera=None\nBlack_Star=None\nlatin SMALL letter A=Some(97)\nBLACK STAR=Some(9733)\nSNOWMAN=Some(9731)\nNO SUCH CODE POINT=None\n",
+      "old": "276832aa91f2086a6ec880884fcdd987991cddf2",
+      "old_generated": {
+        "generated.rs": "1a9e0c4caff1b7fbc056124fac571c8b07d05eba5a4e3dc7d04ca017ac7398f7",
+        "generated_alias.rs": "9f5a28cda43b481b11d8dc6e1bf0f7579cacdf9489e3166ce6e3144a5d017e9f",
+        "generated_phf.rs": "fdc588df40e6e6dba443fefe641f36426a80a71a540a3642cf852342d42ef854"
+      },
+      "old_stdout": "latinsmalllettera=Some(97)\nBlack_Star=Some(9733)\nlatin SMALL letter A=Some(97)\nBLACK STAR=Some(9733)\nSNOWMAN=Some(9731)\nNO SUCH CODE POINT=None\n",
+      "paths": [
+        "crates/ruff_unicode_names2/src/lib.rs",
+        "crates/ruff_unicode_names2_generator/src/lib.rs",
+        "crates/ruff_unicode_names2_generator/src/phf.rs"
+      ],
+      "reader": "reader.rs",
+      "reader_sha256": "956fe82ab063d9a8c090908308d97021385dd8f42c6900cf5b8fc17729148eeb"
+    }
+  },
   "criterion": ">=20% fewer retired instructions for the selected entire rustc, or 2x total Cargo; no product PR after exploratory workers alone",
   "lock": "e4886c7f2ec2b52cc7bf90b183b620800dd81a9c615d68dea1d83ea995ba3d1b",
   "new": "88a50d695c1142294bb4c780fad47d3306173885",

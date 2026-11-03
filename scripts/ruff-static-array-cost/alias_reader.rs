@@ -1,0 +1,1 @@
+fn main() { for name in ["CARRIAGE RETURN", "carriage_return", "FORM FEED", "CHARACTER TABULATION WITH JUSTIFICATION", "NEWLINE", "BLACK STAR", "NO SUCH CODE POINT"] { println!("{name}={:?}", unicode_names2::character(name).map(u32::from)); } }
