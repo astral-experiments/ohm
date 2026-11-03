@@ -1,6 +1,7 @@
 """Count a conservative subset of instructions in a selected compiler process."""
 import ctypes
 import errno
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -33,20 +34,67 @@ def task_id(task):
     stat = (task / 'stat').read_bytes().rsplit(b')', 1)[1].split()
     return int(stat[19])
 
-def matching_driver(process, driver):
-    device = f'{os.major(driver.st_dev):x}', f'{os.minor(driver.st_dev):x}'
-    for row in (process / 'maps').read_text().splitlines():
-        _, permissions, _, dev, ino, *_ = row.split(maxsplit=5)
-        if 'x' in permissions and int(ino) == driver.st_ino:
-            if tuple(format(int(v, 16), 'x') for v in dev.split(':')) == device:
-                return True
-    return False
+def signed_windows(driver):
+    # The SDK installer has hashed the whole driver. Compare its actual GNU build ID
+    # and executable text in memory as well. Overlayfs may report a different device
+    # in stat(2) from the underlying device in procfs, even for the same mapping.
+    with driver.open('rb') as signed:
+        header = signed.read(4096)
+        assert header.startswith(b'\x7fELF\x02\x01')
+        phoff, = struct.unpack_from('<Q', header, 32)
+        entsize, count = struct.unpack_from('<HH', header, 54)
+        assert entsize == 56 and count == 12
+        signed.seek(phoff)
+        phdrs = signed.read(count * entsize)
+        assert len(phdrs) == count * entsize
+        build_id = bytes.fromhex('13d77347e7b9583b23105b596b85d283cd70af08')
+        note = struct.pack('<III', 4, len(build_id), 3) + b'GNU\0' + build_id
+        assert header.count(note) == 1
+        windows = [(0, False, header)]
+        for i in range(count):
+            kind, flags, offset, _, _, size, _, _ = struct.unpack_from('<IIQQQQQQ', phdrs, i * entsize)
+            if kind == 1 and flags & 1:
+                assert size >= 8192
+                signed.seek(offset + 4096)
+                windows.append((offset + 4096, True, signed.read(128)))
+        assert len(windows) == 3
+        return windows
+
+def matching_driver(process, driver, driver_stat, windows, image):
+    regions = []
+    for line in (process / 'maps').read_text().splitlines():
+        parts = line.split(maxsplit=5)
+        if len(parts) != 6 or int(parts[4]) != driver_stat.st_ino or parts[5] != str(driver):
+            continue
+        lo, hi = (int(v, 16) for v in parts[0].split('-'))
+        regions.append((lo, hi, int(parts[2], 16), parts[1], parts[3]))
+    if not regions:
+        return False
+    if not (process / 'root' / driver.relative_to('/')).samefile(driver):
+        return False
+    receipts = []
+    with (process / 'mem').open('rb', buffering=0) as memory:
+        for offset, executable, expected in windows:
+            for lo, hi, file_offset, permissions, device in regions:
+                address = lo + offset - file_offset
+                if lo <= address and address + len(expected) <= hi and ('x' in permissions) == executable:
+                    actual = os.pread(memory.fileno(), len(expected), address)
+                    if actual != expected:
+                        return False
+                    receipts.append({'address': address, 'file_offset': offset, 'map_device': device,
+                                     'bytes': actual.hex(), 'sha256': hashlib.sha256(actual).hexdigest()})
+                    break
+            else:
+                return False
+    image['signed_memory_windows'] = receipts
+    return True
 
 def observe(command, *, library, sdk, dst, cwd, env, stdout, stderr):
     cargo = sdk / 'bin/cargo'
     rustc = sdk / 'bin/rustc'
     driver, = (sdk / 'lib').glob('librustc_driver-*.so')
-    driver = driver.stat()
+    driver_stat = driver.stat()
+    windows = signed_windows(driver)
     fds = {}
     programs = {}
     images = {}
@@ -83,7 +131,7 @@ def observe(command, *, library, sdk, dst, cwd, env, stdout, stderr):
                                 maps = [line for line in (task / 'maps').read_text().splitlines() if 'librustc_driver-' in line]
                                 if maps:
                                     image['driver_seen'] = maps
-                            if not any(arg == '--emit' or arg.startswith('--emit=') for arg in argv) or not matching_driver(task, driver):
+                            if not any(arg == '--emit' or arg.startswith('--emit=') for arg in argv) or not matching_driver(task, driver, driver_stat, windows, image):
                                 continue
                             programs[pid] = {'argv': argv, 'start': task_id(task), 'cargo_pid': int(fields[1])}
                         if task_id(task) != programs[pid]['start'] or not rustc.samefile(task / 'exe'):
@@ -114,6 +162,6 @@ def observe(command, *, library, sdk, dst, cwd, env, stdout, stderr):
             return {'processes': programs, 'threads': rows, 'instructions': sum(r['instructions'] for r in rows)}
         finally:
             (dst/'observed-images.json').write_text(json.dumps({'polls':attempts,'observer_pid':proc.pid,'images':list(images.values()),
-                'driver':{'inode':driver.st_ino,'major':os.major(driver.st_dev),'minor':os.minor(driver.st_dev)}},indent=2)+'\n')
+                'driver':{'inode':driver_stat.st_ino,'major':os.major(driver_stat.st_dev),'minor':os.minor(driver_stat.st_dev)}},indent=2)+'\n')
             for fd in fds.values():
                 os.close(fd)
