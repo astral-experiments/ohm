@@ -33,15 +33,40 @@ def run(capture, root, sdk, observers, proof, products):
     assert p.wait()==0 and len(table)==16
     store(deep/'fn-offsets.json',table)
     sp.run(['cc','-Wall','-Werror','-shared','-fPIC','-O2',observers/'unwind.c','-o',deep/'unwind.so','-lunwind-ptrace','-lunwind-x86_64','-lunwind','-llzma'],check=True)
-    wrapper=d/'exec.sh'
-    wrapper.write_text('#!/bin/bash\nset -eu\n[[ "$1" -ef "$OHM_LICENSED_RUSTC" ]]\nshift\nexec -a "$OHM_LICENSED_RUSTC" "$OHM_LICENSED_RUSTC" "$@"\n')
+    ent=proof/'signed-ron-replay';ent.mkdir()
+    wrapper=d/'jobserver'
+    shutil.copyfile(Path(__file__).with_name('ron_jobserver.py'),wrapper)
     wrapper.chmod(0o700)
-    env=dict(env,OHM_LICENSED_RUSTC=argv[0],OHM_F_SPAN_PY=str(observers/'observe.py'),OHM_F_SPAN_LOG=str(out/'hits.json'))
+    env=dict(env,OHM_LICENSED_RUSTC=argv[0],OHM_F_SPAN_PY=str(observers/'observe.py'),OHM_F_SPAN_LOG=str(out/'hits.json'),OHM_F_JOBSERVER_PROOF=str(ent/'jobserver.json'),OHM_F_PARTIAL=str(ent/'partial-on-completion-or-stop.json'))
     script=d/'run.gdb'
     # The reused reader's optional salsa-specific DSO entry hooks are irrelevant to Ron.
     # Leave the original marker and bridge entry/return probes, hand-decoded SourceMap and native unwind intact.
-    script.write_text('set confirm off\nset python print-stack full\nset pagination off\nset disable-randomization off\nset startup-with-shell on\nset exec-wrapper '+str(wrapper)+'\nset debuginfod enabled off\nset auto-load off\nset auto-solib-add off\nset print thread-events off\nstart\npython\nimport os,gdb\nexec(compile(open(os.environ["OHM_F_SPAN_PY"]).read(),os.environ["OHM_F_SPAN_PY"],"exec"))\nmaybe_macros=lambda:None\nend\ncontinue\npython\nfinish()\nend\n')
-    ent=proof/'signed-ron-replay';ent.mkdir()
+    script.write_text("""set confirm off
+set python print-stack full
+set pagination off
+set disable-randomization off
+set startup-with-shell on
+set exec-wrapper WRAPPER
+set debuginfod enabled off
+set auto-load off
+set auto-solib-add off
+set print thread-events off
+handle SIGUSR1 nostop noprint pass
+start
+python
+import os,gdb
+exec(compile(open(os.environ["OHM_F_SPAN_PY"]).read(),os.environ["OHM_F_SPAN_PY"],"exec"))
+maybe_macros=lambda:None
+def partial():
+    Path(os.environ['OHM_F_PARTIAL']).write_text(json.dumps({'exit_codes':exit_codes,'events':dict(events),'bridge_entries':dict(entries),'joined_returns':len(returns)}))
+gdb.events.stop.connect(lambda ev:partial() if hasattr(ev,'stop_signal') else None)
+end
+continue
+python
+partial()
+finish()
+end
+""".replace('WRAPPER',str(wrapper)))
     notes={'original_pid':pid,'original_argv':prev,'replay_argv':argv,'cwd':str(cwd),'env_names':sorted(env),'driver':checksum,'bridge_offsets':table,'observer_sha256':hf(observers/'observe.py')}
     store(ent/'inputs.json',notes)
     with (ent/'stdout').open('wb')as so,(ent/'stderr').open('wb')as se:
