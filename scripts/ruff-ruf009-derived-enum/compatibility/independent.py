@@ -1,5 +1,6 @@
 """Independently derive all process sets, live mappings and object bytes from a parked-kit run."""
 import collections
+import functools
 import gzip
 import hashlib
 import json
@@ -10,10 +11,29 @@ import sys
 base = Path(sys.argv[1]).resolve(strict=True)
 p = base / "proof"
 read = lambda path: json.loads(path.read_bytes())
-sha = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
+@functools.cache
+def sha(path):
+    with path.open("rb") as stream:
+        return hashlib.file_digest(stream, "sha256").hexdigest()
 reg = read(p / "registration.json")
 product = read(p / "complete.json")
 initial = read(p / "installed-before-any-typed-command.json")
+# A downloaded trace retains the worker's absolute argv, while the files
+# containing that trace can live elsewhere on the reviewing machine.
+archive = len(sys.argv) == 3
+if archive:
+    bound = set(read(Path(sys.argv[2])))
+    observed = read(next(p.glob("*/edit/observed.json")))
+    recorded = Path(observed["true"][0]["argv"][0]).parents[2]
+    assert recorded.is_absolute() and recorded.name==base.name
+else:
+    bound = set()
+    recorded = base
+def physical(path, expected):
+    if archive:
+        assert expected in bound
+        return expected
+    return sha(path)
 dec = json.JSONDecoder()
 assert reg["receiver_sha256"] == sha(Path(__file__).with_name("switch.py"))
 assert product["registration"] == sha(p / "registration.json")
@@ -35,8 +55,8 @@ for cel, (client, role) in roles.items():
         v = cell / name
         inv, obs = read(v / "invocation.json"), read(v / "observed.json")
         assert tuple(inv[k] for k in ("client", "role")) == (client, role)
-        assert inv["driver"] == reg["driver"][role] == sha(base / "packs" / role / "driver")
-        assert inv["cargo"] == reg[{"signed":"cargo", "fixed":"fixed_cargo_sha256","aware":"aware_cargo_sha256"}[client]] == sha(base / "packs" / client)
+        assert inv["driver"] == reg["driver"][role] == physical(base / "packs" / role / "driver", inv["driver"])
+        assert inv["cargo"] == reg[{"signed":"cargo", "fixed":"fixed_cargo_sha256","aware":"aware_cargo_sha256"}[client]] == physical(base / "packs" / client, inv["cargo"])
         assert inv["frontend"] == initial["frontend"] == product["frontend"] and obs["driver"] == initial["drivers"][role]
         assert sha(p / "objects" / obs["metadata_sha256"]) == obs["metadata_sha256"]
         assert (v / "metadata-header.txt").is_file()
@@ -52,18 +72,18 @@ for cel, (client, role) in roles.items():
                     lineage.setdefault(tid, []).append("discard");unlinks.append(tid)
                 if not ln.startswith("execve(") or not ln.endswith(" = 0"):continue
                 exe,n=dec.raw_decode(ln[7:]);argv,_=dec.raw_decode(ln[7+n:].lstrip(", "))
-                if exe==str(base/"rustup/toolchains/ohm/bin/cargo"):
+                if exe==str(recorded/"rustup/toolchains/ohm/bin/cargo"):
                     assert argv[1:] == inv["argv"][2:];cargos.append(tid)
                 if exe.endswith("/wild-ld/ld.bfd"):
-                    native.append((exe, sha(Path(exe))))
-                if exe!=str(base/"install/bin/rustc"):continue
+                    native.append((exe, physical(Path(exe), reg["wild"])))
+                if exe!=str(recorded/"install/bin/rustc"):continue
                 if "--crate-name" in argv and "--out-dir" in argv:
                     assert "--crate-name" in argv and tid not in typed
                     typed[tid]=(argv[argv.index("--crate-name")+1], argv)
                 elif len(argv) == 3 and argv[1] in ("-Zohm-checked-private-derives","-Zohm-checked-private-derives-v2") and argv[2] == "--print=sysroot":
                     assert argv[1] == option;probes.append(tid)
                 else:continue
-                assert re.search(r"^mmap\(.*PROT_EXEC.*<"+re.escape(str(base/"install/lib"))+r"/librustc_driver-[^/<>]+\.so>.* = 0x[0-9a-f]+$",s,re.M)
+                assert re.search(r"^mmap\(.*PROT_EXEC.*<"+re.escape(str(recorded/"install/lib"))+r"/librustc_driver-[^/<>]+\.so>.* = 0x[0-9a-f]+$",s,re.M)
         assert len(cargos)==1 and sorted(probes)==sorted(obs["probes"])
         assert native==[tuple(x) for x in obs["native"]] and all(sha==reg["wild"] for _,sha in native)
         assert typed=={r["pid"]:(r["crate"],r["argv"]) for r in obs["true"]}
@@ -96,5 +116,9 @@ for cel, (client, role) in roles.items():
 assert len(visits)==44 and len(wild)==2 and wild[0]==wild[1]==[product["native"],product["native_rmeta"]]
 assert same["C","aware"][0]!=same["C","fixed"][0] and same["C","aware"][0]!=same["P","aware"][0]
 out=base/"independent.json"
-out.write_text(json.dumps({"terminal_sha256":sha(p/"complete.json"),"native":wild,"visits":visits},sort_keys=True,indent=1)+"\n")
+serialized=json.dumps({"terminal_sha256":sha(p/"complete.json"),"native":wild,"visits":visits},sort_keys=True,indent=1)+"\n"
+if archive:
+    assert out.read_text() == serialized
+else:
+    out.write_text(serialized)
 print(len(visits),sum(len(v["typed"])for v in visits),sum(v["probe_count"]for v in visits),sha(out))

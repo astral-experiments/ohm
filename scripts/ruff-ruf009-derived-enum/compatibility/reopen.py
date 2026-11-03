@@ -21,7 +21,8 @@ def fnv(b):
     x=14695981039346656037
     for c in b:x=((x^c)*1099511628211)%(1<<64)
     return x
-def all_records(root, b3, mode):
+def all_records(root, b3, mode, original_root=None):
+    original_root=root if original_root is None else original_root
     plan=read(root/'registration.json')
     epoch={'f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee':4, '0617e34321cf33fcce38904d066f0d4981b79f752896d37b97d1aed1fbddc48f':5, '1d4c93cd725a06b9a31704dc05a67a5d418c4cf97a3d3680ce8fb522ccee404f':4}[plan['actual_native_cargo']]
     n=0;kcount=0;out={};source={}
@@ -42,7 +43,7 @@ def all_records(root, b3, mode):
                 else:assert not e
                 a,=[r for r in rows if r.get('reason')=='compiler-artifact' and r['target']['name']=='dep']
                 f,=[z for z in a['filenames']if z.endswith('.rmeta')];assert f==checked['meta']['path']
-                assert bool(plan['registry_outputs'])==str(f).startswith(str(root/'cargo-home/registry/private-capability')+'/')
+                assert bool(plan['registry_outputs'])==str(f).startswith(str(original_root/'cargo-home/registry/private-capability')+'/')
                 inventory=read(s/'files.json');data={}
                 for name,row in inventory.items():
                     p=root/'out/blobs'/row['sha256'];v=p.read_bytes()
@@ -111,6 +112,6 @@ def all_records(root, b3, mode):
     return {'report':'First-check source-matched derived-enum / literal metadata dependency','outcome':mode,'commands':n,'binary_fingerprint_epoch':epoch,'kernel_typed_rustcs':kcount,'terminal_sha256':h((root/'out/terminal.json').read_bytes()),'registration_sha256':h((root/'registration.json').read_bytes()),'roles':out}
 
 if __name__=='__main__':
-    ap=argparse.ArgumentParser();ap.add_argument('--root',type=Path,required=True);ap.add_argument('--b3sum',required=True);ap.add_argument('--expect',choices=('legacy','aware'),required=True);ap.add_argument('--output',type=Path,required=True);a=ap.parse_args()
-    result=all_records(a.root,a.b3sum,a.expect);a.output.write_text(json.dumps(result,sort_keys=True,indent=1)+'\n')
+    ap=argparse.ArgumentParser();ap.add_argument('--root',type=Path,required=True);ap.add_argument('--recorded-root',type=Path);ap.add_argument('--b3sum',required=True);ap.add_argument('--expect',choices=('legacy','aware'),required=True);ap.add_argument('--output',type=Path,required=True);a=ap.parse_args()
+    result=all_records(a.root,a.b3sum,a.expect,a.recorded_root);a.output.write_text(json.dumps(result,sort_keys=True,indent=1)+'\n')
     print(result['outcome'],result['commands'],result['kernel_typed_rustcs'],h(a.output.read_bytes()))
