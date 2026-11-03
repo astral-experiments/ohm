@@ -1,0 +1,62 @@
+{
+  "parent": "abc70d60a6fd89c10d5f65cf85820d9b78d5affe",
+  "candidate": "9e279eed91964b0029904928baa3035830ae2e28",
+  "ref": "refs/heads/charlie/retain-registry-compiler-inputs-20261103",
+  "bundle": "04965e5d86306e71922d87e93816efdb3de803a6c6a27ce000903d1304b21e42",
+  "parent_tree": "68e5a1e9b52324ad2e6fb8382eaa7cf53428f97d",
+  "candidate_tree": "c3ba3ccec4c0305f86371e33427eca6241aa7b10",
+  "rust": "f5a51d8cc3e76236c2d0f17d495d59ebb03306e4",
+  "release_sha256": "ecde6809d7f1fc1966798198479867c4a49bdf7a51f3873336d23a40fabce453",
+  "reason": "The signed -24 recheck refuses the empty translated records for registry Insta and Insta-cmd.",
+  "mixed_sdk_reproducer": {
+    "23_23": [
+      "ron"
+    ],
+    "23_24": [
+      "ron"
+    ],
+    "24_23": [
+      "ron",
+      "insta",
+      "insta_cmd"
+    ],
+    "24_24": [
+      "ron",
+      "insta",
+      "insta_cmd"
+    ]
+  },
+  "normal_project": {
+    "old": "3bf4988cf062dc76895ff2f8421acf766172392b",
+    "new": "dfe14506d23010aa5dbc4ff6fea702a22ba312bd",
+    "command": [
+      "cargo",
+      "+ohm",
+      "test",
+      "-p",
+      "ty_project",
+      "--lib",
+      "--no-run",
+      "--offline",
+      "--locked",
+      "-j4",
+      "--message-format=json"
+    ],
+    "verdict": "the new unrelated_file_change_does_not_advance_revision test appears and executes successfully"
+  },
+  "normal_workspace": {
+    "old": "157caa55a51ebae4fa541d31697e3af9a6c32ccf",
+    "new": "bfa2407e98ee1343caeefd02b4b69043509baa8c",
+    "command": [
+      "cargo",
+      "+ohm",
+      "test",
+      "--no-run",
+      "--locked",
+      "--offline",
+      "-j4",
+      "--message-format=json"
+    ]
+  },
+  "admission": "Price complete Cargo hardware instructions on fresh workers. Charge cold, edit, first and second unchanged, and an unaffected all-fresh check with the same signed compiler. Compare selected native versions, diagnostic refusal with preserved file stamps, repaired behavior, and independent clean. Keep stored bytes and every refusal visible. A single pilot is never a product PR result."
+}
