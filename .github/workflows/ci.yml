@@ -1,5 +1,5 @@
-name: 'Attribute the normal Ruff ty_ide library build after rustc #329'
-run-name: Ruff 29697 candidate-only native instruction attribution
+name: 'Read actual rustc partition eligibility on the normal Ruff edit'
+run-name: Ruff 29697 existing compiler split eligibility
 permissions:
   contents: read
   actions: read
@@ -34,19 +34,19 @@ jobs:
         path: factory-src
         persist-credentials: false
         sparse-checkout: scripts/ruff-matched-stage
-    - name: Check the real build and independently attribute both rustc invocations
+    - name: Check the real build and read its original guarded CGU partition sizes
       env:
         REVIEWED_HEAD: ${{ inputs.reviewed_head }}
         OHM_SDK_READ_TOKEN: ${{ github.token }}
-      run: python3 -IB qa/scripts/ruff-original-ty-instructions/standalone-buckets/residual/actor.py
+      run: python3 -IB qa/scripts/ruff-original-ty-instructions/standalone-buckets/residual/eligibility/eligibility.py
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: ruff-ty-ide-build-residual-${{ github.run_id }}
+        name: ruff-ty-project-partition-${{ github.run_id }}
         path: ${{ runner.temp }}/ohm-foreign-join/published/
         retention-days: 21
         if-no-files-found: error
-    name: One unscored genuine library edit
+    name: One unscored compiler partition diagnostic
 'on':
   workflow_dispatch:
     inputs:
