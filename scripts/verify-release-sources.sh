@@ -26,7 +26,7 @@ rust_version="$(jq -er '.release.upstream_rust_version' "$manifest")"
 expected_cargo_repository="$(jq -er '.sources.cargo.repository' "$manifest")"
 
 verify_clean_checkout() {
-  local checkout="$1" checkout_status hidden_entries entry submodule
+  local checkout="$1" checkout_status entry submodule
   # Release builds depend on the executable bits and symlinks in the pinned tree.
   local mode_config=(-c core.fileMode=true -c core.symlinks=true)
   shift
@@ -37,10 +37,9 @@ verify_clean_checkout() {
     exit 1
   fi
 
-  # Status omits changes to assume-unchanged and skip-worktree entries.
-  hidden_entries="$(git -C "$checkout" ls-files -v -- "$@" |
-    awk '/^[a-zS] / { hidden = 1 } END { print hidden + 0 }')"
-  if [[ "$hidden_entries" == 1 ]] && ! (
+  # The checkout index can hide edits through file flags or cached timestamps.
+  # A fresh index compares the tracked contents with the pinned tree.
+  if ! (
     index_directory="$(mktemp -d)" || exit 1
     trap 'rm -rf -- "$index_directory"' EXIT
     GIT_INDEX_FILE="$(cd -- "$index_directory" && pwd -P)/index" || exit 1
