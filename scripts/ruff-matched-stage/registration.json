@@ -16,91 +16,66 @@
     "rust.download-rustc=false"
   ],
   "bundle": {
-    "baseline_commits": [],
-    "branch": "refs/heads/charlie/qa-ty-ide-mono-buckets-29697-20261103",
-    "bytes": 5305,
+    "baseline_commits": [
+      "5c5af1a053326e6ce5df048c4dcb30b53e01a069"
+    ],
+    "branch": "refs/heads/charlie/rc23-ty-root-owner-lanes-20261103",
+    "bytes": 7574,
     "prerequisite": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
-    "sha256": "9697d3d3b831f89ef932e79a53b33827faf39a3eada9fbb25d0667a93cd29af4"
+    "sha256": "c4ad772a0e6df008d5392499fefbe168efd7f4ddf62bcaa2498cd236a04a853e"
   },
   "changed_sources": {
-    "compiler/rustc_codegen_ssa/src/back/symbol_export.rs": {
-      "C": "01c312eaffebd2a0a327d5644ddc7d3616849295",
-      "P": "6af2626bab17fa20c1f0cf4bc7a98e886896f345"
-    },
     "compiler/rustc_incremental/src/persist/file_format.rs": {
-      "C": "f1cc605908e55162469ad0dfd0c0efb0b2c8c238",
-      "P": "f96e27d853eaf23289d72479b990780eda43eacc"
+      "C": "37bdcb5d0315f8928e2685f5d108b67c98c1826f",
+      "P": "f1cc605908e55162469ad0dfd0c0efb0b2c8c238"
     },
-    "compiler/rustc_middle/src/dep_graph/dep_node.rs": {
-      "C": "9cb8b625a6c8ca6775851f1d0bb5875536ec053c",
-      "P": "8b4564c2ed0260bc1a644ebc8c40f2ac1004cbf3"
-    },
-    "compiler/rustc_middle/src/dep_graph/dep_node_key.rs": {
-      "C": "49515352b6a70647a0e086e74008891567684467",
-      "P": "9d03057235279f2ae21cd363554fd82d2fded34e"
-    },
-    "compiler/rustc_middle/src/dep_graph/mod.rs": {
-      "C": "49567c61e0d340ae47cad3c2e91c2004998540a4",
-      "P": "60c4b55ec6d348a3489cc6b06e50a5638b360147"
-    },
-    "compiler/rustc_middle/src/mono.rs": {
-      "C": "8e74b07bc8bcf630f6805eded2875d9182b14f12",
-      "P": "6ab4725289c190fa8743ac0b69c544572df5af93"
-    },
-    "compiler/rustc_middle/src/queries.rs": {
-      "C": "bd94799143ac12d72291a53457e8d618e7701d86",
-      "P": "b3dbd5b04f80a33909f190a5cef829d904523c37"
-    },
-    "compiler/rustc_middle/src/query/keys.rs": {
-      "C": "4b261517443a0ca79204bb493e977d98dc88514d",
-      "P": "7e18b765fd54901860a14f2583a5a2800f8355c5"
-    },
-    "compiler/rustc_middle/src/ty/instance.rs": {
-      "C": "223ff96515c56401b621a8d39fa4f288631647c9",
-      "P": "dcd0ee601aa9da5a91c35048bfdddb86e31199ea"
-    },
-    "tests/incremental/upstream-monomorphization-buckets/auxiliary/provider.rs": {
-      "C": "0ff015b7c0a98c4426d6d127d8b10a071d974baf",
-      "P": null
-    },
-    "tests/incremental/upstream-monomorphization-buckets/main.rs": {
-      "C": "209a7f32dcf4ba1d76d47a1904a4ff36a4a99862",
-      "P": null
+    "compiler/rustc_monomorphize/src/partitioning.rs": {
+      "C": "486619ff9d08927936567253b2c42370fa612c73",
+      "P": "0507a2146501f753e56fe46b3f3992ade14c0c18"
     }
   },
   "follow_on_screen": {
-    "command": "cargo +ohm test -p ty_server --test e2e --no-run --locked --offline -j4 --message-format=json",
-    "source": [
-      "157caa55a51ebae4fa541d31697e3af9a6c32ccf",
-      "bfa2407e98ee1343caeefd02b4b69043509baa8c"
+    "cases": [
+      29697,
+      29604
     ],
-    "status": "Prospective held-out Ruff #29697. No source-built instruction counts examined."
+    "command": [
+      "cargo",
+      "+ohm",
+      "build",
+      "-p",
+      "ty_ide",
+      "--lib",
+      "--locked",
+      "--offline",
+      "-j4",
+      "--message-format=json"
+    ],
+    "scope": "Unscored. Require a material reduction in the affected ty_project driver and admit all independent native, clean, error, cold and storage controls."
   },
   "kit": {
     "commit": "bc0e3e18ccf825c4eeaece4727b9ac3b4ecd8a89",
     "prepare.sh": "de6653dc519f7bc22d8115b87fe8fc9a21bacac9843690f4651a7fc24afe54ec",
     "runtime.py": "abc0a05c278f83688f2e0b4901d3760528aa3212cb14c04bf6a4a67ce931cb35"
   },
-  "owner_buckets": {
+  "owner_lanes": {
     "epoch": {
-      "C": 24450,
-      "P": 26655
+      "C": 48276,
+      "P": 24450
     },
-    "identical_stable_patch_id": "30c8ceaa86486b1fc7d77ca44845ba577eee4dcd",
-    "review_base": "a3fc6da13921586bc374586dee00883e9210aecd",
-    "review_head": "6f0191753a5058a8cd2be8ca8ced980e968c7c92",
-    "source_pr": 329
+    "frozen_selector_sha256": "76796738dc5c9b6801e114d0d32be466e9acf053251937549432db34bff31e92",
+    "parent_port_of": 329
   },
   "roles": {
     "C": {
+      "compiler": "aef77ccc671b84f9771b78388fcd63c460289908",
+      "revision": "3b376385fc19bf9fb979baba742540eb8ab27c60",
+      "tree": "16d79ef9419a4faa44d985777263b5317afb6cb5"
+    },
+    "P": {
       "compiler": "4db171a8fb5c14ad8cb16ceec49e385ca018c094",
       "revision": "5c5af1a053326e6ce5df048c4dcb30b53e01a069",
       "tree": "7331fc8bd148ba6ca7459751548b82a4b1f0bb50"
-    },
-    "P": {
-      "compiler": "01614e1dbcdedca33c620ad320c07b30207e256e",
-      "revision": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
-      "tree": "f5bf03d73f71243fb88e34ecb0b155ef11e99a47"
     }
   },
   "schema": "ohm-remat-builder-registration-v1",

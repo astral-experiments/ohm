@@ -16,8 +16,8 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from capsule import HOST, REG, need, reopen, save, seal, sha
 
-BRANCH = "charlie/qa-ty-ide-mono-stage-29697-20261103"
-BASE = "f1af047a36a1a7ea0fce11ddae61a4028d5e7582"
+BRANCH = "charlie/qa-ty-root-owner-stage-20261103"
+BASE = "3166ffe9aa98befcb452cc25af269af53578604c"
 
 
 def git(repo, *args):
@@ -343,7 +343,7 @@ def build(workspace, root):
 
     compiler_roots = {role: Path(manifest["arms"][name]["root"]) for role, name in (("P","normal"),("C","defer"))}
     save(root / "logs" / "bucket-epochs.json", check_epochs(root/"bucket-epochs", compiler_roots, env,
-                                                           REG["owner_buckets"]["epoch"]))
+                                                           REG["owner_lanes"]["epoch"]))
     for role in ("P", "C"):
         shutil.copy2(capsule / (role + ".json"), root / "logs" / (role + ".json"))
     for name in ("rustcs.json", "storage.json"):
