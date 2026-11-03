@@ -28,7 +28,7 @@ def exercise(work, env, role, label, expected, logs):
     assert rows[-1]=={"reason":"build-finished","success":True}
     lib,=[r for r in rows if r.get('reason')=='compiler-artifact' and r['target']['kind']==['lib']]
     cli,=[r for r in rows if r.get('reason')=='compiler-artifact' and r['target']['kind']==['bin']]
-    path,={Path(n).with_suffix('.rmeta') for n in lib['filenames'] if Path(n).suffix in ('.rlib','.rmeta')}
+    path,=[Path(n) for n in lib['filenames'] if Path(n).suffix=='.rmeta']
     dep=path.with_name(path.stem.removeprefix('lib')+'.d')
     data=dep.read_bytes();(logs/(role+"-"+label+".d")).write_bytes(data)
     untracked=b'/dev/null/ohm-untracked-relink-inputs:' in data.splitlines()
