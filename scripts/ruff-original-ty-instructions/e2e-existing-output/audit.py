@@ -31,7 +31,7 @@ def build(env):
     return stock,llvm
 def control(state,stop,stock,llvm,tag,serial,hit,latch,old_ready):
     start=time.monotonic();ready=None
-    while time.monotonic()-start<150:
+    while time.monotonic()-start<1200:
         new=set(state.glob('ready-*'))-old_ready
         if new:ready,=new;break
         if stop.is_set():return None
@@ -49,17 +49,45 @@ def control(state,stop,stock,llvm,tag,serial,hit,latch,old_ready):
             pairs=[r.split(b'=',1)for r in env[:-1].split(b'\0')];env=dict(pairs);assert len(pairs)==len(env)
             assert not any(x in env for x in (b'LD_PRELOAD',b'LD_AUDIT'))
             cwd=Path(json.loads(view['context']['CWD'][0][0]));p=Path(argv[19]);assert Path('/proc/'+no+'/cwd').resolve()==cwd
-            begin=time.monotonic_ns()
-            proc=subprocess.run(argv,executable=stock,cwd=cwd,env=env,capture_output=True,timeout=80)
-            assert proc.returncode==0 and not proc.stdout and not proc.stderr,(tag,proc.returncode,proc.stderr[:500])
-            snapshot=elf_container.inspect(p,llvm);wrapper['stock_elapsed_ns']=time.monotonic_ns()-begin
-            b.write(P/(tag+'-signed-container.json.gz'),snapshot);wrapper['stock_native_sha256']=snapshot['sha256']
+            reference=[]
+            for n in range(2 if tag in ('native-repair','save-repair') else 1):
+                begin=time.monotonic_ns()
+                proc=subprocess.run(argv,executable=stock,cwd=cwd,env=env,capture_output=True,timeout=80)
+                assert proc.returncode==0 and not proc.stdout and not proc.stderr,(tag,proc.returncode,proc.stderr[:500])
+                # Capture the actual signed return before inspecting and hashing its output.
+                elapsed=time.monotonic_ns()-begin
+                snapshot=elf_container.inspect(p,llvm)
+                b.write(P/(tag+'-signed-'+str(n)+'-container.json.gz'),snapshot)
+                reference.append({'elapsed_ns':elapsed,'sha256':snapshot['sha256'],'ino':snapshot['ino']})
+            b.write(P/(tag+'-signed-container.json.gz'),snapshot)
+            wrapper['signed_repetitions']=reference;wrapper['stock_native_sha256']=snapshot['sha256']
         if hit and latch and view['key']==latch['key'] and view['context']['ADMISSION']==[['true',latch['image']]]:
             wrapper['candidate_requested']=True;answer('verify '+latch['output']+' '+str(latch['size'])+'\n')
         else:answer('full\n')
     except BaseException:
         answer('full\n');raise
     return wrapper
+
+def calibrate(env,state):
+    # The same static actor must really wait for an external full-only reply. Keep this
+    # tiny actual ELF separate from the expensive cold workspace and its collector.
+    tiny=w.root/'boundary-smoke';t=tiny/'ty_server/f5c6198f896cf7b0/out';t.mkdir(parents=True)
+    name=t/contact.BASE;asm=tiny/'start.s';obj=tiny/'start.o'
+    asm.write_text('.global _start\n.text\n_start: mov $60,%eax\n xor %edi,%edi\n syscall\n.section .note.GNU-stack,"",@progbits\n')
+    subprocess.run(['/usr/bin/as','--64','-o',obj,asm],check=True)
+    real=w.sdk/'lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd'
+    previous=set(state.glob('ready-*'));(state/'coordinate').touch()
+    proc=subprocess.Popen([real,'--build-id','-o',name,obj],cwd=tiny,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    deadline=time.monotonic()+30
+    while time.monotonic()<deadline and not(set(state.glob('ready-*'))-previous):
+        if proc.poll() is not None:break
+        time.sleep(.01)
+    ready,=set(state.glob('ready-*'))-previous;pid=ready.name[6:]
+    p=state/('answer-'+pid);tmp=p.with_suffix('.pending');tmp.write_text('full\n');tmp.rename(p)
+    so,se=proc.communicate(timeout=30);assert proc.returncode==0 and not so and not se,(proc.returncode,so,se)
+    assert subprocess.run([name],timeout=5).returncode==0
+    raw=(state/('actor-'+pid+'.tsv')).read_bytes();assert b'MISS\tcoordinator-full\n'in raw and b'VERIFIED\n'in raw
+    (P/'calibration.tsv.gz').write_bytes(gzip.compress(raw,mtime=0));(state/'coordinate').unlink()
 
 def main():
     import threading
@@ -69,7 +97,7 @@ def main():
     registration={'run':os.environ['GITHUB_RUN_ID'],'head':os.environ['GITHUB_SHA'],'boot':Path('/proc/sys/kernel/random/boot_id').read_text().strip(),'sdk':b.SPEC['sdk_manifest'],'reference':contact.LITERALS,'never_skip':True,'original_refusal':41702972179}
     b.write(P/'registration.json',registration)
     subprocess.run(['cc','-Wall','-Wextra','-Werror','-O2',H.parent/'whole_count.c','-o',w.root/'whole_count'],check=True)
-    env=w.install();state=w.root/'native-donor-state';state.mkdir();stock,llvm=build(env);b.select(b.OLD);b.write(P/'registry.json.gz',b.inputs(env));provider=donor.provider_file()
+    env=w.install();state=w.root/'native-donor-state';state.mkdir();stock,llvm=build(env);calibrate(env,state);b.select(b.OLD);b.write(P/'registry.json.gz',b.inputs(env));provider=donor.provider_file()
     meta=json.loads(subprocess.check_output(['cargo','+ohm','metadata','--format-version=1','--locked','--offline','--no-deps'],cwd=w.work,env=env));assert len(meta['workspace_default_members'])==55
     result={};signed_reference=None;previous=None
     for tag,mode in STAGES:
@@ -92,7 +120,10 @@ def main():
                     messages=(td/'stderr').read_bytes()+(td/'stdout.jsonl').read_bytes();assert (b'generation changed'if mode=='mid-read'else b'DELIBERATELY')in messages
                 else:
                     inv=b.inventory(tag,env,meta);out=w.root/inv['binary'];assert len(inv['executables'])==102 and out.name==contact.BASE
-            finally:stop.set()
+            finally:
+                stop.set()
+                for live in set(state.glob('actor-*.tsv'))-before:
+                    (P/tag/('opened-'+live.name+'.gz')).write_bytes(gzip.compress(live.read_bytes(),mtime=0))
             held=target.result()if target else None;mutation=mutate.result()if mutate else None
         a=donor.outputs(before,tag,state,out,not failed)
         if mutation:a['mutation']=mutation
@@ -101,6 +132,7 @@ def main():
             assert held and not held['candidate_requested'];native=elf_container.inspect(out,llvm);b.write(P/(tag+'-source-container.json.gz'),native)
             assert native['sha256']==a['sha256'] and native['buildid']==native['zeroed_complete_buildid']
             if serial:
+                assert len({r['sha256']for r in held['signed_repetitions']})==1,('signed/signed mismatch recorded',tag,held['signed_repetitions'])
                 s=json.loads(gzip.decompress((P/(tag+'-signed-container.json.gz')).read_bytes()))
                 a['signed_relationship']=elf_container.compare(s,native)
                 if s['sha256']!=native['sha256']:
