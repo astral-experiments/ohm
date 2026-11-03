@@ -11,6 +11,17 @@
    "runner_name": "nsc-runner-aovci7qm0uqhs",
    "sha256": "206d6e3a926c54f25ff231f4927f1256c55694e67f297ff31c35f32c17673351"
   },
+  "85ecceb1-373b-4495-8709-bc3eb7d71630": {
+   "boot": "85ecceb1-373b-4495-8709-bc3eb7d71630",
+   "head": "c126e7b93092473f751185aa83d7f6c9712037aa",
+   "job": 125836741741,
+   "label": "published physical-prototype independent",
+   "member_sha256": "de876dd785d4864cc882cd3893a4613e625d534212210f33fefebdeb5bd86470",
+   "original_sha256": "ba4c1ce97781fcd57a71d447ec461b3ddbedf186c00b1c6d02f8b56531627264",
+   "run": 41612235937,
+   "runner_id": 1960,
+   "runner_name": "nsc-runner-lo20265qfo8f6"
+  },
   "b3fc57e8-d455-4bdb-b6b0-1505261ff214": {
    "head": "0eaa9388c5a8539ed982b74200592c6800c692de",
    "id": 13216798719,
@@ -21,6 +32,17 @@
    "runner_id": 1931,
    "runner_name": "nsc-runner-4htsob5gvuji8",
    "sha256": "7de50076419e2b0c31f1f7c19a4351d77c73bf43644ef3708589361be1dc6fc5"
+  },
+  "c7d1905f-4d25-4116-9133-0344be6816de": {
+   "boot": "c7d1905f-4d25-4116-9133-0344be6816de",
+   "head": "c126e7b93092473f751185aa83d7f6c9712037aa",
+   "job": 125836140243,
+   "label": "published physical-prototype first",
+   "member_sha256": "1743c21e4ebf33af0464f90e08ce7fd8c9b208285013b1d52303b609244dd6d5",
+   "original_sha256": "ded15eca6bf8454b86e4214695211a0fea4eb67f95123d49d4cf4e6df8d69717",
+   "run": 41612056250,
+   "runner_id": 1954,
+   "runner_name": "nsc-runner-3ik3sm7bis18o"
   }
  },
  "boot_uuids": [
@@ -49,6 +71,7 @@
   "7bf853cc-35d6-49bd-ab54-994d55b3d111",
   "8287559a-635a-47d0-bc39-859bb3efd4f2",
   "8461ebca-9583-4d70-8eac-198744186904",
+  "85ecceb1-373b-4495-8709-bc3eb7d71630",
   "865b9878-8a6e-4a2a-9765-5e455cdb99a1",
   "9d23133e-bce4-4fe7-b854-ea066fec2c98",
   "9e84f3ed-ae3e-436a-ab37-48885e6f9db0",
@@ -57,6 +80,7 @@
   "b48533ba-18c2-433d-a56e-5d7d03110bab",
   "b5e71b68-f736-48f5-9cba-ba27d90992ba",
   "c0cef69c-0c2e-4bf2-a63b-eee0dc0947d6",
+  "c7d1905f-4d25-4116-9133-0344be6816de",
   "c9fb48af-4e9f-416d-87aa-d25701341731",
   "d4ad8776-10c1-4fc1-a536-531abb953a1d",
   "d5aa006d-e248-44bf-8635-a0f26186c053",
@@ -80,14 +104,65 @@
   1912,
   1923,
   1931,
-  1937
+  1937,
+  1954,
+  1960,
+  1978,
+  1981,
+  1993,
+  2033,
+  2037
  ],
  "runner_names": [
+  "nsc-runner-3ik3sm7bis18o",
   "nsc-runner-4htsob5gvuji8",
   "nsc-runner-71lhnihdidacm",
   "nsc-runner-839r02j8hk6ki",
+  "nsc-runner-abb9vji9drp1e",
+  "nsc-runner-aij4sjsthv5ca",
   "nsc-runner-aovci7qm0uqhs",
+  "nsc-runner-gu8rcmj5aih94",
+  "nsc-runner-h34bn1vfen6ku",
+  "nsc-runner-lo20265qfo8f6",
   "nsc-runner-nn23qic3v8pri",
-  "nsc-runner-ov7tf6vlqcba4"
- ]
+  "nsc-runner-ov7tf6vlqcba4",
+  "nsc-runner-v0ut18434flbm"
+ ],
+ "source_producers": {
+  "R": {
+   "job": 125848517737,
+   "run": 41615634254,
+   "runner_id": 1981,
+   "runner_name": "nsc-runner-h34bn1vfen6ku",
+   "status": "native accepted"
+  },
+  "T": {
+   "job": 125933263665,
+   "run": 41640655120,
+   "runner_id": 2037,
+   "runner_name": "nsc-runner-abb9vji9drp1e",
+   "status": "native accepted"
+  },
+  "first_T": {
+   "job": 125848517681,
+   "run": 41615634254,
+   "runner_id": 1978,
+   "runner_name": "nsc-runner-aij4sjsthv5ca",
+   "status": "refused"
+  },
+  "mechanism_only_T": {
+   "job": 125861504790,
+   "run": 41619498528,
+   "runner_id": 1993,
+   "runner_name": "nsc-runner-v0ut18434flbm",
+   "status": "native mechanism qualified, source correction required"
+  },
+  "post_ThinLTO_probe_T": {
+   "job": 125894837534,
+   "run": 41629356922,
+   "runner_id": 2033,
+   "runner_name": "nsc-runner-gu8rcmj5aih94",
+   "status": "source-identical earlier treatment had no pre-ThinLTO ownership observation"
+  }
+ }
 }

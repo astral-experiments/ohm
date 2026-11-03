@@ -1,4 +1,4 @@
-name: Measure released compiler driver self binding on uv warnings
+name: Measure the production-linked compiler on the uv warnings edit
 'on':
   workflow_dispatch:
     inputs:
@@ -24,7 +24,7 @@ permissions:
   attestations: read
 jobs:
   check:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21577-driver-binding-check'
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21577-driver-source-check'
       && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 100

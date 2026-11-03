@@ -1,6 +1,7 @@
 """Capture every opened Cargo history, including its independent cold control, before calculating prices."""
 from common21577 import *
-from elf import produce
+from source_intake import ROLES,check as check_sdk,prepare as prepare_sdk
+import source_surface
 import time
 
 def invoke_visit(dst,command,env=ENV):
@@ -39,42 +40,15 @@ def externs(forms):
 def clean_target():
     assert TARGET==ROOT/"target" and not TARGET.is_symlink()
     if TARGET.exists():shutil.rmtree(TARGET)
-def check_sdk(role):
-    orig=read(HERE/"signed-sdk.json");rel=read(HERE/"layout.json")["driver"]
-    expected={k:[v["bytes"],PLAN["prototype"] if k==rel and role=="P" else v["sha256"],v["mode"]] for k,v in orig.items()}
-    assert len(expected)==142 and not any(f.is_symlink()for f in SDK.rglob("*"))
-    assert {str(f.relative_to(SDK)):[*blob(f),f.stat().st_mode&0o777] for f in SDK.rglob("*")if f.is_file()}==expected
-    banners=read(HERE/"signed-native.json")["banners"]
-    for binary in ("cargo","rustc"):
-        assert subprocess.check_output([SDK/"bin"/binary,"-vV"],env=ENV,text=True).strip()==banners[binary].strip()
-    assert subprocess.check_output([h.RUSTC,"--print","sysroot"],env=ENV,text=True).strip()==str(SDK)
-    libs=subprocess.check_output(["ldd",h.RUSTC],env=ENV,text=True);assert "not found" not in libs
-    entry,=[s for s in libs.splitlines()if "librustc_driver-" in s];loaded=Path(entry.split("=>")[1].split()[0]).resolve()
-    assert loaded==SDK/rel and blob(loaded)[1]==expected[rel][1]
-    return {"role":role,"driver":expected[rel][1],"cargo":expected["bin/cargo"][1],"count":len(expected),"full_members":expected,"native_banners":banners,"loaded_driver":str(loaded)}
-def select(role,pool,proof):
+def select(role,pool,proof,source=None):
     if SDK.exists():
-        prev,=[n for n in ("S","P") if not (pool/n).exists()]
+        prev,=[n for n in ROLES if not (pool/n).exists()]
         SDK.rename(pool/prev)
     (pool/role).rename(SDK)
-    actual=check_sdk(role)
+    expected=read(proof.parent.parent/"intake"/("effective-"+role+".json"))
+    actual=check_sdk(role,expected,source)
     if proof.exists():assert actual==read(proof)
     else:save(proof,actual)
-def prepare_sdk(out,tmp):
-    from media import Transport
-    sys.path.insert(0,str(HERE.parent/"uv-client-22958"))
-    os.environ.setdefault("UV_22958_CONTRAST","signed")
-    import release23_package,release_intake
-    proof=out/"intake";proof.mkdir();transfer=tmp/"driver-binding-transfer";transfer.mkdir()
-    pool=tmp/"driver-binding-sdks";pool.mkdir()
-    original=release23_package.official(Transport,proof,transfer)
-    release_intake.install_archive(original,pool/"S","R")
-    signed=release_intake.role_sdk("R",pool/"S",proof/"signed")
-    assert signed["runtime"]==read(HERE/"signed-native.json")["runtime"] and signed["source"]==read(HERE/"signed-native.json")["source"]
-    shutil.copytree(pool/"S",pool/"P",copy_function=os.link)
-    rel=read(HERE/"layout.json")["driver"];dst=pool/"P"/rel;dst.unlink()
-    record=produce(pool/"S"/rel,dst);save(proof/"transformation.json",record)
-    assert blob(pool/"S"/rel)[1]==PLAN["signed"] and blob(dst)[1]==PLAN["prototype"]
 def named_meter(d,forms,tools):
     path=d/"per-rustc";path.mkdir()
     req={"command":CHECK,"environment":ENV,"cwd":str(SRC),"compiler_path":str(h.RUSTC),"selectors":forms};save(d/"request.json",req)
@@ -106,24 +80,34 @@ def visit(d,role,store,opening,tools=None,dry=False):
     assert cold==warm and all(len(z)==k for z,k in ((warm["rmeta"],39),(warm["sidecars"],30),(warm["workspace"],4)))
     save(d/"native.json",{"source_A":a,"source_B":b,"A":sha(d/"cold-A/products.json"),"B":sha(k/"products.json"),"cold_B":sha(d/"cold-B/products.json"),"same_native_B":True,"same_held_bare":True,"role":role,"two_forms":sorted(forms),"externs_sha256":sha(k/"externs.json"),"matched_previous_opening":bool(opening),"captured_counters":tools is not None,"cold_A_seed":stamp})
     return {"forms":forms,"A":cold_a,"B":warm,"externs":params}
-def run(out,donor,pool,label,local=False):
+def run(out,donor,pool,label,local=False,sources=None):
+    sources=sources or {}
     assert not (ROOT/"bank").exists() and not (out/"panel").exists()
     ROOT.mkdir(exist_ok=True);(ROOT/"bank").mkdir();(ROOT/"home").mkdir();(ROOT/"cargo").mkdir(exist_ok=local)
     source(SRC,"A",donor);panel=out/"panel";panel.mkdir();store=out/"blobs";store.mkdir()
-    select("S",pool,panel/"selected-S.json")
+    select("S",pool,panel/"selected-S.json",sources.get("S"))
     if not local:h.invoke([h.CARGO,"fetch","--locked"],SRC,dict(ENV,CARGO_NET_OFFLINE="false"))
     save(out/"registry.json",registry())
     openings={};linked={}
-    for role in "SP":
-        select(role,pool,panel/("selected-"+role+".json"))
+    for role in ROLES:
+        select(role,pool,panel/("selected-"+role+".json"),sources.get(role))
         d=panel/("opening-"+role);openings[role]=visit(d,role,store,None,dry=local)
         linked[role]=behavior(role,d/"behavior",donor)
-    assert openings["S"]==openings["P"]
-    assert {k:v["output"]for k,v in linked["S"].items()}=={k:v["output"]for k,v in linked["P"].items()}
-    save(panel/"joint.json",{"both_full_native_cohorts_identical":True,"all_39_raw_rmeta_and_30_public":True,"both_two_argv_and_extern_material_agree":True,"positive_A_B_outputs":{k:v["output"]for k,v in linked["P"].items()},"opening_S":sha(panel/"opening-S/native.json"),"opening_P":sha(panel/"opening-P/native.json")})
+        source_surface.observe(read(panel/("selected-"+role+".json")),openings[role],store,d/"native-reader")
+    selected={role:read(panel/("selected-"+role+".json"))for role in ROLES}
+    witness=source_surface.joint(openings,selected,lambda n:(store/n).read_bytes(),
+        lambda role,digest:(panel/("opening-"+role)/"native-reader"/(digest+".gz")).read_bytes())
+    save(panel/"cross-role-metadata.json",witness)
+    source_surface.require_equal(witness)
+    msgs={role:{k:v["output"]for k,v in checks.items()}for role,checks in linked.items()}
+    assert msgs["S"]==msgs["R"]==msgs["T"]
+    save(panel/"joint.json",{"roles":list(ROLES),"all_39_native_item_inventories":True,
+         "all_30_sidecars_bound_to_native_root":True,"same_kernel_argv_and_direct_extern_interfaces":True,
+         "positive_A_B_outputs":msgs["S"],"native_digest":sha(panel/"cross-role-metadata.json"),
+         "openings":{role:sha(panel/("opening-"+role)/"native.json") for role in ROLES}})
     if local:return
     tools=read(out/"boot-attestation.json")["tools"]
     for i,order in enumerate(PLAN["orders"][label],1):
         for role in order.split("/"):
-            select(role,pool,panel/("selected-"+role+".json"));visit(panel/(str(i)+"-"+role),role,store,openings[role],tools=tools)
+            select(role,pool,panel/("selected-"+role+".json"),sources.get(role));visit(panel/(str(i)+"-"+role),role,store,openings[role],tools=tools)
     save(panel/"complete.json",{"label":label,"order":PLAN["orders"][label],"protocol":sha(HERE/"protocol.json"),"opening":sha(panel/"joint.json")})

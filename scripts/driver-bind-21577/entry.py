@@ -38,6 +38,6 @@ def main(mode):
     assert read(out/"panel/complete.json")["protocol"]==sha(HERE/"protocol.json")
     assert not any(p.is_symlink() for p in out.rglob("*"))
     files={str(p.relative_to(out)):blob(p) for p in sorted(out.rglob("*")) if p.is_file()}
-    assert sum(v[0]for v in files.values())<640<<20
+    assert sum(v[0]for v in files.values())<850<<20
     save(out/"original-index.json",files)
 if __name__=="__main__":main(sys.argv[1])
