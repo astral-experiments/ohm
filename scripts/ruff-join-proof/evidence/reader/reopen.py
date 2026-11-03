@@ -5,7 +5,7 @@ from pathlib import Path
 HERE=Path(__file__).resolve().parent
 def digest(b):return hashlib.sha256(b).hexdigest()
 def unpack(p):
-    expected=json.loads((HERE/'registration.json').read_bytes())
+    expected=json.loads((p.parent/'registration.json').read_bytes())
     assert digest(p.read_bytes())==expected['zstd_sha256'] and p.stat().st_size==expected['bytes']
     data=subprocess.check_output(['zstd','-dc',p]);assert digest(data)==expected['tar_sha256']
     bodies={}
@@ -25,8 +25,8 @@ def decode(b):
         rows.append([ty,path,[number(8),string()]if flag else None])
     assert number(4)==0 and d.read()==b''
     return [v,rows]
-def verify(blake3):
-    reg,raw=unpack(HERE/'originals.tar.zst');idx=reg['index'];rows={}
+def verify(blake3,packet=HERE):
+    reg,raw=unpack(packet/'originals.tar.zst');idx=reg['index'];rows={}
     for value,claim in [('11ff865d',reg['old_payload_blake3']),('1dff865d',reg['new_payload_blake3'])]:
         actual=subprocess.check_output([blake3],input=bytes.fromhex(value)).split()[0].decode()
         assert actual==claim
@@ -76,4 +76,5 @@ def verify(blake3):
 if __name__=='__main__':
     assert platform.system()=='Linux'and platform.machine()=='x86_64'
     parser=argparse.ArgumentParser();parser.add_argument('--b3sum',default='b3sum')
-    verify(parser.parse_args().b3sum)
+    parser.add_argument('--packet',type=Path,default=HERE)
+    args=parser.parse_args();verify(args.b3sum,args.packet)

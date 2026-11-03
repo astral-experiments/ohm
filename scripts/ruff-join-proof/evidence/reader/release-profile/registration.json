@@ -1,0 +1,73 @@
+{
+  "bodies": 114,
+  "bytes": 199944,
+  "cargo_artifact": {
+    "id": 13217478384,
+    "sha256": "a5a390f0f430c15209d44794cbb8358e6a540992822c3d9dbea26eb54a200172"
+  },
+  "drivers_sha256": {
+    "c1": "d377ef6f819ac8dc5d200cc1ad435f76b00290e5bd2dfb83873b3e2f79d6a72c",
+    "c2": "401860d7243a9af2e02d9d51fa6f0565c3352de4962eae163023daf65ecb5599"
+  },
+  "freshness_scope": "The Cargo reader can verify observations actually emitted by the compiler. A single late hash from an older rustc can truthfully reflect the current pathname while disagreeing with the bytes used during expansion.",
+  "index": {
+    "fixed-c1": {
+      "phases": {
+        "during-save": "40878a3a42d344fde342fd71e9503f38c584cdde9115421ceb48b4bab94c3a26",
+        "first-unchanged": "0e99ac81bb8ce7d30ceb6a20fab628395c67143a1c847028603ffa146154e125",
+        "independent-empty": "a05fe054bec166e7290f23ac346f088a6c3b0e49f97ca3c1daae7202cedde6cd",
+        "native-empty": "1239439133fd6483e35fa366bc71b74096c5bffeed21aeb335ccef3347b2ae18",
+        "native-repair": "dee47e4ee4b38ef0ae9c8f2e0807cc0d3d1b14f2c117467606bfd164cb38dc64",
+        "repair": "63aeaa388e3485cbb292959680138345048a505f6abda7cf60a0583ed675b271",
+        "repair-settled": "fd15bdf275d0b6c91bbc580dce5da7258656eb72e7d154396f4072c4669b1aa2"
+      },
+      "saved": "5c93eec0ffccc23910b4cc2f37752b431c75d09b665173c9579c942e94ad7654"
+    },
+    "fixed-c2": {
+      "phases": {
+        "during-save": "8df6211863d95bf7dbea49e894f269ef78a2cf782dd7f7e1eaf73fffbfd48b71",
+        "first-unchanged": "40f054860edb42c7fe37ddb0a5619d94800f921ae9ba1a83c2b93afa30a42ade",
+        "independent-empty": "43d21da793f1c46b94e44e80e47036215c6ac5faab34d8250a6bc647c7d627d3",
+        "native-empty": "6049436de2528e07c7914fd830bd4175ad0245e28f31b4987fa6f970ee97b121",
+        "native-repair": "993b7fdad8af03c81c3e6c04beac2d8c2ac5700535c0fd43bca5d3e3475d65e4",
+        "repair": "6572fcc41d3ab2e9fc0bba2be05397997e6a3d1357d803b8fe9b8f2bda797fc5",
+        "repair-settled": "8908ad852d864e03f8e539205766d237c829cdbd0a29e58cc27c9667b78eaa39"
+      },
+      "saved": "1d777b4d733ff7259661ce4bbe6f7f0dd13f6fbf4ce070c83912588fb73137b5"
+    },
+    "positive-c1": {
+      "phases": {
+        "ordinary": "c1f4c7be713dcff4859a475de040a9756b8b5b242ff9b3881e6696add2916cfd",
+        "ordinary-unchanged": "9ff4a872ca8a3bb5125d183bfe439a2511f63a45b1a26e48b9f3a2de448e1fcf"
+      }
+    },
+    "positive-c2": {
+      "phases": {
+        "ordinary": "9e4580b10d9faadf46e14075168ac245ee3d0e756135bc654f590e6851331e95",
+        "ordinary-unchanged": "47ab26ceb1e9f46f707a44c7c75cda37e314b06c308d47725c686f69dea81edb"
+      }
+    },
+    "upgrade": {
+      "phases": {
+        "during-save": "f3c69e8579896e3d11cacebb5fcbfff6d5268b261f16910e3d15d075d117811e",
+        "first-after-upgrade": "a684289c28345479b14d665a213f8e0df0256a8a961db0c12bbc838c129d1445",
+        "native-empty": "9a666104aa04722f68a5c461c175810923d38772c871e9d2e7f812f3a18eb632",
+        "native-repair": "6b59b3f6bf4a0b131979f11a3f3b55e7532f3f4c56ff624f8a5f4abb80e2ac0c",
+        "poison-independent-empty": "8acb277250b55ea812bd0e7478e6afa601489bdbd2f43068bbeedfd2ee290107",
+        "poison-unchanged": "1053b968da468af65e0b57bdd8312754599dc63ac2cb8368505bdc28e90e6404",
+        "repair": "ee925e5eccbd42591ded5476f936969220ec007ad9aab94586790ad5628e0fef",
+        "repair-settled": "344e86f31bb807a3a7156772e983463fe0e74c13a770a9355e913c68764bbbde"
+      },
+      "saved": "71bd3c64810cf090229b94aa898b1159c790aeb54b34c4750558b483ad963e96"
+    }
+  },
+  "new_payload_blake3": "6aa7f054373fd0f38007db4bdba694355734d9854505ead597ee77f5e1658266",
+  "old_payload_blake3": "3d06fa58de09f94b91c882b16d4b5780253ff7ab9c81c16e2be8e07765acfb4f",
+  "platform": "Linux x86_64",
+  "prior_cargo": "c67a662901b9d15945579f0b607c234cf92e55488c687b68ba8a95f9e22326a2",
+  "profile": "release thin LTO, one CGU, ohm-defaults + all-static, signed d57 source-built compiler",
+  "reader_cargo": "f97b6020c860e05eb3b4a20f0d2ae0d0e1b10953bc2a2d2205b77df9565cb13d",
+  "reader_source": "4a6de7858c60e579fc30e01f5b60ddcaa84c2e30",
+  "tar_sha256": "23f008c3181faede473ea6fbde45415b4c2b6d31913083c7114a5972c87f973e",
+  "zstd_sha256": "0fa6912877788231c83d735fca7ce6545700ef14107b2e92b39f52040d0a042a"
+}

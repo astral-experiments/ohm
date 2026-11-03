@@ -148,7 +148,10 @@ def repaired(work,role):
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('stage',choices=['prepare','verify'])
     for n in ('root','old_cargo','c1','c2'):p.add_argument('--'+n.replace('_','-'),dest=n,type=Path,required=True)
-    p.add_argument('--candidate',type=Path);p.add_argument('--sha');args=p.parse_args();charge()
+    p.add_argument('--candidate',type=Path);p.add_argument('--sha')
+    p.add_argument('--release-prior',action='store_true',help='Use the separately verified ba07041c release Cargo as the old v4 reader.')
+    args=p.parse_args();charge()
+    if args.release_prior:BASE_CARGO='c67a662901b9d15945579f0b607c234cf92e55488c687b68ba8a95f9e22326a2'
     up=args.root/'upgrade'
     if args.stage=='prepare':
         args.root.mkdir();install('c1',args.old_cargo,BASE_CARGO,True)
