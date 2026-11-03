@@ -1,5 +1,5 @@
 name: Compare the actual Ruff derived-impl Cargo edits
-run-name: Two preregistered Ruff CLI edits on the -24 source pair
+run-name: Repeat the separate Ruff CLI receiver from an authenticated initial OLD
 permissions:
   contents: read
   actions: read
@@ -12,8 +12,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - case: '28392'
-          new: d136bd8d002a648de5f344df602e492658306f1e
         - case: '26372'
           new: fa4a7bca2db70229710892c97b26ea6fb046cfc4
     name: Real Ruff edit ${{ matrix.case }}
