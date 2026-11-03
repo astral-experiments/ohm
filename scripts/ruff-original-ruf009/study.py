@@ -35,7 +35,10 @@ alias = state/'rustup'
 sdk = (opened/label).resolve(strict=True)
 manifest = json.loads((opened/'rustcs.json').read_bytes())['arms'][label]
 assert Path(manifest['root']).samefile(sdk)
-env = {**os.environ,'RUSTUP_HOME':str(alias),'CARGO_HOME':str(study/'cargo-home'),'CARGO_TARGET_DIR':str(state/'target'),
+home=state/'home'
+home.mkdir()
+env = {'HOME':str(home),'PATH':os.environ['PATH'],'LC_ALL':'C','GIT_CONFIG_NOSYSTEM':'1',
+       'GIT_CONFIG_GLOBAL':'/dev/null','RUSTUP_AUTO_INSTALL':'0','RUSTUP_HOME':str(alias),'CARGO_HOME':str(study/'cargo-home'),'CARGO_TARGET_DIR':str(state/'target'),
        'CARGO_BUILD_BUILD_DIR':str(state/'build'),'LD_LIBRARY_PATH':str(sdk/'lib'),'CARGO_NET_OFFLINE':'true'}
 assert not any(env.get(k) for k in ('RUSTFLAGS','CARGO_ENCODED_RUSTFLAGS','RUSTC','RUSTC_WORKSPACE_WRAPPER','RUSTC_WRAPPER','LD_PRELOAD',
                                     'CARGO_LOG','CARGO_UNSTABLE_OHM_NATIVE_TOOL_TRUST','CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST'))
