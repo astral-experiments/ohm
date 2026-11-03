@@ -59,9 +59,9 @@ def summarize(path,case):
             sides[role]={"all":counts(t,names),"roots":{root:counts(t,([root]if role=="P" else active[root]))for root in roots},
                          "ordinary_edit_work":counts(t,names&regen) if phase=="edit"else None}
         result[phase]={"stock_choice":chosen,"removed":removed,"added":added,"present_lanes":active,"compilers":sides}
-    result["physical"]={role:{**{k:v[k]for k in ("primary","project","cold","cold_new","noop","cgu_count","storage")},"edited_storage":z.js(role+"/edit-footprint.json"),
+    result["physical"]={role:{**{k:v[k]for k in ("primary","cold","cold_new","noop","cgu_count","storage")},"edited_storage":z.js(role+"/edit-footprint.json"),
                               "native":{t:v["native"][t]["stdout"]for t in v["native"]}} for role,v in terminal["roles"].items()}
-    result["primary_reduction"]=terminal["whole_reduction"];result["rustc_reduction"]=terminal["affected_rustc_reduction"]
+    result["primary_reduction"]=terminal["whole_reduction"]
     return result
 if __name__=="__main__":
     p=argparse.ArgumentParser();p.add_argument("--case",choices=["29697","29604"],required=True);p.add_argument("archive",type=Path);p.add_argument("--output",type=Path,required=True)

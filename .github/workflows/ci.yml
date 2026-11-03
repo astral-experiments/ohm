@@ -55,6 +55,18 @@ jobs:
         path: ${{ runner.temp }}/ohm-foreign-join/published/
         retention-days: 21
         if-no-files-found: error
+    - name: Count selected rustc lifetimes after the ordinary original has been retained
+      env:
+        REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+        OHM_OWNER_CASE: ${{ matrix.case }}
+      run: python3 -IB qa/scripts/ruff-original-ty-instructions/standalone-buckets/owner-lanes/diagnostic.py
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      if: always()
+      with:
+        name: ruff-root-owner-lanes-lifetime-${{ matrix.case }}-${{ github.run_id }}
+        path: ${{ runner.temp }}/ohm-foreign-join/diagnostic/
+        retention-days: 21
+        if-no-files-found: ignore
     name: Unscored source edit ${{ matrix.case }}
 'on':
   workflow_dispatch:

@@ -22,3 +22,9 @@ The local archive reader needs Python 3.11+ and zstd. It authenticates original 
 python3 -IB partition_outcome.py --case 29697 original-29697.zip --output reviewed-29697.json
 python3 -IB partition_outcome.py --case 29604 original-29604.zip --output reviewed-29604.json
 ~~~
+
+## First receiver refusal
+
+The first worker pair ran on the same sealed factory. It retained its originals under [run 41704818423](https://github.com/astral-experiments/ohm/actions/runs/41704818423). There is no admitted pair in that run. The discovery parent emitted a correct edited client, then the thread-epoch observer reported 18,451 positive retired instructions in a ty_project checkpoint whose difference of reported enabled clock ticks was zero. The body-only receiver stopped at its first OLD client because it supplied just the Salsa rlib. The actual original Cargo row supplies both libsalsa-f07a7c8cfad7dfca.rlib and the full libsalsa-f07a7c8cfad7dfca.rmeta, and rustc's crate locator explicitly requires the latter when the former contains a metadata stub.
+
+The replacement retains the complete ordinary pair, including clean and repair, before any secondary observer starts. Its held-out native client supplies both actual Salsa paths. A separate step reopens the private, same-path ordinary targets and performs the counter attribution. An independent perf event starts while the selected rustc is stopped at PTRACE_EVENT_EXEC. It inherits that process's threads, excludes forked processes, and is read after the selected process terminates. It requires a positive, fully scheduled lifetime and is calibrated on single/multiple work sizes, a joined pthread and a CPU-intensive child process. Both the raw thread epochs and the new lifetime counters remain available. The original time-fragment guard continues to disqualify the failed acquisition; we did not add those fragments to a comparison.

@@ -81,6 +81,8 @@ def native_oracle(case,rows,env,td,rev):
     libs=base.products(rows)
     salsa,=(r for r in rows if r["target"]["name"]=="salsa" and r["target"]["kind"]==["lib"])
     sr,=(Path(f) for f in salsa["filenames"] if f.endswith(".rlib"))
+    sm,=(Path(f) for f in salsa["filenames"] if f.endswith(".rmeta"))
+    need(sr.is_file() and sm.is_file() and sr.stem==sm.stem,"mismatched selected Salsa rlib/rmeta pair")
     root=w.root/"lib-oracle";root.mkdir(exist_ok=True)
     exe=root/"consumer";source=root/"client.rs";shutil.copyfile(HERE/"revision.rs",source)
     deps=sorted({str(Path(f).parent) for row in rows for f in row["filenames"]})
@@ -88,7 +90,7 @@ def native_oracle(case,rows,env,td,rev):
     links=sorted({d for r in records if r["reason"]=="build-script-executed" for d in r["linked_paths"]})
     args=["rustc","+ohm",str(source),"--crate-name","ty_root_revision_oracle","--edition=2024","-Cdebuginfo=0"]
     for k,p in {**{k:v["rlib"] for k,v in libs.items()},"salsa":sr}.items(): args+=["--extern",k+"="+str(p)]
-    args+=["-Ldependency="+s for s in deps]+["-L"+s for s in links]+["-o",str(exe)]
+    args+=["--extern","salsa="+str(sm)]+["-Ldependency="+s for s in deps]+["-L"+s for s in links]+["-o",str(exe)]
     w.put(output/"argv.json",args)
     p=sp.run(args,cwd=w.work,env=env,capture_output=True);(output/"compile.stderr").write_bytes(p.stderr)
     need(p.returncode==0,("source-built held-out consumer",p.stderr[-2000:]))
@@ -124,7 +126,7 @@ def main():
     for n in (1000000,4000000):
         d=w.proof/("calibration-"+str(n));d.mkdir();counts.append(old.count(whole,d,[calibration,str(n)],env,w.work))
     need(3.8<counts[1]/counts[0]<4.2,"inherited user-instruction calibration")
-    state={"roster":None,"graph":None};summaries={}
+    state={"roster":None,"graph":None};summaries={};parked={}
     for index,role in enumerate(order):
         w.guard();old.remove_outputs();old.state(old.old);roots[role].rename(w.sdk);hist=w.proof/role;hist.mkdir()
         try:
@@ -174,23 +176,20 @@ def main():
                 need(p.returncode==101 and any((r.get("message",{}).get("code")or{}).get("code")=="E0308" for r in errors if r["reason"]=="compiler-message"),"unchanged normal Cargo did not catch E0308")
             finally:path.write_bytes(saved)
             repaired,_=phase("repair",old.new,native=True)
-            old.state(old.old);prior,po=phase("observed-old",old.old,observer=True,snap=True);old.state(old.new)
-            observed,fo=phase("observed-edit",old.new,observer=True,snap=True);census=observed["observed"]
-            need(set(census["real_execs"])=={"rustc:"+n for n in edit["dirty"]} and observed["dirty"]==edit["dirty"],"observer perturbed the workload")
-            need(census["process_instructions"].get("rustc:ty_project",0)>0 and
-                 not census["positive_instructions_without_clock"].get("rustc:ty_project"),"unclocked affected process")
-            for k in CRATES:need(native_identity(ae[k]["mapping"])==native_identity(fo[k]["mapping"]),("observer changed an emitted native body",k))
-            w.put(hist/"observed-retention.json",{k:delta(po[k],fo[k]) for k in CRATES})
-            final,_=phase("observed-unchanged",old.new,observer=True);need(not final["dirty"] and not final["observed"]["real_execs"],"no-op performed a real compile or link")
             old.remove_outputs();last.clear();clean,ce=phase("independent-clean",old.new,native=True,snap=True,raw=True)
             need(len(clean["dirty"])==len(state["roster"]),"independent control was not fully empty")
             for k in CRATES:need(native_identity(ae[k]["mapping"])==native_identity(ce[k]["mapping"]),("independent clean codegen, member or archive index differs",k))
             need(edit["native"]["elf"]==clean["native"]["elf"]==repaired["native"]["elf"] and initial["native"]["elf"]!=edit["native"]["elf"],"complete native output does not match clean or edit behavior")
             report={"role":role,"primary":edit["instructions"],"cold":initial["instructions"],"cold_new":clean["instructions"],"noop":settled["instructions"],
-                    "project":census["process_instructions"]["rustc:ty_project"],"processes":census,"storage":old_bytes,
+                    "storage":old_bytes,
                     "native":{phase:item["native"]for phase,item in (("old",initial),("edited",edit),("clean",clean))},
                     "cgu_count":{k:len(ae[k]["objects"])for k in CRATES},"actual_dirty":edit["dirty"]}
             w.put(hist/"admitted.json",report);summaries[role]=report
+            parked[role]=[]
+            for directory in (w.target,w.shared):
+                if not directory.exists() and directory==w.shared:continue
+                need(directory.parent==w.root and directory.is_dir() and not directory.is_symlink(),"unsafe ordinary build state")
+                directory.rename(w.root/("park-"+role+"-"+directory.name));parked[role].append(directory.name)
         finally:w.sdk.rename(roots[role])
     a,b=(summaries[k]for k in "PC")
     need(a["actual_dirty"]==b["actual_dirty"] and all(a["native"][k]["stdout"]==b["native"][k]["stdout"] for k in a["native"]),"compilers saw different edit or endpoint")
@@ -206,6 +205,9 @@ def main():
         transition=public["within_role_transitions"][crate+"/edit-to-independent-clean"]
         for row in transition.values():
             need(not any(row["different_keys"]),("warm and fresh metadata changed different keys across compiler roles",crate))
-    w.put(w.proof/"result.json",{"case":case,"roles":summaries,"whole_reduction":1-b["primary"]/a["primary"],"affected_rustc_reduction":1-b["project"]/a["project"]})
+    w.put(w.proof/"result.json",{"case":case,"roles":summaries,"whole_reduction":1-b["primary"]/a["primary"]})
+    allowed={"HOME","PATH","USER","LANG","RUSTUP_HOME","CARGO_HOME","CARGO_TARGET_DIR","CARGO_BUILD_BUILD_DIR","CARGO_NET_GIT_FETCH_WITH_CLI","CARGO_NET_OFFLINE"}
+    need(set(env)<=allowed,"unexpected field in private native diagnostic setup")
+    w.put(w.root/"continuation.json",{"environment":env,"roots":{k:str(v) for k,v in roots.items()},"parked":parked})
 if __name__=="__main__":
     main()
