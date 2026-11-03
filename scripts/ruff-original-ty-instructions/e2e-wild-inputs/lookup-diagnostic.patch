@@ -1,0 +1,88 @@
+--- a/libwild/src/fs.rs
++++ b/libwild/src/fs.rs
+@@ -406,17 +406,26 @@
+         path: &Path,
+         prepopulate_maps: bool,
+     ) -> Result<(Self::Input, Option<Arc<File>>)> {
+-        let file = File::open(path)
++        use std::os::unix::fs::MetadataExt as _;
++        let opened = File::open(path);
++        if let Err(error) = &opened {
++            eprintln!("OHMLOOK\tX\t{}\t{:?}\t{:?}\t{:?}", std::process::id(),
++                std::thread::current().id(), path, error.raw_os_error());
++        }
++        let file = opened
+             .with_context(|| format!("Failed to open input file `{}`", path.display()))?;
+ 
+-        let modification_time = file
+-            .metadata()
+-            .and_then(|meta| meta.modified())
++        let metadata = file.metadata()
++            .with_context(|| format!("Failed to stat input file {}", path.display()))?;
++        let modification_time = metadata.modified()
+             .with_context(|| {
+                 format!("Failed to read file modification time `{}`", path.display())
+             })?;
+ 
+         let bytes = crate::host::fs::read_input(&file, path, prepopulate_maps)?;
++        eprintln!("OHMLOOK\tO\t{}\t{:?}\t{:?}\t{}\t{}\t{}",
++            std::process::id(), std::thread::current().id(), path,
++            metadata.dev(), metadata.ino(), metadata.len());
+ 
+         Ok((
+             OsInputFile {
+@@ -429,7 +438,10 @@
+     }
+ 
+     fn file_type(&self, path: &Path) -> Result<FileType> {
+-        let ty = std::fs::metadata(path)?.file_type();
++        let metadata = std::fs::metadata(path);
++        let errno = metadata.as_ref().err().and_then(std::io::Error::raw_os_error).unwrap_or(0);
++        eprintln!("OHMLOOK\tP\t{}\t{:?}\t{:?}\t{}", std::process::id(), std::thread::current().id(), path, errno);
++        let ty = metadata?.file_type();
+         Ok(if ty.is_file() {
+             FileType::File
+         } else if ty.is_dir() {
+--- a/libwild/src/input_data.rs
++++ b/libwild/src/input_data.rs
+@@ -259,7 +259,8 @@
+         file_system: &F,
+     ) -> Result<Self> {
+         let resolve_script_path = |path: &Path| -> PathBuf {
+-            if file_system.file_type(path).is_ok() {
++            eprintln!("OHMLOOK\tA\t{}\t{:?}\t{:?}", std::process::id(), std::thread::current().id(), path);
++            let result = if file_system.file_type(path).is_ok() {
+                 path.to_owned()
+             } else if let Some(found) =
+                 search_for_file(file_system, args.lib_search_path(), None, path)
+@@ -267,7 +268,10 @@
+                 found
+             } else {
+                 path.to_owned()
+-            }
++            };
++            eprintln!("OHMLOOK\tE\t{}\t{:?}\tSome({:?})", std::process::id(),
++                std::thread::current().id(), result);
++            result
+         };
+ 
+         Ok(Self {
+@@ -771,11 +775,17 @@
+         scope: &Scope<'scope>,
+         referenced_by: Option<PathBuf>,
+     ) -> Result<FileLoadIndex> {
++        eprintln!("OHMLOOK\tB\t{}\t{:?}\t{:?}\t{:?}\t{:?}\t{:?}",
++            std::process::id(), std::thread::current().id(), input.spec, referenced_by,
++            input.search_first, input.modifiers);
+         let paths = input.path(
+             self.args.lib_search_path(),
+             self.args.framework_search_path(),
+             self.file_system.as_ref(),
+-        )?;
++        );
++        eprintln!("OHMLOOK\tE\t{}\t{:?}\t{:?}", std::process::id(),
++            std::thread::current().id(), paths.as_ref().ok().map(|p| &p.absolute));
++        let paths = paths?;
+ 
+         let mut inputs_by_path = self.inputs_by_path.lock().unwrap();
+ 

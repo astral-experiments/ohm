@@ -3,6 +3,8 @@ import gzip,hashlib,json,os,re,shutil,stat,subprocess as sp,sys
 from pathlib import Path
 H=Path(__file__).resolve().parent;sys.path.insert(0,str(H.parent))
 import workspace29697 as b
+sys.path.insert(0,str(H))
+import build_source
 w=b.w;P=b.PROOF;priv=w.root/'e2e-native-role'
 OLD='f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2'
 NEW='86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563'
@@ -33,7 +35,7 @@ def main():
     assert w.git('rev-parse','HEAD')==b.NEW and w.git('rev-parse','HEAD^')==b.OLD and w.hf(w.src/'sdk.json')==b.SPEC['sdk_manifest']
     assert shutil.disk_usage(w.root).free>45*2**30;w.guard();prep()
     b.write(P/'registration.json',dict(head=os.environ['GITHUB_SHA'],run=os.environ['GITHUB_RUN_ID'],boot=Path('/proc/sys/kernel/random/boot_id').read_text().strip(),study=b.SPEC,wild=WILD,previous_link=FROZEN_LINK,reference=dict(run=41617756983,old=OLD,edited=NEW,independent_clean=NEW,test_inventory=LIST),limits='Actual physical selected path/search scope only. No production skip.'))
-    env=w.install();b.select(b.OLD);b.write(P/'locked-registry.json.gz',b.inputs(env))
+    env=w.install();actors=build_source.build(w,env,P);b.select(b.OLD);b.write(P/'locked-registry.json.gz',b.inputs(env))
     meta=json.loads(sp.check_output(['cargo','+ohm','metadata','--format-version=1','--locked','--offline','--no-deps'],cwd=w.work,env=env))
     graph=json.loads(sp.check_output([*b.CMD[:2],'-Zunstable-options',*b.CMD[2:-1],'--unit-graph'],cwd=w.work,env=env))
     assert len(meta['workspace_default_members'])==55 and len(graph['units'])==693
@@ -65,14 +67,15 @@ def main():
     paths=[Path(t)for t in argv if t.startswith('/')and t!=str(out)and Path(t).suffix in ('.o','.rlib','.rmeta','.a','.so')]
     assert len(paths)==396 and sym in paths
     original={str(p):snapshot(p)for p in set(paths)};b.write(cap/'all-literal-inputs.json.gz',original)
-    def visit(tag,add=(),traced=False,expected=None,exit83=False,error=False):
+    def visit(tag,add=(),traced=False,expected=None,exit83=False,error=False,actor=None):
         dest=P/tag;dest.mkdir();w.guard()
         if out.exists():assert out.is_file()and out.is_relative_to(w.root);out.unlink()
         options=[s.replace('$DEP',str(dest/'stock.d'))for s in add]
         args=[*argv,*options];cmd=args;trace=w.root/(tag+'-syscalls')
         if traced:
             trace.mkdir();cmd=['/usr/bin/strace','-ff','-qq','-ttt','-s','2048','-yy','-e','trace=%file,mmap,munmap','-o',str(trace/'task'),*args]
-        doc=dest/'plan.json';b.write(doc,{'command':cmd,'private':str(priv)})
+        doc=dest/'plan.json';b.write(doc,{'command':cmd,'private':str(priv),**({'actor':str(actors/actor)}if actor else {})})
+        assert not (actor and traced)
         with(dest/'stdout').open('wb')as so,(dest/'stderr').open('wb')as se:
             proc=sp.run(['/usr/bin/python3','-IB',H/'dispatch.py',doc],env=env,stdout=so,stderr=se,timeout=180)
         if traced:
@@ -92,6 +95,8 @@ def main():
         return stamp['sha256']
     visit('stock',expected=NEW)
     visit('syscall-observer',traced=True,expected=NEW)
+    visit('src-stock',actor='stock',expected=NEW)
+    visit('src-observer',actor='observer',expected=NEW)
     visit('stock-depfile-trace',['--trace','--dependency-file=$DEP'],expected=NEW)
     if not original_dir:raw.mkdir()
     provider=raw/'libutil.a';assert not provider.exists()
@@ -100,6 +105,7 @@ def main():
     sp.run(['/usr/bin/as','--64','-o',obj,asm],check=True);sp.run(['/usr/bin/ar','crD',provider,obj],check=True)
     for p in (asm,obj,provider):shutil.copy2(p,cap/p.name)
     shadow=visit('earlier-library',['--trace','--dependency-file=$DEP'],traced=True)
+    visit('src-shadow',actor='observer',expected=shadow)
     assert captured.count(b'\0main\0')==1
     def inplace(data):
         s=sym.stat();sym.write_bytes(data);os.utime(sym,ns=(s.st_atime_ns,s.st_mtime_ns))
@@ -107,11 +113,14 @@ def main():
     swapped=captured.replace(b'\0main\0',b'\0zzQA\0');assert sum(a!=b for a,b in zip(swapped,captured))==4
     inplace(swapped);shutil.copyfile(sym,cap/'four-byte-symbols.o')
     bad=visit('four-byte-symbol',['--trace','--dependency-file=$DEP'],traced=True,exit83=True);assert bad!=shadow
+    visit('src-four-byte',actor='observer',expected=bad,exit83=True)
     inplace(captured);visit('symbol-repair',expected=shadow)
     provider.write_bytes(b'DELIBERATELY MALFORMED NATIVE PROVIDER\n');visit('malformed-shadow',traced=True,error=True)
+    visit('src-malformed',actor='observer',error=True)
     provider.unlink()
     if not original_dir:raw.rmdir()
     visit('remove-shadow-repair',expected=NEW)
+    visit('src-final-repair',actor='observer',expected=NEW)
     assert all(snapshot(Path(name))==v for name,v in original.items())and not w.git('status','--porcelain')
     assert sum(f.stat().st_size for f in P.rglob('*')if f.is_file())<180*2**20
 

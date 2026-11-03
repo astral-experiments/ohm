@@ -15,4 +15,4 @@ if pairs:
         a,b=os.pipe();x,y=[fcntl.fcntl(f,fcntl.F_DUPFD_CLOEXEC,64)for f in(a,b)]
         os.close(a);os.close(b);os.write(y,b'+'*fds[rd][0]);os.dup2(x,rd,inheritable=True);os.dup2(y,wr,inheritable=True);os.close(x);os.close(y)
 os.chdir((Path(data['private'])/'cwd').read_text());args=data['command']
-os.execve(args[0],args,env)
+os.execve(data.get('actor',args[0]),args,env)
