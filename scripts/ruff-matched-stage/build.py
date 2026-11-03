@@ -244,7 +244,7 @@ def build(workspace, root):
     )
     directory = root / "build"
     os.chdir(rust)
-    for role in ("C",):
+    for role in ("P", "C"):
         desc = REG["roles"][role]
         rev = desc["revision"]
         git(rust, "checkout", "--quiet", "--detach", "--no-recurse-submodules", rev)
@@ -313,19 +313,25 @@ def build(workspace, root):
         )
         shutil.rmtree(directory)
         print("Froze stage1", role, flush=True)
-    from capsule import native_files, object_modes
-    capsule = root / 'capsule'
-    names = native_files(capsule, 'C')
-    modes = object_modes([names]); objects = capsule / 'objects'
-    need({p.name for p in objects.iterdir()} == set(modes), 'unbound diagnostic objects')
-    destination = root / 'diagnostic-sdk'; destination.mkdir()
-    for name, (digest, length, _) in names.items():
-        obj = objects / digest
-        need(obj.is_file() and not obj.is_symlink() and obj.stat().st_size == length and sha(obj) == digest, 'changed compiler')
-        obj.chmod(modes[digest]); target = destination / name; target.parent.mkdir(parents=True, exist_ok=True); os.link(obj, target)
-    driver, = (destination / 'lib').glob('librustc_driver-*.so')
-    save(root / 'logs/diagnostic.json', dict(schema='ohm-rdr-edge-diagnostic-1',registration=sha(HERE/'registration.json'),source=sha(root/'logs/source.json'),signed_tools=original_tools,files=names,root=str(destination),driver=sha(driver),revision=REG['roles']['C']['revision']))
-    shutil.copy2(capsule/'C.json',root/'logs/C.json')
+    capsule = root / "capsule"
+    receipt = {
+        "schema": "ohm-remat-rustc-capsule-v1",
+        "registration": sha(HERE / "registration.json"),
+        "source_sha256": sha(root / "logs/source.json"),
+        "signed_tools": original_tools,
+        "manifests": {k: sha(capsule / (k + ".json")) for k in ("P", "C")},
+    }
+    save(capsule / "qualified.json", receipt)
+    seal(capsule)
+    manifest = reopen(capsule, root / "reopened")
+    from smoke import smoke
+
+    smoke(root, manifest, env)
+    for role in ("P", "C"):
+        shutil.copy2(capsule / (role + ".json"), root / "logs" / (role + ".json"))
+    for name in ("rustcs.json", "storage.json"):
+        shutil.copy2(root / "reopened" / name, root / "logs" / name)
+    save(root / "logs/accepted.json", receipt)
 
 
 if __name__ == "__main__":

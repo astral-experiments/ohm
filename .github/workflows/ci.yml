@@ -13,7 +13,6 @@ concurrency:
   cancel-in-progress: false
 jobs:
   matched:
-    name: Profile the Ruff linter check
     if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-rdr-visibility-scope-20261103'
       && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     runs-on: namespace-profile-ubuntu-24-04-16
@@ -138,52 +137,26 @@ jobs:
       run: |-
         set -euo pipefail
         gh api -H "Accept: application/octet-stream" repos/astral-experiments/ohm/releases/assets/698533704 > "$RUNNER_TEMP/ohm-branch-object-qa/signed-cargo.tar.gz"
-    - name: Check out the independently qualified ordinary Ruff reader
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        ref: 1273cbdd1b8c827ea4d2fc2141348c8e683336ed
-        path: qa
-        persist-credentials: false
-        sparse-checkout: |
-          scripts/ruff-linter-check-attribution
-          scripts/ruff-heldout-mono-fold/residual
-    - name: Check out signed Cargo SDK reader
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        ref: bd7b58765ae44b21a1c9273b3ff0be8e923adc47
-        path: donor
-        persist-credentials: false
-        sparse-checkout: scripts/ruff-default-owner-pmu
-    - name: Check out the enrolled Ruff edit with its exact parent
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        repository: astral-sh/ruff
-        ref: 04ae7c402b2a7f1c49a9a1dd264629c00e38f61b
-        fetch-depth: 2
-        path: ruff
-        persist-credentials: false
-    - name: Build the single diagnostic stage1 compiler
+    - name: Build the isolated stage1 pair and verify ordinary Cargo
       run: |-
         set -euo pipefail
         command -v git curl cmake ninja cc rustup gh zstd
         python3 -IB qa-code/scripts/ruff-matched-stage/build.py build
-    - name: Authenticate signed dependencies for the ordinary Ruff command
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: python3 -IB qa-code/scripts/ruff-matched-stage/rdr_trace.py prepare
-    - name: Trace the exact four native encoder graphs and run ordinary, invalid and clean controls
-      run: python3 -IB qa-code/scripts/ruff-matched-stage/rdr_trace.py run
-    - name: Retain the original compressed native graphs and Cargo controls
-      if: always()
+    - name: Package authenticated content-addressed compiler objects
+      run: |-
+        set -euo pipefail
+        study="$RUNNER_TEMP/ohm-branch-object-qa"
+        test -s "$study/logs/accepted.json"
+        tar --sort=name --numeric-owner --owner=0 --group=0 --mtime=@0 -C "$study" -cf - capsule | zstd -q -T4 -5 -o "$study/matched-stage.tar.zst"
+        (cd "$study" && sha256sum matched-stage.tar.zst > logs/archive.sha256)
+    - name: Retain the matched compiler capsule
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: ohm-rdr-edge-provenance-${{ github.run_id }}
-        path: |
-          ${{ runner.temp }}/ohm-ruff28444/receipt
-          !${{ runner.temp }}/ohm-ruff28444/receipt/**/*.private
-          !${{ runner.temp }}/ohm-ruff28444/receipt/rdr/**/*.bin
+        name: ohm-upstream-mono-owner-stage1
+        path: ${{ runner.temp }}/ohm-branch-object-qa/matched-stage.tar.zst
+        compression-level: 0
         retention-days: 7
-        if-no-files-found: warn
+        if-no-files-found: error
     - name: Retain source, tool and smoke evidence
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a

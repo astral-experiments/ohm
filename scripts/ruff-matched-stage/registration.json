@@ -26,26 +26,29 @@
       "5c3cea67eca46acbb95bf62a97485200f6c00c44",
       "c6b5bef8a0b36608968c568637529c68069d494f",
       "a3fc6da13921586bc374586dee00883e9210aecd",
-      "259ad7069e47eaf08cf106f187b2b6393f7fd7c2",
-      "d2b093d8771b569e030375053ca507ba43b3372f"
+      "259ad7069e47eaf08cf106f187b2b6393f7fd7c2"
     ],
-    "branch": "refs/heads/charlie/qa-rdr-edge-provenance-20261103",
-    "bytes": 25436,
+    "branch": "refs/heads/charlie/experiment-rdr-inline-adt-visibility-20261103",
+    "bytes": 22583,
     "prerequisite": "28b64bc39032c1786908d98ea2df92f855226d0f",
-    "sha256": "22d28857693ba3f61cab7b94e64b872e2478103e0e522ec51c8911d3102ae845"
+    "sha256": "af243dcdea3b9507f87746dc1c5c14472272190236ca882b7bc744b605a39de3"
   },
   "changed_sources": {
+    "compiler/rustc_incremental/src/persist/file_format.rs": {
+      "C": "b31bf7174b5c9a4189d670ffbe347d9205bbfb70",
+      "P": "f1cc605908e55162469ad0dfd0c0efb0b2c8c238"
+    },
     "compiler/rustc_metadata/src/rmeta/encoder.rs": {
-      "C": "5bcbbdeb8e11d5f8715f45ea3a3028397ce5ec2c",
-      "P": "3e1242c7675d11485bf9ad4a71fe84936f4a2a98"
+      "C": "e6a2e44c5814881adbfdb126a1a33a955ca49c46",
+      "P": "2b2f08dbca687cd0352adeeffe80d38fb1a06a50"
     },
-    "compiler/rustc_metadata/src/rmeta/encoder/public_api_hasher.rs": {
-      "C": "be751752ea90e3e42beea4b74e6cff04e4fa81d3",
-      "P": "3198f7dfeb058e3b7c80f871ed9c106352b13372"
+    "compiler/rustc_middle/src/ty/codec.rs": {
+      "C": "c966d75deb89f5e4beecff5e64c4448000181435",
+      "P": "342fb9b6bfa06ec900163747fe280c78306ffc33"
     },
-    "compiler/rustc_metadata/src/rmeta/encoder/rdr_qa.rs": {
-      "C": "3a1e51fb68efab7f2bb8640b4faff94e6dc84cf2",
-      "P": null
+    "compiler/rustc_middle/src/ty/mod.rs": {
+      "C": "44fc2f371b683aa60e84e873bc0a059b72c11851",
+      "P": "b2d12c787168515fb7f37feab5fe0d0d6e021284"
     }
   },
   "kit": {
@@ -55,14 +58,14 @@
   },
   "roles": {
     "C": {
-      "compiler": "0c661aedd6c5aac563745edd7f2b260690504150",
-      "revision": "35320b3ca778bd37726d5b9c742263da563f9b6e",
-      "tree": "89991cfe626232f3d86539dfd90d76a7a2ad4e3b"
+      "compiler": "5622581ec0c2d61f1b238a0769686c1cac9c6345",
+      "revision": "a7fc5bc7f90966e6e9a92f9239e3e304e79b2f3f",
+      "tree": "0b5a8ed185c5fb6f7368b100b145cd9a74cfcc5b"
     },
     "P": {
-      "compiler": "3d8f6f069fdced4020453c71ef7e62818e1abf2e",
-      "revision": "d2b093d8771b569e030375053ca507ba43b3372f",
-      "tree": "97681cfb235e3e9350ada4af13fb47b2e3cc0118"
+      "compiler": "d0262da6fe48ab665147e0e12014d92574897bdc",
+      "revision": "259ad7069e47eaf08cf106f187b2b6393f7fd7c2",
+      "tree": "2583ceb1254796772d3ae9099ed07a8a53747d2b"
     }
   },
   "schema": "ohm-remat-builder-registration-v1",
