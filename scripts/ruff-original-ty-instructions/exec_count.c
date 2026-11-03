@@ -64,6 +64,15 @@ int main(int argc,char **argv) {
     require(fprintf(journal,"M %d %"PRIu64"\n",getpid(),now())>0,"monitor journal");
     pid_t root=fork();require(root>=0,"fork");if(!root){require(ptrace(PTRACE_TRACEME,0,0,0)==0,"trace child");raise(SIGSTOP);execvp(argv[2],argv+2);_exit(127);}
     int status,code=-1;require(waitpid(root,&status,0)==root && WIFSTOPPED(status),"initial stop");
+    /* Both independent counters observe the very same stopped command. This one
+       inherits all descendants and turns on only when the root execs Cargo. */
+    struct perf_event_attr outer = {
+        .type=PERF_TYPE_HARDWARE,.size=sizeof(outer),.config=PERF_COUNT_HW_INSTRUCTIONS,
+        .disabled=1,.inherit=1,.enable_on_exec=1,.exclude_kernel=1,.exclude_hv=1,
+        .read_format=PERF_FORMAT_TOTAL_TIME_ENABLED|PERF_FORMAT_TOTAL_TIME_RUNNING,
+    };
+    int inherited=(int)syscall(__NR_perf_event_open,&outer,root,-1,-1,PERF_FLAG_FD_CLOEXEC);
+    require(inherited>=0,"whole command counter");
     require(ptrace(PTRACE_SETOPTIONS,root,0,PTRACE_O_TRACEEXEC|PTRACE_O_TRACEFORK|PTRACE_O_TRACEVFORK|PTRACE_O_TRACECLONE|PTRACE_O_TRACEEXIT|PTRACE_O_EXITKILL)==0,"observer options");lookup(root,1);resume(root,0);
     for(;;){pid_t pid=waitpid(-1,&status,__WALL);if(pid<0){if(errno==EINTR)continue;require(errno==ECHILD,"process tree");break;}
         if(WIFEXITED(status)||WIFSIGNALED(status)){struct task *t=lookup(pid,0);require(t!=NULL,"final task");require(close(t->counter)==0,"counter close");memset(t,0,sizeof(*t));if(pid==root)code=WIFEXITED(status)?WEXITSTATUS(status):128+WTERMSIG(status);continue;}
@@ -72,5 +81,8 @@ int main(int argc,char **argv) {
         if(event==PTRACE_EVENT_EXIT)checkpoint(t);
         resume(pid,event||sig==SIGSTOP||sig==SIGTRAP?0:sig);
     }
+    struct count all;
+    require(read(inherited,&all,sizeof(all))==sizeof(all) && close(inherited)==0,"read whole command");
+    require(fprintf(journal,"W %"PRIu64" %"PRIu64" %"PRIu64" %d\n",all.value,all.enabled,all.running,code)>0,"whole command journal");
     require(code>=0 && images>=2 && fclose(journal)==0,"capture complete");return code;
 }
