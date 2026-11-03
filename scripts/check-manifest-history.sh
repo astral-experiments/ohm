@@ -19,6 +19,9 @@ if ! git cat-file -e "$base_revision^{commit}" 2>/dev/null; then
   exit 1
 fi
 
+path_to_root="$(git rev-parse --show-cdup)"
+cd -P -- "./$path_to_root"
+
 while IFS= read -r manifest; do
   case "$manifest" in
     toolchains/*/*.json) ;;
