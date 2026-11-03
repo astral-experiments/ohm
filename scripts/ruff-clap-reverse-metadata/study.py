@@ -28,7 +28,8 @@ def run(cmd,**kwargs):return sp.run(cmd,check=True,**kwargs)
 def read(p):return json.loads(p.read_bytes())
 def H(b):return hashlib.sha256(b).hexdigest()
 def getbin(path,dest):
-    with dest.open('xb')as f:run(['gh','api','--header','Accept: application/octet-stream','repos/astral-experiments/ohm/'+path],stdout=f)
+    accept=['--header','Accept: application/octet-stream']if path.startswith('releases/assets/')else[]
+    with dest.open('xb')as f:run(['gh','api',*accept,'repos/astral-experiments/ohm/'+path],stdout=f)
 def install():
     b.ROOT.mkdir();OUT.mkdir();b.SDKBASE.mkdir();b.guard()
     before=sp.check_output(['git','-C',legacy,'rev-parse','HEAD'],text=True).strip();b.need(before=='e48abf3b09f415b296d0ee2e8ec81c0de7b50611','wrong signed custody')
@@ -171,8 +172,12 @@ def main():
     run([sys.executable,'-IB',HERE/'reopen.py',archive,digest,OUT/'original-normal.json','--legacy',legacy/'evidence-release-24'])
     normal=read(OUT/'original-normal.json');b.need(len(normal['rows'])==1098 and normal['exact_unchanged_consumer_output'] and normal['rustcs']['unchanged-consumer']==[['ruff','bin']],'different original signed case')
     short,=[c for c in choices if c[0]=='ruff'];dev,=[c for c in choices if c[0]=='ruff_dev']
-    clear();observed=run_lane('observed-ruff',*short,True);b.put(OUT/'observed-ruff-summary.json',observed)
-    # Persist any differences in observation before exercising the disjoint external client.
-    b.put(OUT/'observed-comparison.json',{'changed_public_rows_match':observed['changed_public_rows']==len(normal['rows']),'native_work_matches':observed['downstream_actual']==list(map(tuple,normal['rustcs']['unchanged-consumer'])),'native_help_matches':observed['initial_native']['help']==normal['consumer_programs']['initial-consumer']['help'] and observed['final_native']['help']==normal['consumer_programs']['unchanged-consumer']['help']})
-    clear();external=run_lane('normal-ruff_dev',*dev,False);b.put(OUT/'separate-external.json',external)
+    failures={}
+    for label,args,observer in [('observed-ruff',short,True),('normal-ruff_dev',dev,False)]:
+        try:
+            clear();result=run_lane(label,*args,observer);b.put(OUT/(label+'-summary.json'),result)
+            if observer:
+                b.put(OUT/'observed-comparison.json',{'changed_public_rows_match':result['changed_public_rows']==len(normal['rows']),'native_work_matches':result['downstream_actual']==list(map(tuple,normal['rustcs']['unchanged-consumer'])),'native_help_matches':result['initial_native']['help']==normal['consumer_programs']['initial-consumer']['help'] and result['final_native']['help']==normal['consumer_programs']['unchanged-consumer']['help']})
+        except Exception as e:failures[label]=repr(e);b.put(OUT/'refusals.json',failures);print(label,repr(e),flush=True)
+    if failures:raise RuntimeError(failures)
 if __name__=='__main__':main()
