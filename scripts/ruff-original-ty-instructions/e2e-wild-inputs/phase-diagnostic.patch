@@ -1,0 +1,44 @@
+--- a/libwild/src/lib.rs
++++ b/libwild/src/lib.rs
+@@ -332,6 +332,30 @@
+         args.common().save_dir.finish(file_loader, args)?;
+
+         let loaded = loaded?;
++        let q = std::env::var("OHM_QA_WILD_PHASE").unwrap_or_default();
++        if matches!(q.as_str(), "paths" | "hash" | "audit") {
++            let mut root = blake3::Hasher::new();
++            let mut count = 0;
++            let mut size = 0usize;
++            if q != "paths" {
++                for file in &file_loader.loaded_files {
++                    let Some(storage) = file.storage() else {
++                        bail!("QA input has no byte storage");
++                    };
++                    let bytes = storage.bytes();
++                    let h = blake3::hash(bytes);
++                    root.update(&(bytes.len() as u64).to_le_bytes());
++                    root.update(h.as_bytes());
++                    if q == "audit" {
++                        eprintln!("QA_INPUT\t{}\t{}\t{}", bytes.len(), h, file.filename.display());
++                    }
++                    count += 1;
++                    size += bytes.len();
++                }
++            }
++            eprintln!("QA_CUT\t{}\t{}\t{}\t{}", q, count, size, root.finalize());
++            return Ok(LinkerOutput { layout: None, input_file_data: Vec::new() });
++        }
+
+         let output_kind = OutputKind::new(args, file_loader);
+
+@@ -411,6 +435,10 @@
+             &layout_rules,
+         )?;
+
++        if q == "sections" {
++            eprintln!("QA_CUT\tsections\t0\t0\t-");
++            return Ok(LinkerOutput { layout: None, input_file_data: Vec::new() });
++        }
+         let layout = layout::compute::<P, A, F>(
+             symbol_db,
+             per_symbol_flags,

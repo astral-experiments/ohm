@@ -122,6 +122,8 @@ def main():
     visit('remove-shadow-repair',expected=NEW)
     visit('src-final-repair',actor='observer',expected=NEW)
     assert all(snapshot(Path(name))==v for name,v in original.items())and not w.git('status','--porcelain')
+    import phase_price
+    phase_price.run(w,b,H,P,priv,actors,env)
     assert sum(f.stat().st_size for f in P.rglob('*')if f.is_file())<180*2**20
 
 if __name__=='__main__':main()

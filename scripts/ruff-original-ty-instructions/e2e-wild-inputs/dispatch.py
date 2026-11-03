@@ -15,4 +15,10 @@ if pairs:
         a,b=os.pipe();x,y=[fcntl.fcntl(f,fcntl.F_DUPFD_CLOEXEC,64)for f in(a,b)]
         os.close(a);os.close(b);os.write(y,b'+'*fds[rd][0]);os.dup2(x,rd,inheritable=True);os.dup2(y,wr,inheritable=True);os.close(x);os.close(y)
 os.chdir((Path(data['private'])/'cwd').read_text());args=data['command']
-os.execve(data.get('actor',args[0]),args,env)
+if 'phase' in data:
+    assert data['phase'] in ('paths','audit','hash','sections','complete') and 'actor' in data
+    env['OHM_QA_WILD_PHASE']=data['phase']
+actor=data.get('actor',args[0])
+if 'clock' in data:
+    clock,record=data['clock'];os.execve(clock,[clock,record,actor,*args],env)
+os.execve(actor,args,env)
