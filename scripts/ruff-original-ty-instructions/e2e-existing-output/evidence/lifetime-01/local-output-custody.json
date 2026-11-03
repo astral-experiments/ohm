@@ -1,0 +1,45 @@
+{
+  "reflink_errno": 95,
+  "rows": [
+    {
+      "canonical_corrupt": true,
+      "dev": 64769,
+      "handle": "read",
+      "lease": null,
+      "lease_errno": 11,
+      "new_ino": 31529403,
+      "old_ino": 31529403,
+      "output": "existing-inode"
+    },
+    {
+      "canonical_corrupt": false,
+      "dev": 64769,
+      "handle": "read",
+      "lease": null,
+      "lease_errno": 11,
+      "new_ino": 31529405,
+      "old_ino": 31529403,
+      "output": "fresh-inode"
+    },
+    {
+      "canonical_corrupt": true,
+      "dev": 64769,
+      "handle": "path",
+      "lease": 1,
+      "lease_errno": 0,
+      "new_ino": 31529405,
+      "old_ino": 31529405,
+      "output": "existing-inode"
+    },
+    {
+      "canonical_corrupt": false,
+      "dev": 64769,
+      "handle": "path",
+      "lease": 1,
+      "lease_errno": 0,
+      "new_ino": 31529403,
+      "old_ino": 31529405,
+      "output": "fresh-inode"
+    }
+  ]
+}
