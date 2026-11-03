@@ -1,31 +1,47 @@
-name: Independently reopen original Ruff derive codegen pilots
-'on':
+name: Compiler derive placement run-make
+on:
   workflow_dispatch:
     inputs:
       reviewed_head:
-        required: true
         type: string
+        required: true
 permissions:
   contents: read
   actions: read
 jobs:
-  review:
-    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruff-derived-impl-cgus-20261103'
+  test:
+    if: github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruff-derived-impl-cgus-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 30
+    env:
+      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         ref: ${{ inputs.reviewed_head }}
+        path: qa
         sparse-checkout: scripts/ruff-derived-impl-cgus
         persist-credentials: false
-    - name: Reopen registered original objects, metadata, hardware and real process arguments
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 2672756eb5b9d4e890b678d439dc6c40a29a4008
+        path: factory
+        sparse-checkout: scripts/ruff-derived-impl-cgus
+        persist-credentials: false
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: b531208c36579c95ab63e60d8882d14be9634c9b
+        path: support
+        sparse-checkout: scripts/placed-object-run-make
+        persist-credentials: false
+    - name: Run the actual proposed incremental test on both native compilers
       env:
         GH_TOKEN: ${{ github.token }}
-      run: python3 -IB scripts/ruff-derived-impl-cgus/read-pilots.py
+      run: python3 -IB qa/scripts/ruff-derived-impl-cgus/check_run_make.py
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: derived-pilot-independent-proof-${{ github.run_id }}
-        path: ${{ runner.temp }}/verified-pilots
+        name: derived-runmake-${{ github.run_id }}
+        path: ${{ runner.temp }}/derived-runmake-results
+        retention-days: 14
         if-no-files-found: error
