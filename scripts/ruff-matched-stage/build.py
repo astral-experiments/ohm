@@ -286,12 +286,6 @@ def build(workspace, root):
         )
         print("Starting clean stage1", role, rev, flush=True)
         guarded(argv, rust, env, root / "logs" / ("build-" + role + ".log"), root)
-        if role == "C":
-            run_make = argv[:argv.index("build")] + ["test", "--stage", "1", "-j8",
-                                                      "tests/run-make/rdr-public-hash-private-native-derive"]
-            run_make_log = root / "logs/run-make-C.log"
-            guarded(run_make, rust, env, run_make_log, root)
-            need("1 passed; 0 failed; 0 ignored" in run_make_log.read_text(), "candidate regression did not run")
         stage = directory / HOST / "stage1"
         kit.freeze(stage, role, rev)
         # Keep the rustdoc built against this exact driver. Cargo authenticates it
@@ -308,6 +302,13 @@ def build(workspace, root):
         need("bin/rustdoc" not in manifest["files"], "duplicate executable")
         manifest["files"]["bin/rustdoc"] = [digest, doc.stat().st_size, doc.stat().st_mode & 0o777]
         path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
+
+        if role == "C":
+            run_make = argv[:argv.index("build")] + ["test", "--stage", "1", "-j8",
+                                                      "tests/run-make/rdr-public-hash-private-native-derive"]
+            run_make_log = root / "logs/run-make-C.log"
+            guarded(run_make, rust, env, run_make_log, root)
+            need("1 passed; 0 failed; 0 ignored" in run_make_log.read_text(), "candidate regression did not run")
 
         need(
             json.loads(json.dumps(layout.checked(rust, rev, desc["tree"], substitutions))) == full,

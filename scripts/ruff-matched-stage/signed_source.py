@@ -27,11 +27,7 @@ def git(repo, *args):
     return subprocess.check_output(["git", "--no-lazy-fetch", "-C", repo, *args], text=True).strip()
 
 
-def install(repo, role, pin):
-    before, after = pin["before"], pin["after"]
-    need(git(repo, "rev-parse", "HEAD", "HEAD^{tree}").splitlines() == [before, pin["before_tree"]], role)
-    folder = HERE / "canonical-pins"
-    packet = folder / (role + ".pack")
+def index_packet(repo, packet, pin, objects):
     need(pin["pack"] == packet.name and packet.stat().st_size == pin["bytes"] and digest(packet) == pin["sha256"], packet)
     with packet.open("rb", buffering=0) as src:
         header = src.read(12)
@@ -43,13 +39,42 @@ def install(repo, role, pin):
     index = Path(git(repo, "rev-parse", "--path-format=absolute", "--git-path", "objects/pack/pack-" + written[1] + ".idx"))
     with index.open("rb") as inp:
         ids = [row.split()[1] for row in subprocess.check_output(["git", "show-index"], stdin=inp, text=True).splitlines()]
-    roster = folder / (role + ".objects.json")
-    need(roster.name == pin["objects"] and digest(roster) == pin["objects_sha256"], roster)
-    objects = json.loads(roster.read_bytes())["objects"]
     need(ids == [row[0] for row in objects] and len(ids) == pin["object_count"], "different indexed pack objects")
     typed = subprocess.check_output(["git", "--no-lazy-fetch", "-C", repo, "cat-file", "--batch-check=%(objectname) %(objecttype)"],
                                     input="".join(oid + "\n" for oid in ids), text=True)
     need([r.split() for r in typed.splitlines()] == objects, "different object type")
+
+
+def restore_rust_history(repo, pin):
+    """Join the signed snapshot to its original ancestors so bootstrap selects its real CI LLVM."""
+    spec = json.loads((HERE / "rust-bootstrap-history.json").read_bytes())
+    before, base, head = pin["before"], spec["source"], spec["signed"]
+    need(git(repo, "rev-parse", "HEAD") == before and pin["after"] == head
+         and git(repo, "merge-base", before, base) == base, "missing original Rust history prerequisite")
+    index_packet(repo, HERE / spec["pack"], spec, spec["objects"])
+    actual = git(repo, "rev-list", "--reverse", "--parents", head, "^" + base).splitlines()
+    need([r.split() for r in actual] == [[c, p] for c, p in zip(spec["commits"], [base, *spec["commits"]])],
+         "different canonical Rust history")
+    paths = ("src/llvm-project", "src/bootstrap/download-ci-llvm-stamp", "src/version")
+    need(not git(repo, "diff", "--name-only", before, head, "--", *paths), "different CI LLVM build inputs")
+    author = "--author=bors@rust-lang\\.org"
+    closest = git(repo, "rev-list", "--author-date-order", author, "-n1", head)
+    need(closest, "missing upstream Rust merge")
+    modified = git(repo, "rev-list", "--first-parent", "-n1", closest, author, "--", *paths)
+    llvm = modified or closest
+    need(llvm == "fba1b05a7bd8bdc73080edd02f672cef44648267", ("unexpected prebuilt LLVM", llvm))
+    return {"common": base, "commits": spec["commits"], "pack_sha256": spec["sha256"], "ci_llvm": llvm}
+
+
+def install(repo, role, pin):
+    before, after = pin["before"], pin["after"]
+    need(git(repo, "rev-parse", "HEAD", "HEAD^{tree}").splitlines() == [before, pin["before_tree"]], role)
+    folder = HERE / "canonical-pins"
+    packet = folder / (role + ".pack")
+    roster = folder / (role + ".objects.json")
+    need(roster.name == pin["objects"] and digest(roster) == pin["objects_sha256"], roster)
+    objects = json.loads(roster.read_bytes())["objects"]
+    index_packet(repo, packet, pin, objects)
     gitlinks = folder / (role + ".gitlinks.json")
     need(gitlinks.name == pin["gitlinks"] and digest(gitlinks) == pin["gitlinks_sha256"], gitlinks)
     links = json.loads(gitlinks.read_bytes())
@@ -96,6 +121,7 @@ def main():
     need(set(pins) == set(NAMES) == set(releases["sources"]), "unexpected release sources")
     rust = work / "source/rust"
     repos = {"rust":rust, **{n:rust / "src/tools" / n for n in NAMES[1:]}}
+    bootstrap_history = restore_rust_history(rust, pins["rust"])
     report = {}
     for name, repo in repos.items():
         need(stage["source"][name] == pins[name]["before"] and releases["sources"][name]["revision"] == pins[name]["after"], name)
@@ -122,7 +148,7 @@ def main():
     source = {n:git(repos[n], "rev-parse", "HEAD") for n in NAMES}
     with (root / "source.json").open("x") as stream:
         print(json.dumps({"source":source, "layout":actual, "qa":stage["qa"], "run":stage["run"], "coordinator":COORDINATOR,
-                          "manifest_sha256":digest(manifest), "source_verifier":verified, "install":report,
+                          "bootstrap_history":bootstrap_history, "manifest_sha256":digest(manifest), "source_verifier":verified, "install":report,
                           "precursor_sha256":digest(root / "source-precursor.json"), "attempt":os.environ["GITHUB_RUN_ATTEMPT"]},
                          sort_keys=True, indent=2), file=stream)
 
