@@ -38,7 +38,13 @@ def check_sources():
     pins=json.loads((workspace/"qa-code/scripts/ruff-matched-stage/canonical-pins/pins.json").read_bytes())
     replacements={"src/tools/"+k:(pins[k]["after"],pins[k]["tree"]) for k in ("clippy","rustfmt")}
     previous=json.loads((Path(os.environ["RUNNER_TEMP"])/"ohm-branch-object-qa/logs/source.json").read_bytes())
-    checked=layout.checked(src,git_sha(src,"HEAD"),git_sha(src,"HEAD^{tree}"),replacements)
+    try:
+        checked=layout.checked(src,git_sha(src,"HEAD"),git_sha(src,"HEAD^{tree}"),replacements)
+    except ValueError:
+        names=sp.check_output(["git","-C",src,"ls-files","--others","-z","--",".",":(exclude)src/tools/clippy",":(exclude)src/tools/rustfmt"]).split(b"\0")
+        (logs/"untracked.json").write_text(json.dumps([os.fsdecode(n) for n in names if n],indent=2))
+        print("Untracked names:",[os.fsdecode(n)for n in names[:12]],flush=True)
+        raise
     for field in ("gitlinks","authorized_differences"):
         assert json.loads(json.dumps(checked[field]))==previous["layout"][field],field
 
@@ -54,7 +60,7 @@ def source():
 
 def clean_env():
     keys = ("PATH", "HOME", "USER", "LANG", "TMPDIR", "DEVELOPER_DIR", "SDKROOT")
-    return {k: os.environ[k] for k in keys if k in os.environ}
+    return {**{k: os.environ[k] for k in keys if k in os.environ}, "PYTHONDONTWRITEBYTECODE":"1"}
 
 def install():
     check_sources()
@@ -83,7 +89,7 @@ def build():
     candidate = root/"cargo-target/debug/cargo"
     assert candidate.is_file()
     output = root/"rust-build"
-    args = [sys.executable,"x.py","--ci","false","--build-dir",str(output),"--set","build.submodules=false","--set","rust.debug-assertions=false","--set","rust.lto=off","--set","llvm.download-ci-llvm=true","--set","rust.download-rustc=false","build","--stage","1","-j6","compiler/rustc","library","src/tools/rustdoc"]
+    args = [sys.executable,"-IB","x.py","--ci","false","--build-dir",str(output),"--set","build.submodules=false","--set","rust.debug-assertions=false","--set","rust.lto=off","--set","llvm.download-ci-llvm=true","--set","rust.download-rustc=false","build","--stage","1","-j6","compiler/rustc","library","src/tools/rustdoc"]
     sp.run(args, env=env, cwd=src, check=True)
     check_sources()
     shutil.copytree(output/host/"stage1", fixed, symlinks=False)
