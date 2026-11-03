@@ -6,7 +6,8 @@ import subprocess
 def source(body):
     name='pub(crate) fn symbols_only('
     assert body.count(name)==1
-    return name+body.rsplit(name,1)[1]+'''\nfn main(){ use std::io::Read; let mut b=Vec::new();std::io::stdin().read_to_end(&mut b).unwrap();
+    start=body.index(name);end=body.index('\n}\n',start)+3
+    return body[start:end]+'''\nfn main(){ use std::io::Read; let mut b=Vec::new();std::io::stdin().read_to_end(&mut b).unwrap();
         std::process::exit(if symbols_only(&b){0}else{2}); }\n'''
 def build(root,script,env):
     p=root/'qa_symbols_gate.rs';p.write_text(source((script/'reuse.rs').read_text()))
