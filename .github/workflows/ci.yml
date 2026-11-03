@@ -1,12 +1,12 @@
 name: Exercise source-owned compiler partitions on two real Ruff edits
-run-name: Bound repeated private codegen in two native Ruff libraries
+run-name: Classify actual LLVM noinline copies under signed Ruff codegen
 permissions:
   contents: read
   actions: read
 jobs:
   read_originals:
-    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head &&
-      github.ref_name == 'charlie/qa-ruff-root-owner-lanes-20261103'
+    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head && github.ref_name
+      == 'charlie/qa-ruff-root-owner-lanes-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 35
     steps:
@@ -15,23 +15,21 @@ jobs:
         ref: ${{ inputs.reviewed_head }}
         path: qa
         persist-credentials: false
-        sparse-checkout: scripts/ruff-original-ty-instructions
-    - name: Check the physical ELF controls and census both signed original archives
+        sparse-checkout: 'scripts/ruff-original-ty-instructions
+
+          scripts/ruff-foreign-span-observer'
+    - name: Compare real noinline, linkage and emitted symbols with registered codegen weights
       env:
         GH_TOKEN: ${{ github.token }}
-      run: 'set -eu
-
-        python3 -IB qa/scripts/ruff-original-ty-instructions/standalone-buckets/baseline-inline-copies/control.py
-
-        python3 -IB qa/scripts/ruff-original-ty-instructions/standalone-buckets/baseline-inline-copies/census.py'
+      run: python3 -IB qa/scripts/ruff-original-ty-instructions/standalone-buckets/baseline-inline-copies/ir_28106.py
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: baseline-native-inline-census-${{ github.run_id }}
-        path: ${{ runner.temp }}/inline-baseline/results/
+        name: baseline-inline-28106-${{ github.run_id }}
+        path: ${{ runner.temp }}/owner-ir-held/result.json
         retention-days: 21
         if-no-files-found: error
-    name: Count emitted function copies and their actual native definitions
+    name: Read all actual Ruff LLVM definitions and native objects for the earlier option edit
 'on':
   workflow_dispatch:
     inputs:
