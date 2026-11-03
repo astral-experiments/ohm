@@ -126,7 +126,7 @@ jobs:
       run: |
         set -euo pipefail
         sudo apt-get update -qq
-        sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build pkg-config libssl-dev jq zstd
+        sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build pkg-config libssl-dev jq zstd strace
     - name: Admit this reviewed nonrelease worker
       run: |-
         set -euo pipefail
@@ -167,6 +167,24 @@ jobs:
         compression-level: 0
         retention-days: 7
         if-no-files-found: error
+    - name: Preserve the exact compilers for investigation if a later check failed
+      if: failure()
+      run: |-
+        set -euo pipefail
+        study="$RUNNER_TEMP/ohm-branch-object-qa"
+        if test -s "$study/capsule/qualified.json" && ! test -f "$study/logs/accepted.json"; then
+          tar --sort=name --numeric-owner --owner=0 --group=0 --mtime=@0 -C "$study" -cf - capsule | zstd -q -T4 -5 -o "$study/diagnostic-stage.tar.zst"
+          (cd "$study" && sha256sum diagnostic-stage.tar.zst > logs/diagnostic-archive.sha256)
+        fi
+    - name: Retain failed compilers for local diagnosis
+      if: failure()
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: ohm-rc23-private-derive-failed-diagnostic
+        path: ${{ runner.temp }}/ohm-branch-object-qa/diagnostic-stage.tar.zst
+        compression-level: 0
+        retention-days: 2
+        if-no-files-found: ignore
     - name: Retain source, tool and smoke evidence
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
