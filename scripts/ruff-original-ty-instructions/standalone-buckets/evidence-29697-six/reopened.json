@@ -1,0 +1,1761 @@
+{
+  "confirmed_twofold": true,
+  "coverage_of_median_interval": 0.96875,
+  "exact_two_sided_sign_p": 0.03125,
+  "first_pair_excluded": 41659042826,
+  "independently_executed_clients": 12,
+  "matched_source_sdk_factory": 41624273152,
+  "median_reduction": 0.5612307752164503,
+  "median_speedup": 2.2791024184309094,
+  "new_elf": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+  "old_elf": "2407856bb255264e0dca8dbd9ef31ccfbaffeb1c2bfe800543d98b899db2ca6a",
+  "pairs": [
+    {
+      "boot": "12ec1b83-c9f1-43a8-b9c2-6b6d0fab52f2",
+      "independent_report_sha256": "1e10b25c4149053b6d7426e8d926aae60aa525aa5320d4d96d4b5bcc5a01de60",
+      "job": 126003569387,
+      "native_bodies": 45,
+      "new_physical_sources_bytes": 1051673932,
+      "order": "PC",
+      "original": {
+        "bytes": 251484166,
+        "id": 13242656789,
+        "sha256": "ffbb2d8cee62873a82435bff37b809a490c04da614aa4aaecb96ce31bab4e181"
+      },
+      "reduction": 0.5611518240972786,
+      "roles": [
+        {
+          "CGUs": 171,
+          "cold": 2097877634781,
+          "footprint": {
+            "allocated_unique_bytes": 2216443904,
+            "incremental_classes": {
+              "dep-graph.bin": 728757613,
+              "query-cache.bin": 369618459,
+              "work-products.bin": 185098
+            },
+            "logical_unique_bytes": 2204065673,
+            "physical_files": 5120
+          },
+          "noop": 423165337,
+          "observed": {
+            "positive_instructions_without_clock": {},
+            "process_instructions": {
+              "cargo": 484382596,
+              "exec_count": 2152,
+              "rustc:ty_ide": 28514307507,
+              "rustc:ty_project": 14741328853,
+              "rustup": 9900696
+            },
+            "real_execs": [
+              "rustc:ty_project",
+              "rustc:ty_ide"
+            ]
+          },
+          "observed_matches_primary": true,
+          "oracle_elf": {
+            "edit": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "independent-clean": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "old": "2407856bb255264e0dca8dbd9ef31ccfbaffeb1c2bfe800543d98b899db2ca6a",
+            "repair": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f"
+          },
+          "primary": 43438925890,
+          "retained": 148,
+          "rlib_edit": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "961bf40f1bf137cbbe3257fb4ebaefbf662f1a68af453175d8b22e525e8a14a3"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "5ad32746c0589d05bbb048ed63fb7730ac254336be0d6e0c817e328e85705b01"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043944,
+                  "sha256": "b8e38813e95945f13ae44cf02e86fc939f3ec1fb2d9d83d01ef3594bc8e70ea2"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949724,
+                "sha256": "db34faba8e043496721d45219283ff8928abda42b32366440e7d2b08916032d8"
+              }
+            }
+          },
+          "rlib_independent": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "22f6ab0ae5696f27d2c4bdd4e9aa437e265ce1ba68ba625eb0fbc18ec32b6d56"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "40060eb493864bb130e26c638de87afb1b063471ea4691009196a57edbde7359"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043679,
+                  "sha256": "a67cffd1bb2cbfc59472794531436d6b3407375f6329cef6dbd6f432bd5d4fb0"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949460,
+                "sha256": "8959582825121c0c4946113551eebfe9763a3c13004e22afb3a16a97e9fcb4d4"
+              }
+            }
+          },
+          "role": "P"
+        },
+        {
+          "CGUs": 171,
+          "cold": 2097896368693,
+          "footprint": {
+            "allocated_unique_bytes": 2228989952,
+            "incremental_classes": {
+              "dep-graph.bin": 742320553,
+              "query-cache.bin": 368597240,
+              "work-products.bin": 185098
+            },
+            "logical_unique_bytes": 2216607636,
+            "physical_files": 5120
+          },
+          "noop": 422868739,
+          "observed": {
+            "positive_instructions_without_clock": {},
+            "process_instructions": {
+              "cargo": 484105588,
+              "exec_count": 2152,
+              "rustc:ty_ide": 4180799080,
+              "rustc:ty_project": 14682570105,
+              "rustup": 9898500
+            },
+            "real_execs": [
+              "rustc:ty_project",
+              "rustc:ty_ide"
+            ]
+          },
+          "observed_matches_primary": true,
+          "oracle_elf": {
+            "edit": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "independent-clean": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "old": "2407856bb255264e0dca8dbd9ef31ccfbaffeb1c2bfe800543d98b899db2ca6a",
+            "repair": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f"
+          },
+          "primary": 19063093390,
+          "retained": 171,
+          "rlib_edit": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "331388e2fc4787d017c1f03c8e4d00a4d4fc00747ef64a8eb7cda498b0b16676"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "4a55786ee0c4382a915640e918d24c14ba5870a3015a0938b3a7c6d3445d1675"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043944,
+                  "sha256": "56c1db14d7b8b47ae07283c7cb84b98b666edc816b66d5be9a41d20b6db35689"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949724,
+                "sha256": "742539a5aa06b4cb526691d9b351c38bbb20eb41654060b4953d7843f4429fb9"
+              }
+            }
+          },
+          "rlib_independent": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "2f6be60e514f708254f6525714939408c045ea90bda5d54919e7ebd3da5173dc"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "e365ff6c1bce850e2e081a97734b2bcf618e7e09195da9312a5e0c678eaeb376"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043679,
+                  "sha256": "3c09bac20b2c9caf17765b0a88dff28a91179a31786f75748b2ee959967e0d4a"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949460,
+                "sha256": "4bfd2489d4dfe0defa26c492b5752de93511fde4512b456ee94c815d3beab6ff"
+              }
+            }
+          },
+          "role": "C"
+        }
+      ],
+      "runner": "nsc-runner-46cc72bkqtda4",
+      "slot": 0,
+      "speedup": 2.278692392746023,
+      "warm_clean": {
+        "ty_ide/edit-to-independent-clean": {
+          "definition_identities": {
+            "candidate_changed": 0,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 0
+          },
+          "expansions": {
+            "candidate_changed": 9,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 9
+          },
+          "public_definition_hashes": {
+            "candidate_changed": 3084,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 3084
+          },
+          "required_crates": {
+            "candidate_changed": 26,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 26
+          }
+        },
+        "ty_project/edit-to-independent-clean": {
+          "definition_identities": {
+            "candidate_changed": 0,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 0
+          },
+          "expansions": {
+            "candidate_changed": 46,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 46
+          },
+          "public_definition_hashes": {
+            "candidate_changed": 4276,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 4276
+          },
+          "required_crates": {
+            "candidate_changed": 25,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 25
+          }
+        }
+      }
+    },
+    {
+      "boot": "1a7d9e71-18f2-4269-85bc-821522bd98bf",
+      "independent_report_sha256": "58b20c593d8708a6b2b969939f6a0b7f8b4d623ebbf8133a02257907a9472a82",
+      "job": 126003569877,
+      "native_bodies": 44,
+      "new_physical_sources_bytes": 1048631878,
+      "order": "CP",
+      "original": {
+        "bytes": 250117616,
+        "id": 13241578665,
+        "sha256": "72f0766f5728065378e31ac615f74ba661a80d540a03302229ad1612dd83406b"
+      },
+      "reduction": 0.5612642440607374,
+      "roles": [
+        {
+          "CGUs": 171,
+          "cold": 2098381456168,
+          "footprint": {
+            "allocated_unique_bytes": 2219335680,
+            "incremental_classes": {
+              "dep-graph.bin": 730459727,
+              "query-cache.bin": 370817148,
+              "work-products.bin": 185098
+            },
+            "logical_unique_bytes": 2206966473,
+            "physical_files": 5120
+          },
+          "noop": 423688986,
+          "observed": {
+            "positive_instructions_without_clock": {
+              "rustc:ty_ide": 17126
+            },
+            "process_instructions": {
+              "cargo": 484332760,
+              "exec_count": 2151,
+              "rustc:ty_ide": 28522461698,
+              "rustc:ty_project": 14745067105,
+              "rustup": 9901336
+            },
+            "real_execs": [
+              "rustc:ty_project",
+              "rustc:ty_ide"
+            ]
+          },
+          "observed_matches_primary": true,
+          "oracle_elf": {
+            "edit": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "independent-clean": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "old": "2407856bb255264e0dca8dbd9ef31ccfbaffeb1c2bfe800543d98b899db2ca6a",
+            "repair": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f"
+          },
+          "primary": 43427053925,
+          "retained": 148,
+          "rlib_edit": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "5d657ee442df874ff795d6afec11a7f997076070da78abb646cd6b4381886839"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "ba2cd76516ea58feb0fd91531bc999098076afdef16aa0937cad2ae0b289a95c"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043944,
+                  "sha256": "364f43cc862716588c91edeab9eae30eed8c6c49c621c1392cc8fcafea4f4652"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949724,
+                "sha256": "62df7c32b8c062b8f632e24c5ce94da825b9c2ca95c107f1a0177f8d0c1faec9"
+              }
+            }
+          },
+          "rlib_independent": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "6d4d522504a406247071a084e98413d655c38bdbaf819536801e1ac9fe618da3"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "f5a990d5d21cf0f78101bff5f7c65ccdecbdde91a98f7bfb3fbccff8ff79c059"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043679,
+                  "sha256": "ffe22845957480ebad8d762714558fab2b0a6a0b9446dab00393468701ae7b8d"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949460,
+                "sha256": "04307b0150df92686f7c815b7e8e8403fa99004af6afb88501c35aad59005d80"
+              }
+            }
+          },
+          "role": "P"
+        },
+        {
+          "CGUs": 171,
+          "cold": 2097761817187,
+          "footprint": {
+            "allocated_unique_bytes": 2228793344,
+            "incremental_classes": {
+              "dep-graph.bin": 742216752,
+              "query-cache.bin": 368530518,
+              "work-products.bin": 185098
+            },
+            "logical_unique_bytes": 2216404397,
+            "physical_files": 5120
+          },
+          "noop": 423022378,
+          "observed": {
+            "positive_instructions_without_clock": {},
+            "process_instructions": {
+              "cargo": 484104190,
+              "exec_count": 2152,
+              "rustc:ty_ide": 4179433604,
+              "rustc:ty_project": 14679567912,
+              "rustup": 9899548
+            },
+            "real_execs": [
+              "rustc:ty_project",
+              "rustc:ty_ide"
+            ]
+          },
+          "observed_matches_primary": true,
+          "oracle_elf": {
+            "edit": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "independent-clean": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "old": "2407856bb255264e0dca8dbd9ef31ccfbaffeb1c2bfe800543d98b899db2ca6a",
+            "repair": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f"
+          },
+          "primary": 19053001332,
+          "retained": 171,
+          "rlib_edit": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "19e15eacd2a1023fbf1d23e392399c83dfe98ba7810667e8dee43bcf45e11534"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "bc956eda8f4f10e2446064e6984fabacb6059b98d759be0dda870682747ddc61"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043944,
+                  "sha256": "4311b56f04d02544f4777982c529af4ca2ca4afa9a9642ad0ca4c18116409b5c"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949724,
+                "sha256": "9077ea4d14acae919f813f97123d3cbd4e3eba834e3038847d54009a64b87c9a"
+              }
+            }
+          },
+          "rlib_independent": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "32618b6e3b3720c680d3c7d0de9093a4d3d6c5e768b4098364c8d67b62db5e4f"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "70c4f7301f69fa20b9cad490d064cbfa9cb29df2b4c3378fecb38e110b0c5b37"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043679,
+                  "sha256": "aeebd70cbe1d02be8c336bf774e164d296a4a2e71d6746e9428a1327d5265480"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949460,
+                "sha256": "4878f6faf437b68dedb5c7542680077f47297050683f20ae21bcd67837337dad"
+              }
+            }
+          },
+          "role": "C"
+        }
+      ],
+      "runner": "nsc-runner-d6n9j0ett66hq",
+      "slot": 1,
+      "speedup": 2.2792762761247047,
+      "warm_clean": {
+        "ty_ide/edit-to-independent-clean": {
+          "definition_identities": {
+            "candidate_changed": 0,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 0
+          },
+          "expansions": {
+            "candidate_changed": 9,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 9
+          },
+          "public_definition_hashes": {
+            "candidate_changed": 3084,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 3084
+          },
+          "required_crates": {
+            "candidate_changed": 26,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 26
+          }
+        },
+        "ty_project/edit-to-independent-clean": {
+          "definition_identities": {
+            "candidate_changed": 0,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 0
+          },
+          "expansions": {
+            "candidate_changed": 46,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 46
+          },
+          "public_definition_hashes": {
+            "candidate_changed": 4276,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 4276
+          },
+          "required_crates": {
+            "candidate_changed": 25,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 25
+          }
+        }
+      }
+    },
+    {
+      "boot": "9e473c1b-2c46-4adc-929c-0876c7e3e79a",
+      "independent_report_sha256": "ff41acc22844ebd45d1c5875b69d348e1134300532960c3d12d03d4d0707b962",
+      "job": 126003570043,
+      "native_bodies": 45,
+      "new_physical_sources_bytes": 1051671675,
+      "order": "CP",
+      "original": {
+        "bytes": 251474048,
+        "id": 13241603260,
+        "sha256": "93a99ad6a46d00f38a3ee69ffff6a99a3cde50a67b293f8e7a9ab998c2f0cc99"
+      },
+      "reduction": 0.5612468202777463,
+      "roles": [
+        {
+          "CGUs": 171,
+          "cold": 2097820024618,
+          "footprint": {
+            "allocated_unique_bytes": 2216472576,
+            "incremental_classes": {
+              "dep-graph.bin": 728801355,
+              "query-cache.bin": 369641758,
+              "work-products.bin": 185098
+            },
+            "logical_unique_bytes": 2204100228,
+            "physical_files": 5120
+          },
+          "noop": 423180600,
+          "observed": {
+            "positive_instructions_without_clock": {},
+            "process_instructions": {
+              "cargo": 487595949,
+              "exec_count": 2152,
+              "rustc:ty_ide": 28528998684,
+              "rustc:ty_project": 14741389403,
+              "rustup": 9900426
+            },
+            "real_execs": [
+              "rustc:ty_project",
+              "rustc:ty_ide"
+            ]
+          },
+          "observed_matches_primary": true,
+          "oracle_elf": {
+            "edit": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "independent-clean": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "old": "2407856bb255264e0dca8dbd9ef31ccfbaffeb1c2bfe800543d98b899db2ca6a",
+            "repair": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f"
+          },
+          "primary": 43438179573,
+          "retained": 148,
+          "rlib_edit": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "b129b3a1586e369e03a933179c5547150ad39635399286a1db083efdab8d4302"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "6e7f6e3b6c6cb8786acf2f8f2c5b36b1700c621d40cde1d2cddc0857bc498e16"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043944,
+                  "sha256": "29cf81e9cd1637757e3dd79684979b0d2f90488203c56afd7a01ef8444116ab7"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949724,
+                "sha256": "45c1d9d1e540ed0f718f3ba761ee6dbb0c31df196dbd2653030107210cf55519"
+              }
+            }
+          },
+          "rlib_independent": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "f830f8a5f1d1a5319d82f2b5376540c02643ae1a04d7d11911a92578a828c9cf"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "51e17fadce1a1cf5a911f1887f455d90a91368d90b4e1d39fa099b76c8713966"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043679,
+                  "sha256": "4606ae0e0d8abbbd8cab8ee3bcef806d1c5828afea5ce5760aa3ba665b8c0a99"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949460,
+                "sha256": "898d70eb2a321ec4333f6f0997ea4cacb23ed543925c148baba03f82ffa71e6c"
+              }
+            }
+          },
+          "role": "P"
+        },
+        {
+          "CGUs": 171,
+          "cold": 2098545743823,
+          "footprint": {
+            "allocated_unique_bytes": 2232078336,
+            "incremental_classes": {
+              "dep-graph.bin": 744160031,
+              "query-cache.bin": 369879822,
+              "work-products.bin": 185098
+            },
+            "logical_unique_bytes": 2219696718,
+            "physical_files": 5120
+          },
+          "noop": 423061431,
+          "observed": {
+            "positive_instructions_without_clock": {},
+            "process_instructions": {
+              "cargo": 484262252,
+              "exec_count": 2152,
+              "rustc:ty_ide": 4179213620,
+              "rustc:ty_project": 14680229762,
+              "rustup": 9900184
+            },
+            "real_execs": [
+              "rustc:ty_project",
+              "rustc:ty_ide"
+            ]
+          },
+          "observed_matches_primary": true,
+          "oracle_elf": {
+            "edit": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "independent-clean": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "old": "2407856bb255264e0dca8dbd9ef31ccfbaffeb1c2bfe800543d98b899db2ca6a",
+            "repair": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f"
+          },
+          "primary": 19058639409,
+          "retained": 171,
+          "rlib_edit": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "eb3d53693987c026078714c54f164b6eda360560a70ba1f49d79425828a5c64f"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "f426e865a4a035c60bb9c325b42cc09f4dd5aa9675d9450b760a26245aa03e3a"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043944,
+                  "sha256": "d0b5d4f2cab0174a11e45c7c097b6e49d4f608b2e47d5b67a8757be5ad6459d5"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949724,
+                "sha256": "08c9fd34b0359d5e3c09e7b74250e02dbac58a7ae81242097182133c47936759"
+              }
+            }
+          },
+          "rlib_independent": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "d369a24ab3f9af29e7259eb660eb63bee7ffb7f1a58fb726c1991ba7224ea994"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "2ef0fdb7894ac44901f04ff53f54688d6adedc4f720f6cd85dcc9af01f201238"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043679,
+                  "sha256": "24951a7842c8f47bbc37f03d9913d3cfb17fad755280ecae8e88d33c43c05aeb"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949460,
+                "sha256": "2d9498db54d0e01f77a1fa3effe9a68a1ecf9023bc00a631875c280659463721"
+              }
+            }
+          },
+          "role": "C"
+        }
+      ],
+      "runner": "nsc-runner-s6slmchm2i408",
+      "slot": 2,
+      "speedup": 2.2791857614183795,
+      "warm_clean": {
+        "ty_ide/edit-to-independent-clean": {
+          "definition_identities": {
+            "candidate_changed": 0,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 0
+          },
+          "expansions": {
+            "candidate_changed": 9,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 9
+          },
+          "public_definition_hashes": {
+            "candidate_changed": 3084,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 3084
+          },
+          "required_crates": {
+            "candidate_changed": 26,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 26
+          }
+        },
+        "ty_project/edit-to-independent-clean": {
+          "definition_identities": {
+            "candidate_changed": 0,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 0
+          },
+          "expansions": {
+            "candidate_changed": 46,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 46
+          },
+          "public_definition_hashes": {
+            "candidate_changed": 4276,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 4276
+          },
+          "required_crates": {
+            "candidate_changed": 25,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 25
+          }
+        }
+      }
+    },
+    {
+      "boot": "2fc0026c-af45-4529-b4c5-cbdaa4871e47",
+      "independent_report_sha256": "8c846b4030cdbe7322fec440a53d4cf4b19ae489c5fc28b412b0e2b22a204779",
+      "job": 126003569802,
+      "native_bodies": 45,
+      "new_physical_sources_bytes": 1051673493,
+      "order": "PC",
+      "original": {
+        "bytes": 251390066,
+        "id": 13242671830,
+        "sha256": "2a41848e3df3e38b727da24f9b470201c5e733dc7b7259c22fafdb63b7017423"
+      },
+      "reduction": 0.5612147301551543,
+      "roles": [
+        {
+          "CGUs": 171,
+          "cold": 2098051251351,
+          "footprint": {
+            "allocated_unique_bytes": 2216574976,
+            "incremental_classes": {
+              "dep-graph.bin": 728860866,
+              "query-cache.bin": 369680896,
+              "work-products.bin": 185098
+            },
+            "logical_unique_bytes": 2204198954,
+            "physical_files": 5120
+          },
+          "noop": 423106076,
+          "observed": {
+            "positive_instructions_without_clock": {},
+            "process_instructions": {
+              "cargo": 484345505,
+              "exec_count": 2153,
+              "rustc:ty_ide": 28523552754,
+              "rustc:ty_project": 14736331137,
+              "rustup": 9901859
+            },
+            "real_execs": [
+              "rustc:ty_project",
+              "rustc:ty_ide"
+            ]
+          },
+          "observed_matches_primary": true,
+          "oracle_elf": {
+            "edit": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "independent-clean": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "old": "2407856bb255264e0dca8dbd9ef31ccfbaffeb1c2bfe800543d98b899db2ca6a",
+            "repair": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f"
+          },
+          "primary": 43428944590,
+          "retained": 148,
+          "rlib_edit": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "f0de4e7c3ccca2d8a4aa2468af4fd50648fc4e62d4716a325a3eaeb169265171"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "f4a8b32dfae8d37efac2bd8423e2014ea75dac7198ae66139950d9afa740b0a7"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043944,
+                  "sha256": "57f885a12b1a8e0d17e125e5f4dc5f78f38ca009b31d4eab32464bb4d6e61c6f"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949724,
+                "sha256": "3d4768297ca4e6069c4359c90fe0f2d1b32fbb02f48f2bd7a7485c5b0b361ea1"
+              }
+            }
+          },
+          "rlib_independent": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "5a30c1de25b0db866c5195c23d874237e7e4c9611a7fbb72b6fe7756a353007d"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "7b162336f9ead3bded4a97b7bb475efb41bfee5efa65c7edc7766a3c86641656"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043679,
+                  "sha256": "f00cb106fc86b977ba5031d9a034682befa2afd321c2eb9dcc915259fe51d488"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949460,
+                "sha256": "dc7cd1990151be4079c64fb215c7fcbe558e8a5921d68beae77acde5c45f8899"
+              }
+            }
+          },
+          "role": "P"
+        },
+        {
+          "CGUs": 171,
+          "cold": 2097658193163,
+          "footprint": {
+            "allocated_unique_bytes": 2229460992,
+            "incremental_classes": {
+              "dep-graph.bin": 742574246,
+              "query-cache.bin": 368815433,
+              "work-products.bin": 185098
+            },
+            "logical_unique_bytes": 2217079766,
+            "physical_files": 5120
+          },
+          "noop": 423309539,
+          "observed": {
+            "positive_instructions_without_clock": {
+              "rustc:ty_project": 19724
+            },
+            "process_instructions": {
+              "cargo": 484335603,
+              "exec_count": 2152,
+              "rustc:ty_ide": 4179963794,
+              "rustc:ty_project": 14678331824,
+              "rustup": 9901135
+            },
+            "real_execs": [
+              "rustc:ty_project",
+              "rustc:ty_ide"
+            ]
+          },
+          "observed_matches_primary": true,
+          "oracle_elf": {
+            "edit": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "independent-clean": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "old": "2407856bb255264e0dca8dbd9ef31ccfbaffeb1c2bfe800543d98b899db2ca6a",
+            "repair": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f"
+          },
+          "primary": 19055981171,
+          "retained": 171,
+          "rlib_edit": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "330adf1657e2bf9bcd5fd64a0d0c7862f9d6ac97401df91c16d09297bb278bec"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "b25a4fdaed8541cf6347450dd7800559d53c2f6844dfd51a8e765edcc0189f76"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043944,
+                  "sha256": "d1a7f2b429cde7a7987ab2086bba0cfbca1543bc1c0330526bdfb9f8318721f8"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949724,
+                "sha256": "61c8f7f1e08a9c2a495b450904c3c4726568b930a8b960bc45815d15d7e2d023"
+              }
+            }
+          },
+          "rlib_independent": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "53e7f443152af9c46fe2aae6c312d3f2f1e01b4e2046aa5886f10013bc68978a"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "ad75a71a21b14cbd6ca9529230eadda1f34a37e369c5c163d9239d6263d91845"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043679,
+                  "sha256": "15b04143309f87343c60ae1d9d271fecec033ac84676bf3043ea0fccc38ae038"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949460,
+                "sha256": "8d281369b948a4e9eeb2975124c2667e7c4c509c9130fc047093d9724d768bc6"
+              }
+            }
+          },
+          "role": "C"
+        }
+      ],
+      "runner": "nsc-runner-dbgap94aera58",
+      "slot": 3,
+      "speedup": 2.279019075443439,
+      "warm_clean": {
+        "ty_ide/edit-to-independent-clean": {
+          "definition_identities": {
+            "candidate_changed": 0,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 0
+          },
+          "expansions": {
+            "candidate_changed": 9,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 9
+          },
+          "public_definition_hashes": {
+            "candidate_changed": 3084,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 3084
+          },
+          "required_crates": {
+            "candidate_changed": 26,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 26
+          }
+        },
+        "ty_project/edit-to-independent-clean": {
+          "definition_identities": {
+            "candidate_changed": 0,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 0
+          },
+          "expansions": {
+            "candidate_changed": 46,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 46
+          },
+          "public_definition_hashes": {
+            "candidate_changed": 4276,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 4276
+          },
+          "required_crates": {
+            "candidate_changed": 25,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 25
+          }
+        }
+      }
+    },
+    {
+      "boot": "da3e688d-9964-457c-823c-69a9a56f876a",
+      "independent_report_sha256": "db91c3c5054a91d380b6c16ea40ce4229a57a7748fdceba6e8824697683b9303",
+      "job": 126003569885,
+      "native_bodies": 46,
+      "new_physical_sources_bytes": 1054728727,
+      "order": "PC",
+      "original": {
+        "bytes": 252696199,
+        "id": 13242318224,
+        "sha256": "535656bf747b8986788d1bd1ec2063d596fb6a8826f146aea609906c72e7351c"
+      },
+      "reduction": 0.561164385413959,
+      "roles": [
+        {
+          "CGUs": 171,
+          "cold": 2097821273505,
+          "footprint": {
+            "allocated_unique_bytes": 2216509440,
+            "incremental_classes": {
+              "dep-graph.bin": 728822909,
+              "query-cache.bin": 369652085,
+              "work-products.bin": 185098
+            },
+            "logical_unique_bytes": 2204131810,
+            "physical_files": 5120
+          },
+          "noop": 423298635,
+          "observed": {
+            "positive_instructions_without_clock": {
+              "rustc:ty_ide": 16479
+            },
+            "process_instructions": {
+              "cargo": 484358783,
+              "exec_count": 2151,
+              "rustc:ty_ide": 28532964638,
+              "rustc:ty_project": 14732243902,
+              "rustup": 9901673
+            },
+            "real_execs": [
+              "rustc:ty_project",
+              "rustc:ty_ide"
+            ]
+          },
+          "observed_matches_primary": true,
+          "oracle_elf": {
+            "edit": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "independent-clean": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "old": "2407856bb255264e0dca8dbd9ef31ccfbaffeb1c2bfe800543d98b899db2ca6a",
+            "repair": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f"
+          },
+          "primary": 43438494706,
+          "retained": 148,
+          "rlib_edit": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "4df18231aa9081261fd4d4f4ae3a65b36a6100d1687aae424a35cb8fa055241c"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "17508c21f81b0ae037bf0b9e66fc91382852ab706c6580509e7478e22b14b068"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043944,
+                  "sha256": "3959c578668ecd77e71fcd31e75fed3e203267ce250b401f0da4dfdbf3681b25"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949724,
+                "sha256": "e5c7d5370c0c2054c5a6a63a63af83ff14c64e585d21ac508825e8092252ffbf"
+              }
+            }
+          },
+          "rlib_independent": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "8869298df109dd2e5d21132ad4bdcda898221300b52b115fe4bb304075205f01"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "82d69d527be2d47e2a3f091e6b864bde6a172d8f1d9d0068f3748f7a1b1c7a64"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043679,
+                  "sha256": "de7cf5536322a6151c5f5bdad4f2c79921d0bab5e32a37ba81f24544135ed1cf"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949460,
+                "sha256": "509606143d90694740f74ceb521f8b7e5930b205e62af49280abc8f2b570a7ca"
+              }
+            }
+          },
+          "role": "P"
+        },
+        {
+          "CGUs": 171,
+          "cold": 2097704711177,
+          "footprint": {
+            "allocated_unique_bytes": 2228781056,
+            "incremental_classes": {
+              "dep-graph.bin": 742198233,
+              "query-cache.bin": 368509227,
+              "work-products.bin": 185098
+            },
+            "logical_unique_bytes": 2216397279,
+            "physical_files": 5120
+          },
+          "noop": 423214567,
+          "observed": {
+            "positive_instructions_without_clock": {},
+            "process_instructions": {
+              "cargo": 484547998,
+              "exec_count": 2152,
+              "rustc:ty_ide": 4187663621,
+              "rustc:ty_project": 14682941592,
+              "rustup": 9901434
+            },
+            "real_execs": [
+              "rustc:ty_project",
+              "rustc:ty_ide"
+            ]
+          },
+          "observed_matches_primary": true,
+          "oracle_elf": {
+            "edit": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "independent-clean": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "old": "2407856bb255264e0dca8dbd9ef31ccfbaffeb1c2bfe800543d98b899db2ca6a",
+            "repair": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f"
+          },
+          "primary": 19062358521,
+          "retained": 171,
+          "rlib_edit": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "c77087835a876e097db0c57ca137db6e5f447a26a6ecce6b445955fe6f8c755b"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "c1cc8f553fddf15802cc795a5069ff64ee1a602522e921dea4ec915d975e3c20"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043944,
+                  "sha256": "dff0ac22fc27f9693b27f5f916b2be58dce35bc9956c532d9fc4f23b376fb4b2"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949724,
+                "sha256": "6dd7a5a5b7c80246bbe98ee7026ab005986163ca3f4ea0b2790ab2ef1381edcc"
+              }
+            }
+          },
+          "rlib_independent": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "b27811bc1483838b8ac525a2076e51bc41df1c9e51751acf41031c90b72d95f8"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "c93d5c64e2841d700133a4c9ad4be110408a06e4c83cb75ef9eb70888b0ba60e"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043679,
+                  "sha256": "aa44534908191e6d781010bb2dc1a208800cf79104bcc121f21c133428a44e9d"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949460,
+                "sha256": "4d95dd2e6e126c1b191e7416b9379d613c9f08d9146cd1c6fc49b1b0e4f48c51"
+              }
+            }
+          },
+          "role": "C"
+        }
+      ],
+      "runner": "nsc-runner-vk1d6k5k50ivc",
+      "slot": 4,
+      "speedup": 2.2787576184838874,
+      "warm_clean": {
+        "ty_ide/edit-to-independent-clean": {
+          "definition_identities": {
+            "candidate_changed": 0,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 0
+          },
+          "expansions": {
+            "candidate_changed": 9,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 9
+          },
+          "public_definition_hashes": {
+            "candidate_changed": 3084,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 3084
+          },
+          "required_crates": {
+            "candidate_changed": 26,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 26
+          }
+        },
+        "ty_project/edit-to-independent-clean": {
+          "definition_identities": {
+            "candidate_changed": 0,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 0
+          },
+          "expansions": {
+            "candidate_changed": 46,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 46
+          },
+          "public_definition_hashes": {
+            "candidate_changed": 4276,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 4276
+          },
+          "required_crates": {
+            "candidate_changed": 25,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 25
+          }
+        }
+      }
+    },
+    {
+      "boot": "09649fca-6fc3-471d-a3cf-16cf6ad191f1",
+      "independent_report_sha256": "3a71e6f1da47b48ae97c28ca465756c260cfdd401d4566aa4c1ce6bde9327518",
+      "job": 126003569833,
+      "native_bodies": 46,
+      "new_physical_sources_bytes": 1054714958,
+      "order": "CP",
+      "original": {
+        "bytes": 252742719,
+        "id": 13243410026,
+        "sha256": "449a76b711c9b49769eb3a3a57aab1f8add5f6c038d0c3c32e52f1da425cc1bc"
+      },
+      "reduction": 0.5614643538860368,
+      "roles": [
+        {
+          "CGUs": 171,
+          "cold": 2098024381548,
+          "footprint": {
+            "allocated_unique_bytes": 2216517632,
+            "incremental_classes": {
+              "dep-graph.bin": 728807085,
+              "query-cache.bin": 369644637,
+              "work-products.bin": 185098
+            },
+            "logical_unique_bytes": 2204141613,
+            "physical_files": 5120
+          },
+          "noop": 423049621,
+          "observed": {
+            "positive_instructions_without_clock": {},
+            "process_instructions": {
+              "cargo": 484415664,
+              "exec_count": 2152,
+              "rustc:ty_ide": 28511643796,
+              "rustc:ty_project": 14741217012,
+              "rustup": 9898643
+            },
+            "real_execs": [
+              "rustc:ty_project",
+              "rustc:ty_ide"
+            ]
+          },
+          "observed_matches_primary": true,
+          "oracle_elf": {
+            "edit": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "independent-clean": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "old": "2407856bb255264e0dca8dbd9ef31ccfbaffeb1c2bfe800543d98b899db2ca6a",
+            "repair": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f"
+          },
+          "primary": 43445098324,
+          "retained": 148,
+          "rlib_edit": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "65ceb0a790191bcb3a7a315983ced4ede7082c0096e46a386f4856e794da68b5"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "ba40afc000639cfd28209e52b8f63776b70739c825c157efc508aef2071f7144"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043944,
+                  "sha256": "d1abe1612341c7a303ea31f5a60b901b64b405382439688dfbf8a97a278661fa"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949724,
+                "sha256": "4bcf4e413da0f9252abe0a5e9a1a4df3c8f349a221825647e9f0f5af7ad1a963"
+              }
+            }
+          },
+          "rlib_independent": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "cc54b0f7bd4601ce026c948792986166a1e7cc50748d1b21a4b3043d13b89cf0"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "61518726744f28626e58965fc04ad9502427e12347683c1ec3cfa3622b8fc1dc"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043679,
+                  "sha256": "f932320b0e2345c6c675578f6579f7c28ca4455d4d4578024ce0bc0a5f6046eb"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949460,
+                "sha256": "4ca5265c5574b1a62717f5a5ddb793c7a9a9f8ecb9b819a8784a68311d67d34b"
+              }
+            }
+          },
+          "role": "P"
+        },
+        {
+          "CGUs": 171,
+          "cold": 2097794332733,
+          "footprint": {
+            "allocated_unique_bytes": 2228793344,
+            "incremental_classes": {
+              "dep-graph.bin": 742222010,
+              "query-cache.bin": 368531584,
+              "work-products.bin": 185098
+            },
+            "logical_unique_bytes": 2216410474,
+            "physical_files": 5120
+          },
+          "noop": 423074689,
+          "observed": {
+            "positive_instructions_without_clock": {},
+            "process_instructions": {
+              "cargo": 484364980,
+              "exec_count": 2151,
+              "rustc:ty_ide": 4184445145,
+              "rustc:ty_project": 14675315321,
+              "rustup": 9901700
+            },
+            "real_execs": [
+              "rustc:ty_project",
+              "rustc:ty_ide"
+            ]
+          },
+          "observed_matches_primary": true,
+          "oracle_elf": {
+            "edit": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "independent-clean": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+            "old": "2407856bb255264e0dca8dbd9ef31ccfbaffeb1c2bfe800543d98b899db2ca6a",
+            "repair": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f"
+          },
+          "primary": 19052224264,
+          "retained": 171,
+          "rlib_edit": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "e773bbee310a54891ea3a1d931e7d4d42d7cb8d12ea6efa634760a4e3e274ec7"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "fd5f4e27ab936c03b1121e3c55c3114b0852c0f09494b4b73181cce9b249e024"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043944,
+                  "sha256": "7f7f3ac59e19580c3f360beb2157f8f13dd5729db47caf235a90783bb5219d2d"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949724,
+                "sha256": "b6b925799011cbf1760c285d5471c72a358f5ffa86190454d97cb4202c223825"
+              }
+            }
+          },
+          "rlib_independent": {
+            "ty_ide": {
+              "metadata": [
+                {
+                  "bytes": 2036791,
+                  "sha256": "5b5f6378c73805b1466008cb7e6240eb84c6fdc7c66991bdbd5e71c22b9bd068"
+                }
+              ],
+              "rlib": {
+                "bytes": 21045912,
+                "sha256": "6ab74841703d66bacc3d3f7d37c1e7f33fb8c7221d80d9df7f80b8346832aad8"
+              }
+            },
+            "ty_project": {
+              "metadata": [
+                {
+                  "bytes": 3043679,
+                  "sha256": "d5966cacfe3b02a16e235cd2dfbb76cbca0f7796e49ec3276b70d816490afe1b"
+                }
+              ],
+              "rlib": {
+                "bytes": 28949460,
+                "sha256": "750340bd14069e6692d329bdab28135718dcdaa041a1b09e57565dc879041e34"
+              }
+            }
+          },
+          "role": "C"
+        }
+      ],
+      "runner": "nsc-runner-i2bnvo1e0togu",
+      "slot": 5,
+      "speedup": 2.2803163411261846,
+      "warm_clean": {
+        "ty_ide/edit-to-independent-clean": {
+          "definition_identities": {
+            "candidate_changed": 0,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 0
+          },
+          "expansions": {
+            "candidate_changed": 9,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 9
+          },
+          "public_definition_hashes": {
+            "candidate_changed": 3084,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 3084
+          },
+          "required_crates": {
+            "candidate_changed": 26,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 26
+          }
+        },
+        "ty_project/edit-to-independent-clean": {
+          "definition_identities": {
+            "candidate_changed": 0,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 0
+          },
+          "expansions": {
+            "candidate_changed": 46,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 46
+          },
+          "public_definition_hashes": {
+            "candidate_changed": 4276,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 4276
+          },
+          "required_crates": {
+            "candidate_changed": 25,
+            "different_keys": [
+              0,
+              0,
+              0
+            ],
+            "parent_changed": 25
+          }
+        }
+      }
+    }
+  ],
+  "reduction_interval": [
+    0.5611518240972786,
+    0.5614643538860368
+  ],
+  "resources": {
+    "allocated_unique_bytes": {
+      "candidate_median": 2228891648.0,
+      "median_paired_change": 0.005599363834189686,
+      "paired_range": [
+        0.004261484229370893,
+        0.007040808972319068
+      ],
+      "parent_median": 2216513536.0
+    },
+    "cold": {
+      "candidate_median": 2097778074960.0,
+      "median_paired_change": -8.260686373473547e-05,
+      "paired_range": [
+        -0.0002952937747227047,
+        0.0003459396880969301
+      ],
+      "parent_median": 2097951008164.5
+    },
+    "logical_unique_bytes": {
+      "candidate_median": 2216509055.0,
+      "median_paired_change": 0.005628326233858338,
+      "paired_range": [
+        0.0042764238222299245,
+        0.007076125578078685
+      ],
+      "parent_median": 2204136711.5
+    },
+    "noop": {
+      "candidate_median": 423068060.0,
+      "median_paired_change": -0.00024010263939377996,
+      "paired_range": [
+        -0.0015733427632692587,
+        0.0004808794095407798
+      ],
+      "parent_median": 423172968.5
+    },
+    "physical_files": {
+      "candidate_median": 5120.0,
+      "median_paired_change": 0.0,
+      "paired_range": [
+        0.0,
+        0.0
+      ],
+      "parent_median": 5120.0
+    },
+    "primary": {
+      "candidate_median": 19057310290.0,
+      "median_paired_change": -0.5612307752164503,
+      "paired_range": [
+        -0.5614643538860368,
+        -0.5611518240972786
+      ],
+      "parent_median": 43438337139.5
+    }
+  },
+  "source_head": "6021d694d1c5d2e1a661e19b14d2990e7bb30834",
+  "source_run": 41660912896,
+  "speedup_interval": [
+    2.278692392746023,
+    2.2803163411261846
+  ],
+  "verified_native_bodies": 271
+}
