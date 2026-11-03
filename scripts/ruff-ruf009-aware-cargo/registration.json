@@ -1,0 +1,43 @@
+{
+  "aware_bundle_sha256": "ad3a7314471e217c90787cb7bb4f9c8a4dc10f032ebd74f8683deea42a19e4bf",
+  "cargo_release": "7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed",
+  "changed": {
+    "src/compiler/build_runner/compilation_files.rs": {
+      "candidate": "ad89189e6f9f3d85deb219422d1cc2fc3acd8999",
+      "parent": "51595d9e65d472abdd70d0bc10816b3f1bf54bd2"
+    },
+    "src/compiler/fingerprint/mod.rs": {
+      "candidate": "0be8213bb66603b1f9857881d108934f49ec0ec7",
+      "parent": "eba9d2506fa1bf1d129f2cb3b762946927bde2a0"
+    },
+    "src/compiler/mod.rs": {
+      "candidate": "a57db1f43422a8f9470842d1858efe265e1ed460",
+      "parent": "7acef59e11d5b6ba2d63fcd991eced026b79358f"
+    },
+    "src/util/rustc.rs": {
+      "candidate": "88f267245f55f18a33c4092359b5fddca8678adf",
+      "parent": "6c852c7f860e60c310dee141e61ddbfa572a8dac"
+    }
+  },
+  "features": "ohm-defaults,all-static",
+  "parent": "9f2bf0359b8186e059bd853e2ce89ceef9fc5087",
+  "prior_qa": "ea1854f5a338df58203624078eed8f16d4bbb6c4",
+  "prior_receiver": {
+    "scripts/ruff-foreign-span-observer/sdk.json": "645149ec05ae49e6038fe26c42710c1ef603159fefe0f85bf1fb843cc28d9a8d",
+    "scripts/ruff-foreign-span-observer/worker.py": "5ec87e56204ba9fa95952d5190b45923830e6b9cd3f749b94b8ec7c81480a519",
+    "scripts/ruff-join-proof/fix/build.py": "647ecfc9ac0743362cd0838eddc99ed2b95d8213f8b817a38d47a9bbc61527cf",
+    "scripts/ruff-join-proof/fix/plan.json": "036bf34d99b579045252e32bcc26caefd3ac3110749b83bd46a3c6725303b011"
+  },
+  "profile": {
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": "1",
+    "CARGO_PROFILE_RELEASE_DEBUG": "0",
+    "CARGO_PROFILE_RELEASE_INCREMENTAL": "false",
+    "CARGO_PROFILE_RELEASE_LTO": "thin"
+  },
+  "rustc_release": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+  "schema": 1,
+  "scope": "Native GNU Linux release-profile Cargo compiled from a verified child of the independent input-check fix; separately report absence of the distribution PGO + BOLT pipeline.",
+  "source": "e97c67e819783d50fb3eae2069ad45d92d9b25cd",
+  "tree": "c0f93bd1f9d0a72e3cc8f1941c440f409560f0d1"
+}

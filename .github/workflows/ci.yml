@@ -1,5 +1,5 @@
-name: Read signed Rust foreign-span observations on a Ruff check
-run-name: RUF009 native macro observation ${{ inputs.reviewed_head }}
+name: Build the input-validating Cargo used by the RUF009 mixed-toolchain study
+run-name: RUF009 negotiated compiler capability ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
@@ -11,7 +11,7 @@ permissions:
   contents: read
 jobs:
   inspect:
-    if: github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruf009-join-proof-20261103'
+    if: github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruf009-aware-cargo-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 65
     steps:
@@ -22,7 +22,8 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             scripts/ruff-foreign-span-observer
-            scripts/ruff-join-proof
+            scripts/ruff-join-proof/fix
+            scripts/ruff-ruf009-aware-cargo
       - name: Check out the prior authenticated QA source pack
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -30,17 +31,16 @@ jobs:
           persist-credentials: false
           path: accepted-source
           sparse-checkout: scripts/ohm-apple-zmij/cargo293
-      - name: Build and validate actual Cargo after dependencies complete
+      - name: Reopen all signed SDK and Cargo sources, then build the single release-profile client
         env:
-          OHM_INPUT_RECHECK_QA: '1'
           OHM_SDK_READ_TOKEN: ${{ github.token }}
         run: |
-          command -v strace || (sudo apt-get -qq update && sudo apt-get -qq install -y --no-install-recommends strace)
-          python3 -IB qa/scripts/ruff-join-proof/causality/probe.py
+          set -euo pipefail
+          python3 -IB qa/scripts/ruff-ruf009-aware-cargo/build.py --prior-source-pack accepted-source/scripts/ohm-apple-zmij/cargo293/source.pack
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: ruf009-join-proof-${{ github.run_id }}
+          name: ruf009-aware-cargo-${{ github.run_id }}
           path: ${{ runner.temp }}/ohm-foreign-join/published/
           retention-days: 15
           if-no-files-found: error
