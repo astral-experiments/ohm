@@ -138,7 +138,11 @@ def observe_products(directory,state):
                 put(directory/'unrecognized-library-envelope.json',{'error':str(error),'raw_body':zsave(selected,base)})
             else:
                 put(directory/'selected-ruff-members.json',ledger)
-                proof=[member_names.native_identity(ledger),ledger['metadata']]
+                # native_identity includes the complete lib.rmeta-link ELF with only the
+                # invocation nonce in each proven native filename replaced.
+                actual_meta=[item for item in ledger['metadata']if item[0]=='lib.rmeta']
+                need(len(actual_meta)==1,'missing native Rust metadata')
+                proof=[member_names.native_identity(ledger),actual_meta]
                 data['canonical_archive']=hashlib.sha256(json.dumps(proof,separators=(',',':')).encode()).hexdigest()
             meta=directory/'embedded-rust-metadata'
             with meta.open('xb')as f:sp.run(['ar','p',selected,'lib.rmeta'],stdout=f,check=True)

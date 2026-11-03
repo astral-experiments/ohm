@@ -9,12 +9,16 @@ def run(tag,state):
     put(td/'products.json',out)
     return out
 select(OLD);prepare();ref=run('old',OLD)
-if MODE=='build':shutil.copyfile(TARGET/'debug/ruff',ROOT/'retained-old');(ROOT/'retained-old').chmod(0o755)
+if MODE=='build':
+    retained=ROOT/'retained-old'/'ruff'
+    retained.parent.mkdir()
+    shutil.copyfile(TARGET/'debug/ruff',retained)
+    retained.chmod(0o755)
 old_warm=run('old-unchanged',OLD);need(same_artifacts(old_warm,ref),'old unchanged differed')
 select(NEW)
 if MODE=='build':
     stale=PUB/'old-exe-on-new-source';stale.mkdir()
-    need(verdict(ROOT/'retained-old',stale,OLD)==ref['verdict'],'saved older native program changed under edited source')
+    need(verdict(retained,stale,OLD)==ref['verdict'],'saved older native program changed under edited source')
 edit=run('edit',NEW);warm=run('edited-unchanged',NEW)
 if MODE=='build':
     need(ref['elf']!=edit['elf'] and ref['verdict']['show_example']==edit['verdict']['show_example'],'required genuine help change')
