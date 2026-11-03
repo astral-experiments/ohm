@@ -90,4 +90,18 @@ check_history
 
 check_history "$test_root/toolchains/1.97.1"
 
+mv -- "$manifest" "$test_root/same-content.json"
+ln -s ../../same-content.json "$manifest"
+expect_history_failure 'a symlink replacing a published manifest'
+unlink "$manifest"
+mv -- "$test_root/same-content.json" "$manifest"
+
+ln -s 1.json "$test_root/toolchains/1.97.1/2.json"
+expect_history_failure 'a new symlinked manifest'
+unlink "$test_root/toolchains/1.97.1/2.json"
+
+mv -- "$test_root/toolchains/1.97.1" "$test_root/version"
+ln -s ../version "$test_root/toolchains/1.97.1"
+expect_history_failure 'a symlink replacing the manifest directory'
+
 echo 'manifest history tests passed'
