@@ -1,0 +1,1411 @@
+{
+  "cases": {
+    "23": {
+      "challenge": {
+        "changed_offsets": [
+          8731,
+          8732,
+          8733,
+          8734
+        ],
+        "mode": "four",
+        "provider": "a83083cb94eedabc22eb859b71a97adf67b48f6860849d958d1e0ad028b7a273",
+        "symbol_after": "734ae1ea4dfc14a6309dc5aef312030b6d924cdb3612428b457bf952bbd7d86b",
+        "symbol_before": "686f6a2749ab0d980e5627e5568850d2a8d8e79e480d6d62499241056036873d"
+      },
+      "changed_contexts_in_separate_trace": 48,
+      "cost_census": {
+        "all_eligible_stock_wild": 58467220237,
+        "cost_without_those_48": 21547627825,
+        "disjoint_domains": {
+          "Cargo/rustup": {
+            "enabled": 813846270,
+            "epochs": {
+              "exec": 2,
+              "first": 51
+            },
+            "instructions_raw": 1851156810,
+            "running": 813846270,
+            "unscaled_exact": true
+          },
+          "GNU/cc": {
+            "enabled": 275967535,
+            "epochs": {
+              "exec": 50,
+              "first": 50
+            },
+            "instructions_raw": 400280167,
+            "running": 275967535,
+            "unscaled_exact": true
+          },
+          "GNU/collect2": {
+            "enabled": 67124993,
+            "epochs": {
+              "exec": 50,
+              "first": 50
+            },
+            "instructions_raw": 22205563,
+            "running": 67124993,
+            "unscaled_exact": true
+          },
+          "ObserverStartup": {
+            "enabled": 16705649,
+            "epochs": {
+              "first": 1
+            },
+            "instructions_raw": 2152,
+            "running": 16705649,
+            "unscaled_exact": true
+          },
+          "StockWild": {
+            "enabled": 16029396407,
+            "epochs": {
+              "exec": 50,
+              "first": 50
+            },
+            "instructions_raw": 64361163410,
+            "running": 16029396407,
+            "unscaled_exact": true
+          },
+          "rustc/full": {
+            "enabled": 2098216539,
+            "epochs": {
+              "exec": 1
+            },
+            "instructions_raw": 9328833445,
+            "running": 2098216539,
+            "unscaled_exact": true
+          },
+          "rustc/link-only": {
+            "enabled": 955289263,
+            "epochs": {
+              "exec": 50,
+              "first": 50
+            },
+            "instructions_raw": 1642222177,
+            "running": 955289263,
+            "unscaled_exact": true
+          }
+        },
+        "excluded_wild": 5893943173,
+        "outer": [
+          80014848062,
+          20816741097,
+          20816741097,
+          0
+        ],
+        "unassigned_child_gap": 2408984338
+      },
+      "exercised_negatives": [
+        "forged allowed",
+        "forged response",
+        "forged action",
+        "forged pid",
+        "forged from_full_stage",
+        "forged key",
+        "missing EMITTED",
+        "missing VERIFIED",
+        "missing ACTUAL-GROUP",
+        "forged accepted old output",
+        "unselected libutil",
+        "wrong opened provider bytes",
+        "wrong output identity",
+        "opposite output semantic family",
+        "three changed bytes"
+      ],
+      "native_stdout": null,
+      "ordinary_phases": {
+        "edit": {
+          "C": {
+            "actions": {
+              "full": 48
+            },
+            "held_allocated": 0,
+            "metadata_bytes": 13544,
+            "meter": {
+              "cancelled_write_bytes": 192507904,
+              "elapsed_ns": 19161759407,
+              "enabled": 73229337773,
+              "inblock": 0,
+              "instructions": 329123366628,
+              "involuntary_switches": 348,
+              "majflt": 72,
+              "maxrss_kib": 1120852,
+              "minflt": 7075947,
+              "outblock": 12348688,
+              "pid": 67848,
+              "rchar": 17380613417,
+              "read_bytes": 0,
+              "reaped": 1,
+              "running": 73229337773,
+              "status": 0,
+              "syscr": 88536,
+              "syscw": 1650726,
+              "system_us": 17444177,
+              "user_us": 56198883,
+              "voluntary_switches": 20174,
+              "wchar": 4831294845,
+              "write_bytes": 6322528256
+            },
+            "native_bytes_consumed": 12224881770,
+            "signed_output_reads_for_donor": 3581344232
+          },
+          "P": {
+            "meter": {
+              "cancelled_write_bytes": 192507904,
+              "elapsed_ns": 15939632077,
+              "enabled": 62511218354,
+              "inblock": 0,
+              "instructions": 284762523337,
+              "involuntary_switches": 379,
+              "majflt": 330,
+              "maxrss_kib": 1122688,
+              "minflt": 4162184,
+              "outblock": 12308736,
+              "pid": 28646,
+              "rchar": 850403965,
+              "read_bytes": 0,
+              "reaped": 58,
+              "running": 62511218354,
+              "status": 0,
+              "syscr": 39959,
+              "syscw": 16176,
+              "system_us": 16332289,
+              "user_us": 46571358,
+              "voluntary_switches": 16703,
+              "wchar": 1229990882,
+              "write_bytes": 6302072832
+            }
+          }
+        },
+        "warm1": {
+          "C": {
+            "actions": {
+              "fresh": 48
+            },
+            "held_allocated": 3581448192,
+            "metadata_bytes": 13544,
+            "meter": {
+              "cancelled_write_bytes": 3309637632,
+              "elapsed_ns": 5984014032,
+              "enabled": 19345620056,
+              "inblock": 0,
+              "instructions": 63188465596,
+              "involuntary_switches": 103,
+              "majflt": 16,
+              "maxrss_kib": 1058572,
+              "minflt": 5225927,
+              "outblock": 7784704,
+              "pid": 71237,
+              "rchar": 17145601810,
+              "read_bytes": 0,
+              "reaped": 1,
+              "running": 19345620056,
+              "status": 0,
+              "syscr": 79258,
+              "syscw": 1636263,
+              "system_us": 10894519,
+              "user_us": 8621967,
+              "voluntary_switches": 7406,
+              "wchar": 3609115966,
+              "write_bytes": 3985768448
+            },
+            "native_bytes_consumed": 12224881770,
+            "signed_output_reads_for_donor": 0
+          },
+          "P": {
+            "meter": {
+              "cancelled_write_bytes": 2184970240,
+              "elapsed_ns": 5927526642,
+              "enabled": 21480130011,
+              "inblock": 0,
+              "instructions": 80008623288,
+              "involuntary_switches": 116,
+              "majflt": 257,
+              "maxrss_kib": 871996,
+              "minflt": 2025499,
+              "outblock": 7645976,
+              "pid": 32036,
+              "rchar": 615402924,
+              "read_bytes": 0,
+              "reaped": 51,
+              "running": 21480130011,
+              "status": 0,
+              "syscr": 34162,
+              "syscw": 2385,
+              "system_us": 9344216,
+              "user_us": 12374051,
+              "voluntary_switches": 6748,
+              "wchar": 8052573,
+              "write_bytes": 3914739712
+            }
+          }
+        },
+        "warm2": {
+          "C": {
+            "actions": {
+              "fresh": 48
+            },
+            "held_allocated": 3581448192,
+            "metadata_bytes": 13544,
+            "meter": {
+              "cancelled_write_bytes": 3963097088,
+              "elapsed_ns": 5844734337,
+              "enabled": 19769752848,
+              "inblock": 0,
+              "instructions": 63026386322,
+              "involuntary_switches": 112,
+              "majflt": 16,
+              "maxrss_kib": 1057512,
+              "minflt": 5226003,
+              "outblock": 7784704,
+              "pid": 72177,
+              "rchar": 17145601743,
+              "read_bytes": 0,
+              "reaped": 1,
+              "running": 19769752848,
+              "status": 0,
+              "syscr": 79253,
+              "syscw": 1636258,
+              "system_us": 10750138,
+              "user_us": 9200662,
+              "voluntary_switches": 7354,
+              "wchar": 3609115963,
+              "write_bytes": 3985768448
+            },
+            "native_bytes_consumed": 12224881770,
+            "signed_output_reads_for_donor": 0
+          },
+          "P": {
+            "meter": {
+              "cancelled_write_bytes": 3907301376,
+              "elapsed_ns": 5898989593,
+              "enabled": 21443446138,
+              "inblock": 0,
+              "instructions": 80007272651,
+              "involuntary_switches": 119,
+              "majflt": 261,
+              "maxrss_kib": 872104,
+              "minflt": 2036826,
+              "outblock": 7636072,
+              "pid": 32976,
+              "rchar": 615403162,
+              "read_bytes": 0,
+              "reaped": 51,
+              "running": 21443446138,
+              "status": 0,
+              "syscr": 34147,
+              "syscw": 2316,
+              "system_us": 9203851,
+              "user_us": 12488551,
+              "voluntary_switches": 6603,
+              "wchar": 7944914,
+              "write_bytes": 3909668864
+            }
+          }
+        },
+        "warm3": {
+          "C": {
+            "actions": {
+              "fresh": 48
+            },
+            "held_allocated": 3581448192,
+            "metadata_bytes": 13544,
+            "meter": {
+              "cancelled_write_bytes": 3963097088,
+              "elapsed_ns": 6192328018,
+              "enabled": 20056477017,
+              "inblock": 0,
+              "instructions": 63167998396,
+              "involuntary_switches": 84,
+              "majflt": 16,
+              "maxrss_kib": 1058728,
+              "minflt": 5227632,
+              "outblock": 7784704,
+              "pid": 73118,
+              "rchar": 17145601688,
+              "read_bytes": 0,
+              "reaped": 1,
+              "running": 20056477017,
+              "status": 0,
+              "syscr": 79239,
+              "syscw": 1636244,
+              "system_us": 11132955,
+              "user_us": 9134126,
+              "voluntary_switches": 7456,
+              "wchar": 3609115954,
+              "write_bytes": 3985768448
+            },
+            "native_bytes_consumed": 12224881770,
+            "signed_output_reads_for_donor": 0
+          },
+          "P": {
+            "meter": {
+              "cancelled_write_bytes": 3963097088,
+              "elapsed_ns": 6122567355,
+              "enabled": 21143385541,
+              "inblock": 0,
+              "instructions": 80004529186,
+              "involuntary_switches": 122,
+              "majflt": 258,
+              "maxrss_kib": 873276,
+              "minflt": 2017808,
+              "outblock": 7745048,
+              "pid": 33916,
+              "rchar": 615402959,
+              "read_bytes": 0,
+              "reaped": 51,
+              "running": 21143385541,
+              "status": 0,
+              "syscr": 34136,
+              "syscw": 2306,
+              "system_us": 9247106,
+              "user_us": 12144492,
+              "voluntary_switches": 6118,
+              "wchar": 7944908,
+              "write_bytes": 3965464576
+            }
+          }
+        }
+      },
+      "phase": "C-native-four",
+      "physical_elf_sections": [
+        [
+          "",
+          0,
+          0,
+          0,
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        [
+          ".note.gnu.property",
+          7,
+          2,
+          32,
+          "5978480398fc48bfa6c56246117c5bc1a40145463a2faca541e5e91d5067ff79"
+        ],
+        [
+          ".note.gnu.build-id",
+          7,
+          2,
+          48,
+          "8e0b9ea553c048b198025a0751166218c228db817d6298663ff1268bf5000cd8"
+        ],
+        [
+          ".interp",
+          1,
+          2,
+          28,
+          "9097c98ea70f6f3b01d50145eb72bf55ad1f4e9713bccf27bd6405d6254eed00"
+        ],
+        [
+          ".note.ABI-tag",
+          7,
+          2,
+          32,
+          "6e48317ad93a8ac2dc04321465ede06d1274543fc8ab172e68171a9d684bb313"
+        ],
+        [
+          ".gnu.hash",
+          1879048182,
+          2,
+          28,
+          "7cf5a4deb1a8cb971838f3f02355061339200bca7d7c630ff8e84e25c25be1d2"
+        ],
+        [
+          ".dynsym",
+          11,
+          2,
+          3432,
+          "12d5f41c53c03c9ba18f390b9b77b30175a5b4fa4abd9a1ccf6189d82dbdd293"
+        ],
+        [
+          ".dynstr",
+          3,
+          2,
+          2141,
+          "ac091439bdaebab0cf6eef7972fb71340c93c9a1c1f3776590435759f47744f2"
+        ],
+        [
+          ".gnu.version",
+          1879048191,
+          2,
+          286,
+          "263480c402f0c94426c02764408e2179bfb4702f172995544f5c2a30de750e2f"
+        ],
+        [
+          ".gnu.version_r",
+          1879048190,
+          2,
+          368,
+          "2c9eb1c92db5ec8be0348ed44f104fa4e68dca678931958726a53e22cfe9ff12"
+        ],
+        [
+          ".rela.dyn",
+          4,
+          2,
+          3313776,
+          "64eeee50cdc0fb2b518af3bd1070ff8b787981bca3a88d383c80ca16488df7c3"
+        ],
+        [
+          ".rodata",
+          1,
+          50,
+          5851098,
+          "721efe58b6f0ab460615229f7dcae5c59c03a74268104acae5c0136e054948b9"
+        ],
+        [
+          ".eh_frame_hdr",
+          1,
+          2,
+          861084,
+          "1247c94f86dbd26f8a63e4fbfb32303b29cd0497adbc88587479f8d226aef9d9"
+        ],
+        [
+          ".eh_frame",
+          1,
+          2,
+          5047748,
+          "7a47b3bc12d4fd9cf32c7a92c3f85732d880d8bbb3624274c87df211138e0081"
+        ],
+        [
+          ".gcc_except_table",
+          1,
+          2,
+          1444184,
+          "0af51aded48b1a149ce0fed298a91ce8ecfbad2e408e6b9f8051f0bb96c511b4"
+        ],
+        [
+          ".debug_gdb_scripts",
+          1,
+          50,
+          34,
+          "90b05a6111bee6fd5b996298dba2fda834c39fb2709fd7f2377455c439f84eee"
+        ],
+        [
+          ".plt.got",
+          1,
+          6,
+          176,
+          "13cefedfc8e50baa33c634859996d9857f51ab4ab2a43206ae97302fc17cfcf8"
+        ],
+        [
+          ".init",
+          1,
+          6,
+          27,
+          "d7f2d8ed91187c201cb107206fba140e6d884e8e7b8c85017cebeb0688bc6dc4"
+        ],
+        [
+          ".fini",
+          1,
+          6,
+          13,
+          "6a4f3e5efc7c1f7ee7d6f21afd9ed040ba1d7f0b97bb12b016f5b176cc558bd8"
+        ],
+        [
+          ".text",
+          1,
+          6,
+          28192436,
+          "4505ae1ae2ed8129fec56d22c6f027c361742db2ea2ae582b964f91ff8bae02a"
+        ],
+        [
+          ".tdata",
+          1,
+          1027,
+          581,
+          "05813361113753c2a56a6ddc37bd8d62265e78b21e53a0dcb43fc38be29ba4df"
+        ],
+        [
+          ".tbss",
+          8,
+          1027,
+          645,
+          null
+        ],
+        [
+          ".init_array",
+          14,
+          3,
+          2640,
+          "855745003e7c964f375554a7448241e5e6235fe78dac1d20fa85956421bdf0a1"
+        ],
+        [
+          ".fini_array",
+          15,
+          3,
+          8,
+          "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc"
+        ],
+        [
+          ".data.rel.ro",
+          1,
+          3,
+          1516784,
+          "49396d433755fe674c6fc293a4176e2f26517fe0a938105934ef226c498d6cab"
+        ],
+        [
+          ".dynamic",
+          6,
+          3,
+          752,
+          "5924f0d8f00594c3072e5b648e5e7408e93ff06ea28f65a10136ddc2c3a65305"
+        ],
+        [
+          ".got",
+          1,
+          3,
+          453320,
+          "78d0ed89cfecb0cf6a9b65bd88575b746e96ef0e6b23e4e69d3de7279a8cae92"
+        ],
+        [
+          ".relro_padding",
+          8,
+          3,
+          2368,
+          null
+        ],
+        [
+          ".data",
+          1,
+          3,
+          24953,
+          "c0c284b8c708bd71560c94bb552a8d5baa66e491088fd29264f88e6b154a5680"
+        ],
+        [
+          ".tm_clone_table",
+          1,
+          3,
+          0,
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        [
+          ".bss",
+          8,
+          3,
+          9000,
+          null
+        ],
+        [
+          ".debug_abbrev",
+          1,
+          0,
+          479555,
+          "c66bb49f0c821ccca8114453d8b851a85f0cf322fb75f2435b421e354fdb15ea"
+        ],
+        [
+          ".debug_info",
+          1,
+          0,
+          41739525,
+          "e716a16856860db70f7eacc1019b4cfba5b9f3eee6330bec976c6de0bba9e92c"
+        ],
+        [
+          ".debug_aranges",
+          1,
+          0,
+          2582752,
+          "8bf0b1495e86558cdb5783872e48db68d3b80a480a415b7dff2dd0b8ea11a557"
+        ],
+        [
+          ".debug_ranges",
+          1,
+          0,
+          20420624,
+          "e9f343d41aace1620d43dc885880c49e1b74bc50b63a272b0b54b3120dada080"
+        ],
+        [
+          ".debug_str",
+          1,
+          48,
+          58750844,
+          "d7b3d0892a826fce5ebc015ebba109fc563c4e46d48d0ab2e2cab14ca2d749a7"
+        ],
+        [
+          ".debug_line",
+          1,
+          0,
+          26925415,
+          "ff700c82addf88b41c697f79ea4225288c6df98d86c6a3c62b34b21aef9ad4af"
+        ],
+        [
+          ".debug_loc",
+          1,
+          0,
+          3557025,
+          "6b1cde85194758f4c207029f1bc195700ce9ed1fae15c8ba8db8bec9a25cf9eb"
+        ],
+        [
+          ".comment",
+          1,
+          48,
+          174,
+          "f1a1d093c134cfb4b94aa791a8f5434645a8c4b71f48712db3a2f43cdbe7d50b"
+        ],
+        [
+          ".shstrtab",
+          3,
+          0,
+          451,
+          "af6aae4ef89e94643755578d0bbcca9056bfde70a92e682823448b5c2c92f6b0"
+        ],
+        [
+          ".symtab",
+          2,
+          0,
+          3366648,
+          "04190b5eba75e389b9bef4372fa1ff3286fe0d731c6a60631a3c12d1b7d4868a"
+        ],
+        [
+          ".strtab",
+          3,
+          0,
+          23436695,
+          "8b69087aecd136b1dd3f36d5258a9100f6a8af2aa1fc6cd954d46d01fdc2863a"
+        ]
+      ],
+      "physical_output": {
+        "action": "full-typed-refusal",
+        "actual_output": {
+          "blake3": "c12fe992e53446199fa3b6100caebb7213d3ec5a30a828d0f4e21e5e739ae3d3",
+          "identity": [
+            33,
+            7766492,
+            227979400
+          ],
+          "path": "/home/runner/work/_temp/ohm-foreign-join/target/debug/build/workspaces/f44635c822fcb5f3/v2-a99c773b2e0f1b3f/ty_server/f5c6198f896cf7b0/out/e2e-f5c6198f896cf7b0",
+          "sha256": "8c579fff30074179355f18b92e83ef24ba7649894dfd6b456f11fe306873eeb6"
+        },
+        "consumed_provider": [
+          "33",
+          "8115464",
+          "1094",
+          "6155742e854e1274d63647f3d0137dd6fa9cabaefb4ab9c23e8a8bf6eeb4510c",
+          "/home/runner/work/_temp/ohm-foreign-join/target/debug/build/workspaces/f44635c822fcb5f3/v2-a99c773b2e0f1b3f/ty_server/f5c6198f896cf7b0/out/rustceXus4N/raw-dylibs/libutil.a"
+        ],
+        "consumed_symbols": [
+          "33",
+          "8115455",
+          "39760",
+          "aff6d5791dc7823abf518d6ccacaedafaea574aba3b5befa30c9520f64f7384c",
+          "/home/runner/work/_temp/ohm-foreign-join/target/debug/build/workspaces/f44635c822fcb5f3/v2-a99c773b2e0f1b3f/ty_server/f5c6198f896cf7b0/out/rustceXus4N/symbols.o"
+        ],
+        "current_key": "93277cba1324f7854419459fe88d4e5596bd5ef6d42106e635a07e564f7a6c75",
+        "pid": "82716",
+        "previous_output_sha256": "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+        "prior_key": "47a7628908f601877e84137d7970539c02631bd8330e37e17c6742d2a380e7e5"
+      },
+      "provider_source_original": "four",
+      "run": 41737649726,
+      "zip_sha256": "b793f66dcaa3d935abca0fc2d5d9fd6de9737da7c3e3c1b05836581ffe481c7f"
+    },
+    "24": {
+      "challenge": {
+        "mode": "earlier",
+        "provider": "a83083cb94eedabc22eb859b71a97adf67b48f6860849d958d1e0ad028b7a273",
+        "symbol_after": "9d0228b7624d135b1e8ce7ea51e5972be7fc452d8d081efa8d0cb99eafea6259",
+        "symbol_before": "9d0228b7624d135b1e8ce7ea51e5972be7fc452d8d081efa8d0cb99eafea6259"
+      },
+      "changed_contexts_in_separate_trace": 48,
+      "cost_census": {
+        "all_eligible_stock_wild": 58171496986,
+        "cost_without_those_48": 65908537745,
+        "disjoint_domains": {
+          "Cargo/rustup": {
+            "enabled": 882247889,
+            "epochs": {
+              "exec": 2,
+              "first": 53
+            },
+            "instructions_raw": 1896982699,
+            "running": 882247889,
+            "unscaled_exact": true
+          },
+          "GNU/cc": {
+            "enabled": 276810921,
+            "epochs": {
+              "exec": 50,
+              "first": 50
+            },
+            "instructions_raw": 400324918,
+            "running": 276810921,
+            "unscaled_exact": true
+          },
+          "GNU/collect2": {
+            "enabled": 61712065,
+            "epochs": {
+              "exec": 50,
+              "first": 50
+            },
+            "instructions_raw": 22206502,
+            "running": 61712065,
+            "unscaled_exact": true
+          },
+          "ObserverStartup": {
+            "enabled": 22084261,
+            "epochs": {
+              "first": 1
+            },
+            "instructions_raw": 2173,
+            "running": 22084261,
+            "unscaled_exact": true
+          },
+          "StockWild": {
+            "enabled": 15893988773,
+            "epochs": {
+              "exec": 50,
+              "first": 50
+            },
+            "instructions_raw": 64010732235,
+            "running": 15893988773,
+            "unscaled_exact": true
+          },
+          "rustc/full": {
+            "enabled": 10201780937,
+            "epochs": {
+              "exec": 3
+            },
+            "instructions_raw": 53558541126,
+            "running": 10201780937,
+            "unscaled_exact": true
+          },
+          "rustc/link-only": {
+            "enabled": 912139359,
+            "epochs": {
+              "exec": 50,
+              "first": 50
+            },
+            "instructions_raw": 1643131886,
+            "running": 912139359,
+            "unscaled_exact": true
+          }
+        },
+        "excluded_wild": 5839235249,
+        "outer": [
+          124080034731,
+          28848838058,
+          28848838058,
+          0
+        ],
+        "unassigned_child_gap": 2548113192
+      },
+      "exercised_negatives": [
+        "forged allowed",
+        "forged response",
+        "forged action",
+        "forged pid",
+        "forged from_full_stage",
+        "forged key",
+        "missing EMITTED",
+        "missing VERIFIED",
+        "missing ACTUAL-GROUP",
+        "forged accepted old output",
+        "unselected libutil",
+        "wrong opened provider bytes",
+        "wrong output identity",
+        "opposite output semantic family"
+      ],
+      "native_stdout": "\nrunning 1 test\ntest commands::debug_command ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 199 filtered out; finished in 0.05s\n\n",
+      "ordinary_phases": {
+        "edit": {
+          "C": {
+            "actions": {
+              "full": 47,
+              "full-typed-refusal": 1
+            },
+            "held_allocated": 0,
+            "metadata_bytes": 13276,
+            "meter": {
+              "cancelled_write_bytes": 202219520,
+              "elapsed_ns": 17709559199,
+              "enabled": 64424989379,
+              "inblock": 0,
+              "instructions": 263700047369,
+              "involuntary_switches": 307,
+              "majflt": 68,
+              "maxrss_kib": 1115068,
+              "minflt": 7024375,
+              "outblock": 12280856,
+              "pid": 68211,
+              "rchar": 17131292967,
+              "read_bytes": 0,
+              "reaped": 1,
+              "running": 64424989379,
+              "status": 0,
+              "syscr": 92111,
+              "syscw": 1652764,
+              "system_us": 18200370,
+              "user_us": 46653328,
+              "voluntary_switches": 20691,
+              "wchar": 4804613929,
+              "write_bytes": 6287798272
+            },
+            "native_bytes_consumed": 12184082106,
+            "signed_output_reads_for_donor": 3355671968
+          },
+          "P": {
+            "meter": {
+              "cancelled_write_bytes": 202219520,
+              "elapsed_ns": 13062822932,
+              "enabled": 50323764224,
+              "inblock": 0,
+              "instructions": 219340178479,
+              "involuntary_switches": 290,
+              "majflt": 324,
+              "maxrss_kib": 1115480,
+              "minflt": 4113054,
+              "outblock": 12241136,
+              "pid": 28666,
+              "rchar": 867467221,
+              "read_bytes": 0,
+              "reaped": 58,
+              "running": 50323764224,
+              "status": 0,
+              "syscr": 43673,
+              "syscw": 16287,
+              "system_us": 15158674,
+              "user_us": 35461245,
+              "voluntary_switches": 16977,
+              "wchar": 1219369355,
+              "write_bytes": 6267461632
+            }
+          }
+        },
+        "warm1": {
+          "C": {
+            "actions": {
+              "fresh": 46,
+              "full": 1,
+              "full-typed-refusal": 1
+            },
+            "held_allocated": 3211272192,
+            "metadata_bytes": 13275,
+            "meter": {
+              "cancelled_write_bytes": 3001344000,
+              "elapsed_ns": 8673299930,
+              "enabled": 29081401063,
+              "inblock": 0,
+              "instructions": 113047461462,
+              "involuntary_switches": 121,
+              "majflt": 17,
+              "maxrss_kib": 1051524,
+              "minflt": 5305890,
+              "outblock": 7549968,
+              "pid": 71647,
+              "rchar": 16966889363,
+              "read_bytes": 0,
+              "reaped": 1,
+              "running": 29081401063,
+              "status": 0,
+              "syscr": 83824,
+              "syscw": 1638556,
+              "system_us": 10903078,
+              "user_us": 18384370,
+              "voluntary_switches": 9604,
+              "wchar": 3613431639,
+              "write_bytes": 3865583616
+            },
+            "native_bytes_consumed": 12184082106,
+            "signed_output_reads_for_donor": 209710888
+          },
+          "P": {
+            "meter": {
+              "cancelled_write_bytes": 2175070208,
+              "elapsed_ns": 7508459259,
+              "enabled": 26738455983,
+              "inblock": 0,
+              "instructions": 124090212487,
+              "involuntary_switches": 127,
+              "majflt": 253,
+              "maxrss_kib": 864760,
+              "minflt": 2162271,
+              "outblock": 7722352,
+              "pid": 32101,
+              "rchar": 637852631,
+              "read_bytes": 0,
+              "reaped": 51,
+              "running": 26738455983,
+              "status": 0,
+              "syscr": 38487,
+              "syscw": 2658,
+              "system_us": 8505798,
+              "user_us": 18408797,
+              "voluntary_switches": 7260,
+              "wchar": 28206847,
+              "write_bytes": 3953844224
+            }
+          }
+        },
+        "warm2": {
+          "C": {
+            "actions": {
+              "fresh": 46,
+              "full": 1,
+              "full-typed-refusal": 1
+            },
+            "held_allocated": 3194384384,
+            "metadata_bytes": 13278,
+            "meter": {
+              "cancelled_write_bytes": 3739770880,
+              "elapsed_ns": 8713220445,
+              "enabled": 28899269452,
+              "inblock": 0,
+              "instructions": 113151762215,
+              "involuntary_switches": 146,
+              "majflt": 29,
+              "maxrss_kib": 1015440,
+              "minflt": 5304853,
+              "outblock": 7348632,
+              "pid": 72637,
+              "rchar": 16884780481,
+              "read_bytes": 0,
+              "reaped": 1,
+              "running": 28899269452,
+              "status": 0,
+              "syscr": 83760,
+              "syscw": 1638606,
+              "system_us": 10625301,
+              "user_us": 18453786,
+              "voluntary_switches": 10887,
+              "wchar": 3613431865,
+              "write_bytes": 3762499584
+            },
+            "native_bytes_consumed": 12184082106,
+            "signed_output_reads_for_donor": 144488528
+          },
+          "P": {
+            "meter": {
+              "cancelled_write_bytes": 3966369792,
+              "elapsed_ns": 7513497297,
+              "enabled": 26717907239,
+              "inblock": 0,
+              "instructions": 124077412129,
+              "involuntary_switches": 144,
+              "majflt": 262,
+              "maxrss_kib": 864524,
+              "minflt": 2160923,
+              "outblock": 7751536,
+              "pid": 33089,
+              "rchar": 637852930,
+              "read_bytes": 0,
+              "reaped": 51,
+              "running": 26717907239,
+              "status": 0,
+              "syscr": 38531,
+              "syscw": 2701,
+              "system_us": 8559047,
+              "user_us": 18357854,
+              "voluntary_switches": 7061,
+              "wchar": 28206886,
+              "write_bytes": 3968786432
+            }
+          }
+        },
+        "warm3": {
+          "C": {
+            "actions": {
+              "fresh": 47,
+              "full": 1
+            },
+            "held_allocated": 3338874880,
+            "metadata_bytes": 13547,
+            "meter": {
+              "cancelled_write_bytes": 3966369792,
+              "elapsed_ns": 9396187380,
+              "enabled": 29697089358,
+              "inblock": 0,
+              "instructions": 111076221483,
+              "involuntary_switches": 137,
+              "majflt": 17,
+              "maxrss_kib": 1015408,
+              "minflt": 5315695,
+              "outblock": 7791200,
+              "pid": 73627,
+              "rchar": 17111367445,
+              "read_bytes": 0,
+              "reaped": 1,
+              "running": 29697089358,
+              "status": 0,
+              "syscr": 83829,
+              "syscw": 1637021,
+              "system_us": 11433116,
+              "user_us": 18474607,
+              "voluntary_switches": 9219,
+              "wchar": 3613425542,
+              "write_bytes": 3989094400
+            },
+            "native_bytes_consumed": 12184082106,
+            "signed_output_reads_for_donor": 226598344
+          },
+          "P": {
+            "meter": {
+              "cancelled_write_bytes": 3966369792,
+              "elapsed_ns": 8144110714,
+              "enabled": 28268926766,
+              "inblock": 0,
+              "instructions": 124102607697,
+              "involuntary_switches": 144,
+              "majflt": 254,
+              "maxrss_kib": 864956,
+              "minflt": 2163681,
+              "outblock": 7751536,
+              "pid": 34076,
+              "rchar": 637853085,
+              "read_bytes": 0,
+              "reaped": 51,
+              "running": 28268926766,
+              "status": 0,
+              "syscr": 38499,
+              "syscw": 2669,
+              "system_us": 9433314,
+              "user_us": 19081790,
+              "voluntary_switches": 6921,
+              "wchar": 28206860,
+              "write_bytes": 3968786432
+            }
+          }
+        }
+      },
+      "phase": "C-native-earlier",
+      "physical_elf_sections": [
+        [
+          "",
+          0,
+          0,
+          0,
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        [
+          ".note.gnu.property",
+          7,
+          2,
+          32,
+          "5978480398fc48bfa6c56246117c5bc1a40145463a2faca541e5e91d5067ff79"
+        ],
+        [
+          ".note.gnu.build-id",
+          7,
+          2,
+          48,
+          "aa95cdd0ea547b8c2917371e76df38feca5f8a0b29b4dcf9f1bf1a4d5369c8c5"
+        ],
+        [
+          ".interp",
+          1,
+          2,
+          28,
+          "9097c98ea70f6f3b01d50145eb72bf55ad1f4e9713bccf27bd6405d6254eed00"
+        ],
+        [
+          ".note.ABI-tag",
+          7,
+          2,
+          32,
+          "6e48317ad93a8ac2dc04321465ede06d1274543fc8ab172e68171a9d684bb313"
+        ],
+        [
+          ".gnu.hash",
+          1879048182,
+          2,
+          28,
+          "7cf5a4deb1a8cb971838f3f02355061339200bca7d7c630ff8e84e25c25be1d2"
+        ],
+        [
+          ".dynsym",
+          11,
+          2,
+          3432,
+          "12d5f41c53c03c9ba18f390b9b77b30175a5b4fa4abd9a1ccf6189d82dbdd293"
+        ],
+        [
+          ".dynstr",
+          3,
+          2,
+          2141,
+          "ac091439bdaebab0cf6eef7972fb71340c93c9a1c1f3776590435759f47744f2"
+        ],
+        [
+          ".gnu.version",
+          1879048191,
+          2,
+          286,
+          "263480c402f0c94426c02764408e2179bfb4702f172995544f5c2a30de750e2f"
+        ],
+        [
+          ".gnu.version_r",
+          1879048190,
+          2,
+          368,
+          "2c9eb1c92db5ec8be0348ed44f104fa4e68dca678931958726a53e22cfe9ff12"
+        ],
+        [
+          ".rela.dyn",
+          4,
+          2,
+          3360192,
+          "0b80c79940f5a651a0aaa708adfc80362d74ff86b486565d5685653dcfbacfa7"
+        ],
+        [
+          ".rodata",
+          1,
+          50,
+          5819805,
+          "9f0c2d0d36cb996de2feebc73625a7703e7b95b4f3d048f571ca9d2274baf9df"
+        ],
+        [
+          ".eh_frame_hdr",
+          1,
+          2,
+          873076,
+          "c16bb7708f50ab1ccfd69280161b2d988d20de15cee417bc818180c5ba77a4c9"
+        ],
+        [
+          ".eh_frame",
+          1,
+          2,
+          5048800,
+          "385e515ef368b3d30ad0a4811ea2b903ffb9dbc6bf7d619d7dca1d5f79b03878"
+        ],
+        [
+          ".gcc_except_table",
+          1,
+          2,
+          1431812,
+          "480260ba8e23e25e38704df6cc9446faa735d3bccc11e3b31ed79b3d93f23acd"
+        ],
+        [
+          ".debug_gdb_scripts",
+          1,
+          50,
+          34,
+          "90b05a6111bee6fd5b996298dba2fda834c39fb2709fd7f2377455c439f84eee"
+        ],
+        [
+          ".plt.got",
+          1,
+          6,
+          176,
+          "d291373950da19b7dd87a0e74bff565466768121e4b31d22dfc9c07c0a231f2e"
+        ],
+        [
+          ".init",
+          1,
+          6,
+          27,
+          "15473166f434248a7ef6f45f7ccaa93b071aa59840d8b016e8e0c85ebd8b9368"
+        ],
+        [
+          ".fini",
+          1,
+          6,
+          13,
+          "6a4f3e5efc7c1f7ee7d6f21afd9ed040ba1d7f0b97bb12b016f5b176cc558bd8"
+        ],
+        [
+          ".text",
+          1,
+          6,
+          28091018,
+          "19b1318149853c3fe0e86fa38e191b6a9fcda0a5a1605c891955ba808f562181"
+        ],
+        [
+          ".tdata",
+          1,
+          1027,
+          581,
+          "05813361113753c2a56a6ddc37bd8d62265e78b21e53a0dcb43fc38be29ba4df"
+        ],
+        [
+          ".tbss",
+          8,
+          1027,
+          645,
+          null
+        ],
+        [
+          ".init_array",
+          14,
+          3,
+          2632,
+          "1afc4dc9a7aecbfbce4a992cf570812b46d677b0148b9ef646c38fe9d01c6b01"
+        ],
+        [
+          ".fini_array",
+          15,
+          3,
+          8,
+          "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc"
+        ],
+        [
+          ".data.rel.ro",
+          1,
+          3,
+          1516408,
+          "2389b0bc532bb5c8a7a5a4b67c3921b97132630bae805b5c0f7e0c427feb7e71"
+        ],
+        [
+          ".dynamic",
+          6,
+          3,
+          752,
+          "ac6db0deda253f9b67d7a5412d1e567d79e566cddd709a3e6a9388683bca7d37"
+        ],
+        [
+          ".got",
+          1,
+          3,
+          468896,
+          "f3ecf18ab180889fbb4eb2c16256a6647ae7afeee5a3c4332b599485d66fefd3"
+        ],
+        [
+          ".relro_padding",
+          8,
+          3,
+          3152,
+          null
+        ],
+        [
+          ".data",
+          1,
+          3,
+          24953,
+          "eb11c5eaacd6d92642a7cf646c862e07daadc3c4333cb47220d7a217f4129a6f"
+        ],
+        [
+          ".tm_clone_table",
+          1,
+          3,
+          0,
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        [
+          ".bss",
+          8,
+          3,
+          9000,
+          null
+        ],
+        [
+          ".debug_abbrev",
+          1,
+          0,
+          480942,
+          "b817d1ce4b12595e4c0f662cbc8da38475284137aebebec731aa9bbc88d922f9"
+        ],
+        [
+          ".debug_info",
+          1,
+          0,
+          40945600,
+          "247b6a3b12c500c8dfd72c4eec7bd1e11a2dc51e5edbe26dd20555e9296c90ee"
+        ],
+        [
+          ".debug_aranges",
+          1,
+          0,
+          2578768,
+          "828f93feb7ce30ebf8583489d358dcb01cece9387eef2bfcaa652ba31c29438d"
+        ],
+        [
+          ".debug_ranges",
+          1,
+          0,
+          20149584,
+          "730b5bb22c7a9b7ae3377e38d735663cc91a6b84dccfca0ffea4e75114c047ba"
+        ],
+        [
+          ".debug_str",
+          1,
+          48,
+          58196209,
+          "67f95d98a6eae7e1e8da9de9fcddf5da092ab4158bf38c1c390c6f035e5a1c7c"
+        ],
+        [
+          ".debug_line",
+          1,
+          0,
+          26755371,
+          "6c44d036e1d67f49ca42db209b5586808064f37203284ef3cd6d0f755ba3850e"
+        ],
+        [
+          ".debug_loc",
+          1,
+          0,
+          3557025,
+          "10f85cbf714caecae41e4ab33d38f6d86ba50d2e662d93e0691c7fd4b48b6163"
+        ],
+        [
+          ".comment",
+          1,
+          48,
+          174,
+          "8cde3698c1e48f6bc1cea9835b8160dace3f3bfe57beba9255b48fba5ecd7573"
+        ],
+        [
+          ".shstrtab",
+          3,
+          0,
+          451,
+          "af6aae4ef89e94643755578d0bbcca9056bfde70a92e682823448b5c2c92f6b0"
+        ],
+        [
+          ".symtab",
+          2,
+          0,
+          3393768,
+          "8a972e773e5064866e731836a5fb417ac363095e2df731c5003f2cbb74ceaebf"
+        ],
+        [
+          ".strtab",
+          3,
+          0,
+          23891167,
+          "2cc1396c49dab005926b0ac1817647a401e791dd5cc1a2c4b3966e9a09a592db"
+        ]
+      ],
+      "physical_output": {
+        "action": "full-typed-refusal",
+        "actual_output": {
+          "blake3": "783ec3e5efb11c682ee6b2c61f7147bf30ac8e82d0f4f9e3114ff6d812f9d19c",
+          "identity": [
+            33,
+            7768730,
+            226598344
+          ],
+          "path": "/home/runner/work/_temp/ohm-foreign-join/target/debug/build/workspaces/f44635c822fcb5f3/v2-99f9da5da3376007/ty_server/f5c6198f896cf7b0/out/e2e-f5c6198f896cf7b0",
+          "sha256": "9827cae719308452d3293caadd022351e4a940b9c01502c3da339d12c036ed25"
+        },
+        "consumed_provider": [
+          "33",
+          "7993731",
+          "1094",
+          "6155742e854e1274d63647f3d0137dd6fa9cabaefb4ab9c23e8a8bf6eeb4510c",
+          "/home/runner/work/_temp/ohm-foreign-join/target/debug/build/workspaces/f44635c822fcb5f3/v2-99f9da5da3376007/ty_server/f5c6198f896cf7b0/out/rustcvT8OQZ/raw-dylibs/libutil.a"
+        ],
+        "consumed_symbols": [
+          "33",
+          "7993242",
+          "40024",
+          "1684426c1412ec0d3b6dbec1d9aacfd3122829ea46a85a7390e8d8c9c7a88ee8",
+          "/home/runner/work/_temp/ohm-foreign-join/target/debug/build/workspaces/f44635c822fcb5f3/v2-99f9da5da3376007/ty_server/f5c6198f896cf7b0/out/rustcvT8OQZ/symbols.o"
+        ],
+        "current_key": "7e2dfb8cb652b13f0f8c0719fce3c17eaf9182c3d2f8c05fbf9f84acf82ac5a0",
+        "pid": "83538",
+        "previous_output_sha256": "9827cae719308452d3293caadd022351e4a940b9c01502c3da339d12c036ed25",
+        "prior_key": "3a9308b6a10a6ea5b368b1bb66a5ccc9c30ec9bcc4256035692881e159eb2612"
+      },
+      "provider_source_original": "earlier",
+      "run": 41737656295,
+      "zip_sha256": "cd34338da0ad5cb2812ac7f87baea7f93d97e49196ac448fb82cc0a7781d5505"
+    }
+  },
+  "objdump": "In archive libutil.a:\n\nguard.o:     file format elf64-x86-64\n\n\nDisassembly of section .text:\n\n0000000000000000 <zzQA>:\n   0:\tc3                   \tret\n\n0000000000000001 <qa_force_exit>:\n   1:\tbf 53 00 00 00       \tmov    $0x53,%edi\n   6:\tb8 e7 00 00 00       \tmov    $0xe7,%eax\n   b:\t0f 05                \tsyscall\n   d:\t0f 0b                \tud2\n",
+  "original_asm": ".text\n.globl zzQA\n.type zzQA,@function\nzzQA: ret\n.type qa_force_exit,@function\nqa_force_exit: mov $83,%edi\n mov $231,%eax\n syscall\n ud2\n.section .init_array,\"aw\",@init_array\n.p2align 3\n.quad qa_force_exit\n.section .note.GNU-stack,\"\",@progbits\n",
+  "provider": {
+    "blake3": "6155742e854e1274d63647f3d0137dd6fa9cabaefb4ab9c23e8a8bf6eeb4510c",
+    "bytes": 1094,
+    "sha256": "a83083cb94eedabc22eb859b71a97adf67b48f6860849d958d1e0ad028b7a273"
+  },
+  "provider_source_sha256": "e332b0863ecc53c1fb33d9840696f2efbefec6460c03aa00b2b5b74f53277d0c"
+}

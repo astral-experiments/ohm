@@ -70,8 +70,15 @@ def gather(z, tag):
             assert tag.startswith("C-") and r["mode"] == "other"
             mode = "FallbackStockWild"
             signed_file.add((r["dev"], r["ino"]))
-        elif mode == "other" and any(
-            a.endswith("/workspace-link-pilot/coordinator.py") for a in args
+        elif mode == "other" and path.name == "exec_count":
+            assert r["trigger"] == "first" and args[0] == str(path)
+            assert Path(args[1]).name == "tasks" and Path(args[1]).parent.name == tag
+            mode = "ObserverStartup"
+        elif (
+            mode == "other"
+            and len(args) >= 3
+            and args[1] == "-IB"
+            and args[2].endswith("/workspace-link-pilot/coordinator.py")
         ):
             assert path.name.startswith("python") and tag.startswith("C-")
             mode = "Coordinator"

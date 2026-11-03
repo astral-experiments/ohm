@@ -7,7 +7,7 @@ from zipfile import ZipFile
 
 HERE = Path(__file__).resolve().parent
 sys.path[:0] = [str(HERE), str(HERE.parent / "workspace-link-proof")]
-import coordinator, release_scope
+import coordinator, native_fallback, release_scope
 
 E2E = "/ty_server/f5c6198f896cf7b0/out/e2e-f5c6198f896cf7b0"
 
@@ -121,6 +121,11 @@ def intake(path, expected_sha, head, run, release):
     refusal = {}
     list_sha = None
     complement = {}
+    strong_native = head in {
+        "d68c5ce147ce6089d48f2524836ab663737c175f",
+        "db84fc8eed1057088d9c186cdb06ee839ce8fde0",
+    }
+    guarded_outputs = {}
     initial = (
         "old",
         "edit",
@@ -128,6 +133,11 @@ def intake(path, expected_sha, head, run, release):
         "warm2",
         "warm3",
         "exec-warm",
+        *(
+            ("exec-warm-stable", "ordinary-repeat-old", "ordinary-repeat-edit")
+            if strong_native
+            else ()
+        ),
         "reverse-old",
         "exec-edit",
     )
@@ -135,6 +145,14 @@ def intake(path, expected_sha, head, run, release):
     for mode in (["earlier"] if release == 24 else []) + ["four", "malformed", "save"]:
         names += ["C-native-" + mode, "C-native-" + mode + "-repair"]
     names += ["C-before-output-control-1", "C-before-output-control-2"]
+    extra = [
+        i
+        for i in range(3, 7)
+        if f"C-before-output-control-{i}-receipt.json.gz" in members
+    ]
+    assert extra == list(range(3, 3 + len(extra))) and (not extra or strong_native)
+    names += [f"C-before-output-control-{i}" for i in extra]
+
     if release == 24:
         names += ["C-distinct-OPATHs"]
     names += [
@@ -243,6 +261,32 @@ def intake(path, expected_sha, head, run, release):
                     tag + "-native/stdout"
                 )
                 list_sha = digest
+            if (
+                strong_native
+                and tag in ("C-native-four", "C-native-earlier")
+                and tag + "-full-output.json" in members
+            ):
+                received = j(tag + "-full-output.json")
+                actor = j(prefix + "physical-decisions.json")["actors"][E2E]
+                native_raw = data(prefix + "actor-" + actor["pid"] + ".tsv.gz").decode()
+                # Exact bytes from independently rebuilt guard.o member in libutil.a.
+                provider = {
+                    "bytes": 1094,
+                    "sha256": "a83083cb94eedabc22eb859b71a97adf67b48f6860849d958d1e0ad028b7a273",
+                    "blake3": "6155742e854e1274d63647f3d0137dd6fa9cabaefb4ab9c23e8a8bf6eeb4510c",
+                }
+                actual = received["actual_output"]
+                assert actual["path"].endswith("/" + inv["binary"])
+                assert elfs[E2E] == (actual["sha256"], actual["identity"][2])
+                assert received == native_fallback.check(
+                    actor,
+                    native_raw,
+                    j(tag + "-actual-change.json"),
+                    provider,
+                    actual,
+                    phases["C-exec-edit"]["elfs"][E2E][0],
+                )
+                guarded_outputs[tag] = received
         if tag.startswith("C-"):
             if tag == "C-empty-new":
                 ledger = {}
@@ -396,7 +440,40 @@ def intake(path, expected_sha, head, run, release):
             if tag.startswith("C-") and subset & set(bad):
                 refusal[tag] = sorted(subset & set(bad))
         expected = j("complete.json")
-        assert expected["qualified"] == (not refusal)
+        # The producer closes on wrong admitted hits. Preserve that verdict separately from the
+        # independent requirement that even a real full fallback among these 48 match the empty build.
+        wrong_hits = {
+            k: sorted(set(v) & phases[k]["native"]["fresh"].keys())
+            for k, v in refusal.items()
+            if set(v) & phases[k]["native"]["fresh"].keys()
+        }
+        assert expected["failures"] == wrong_hits and expected["qualified"] == (
+            not wrong_hits
+        )
+        if strong_native:
+            assert set(guarded_outputs) == (
+                {"C-native-four", "C-native-earlier"}
+                if release == 24
+                else {"C-native-four"}
+            )
+            for arm in ("P", "C"):
+                raw = data(arm + "-withheld-ordinary-repeat-old/stdout")
+                assert (
+                    b"1 failed;" in raw
+                    and b"script_tag" in raw
+                    and b"source_text" in raw
+                )
+            if release == 24:
+                control = j("before-output-selection.json")
+                assert control["phase"] == "C-before-output-control-" + str(
+                    max([2] + extra)
+                )
+                assert len(control["targets"]) == 2 and E2E in control["targets"]
+                assert (
+                    set(control["targets"])
+                    <= phases[control["phase"]]["native"]["fresh"].keys()
+                )
+
         for arm in ("P", "C"):
             raw = data(arm + "-withheld-old-on-new/stdout")
             assert (
@@ -436,6 +513,7 @@ def intake(path, expected_sha, head, run, release):
         "archive_bytes": path.stat().st_size,
         "stage_count": len(phases),
         "registered_stages": len(names),
+        "guarded_native_outputs": guarded_outputs,
         "complete": "complete.json" in members,
         "qualified": accepted,
         "refusal": refusal,
