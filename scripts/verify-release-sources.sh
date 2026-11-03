@@ -30,8 +30,8 @@ for checkout in "$rust_checkout" "$cargo_checkout" "$clippy_checkout" "$rustfmt_
     exit 1
   fi
 
+  checkout_paths=(.)
   if [[ "$checkout" == "$rust_checkout" ]]; then
-    checkout_paths=(.)
     if [[ "$clippy_checkout" -ef "$rust_checkout/src/tools/clippy" ]]; then
       checkout_paths+=(':(exclude)src/tools/clippy')
     fi
@@ -39,15 +39,27 @@ for checkout in "$rust_checkout" "$cargo_checkout" "$clippy_checkout" "$rustfmt_
     if [[ "$rustfmt_checkout" -ef "$rust_checkout/src/tools/rustfmt" ]]; then
       checkout_paths+=(':(exclude)src/tools/rustfmt')
     fi
-
-    checkout_status="$(git -C "$checkout" status --porcelain --untracked-files=normal \
-      -- "${checkout_paths[@]}")"
-  else
-    checkout_status="$(git -C "$checkout" status --porcelain --untracked-files=normal)"
   fi
 
+  checkout_status="$(git -C "$checkout" status --porcelain --untracked-files=normal \
+    -- "${checkout_paths[@]}")"
   if [[ -n "$checkout_status" ]]; then
     echo "source checkout is not clean: $checkout" >&2
+    exit 1
+  fi
+
+  # Status omits changes to assume-unchanged and skip-worktree entries.
+  hidden_entries="$(git -C "$checkout" ls-files -v -- "${checkout_paths[@]}" |
+    awk '/^[a-zS] / { hidden = 1 } END { print hidden + 0 }')"
+  if [[ "$hidden_entries" == 1 ]] && ! (
+    index_directory="$(mktemp -d)" || exit 1
+    trap 'rm -rf -- "$index_directory"' EXIT
+    GIT_INDEX_FILE="$(cd -- "$index_directory" && pwd -P)/index" || exit 1
+    export GIT_INDEX_FILE
+    git -C "$checkout" -c core.sparseCheckout=false read-tree HEAD &&
+      git -C "$checkout" -c core.sparseCheckout=false diff --no-ext-diff --no-textconv --quiet HEAD -- "${checkout_paths[@]}"
+  ); then
+    echo "could not verify tracked source files against HEAD: $checkout" >&2
     exit 1
   fi
 done
