@@ -917,4 +917,4 @@ In a Ruff benchmark, the median warm `cargo test --doc` took 13.56 seconds with 
 See:
 
 - [Cargo #429](https://github.com/astral-experiments/ohm-cargo/pull/429)
-- [Ruff doctest benchmark](https://github.com/astral-experiments/ohm/pull/254)
+- [Ohm #254](https://github.com/astral-experiments/ohm/pull/254)
