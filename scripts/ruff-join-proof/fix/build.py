@@ -19,6 +19,16 @@ def run(sdk, env, label, cmd, cwd):
 def setup(sdk,e):
     root=Path(os.environ['GITHUB_WORKSPACE'])/'cargo'; bundle=src/'candidate.bundle'
     git=lambda *args:subprocess.check_output(['git','-C',str(root),*args],text=True).strip()
+    root.mkdir()
+    git('init','--quiet','--template=')
+    prior=spec['prior_qa_source']; kit=root.parent/'accepted-source'/prior['path'];delta=src/'signed-delta.pack'
+    assert sdk.hf(kit)==prior['pack_sha256'] and sdk.hf(delta)==spec['delta_sha256']
+    for pack in (kit,delta):
+        with pack.open('rb')as fp:subprocess.run(['git','-C',root,'index-pack','--stdin'],stdin=fp,check=True)
+    (root/'.git/shallow').write_text(prior['source_sha']+'\n'+spec['parent']+'\n')
+    git('update-ref','refs/heads/release-parent',spec['parent']);git('switch','--detach',spec['parent'])
+    git('fsck','--full','--strict','--no-progress')
+    assert git('rev-parse','HEAD^{tree}')==spec['signed_tree'] and git('write-tree')==spec['signed_tree']
     assert sdk.hf(bundle)==spec['bundle_sha256'] and git('rev-parse','HEAD')==spec['parent']
     git('fetch',str(bundle),'HEAD:refs/qa/input-recheck-candidate');git('switch','--detach',spec['candidate'])
     assert git('rev-parse','HEAD^')==spec['parent']and git('rev-parse','HEAD^{tree}')==spec['tree']and not git('status','--porcelain')
