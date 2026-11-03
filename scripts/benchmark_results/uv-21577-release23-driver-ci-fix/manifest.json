@@ -1,0 +1,895 @@
+{
+  "additional_immutable_source": {
+    ".github/workflows/ci.yml": "a62578a8f27a972f37d7eb3148053e8eed5f33f1",
+    "compiler/rustc_codegen_ssa/src/base.rs": "da8aa1143faed8af39a28539de11394beb01f254",
+    "compiler/rustc_interface/src/passes.rs": "bcfd8c88db9699b8d955cd3b73bfd88947b231bf",
+    "compiler/rustc_metadata/src/rmeta/encoder.rs": "2b2f08dbca687cd0352adeeffe80d38fb1a06a50",
+    "compiler/rustc_mir_transform/src/cross_crate_inline.rs": "13b3304fda8f2b9209385190811e80847a936f86",
+    "compiler/rustc_span/src/def_id.rs": "38d0bc4df3c4ca996b313eb90eaa10e806defd0a"
+  },
+  "archives": [
+    {
+      "archive": "native.tar.xz",
+      "compressed_bytes": 752200,
+      "sha256": "5aaf5c732d22b3a8fc95d910b5d8ea653426564a7e7f155c886eab93196f390a"
+    },
+    {
+      "archive": "link-inputs.tar.xz",
+      "compressed_bytes": 5659816,
+      "sha256": "14bff4ecc545108afcd9ffc677324cde148602516ee0b9d9f193d74b88de4adb"
+    }
+  ],
+  "compilation": {
+    "absolute_path_forced_same_within_pair": true,
+    "common_flags": [
+      "--cfg bootstrap",
+      "-Cprefer-dynamic",
+      "-Cmetadata=351f10ed5ea1ed01",
+      "-Copt-level=3",
+      "-Cdebuginfo=0",
+      "-Ccodegen-units=1"
+    ],
+    "dependency_inventory": {
+      "ar_archive_writer": {
+        "bytes": 2428674,
+        "file": "libar_archive_writer-330677dbdc309681.rlib",
+        "origin_fingerprint": "ar_archive_writer-330677dbdc309681/lib-ar_archive_writer",
+        "sha256": "b27daf41aade6cd5dbb66ee1f5e2b9019cf480d5b2a80c6270e5c34dbf357fa2",
+        "unit_local_fingerprint": "9fc232b8fa449539"
+      },
+      "bitflags": {
+        "bytes": 284240,
+        "file": "libbitflags-506c91382421775d.rlib",
+        "origin_fingerprint": "bitflags-506c91382421775d/lib-bitflags",
+        "sha256": "ec7ad9cff980632f24d0da94f67f70f247130417141b767a09bf8e49851d65f9",
+        "unit_local_fingerprint": "7efeac6a029c05ba"
+      },
+      "bstr": {
+        "bytes": 2823676,
+        "file": "libbstr-dc6e6208f0790aed.rlib",
+        "origin_fingerprint": "bstr-dc6e6208f0790aed/lib-bstr",
+        "sha256": "16cf0a24c693c8b48cc5e4291a1edd598250278d1eaf578d9fc0a02f040465a8",
+        "unit_local_fingerprint": "e95476ce699824dd"
+      },
+      "find_msvc_tools": {
+        "bytes": 297538,
+        "file": "libfind_msvc_tools-51801194ed49f2d3.rlib",
+        "origin_fingerprint": "find-msvc-tools-51801194ed49f2d3/lib-find_msvc_tools",
+        "sha256": "7567d7a39522819976beaa5cf91c60aeefaa0514faf4f34f5bf94b3d75013c31",
+        "unit_local_fingerprint": "bb84e340e3be1644"
+      },
+      "itertools": {
+        "bytes": 2971608,
+        "file": "libitertools-e4a23f3319ff8eef.rlib",
+        "origin_fingerprint": "itertools-e4a23f3319ff8eef/lib-itertools",
+        "sha256": "a34ffb7ac6718d24842d96503535552d980304f9edbf445f85cb7e02531ef8d4",
+        "unit_local_fingerprint": "8d499bd35aec79b2"
+      },
+      "libc": {
+        "bytes": 5187856,
+        "file": "liblibc-569be540a361de81.rlib",
+        "origin_fingerprint": "libc-569be540a361de81/lib-libc",
+        "sha256": "279e1e999fa7c8b2e2aaef60cdb630938e8d5d8ced1644c9184ad92c7624526a",
+        "unit_local_fingerprint": "22ce1fc990fe0762"
+      },
+      "object": {
+        "bytes": 10557048,
+        "file": "libobject-474eb411fc94ed94.rlib",
+        "origin_fingerprint": "object-474eb411fc94ed94/lib-object",
+        "sha256": "c89e908b4f4e6db2bd5653d88402524f8f7c8026a0f12670b84c15fddea96f9a",
+        "unit_local_fingerprint": "27285a30f83b6ac2"
+      },
+      "pathdiff": {
+        "bytes": 13358,
+        "file": "libpathdiff-b3ccecdf03bd8ec5.rlib",
+        "origin_fingerprint": "pathdiff-b3ccecdf03bd8ec5/lib-pathdiff",
+        "sha256": "9ce7a24c37b57e86217de7cc8ab9b926894dfb5ce04880a535a20d68a59bd5a9",
+        "unit_local_fingerprint": "d8940a44b2c4a5b5"
+      },
+      "regex": {
+        "bytes": 1013956,
+        "file": "libregex-d3fa6d6269c28542.rlib",
+        "origin_fingerprint": "regex-d3fa6d6269c28542/lib-regex",
+        "sha256": "f1c7cdee917abbad0b572be9ca4933e47f44fed4dbc8e351b99e54c4d5921779",
+        "unit_local_fingerprint": "35ee63eb3e6cfc06"
+      },
+      "rustc_abi": {
+        "bytes": 1573232,
+        "file": "librustc_abi-f7f891aa30f3ca30.rlib",
+        "origin_fingerprint": "rustc_abi-f7f891aa30f3ca30/lib-rustc_abi",
+        "sha256": "3d2209513e37ae7fdd38e08b8b9c9634e0f1cd80c17e9f6e8c8c8403b1f054b8",
+        "unit_local_fingerprint": "f5437864c20ea93e"
+      },
+      "rustc_arena": {
+        "bytes": 88062,
+        "file": "librustc_arena-5f06bfbd33bc4376.rlib",
+        "origin_fingerprint": "rustc_arena-5f06bfbd33bc4376/lib-rustc_arena",
+        "sha256": "d84d79bfb557d36eb6696d229efef9c3a94faa892900ba1f6c44e2be2a5a2db6",
+        "unit_local_fingerprint": "0f147620f95bdd77"
+      },
+      "rustc_ast": {
+        "bytes": 9511910,
+        "file": "librustc_ast-b3664afab2598950.rlib",
+        "origin_fingerprint": "rustc_ast-b3664afab2598950/lib-rustc_ast",
+        "sha256": "54c4eae08541a7dba69725d1b963eee9a5609167ebc27d208ce02df307af518d",
+        "unit_local_fingerprint": "781d7fd042845c27"
+      },
+      "rustc_attr_parsing": {
+        "bytes": 25332650,
+        "file": "librustc_attr_parsing-6adceb955cf67297.rlib",
+        "origin_fingerprint": "rustc_attr_parsing-6adceb955cf67297/lib-rustc_attr_parsing",
+        "sha256": "05da344898cd1fd3ccc455571a160d2e6cd110e2eb8be16c5dc85ac5e28e06d9",
+        "unit_local_fingerprint": "800364e169cfc671"
+      },
+      "rustc_crate_store": {
+        "bytes": 127958,
+        "file": "librustc_crate_store-d7b55fe1124c07fa.rlib",
+        "origin_fingerprint": "rustc_crate_store-d7b55fe1124c07fa/lib-rustc_crate_store",
+        "sha256": "0accac4289ecd49b898127d177ab22c309e723be1bb87bf940a0428b8a01a358",
+        "unit_local_fingerprint": "d1b3cf213ba982d7"
+      },
+      "rustc_data_structures": {
+        "bytes": 3690108,
+        "file": "librustc_data_structures-6edc7cf83a6c1349.rlib",
+        "origin_fingerprint": "rustc_data_structures-6edc7cf83a6c1349/lib-rustc_data_structures",
+        "sha256": "dbad7c5b0a1e69834ab488064c8985c441ed2f2f7d839e81e2a03c85989f447a",
+        "unit_local_fingerprint": "0dac6da7b9eb851a"
+      },
+      "rustc_errors": {
+        "bytes": 8177180,
+        "file": "librustc_errors-713d46feeaddd5c7.rlib",
+        "origin_fingerprint": "rustc_errors-713d46feeaddd5c7/lib-rustc_errors",
+        "sha256": "f686a55fcfaee771e4996449942e7aac9b49c448261b7c4e6187211d80309028",
+        "unit_local_fingerprint": "1ae321fd96a2aa6b"
+      },
+      "rustc_fs_util": {
+        "bytes": 24008,
+        "file": "librustc_fs_util-7c88ffb84b6e31fe.rlib",
+        "origin_fingerprint": "rustc_fs_util-7c88ffb84b6e31fe/lib-rustc_fs_util",
+        "sha256": "a15e0a20b756d3ac0f136cf4d4cc0d70bf28df7c00c95ecdffcbc6667b70bc27",
+        "unit_local_fingerprint": "282cd17b9b39b52b"
+      },
+      "rustc_hashes": {
+        "bytes": 27018,
+        "file": "librustc_hashes-627b5f21ec43ce62.rlib",
+        "origin_fingerprint": "rustc_hashes-627b5f21ec43ce62/lib-rustc_hashes",
+        "sha256": "19db5511371cd0f5c4685a9e8bb74eafcaf6c967e15e09a304d8ac61fbb7a717",
+        "unit_local_fingerprint": "558ff07b4ee8b0ed"
+      },
+      "rustc_hir": {
+        "bytes": 4071324,
+        "file": "librustc_hir-99cb3e3691c4a572.rlib",
+        "origin_fingerprint": "rustc_hir-99cb3e3691c4a572/lib-rustc_hir",
+        "sha256": "032984a03fd37d2b336aa51bc1d71b97bb705ea3c82baf8b6c068c05724d3133",
+        "unit_local_fingerprint": "adb8b31f1d8df630"
+      },
+      "rustc_incremental": {
+        "bytes": 4685742,
+        "file": "librustc_incremental-582abf0015495c95.rlib",
+        "origin_fingerprint": "rustc_incremental-582abf0015495c95/lib-rustc_incremental",
+        "sha256": "7fc94851a29f799c7ff9f70dc116fc0813b1664a6c358b74a96d1aa0533b67ce",
+        "unit_local_fingerprint": "df87c02de2001846"
+      },
+      "rustc_index": {
+        "bytes": 493130,
+        "file": "librustc_index-341f29317184c472.rlib",
+        "origin_fingerprint": "rustc_index-341f29317184c472/lib-rustc_index",
+        "sha256": "21e5f0a7a832180146e892845af266b8060b77494bc2760891224fb5fc04f08f",
+        "unit_local_fingerprint": "f10965737458d9aa"
+      },
+      "rustc_lint_defs": {
+        "bytes": 685038,
+        "file": "librustc_lint_defs-c3be93855f85b026.rlib",
+        "origin_fingerprint": "rustc_lint_defs-c3be93855f85b026/lib-rustc_lint_defs",
+        "sha256": "7b68d3247df804e4f2abfa34149e29f07278e2cd2bcd125fc55e272b818c28a4",
+        "unit_local_fingerprint": "f58884433e7b2ebd"
+      },
+      "rustc_macros": {
+        "bytes": 5885064,
+        "file": "librustc_macros-5b27fbb29ae6309f.so",
+        "origin_fingerprint": "rustc_macros-5b27fbb29ae6309f/lib-rustc_macros",
+        "sha256": "c71614360ee1b7ab83801a9a6ff404e42864c37cd18bf3fa377ec79f6c42933b",
+        "unit_local_fingerprint": "fb9a143a87a85f78"
+      },
+      "rustc_metadata": {
+        "bytes": 45038676,
+        "file": "librustc_metadata-7b399f81b9646abb.rlib",
+        "origin_fingerprint": "rustc_metadata-7b399f81b9646abb/lib-rustc_metadata",
+        "sha256": "24a18f1a451367f6ba35d8650aff4c0ad2558b54be32d16d4c6d8554cac11544",
+        "unit_local_fingerprint": "05b32afcebcfc5d7"
+      },
+      "rustc_middle": {
+        "bytes": 73251056,
+        "file": "librustc_middle-17583562ac037b2d.rlib",
+        "origin_fingerprint": "rustc_middle-17583562ac037b2d/lib-rustc_middle",
+        "sha256": "1eee2f090e0a627e313ecc263cabae22414221b7d8abd0a650a0b4c2256a970f",
+        "unit_local_fingerprint": "e71c122607935426"
+      },
+      "rustc_mir_transform": {
+        "bytes": 42251068,
+        "file": "librustc_mir_transform-a7d24cb8ce6ee828.rlib",
+        "origin_fingerprint": "rustc_mir_transform-a7d24cb8ce6ee828/lib-rustc_mir_transform",
+        "sha256": "6b337e6ef3aed6017b6a338d3eaa1786ba26f8f317e5bfe2db07a1510416e695",
+        "unit_local_fingerprint": "752a477dc6aec926"
+      },
+      "rustc_serialize": {
+        "bytes": 452016,
+        "file": "librustc_serialize-0b3986562080c1a2.rlib",
+        "origin_fingerprint": "rustc_serialize-0b3986562080c1a2/lib-rustc_serialize",
+        "sha256": "55b760cabe78d21b66c0e474d7365d1e7efc3c2013127aef727b32fce7f8490f",
+        "unit_local_fingerprint": "ff28e2829c2f4c1d"
+      },
+      "rustc_session": {
+        "bytes": 10426392,
+        "file": "librustc_session-88c9c2c45ac301df.rlib",
+        "origin_fingerprint": "rustc_session-88c9c2c45ac301df/lib-rustc_session",
+        "sha256": "8aea7db84a8762ae183d31ea5d0b0a66af7a92a3fcce026a12bb25ce0dcc5fbd",
+        "unit_local_fingerprint": "84fbca1f404198d9"
+      },
+      "rustc_span": {
+        "bytes": 6699634,
+        "file": "librustc_span-4c3795285c22935c.rlib",
+        "origin_fingerprint": "rustc_span-4c3795285c22935c/lib-rustc_span",
+        "sha256": "dbf09d442bbdc38cd17a457dcab8911133af1792bdaa345a92bfa517e96f0b53",
+        "unit_local_fingerprint": "898176f3ab23f8a1"
+      },
+      "rustc_symbol_mangling": {
+        "bytes": 1663546,
+        "file": "librustc_symbol_mangling-3e226229485ac631.rlib",
+        "origin_fingerprint": "rustc_symbol_mangling-3e226229485ac631/lib-rustc_symbol_mangling",
+        "sha256": "795c5c583dc56372c0f5365e3b9faf91579121fbaea0b1441572a82d9e77654e",
+        "unit_local_fingerprint": "88b7c888ba35f45a"
+      },
+      "rustc_target": {
+        "bytes": 19533238,
+        "file": "librustc_target-abb9711ef6f3ee14.rlib",
+        "origin_fingerprint": "rustc_target-abb9711ef6f3ee14/lib-rustc_target",
+        "sha256": "ac106476a0bfe6bd63d17a2897cee7b303486afc75173fd07978167ba25664bf",
+        "unit_local_fingerprint": "2888d7271e475fe9"
+      },
+      "rustc_trait_selection": {
+        "bytes": 78754184,
+        "file": "librustc_trait_selection-4da98d10d0913ddf.rlib",
+        "origin_fingerprint": "rustc_trait_selection-4da98d10d0913ddf/lib-rustc_trait_selection",
+        "sha256": "f3630a2703bcd2826dc52be24aa8eaecc8f1f0d812a7591f3542115723bd5f7d",
+        "unit_local_fingerprint": "3b67ef9d4bed17dc"
+      },
+      "serde_json": {
+        "bytes": 2494192,
+        "file": "libserde_json-8299e0183cd046de.rlib",
+        "origin_fingerprint": "serde_json-8299e0183cd046de/lib-serde_json",
+        "sha256": "ebdd6445e9a2c41d69ad0fbe2c27c02fa51e57606b0d97b75b98bcdaf4aab0fa",
+        "unit_local_fingerprint": "ae736767d7fd52eb"
+      },
+      "smallvec": {
+        "bytes": 213258,
+        "file": "libsmallvec-53058208a141be68.rlib",
+        "origin_fingerprint": "smallvec-53058208a141be68/lib-smallvec",
+        "sha256": "14a43df1fec18c0134f7794badf2645873447b40794757fc303ac49c8146ae84",
+        "unit_local_fingerprint": "54be9a137af07d68"
+      },
+      "tempfile": {
+        "bytes": 732990,
+        "file": "libtempfile-9906212effc10ccd.rlib",
+        "origin_fingerprint": "tempfile-9906212effc10ccd/lib-tempfile",
+        "sha256": "696d100579f4dd1e84d86a21ead0a34a9cbadf5304b3a513def384c4bf7942df",
+        "unit_local_fingerprint": "50d63fccee72a58c"
+      },
+      "thorin": {
+        "bytes": 1960232,
+        "file": "libthorin-5ffd266de98fb39c.rlib",
+        "origin_fingerprint": "thorin-dwp-5ffd266de98fb39c/lib-thorin",
+        "sha256": "b02c65a4f28de0d01d9849257958cbb7b3f82470eb5558017be57c1d5a8ced9f",
+        "unit_local_fingerprint": "de5c8a98ba73380e"
+      },
+      "tracing": {
+        "bytes": 664334,
+        "file": "libtracing-41e5275e1ca0dc32.rlib",
+        "origin_fingerprint": "tracing-41e5275e1ca0dc32/lib-tracing",
+        "sha256": "ef66cfa723c55d201750eae109c2cd73c68835a56426241586c4e7c3899a7af1",
+        "unit_local_fingerprint": "9459e9d2d2488c85"
+      },
+      "wasm_encoder": {
+        "bytes": 2216476,
+        "file": "libwasm_encoder-ff61253d78ff2cba.rlib",
+        "origin_fingerprint": "wasm-encoder-ff61253d78ff2cba/lib-wasm_encoder",
+        "sha256": "7569430f4842ac8b7b7333cf2c4943bc7776a8ab89e65dca1bba38b9359ce160",
+        "unit_local_fingerprint": "4c3462db23d23d8a"
+      }
+    },
+    "hosted_pgo_training_files_in_published_archives": false,
+    "link_input_addition": [
+      "-Cembed-bitcode=yes",
+      "-Clto=thin",
+      "-Zdylib-lto",
+      "--emit=obj,llvm-bc,metadata"
+    ],
+    "native_addition": [
+      "-Cembed-bitcode=no",
+      "--emit=obj"
+    ],
+    "pinned_stage0": "rustc 1.98.0 (88d9e12ae 2026-08-18)\nbinary: rustc\ncommit-hash: 88d9e12ae178fab0fb5cc050a94da85685d449ea\ncommit-date: 2026-08-18\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.0\nLLVM version: 22.1.8\n",
+    "role_lock_sha256": "c50b183a3fe63de884699baca1f9a54bcb17a6e980408844e8725e4cbb9bb5d5",
+    "stage0_launcher_sha256": "3690cc576ede140504698405d5d8fa3826aaadbe71699c6c4ed0a565d6f493e2"
+  },
+  "consumer": {
+    "observations": {
+      "child": {
+        "complete_rmeta": "0b9a23b5f7d49e936d42a601032c6f01dbd266e49fde503d22c49986108b1ed3",
+        "llvm_call": [
+          "; call <rustc_codegen_ssa::CrateInfo>::new",
+          "  tail call void @_RNvMNtCsdgtrZ2TShmM_17rustc_codegen_ssa4baseNtB4_9CrateInfo3new(ptr noalias nofree noundef nonnull sret([592 x i8]) align 8 captures(none) dereferenceable(592) %_0, ptr noundef nonnull align 8 %tcx, ptr noalias nofree noundef nonnull align 8 captures(address) dereferenceable(24) %cpu)"
+        ],
+        "llvm_ir_sha256": "2b9bca7155b2c5b8ca13ac84102125469decd788dc9f048beae3770d7a2f8ebc",
+        "object_sha256": "7868ab4001883b05cb42a08c07fff312fbb316704f7fa32071b00929fd2aab96",
+        "undefined_symbols": [
+          "                 U <rustc_codegen_ssa::CrateInfo>::new"
+        ]
+      },
+      "parent": {
+        "complete_rmeta": "24a7d9963071d6671ff6b778f1de020a0ec7d839358a42f2e630b33bdd35538b",
+        "llvm_call": [
+          "; call <rustc_codegen_ssa::CrateInfo>::new",
+          "  tail call void @_RNvMNtCsdgtrZ2TShmM_17rustc_codegen_ssa4baseNtB4_9CrateInfo3new(ptr noalias nofree noundef nonnull sret([592 x i8]) align 8 captures(none) dereferenceable(592) %_0, ptr noundef nonnull align 8 %tcx, ptr noalias nofree noundef nonnull align 8 captures(address) dereferenceable(24) %cpu)"
+        ],
+        "llvm_ir_sha256": "2b9bca7155b2c5b8ca13ac84102125469decd788dc9f048beae3770d7a2f8ebc",
+        "object_sha256": "7868ab4001883b05cb42a08c07fff312fbb316704f7fa32071b00929fd2aab96",
+        "undefined_symbols": [
+          "                 U <rustc_codegen_ssa::CrateInfo>::new"
+        ]
+      }
+    },
+    "source_sha256": "b71813509e729d79d60ecd47dfa71f6e308bf98dfba2157ca4d82bb82a09e10e"
+  },
+  "earlier_failure": {
+    "excerpt": [
+      "2026-11-03T14:09:46.2713070Z warning: unused variable: `path`",
+      "2026-11-03T14:09:46.2713360Z     --> compiler/rustc_codegen_ssa/src/back/linker.rs:1754:17",
+      "2026-11-03T14:09:46.2713550Z      |",
+      "2026-11-03T14:09:46.2713660Z 1754 |     if let Some(path) = &target {",
+      "2026-11-03T14:09:46.2713890Z      |                 ^^^^ help: if this is intentional, prefix it with an underscore: `_path`",
+      "2026-11-03T14:09:46.2714100Z      |",
+      "2026-11-03T14:09:46.2714280Z      = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default",
+      "2026-11-03T14:09:46.2714490Z ",
+      "2026-11-03T14:09:46.9979410Z error: `rustc_codegen_ssa` (lib) generated 1 warning (run `cargo fix --lib -p rustc_codegen_ssa` to apply 1 suggestion)",
+      "2026-11-03T14:09:46.9983650Z error: warnings are denied by `build.warnings` configuration"
+    ],
+    "log_sha256": "96e5660d31e8920ad1249807b5d61b0e9a4e22068918494125d892519d5a99cd"
+  },
+  "hardware_only_on_source": "9b63803c29b00106e2eeb544b2387a6e8a8cba1f",
+  "hardware_report": {
+    "case": "uv #21577",
+    "sha256": "9e7a993c301cf2e2a4d02c5369a82f79f6b51bf8d0e5aefa4158c4b13e7c4d43"
+  },
+  "linux": {
+    "case": {
+      "command": "ae4e76fcc94f8bf8de77fbd04140fcfe594dd67a5e8a6c20390ea565f3e94d65",
+      "comparison": {
+        "different_allocated_or_relocation_sections": [],
+        "different_sections": [],
+        "equal_whole_object": true,
+        "sections": [
+          9114,
+          9114
+        ]
+      },
+      "dependency_count": 38,
+      "dependency_inventory": "bb5047488c200ec2a3e1a21699e3e132a20cdc937673bece45ef2e3e50845264",
+      "products": {
+        "child": {
+          "bytes": 4411216,
+          "commit": "a325fe305ae1d6f037ffc0223036b89228bbd6e6",
+          "diagnostics": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "native_code_bytes": 1371710,
+          "relocation_sections": 3375,
+          "sections_sha256": "23d3052f98c0619408961858ca29db770e3f6c3cb42df49043077a7c2feb89c4",
+          "sha256": "eff53610f04f80dcff671dd4311a156c7d4b3b15dabd2f3f583882554f89650e"
+        },
+        "parent": {
+          "bytes": 4411216,
+          "commit": "9b63803c29b00106e2eeb544b2387a6e8a8cba1f",
+          "diagnostics": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "native_code_bytes": 1371710,
+          "relocation_sections": 3375,
+          "sections_sha256": "23d3052f98c0619408961858ca29db770e3f6c3cb42df49043077a7c2feb89c4",
+          "sha256": "eff53610f04f80dcff671dd4311a156c7d4b3b15dabd2f3f583882554f89650e"
+        }
+      },
+      "rustc_banner": "rustc 1.98.0 (88d9e12ae 2026-08-18)\nbinary: rustc\ncommit-hash: 88d9e12ae178fab0fb5cc050a94da85685d449ea\ncommit-date: 2026-08-18\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.0\nLLVM version: 22.1.8\n"
+    },
+    "link_inputs": {
+      "command_sha256": "33ef8b8793d8ef42682ae9ca9a96cb527dfec13720f0db36a040234fcf8b7695",
+      "equal": {
+        "llvm_bitcode": false,
+        "object": true,
+        "rust_metadata": false
+      },
+      "products": {
+        "child": {
+          "llvm_bitcode": {
+            "bytes": 14769996,
+            "raw_original": "child-llvm_bitcode.gz",
+            "sha256": "9677fe22739d8bf02f4f02f1de41c10dcef8947c76ca5852020b664cbb9ae336"
+          },
+          "object": {
+            "bytes": 4543624,
+            "raw_original": "parent-object.gz",
+            "sha256": "e32cd537f245b783f6a69c05c0bbee6b2cf8e2c153ccd71e6264564a7fb749bc"
+          },
+          "rust_metadata": {
+            "bytes": 5207291,
+            "raw_original": "child-rust_metadata.gz",
+            "sha256": "0b9a23b5f7d49e936d42a601032c6f01dbd266e49fde503d22c49986108b1ed3"
+          }
+        },
+        "parent": {
+          "llvm_bitcode": {
+            "bytes": 14769996,
+            "raw_original": "parent-llvm_bitcode.gz",
+            "sha256": "32fc162520af61ff073b7286864486a613036599c2cda250db3b1ed8007ffe8e"
+          },
+          "object": {
+            "bytes": 4543624,
+            "raw_original": "parent-object.gz",
+            "sha256": "e32cd537f245b783f6a69c05c0bbee6b2cf8e2c153ccd71e6264564a7fb749bc"
+          },
+          "rust_metadata": {
+            "bytes": 5207291,
+            "raw_original": "parent-rust_metadata.gz",
+            "sha256": "24a7d9963071d6671ff6b778f1de020a0ec7d839358a42f2e630b33bdd35538b"
+          }
+        }
+      },
+      "target": "x86_64-unknown-linux-gnu"
+    },
+    "sensitivity": {
+      "different_executable_sections": [
+        {
+          "mutated": "a0c4a1457c9bc13ef6c9d5d80b25b7cade591287aff03d84503313ee9ae31ca6",
+          "original": "56e83d6c995c5649bb69cee5ada217fd25fdb48b57efcbbdba7cc6ee88a3055a",
+          "section": ".text._RNvMNtCsdgtrZ2TShmM_17rustc_codegen_ssa4baseNtB4_9CrateInfo3new",
+          "sizes": [
+            26887,
+            26887
+          ],
+          "symbol": "<rustc_codegen_ssa[9a839d351857eb0a]::CrateInfo>::new"
+        }
+      ],
+      "operation": "Swap meta.dev() and meta.ino() arguments only at the actual guarded _path.with_file_name() call. Both builds from private copies of real follow-up.",
+      "swapped_device_and_inode": {
+        "bytes": 4411216,
+        "elf_sha256": "000d73d5ddc48ab3cef7a3502f73abcebc5a0403589693a7b94087fa74cf47f0",
+        "source_sha256": "8eccf0ff2c36d2f0a55f67a72d81baff66e8001a4817154847422e41f3bcdf2a"
+      },
+      "unmodified": {
+        "bytes": 4411216,
+        "elf_sha256": "eff53610f04f80dcff671dd4311a156c7d4b3b15dabd2f3f583882554f89650e",
+        "source_sha256": "c034f9b8048c585129ebe7019cacd3778c19d331744cf94cb88ed9cbc0eaa963"
+      }
+    }
+  },
+  "llvm": {
+    "decoder": "libLLVM.so.22.1-rust-1.98.0-stable",
+    "decoder_sha256": "b2cc5bb9aafd2c8d1fd8ad0e99fd7de09e6831ff319ac99130d737261316596e",
+    "ir": {
+      "bytes": [
+        57703290,
+        57703290
+      ],
+      "child_sha256": "806735761df7850113d84e32edd3757d3c66973fc854547a40e4fae51965b3a5",
+      "diff_sha256": "aaee6220d56a9cae3da9642c27339c879741de218a618a2c1ab417918771435b",
+      "different_lines": 2,
+      "lines": [
+        559800,
+        559800
+      ],
+      "literal_equal": false,
+      "parent_sha256": "063e15c7f7bb517067f44f0bba7db303d3f8d778566b0f4f44b8c43fd1b4255b"
+    },
+    "physical_differing_bytes": {
+      "llvm_bitcode": 38,
+      "rust_metadata": 365
+    },
+    "srcloc": {
+      "child": {
+        "all_ir_except_two_srcloc_payloads_sha256": "42460f7938c19b4334e589ec447d4badc1fcda523418f933b86547f797d2056e",
+        "rows": [
+          {
+            "attachment": "!15585",
+            "function": "define internal fastcc void @_RINvNtCsc36rpYXAlPq_4core3ptr9drop_glueNtNtCsaCv6QgnVwxL_21rustc_data_structures9profiling11TimingGuardECsdgtrZ2TShmM_17rustc_codegen_ssa(ptr noalias nofree noundef nonnull readonly align 8 captures(none) dereferenceable(40) %_1) unnamed_addr #0 {",
+            "line": 70370,
+            "text": "%11 = tail call { i32, i32, i32, i32 } asm sideeffect \"xor %eax, %eax\\0Amov %rbx, ${0:q}\\0Acpuid\\0Amov ${0:q}, %rbx\", \"=r,={ax},={dx},={cx},~{dirflag},~{fpsr},~{flags},~{memory}\"() #73, !noalias !15584, !srcloc !15585"
+          },
+          {
+            "attachment": "!15586",
+            "function": "define internal fastcc void @_RINvNtCsc36rpYXAlPq_4core3ptr9drop_glueNtNtCsaCv6QgnVwxL_21rustc_data_structures9profiling11TimingGuardECsdgtrZ2TShmM_17rustc_codegen_ssa(ptr noalias nofree noundef nonnull readonly align 8 captures(none) dereferenceable(40) %_1) unnamed_addr #0 {",
+            "line": 70371,
+            "text": "%12 = tail call { i32, i32 } asm sideeffect \"rdpmc\", \"={ax},={dx},{cx},~{dirflag},~{fpsr},~{flags},~{memory}\"(i32 %counter1.val.i.i.i.i) #73, !noalias !15584, !srcloc !15586"
+          },
+          {
+            "attachment": "!15585",
+            "function": "define internal fastcc void @_RINvNtCsc36rpYXAlPq_4core3ptr9drop_glueNtNtCsaCv6QgnVwxL_21rustc_data_structures9profiling11TimingGuardECsdgtrZ2TShmM_17rustc_codegen_ssa(ptr noalias nofree noundef nonnull readonly align 8 captures(none) dereferenceable(40) %_1) unnamed_addr #0 {",
+            "line": 70389,
+            "text": "%19 = tail call { i32, i32, i32, i32 } asm sideeffect \"xor %eax, %eax\\0Amov %rbx, ${0:q}\\0Acpuid\\0Amov ${0:q}, %rbx\", \"=r,={ax},={dx},={cx},~{dirflag},~{fpsr},~{flags},~{memory}\"() #73, !noalias !15591, !srcloc !15585"
+          },
+          {
+            "attachment": "!15586",
+            "function": "define internal fastcc void @_RINvNtCsc36rpYXAlPq_4core3ptr9drop_glueNtNtCsaCv6QgnVwxL_21rustc_data_structures9profiling11TimingGuardECsdgtrZ2TShmM_17rustc_codegen_ssa(ptr noalias nofree noundef nonnull readonly align 8 captures(none) dereferenceable(40) %_1) unnamed_addr #0 {",
+            "line": 70390,
+            "text": "%20 = tail call { i32, i32 } asm sideeffect \"rdpmc\", \"={ax},={dx},{cx},~{dirflag},~{fpsr},~{flags},~{memory}\"(i32 %_6.i.i.i.i.i.i) #73, !noalias !15591, !srcloc !15586"
+          },
+          {
+            "attachment": "!15586",
+            "function": "define internal fastcc void @_RINvNtCsc36rpYXAlPq_4core3ptr9drop_glueNtNtCsaCv6QgnVwxL_21rustc_data_structures9profiling11TimingGuardECsdgtrZ2TShmM_17rustc_codegen_ssa(ptr noalias nofree noundef nonnull readonly align 8 captures(none) dereferenceable(40) %_1) unnamed_addr #0 {",
+            "line": 70395,
+            "text": "%23 = tail call { i32, i32 } asm sideeffect \"rdpmc\", \"={ax},={dx},{cx},~{dirflag},~{fpsr},~{flags},~{memory}\"(i32 %_7.i.i.i.i.i.i) #73, !noalias !15591, !srcloc !15586"
+          },
+          {
+            "attachment": "!15585",
+            "function": "define internal fastcc void @_RINvNtCsc36rpYXAlPq_4core3ptr9drop_glueNtNtCsaCv6QgnVwxL_21rustc_data_structures9profiling11TimingGuardECsdgtrZ2TShmM_17rustc_codegen_ssa(ptr noalias nofree noundef nonnull readonly align 8 captures(none) dereferenceable(40) %_1) unnamed_addr #0 {",
+            "line": 70421,
+            "text": "%34 = tail call { i32, i32, i32, i32 } asm sideeffect \"xor %eax, %eax\\0Amov %rbx, ${0:q}\\0Acpuid\\0Amov ${0:q}, %rbx\", \"=r,={ax},={dx},={cx},~{dirflag},~{fpsr},~{flags},~{memory}\"() #73, !noalias !15599, !srcloc !15585"
+          },
+          {
+            "attachment": "!15586",
+            "function": "define internal fastcc void @_RINvNtCsc36rpYXAlPq_4core3ptr9drop_glueNtNtCsaCv6QgnVwxL_21rustc_data_structures9profiling11TimingGuardECsdgtrZ2TShmM_17rustc_codegen_ssa(ptr noalias nofree noundef nonnull readonly align 8 captures(none) dereferenceable(40) %_1) unnamed_addr #0 {",
+            "line": 70422,
+            "text": "%35 = tail call { i32, i32 } asm sideeffect \"rdpmc\", \"={ax},={dx},{cx},~{dirflag},~{fpsr},~{flags},~{memory}\"(i32 %_6.i.i.i.i.i.i.i) #73, !noalias !15599, !srcloc !15586"
+          },
+          {
+            "attachment": "!15586",
+            "function": "define internal fastcc void @_RINvNtCsc36rpYXAlPq_4core3ptr9drop_glueNtNtCsaCv6QgnVwxL_21rustc_data_structures9profiling11TimingGuardECsdgtrZ2TShmM_17rustc_codegen_ssa(ptr noalias nofree noundef nonnull readonly align 8 captures(none) dereferenceable(40) %_1) unnamed_addr #0 {",
+            "line": 70427,
+            "text": "%38 = tail call { i32, i32 } asm sideeffect \"rdpmc\", \"={ax},={dx},{cx},~{dirflag},~{fpsr},~{flags},~{memory}\"(i32 %_7.i.i.i7.i.i.i.i) #73, !noalias !15599, !srcloc !15586"
+          },
+          {
+            "definition": "!15585",
+            "line": 473942,
+            "text": "!15585 = !{i64 101267134065657310, i64 101268061778593455, i64 101268340951467776, i64 101268517045126937}"
+          },
+          {
+            "definition": "!15586",
+            "line": 473943,
+            "text": "!15586 = !{i64 101272919386606378}"
+          }
+        ]
+      },
+      "parent": {
+        "all_ir_except_two_srcloc_payloads_sha256": "42460f7938c19b4334e589ec447d4badc1fcda523418f933b86547f797d2056e",
+        "rows": [
+          {
+            "attachment": "!15585",
+            "function": "define internal fastcc void @_RINvNtCsc36rpYXAlPq_4core3ptr9drop_glueNtNtCsaCv6QgnVwxL_21rustc_data_structures9profiling11TimingGuardECsdgtrZ2TShmM_17rustc_codegen_ssa(ptr noalias nofree noundef nonnull readonly align 8 captures(none) dereferenceable(40) %_1) unnamed_addr #0 {",
+            "line": 70370,
+            "text": "%11 = tail call { i32, i32, i32, i32 } asm sideeffect \"xor %eax, %eax\\0Amov %rbx, ${0:q}\\0Acpuid\\0Amov ${0:q}, %rbx\", \"=r,={ax},={dx},={cx},~{dirflag},~{fpsr},~{flags},~{memory}\"() #73, !noalias !15584, !srcloc !15585"
+          },
+          {
+            "attachment": "!15586",
+            "function": "define internal fastcc void @_RINvNtCsc36rpYXAlPq_4core3ptr9drop_glueNtNtCsaCv6QgnVwxL_21rustc_data_structures9profiling11TimingGuardECsdgtrZ2TShmM_17rustc_codegen_ssa(ptr noalias nofree noundef nonnull readonly align 8 captures(none) dereferenceable(40) %_1) unnamed_addr #0 {",
+            "line": 70371,
+            "text": "%12 = tail call { i32, i32 } asm sideeffect \"rdpmc\", \"={ax},={dx},{cx},~{dirflag},~{fpsr},~{flags},~{memory}\"(i32 %counter1.val.i.i.i.i) #73, !noalias !15584, !srcloc !15586"
+          },
+          {
+            "attachment": "!15585",
+            "function": "define internal fastcc void @_RINvNtCsc36rpYXAlPq_4core3ptr9drop_glueNtNtCsaCv6QgnVwxL_21rustc_data_structures9profiling11TimingGuardECsdgtrZ2TShmM_17rustc_codegen_ssa(ptr noalias nofree noundef nonnull readonly align 8 captures(none) dereferenceable(40) %_1) unnamed_addr #0 {",
+            "line": 70389,
+            "text": "%19 = tail call { i32, i32, i32, i32 } asm sideeffect \"xor %eax, %eax\\0Amov %rbx, ${0:q}\\0Acpuid\\0Amov ${0:q}, %rbx\", \"=r,={ax},={dx},={cx},~{dirflag},~{fpsr},~{flags},~{memory}\"() #73, !noalias !15591, !srcloc !15585"
+          },
+          {
+            "attachment": "!15586",
+            "function": "define internal fastcc void @_RINvNtCsc36rpYXAlPq_4core3ptr9drop_glueNtNtCsaCv6QgnVwxL_21rustc_data_structures9profiling11TimingGuardECsdgtrZ2TShmM_17rustc_codegen_ssa(ptr noalias nofree noundef nonnull readonly align 8 captures(none) dereferenceable(40) %_1) unnamed_addr #0 {",
+            "line": 70390,
+            "text": "%20 = tail call { i32, i32 } asm sideeffect \"rdpmc\", \"={ax},={dx},{cx},~{dirflag},~{fpsr},~{flags},~{memory}\"(i32 %_6.i.i.i.i.i.i) #73, !noalias !15591, !srcloc !15586"
+          },
+          {
+            "attachment": "!15586",
+            "function": "define internal fastcc void @_RINvNtCsc36rpYXAlPq_4core3ptr9drop_glueNtNtCsaCv6QgnVwxL_21rustc_data_structures9profiling11TimingGuardECsdgtrZ2TShmM_17rustc_codegen_ssa(ptr noalias nofree noundef nonnull readonly align 8 captures(none) dereferenceable(40) %_1) unnamed_addr #0 {",
+            "line": 70395,
+            "text": "%23 = tail call { i32, i32 } asm sideeffect \"rdpmc\", \"={ax},={dx},{cx},~{dirflag},~{fpsr},~{flags},~{memory}\"(i32 %_7.i.i.i.i.i.i) #73, !noalias !15591, !srcloc !15586"
+          },
+          {
+            "attachment": "!15585",
+            "function": "define internal fastcc void @_RINvNtCsc36rpYXAlPq_4core3ptr9drop_glueNtNtCsaCv6QgnVwxL_21rustc_data_structures9profiling11TimingGuardECsdgtrZ2TShmM_17rustc_codegen_ssa(ptr noalias nofree noundef nonnull readonly align 8 captures(none) dereferenceable(40) %_1) unnamed_addr #0 {",
+            "line": 70421,
+            "text": "%34 = tail call { i32, i32, i32, i32 } asm sideeffect \"xor %eax, %eax\\0Amov %rbx, ${0:q}\\0Acpuid\\0Amov ${0:q}, %rbx\", \"=r,={ax},={dx},={cx},~{dirflag},~{fpsr},~{flags},~{memory}\"() #73, !noalias !15599, !srcloc !15585"
+          },
+          {
+            "attachment": "!15586",
+            "function": "define internal fastcc void @_RINvNtCsc36rpYXAlPq_4core3ptr9drop_glueNtNtCsaCv6QgnVwxL_21rustc_data_structures9profiling11TimingGuardECsdgtrZ2TShmM_17rustc_codegen_ssa(ptr noalias nofree noundef nonnull readonly align 8 captures(none) dereferenceable(40) %_1) unnamed_addr #0 {",
+            "line": 70422,
+            "text": "%35 = tail call { i32, i32 } asm sideeffect \"rdpmc\", \"={ax},={dx},{cx},~{dirflag},~{fpsr},~{flags},~{memory}\"(i32 %_6.i.i.i.i.i.i.i) #73, !noalias !15599, !srcloc !15586"
+          },
+          {
+            "attachment": "!15586",
+            "function": "define internal fastcc void @_RINvNtCsc36rpYXAlPq_4core3ptr9drop_glueNtNtCsaCv6QgnVwxL_21rustc_data_structures9profiling11TimingGuardECsdgtrZ2TShmM_17rustc_codegen_ssa(ptr noalias nofree noundef nonnull readonly align 8 captures(none) dereferenceable(40) %_1) unnamed_addr #0 {",
+            "line": 70427,
+            "text": "%38 = tail call { i32, i32 } asm sideeffect \"rdpmc\", \"={ax},={dx},{cx},~{dirflag},~{fpsr},~{flags},~{memory}\"(i32 %_7.i.i.i7.i.i.i.i) #73, !noalias !15599, !srcloc !15586"
+          },
+          {
+            "definition": "!15585",
+            "line": 473942,
+            "text": "!15585 = !{i64 101267125475722716, i64 101268053188658861, i64 101268332361533182, i64 101268508455192343}"
+          },
+          {
+            "definition": "!15586",
+            "line": 473943,
+            "text": "!15586 = !{i64 101272910796671784}"
+          }
+        ]
+      }
+    }
+  },
+  "measured_pair": {
+    "R": {
+      "coordinator": "6aa4ca42185a20df40680c5ee62d349d875e20a4",
+      "driver_sha256": "e200165fcc7173ad18a4773c7aa3cca5e310945e9e03f58a42ebe85eff4f2921",
+      "effective_cargo": "/home/dev-user/Documents/Codex/2026-10-28/i-want-you-to-hillclimb-on/work/check-root-20261101/remainder/loader-small-edits/production-source/completed-production/R/fixed/cargo",
+      "installed_members": 142,
+      "job": 125848517737,
+      "qa": {
+        "bytes": 3139704,
+        "id": 13223886057,
+        "name": "rc23-21577-qa-R-attempt-1",
+        "reopened_members": {
+          "role.json": {
+            "bytes": 97457,
+            "sha256": "e03d6ed21757798d28f74b49827533f6f2d8174824fcf9551453793cc5a2dada"
+          },
+          "source.json": {
+            "bytes": 5181,
+            "sha256": "a59cd2d703ae3681de0cf2b2a9ab6f43590719e30c41d9edfb6f8c1b30dac4aa"
+          }
+        },
+        "sha256": "e02e63f9c0654b1ce4ad9ad18472f011795f84b0a065bad8f29c14a5b31b137a",
+        "total_members": 35
+      },
+      "role_sha256": "e03d6ed21757798d28f74b49827533f6f2d8174824fcf9551453793cc5a2dada",
+      "run": 41615634254,
+      "sdk": {
+        "bytes": 360058814,
+        "id": 13222703895,
+        "name": "rc23-21577-sdk-R",
+        "reopened_members": {
+          "role.json": {
+            "bytes": 97457,
+            "sha256": "e03d6ed21757798d28f74b49827533f6f2d8174824fcf9551453793cc5a2dada"
+          },
+          "source.json": {
+            "bytes": 5181,
+            "sha256": "a59cd2d703ae3681de0cf2b2a9ab6f43590719e30c41d9edfb6f8c1b30dac4aa"
+          }
+        },
+        "sha256": "4f5bf88b6dbe2fcf1dabc37f5b689ebaa94fc6a379d1574ad9832955ceff3b77",
+        "total_members": 6
+      },
+      "source_commit": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+      "source_sha256": "a59cd2d703ae3681de0cf2b2a9ab6f43590719e30c41d9edfb6f8c1b30dac4aa",
+      "source_tree": "f5bf03d73f71243fb88e34ecb0b155ef11e99a47"
+    },
+    "T": {
+      "coordinator": "5acf266eebbefac4c04f8f25e2722ae25a3c4425",
+      "driver_sha256": "99baba753ab3d4e39e13b1fc5ff7541ada19206e74d5e8e52153db9081411e56",
+      "effective_cargo": "/home/dev-user/Documents/Codex/2026-10-28/i-want-you-to-hillclimb-on/work/check-root-20261101/remainder/loader-small-edits/production-source/product-amendment/phase-producer/completed-production/T/fixed/cargo",
+      "installed_members": 142,
+      "job": 125933263665,
+      "qa": {
+        "bytes": 6770674,
+        "id": 13235019306,
+        "name": "rc23-21577-prelto-qa-T-attempt-1",
+        "reopened_members": {
+          "role.json": {
+            "bytes": 115152,
+            "sha256": "4e906833ba6a1fe6e09eb12c98c3f9df0bf3969aa6ce0387a4eb6a3621ec516f"
+          },
+          "source-observation.json": {
+            "bytes": 410487,
+            "sha256": "9283c738c5dfcba738cff3ca6a9507f56001d35f970bf466a050f998d28d5ec2"
+          },
+          "source.json": {
+            "bytes": 8079,
+            "sha256": "3b63b115f6253f9ab13b9a86ce62e491a87677fd9998f879ca4a7f2b09823309"
+          }
+        },
+        "sha256": "1cf127e08bac8123aa2b80bc949f46c451428c82b8e55a4b2ce7b3decef6f6a1",
+        "total_members": 921
+      },
+      "role_sha256": "4e906833ba6a1fe6e09eb12c98c3f9df0bf3969aa6ce0387a4eb6a3621ec516f",
+      "run": 41640655120,
+      "sdk": {
+        "bytes": 413681473,
+        "id": 13236130663,
+        "name": "rc23-21577-prelto-dist-T",
+        "reopened_members": {
+          "source.json": {
+            "bytes": 8079,
+            "sha256": "3b63b115f6253f9ab13b9a86ce62e491a87677fd9998f879ca4a7f2b09823309"
+          }
+        },
+        "sha256": "baa5b0acd2553963ee3dec6c7402de128e338388b9f41cff264ad0676c628542",
+        "total_members": 5
+      },
+      "source_commit": "9b63803c29b00106e2eeb544b2387a6e8a8cba1f",
+      "source_sha256": "3b63b115f6253f9ab13b9a86ce62e491a87677fd9998f879ca4a7f2b09823309",
+      "source_tree": "8baa0c39260b1bc23a181a1de0be4a6885f36cc1"
+    }
+  },
+  "members": {
+    "caller.rs": {
+      "bytes": 277,
+      "sha256": "b71813509e729d79d60ecd47dfa71f6e308bf98dfba2157ca4d82bb82a09e10e"
+    },
+    "child-caller.ll": {
+      "bytes": 1660,
+      "sha256": "2b9bca7155b2c5b8ca13ac84102125469decd788dc9f048beae3770d7a2f8ebc"
+    },
+    "child-caller.o": {
+      "bytes": 1176,
+      "sha256": "7868ab4001883b05cb42a08c07fff312fbb316704f7fa32071b00929fd2aab96"
+    },
+    "child.bc": {
+      "bytes": 14769996,
+      "sha256": "9677fe22739d8bf02f4f02f1de41c10dcef8947c76ca5852020b664cbb9ae336"
+    },
+    "child.o": {
+      "bytes": 4411216,
+      "sha256": "eff53610f04f80dcff671dd4311a156c7d4b3b15dabd2f3f583882554f89650e"
+    },
+    "child.rmeta": {
+      "bytes": 5207291,
+      "sha256": "0b9a23b5f7d49e936d42a601032c6f01dbd266e49fde503d22c49986108b1ed3"
+    },
+    "child.rs": {
+      "bytes": 73502,
+      "sha256": "c034f9b8048c585129ebe7019cacd3778c19d331744cf94cb88ed9cbc0eaa963"
+    },
+    "parent-caller.ll": {
+      "bytes": 1660,
+      "sha256": "2b9bca7155b2c5b8ca13ac84102125469decd788dc9f048beae3770d7a2f8ebc"
+    },
+    "parent-caller.o": {
+      "bytes": 1176,
+      "sha256": "7868ab4001883b05cb42a08c07fff312fbb316704f7fa32071b00929fd2aab96"
+    },
+    "parent.bc": {
+      "bytes": 14769996,
+      "sha256": "32fc162520af61ff073b7286864486a613036599c2cda250db3b1ed8007ffe8e"
+    },
+    "parent.o": {
+      "bytes": 4411216,
+      "sha256": "eff53610f04f80dcff671dd4311a156c7d4b3b15dabd2f3f583882554f89650e"
+    },
+    "parent.rmeta": {
+      "bytes": 5207291,
+      "sha256": "24a7d9963071d6671ff6b778f1de020a0ec7d839358a42f2e630b33bdd35538b"
+    },
+    "parent.rs": {
+      "bytes": 73500,
+      "sha256": "93674065522f41b77dbd9c64f35f40fd652dce10509b9304d6c893e7654b0a55"
+    },
+    "swapped.o": {
+      "bytes": 4411216,
+      "sha256": "000d73d5ddc48ab3cef7a3502f73abcebc5a0403589693a7b94087fa74cf47f0"
+    }
+  },
+  "metadata_root": {
+    "child": {
+      "sha256": "3aa04f026f578de4fdb5c2a51827f65f58f180b094ac829ad2ddcdaa70bdb0fd",
+      "text": "Crate info:\nname rustc_codegen_ssa\nhash e5181d3452d0f8f47799a63511d9a8ec stable_crate_id StableCrateId(11133915555157240586)\nproc_macro false\ntriple x86_64-unknown-linux-gnu\nedition 2024\nsymbol_mangling_version V0\nrequired_panic_strategy None panic_in_drop_strategy Unwind\nhas_global_allocator false has_alloc_error_handler false has_panic_handler fa"
+    },
+    "parent": {
+      "sha256": "945c3d07c90a188987a2ecdfb5d607ed29ec628e32b69fff7e96cf65d75729b5",
+      "text": "Crate info:\nname rustc_codegen_ssa\nhash f8d8c5921a96ad33438caf73af8a7429 stable_crate_id StableCrateId(11133915555157240586)\nproc_macro false\ntriple x86_64-unknown-linux-gnu\nedition 2024\nsymbol_mangling_version V0\nrequired_panic_strategy None panic_in_drop_strategy Unwind\nhas_global_allocator false has_alloc_error_handler false has_panic_handler fa"
+    }
+  },
+  "path": "compiler/rustc_codegen_ssa/src/back/linker.rs",
+  "schema": 1,
+  "source": {
+    "child": {
+      "commit": "a325fe305ae1d6f037ffc0223036b89228bbd6e6",
+      "git_blob": "02e51695774acbdc76f7084835c3846661a51c21",
+      "tree": "3ae682a74d2ea019b1c1a9f567103311796a9696"
+    },
+    "parent": {
+      "commit": "9b63803c29b00106e2eeb544b2387a6e8a8cba1f",
+      "git_blob": "c7f58f5cb0fb7685d5686a0be710b4cb907637e4",
+      "tree": "8baa0c39260b1bc23a181a1de0be4a6885f36cc1"
+    }
+  },
+  "target_probe": {
+    "followup": {
+      "source": "#![feature(no_core, lang_items)]\n#![no_core]\n#![allow(internal_features)]\n#![deny(unused_variables)]\n#[lang = \"pointee_sized\"] pub trait PointeeSized {}\n#[lang = \"meta_sized\"] pub trait MetaSized: PointeeSized {}\n#[lang = \"sized\"] pub trait Sized: MetaSized {}\n#[lang = \"copy\"] pub trait Copy {}\npub enum Target { Some(u32), None }\nuse Target::Some;\nfn consume(_: &u32) {}\npub fn probe(target: Target) {\n    if let Some(_path) = &target {\n        #[cfg(target_os = \"linux\")]\n        consume(_path);\n    }\n}\n",
+      "target_results": [
+        {
+          "commit": "a325fe305ae1d6f037ffc0223036b89228bbd6e6",
+          "diagnostic": "",
+          "metadata_sha256": "a959409d82244dfd0cfb0d1e3178ca023ba45d9bf21f4b78d8c060b9a38aabc7",
+          "parameters": {
+            "binding": "    if let Some(_path) = &target {",
+            "cfg": "#[cfg(target_os = \"linux\")]",
+            "use": "_path"
+          },
+          "returncode": 0,
+          "source_projection_sha256": "1f8529876ef0c8e727e37e44fe20267af557b18ed7128fea70791be70d560ae2",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        {
+          "commit": "a325fe305ae1d6f037ffc0223036b89228bbd6e6",
+          "diagnostic": "warning: function `consume` is never used\n  --> $PROBE/followup.rs:11:4\n   |\n11 | fn consume(_: &u32) {}\n   |    ^^^^^^^\n   |\n   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\nwarning: 1 warning emitted\n\n",
+          "metadata_sha256": "962d7cce7df5d9f6bb5e98cd5a44da8b67a73166d7919b652a3e4584df4fedc1",
+          "parameters": {
+            "binding": "    if let Some(_path) = &target {",
+            "cfg": "#[cfg(target_os = \"linux\")]",
+            "use": "_path"
+          },
+          "returncode": 0,
+          "source_projection_sha256": "1f8529876ef0c8e727e37e44fe20267af557b18ed7128fea70791be70d560ae2",
+          "stderr_sha256": "431cc1b71c5f2a8d873053e913cf14dc48ac524dafeaf134c3e4c7c74e421f74",
+          "target": "aarch64-apple-darwin"
+        },
+        {
+          "commit": "a325fe305ae1d6f037ffc0223036b89228bbd6e6",
+          "diagnostic": "warning: function `consume` is never used\n  --> $PROBE/followup.rs:11:4\n   |\n11 | fn consume(_: &u32) {}\n   |    ^^^^^^^\n   |\n   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\nwarning: 1 warning emitted\n\n",
+          "metadata_sha256": "b807491aaf681f28679b578d4014f1207f6f193ef7f6c9cca9ef60e752a7ed0e",
+          "parameters": {
+            "binding": "    if let Some(_path) = &target {",
+            "cfg": "#[cfg(target_os = \"linux\")]",
+            "use": "_path"
+          },
+          "returncode": 0,
+          "source_projection_sha256": "1f8529876ef0c8e727e37e44fe20267af557b18ed7128fea70791be70d560ae2",
+          "stderr_sha256": "431cc1b71c5f2a8d873053e913cf14dc48ac524dafeaf134c3e4c7c74e421f74",
+          "target": "x86_64-pc-windows-msvc"
+        }
+      ]
+    },
+    "measured": {
+      "source": "#![feature(no_core, lang_items)]\n#![no_core]\n#![allow(internal_features)]\n#![deny(unused_variables)]\n#[lang = \"pointee_sized\"] pub trait PointeeSized {}\n#[lang = \"meta_sized\"] pub trait MetaSized: PointeeSized {}\n#[lang = \"sized\"] pub trait Sized: MetaSized {}\n#[lang = \"copy\"] pub trait Copy {}\npub enum Target { Some(u32), None }\nuse Target::Some;\nfn consume(_: &u32) {}\npub fn probe(target: Target) {\n    if let Some(path) = &target {\n        #[cfg(target_os = \"linux\")]\n        consume(path);\n    }\n}\n",
+      "target_results": [
+        {
+          "commit": "9b63803c29b00106e2eeb544b2387a6e8a8cba1f",
+          "diagnostic": "",
+          "metadata_sha256": "d5f8f3d50de863359cff2d5e908e795fa479d707a922e2833eabf30a9aec3fbe",
+          "parameters": {
+            "binding": "    if let Some(path) = &target {",
+            "cfg": "#[cfg(target_os = \"linux\")]",
+            "use": "path"
+          },
+          "returncode": 0,
+          "source_projection_sha256": "1c1d8950fa6871bfb9cf3be3e84d8d7f6eed1aeb707db090ce1941c006b0e315",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        {
+          "commit": "9b63803c29b00106e2eeb544b2387a6e8a8cba1f",
+          "diagnostic": "error: unused variable: `path`\n  --> $PROBE/measured.rs:13:17\n   |\n13 |     if let Some(path) = &target {\n   |                 ^^^^ help: if this is intentional, prefix it with an underscore: `_path`\n   |\nnote: the lint level is defined here\n  --> $PROBE/measured.rs:4:9\n   |\n 4 | #![deny(unused_variables)]\n   |         ^^^^^^^^^^^^^^^^\n\nwarning: function `consume` is never used\n  --> $PROBE/measured.rs:11:4\n   |\n11 | fn consume(_: &u32) {}\n   |    ^^^^^^^\n   |\n   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\nerror: aborting due to 1 previous error; 1 warning emitted\n\n",
+          "metadata_sha256": null,
+          "parameters": {
+            "binding": "    if let Some(path) = &target {",
+            "cfg": "#[cfg(target_os = \"linux\")]",
+            "use": "path"
+          },
+          "returncode": 1,
+          "source_projection_sha256": "1c1d8950fa6871bfb9cf3be3e84d8d7f6eed1aeb707db090ce1941c006b0e315",
+          "stderr_sha256": "5b41bacd22481ea932e5525f9f67e55cf243417268b316721d4132dc0bbee4f9",
+          "target": "aarch64-apple-darwin"
+        },
+        {
+          "commit": "9b63803c29b00106e2eeb544b2387a6e8a8cba1f",
+          "diagnostic": "error: unused variable: `path`\n  --> $PROBE/measured.rs:13:17\n   |\n13 |     if let Some(path) = &target {\n   |                 ^^^^ help: if this is intentional, prefix it with an underscore: `_path`\n   |\nnote: the lint level is defined here\n  --> $PROBE/measured.rs:4:9\n   |\n 4 | #![deny(unused_variables)]\n   |         ^^^^^^^^^^^^^^^^\n\nwarning: function `consume` is never used\n  --> $PROBE/measured.rs:11:4\n   |\n11 | fn consume(_: &u32) {}\n   |    ^^^^^^^\n   |\n   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\nerror: aborting due to 1 previous error; 1 warning emitted\n\n",
+          "metadata_sha256": null,
+          "parameters": {
+            "binding": "    if let Some(path) = &target {",
+            "cfg": "#[cfg(target_os = \"linux\")]",
+            "use": "path"
+          },
+          "returncode": 1,
+          "source_projection_sha256": "1c1d8950fa6871bfb9cf3be3e84d8d7f6eed1aeb707db090ce1941c006b0e315",
+          "stderr_sha256": "5b41bacd22481ea932e5525f9f67e55cf243417268b316721d4132dc0bbee4f9",
+          "target": "x86_64-pc-windows-msvc"
+        }
+      ]
+    }
+  },
+  "two_token_patch": "f15848e2ab3535f58d1069e45e97482c33d83ce7bf35ea63adde6f76b6364365"
+}
