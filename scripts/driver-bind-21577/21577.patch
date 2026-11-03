@@ -1,0 +1,771 @@
+diff --git a/crates/uv-client/tests/it/ssl_certs.rs b/crates/uv-client/tests/it/ssl_certs.rs
+index 17ea2c410f383fa11392f1d129485713cf3f9fbd..bef08517b8bbb4af594a7a44611e00ebe0de509a 100644
+--- a/crates/uv-client/tests/it/ssl_certs.rs
++++ b/crates/uv-client/tests/it/ssl_certs.rs
+@@ -261,7 +261,7 @@ impl TestClient {
+             let mut rendered = String::new();
+             write_error_chain_with_options(
+                 &error,
+-                error.hints(),
++                &error.hints(),
+                 ErrorOptions::default().with_stream(&mut rendered),
+             )
+             .unwrap();
+diff --git a/crates/uv-dev/src/main.rs b/crates/uv-dev/src/main.rs
+index 54476fc70e9a956241dbbcd8c1da1e7a5c25fece..c55d6fe658231ed2af8f034500fc6d22f804c019 100644
+--- a/crates/uv-dev/src/main.rs
++++ b/crates/uv-dev/src/main.rs
+@@ -68,7 +68,7 @@ async fn main() -> ExitCode {
+     if let Err(err) = result {
+         trace!("Error trace: {err:?}");
+         let err = err.context("uv-dev failed");
+-        uv_errors::write_error_chain(err.as_ref(), uv_errors::Hints::none())
++        uv_errors::write_error_chain(err.as_ref(), &uv_errors::Hints::none())
+             .expect("writing to stderr should not fail");
+         ExitCode::FAILURE
+     } else {
+diff --git a/crates/uv-errors/src/lib.rs b/crates/uv-errors/src/lib.rs
+index b250c3ebee48c177e4244f1e7394cfb6280126b2..dce342adbf9b53bb7ff2c416e26108ca9b2cd376 100644
+--- a/crates/uv-errors/src/lib.rs
++++ b/crates/uv-errors/src/lib.rs
+@@ -21,30 +21,90 @@ pub trait Hinted {
+     }
+ }
+ 
++/// The display order of a user-facing hint.
++#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
++pub enum HintOrdering {
++    /// Advice that should be shown before other hints.
++    First,
++    /// Advice with no preferred placement.
++    #[default]
++    Any,
++    /// General advice that should follow more specific hints.
++    Last,
++}
++
++/// A user-facing hint and its preferred display order.
++pub struct Hint<'a> {
++    message: Cow<'a, str>,
++    ordering: HintOrdering,
++}
++
++impl<'a> Hint<'a> {
++    /// Create a hint with no preferred placement.
++    pub fn new(message: impl Into<Cow<'a, str>>) -> Self {
++        Self {
++            message: message.into(),
++            ordering: HintOrdering::default(),
++        }
++    }
++
++    /// Set the preferred display order of this hint.
++    #[must_use]
++    pub fn with_ordering(mut self, ordering: HintOrdering) -> Self {
++        self.ordering = ordering;
++        self
++    }
++
++    /// Convert a borrowed hint to owned, extending its lifetime to `'static`.
++    fn into_owned(self) -> Hint<'static> {
++        Hint {
++            message: Cow::Owned(self.message.into_owned()),
++            ordering: self.ordering,
++        }
++    }
++}
++
++impl<'a> From<&'a str> for Hint<'a> {
++    fn from(message: &'a str) -> Self {
++        Self::new(message)
++    }
++}
++
++impl From<String> for Hint<'_> {
++    fn from(message: String) -> Self {
++        Self::new(message)
++    }
++}
++
+ /// A collection of user-facing hint messages.
+ ///
+ /// Each hint is rendered on its own line, prefixed with the styled `hint:` label.
+-pub struct Hints<'a>(Vec<Cow<'a, str>>);
++/// Hints are grouped by [`HintOrdering`], retaining insertion order within each group.
++pub struct Hints<'a>(Vec<Hint<'a>>);
+ 
+-impl Hints<'_> {
++impl<'a> Hints<'a> {
+     /// No hints.
+     pub fn none() -> Self {
+         Self(Vec::new())
+     }
+ 
+-    /// Add a single owned hint.
+-    pub fn push(&mut self, hint: String) {
+-        self.0.push(Cow::Owned(hint));
++    /// Add a single hint.
++    pub fn push(&mut self, hint: impl Into<Hint<'a>>) {
++        self.0.push(hint.into());
++    }
++
++    /// Set the display order of every hint in this collection.
++    #[must_use]
++    pub fn with_ordering(mut self, ordering: HintOrdering) -> Self {
++        for hint in &mut self.0 {
++            hint.ordering = ordering;
++        }
++        self
+     }
+ 
+     /// Convert all borrowed hints to owned, extending the lifetime to `'static`.
+     pub fn into_owned(self) -> Hints<'static> {
+-        Hints(
+-            self.0
+-                .into_iter()
+-                .map(|cow| Cow::Owned(cow.into_owned()))
+-                .collect(),
+-        )
++        Hints(self.0.into_iter().map(Hint::into_owned).collect())
+     }
+ 
+     /// Whether the collection is empty.
+@@ -52,20 +112,75 @@ impl Hints<'_> {
+         self.0.is_empty()
+     }
+ 
++    /// Iterate over hint messages in display order.
++    pub fn iter(&self) -> HintsIter<'_, 'a> {
++        HintsIter {
++            hints: &self.0,
++            current: self.0.iter(),
++            ordering: HintOrdering::First,
++            remaining: [HintOrdering::Any, HintOrdering::Last].into_iter(),
++        }
++    }
++
+     /// Extend with another set of hints, converting borrowed hints to owned.
+-    pub fn extend<T>(&mut self, other: impl IntoIterator<Item = T>)
+-    where
+-        T: Into<String>,
+-    {
+-        for hint in other {
+-            let hint = Cow::Owned(hint.into());
+-            if !self.0.iter().any(|existing| existing == &hint) {
+-                self.0.push(hint);
++    ///
++    /// Duplicate messages retain their first insertion position and earliest ordering.
++    pub fn extend(&mut self, other: Hints<'_>) {
++        for hint in other.0 {
++            if let Some(existing) = self
++                .0
++                .iter_mut()
++                .find(|existing| existing.message == hint.message)
++            {
++                existing.ordering = existing.ordering.min(hint.ordering);
++            } else {
++                self.0.push(hint.into_owned());
+             }
+         }
+     }
+ }
+ 
++/// A borrowed iterator over hint messages in display order.
++pub struct HintsIter<'h, 'a> {
++    hints: &'h [Hint<'a>],
++    current: std::slice::Iter<'h, Hint<'a>>,
++    ordering: HintOrdering,
++    remaining: std::array::IntoIter<HintOrdering, 2>,
++}
++
++impl<'h> Iterator for HintsIter<'h, '_> {
++    type Item = &'h str;
++
++    fn next(&mut self) -> Option<Self::Item> {
++        loop {
++            if let Some(hint) = self.current.find(|hint| hint.ordering == self.ordering) {
++                return Some(hint.message.as_ref());
++            }
++            self.ordering = self.remaining.next()?;
++            self.current = self.hints.iter();
++        }
++    }
++}
++
++impl<'h, 'a> IntoIterator for &'h Hints<'a> {
++    type Item = &'h str;
++    type IntoIter = HintsIter<'h, 'a>;
++
++    fn into_iter(self) -> Self::IntoIter {
++        self.iter()
++    }
++}
++
++impl<'a> IntoIterator for Hints<'a> {
++    type Item = Cow<'a, str>;
++    type IntoIter = std::iter::Map<std::vec::IntoIter<Hint<'a>>, fn(Hint<'a>) -> Cow<'a, str>>;
++
++    fn into_iter(mut self) -> Self::IntoIter {
++        self.0.sort_by_key(|hint| hint.ordering);
++        self.0.into_iter().map(|hint| hint.message)
++    }
++}
++
+ /// A display adapter for an error followed by its hints.
+ ///
+ /// Error renderers line-terminate the error before rendering [`Hints`]. Use
+@@ -95,40 +210,37 @@ impl<E: fmt::Display> fmt::Display for ErrorWithHints<'_, E> {
+ 
+ impl<'a> From<&'a str> for Hints<'a> {
+     fn from(hint: &'a str) -> Self {
+-        Self(vec![Cow::Borrowed(hint)])
++        Self::from(Hint::from(hint))
+     }
+ }
+ 
+ impl From<String> for Hints<'_> {
+     fn from(hint: String) -> Self {
+-        Self(vec![Cow::Owned(hint)])
++        Self::from(Hint::from(hint))
+     }
+ }
+ 
+-impl FromIterator<String> for Hints<'_> {
+-    fn from_iter<I: IntoIterator<Item = String>>(iter: I) -> Self {
+-        Self(iter.into_iter().map(Cow::Owned).collect())
++impl<'a> From<Hint<'a>> for Hints<'a> {
++    fn from(hint: Hint<'a>) -> Self {
++        Self(vec![hint])
++    }
++}
++
++impl<'a, T: Into<Hint<'a>>> FromIterator<T> for Hints<'a> {
++    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
++        Self(iter.into_iter().map(Into::into).collect())
+     }
+ }
+ 
+ impl fmt::Display for Hints<'_> {
+     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+-        for hint in &self.0 {
++        for hint in self {
+             write!(f, "\n{HintPrefix} {hint}")?;
+         }
+         Ok(())
+     }
+ }
+ 
+-impl<'a> IntoIterator for Hints<'a> {
+-    type Item = Cow<'a, str>;
+-    type IntoIter = std::vec::IntoIter<Cow<'a, str>>;
+-
+-    fn into_iter(self) -> Self::IntoIter {
+-        self.0.into_iter()
+-    }
+-}
+-
+ /// A styled `hint:` prefix for use in user-facing messages.
+ pub struct HintPrefix;
+ 
+@@ -208,7 +320,7 @@ impl<'a, C, W> ErrorOptions<'a, C, W> {
+ 
+ /// Format an error chain and explicitly supplied hints to standard error using the default level
+ /// and color.
+-pub fn write_error_chain(err: &dyn Error, hints: Hints<'_>) -> fmt::Result {
++pub fn write_error_chain(err: &dyn Error, hints: &Hints<'_>) -> fmt::Result {
+     write_error_chain_with_options(err, hints, ErrorOptions::default())
+ }
+ 
+@@ -236,7 +348,7 @@ impl fmt::Display for DebugErrorChain<'_> {
+ /// Each hint is rendered on its own line, prefixed with the styled `hint:` label.
+ pub fn write_error_chain_with_options<C: DynColor + Copy, W: fmt::Write>(
+     err: &dyn Error,
+-    hints: Hints<'_>,
++    hints: &Hints<'_>,
+     options: ErrorOptions<'_, C, W>,
+ ) -> fmt::Result {
+     let ErrorOptions {
+@@ -297,11 +409,11 @@ pub fn write_error_chain_with_options<C: DynColor + Copy, W: fmt::Write>(
+ mod tests {
+     use anyhow::anyhow;
+     use indoc::indoc;
+-    use insta::assert_snapshot;
++    use insta::{assert_debug_snapshot, assert_snapshot};
+     use owo_colors::AnsiColors;
+ 
+     use super::{
+-        ErrorOptions, ErrorWithHints, HintPrefix, Hints, debug_error_chain,
++        ErrorOptions, ErrorWithHints, Hint, HintOrdering, Hints, debug_error_chain,
+         write_error_chain_with_options,
+     };
+ 
+@@ -311,23 +423,103 @@ mod tests {
+         hints.extend(Hints::from("same"));
+         hints.extend(Hints::from("other"));
+ 
+-        let hints = hints
+-            .into_iter()
+-            .map(std::borrow::Cow::into_owned)
+-            .collect::<Vec<_>>();
+-        assert_eq!(hints, vec!["same".to_string(), "other".to_string()]);
++        let hints = hints.iter().collect::<Vec<_>>();
++        assert_debug_snapshot!(hints, @r#"
++        [
++            "same",
++            "other",
++        ]
++        "#);
++    }
++
++    #[test]
++    fn hint_ordering_retains_insertion_order() {
++        let mut hints = Hints::from("any 1");
++        hints.push(Hint::new("last 1").with_ordering(HintOrdering::Last));
++        hints.push(Hint::new("first 1").with_ordering(HintOrdering::First));
++        hints.push("any 2".to_string());
++        hints.extend(Hints::from("last 2").with_ordering(HintOrdering::Last));
++        hints.extend(Hints::from("first 2").with_ordering(HintOrdering::First));
++
++        assert_snapshot!(anstream::adapter::strip_str(&hints.to_string()), @"
++        hint: first 1
++        hint: first 2
++        hint: any 1
++        hint: any 2
++        hint: last 1
++        hint: last 2
++        ");
++        assert_debug_snapshot!((&hints).into_iter().collect::<Vec<_>>(), @r#"
++        [
++            "first 1",
++            "first 2",
++            "any 1",
++            "any 2",
++            "last 1",
++            "last 2",
++        ]
++        "#);
++        assert_debug_snapshot!(hints.into_iter().collect::<Vec<_>>(), @r#"
++        [
++            "first 1",
++            "first 2",
++            "any 1",
++            "any 2",
++            "last 1",
++            "last 2",
++        ]
++        "#);
++    }
++
++    #[test]
++    fn changing_ordering_retains_insertion_order() {
++        let hints = [
++            Hint::new("last").with_ordering(HintOrdering::Last),
++            Hint::new("first").with_ordering(HintOrdering::First),
++            Hint::new("any"),
++        ]
++        .into_iter()
++        .collect::<Hints<'_>>()
++        .with_ordering(HintOrdering::Any);
++
++        assert_debug_snapshot!(hints.iter().collect::<Vec<_>>(), @r#"
++        [
++            "last",
++            "first",
++            "any",
++        ]
++        "#);
++    }
++
++    #[test]
++    fn duplicate_hints_retain_the_earliest_ordering() {
++        let message = String::from("shared");
++        let mut hints = Hints::from(message.as_str())
++            .with_ordering(HintOrdering::Last)
++            .into_owned();
++        drop(message);
++
++        hints.extend(Hints::from("first").with_ordering(HintOrdering::First));
++        hints.extend(Hints::from("shared").with_ordering(HintOrdering::First));
++        hints.extend(Hints::from("shared").with_ordering(HintOrdering::Last));
++        hints.extend(Hints::from("any"));
++
++        assert_snapshot!(anstream::adapter::strip_str(&hints.to_string()), @"
++        hint: shared
++        hint: first
++        hint: any
++        ");
+     }
+ 
+     #[test]
+     fn error_with_hints_separates_hints_from_error() {
+-        assert_eq!(
+-            ErrorWithHints::new("error", Hints::from("fix it")).to_string(),
+-            format!("error\n\n{HintPrefix} fix it")
+-        );
+-        assert_eq!(
+-            ErrorWithHints::new("error", Hints::none()).to_string(),
+-            "error"
+-        );
++        let output = ErrorWithHints::new("error", Hints::from("fix it")).to_string();
++        assert_snapshot!(anstream::adapter::strip_str(&output), @"
++        error
++
++        hint: fix it
++        ");
++        assert_snapshot!(ErrorWithHints::new("error", Hints::none()), @"error");
+     }
+ 
+     #[test]
+@@ -349,7 +541,7 @@ mod tests {
+         let mut output = String::new();
+         write_error_chain_with_options(
+             &error,
+-            Hints::none(),
++            &Hints::none(),
+             ErrorOptions::default()
+                 .with_width_override(80)
+                 .with_stream(&mut output),
+@@ -382,7 +574,7 @@ mod tests {
+         let mut output = String::new();
+         write_error_chain_with_options(
+             &error,
+-            Hints::none(),
++            &Hints::none(),
+             ErrorOptions::default().with_stream(&mut output),
+         )
+         .unwrap();
+@@ -426,7 +618,7 @@ mod tests {
+         let mut output = String::new();
+         write_error_chain_with_options(
+             error.as_ref(),
+-            Hints::none(),
++            &Hints::none(),
+             ErrorOptions::default()
+                 .with_level("warning")
+                 .with_color(AnsiColors::Yellow)
+@@ -451,7 +643,7 @@ mod tests {
+         let mut output = String::new();
+         write_error_chain_with_options(
+             &error,
+-            Hints::none(),
++            &Hints::none(),
+             ErrorOptions::default()
+                 .with_width_override(50)
+                 .with_stream(&mut output),
+@@ -476,7 +668,7 @@ mod tests {
+         let mut output = String::new();
+         write_error_chain_with_options(
+             &error,
+-            Hints::none(),
++            &Hints::none(),
+             ErrorOptions::default()
+                 .with_width_override(40)
+                 .with_stream(&mut output),
+@@ -516,7 +708,7 @@ mod tests {
+         let mut output = String::new();
+         write_error_chain_with_options(
+             &error,
+-            Hints::none(),
++            &Hints::none(),
+             ErrorOptions::default()
+                 .with_width_override(60)
+                 .with_stream(&mut output),
+@@ -542,7 +734,7 @@ mod tests {
+         let mut output = String::new();
+         write_error_chain_with_options(
+             &error,
+-            Hints::none(),
++            &Hints::none(),
+             ErrorOptions::default()
+                 .with_width_override(50)
+                 .with_stream(&mut output),
+@@ -569,7 +761,7 @@ mod tests {
+         let mut output = String::new();
+         write_error_chain_with_options(
+             &error,
+-            Hints::none(),
++            &Hints::none(),
+             ErrorOptions::default()
+                 .with_width_override(50)
+                 .with_stream(&mut output),
+@@ -596,7 +788,7 @@ mod tests {
+         let mut rendered = String::new();
+         write_error_chain_with_options(
+             err.as_ref(),
+-            hints,
++            &hints,
+             ErrorOptions::default().with_stream(&mut rendered),
+         )
+         .unwrap();
+@@ -625,7 +817,7 @@ mod tests {
+         let mut rendered = String::new();
+         write_error_chain_with_options(
+             err.as_ref(),
+-            Hints::none(),
++            &Hints::none(),
+             ErrorOptions::default().with_stream(&mut rendered),
+         )
+         .unwrap();
+diff --git a/crates/uv-publish/src/lib.rs b/crates/uv-publish/src/lib.rs
+index e3215e00d62380169ac9ad77a1c43d35a06fde07..f6163bac05f5a9fe9be1222c44f62fc7e6997fa2 100644
+--- a/crates/uv-publish/src/lib.rs
++++ b/crates/uv-publish/src/lib.rs
+@@ -2246,7 +2246,7 @@ mod tests {
+         let mut capture = String::new();
+         write_error_chain_with_options(
+             &err,
+-            Hints::none(),
++            &Hints::none(),
+             ErrorOptions::default().with_stream(&mut capture),
+         )
+         .unwrap();
+@@ -2280,7 +2280,7 @@ mod tests {
+         let mut capture = String::new();
+         write_error_chain_with_options(
+             &err,
+-            Hints::none(),
++            &Hints::none(),
+             ErrorOptions::default().with_stream(&mut capture),
+         )
+         .unwrap();
+@@ -2319,7 +2319,7 @@ mod tests {
+         let mut capture = String::new();
+         write_error_chain_with_options(
+             &err,
+-            Hints::none(),
++            &Hints::none(),
+             ErrorOptions::default().with_stream(&mut capture),
+         )
+         .unwrap();
+@@ -2361,7 +2361,7 @@ mod tests {
+         let mut capture = String::new();
+         write_error_chain_with_options(
+             &err,
+-            Hints::none(),
++            &Hints::none(),
+             ErrorOptions::default().with_stream(&mut capture),
+         )
+         .unwrap();
+diff --git a/crates/uv-python/src/discovery.rs b/crates/uv-python/src/discovery.rs
+index c82dec12f19da4a19d009db470e1bf75267fb283..60852807ad0b35769d4d41d09f3a0287a02f28f0 100644
+--- a/crates/uv-python/src/discovery.rs
++++ b/crates/uv-python/src/discovery.rs
+@@ -1387,7 +1387,7 @@ pub fn find_all_python_installations(
+             Ok(Err(_)) => {}
+             Err(err @ Error::Query(..)) => {
+                 if uv_warnings::ENABLED.load(Ordering::Relaxed) {
+-                    write_warning_chain(&err, Hints::none())
++                    write_warning_chain(&err, &Hints::none())
+                         .expect("writing to stderr should not fail");
+                 }
+             }
+@@ -1677,7 +1677,7 @@ pub(crate) async fn find_best_python_installation(
+                 let error = anyhow::Error::from(error).context(format!(
+                     "A managed Python download is available for {request}, but an error occurred when attempting to download it."
+                 ));
+-                write_warning_chain(error.as_ref(), Hints::none())
++                write_warning_chain(error.as_ref(), &Hints::none())
+                     .expect("writing to stderr should not fail");
+                 previous_fetch_failed = true;
+             }
+diff --git a/crates/uv-warnings/src/lib.rs b/crates/uv-warnings/src/lib.rs
+index 2e8a9b4d631ea43a0ff44d2eeebc7d5e2f8a5222..89871285b5fd05b8b050b0980e9f71a0e475fde3 100644
+--- a/crates/uv-warnings/src/lib.rs
++++ b/crates/uv-warnings/src/lib.rs
+@@ -25,13 +25,13 @@ pub fn disable() {
+ }
+ 
+ /// Format a warning chain to standard error.
+-pub fn write_warning_chain(err: &dyn Error, hints: Hints<'_>) -> fmt::Result {
++pub fn write_warning_chain(err: &dyn Error, hints: &Hints<'_>) -> fmt::Result {
+     write_warning_chain_with_options(err, hints, ErrorOptions::default())
+ }
+ 
+ fn write_warning_chain_with_options<C, W: fmt::Write>(
+     err: &dyn Error,
+-    hints: Hints<'_>,
++    hints: &Hints<'_>,
+     options: ErrorOptions<'_, C, W>,
+ ) -> fmt::Result {
+     write_error_chain_with_options(
+@@ -93,7 +93,7 @@ mod tests {
+         let mut output = String::new();
+         write_warning_chain_with_options(
+             error.as_ref(),
+-            Hints::none(),
++            &Hints::none(),
+             ErrorOptions::default().with_stream(&mut output),
+         )
+         .unwrap();
+diff --git a/crates/uv/src/commands/build_frontend.rs b/crates/uv/src/commands/build_frontend.rs
+index a15b3859b8e696bf5e4f63e726771305491d2072..8532b16d40b113664db48e5334e4b0f5c46e6a7e 100644
+--- a/crates/uv/src/commands/build_frontend.rs
++++ b/crates/uv/src/commands/build_frontend.rs
+@@ -521,7 +521,7 @@ async fn build_impl(
+                 let hints = crate::commands::diagnostics::hints_for_error(&err);
+                 write_error_chain_with_options(
+                     err.as_ref(),
+-                    hints,
++                    &hints,
+                     ErrorOptions::default().with_stream(printer.stderr_important()),
+                 )?;
+ 
+diff --git a/crates/uv/src/commands/diagnostics.rs b/crates/uv/src/commands/diagnostics.rs
+index aab48514ee1fd2cfcc92dbc48f47414ae1e90bac..e95739e7554e0f29595b627e27a0a2b2c47cb68d 100644
+--- a/crates/uv/src/commands/diagnostics.rs
++++ b/crates/uv/src/commands/diagnostics.rs
+@@ -8,7 +8,7 @@ use version_ranges::Ranges;
+ use uv_distribution_types::{
+     DerivationChain, DerivationStep, Dist, DistErrorKind, Name, RequestedDist,
+ };
+-use uv_errors::{Hinted, Hints};
++use uv_errors::{HintOrdering, Hinted, Hints};
+ use uv_normalize::PackageName;
+ use uv_pep440::{Version, strip_local_version_sentinels};
+ 
+@@ -109,8 +109,14 @@ impl OperationDiagnostic {
+             err => return Some(err),
+         };
+ 
+-        // Render all hints after the error output.
+-        hints.extend(self.hints);
++        // Caller-provided advice describes how to adjust the command, so show the underlying
++        // failure's more specific hints first.
++        hints.extend(
++            self.hints
++                .into_iter()
++                .collect::<Hints<'_>>()
++                .with_ordering(HintOrdering::Last),
++        );
+         if !hints.is_empty() {
+             anstream::eprintln!("{hints}");
+         }
+@@ -218,7 +224,7 @@ fn no_solution(
+ pub(crate) fn write_error_chain(err: &anyhow::Error, printer: Printer) -> std::fmt::Result {
+     uv_errors::write_error_chain_with_options(
+         err.as_ref(),
+-        hints_for_error(err),
++        &hints_for_error(err),
+         uv_errors::ErrorOptions::default().with_stream(printer.stderr_important()),
+     )
+ }
+@@ -417,7 +423,7 @@ fn format_chain(name: &PackageName, version: Option<&Version>, chain: &Derivatio
+ 
+ #[cfg(test)]
+ mod tests {
+-    use std::borrow::Cow;
++    use insta::assert_debug_snapshot;
+ 
+     use uv_workspace::pyproject::{PyprojectTomlError, SourceError};
+ 
+@@ -431,14 +437,11 @@ mod tests {
+             "python_version != '3.12'".to_string(),
+         )));
+ 
+-        let hints = hints_for_error(&err)
+-            .into_iter()
+-            .map(Cow::into_owned)
+-            .collect::<Vec<_>>();
+-
+-        assert_eq!(
+-            hints,
+-            vec!["replace `python_version == '3.12'` with `python_version != '3.12'`".to_string()]
+-        );
++        let hints = hints_for_error(&err);
++        assert_debug_snapshot!(hints.iter().collect::<Vec<_>>(), @r#"
++        [
++            "replace `python_version == '3.12'` with `python_version != '3.12'`",
++        ]
++        "#);
+     }
+ }
+diff --git a/crates/uv/src/commands/publish.rs b/crates/uv/src/commands/publish.rs
+index 1309d0a286b9ad19a7b22559b97e2476677108d9..232994763d4a03824e29b2f0e083d678287d22d4 100644
+--- a/crates/uv/src/commands/publish.rs
++++ b/crates/uv/src/commands/publish.rs
+@@ -198,7 +198,7 @@ async fn publish_files(
+                 }
+                 write_error_chain_with_options(
+                     err.as_ref(),
+-                    Hints::none(),
++                    &Hints::none(),
+                     ErrorOptions::default().with_stream(printer.stderr()),
+                 )?;
+                 error_count += 1;
+@@ -394,7 +394,7 @@ async fn gather_credentials(
+             anyhow::Error::from(err)
+                 .context("Trusted publishing failed")
+                 .as_ref(),
+-            Hints::none(),
++            &Hints::none(),
+             ErrorOptions::default().with_stream(printer.stderr()),
+         )?;
+     }
+diff --git a/crates/uv/src/commands/python/install.rs b/crates/uv/src/commands/python/install.rs
+index 4713b52a10f9cdd6573be0c767349a8b61239633..0898c788037951ed892963dedd274ad46edda9f8 100644
+--- a/crates/uv/src/commands/python/install.rs
++++ b/crates/uv/src/commands/python/install.rs
+@@ -917,7 +917,7 @@ async fn perform_install(
+                 InstallErrorKind::DownloadUnpack => {
+                     write_error_chain_with_options(
+                         err.context(format!("Failed to install {key}")).as_ref(),
+-                        Hints::none(),
++                        &Hints::none(),
+                         ErrorOptions::default().with_stream(printer.stderr()),
+                     )?;
+                 }
+@@ -931,7 +931,7 @@ async fn perform_install(
+                     write_error_chain_with_options(
+                         err.context(format!("Failed to install executable for {key}"))
+                             .as_ref(),
+-                        Hints::none(),
++                        &Hints::none(),
+                         ErrorOptions::default()
+                             .with_level(level)
+                             .with_color(color)
+@@ -949,7 +949,7 @@ async fn perform_install(
+                     write_error_chain_with_options(
+                         err.context(format!("Failed to create registry entry for {key}"))
+                             .as_ref(),
+-                        Hints::none(),
++                        &Hints::none(),
+                         ErrorOptions::default()
+                             .with_level(level)
+                             .with_color(color)
+diff --git a/crates/uv/src/commands/tool/run.rs b/crates/uv/src/commands/tool/run.rs
+index 0387ab8739cb5bc5db646785a70047357765b578..a9a95b819a4a3a3aac84eecc7176b3e0198a684d 100644
+--- a/crates/uv/src/commands/tool/run.rs
++++ b/crates/uv/src/commands/tool/run.rs
+@@ -1244,7 +1244,7 @@ pub(crate) enum ToolRunScriptError {
+ 
+ impl uv_errors::Hinted for ToolRunScriptError {
+     fn hints(&self) -> uv_errors::Hints<'_> {
+-        uv_errors::Hints::from(match self {
++        let message = match self {
+             Self::FromScript {
+                 package_name,
+                 target,
+@@ -1267,6 +1267,9 @@ impl uv_errors::Hinted for ToolRunScriptError {
+                 package_name.cyan(),
+                 format!("{invocation} --from {package_name} {target}").green(),
+             ),
+-        })
++        };
++        uv_errors::Hints::from(
++            uv_errors::Hint::new(message).with_ordering(uv_errors::HintOrdering::Last),
++        )
+     }
+ }
+diff --git a/crates/uv/src/commands/tool/upgrade.rs b/crates/uv/src/commands/tool/upgrade.rs
+index 577220e3de70d186a23edbf75e1346a678e8a78b..08f14a3cf0d4d45a27a77f1010795aa9df73c979 100644
+--- a/crates/uv/src/commands/tool/upgrade.rs
++++ b/crates/uv/src/commands/tool/upgrade.rs
+@@ -182,7 +182,7 @@ pub(crate) async fn upgrade(
+             write_error_chain_with_options(
+                 err.context(format!("Failed to upgrade {}", name.green()))
+                     .as_ref(),
+-                Hints::none(),
++                &Hints::none(),
+                 ErrorOptions::default().with_stream(printer.stderr()),
+             )?;
+         }

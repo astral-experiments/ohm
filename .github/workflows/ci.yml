@@ -1,44 +1,38 @@
-name: 'Measure the registered #21134 handwritten impl production candidate'
+name: Measure released compiler driver self binding on uv warnings
 'on':
   workflow_dispatch:
     inputs:
       reviewed_head:
         required: true
         type: string
-        description: Reviewed same source across all four placements
-      G_lock:
+      protocol:
         required: true
         type: string
-        description: Final verified production G receipt SHA-256
       series:
         required: true
         type: choice
         options:
-        - marginal.initial
-        - signed.initial
-        - marginal.repeat
-        - signed.repeat
-      prior_boots:
+        - first
+        - independent
+      prior:
         required: true
         type: string
         default: '[]'
-        description: JSON list of each previously calibrated run, job, label, boot artifact ID and SHA-256. Use [] only on the first
-          allocation.
 permissions:
   contents: read
   actions: read
   attestations: read
 jobs:
-  root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21134-handwritten-check'
-      && github.sha == inputs.reviewed_head && github.run_attempt == 1 && startsWith(inputs.series, 'marginal.')
+  check:
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21577-driver-binding-check'
+      && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 180
+    timeout-minutes: 100
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      G_LOCK: ${{ inputs.G_lock }}
+      PROTOCOL: ${{ inputs.protocol }}
       SERIES: ${{ inputs.series }}
-      PRIOR_BOOTS: ${{ inputs.prior_boots }}
+      PRIOR: ${{ inputs.prior }}
     steps:
     - name: Check out coordinator
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -52,7 +46,9 @@ jobs:
 
           scripts/uv-client-22958
 
-          scripts/uv-check-21134'
+          scripts/uv-check-21134
+
+          scripts/driver-bind-21577'
         fetch-depth: '2'
     - name: Check out opening
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -116,15 +112,15 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         repository: astral-sh/uv
-        ref: a6904bbdabd3c6ac42b1051896ff597c8bd1895a
-        fetch-depth: '3'
+        ref: 2a80362a62fdb4d1da59874e0d4607984522bb3a
+        fetch-depth: '20'
         fetch-tags: 'false'
         persist-credentials: 'false'
         path: uv-source
-    - name: Require the originally locked signed release, admitted G and an unused physical host
+    - name: Authenticate the signed release and an independent physical host
       env:
         GH_TOKEN: ${{ github.token }}
-      run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-check-21134/host.py start
+      run: /usr/bin/python3.12 -ISBu coordinator/scripts/driver-bind-21577/entry.py start
     - name: Check the original host prerequisites
       run: 'set -euo pipefail
 
@@ -132,31 +128,31 @@ jobs:
     - name: Calibrate original retired-instruction counters, subprocess instrumentation and blocking clock
       env:
         GH_TOKEN: ${{ github.token }}
-      run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-check-21134/host.py calibrate
+      run: /usr/bin/python3.12 -ISBu coordinator/scripts/driver-bind-21577/entry.py calibrate
     - name: Seal the fresh physical runner and its blocking wall calibration
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-21134-${{ inputs.series }}-boot
+        name: uv-21577-${{ inputs.series }}-boot
         path: trait-results/boot-attestation.json
         if-no-files-found: error
         retention-days: 14
     - name: Install the original authenticated SDKs and genuine signed Cargo
       env:
         GH_TOKEN: ${{ github.token }}
-      run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-check-21134/host.py assets
-    - name: Capture native fields and eight independently restored first-edit pairs
+      run: /usr/bin/python3.12 -ISBu coordinator/scripts/driver-bind-21577/entry.py assets
+    - name: Capture eight independently prepared ordinary uv-warnings edit pairs
       env:
         GH_TOKEN: ${{ github.token }}
-      run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-check-21134/host.py study
+      run: /usr/bin/python3.12 -ISBu coordinator/scripts/driver-bind-21577/entry.py study
     - name: Verify the closing calibration and seal the unscored capture
       env:
         GH_TOKEN: ${{ github.token }}
-      run: /usr/bin/python3.12 -ISBu coordinator/scripts/uv-check-21134/host.py finish
+      run: /usr/bin/python3.12 -ISBu coordinator/scripts/driver-bind-21577/entry.py finish
     - name: Preserve the full native, timing and counter original, including any refusal
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-21134-${{ inputs.series }}-original
+        name: uv-21577-${{ inputs.series }}-original
         path: trait-results/
         if-no-files-found: error
         compression-level: '1'

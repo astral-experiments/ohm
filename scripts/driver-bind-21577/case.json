@@ -1,0 +1,61 @@
+{
+ "A": "db3346a50dbb1ab87f01a90755ffed66dcbfe0b8",
+ "B": "2a80362a62fdb4d1da59874e0d4607984522bb3a",
+ "all_changed": [
+  "crates/uv-client/tests/it/ssl_certs.rs",
+  "crates/uv-dev/src/main.rs",
+  "crates/uv-errors/src/lib.rs",
+  "crates/uv-publish/src/lib.rs",
+  "crates/uv-python/src/discovery.rs",
+  "crates/uv-warnings/src/lib.rs",
+  "crates/uv/src/commands/build_frontend.rs",
+  "crates/uv/src/commands/diagnostics.rs",
+  "crates/uv/src/commands/publish.rs",
+  "crates/uv/src/commands/python/install.rs",
+  "crates/uv/src/commands/tool/run.rs",
+  "crates/uv/src/commands/tool/upgrade.rs"
+ ],
+ "census": "948a6e8ca65c9248566cd7e39004b938fac176686a77c3c4ec04f26a9947e059",
+ "edit": "4fd80f35fa7a5b4d3c63ae85a7a3b8854e44604e3e9668fe14be0e650bd58bad",
+ "expected_compilers": [
+  "uv_errors",
+  "uv_warnings"
+ ],
+ "known_source": "c7ab7ca072d74e6a734bab35c833da11d340faed6aa5bbc7264028ae53e9a06d",
+ "lock": "43656655b1cd577551f79567af2dd534d5a27f9c7140741cc966103cb7a1eb64",
+ "positive_source": "uv_warnings::write_warning_chain actually changed to take &Hints. The edit also changes the public uv_errors hint ordering, observed through the warning formatter.",
+ "public": "fbb086a654fa8e8d21f9a5d937c3f1ed106bed56b3bbb33dd7391faaf03eefc2",
+ "selected": "uv_warnings",
+ "selection": "a3de0be8c35ec05427789da194c3ef8ebcf17f909758c8425ade0e03b137beb9",
+ "signed_current_source": {
+  "effective": "91b3567aa400deeda4ceee453c54d7cb3adfbfd003d4fcaf04a1ef1eb0d72585",
+  "intake": "3b7f906fa09b1ac6486881ca3e4f2a98d7dbc091ebc3fda60f1963616e6f6336",
+  "pairs_lock": "d5b6bd481827f274f858be917aaa62fe1a3a5567760c34d6ca211b3dc16862c8",
+  "rust": {
+   "commit": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+   "epoch": 26655,
+   "metadata_epoch": 3,
+   "tree": "f5bf03d73f71243fb88e34ecb0b155ef11e99a47"
+  },
+  "sdk": "89a29f816c885709b4889fe7c8f35b17c35baee2bb8699b2a60d54c383ecde66",
+  "signed_cargo": "f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee"
+ },
+ "tag": "0ebbd9274a55a8a53a13970be3b97e4209598e17",
+ "tag_name": "0.12.13",
+ "top": {
+  "A": "db3346a50dbb1ab87f01a90755ffed66dcbfe0b8",
+  "B": "2a80362a62fdb4d1da59874e0d4607984522bb3a",
+  "changed_production_paths": [
+   "crates/uv-warnings/src/lib.rs"
+  ],
+  "crate": "uv-warnings",
+  "index": 867,
+  "source_bytes": 3285,
+  "source_files": 1,
+  "title": "Add explicit ordering to diagnostic hints (#21577)"
+ },
+ "tree": [
+  "3cd715d8abad91086326888bf5bd250f5d5e48ae",
+  "0713914715217810ecd506d3bf43e236e2d8c59f"
+ ]
+}
