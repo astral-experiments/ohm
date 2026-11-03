@@ -16,6 +16,8 @@ def writez(p,z):
 def readz(p):return json.loads(gzip.decompress(Path(p).read_bytes()))
 PLAN=read(HERE/'protocol.json');CASE=read(HERE/'case.json');KIT=read(HERE/'instruments.json');LOCK=readz(HERE/'production-inputs.json.gz')
 assert filehash(HERE/'protocol.json')==CASE['protocol']=='8ce5b388b9e5ca2a3543abbdf572aff97bf4a7958aa0be69813978d330eaf803'
+from replication import ordered
+PLAN['pairs']['pair_orders']=ordered(CASE['protocol'],PLAN['pairs']['pair_orders'])
 assert filehash(HERE/'production-inputs.json.gz')==CASE['role_authority']and all(filehash(HERE/'kit'/n)==z['sha256']for n,z in KIT.items())
 SIX=PLAN['six'];WORKSPACE={r['crate']:r['source']for r in CASE['expected']['A']['workspace']};assert len(WORKSPACE)==38 and len(SIX)==6
 WUNITS=set(WORKSPACE)|set(read(HERE/'full-surfaces.json')['additional_linked_workspace_metadata']);assert len(WUNITS)==39

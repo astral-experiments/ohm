@@ -3,24 +3,25 @@ from pathlib import Path
 import gzip,json,os,shutil,subprocess,sys,time
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from basis import CASE,HERE,LOCK,PLAN,Env,digest,filehash,read,write,setup
-PARENT='b9396475c5c973c931fabd8c95ab9548104dbdc4';BRANCH='charlie/codex-22536-source-session-check'
+import replication
+PARENT='ca8b83712b881b45cbb8e8b0513d0811971e4a98';PREVIOUS='b9396475c5c973c931fabd8c95ab9548104dbdc4';BRANCH='charlie/codex-22536-instruction-replica-22'
 def git(d,*v):return subprocess.check_output(['git','-C',d,*v],text=True).strip()
 def historical_enrollment(co,en,guard):
     add=read(HERE/'same-mode-eligibility.json');p=add['previous_source_enrollment'];path='scripts/uv-check-22536/dispatch-enrollment.json'
-    assert git(co,'rev-parse','HEAD^^^')==guard['original_parent'] and git(co,'rev-parse','HEAD^^')==guard['previous_head']
-    assert add['closed_run']['head']==PARENT and guard['true_prior_calibrated_boots']==27 and add['protocol']==CASE['protocol'] and add['score']==filehash(HERE/'score.py')
+    assert git(co,'rev-parse',PARENT+'^^^')==guard['original_parent'] and git(co,'rev-parse',PARENT+'^^')==guard['previous_head']
+    assert add['closed_run']['head']==PREVIOUS and guard['true_prior_calibrated_boots']==27 and add['protocol']==CASE['protocol'] and add['score']==filehash(HERE/'score.py')
     assert en['same_mode_eligibility']==filehash(HERE/'same-mode-eligibility.json') and filehash(HERE/p['file'])==p['compressed']
     historic=gzip.decompress((HERE/p['file']).read_bytes());assert digest(historic)==p['sha256']==guard['scientific_enrollment']
     import hashlib
     h=hashlib.sha1(b'blob '+str(len(historic)).encode()+bytes([0])+historic).hexdigest()
-    assert git(co,'ls-tree',PARENT,'--',path).split()==['100644','blob',h,path] and h==p['oid']
+    assert git(co,'ls-tree',PREVIOUS,'--',path).split()==['100644','blob',h,path] and h==p['oid']
     prior=json.loads(historic);extra=add['closed_run']['native_calibration']
-    assert extra['head']==PARENT and extra['prior']==p['sha256'] and extra['boot']==add['closed_run']['machine']['boot']
+    assert extra['head']==PREVIOUS and extra['prior']==p['sha256'] and extra['boot']==add['closed_run']['machine']['boot']
     assert en==prior|{'excluded_boots':prior['excluded_boots']+[extra['boot']],'adjacent_originals':prior['adjacent_originals']+[extra],'same_mode_eligibility':filehash(HERE/'same-mode-eligibility.json')}
     assert add['admission']['prospective_sources']=={n:filehash(HERE/n)for n in ('session.py','live_metadata.py','live_review.py','fixed_input.py')}
-    # The depth-four blobless checkout authenticates the two grandfathered registrations. The
+    # The depth-five blobless checkout authenticates the two grandfathered registrations. The
     # compressed member preserves the historical bytes without a credentialed fetch.
-    for rev,oid in [(guard['previous_head'],guard['previous_workflow_blob']),(PARENT,guard['depth3_workflow_blob']),('HEAD',add['workflow_blob'])]:
+    for rev,oid in [(guard['previous_head'],guard['previous_workflow_blob']),(PREVIOUS,guard['depth3_workflow_blob']),(PARENT,add['workflow_blob'])]:
         assert git(co,'ls-tree',rev,'--','.github/workflows/ci.yml').split()==['100644','blob',oid,'.github/workflows/ci.yml']
     row=git(co,'ls-tree',guard['original_parent'],'--',path).split()
     b=gzip.decompress((HERE/guard['source_bytes_from_content_member']).read_bytes())
@@ -41,6 +42,7 @@ def assigned_runner(read_jobs,run,head,name,prior,job_name,pause=time.sleep):
             assert row['status']in ('queued','in_progress')and rid!=prior['previous_runner_id']and actual!=prior['previous_runner_name']
             if 'additional_host' in prior:
                 old=prior['additional_host'];assert job!=old['job'] and rid!=old['machine']['runner'] and actual!=old['machine']['name']
+            assert job!=replication.FIRST['job'] and rid!=replication.FIRST['runner_id'] and actual!=replication.FIRST['runner_name']
             seen=job;observations.append({'job':job,'status':row['status'],'runner_id':rid,'runner_name':actual})
             if type(rid)is int and rid>0:
                 assert actual==name and name
@@ -55,16 +57,18 @@ def checked_binding():
     assert git(co,'rev-parse','HEAD')==e['GITHUB_SHA']==e['REVIEWED_HEAD']and git(co,'rev-parse','HEAD^')==PARENT
     assert not git(co,'status','--porcelain','--untracked-files=no')and not git(co,'diff','--name-only','--no-renames',PARENT,'HEAD','--','scripts/uv-client-22958','scripts/uv-callables-21041','scripts/handwritten-panel')
     assert HERE==co/'scripts/uv-check-22536';en=read(HERE/'dispatch-enrollment.json')
+    assert filehash(HERE/'dispatch-enrollment.json')==replication.FIRST['original_source_enrollment_sha256']
+    assert git(co,'rev-parse',PARENT+'^')==PREVIOUS and replication.FIRST['head']==PARENT
     assert en.get('local_native_gates_accepted')is True and en['submit_authority']=='explicit workflow_dispatch of the operator-reviewed exact SHA' and en['protocol']==CASE['protocol']and en['prior_public_case']==CASE['frozen_initial_case']
     assert len(en['excluded_boots'])==len(set(en['excluded_boots']))==28 and en['local_native']['held_out_signed_control']=='R' and en['local_native']['treatment']=='F'
     assert en['local_native']['typed_graph']['live_raw_argv_differences']==[0,0,0]and en['local_native']['typed_graph']['previous_separate_path_raw_differences']==6942
     guard=read(HERE/'partial-checkout-authority.json');prior=historical_enrollment(co,en,guard);add=read(HERE/'eligibility-addendum.json')
     assert en['eligibility_addendum']==filehash(HERE/'eligibility-addendum.json')and en['excluded_boots'][:-1]==prior['excluded_boots']+[add['prospective_panel']['new_boot_exclusion']['boot']]and add['previous']['head']==guard['original_parent']
     recent=read(HERE/'same-mode-eligibility.json')['closed_run']
-    assert e['GITHUB_RUN_ID'] not in (str(guard['previous_run']),str(recent['id'])) and e['RUNNER_NAME'] not in (guard['previous_runner_name'],recent['machine']['name'])
+    assert e['GITHUB_RUN_ID'] not in (str(guard['previous_run']),str(recent['id']),str(replication.FIRST['run'])) and e['RUNNER_NAME'] not in (guard['previous_runner_name'],recent['machine']['name'],replication.FIRST['runner_name'])
     assert en['local_native']['true_role_source']=={n:LOCK['roles'][n]['source']for n in ('R','F')}and en['local_native']['runtime_inventory_sha256']=={n:LOCK['roles'][n]['hash']for n in ('R','F')}
-    assert not git(co,'diff','--name-only','--no-renames',PARENT,'HEAD','--',*['scripts/uv-check-22536/'+n for n in ('protocol.json','score.py','basis.py','instruments.json','case.json','production-inputs.json.gz','metadata-kit.json','producer_map.py','fixed-layout-rule.json','opening.py','science.py','semantics.py','compatibility.py','fixed_products.py')])
-    return w,t,en
+    assert not git(co,'diff','--name-only','--no-renames',PARENT,'HEAD','--',*['scripts/uv-check-22536/'+n for n in ('protocol.json','score.py','instruments.json','case.json','production-inputs.json.gz','metadata-kit.json','producer_map.py','fixed-layout-rule.json','opening.py','science.py','semantics.py','compatibility.py','fixed_products.py')])
+    return w,t,en|{'excluded_boots':replication.excluded(en['excluded_boots'])}
 def scope():
     w,t,en=checked_binding()
     boot=Path('/proc/sys/kernel/random/boot_id').read_text().strip();assert boot not in en['excluded_boots'];return w,t,boot
@@ -89,9 +93,15 @@ def acquire():
     pool=t/'ctfe22-root-sdks';fresh.s.lock['raw']['R']=LOCK['roles']['R']['runtime'];fresh.install_archive(signed,pool/'R','R')
     scan=t/'uv22536-registry';scan.mkdir();uv=w/'uv-source';env={'PATH':str(pool/'R/bin')+':/usr/bin:/bin','HOME':str(t),'CARGO_HOME':str(scan),'RUSTC':str(pool/'R/bin/rustc'),'GIT_TERMINAL_PROMPT':'0','LC_ALL':'C.UTF-8'}
     assert git(uv,'rev-parse','HEAD')==CASE['states']['D']['source'];subprocess.run([pool/'R/bin/cargo','fetch','--locked'],cwd=uv,env=env,check=True)
-    root=t/'uv22536-canonical';res=w/'session-results';root.mkdir();res.mkdir();en=read(HERE/'dispatch-enrollment.json')
+    root=t/'uv22536-canonical';res=w/'session-results';root.mkdir();res.mkdir();en=checked_binding()[2]
+    write(res/'replication-host.json',{'registration':replication.REGISTRATION_SHA,'boot':boot,'job':host,'previous':replication.FIRST})
     cfg={'root':str(root),'results':str(res),'source_donor':str(uv),'sdks':{r:str(pool/r)for r in ('R','S','F')},'cargo_home':str(scan),'control_candidate_source_inputs':CASE['role_authority'],'fresh_private_sdk_pool':str(pool),'require_source_tag':True,'excluded_boots':en['excluded_boots']}
     setup(Env(cfg));write(w/'session-config.json',cfg);write(res/'transport.json',{'source_lock':filehash(HERE/'production-inputs.json.gz'),'original_release':filehash(proof/'intake/latest.json'),'reopened_producer_pair':filehash(proof/'intake.json'),'host_inputs':filehash(res/'actual-inputs.json'),'new_head':os.environ['GITHUB_SHA'],'run_id':os.environ['GITHUB_RUN_ID']})
-def latest():
-    w,t,_=scope();fresh=oracle();fresh.latest(w/'session-results/fresh-publication.json')
-if __name__=='__main__':{'acquire':acquire,'latest':latest}[sys.argv[1]]()
+def latest(after=False):
+    w,_,_=scope();root=w/'session-results';fresh=oracle()
+    assert read(root/'qualification/accepted.json')['control']=='R'
+    data=fresh.transport().gh_json('api','--method','GET','-H','Cache-Control: no-cache','repos/astral-experiments/ohm/releases/latest')
+    path=root/('fresh-publication-after.json' if after else 'fresh-publication.json')
+    write(path,data)
+    replication.release(data,LOCK['release'])
+if __name__=='__main__':{'acquire':acquire,'latest':latest,'latest-after':lambda:latest(after=True)}[sys.argv[1]]()

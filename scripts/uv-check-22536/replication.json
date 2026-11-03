@@ -1,0 +1,47 @@
+{
+  "adjacent_protocol": "8ce5b388b9e5ca2a3543abbdf572aff97bf4a7958aa0be69813978d330eaf803",
+  "first": {
+    "boot": "6f37ffda-b84a-4873-9556-ae412f80fc82",
+    "inner": "2c7feb8d80794c0c5262cb1fcebebb075b72d308206b94ea499c2bbf0708ffa6",
+    "job": 125573047814,
+    "raw_opening": "313a7f29d6a83e8627254f2e0670a783d4af533439857426870f49b2bc4a1b1e",
+    "release_id": 430629054,
+    "run": 41531636175,
+    "runner": 1797,
+    "service_receipt": "eff08107d0ba19ca593100df14072c3940328c1e2bfcbdac515c71d41c9432b5",
+    "source": "8c7d5b4500fdfa6e2234417340aa190e5787e513"
+  },
+  "guard": "Same original source, native R/F, physical signed -22, current at admission and after measurement; exactly the original numeric gate, missing samples or age change produce no replication claim. Boot differs from all 29 prior calibrated boots. No timing sample is a stopping criterion.",
+  "hardware_primary": {
+    "crates": [
+      "uv_cache",
+      "uv_client",
+      "uv_configuration",
+      "uv_distribution_types",
+      "uv_metadata",
+      "uv_torch"
+    ],
+    "edits": [
+      "feature_B",
+      "rename_D"
+    ],
+    "rule": "all 8 candidate/control values below 0.80 and both fixed 4-pair medians below 0.80 on each host; second-host 12-comparison sign bound 12/256"
+  },
+  "hardware_secondary": [
+    "sum_six",
+    "whole_Cargo"
+  ],
+  "orders": [
+    "TP",
+    "PT",
+    "PT",
+    "TP",
+    "PT",
+    "TP",
+    "TP",
+    "PT"
+  ],
+  "purpose": "Confirm each of the 12 first-host compiler/edit instruction findings on an independent VM while Ohm -22 is latest, also remeasure elapsed time. The first-host observations are already known.",
+  "reader": "ebd8a0a4811783b0ea4f6954b5766a18b2b6e251d0146abff1028bcc3cfd245f",
+  "wall_primary": "Sum ordinary cargo wall times for the two real code edits within each independently prepared arm. Report each edit, intervening rustdoc C and aggregate separately. Strict 2x requires all eight ratios above 2 on each host and each half median above 2. The first host already missed that threshold."
+}

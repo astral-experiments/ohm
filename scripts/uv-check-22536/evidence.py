@@ -74,5 +74,5 @@ def export(w):
         assert z.testzip()is None and len(z.namelist())==len(inventory)+1
         for n,(length,h)in inventory.items():
             with z.open(n)as fp:assert hashlib.file_digest(fp,'sha256').hexdigest()==h
-    write(out/'verified.json',{'bytes':archive.stat().st_size,'sha256':filehash(archive),'complete_score':(w/'session-results/result.json').is_file(),'compact_file_count':len(files),'optional_rmeta_count':len(chosen),'all_priority_raw_retained':manifest['all_priority_raw_retained'],'maximum_bytes':fit})
+    write(out/'verified.json',{'bytes':archive.stat().st_size,'sha256':filehash(archive),'complete_score':all(f.is_file() and f.stat().st_size>0 for f in (w/'session-results'/n for n in ('result.json','fresh-publication-after.json','independent-replay.json','native-replay.json'))),'compact_file_count':len(files),'optional_rmeta_count':len(chosen),'all_priority_raw_retained':manifest['all_priority_raw_retained'],'maximum_bytes':fit})
 if __name__=='__main__':export(Path(os.environ['GITHUB_WORKSPACE']).resolve())

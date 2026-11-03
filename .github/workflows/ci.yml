@@ -1,4 +1,4 @@
-name: 'Two real uv #22536 code edits and the intervening rustdoc edit'
+name: 'Independent signed −22 compiler-instruction replication for uv #22536'
 'on':
   workflow_dispatch:
     inputs:
@@ -12,7 +12,7 @@ permissions:
   attestations: read
 jobs:
   eight-real-session-pairs:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22536-source-session-check' && github.sha == inputs.reviewed_head && github.run_attempt == 1
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22536-instruction-replica-22' && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 210
     env:
@@ -31,7 +31,7 @@ jobs:
           scripts/uv-client-22958
 
           scripts/uv-check-22536'
-        fetch-depth: '4'
+        fetch-depth: '5'
     - name: Check out opening
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
@@ -167,6 +167,15 @@ jobs:
       run: 'set -euo pipefail
 
         /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/science.py measure session-config.json
+
+        '
+    - name: Recheck the published signed release after the last measurement
+      shell: bash
+      run: /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/authority.py latest-after
+      env: *id001
+    - name: Reopen every native visit and physical counter on the fresh host
+      shell: bash
+      run: 'set -euo pipefail
 
         /usr/bin/python3.12 -ISB coordinator/scripts/uv-check-22536/score.py session-results > session-results/independent-replay.json
 
