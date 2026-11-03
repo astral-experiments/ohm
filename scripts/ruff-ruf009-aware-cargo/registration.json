@@ -1,6 +1,14 @@
 {
   "aware_bundle": "green-aware.bundle",
-  "aware_bundle_sha256": "4dbef54fb07f35070c319052ecd8e600911d8c0a7b246ce7166c3e19e2cefabe",
+  "aware_bundle_sha256": "c9ac685d6e0c1da7a3d5fb50545252de54475a8e3886bc3cf0519991643970ae",
+  "capability": {
+    "expected_active_rust": "b6c3da0e9c7df8d7239cdf702600d334a8057c3a",
+    "expected_inactive_rust": [
+      "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2",
+      "800fcd497d67c2e0926f26ecbfe12b8837013637"
+    ],
+    "option": "-Zohm-checked-private-derives-v2"
+  },
   "cargo_release": "7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed",
   "changed": {
     "src/compiler/build_runner/compilation_files.rs": {
@@ -12,11 +20,11 @@
       "parent": "a727f9d583b293adf63b0848ddb05ad3d0c010d5"
     },
     "src/compiler/mod.rs": {
-      "candidate": "a57db1f43422a8f9470842d1858efe265e1ed460",
+      "candidate": "73619122641f911dcfad749460fd021c19f133ab",
       "parent": "7acef59e11d5b6ba2d63fcd991eced026b79358f"
     },
     "src/util/rustc.rs": {
-      "candidate": "88f267245f55f18a33c4092359b5fddca8678adf",
+      "candidate": "10823dae95c9064e2a959227ee6d0185e2dbd1a2",
       "parent": "6c852c7f860e60c310dee141e61ddbfa572a8dac"
     }
   },
@@ -27,7 +35,13 @@
     "reconciliation": "The 9f2b-to-ba07041 changes are Cargo tests only. This native product is freshly built at the current #436 base with an independent target and build root; the executed crate must report this exact source commit. Previous native rows remain at their own binary/commit."
   },
   "features": "ohm-defaults,all-static",
-  "parent": "ba07041c4b41686b0f80ad89985b8881046cb48e",
+  "parent": "4a6de7858c60e579fc30e01f5b60ddcaa84c2e30",
+  "prerequisite": {
+    "dep_info": "f7beef1a68a5362bb586c6081695b4061e129cd9",
+    "native_reader_evidence": "08ca9605d18606a16a1b178f1c5d11efb3c8c65d",
+    "source": "4a6de7858c60e579fc30e01f5b60ddcaa84c2e30",
+    "tree": "1a128e47d068ee91f33ba94e416ee0c0e014de5a"
+  },
   "prior_qa": "ea1854f5a338df58203624078eed8f16d4bbb6c4",
   "prior_receiver": {
     "scripts/ruff-foreign-span-observer/sdk.json": "645149ec05ae49e6038fe26c42710c1ef603159fefe0f85bf1fb843cc28d9a8d",
@@ -45,7 +59,7 @@
   "rustc_release": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
   "schema": 1,
   "scope": "Native GNU Linux release-profile Cargo compiled from a verified child of the independent input-check fix; separately report absence of the distribution PGO + BOLT pipeline.",
-  "source": "7c5f8b2d570b66f2125a8683bc2ce0cb98af88a6",
+  "source": "c1d1c6c84ea7985bad7f4bab5815fe03b562b0b0",
   "source_chain": [
     "256d5e65ded7c8a83cd484968e2f3533112200e4",
     "96eabb4ca7b3d0e0849fa37407735300bd5a841d",
@@ -53,8 +67,9 @@
     "8f5b495176228d2821eb8fdfd547a15913df415a",
     "755234340ca303c4baa6eda81a41046ae2f05b54",
     "ba07041c4b41686b0f80ad89985b8881046cb48e",
-    "7c5f8b2d570b66f2125a8683bc2ce0cb98af88a6"
+    "4a6de7858c60e579fc30e01f5b60ddcaa84c2e30",
+    "c1d1c6c84ea7985bad7f4bab5815fe03b562b0b0"
   ],
   "transport_base": "9f2bf0359b8186e059bd853e2ce89ceef9fc5087",
-  "tree": "5b01a54db00aad32e3748d8805c802839c37bd2b"
+  "tree": "273c62af0043d1c86c6777a725103bcb18ee0411"
 }

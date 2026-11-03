@@ -11,7 +11,7 @@ permissions:
   contents: read
 jobs:
   inspect:
-    if: github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruf009-aware-cargo-20261103'
+    if: github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-derive-consumed-cargo-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 65
     steps:
@@ -40,7 +40,7 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: ruf009-aware-cargo-${{ github.run_id }}
+          name: ruf009-aware-v5-cargo-${{ github.run_id }}
           path: ${{ runner.temp }}/ohm-foreign-join/published/
           retention-days: 15
           if-no-files-found: error
