@@ -55,7 +55,7 @@ def main():
         ap.add_argument("--" + name, type=Path, required=True)
     args = ap.parse_args()
     reg = json.loads(args.registration.read_bytes())
-    assert reg["C"] in ('800fcd497d67c2e0926f26ecbfe12b8837013637', 'b6c3da0e9c7df8d7239cdf702600d334a8057c3a') and reg["option"] == ('-Zohm-checked-private-derives' if reg["C"] == '800fcd497d67c2e0926f26ecbfe12b8837013637' else '-Zohm-checked-private-derives-v2')
+    assert reg["P"] == 'dad5fae340339ea631fdafc3ef27956df1ffb81a' and reg["C"] == 'e157d8912adcdae91bd43df88959f3a510bfa34a' and reg["option"] == '-Zohm-checked-private-derives-v2'
     base = args.work.resolve()
     base.mkdir(mode=0o700, exist_ok=False)
     proof = base / "proof"
