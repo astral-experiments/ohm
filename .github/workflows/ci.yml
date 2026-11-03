@@ -16,8 +16,13 @@ jobs:
   prices:
     if: ${{ github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-real-cgu-weights-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1' && inputs.distributions == 'cgu-weights' }}
     runs-on: namespace-profile-ubuntu-24-04-16
+    strategy:
+      fail-fast: false
+      matrix:
+        replicate: [1, 2]
     timeout-minutes: 155
     env:
+      NATIVE_WINDOW_REPLICATE: ${{ matrix.replicate }}
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       PLACEMENT_FACTORY: '41475100027'
       PLACEMENT_SOURCE: 4e546b27c311f29d99f9528e64420887f57c7538
@@ -71,7 +76,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: actual-source-cgu-instruction-proof
+          name: actual-native-unit-instructions-${{ matrix.replicate }}
           path: |
             ${{ runner.temp }}/cgu-profile-report/*.json
             ${{ runner.temp }}/cgu-profile-report/*.gz

@@ -13,7 +13,7 @@ from unittest.mock import patch
 HERE = Path(__file__).resolve().parent
 sys.path[:0] = [str(HERE), str(HERE.parent/"ruff-source-placement")]
 import common
-import decode
+import object_windows
 import worker as prior
 
 BRANCH = "charlie/qa-real-cgu-weights-20261102"
@@ -111,41 +111,8 @@ def history(kit, where, work, repo, env, which, suite, graph, cmd, extras, gold,
     try:
         assert checkpoint(work,dirs)==before, "restored state differs from the ordinary starting state"
         save(out/"checkpoint.json",before)
-        profiles=out/"profiles";profiles.mkdir()
-        feature=["-Zself-profile="+str(profiles),"-Zself-profile-counter=instructions:u","-Zself-profile-events=generic-activity,args"]
         loc=where.parent/"new-profiled"
-        profenv={**env,"RUSTC_WRAPPER":str(HERE/"profile-owner"),"OHM_PROBE_PROFILE_DIR":str(profiles)}
-        cloned=[kit,loc,work,repo,profenv,which,suite,graph,cmd,extras,gold,False,True,True]
-        original_check=prior.runtime.childenv.check
-        expected_env={"RUSTC_WRAPPER":str(HERE/"profile-owner"), "OHM_PROBE_PROFILE_DIR":str(profiles)}
-        assert DIGEST((HERE/"profile-owner").read_bytes())==DIGEST(subprocess.check_output(["git","-C",HERE,"show","HEAD:scripts/ruff-real-cgu-weights/profile-owner"]))
-        def check_profile_env(actual,sdk=None):
-            # Keep the ordinary allowlist, with only the exact enrolled tool and output directory added.
-            for key,value in expected_env.items():
-                if key in actual and actual[key]!=value:
-                    raise ValueError("different diagnostic environment: "+key)
-            return original_check({k:v for k,v in actual.items() if k not in expected_env},sdk)
-        assert not check_profile_env(profenv)
-        with patch.object(prior.runtime,"clean",check_profile_env), patch.object(prior.runtime.childenv,"check",check_profile_env):
-            observed=bare(*cloned)
-        rows=prior.replay.cargo_rows((loc/"outer.stdout").read_bytes())
-        arc=prior.study.artifact(prior.study.results(rows,True),prior.study.OWNER)
-        names=elf_members(arc,reference)
-        assert observed["raw_roster"]==baseline["raw_roster"] and observed["verdict"]==baseline["verdict"] and observed["elf"]==baseline["elf"]
-        assert len(observed["root_argv"])==len(baseline["root_argv"])==1
-        n, argv=observed["root_argv"][0]
-        assert all(argv.count(flag)==1 for flag in feature)
-        assert [n,[a for a in argv if a not in feature]]==baseline["root_argv"][0]
-        for phase,folder in (("ordinary",where),("profiled",loc)):
-            for name in ("actual-libraries.json", "build-script-flags.json", "linker-argv.json"):
-                path=folder/name
-                assert path.is_file()
-                (out/(phase+"-"+name)).write_bytes(path.read_bytes())
-        profile,=profiles.glob("*.mm_profdata")
-        raw=profile.read_bytes()
-        save(out/"record.json",{"argv":argv,"normal_native_matches":len(names),"sha256":DIGEST(raw),"roster":observed["raw_roster"]})
-        (out/"edited-owner.mm_profdata.gz").write_bytes(gzip.compress(raw,6,mtime=0))
-        save(out/"counts.json",decode.module_counts(raw,EXPECTED["dirty"]))
+        object_windows.observe(prior,kit,loc,work,repo,env,cmd,suite,graph,which,extras,gold,baseline,reference,out,EXPECTED,elf_members,save)
     except Exception as error:
         save(out/"refusal.json",{"error":str(error)[:4000],"phase":"restored ordinary Cargo edit"})
         for which in ("outer.stderr","outer.stdout"):
@@ -166,6 +133,7 @@ def main():
     assert subprocess.check_output(["git","-C",HERE,"rev-parse","HEAD"]).decode().strip()==os.environ["REVIEWED_HEAD"]==os.environ["GITHUB_SHA"]
     assert os.environ["PLACEMENT_FACTORY"]=="41475100027"
     out=Path(os.environ["RUNNER_TEMP"])/"cgu-profile-report";out.mkdir()
+    object_windows.prepare(out,save)
     original_suite=prior.acquire.suite_run
     bare=prior.acquire.phase
     def suite(*args):
@@ -176,8 +144,10 @@ def main():
             return original_suite(*args)
     with patch.object(prior.transport,"BRANCH",BRANCH),patch.object(prior.acquire,"suite_run",suite):
         prior.collect("admit",1,{"option":Path(sys.argv[1]).resolve(strict=True)})
+    object_windows.finalize(out,save)
     assert (out/"counts.json").exists()
     save(out/"terminal.json",{"sha":os.environ["GITHUB_SHA"],"run":os.environ["GITHUB_RUN_ID"],
+         "replicate":int(os.environ["NATIVE_WINDOW_REPLICATE"]),"boot":Path("/proc/sys/kernel/random/boot_id").read_text().strip(),
          "ordered_counts":DIGEST((out/"counts.json").read_bytes()),"native_gate":DIGEST((out/"record.json").read_bytes()),
          "source":EXPECTED["source"],"ordinary_parent":"531eb1980c08c75ccbf3f6b77adbee53cd9b8bd5"})
 
