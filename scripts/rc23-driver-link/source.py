@@ -10,7 +10,10 @@ sys.path.insert(0,str(Path(__file__).resolve().parent))
 import gate as g
 
 def blob(repo,commit,path):
-    mode,kind,oid,name=g.text(repo,"ls-tree",commit,"--",path).split()
+    entry=g.text(repo,"ls-tree",commit,"--",path)
+    if not entry:
+        return None
+    mode,kind,oid,name=entry.split()
     assert mode=="100644" and kind=="blob" and name==path
     data=g.git(repo,"cat-file","blob",oid)
     return {"mode":mode,"oid":oid,"bytes":len(data),"sha256":hashlib.sha256(data).hexdigest()}
@@ -31,7 +34,11 @@ def apply(repo,role,raw,checkout=True):
     changed=g.text(repo,"diff-tree","--no-commit-id","--no-renames","-r","--name-only",g.BASE,role["commit"]).splitlines()
     assert changed==list(g.PATHS)
     for path in changed:
-        assert blob(repo,g.BASE,path)==role["files"][path]["before"] and blob(repo,role["commit"],path)==role["files"][path]["after"]
+        leaf=role["files"][path]
+        before,after=blob(repo,g.BASE,path),blob(repo,role["commit"],path)
+        assert before==leaf["before"] and after is not None and after==leaf["after"]
+        if before is None:
+            assert path.startswith("tests/run-make/ohm-driver-preemption-link-modes/")
     if checkout:
         g.git(repo,"checkout","--quiet","--detach","--no-recurse-submodules",role["commit"])
         assert all(g.sha(repo/path)==r["after"]["sha256"] for path,r in role["files"].items())

@@ -1,62 +1,22 @@
 {
-  "EII_fixture": "d0fbed93e15276838893bb9bcbf03beb69cc95946e1022cf3f9d5d4b77812070",
-  "hardware_diagnostic": "f391dc4003052c32b4898301beeffca4a75ca41f",
-  "native_original": "3a28b42c9756657c48078d38d1814f3feb6fdff6a1e1eeb744a96972d61833f3",
-  "objects": 13,
-  "pack": "d725de1efa50594808bcaf3b6b6157edb2cbbd27b98fb9cc157f30c87b4c3f76",
-  "previously_absent": true,
-  "receiver": "1cdc1d6845cb325fe0f83f3b94404f9aecc30762",
-  "source": "803287036690ab55e430be8c5710b5c11d61a73e2e67398ca2dd682248ffa423",
-  "typed_and_bootstrap": {
-    "pinned-stage0-bootstrap-sealed": {
-      "command": {
-        "argv": [
-          "taskset",
-          "-c",
-          "16-23",
-          "nice",
-          "-n",
-          "10",
-          "/home/dev-user/Documents/Codex/2026-10-28/i-want-you-to-hillclimb-on/work/round18-compiler/full-toolchain/stage0/bin/cargo",
-          "check",
-          "--manifest-path",
-          "src/bootstrap/Cargo.toml",
-          "-p",
-          "bootstrap",
-          "--lib",
-          "-j8",
-          "--locked"
-        ],
-        "cargo": "ff3022fcbd13b08434ea7afde9a0ef9d5b3f5c17b5fc7a40031be3ee000a6a24",
-        "patch": "df4efe3c619ad3fab6ca5be78a537067bc7faef511d1a57ba0955dea806084f8",
-        "rustc": "3690cc576ede140504698405d5d8fa3826aaadbe71699c6c4ed0a565d6f493e2"
-      },
-      "exit": 0,
-      "log": "67cc127d2f20560fa71e75a2e233e514f569b00f6866b02db2e2952c21c8d92f"
-    },
-    "pinned-stage0-sealed": {
-      "command": {
-        "argv": [
-          "taskset",
-          "-c",
-          "16-23",
-          "nice",
-          "-n",
-          "10",
-          "/home/dev-user/Documents/Codex/2026-10-28/i-want-you-to-hillclimb-on/work/round18-compiler/full-toolchain/stage0/bin/cargo",
-          "check",
-          "-p",
-          "rustc_codegen_ssa",
-          "--lib",
-          "-j8",
-          "--locked"
-        ],
-        "cargo": "ff3022fcbd13b08434ea7afde9a0ef9d5b3f5c17b5fc7a40031be3ee000a6a24",
-        "patch": "df4efe3c619ad3fab6ca5be78a537067bc7faef511d1a57ba0955dea806084f8",
-        "rustc": "3690cc576ede140504698405d5d8fa3826aaadbe71699c6c4ed0a565d6f493e2"
-      },
-      "exit": 0,
-      "log": "3ded3647e93f7b9ed09d08fc40ae801a0286675e308bea6710a0655371f106a3"
-    }
-  }
+  "added_blobs_with_missing_before": 3,
+  "all_paths": [
+    "compiler/rustc_codegen_ssa/src/back/linker.rs",
+    "src/bootstrap/src/core/build_steps/compile.rs",
+    "src/tools/lld-wrapper/src/main.rs",
+    "tests/run-make/ohm-driver-preemption-link-modes/driver.rs",
+    "tests/run-make/ohm-driver-preemption-link-modes/rmake.rs",
+    "tests/run-make/ohm-driver-preemption-link-modes/supplier.rs"
+  ],
+  "applied_postimages_match": true,
+  "commit": "9b63803c29b00106e2eeb544b2387a6e8a8cba1f",
+  "indexed": "pack\t956e5769c2358a48649274000a6dc993d6b1e3aa",
+  "new_direct_relative_objects": 23,
+  "original_patch_rebuilds_exact_tree": true,
+  "pack_sha256": "0dfaaeabc0b1b642a88759c0342aaa9248081704510ef807991c16f06697fb00",
+  "parent": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+  "patch_sha256": "dc334c782a2ab9ab3045a956b47e6042bd2b39ca2be547cd669fffa8bf2afd6e",
+  "role_sha256": "d7b91ced743d0f95d277bd99188cde04a5b0d257ca86b18a407301b841b11a2a",
+  "strict_base_only_receiver_initially_lacked_child": true,
+  "tree": "8baa0c39260b1bc23a181a1de0be4a6885f36cc1"
 }

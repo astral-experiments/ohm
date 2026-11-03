@@ -1,4 +1,4 @@
-name: Build private stage-2 GNU driver-link treatment
+name: Build corrected private stage-2 GNU driver-link treatment
 'on':
   workflow_dispatch:
     inputs:
@@ -9,7 +9,7 @@ name: Build private stage-2 GNU driver-link treatment
 permissions: {}
 jobs:
   plan:
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21577-driver-link-production23-t' && github.sha == inputs.reviewed_head
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21577-driver-link-production23-fixed-t' && github.sha == inputs.reviewed_head
       && github.run_attempt == 1
     runs-on: ubuntu-24.04
     permissions:
@@ -51,7 +51,7 @@ jobs:
       matrix:
         arm: ${{ fromJSON(needs.plan.outputs.roles) }}
     needs: plan
-    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21577-driver-link-production23-t' && github.sha == inputs.reviewed_head
+    if: github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21577-driver-link-production23-fixed-t' && github.sha == inputs.reviewed_head
       && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
     permissions:
@@ -205,7 +205,7 @@ jobs:
       if: always() && steps.custody.outputs.available == 'true'
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: rc23-21577-source-dist-T
+        name: rc23-21577-fixed-source-dist-T
         path: driver-source-dist/
         if-no-files-found: error
         compression-level: 0
@@ -217,7 +217,12 @@ jobs:
         path: official-cargo
         merge-multiple: true
     - name: Verify installed components, ELF, EII and real external interposition
-      run: python3 -ISB scripts/rc23-driver-link/native.py
+      run: |
+        if ! command -v strace >/dev/null; then
+          sudo apt-get install --no-install-recommends --yes strace
+        fi
+        python3 -ISB scripts/rc23-driver-link/oldcc.py
+        python3 -ISB scripts/rc23-driver-link/native.py
       shell: python3 -ISB scripts/rc23-22958-production/standard-capacity.py watch native-qa {0}
     - name: Reopen role, native and capacity evidence
       run: python3 -ISB scripts/rc23-22958-production/standard-capacity.py summarize
@@ -226,7 +231,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: rc23-21577-source-qa-T-attempt-1
+        name: rc23-21577-fixed-source-qa-T-attempt-1
         path: trait-evidence/
         if-no-files-found: warn
         retention-days: 14

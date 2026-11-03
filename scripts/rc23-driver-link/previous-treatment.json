@@ -1,0 +1,76 @@
+{
+  "archive_sha256": "41b5bb8f8fc4a13a151506d660a760044f376d9b84f60e53f4c1868792e05920",
+  "archives": {
+    "qa": {
+      "bytes": 2725978,
+      "id": 13224789287,
+      "name": "rc23-21577-source-qa-T-attempt-1",
+      "sha256": "c50d65bb6588a346757c883f4b9eb1a716da74fa3c27da8846a973ed66866c9c"
+    },
+    "sdk": {
+      "bytes": 413589620,
+      "id": 13224689278,
+      "name": "rc23-21577-source-dist-T",
+      "sha256": "c943ce9e82f910e743545fe4c96dbd0e6f2f4b2e6a9b45031ee852980ece6a12"
+    },
+    "signed_cargo_original": {
+      "bytes": 40390513,
+      "id": 13222043764,
+      "name": "rc23-21577-signed-cargo",
+      "sha256": "8f138a03f5cbcd1ade2ae4e435d49694aac11ac81eda4161f0295f31905bbbbe"
+    }
+  },
+  "capacity_sha256": "b2fc360be8037a9d3797380e7e98825eb9ece0df7e02905da021e3fb486e863f",
+  "coordinator": "24da1cefd940ef49ab92dd9d3218f92f493ddd36",
+  "cross_role_sha256": "e4bc92864a1db393e9e03f0497d444a93461e0125cf37fdc2fc3affeb3947105",
+  "disposition": {
+    "eligible_for_performance": false,
+    "needs_source_correction": [
+      "rlink replay",
+      "fallback through an older C compiler"
+    ],
+    "scope": "native GNU driver and ELF mechanism control"
+  },
+  "driver_sha256": "00cad517dc92b8662087bbc7ae1b11f23190a759ceeb479cb4c0df462d2b4262",
+  "initial_refused_T_sha256": "05ebafb63c5e94fc18db9d83a4433330d5d22c5bbf04b21cf5b171446ca2c590",
+  "inventory_sha256": "ebfe4032eefd14611309219f424d583fb98bba62b6beff01a5b5f3eb9b3666fa",
+  "job": 125861504790,
+  "lock_sha256": "3baf712c4e0ae643d800800ca504eaed14bd8f84656623c66f1e51b5513e5a12",
+  "numerical_observations": 0,
+  "physical_named": {
+    "declared_relative_prefix_increase": 8892,
+    "non_plt_named_reduction": 8889,
+    "prefix_reader_sha256": "c4a2825853802c97b1f68cacf91cfc33c1625c97da5eaceff7d77fb765a383a3",
+    "reader_sha256": "aa533016994c5e82a4cab40de56f6223e9c28114a89dcc399837ef8c40e6b980",
+    "roles": {
+      "R": {
+        "DT_RELACOUNT": 100902,
+        "all_named_in_both_tables": 14350,
+        "named_non_plt": 14032,
+        "named_plt": 318,
+        "other_unnamed_non_plt": 20,
+        "physical_PT_DYNAMIC_and_PT_LOAD_match_sections": true,
+        "relative_beyond_fast_prefix": 0,
+        "relocations_non_plt": 114954,
+        "role_elf_sha256": "e200165fcc7173ad18a4773c7aa3cca5e310945e9e03f58a42ebe85eff4f2921"
+      },
+      "T": {
+        "DT_RELACOUNT": 109794,
+        "all_named_in_both_tables": 5461,
+        "named_non_plt": 5143,
+        "named_plt": 318,
+        "other_unnamed_non_plt": 20,
+        "physical_PT_DYNAMIC_and_PT_LOAD_match_sections": true,
+        "relative_beyond_fast_prefix": 0,
+        "relocations_non_plt": 114957,
+        "role_elf_sha256": "00cad517dc92b8662087bbc7ae1b11f23190a759ceeb479cb4c0df462d2b4262"
+      }
+    },
+    "section_reader_sha256": "774c0db6ca2d5a3707f76154fa5a0704d8d594ce06977d8e077f5d1701c76492"
+  },
+  "preload_sha256": "43e5ba9b1a1b59ad90ba9a5ed8331e13df519ca6487ff90054c0969fdb86ea98",
+  "run": 41619498528,
+  "source_commit": "1e84052bab906c68e8d63eecc806198d299b55c4",
+  "source_sha256": "a82573fee3514c4fae3c2ef7531c9411d28e6b4f26b0185f6cb87f5fcb6d39b6",
+  "source_tree": "cbb86f861bbc191f03f5ba8294c47b00226f8f28"
+}

@@ -11,7 +11,14 @@ PREVIOUS=HERE.parent/"rc23-22958-production"
 ROOT=HERE.parents[1]
 BASE="d57fd1515986dccecdcece8da85e651bfb4b81f9"
 TREE="f5bf03d73f71243fb88e34ecb0b155ef11e99a47"
-PATHS=("compiler/rustc_codegen_ssa/src/back/linker.rs","src/bootstrap/src/core/build_steps/compile.rs")
+PATHS=(
+    'compiler/rustc_codegen_ssa/src/back/linker.rs',
+    'src/bootstrap/src/core/build_steps/compile.rs',
+    'src/tools/lld-wrapper/src/main.rs',
+    'tests/run-make/ohm-driver-preemption-link-modes/driver.rs',
+    'tests/run-make/ohm-driver-preemption-link-modes/rmake.rs',
+    'tests/run-make/ohm-driver-preemption-link-modes/supplier.rs',
+)
 PGO="verified executed PGO profile coverage for rustc, rustdoc, Cargo, Clippy, rustfmt, and cargo-fmt"
 def read(p): return json.loads(Path(p).read_bytes())
 def save(p,x):
@@ -32,12 +39,19 @@ def selected():
         assert item.is_file() and not item.is_symlink() and sha(item)==digest,path
     inside={str(x.relative_to(ROOT)) for x in HERE.rglob("*") if x.is_file()}
     assert inside=={p for p in reg["files"] if p.startswith("scripts/rc23-driver-link/")}|{"scripts/rc23-driver-link/registration.json"}
+    assert reg.get("source_generation")=="rlink-and-old-cc-corrected"
+    assert sha(HERE/"accepted-control.json")=="fc222a09c9c75b7d6ceb73160240c319a225214e610ed6cb4cb040736428d6bf"
+    assert sha(HERE/"previous-treatment.json")=="ab78c2c2b5a97b89024310a3c2343ef58407edf300e81af08d96a079cfd90d66"
     role=read(HERE/"source.json")
+    assert role["commit"] not in (BASE,"1e84052bab906c68e8d63eecc806198d299b55c4")
     assert (role["parent"],role["parent_tree"])==(BASE,TREE)
     assert list(sorted(role["files"]))==list(PATHS) and role["commit"]!=BASE and role["tree"]!=TREE
     assert sha(HERE/"source.pack")==role["packet"]["sha256"]
-    assert role["changed_formats"]==[] and sha(HERE/"source.json")=="803287036690ab55e430be8c5710b5c11d61a73e2e67398ca2dd682248ffa423"
-    assert sha(HERE/"source-qualified.json")=="53477907aedd7d2f4a4e9e44b1404cac920c3d7576e4a3dd7d6072b90d8c173f"
+    assert role["changed_formats"]==[] and sha(HERE/"source.json")=="d7b91ced743d0f95d277bd99188cde04a5b0d257ca86b18a407301b841b11a2a"
+    assert sha(HERE/"source-qualified.json")=="ef3fe572c2b94dc88b93edd881d613151b8ec64ec3286dbc87435ce696278b33"
+    native=read(HERE/"source-native.json")
+    assert native["source"]==reg["treatment"]==role["commit"] and native["tree"]==role["tree"] and native["actual_conditional_release_authorized"]
+    assert reg["source_changed_files"]==len(PATHS)==6 and len(role["packet"]["objects"])==23
     q=PREVIOUS/"enrollment";intake=read(q/"intake.json");assert sha(q/"intake.json")==SIGNED["intake_sha256"]
     assert (intake["release_id"],intake["tag"],intake["tag_commit"],intake["manifest_rust"],intake["asset"])==(432227571,SIGNED["tag"],POLICY["official_release"],BASE,SIGNED["archive"])
     for name in ("verify.json","verify-asset.json"):
@@ -69,6 +83,8 @@ def verify_sdk_receipts(w,src,role,proofs):
     assert role["eii"]["normal"]==[11,12,13,14,11] and role["integrated"]["preloaded"]==([21,22,23,21,22,23] if arm=="R" else [11,22,23,21,22,23])
     assert role["pre_bolt"]["bolt_note"] is False and role["installed_elf"]["bolt_note"] is True and role["installed_elf"]["sha256"]==role["driver"]["sha256"]
     assert role["policy_evidence"]["arm"]==arm and role["signed_cargo_smoke"]["stdout"]=="ordinary cargo 19"
+    assert role["actual_linker_executions_sha256"]==proofs["linker-executions.json"]["sha256"]
+    assert role["link_modes_sha256"]==proofs["link-modes.json"]["sha256"] and "old-cc-inputs.json" in role["qa"]
     out=w/"trait-sdk"; assert set(x.name for x in out.iterdir())=={"ohm.tar.gz","source.json","role.json","component-inventory.json","sdk-inventory.json","SHA256SUMS"}
     sums=(out/"SHA256SUMS").read_text().splitlines()
     expect=("ohm.tar.gz","source.json","role.json","sdk-inventory.json","component-inventory.json")

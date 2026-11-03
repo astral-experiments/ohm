@@ -13,6 +13,8 @@ import elf
 import live
 import policy
 import domain
+import trace_qa
+import link_modes
 sys.path.append(str(g.PREVIOUS))
 import sdk
 
@@ -76,6 +78,10 @@ def main():
     pre=pre_with_probes
     g.save(exp/"pre-bolt.json",pre);g.save(exp/"installed.json",post)
     policy_record,exceptions=policy.prove(w,arm,pre,post,pre_rows,post_rows)
+    trace=trace_qa.check(w,installed,db)
+    g.save(qa/"linker-executions.json",trace)
+    mode_result=link_modes.check(w,installed,w/"source/rust",tmp,qa,env)
+    g.save(qa/"link-modes.json",mode_result)
     final_stage=Path(policy_record["pre_bolt"]["live"])
     # Dist can strip debug data after copying the stage2 driver. Verify the
     # actual executable and dynamic lookup sections across that packaging step.
@@ -94,7 +100,7 @@ def main():
              "launcher":db["bin/rustc"]|{"path":"bin/rustc"},"driver":db[driver]|{"path":driver},"llvm":db[llvm]|{"path":llvm},
              "bundled_cargo":db["bin/cargo"]|{"path":"bin/cargo"},"effective_cargo":g.SIGNED["cargo"],"signed_cargo_smoke":cargo_qa,
              "execution_pgo":g.PGO,"rustc_banner":rc,"cargo_banner":cc,"ldd":ld,"eii":eii,"integrated":integrated,
-             "pre_bolt":pre,"installed_elf":post,"policy_evidence":policy_record,"qa":{k:g.sha(qa/k) for k in ("source.json","build.log","signed-cargo.json","eii.json","integration.json","policy.json","native-proofs.json")}}
+             "pre_bolt":pre,"installed_elf":post,"policy_evidence":policy_record,"actual_linker_executions_sha256":g.sha(qa/"linker-executions.json"),"link_modes_sha256":g.sha(qa/"link-modes.json"),"qa":{k:g.sha(qa/k) for k in ("source.json","build.log","signed-cargo.json","eii.json","integration.json","policy.json","linker-executions.json","link-modes.json","old-cc-inputs.json","native-proofs.json")}}
     g.save(dest/"role.json",product);shutil.copyfile(dest/"role.json",qa/"role.json")
     names=("ohm.tar.gz","source.json","role.json","sdk-inventory.json","component-inventory.json")
     (dest/"SHA256SUMS").write_text("".join(g.sha(dest/n)+"  "+n+"\n" for n in names))

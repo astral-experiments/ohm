@@ -28,10 +28,16 @@ for name,file in (("rustc_fixture","provider.rs"),("support","support.rs")):
     run(*base,"--crate-name",name,"--crate-type=rlib",here/file,"-o",dest/("lib"+name+".rlib"))
 img=dest/"librustc_driver.so"
 bind=dest/"binding-policy";bind.mkdir()
-(bind/"owners").write_text("rustc_driver\nrustc_fixture\n")
-run(*base,"--crate-name","rustc_driver","--crate-type=dylib",here/"driver.rs",
+package=dest/"canonical-driver"
+(package/"src").mkdir(parents=True)
+(package/"src/lib.rs").write_bytes((here/"driver.rs").read_bytes())
+(bind/"driver").write_text(str(package))
+provider=dest/"librustc_fixture.rlib"
+stat=provider.stat()
+os.link(provider,bind/f"{stat.st_dev:x}-{stat.st_ino:x}.rlib")
+run(*base,"--crate-name","rustc_driver","--crate-type=dylib",package/"src/lib.rs",
     "--extern","rustc_fixture="+str(dest/"librustc_fixture.rlib"),"--extern","support="+str(dest/"libsupport.rlib"),
-    "-o",img,more={"OHM_RUSTC_DRIVER_LINK_DIR":str(bind)})
+    "-o",img,more={"OHM_RUSTC_DRIVER_LINK_DIR":str(bind),"CARGO_MANIFEST_DIR":str(package)})
 syms=run("nm","-D","-P","--defined-only",img)
 names=[l.split()[0] for l in syms.splitlines() if l.startswith("_R")]
 def symbol(end):

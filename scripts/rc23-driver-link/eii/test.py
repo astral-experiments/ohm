@@ -1,5 +1,5 @@
 from pathlib import Path
-import hashlib, json, os, re, subprocess as sp, tempfile
+import gzip, hashlib, json, os, re, runpy, subprocess as sp, tempfile
 H=Path(__file__).resolve().parent
 import sys
 sdk=Path(sys.argv[1]).resolve()
@@ -10,10 +10,11 @@ def run(args,**kw):
 def test():
     assert sha(rustc.read_bytes())==sys.argv[3]
     lld,=sdk.rglob('rust-lld')
-    env=dict(PATH='/usr/bin:/bin',LC_ALL='C',RUSTC_BOOTSTRAP='1')
+    env=dict(PATH='/usr/bin:/bin',LC_ALL='C',RUSTC_BOOTSTRAP='1',LD_LIBRARY_PATH=str(sdk/'lib'))
     observed={}
-    def compile_role(out,extra,more=None):
-        args=[rustc,'--crate-name','rustc_driver','--crate-type','dylib','--target',triple,'-Cprefer-dynamic=yes','-Copt-level=1','--emit=link','-Clink-arg=-Wl,-q','--print=link-args',*extra,'-o',out,H/'rust-policy.rs']
+    def compile_role(out,extra,more=None,trace=None):
+        args=[rustc,'--crate-name','rustc_driver','--crate-type','dylib','--target',triple,'-Cprefer-dynamic=yes','-Copt-level=1','--emit=link','-Clink-arg=-Wl,-q','--print=link-args',*extra,'-o',out,(Path(more['CARGO_MANIFEST_DIR'])/'src/lib.rs') if more and 'OHM_RUSTC_DRIVER_LINK_DIR' in more else H/'rust-policy.rs']
+        if trace is not None:args=['strace','-f','-qq','-s','65535','-e','trace=execve','-o',trace,*args]
         p=sp.run(args,env={**env,**(more or {})},stdout=sp.PIPE,stderr=sp.PIPE)
         if p.returncode:raise RuntimeError(p.stderr.decode())
         return (p.stdout+p.stderr).decode()
@@ -69,8 +70,10 @@ def test():
             observed[label]=dict(baseline=list(map(int,normal)),interposed=list(map(int,live)),dynamic_relocations=row,elf_sha256=sha((d/'libpolicy.so').read_bytes()),dynsym=sha('\n'.join(sorted(syms(d/'libpolicy.so'))).encode()),linker_flags=[fl for fl in ['-fuse-ld=lld','-Bsymbolic-non-weak-functions','--export-dynamic-symbol-list='] if fl in (log if label=='original' else applied)])
         # Exercise the installed compiler's actual typed export traversal as well.
         auto=t/'auto';auto.mkdir();policy_dir=t/'automatic policy';policy_dir.mkdir()
-        (policy_dir/'owners').write_text('rustc_driver\n')
-        actual=compile_role(auto/'libpolicy.so',[],{'OHM_RUSTC_DRIVER_LINK_DIR':str(policy_dir)})
+        package=t/'canonical-driver';(package/'src').mkdir(parents=True)
+        (package/'src/lib.rs').write_bytes((H/'rust-policy.rs').read_bytes())
+        (policy_dir/'driver').write_text(str(package))
+        raw=auto/'automatic.exec';actual=compile_role(auto/'libpolicy.so',[],{'OHM_RUSTC_DRIVER_LINK_DIR':str(policy_dir),'CARGO_MANIFEST_DIR':str(package)},raw)
         assert syms(auto/'libpolicy.so')==snapshot
         ld=dict(env,LD_LIBRARY_PATH=os.pathsep.join(map(str,[auto,libdir,sdk/'lib'])))
         clean=list(map(int,run([binary],env=ld).split()))
@@ -78,11 +81,20 @@ def test():
         typed=sys.argv[4]=='T';assert sys.argv[4] in ('R','T')
         assert clean==[11,12,13,14,11] and replaced==([11,112,113,115,111] if typed else [111,112,113,115,111])
         lists=list(policy_dir.glob('*.exports'))
-        assert len(lists)==int(typed) and ('-Bsymbolic-non-weak-functions' in actual)==typed
+        assert len(lists)==int(typed) and '-Bsymbolic-non-weak-functions' not in actual and '--export-dynamic-symbol-list=' not in actual
+        calls=runpy.run_path(str(H.parent/'validate_modes.py'))['events'](raw)
+        cc=[a for e,a in calls if Path(e).name=='cc' or re.fullmatch(r'(?:[\w.+-]+-)?(?:gcc|clang)(?:-[0-9.]+)?',Path(e).name)]
+        assert cc and not any('-Bsymbolic-non-weak-functions' in v or '--export-dynamic-symbol-list=' in v for a in cc for v in a)
+        inner,=[a for e,a in calls if Path(e).resolve()==lld.resolve()]
+        policy_flags=[v for v in inner if v.startswith(('-Bsymbolic','--export-dynamic-symbol-list='))]
+        assert policy_flags==(['-Bsymbolic-non-weak-functions','--export-dynamic-symbol-list='+str(lists[0])] if typed else [])
+        rawb=raw.read_bytes();trace_file=Path(sys.argv[2]).with_suffix('.exec.gz')
+        trace_file.write_bytes(gzip.compress(rawb,mtime=0))
         if typed:
             names={l.strip().removesuffix(';') for l in lists[0].read_text().splitlines()}
             assert work not in names and {weak,strong,spoof}<=names
-        observed['integrated']={'normal':clean,'interposed':replaced,'typed_policy':typed,'exception_sha256':sha(lists[0].read_bytes()) if typed else None}
+        observed['integrated']={'normal':clean,'interposed':replaced,'typed_policy':typed,'exception_sha256':sha(lists[0].read_bytes()) if typed else None,
+                                'kernel_sha256':sha(rawb),'kernel_bytes':len(rawb),'actual_lld':inner[0],'actual_policy_flags':policy_flags,'outer_cc':cc}
         relocated=t/'path with space,comma';relocated.mkdir()
         second_list=relocated/'second.list';second_list.write_bytes(pre.read_bytes())
         equivalent_dir=t/'equivalent';equivalent_dir.mkdir();equivalent=equivalent_dir/'libpolicy.so'
