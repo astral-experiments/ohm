@@ -18,7 +18,8 @@ EXEC = re.compile(r'^execve\(("(?:\\.|[^"\\])*"), (\[.*?\]), .*\)\s+= 0$')
 PRODUCER = 'annotate_snippets'  # The library target of package ruff_annotate_snippets.
 DIRECT = {'ruff_db', 'ty_site_packages'}
 TARGET = 'ty_server'
-WITNESSES = {PRODUCER, *DIRECT, TARGET}
+WITNESSES = {PRODUCER, *DIRECT, TARGET, 'ruff_ranged_value', 'ty_combine', 'ty_ide',
+             'ty_module_resolver', 'ty_project', 'ty_python_core', 'ty_python_semantic', 'ty_vendored'}
 INVALID = 'const _: () = "OHM_VISIBILITY_E0308";'
 
 

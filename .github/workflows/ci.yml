@@ -1,5 +1,5 @@
-name: Compare the crate-root visibility rule on a historical ty_server check
-run-name: Ruff 27470 scoped visibility admission ${{ inputs.reviewed_head }}
+name: Price field visibility dependencies on a historical ty_server check
+run-name: Ruff 27470 field visibility admission ${{ inputs.reviewed_head }}
 
 on:
   workflow_dispatch:
@@ -60,7 +60,7 @@ jobs:
           sparse-checkout: scripts/ruff-linter-check-attribution
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: a126c17db143071a502603870986ff9b4d8c69f7
+          ref: 3a830cdc9f00b01c7110fac3653d8cd0b305c355
           path: scope-root
           persist-credentials: false
           sparse-checkout: scripts/ruff-matched-stage
