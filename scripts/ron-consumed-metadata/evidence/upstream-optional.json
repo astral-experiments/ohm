@@ -1,0 +1,159 @@
+{
+  "argv": [
+    "rustc",
+    "+ohm",
+    "--edition=2021",
+    "--crate-type",
+    "lib",
+    "--crate-name",
+    "buyer",
+    "--emit=dep-info,metadata",
+    "--error-format=json",
+    "-Zbinary-dep-depinfo",
+    "-Zchecksum-hash-algorithm=blake3",
+    "--extern",
+    "leaf=$STUDY/official-stock-optional/source/libleaf.rmeta",
+    "$STUDY/official-stock-optional/source/owner.rs",
+    "--out-dir",
+    "$STUDY/official-stock-optional/output"
+  ],
+  "physical_frontend": "f3834d26669b03f6855fa54bd2381443123e860167bc0c7a8dd137e5cf6e5e4f",
+  "role_rows": {
+    "independent-bad": {
+      "checksums": [],
+      "errors": [
+        "E0786"
+      ],
+      "outputs": {},
+      "rc": 1
+    },
+    "independent-repair": {
+      "checksums": [
+        "# checksum:blake3=8408f734613fb6985423372ae9286349cf32c89b750f0a4188fefc696fbe46ec file_len:2270 $STUDY/official-stock-optional/source/libleaf.rmeta"
+      ],
+      "errors": [],
+      "outputs": {
+        "buyer.d": "8e73596d98cbced64229e2d276aa0efa1234257fa541ebeae6d0acdca8887c8b",
+        "libbuyer.rmeta": "c27f38e744d032a234e2f1b13551cf8cfe6b7e0e75bdd6190c90a8aac6c80a34"
+      },
+      "rc": 0
+    },
+    "inplace": {
+      "action": "inplace",
+      "actual_executable": "$HOME/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+      "checksums": [
+        "# checksum:blake3=6837237ae75a0f876bc893352ffae4ca7fb4413576cc32e84c6079e1ce400aa7 file_len:2270 $STUDY/official-stock-optional/source/libleaf.rmeta"
+      ],
+      "errors": [],
+      "inode_after": 31527096,
+      "inode_before": 31527096,
+      "malformed_sha256": "0618a81b2e2f61dd5eb84be4579a3fe04d005c3ae772e50b8aaae9f7308331c4",
+      "map_after": "7852f2fa8000-7852f2fa9000 r--p 00000000 fd:01 31527096                   $STUDY/official-stock-optional/source/libleaf.rmeta",
+      "mapped_after": "527573740000000a6107000000000000",
+      "mapped_before": "727573740000000a6107000000000000",
+      "mapped_on_resume": "527573740000000a6107000000000000",
+      "open_masks_before_intervention": [
+        32
+      ],
+      "original_map": "7852f2fa8000-7852f2fa9000 r--p 00000000 fd:01 31527096                   $STUDY/official-stock-optional/source/libleaf.rmeta",
+      "original_sha256": "207034d3a3c37785251c5ead595361995af9238ccb10f9d2dbcb11502126f8df",
+      "outputs": {
+        "buyer.d": "8f1670932643b5d01f2a411ca5cb147a276ac1d97afa56123f103e310e44980a",
+        "libbuyer.rmeta": "c27f38e744d032a234e2f1b13551cf8cfe6b7e0e75bdd6190c90a8aac6c80a34"
+      },
+      "path_after": "527573740000000a6107000000000000",
+      "pid": 60,
+      "rc": 0,
+      "same_mtime": true,
+      "size": 2270
+    },
+    "inplace_restore": {
+      "action": "inplace_restore",
+      "actual_executable": "$HOME/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+      "checksums": [
+        "# checksum:blake3=8408f734613fb6985423372ae9286349cf32c89b750f0a4188fefc696fbe46ec file_len:2270 $STUDY/official-stock-optional/source/libleaf.rmeta"
+      ],
+      "errors": [],
+      "inode_after": 31527086,
+      "inode_before": 31527086,
+      "malformed_sha256": "0618a81b2e2f61dd5eb84be4579a3fe04d005c3ae772e50b8aaae9f7308331c4",
+      "map_after": "7d217e1e9000-7d217e1ea000 r--p 00000000 fd:01 31527086                   $STUDY/official-stock-optional/source/libleaf.rmeta",
+      "mapped_after": "527573740000000a6107000000000000",
+      "mapped_before": "727573740000000a6107000000000000",
+      "mapped_on_resume": "727573740000000a6107000000000000",
+      "open_masks_before_intervention": [
+        32
+      ],
+      "original_map": "7d217e1e9000-7d217e1ea000 r--p 00000000 fd:01 31527086                   $STUDY/official-stock-optional/source/libleaf.rmeta",
+      "original_sha256": "207034d3a3c37785251c5ead595361995af9238ccb10f9d2dbcb11502126f8df",
+      "outputs": {
+        "buyer.d": "8e73596d98cbced64229e2d276aa0efa1234257fa541ebeae6d0acdca8887c8b",
+        "libbuyer.rmeta": "c27f38e744d032a234e2f1b13551cf8cfe6b7e0e75bdd6190c90a8aac6c80a34"
+      },
+      "path_after": "527573740000000a6107000000000000",
+      "pid": 49,
+      "rc": 0,
+      "same_mtime": true,
+      "size": 2270
+    },
+    "rename": {
+      "action": "rename",
+      "actual_executable": "$HOME/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+      "checksums": [
+        "# checksum:blake3=6837237ae75a0f876bc893352ffae4ca7fb4413576cc32e84c6079e1ce400aa7 file_len:2270 $STUDY/official-stock-optional/source/libleaf.rmeta"
+      ],
+      "errors": [],
+      "inode_after": 31527090,
+      "inode_before": 31527086,
+      "malformed_sha256": "0618a81b2e2f61dd5eb84be4579a3fe04d005c3ae772e50b8aaae9f7308331c4",
+      "map_after": "746a0ba4b000-746a0ba4c000 r--p 00000000 fd:01 31527086                   $STUDY/official-stock-optional/source/libleaf.rmeta (deleted)",
+      "mapped_after": "727573740000000a6107000000000000",
+      "mapped_before": "727573740000000a6107000000000000",
+      "mapped_on_resume": "727573740000000a6107000000000000",
+      "open_masks_before_intervention": [
+        32
+      ],
+      "original_map": "746a0ba4b000-746a0ba4c000 r--p 00000000 fd:01 31527086                   $STUDY/official-stock-optional/source/libleaf.rmeta",
+      "original_sha256": "207034d3a3c37785251c5ead595361995af9238ccb10f9d2dbcb11502126f8df",
+      "outputs": {
+        "buyer.d": "8f1670932643b5d01f2a411ca5cb147a276ac1d97afa56123f103e310e44980a",
+        "libbuyer.rmeta": "c27f38e744d032a234e2f1b13551cf8cfe6b7e0e75bdd6190c90a8aac6c80a34"
+      },
+      "path_after": "527573740000000a6107000000000000",
+      "pid": 38,
+      "rc": 0,
+      "same_mtime": true,
+      "size": 2270
+    },
+    "sham": {
+      "action": "sham",
+      "actual_executable": "$HOME/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+      "checksums": [
+        "# checksum:blake3=8408f734613fb6985423372ae9286349cf32c89b750f0a4188fefc696fbe46ec file_len:2270 $STUDY/official-stock-optional/source/libleaf.rmeta"
+      ],
+      "errors": [],
+      "inode_after": 31527080,
+      "inode_before": 31527080,
+      "malformed_sha256": "0618a81b2e2f61dd5eb84be4579a3fe04d005c3ae772e50b8aaae9f7308331c4",
+      "map_after": "77af1b1ca000-77af1b1cb000 r--p 00000000 fd:01 31527080                   $STUDY/official-stock-optional/source/libleaf.rmeta",
+      "mapped_after": "727573740000000a6107000000000000",
+      "mapped_before": "727573740000000a6107000000000000",
+      "mapped_on_resume": "727573740000000a6107000000000000",
+      "open_masks_before_intervention": [
+        32
+      ],
+      "original_map": "77af1b1ca000-77af1b1cb000 r--p 00000000 fd:01 31527080                   $STUDY/official-stock-optional/source/libleaf.rmeta",
+      "original_sha256": "207034d3a3c37785251c5ead595361995af9238ccb10f9d2dbcb11502126f8df",
+      "outputs": {
+        "buyer.d": "8e73596d98cbced64229e2d276aa0efa1234257fa541ebeae6d0acdca8887c8b",
+        "libbuyer.rmeta": "c27f38e744d032a234e2f1b13551cf8cfe6b7e0e75bdd6190c90a8aac6c80a34"
+      },
+      "path_after": "727573740000000a6107000000000000",
+      "pid": 27,
+      "rc": 0,
+      "same_mtime": true,
+      "size": 2270
+    }
+  },
+  "stock_rustc": "rustc 1.99.0 (b940084d7 2026-09-28)\nbinary: rustc\ncommit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4\ncommit-date: 2026-09-28\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0\nLLVM version: 23.1.1\n"
+}

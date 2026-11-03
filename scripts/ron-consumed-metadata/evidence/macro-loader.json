@@ -1,0 +1,159 @@
+{
+  "archive": "sha256:74933fe90daeb5b2b8d0b4ec48bd9d84356a7991028cf185c0734e744b930acc",
+  "full_role": [
+    {
+      "authorized_input": null,
+      "diagnostics": [],
+      "name": "ordinary-healthy",
+      "outputs": {
+        "libron-0b42003ff6bbcee9.rlib": "00c6d5b665398ffdcbab7c58dfe896bed5bf65aeb55e94f2f941419f27cae757",
+        "libron-0b42003ff6bbcee9.rmeta": "c21381eaec41a3031fdf953e7ee629707674e765dcf89d07f41d1502fca11810",
+        "ron-0b42003ff6bbcee9.d": "8ddd581fa5516a4abcf2b34e51fdf3936135ccc478c5de40c471e0f4deaef954"
+      },
+      "rc": 0
+    },
+    {
+      "authorized_input": null,
+      "diagnostics": [
+        [
+          "E0782",
+          "extensions.rs",
+          5,
+          83,
+          94
+        ],
+        [
+          "E0782",
+          "public.rs",
+          17,
+          37,
+          98
+        ]
+      ],
+      "name": "ordinary-malformed",
+      "outputs": {
+        "ron-0b42003ff6bbcee9.d": "38a3338d32e924cfdcd8ce8fed28ff4e5a3b7484240dc228c500fb0d9bd669eb"
+      },
+      "rc": 1
+    },
+    {
+      "authorized_input": true,
+      "diagnostics": [],
+      "name": "observed-healthy",
+      "outputs": {
+        "libron-0b42003ff6bbcee9.rlib": "00c6d5b665398ffdcbab7c58dfe896bed5bf65aeb55e94f2f941419f27cae757",
+        "libron-0b42003ff6bbcee9.rmeta": "5d872cd34da0a3672a7bb3646504852e2948423ec097fd8c60cfcdf06fcb20d0",
+        "ron-0b42003ff6bbcee9.d": "8ddd581fa5516a4abcf2b34e51fdf3936135ccc478c5de40c471e0f4deaef954"
+      },
+      "rc": 0
+    },
+    {
+      "authorized_input": false,
+      "diagnostics": [
+        [
+          "E0782",
+          "extensions.rs",
+          5,
+          83,
+          94
+        ],
+        [
+          "E0782",
+          "public.rs",
+          17,
+          37,
+          98
+        ]
+      ],
+      "name": "observed-malformed",
+      "outputs": {
+        "ron-0b42003ff6bbcee9.d": "38a3338d32e924cfdcd8ce8fed28ff4e5a3b7484240dc228c500fb0d9bd669eb"
+      },
+      "rc": 1
+    },
+    {
+      "authorized_input": false,
+      "diagnostics": [
+        [
+          "E0782",
+          "extensions.rs",
+          5,
+          83,
+          94
+        ],
+        [
+          "E0782",
+          "public.rs",
+          17,
+          37,
+          98
+        ]
+      ],
+      "name": "observed-rename-mid-load",
+      "outputs": {
+        "ron-0b42003ff6bbcee9.d": "38a3338d32e924cfdcd8ce8fed28ff4e5a3b7484240dc228c500fb0d9bd669eb"
+      },
+      "rc": 1
+    },
+    {
+      "authorized_input": false,
+      "diagnostics": [
+        [
+          "E0782",
+          "extensions.rs",
+          5,
+          83,
+          94
+        ],
+        [
+          "E0782",
+          "public.rs",
+          17,
+          37,
+          98
+        ]
+      ],
+      "name": "observed-blocking-editor",
+      "outputs": {
+        "ron-0b42003ff6bbcee9.d": "38a3338d32e924cfdcd8ce8fed28ff4e5a3b7484240dc228c500fb0d9bd669eb"
+      },
+      "rc": 1
+    }
+  ],
+  "mutated_dso": "d10101784698b81eec63d9994e59590a3c4596f0861a46f8ee7ccf41718b5d14",
+  "normal_dso": "406b8448ec89af1429a3a253381c6d9176970deb874c1035e680264ba8df382b",
+  "ordinary_reference_results": [
+    {
+      ".d": "a0fee16010ffff9efd7f9200a87dee78e698c2027a6ce49aae2671bca8b8e074",
+      ".rlib": "00c6d5b665398ffdcbab7c58dfe896bed5bf65aeb55e94f2f941419f27cae757",
+      ".rmeta": "5d872cd34da0a3672a7bb3646504852e2948423ec097fd8c60cfcdf06fcb20d0"
+    },
+    {
+      ".d": "a0fee16010ffff9efd7f9200a87dee78e698c2027a6ce49aae2671bca8b8e074",
+      ".rlib": "00c6d5b665398ffdcbab7c58dfe896bed5bf65aeb55e94f2f941419f27cae757",
+      ".rmeta": "c21381eaec41a3031fdf953e7ee629707674e765dcf89d07f41d1502fca11810"
+    },
+    {
+      ".d": "a0fee16010ffff9efd7f9200a87dee78e698c2027a6ce49aae2671bca8b8e074",
+      ".rlib": "00c6d5b665398ffdcbab7c58dfe896bed5bf65aeb55e94f2f941419f27cae757",
+      ".rmeta": "5d872cd34da0a3672a7bb3646504852e2948423ec097fd8c60cfcdf06fcb20d0"
+    },
+    {
+      ".d": "a0fee16010ffff9efd7f9200a87dee78e698c2027a6ce49aae2671bca8b8e074",
+      ".rlib": "00c6d5b665398ffdcbab7c58dfe896bed5bf65aeb55e94f2f941419f27cae757",
+      ".rmeta": "936d25982563b96f0f14ec45a5068869c49572490847a912f7aec17884025164"
+    },
+    {
+      ".d": "a0fee16010ffff9efd7f9200a87dee78e698c2027a6ce49aae2671bca8b8e074",
+      ".rlib": "00c6d5b665398ffdcbab7c58dfe896bed5bf65aeb55e94f2f941419f27cae757",
+      ".rmeta": "5d872cd34da0a3672a7bb3646504852e2948423ec097fd8c60cfcdf06fcb20d0"
+    },
+    {
+      ".d": "a0fee16010ffff9efd7f9200a87dee78e698c2027a6ce49aae2671bca8b8e074",
+      ".rlib": "00c6d5b665398ffdcbab7c58dfe896bed5bf65aeb55e94f2f941419f27cae757",
+      ".rmeta": "5d872cd34da0a3672a7bb3646504852e2948423ec097fd8c60cfcdf06fcb20d0"
+    }
+  ],
+  "physical_bytes": 4902736,
+  "scope": "Actual loaded macro generation only. No native link validation or product shortcut."
+}

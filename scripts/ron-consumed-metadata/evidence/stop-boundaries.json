@@ -1,0 +1,116 @@
+[
+  {
+    "barrier": {
+      "after": [
+        253,
+        1,
+        31459406,
+        4244611,
+        1793704001745069732,
+        "74dcdd53fcc3105f049e72ab596f712a0727869b83d3544aa38f0d699cb78477"
+      ],
+      "before": [
+        253,
+        1,
+        31458729,
+        4244611,
+        1793704001745069732,
+        "fad260d4ed0b14149668cc0469c215376c7e9dfe7c3fcbbe071de03a1dae36e0"
+      ],
+      "events": [
+        32,
+        32,
+        16
+      ],
+      "executable": "$SDK/bin/rustc",
+      "maps_after": [
+        "7b9be3200000-7b9be360d000 r--p 00000000 fd:01 31458729                   $STUDY/race/input/shared/debug/build/registries/v2-de56e134d9f76150/serde_core/8b1f50303d3fbc82/out/libserde_core-8b1f50303d3fbc82.rmeta (deleted)"
+      ],
+      "no_depfile": true,
+      "original_maps": [
+        "7b9be3200000-7b9be360d000 r--p 00000000 fd:01 31458729                   $STUDY/race/input/shared/debug/build/registries/v2-de56e134d9f76150/serde_core/8b1f50303d3fbc82/out/libserde_core-8b1f50303d3fbc82.rmeta"
+      ],
+      "pid": 134
+    },
+    "history": "race",
+    "phase": "replaced-after-map"
+  },
+  {
+    "barrier": {
+      "after": [
+        253,
+        1,
+        31458729,
+        4244611,
+        1793704001745069732,
+        "fad260d4ed0b14149668cc0469c215376c7e9dfe7c3fcbbe071de03a1dae36e0"
+      ],
+      "before": [
+        253,
+        1,
+        31458729,
+        4244611,
+        1793704001745069732,
+        "fad260d4ed0b14149668cc0469c215376c7e9dfe7c3fcbbe071de03a1dae36e0"
+      ],
+      "events": [
+        32,
+        32,
+        16
+      ],
+      "executable": "$SDK/bin/rustc",
+      "maps_after": [
+        "72d161e00000-72d16220d000 r--p 00000000 fd:01 31458729                   $STUDY/race/input/shared/debug/build/registries/v2-de56e134d9f76150/serde_core/8b1f50303d3fbc82/out/libserde_core-8b1f50303d3fbc82.rmeta"
+      ],
+      "no_depfile": true,
+      "original_maps": [
+        "72d161e00000-72d16220d000 r--p 00000000 fd:01 31458729                   $STUDY/race/input/shared/debug/build/registries/v2-de56e134d9f76150/serde_core/8b1f50303d3fbc82/out/libserde_core-8b1f50303d3fbc82.rmeta"
+      ],
+      "pid": 103
+    },
+    "history": "race",
+    "phase": "same-map-sham"
+  },
+  {
+    "barrier": {
+      "before": [
+        "7e8901400000-7e890180d000 r--p 00000000 fd:01 31459432                   $STUDY/race/input/shared/debug/build/registries/v2-de56e134d9f76150/serde_core/8b1f50303d3fbc82/out/libserde_core-8b1f50303d3fbc82.rmeta"
+      ],
+      "before_depfile_create": true,
+      "current_inode": 31459453,
+      "events": [
+        32
+      ],
+      "maps_after": [
+        "7e8901400000-7e890180d000 r--p 00000000 fd:01 31459432                   $STUDY/race/input/shared/debug/build/registries/v2-de56e134d9f76150/serde_core/8b1f50303d3fbc82/out/libserde_core-8b1f50303d3fbc82.rmeta (deleted)"
+      ],
+      "original_inode": 31459432,
+      "physical_rustc": "$SDK/bin/rustc",
+      "pid": 37,
+      "same_size_mtime": true
+    },
+    "history": "race-early",
+    "phase": "first-map-replace"
+  },
+  {
+    "barrier": {
+      "before": [
+        "71a946e00000-71a94720d000 r--p 00000000 fd:01 31459432                   $STUDY/race/input/shared/debug/build/registries/v2-de56e134d9f76150/serde_core/8b1f50303d3fbc82/out/libserde_core-8b1f50303d3fbc82.rmeta"
+      ],
+      "before_depfile_create": true,
+      "current_inode": 31459432,
+      "events": [
+        32
+      ],
+      "maps_after": [
+        "71a946e00000-71a94720d000 r--p 00000000 fd:01 31459432                   $STUDY/race/input/shared/debug/build/registries/v2-de56e134d9f76150/serde_core/8b1f50303d3fbc82/out/libserde_core-8b1f50303d3fbc82.rmeta"
+      ],
+      "original_inode": 31459432,
+      "physical_rustc": "$SDK/bin/rustc",
+      "pid": 6,
+      "same_size_mtime": true
+    },
+    "history": "race-early",
+    "phase": "first-map-sham"
+  }
+]

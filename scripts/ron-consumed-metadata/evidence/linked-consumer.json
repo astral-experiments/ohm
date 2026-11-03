@@ -1,0 +1,113 @@
+{
+  "invalid_E0308": true,
+  "literal_last_argv": [
+    "rustc",
+    "+ohm",
+    "--edition=2021",
+    "--crate-name",
+    "ron_consumer",
+    "$STUDY/native-reader-qualified/reader.rs",
+    "--extern",
+    "ron=$STUDY/native-reader-qualified/input/libron-0b42003ff6bbcee9.rmeta",
+    "--extern",
+    "ron=$STUDY/native-reader-qualified/input/libron-0b42003ff6bbcee9.rlib",
+    "-Cdebuginfo=0",
+    "--error-format=json",
+    "-L",
+    "dependency=$ROLE/shared/debug/build/registries/v2-de56e134d9f76150/bitflags/367b786f8de371ca/out",
+    "-L",
+    "dependency=$ROLE/shared/debug/build/registries/v2-de56e134d9f76150/once_cell/fed376f30fe21593/out",
+    "-L",
+    "dependency=$ROLE/shared/debug/build/registries/v2-de56e134d9f76150/serde_core/8b1f50303d3fbc82/out",
+    "-L",
+    "dependency=$ROLE/shared/debug/build/registries/v2-de56e134d9f76150/typeid/eede586f7803950c/out",
+    "-L",
+    "dependency=$ROLE/shared/debug/build/registries/v2-de56e134d9f76150/unicode-ident/c6b7151656fd563d/out",
+    "-L",
+    "dependency=$ROLE/target/debug/build/workspaces/f44635c822fcb5f3/v2-de56e134d9f76150/serde/90583f82f4850bc4/out",
+    "-L",
+    "dependency=$ROLE/target/debug/build/workspaces/f44635c822fcb5f3/v2-de56e134d9f76150/serde_derive/6037f10264f9dbbd/out",
+    "-o",
+    "$STUDY/native-reader-qualified/reader"
+  ],
+  "physical_artifacts": {
+    "actual-reference": {
+      "ELF": "261da844a4cea2876e7e488cf815b759baa21ecf44531a82d8ab1e4d980f339b",
+      "rlib": "00c6d5b665398ffdcbab7c58dfe896bed5bf65aeb55e94f2f941419f27cae757",
+      "rmeta": "c21381eaec41a3031fdf953e7ee629707674e765dcf89d07f41d1502fca11810",
+      "size": 1283240,
+      "stdout": "valid=[8,13,21] roundtrip=3 malformed=1:5\n"
+    },
+    "binary-depinfo-clean": {
+      "ELF": "42cc1452a6b17303927183d0f23959340d94744b2fe50c7cb8fec6f9e711ed82",
+      "rlib": "16c21204f76baa5e750e76bbe9dec5a304894eb50d03c123c1a4c67450b6ea45",
+      "rmeta": "cf017ca91692535555ea0dbe33bee134e45e24b116a3733063d475e9e3601ae9",
+      "size": 1283176,
+      "stdout": "valid=[8,13,21] roundtrip=3 malformed=1:5\n"
+    },
+    "binary-depinfo-independent-empty": {
+      "ELF": "42cc1452a6b17303927183d0f23959340d94744b2fe50c7cb8fec6f9e711ed82",
+      "rlib": "16c21204f76baa5e750e76bbe9dec5a304894eb50d03c123c1a4c67450b6ea45",
+      "rmeta": "2b7b4dff26a04163bc3c5bd0fd63e5f619a65d0f085a5faed4cacb0ddb63cdea",
+      "size": 1283176,
+      "stdout": "valid=[8,13,21] roundtrip=3 malformed=1:5\n"
+    },
+    "first-repaired": {
+      "ELF": "729b56baa4d5b47cec3c34324be4351e3cfb6d755a132bc57991acde5bdcbfca",
+      "rlib": "270d7c2144302e52ce6eb0db2659cc6f5cc5398ec7c662e808825ab1da947d6b",
+      "rmeta": "09d7412828a3dbcef4381c570dfe9b805b255ebefcc0aeb5f91c1b5d58b53581",
+      "size": 1283056,
+      "stdout": "valid=[8,13,21] roundtrip=3 malformed=1:5\n"
+    },
+    "independent-empty-repaired": {
+      "ELF": "729b56baa4d5b47cec3c34324be4351e3cfb6d755a132bc57991acde5bdcbfca",
+      "rlib": "270d7c2144302e52ce6eb0db2659cc6f5cc5398ec7c662e808825ab1da947d6b",
+      "rmeta": "13efa9e312741368098767907ee756e63037b67b9299a1d955adfc51ae3b575c",
+      "size": 1283056,
+      "stdout": "valid=[8,13,21] roundtrip=3 malformed=1:5\n"
+    },
+    "inplace": {
+      "ELF": "42cc1452a6b17303927183d0f23959340d94744b2fe50c7cb8fec6f9e711ed82",
+      "rlib": "16c21204f76baa5e750e76bbe9dec5a304894eb50d03c123c1a4c67450b6ea45",
+      "rmeta": "2b7b4dff26a04163bc3c5bd0fd63e5f619a65d0f085a5faed4cacb0ddb63cdea",
+      "size": 1283176,
+      "stdout": "valid=[8,13,21] roundtrip=3 malformed=1:5\n"
+    },
+    "inplace_restore": {
+      "ELF": "42cc1452a6b17303927183d0f23959340d94744b2fe50c7cb8fec6f9e711ed82",
+      "rlib": "16c21204f76baa5e750e76bbe9dec5a304894eb50d03c123c1a4c67450b6ea45",
+      "rmeta": "ae2bd3e073115aab3a0c693366b8572be4f7f6cad7c88362ce8f61bb49c23c38",
+      "size": 1283176,
+      "stdout": "valid=[8,13,21] roundtrip=3 malformed=1:5\n"
+    },
+    "private-good": {
+      "ELF": "729b56baa4d5b47cec3c34324be4351e3cfb6d755a132bc57991acde5bdcbfca",
+      "rlib": "270d7c2144302e52ce6eb0db2659cc6f5cc5398ec7c662e808825ab1da947d6b",
+      "rmeta": "09d7412828a3dbcef4381c570dfe9b805b255ebefcc0aeb5f91c1b5d58b53581",
+      "size": 1283056,
+      "stdout": "valid=[8,13,21] roundtrip=3 malformed=1:5\n"
+    },
+    "rename": {
+      "ELF": "42cc1452a6b17303927183d0f23959340d94744b2fe50c7cb8fec6f9e711ed82",
+      "rlib": "16c21204f76baa5e750e76bbe9dec5a304894eb50d03c123c1a4c67450b6ea45",
+      "rmeta": "ae2bd3e073115aab3a0c693366b8572be4f7f6cad7c88362ce8f61bb49c23c38",
+      "size": 1283176,
+      "stdout": "valid=[8,13,21] roundtrip=3 malformed=1:5\n"
+    },
+    "same-argv-trace": {
+      "ELF": "261da844a4cea2876e7e488cf815b759baa21ecf44531a82d8ab1e4d980f339b",
+      "rlib": "00c6d5b665398ffdcbab7c58dfe896bed5bf65aeb55e94f2f941419f27cae757",
+      "rmeta": "5d872cd34da0a3672a7bb3646504852e2948423ec097fd8c60cfcdf06fcb20d0",
+      "size": 1283240,
+      "stdout": "valid=[8,13,21] roundtrip=3 malformed=1:5\n"
+    },
+    "sham": {
+      "ELF": "42cc1452a6b17303927183d0f23959340d94744b2fe50c7cb8fec6f9e711ed82",
+      "rlib": "16c21204f76baa5e750e76bbe9dec5a304894eb50d03c123c1a4c67450b6ea45",
+      "rmeta": "ae2bd3e073115aab3a0c693366b8572be4f7f6cad7c88362ce8f61bb49c23c38",
+      "size": 1283176,
+      "stdout": "valid=[8,13,21] roundtrip=3 malformed=1:5\n"
+    }
+  },
+  "repair_elf": "42cc1452a6b17303927183d0f23959340d94744b2fe50c7cb8fec6f9e711ed82"
+}
