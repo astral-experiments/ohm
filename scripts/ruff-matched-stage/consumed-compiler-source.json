@@ -1,20 +1,42 @@
 {
-  "C": "b6c3da0e9c7df8d7239cdf702600d334a8057c3a",
-  "P": "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2",
+  "C": "e157d8912adcdae91bd43df88959f3a510bfa34a",
+  "P": "dad5fae340339ea631fdafc3ef27956df1ffb81a",
   "bundle": {
     "baseline_commits": [
       "6b53006403f4b0194f5ef89be6bef622d000ef4c",
       "55f4bd7498ca455141dd13086ad4d0f624314f4c",
       "d70d44a7b3edc2207d60f07bb0324128f56f119e",
-      "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2"
+      "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2",
+      "dad5fae340339ea631fdafc3ef27956df1ffb81a"
     ],
-    "branch": "refs/heads/charlie/private-derives-after-consumed-inputs-v2",
-    "bytes": 10615,
+    "branch": "refs/heads/charlie/private-derives-after-consumed-and-sete",
+    "bytes": 11402,
     "candidate_commits": [
-      "b6c3da0e9c7df8d7239cdf702600d334a8057c3a"
+      "e157d8912adcdae91bd43df88959f3a510bfa34a"
     ],
     "prerequisite": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
-    "sha256": "8ee09638befc3d5993f9b86621a01c2c6dfec3a922bb1d7197c342f56adf037d"
+    "sha256": "ef5ce985a4f06b7ae05d1566b12a1cbfc0fa36fd2f4f1f150f8dd416f992fe76"
+  },
+  "common_sete": {
+    "blobs": {
+      "compiler/rustc_codegen_llvm/src/asm.rs": {
+        "new": "021d238ee77922eb522864b14940826d05afe26c",
+        "old": "033cf9df65b477ed566089157db7e315dabd6e61"
+      },
+      "tests/run-make/ohm-checked-dep-info/inline.rs": {
+        "new": "a2e5fd1f0c35dc9a8b9d7a97779e9f1d3fa8e63a",
+        "old": "9246a6a6c4af75f17c7b3bb4d0148c9958688c3a"
+      }
+    },
+    "branch": "refs/heads/charlie/recognize-register-equality-result",
+    "bytes": 1017,
+    "original_roles": {
+      "C": "b6c3da0e9c7df8d7239cdf702600d334a8057c3a",
+      "P": "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2"
+    },
+    "sha256": "134086ff1edb51b1d8e8e391b3856f05f27e55814effb461d43dec03c896e6fa",
+    "signed": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+    "upstream": "a65831c7215662f270cd95a760b7163399835269"
   },
   "compared_common_consumed_inputs": {
     ".github/workflows/ci.yml": "fecb141897a0c06a420fd7ca9eb57325a8e15038",
@@ -56,5 +78,5 @@
   "seed_bytes": 2254845,
   "signed_seed_objects": 4624,
   "signed_source": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
-  "tree": "eca2be1fda279d04fb40aff9b4a063fc513a5130"
+  "tree": "c998e9949b409ae7ece9020e6dff2a300882176b"
 }

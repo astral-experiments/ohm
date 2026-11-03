@@ -20,15 +20,16 @@
       "6b53006403f4b0194f5ef89be6bef622d000ef4c",
       "55f4bd7498ca455141dd13086ad4d0f624314f4c",
       "d70d44a7b3edc2207d60f07bb0324128f56f119e",
-      "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2"
+      "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2",
+      "dad5fae340339ea631fdafc3ef27956df1ffb81a"
     ],
-    "branch": "refs/heads/charlie/private-derives-after-consumed-inputs-v2",
-    "bytes": 10615,
+    "branch": "refs/heads/charlie/private-derives-after-consumed-and-sete",
+    "bytes": 11402,
     "candidate_commits": [
-      "b6c3da0e9c7df8d7239cdf702600d334a8057c3a"
+      "e157d8912adcdae91bd43df88959f3a510bfa34a"
     ],
     "prerequisite": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
-    "sha256": "8ee09638befc3d5993f9b86621a01c2c6dfec3a922bb1d7197c342f56adf037d"
+    "sha256": "ef5ce985a4f06b7ae05d1566b12a1cbfc0fa36fd2f4f1f150f8dd416f992fe76"
   },
   "capability": {
     "active": "-Zohm-checked-private-derives-v2",
@@ -73,6 +74,27 @@
     "tests/run-make/dep-info-consumed-input/rmake.rs": "a05fbe142cf79ebefd75008752ccd69569dc9de7",
     "tests/run-make/dep-info-consumed-input/save.rs": "4d6e19d02ffe141575d31e953acb212d6e462084"
   },
+  "common_sete": {
+    "blobs": {
+      "compiler/rustc_codegen_llvm/src/asm.rs": {
+        "new": "021d238ee77922eb522864b14940826d05afe26c",
+        "old": "033cf9df65b477ed566089157db7e315dabd6e61"
+      },
+      "tests/run-make/ohm-checked-dep-info/inline.rs": {
+        "new": "a2e5fd1f0c35dc9a8b9d7a97779e9f1d3fa8e63a",
+        "old": "9246a6a6c4af75f17c7b3bb4d0148c9958688c3a"
+      }
+    },
+    "branch": "refs/heads/charlie/recognize-register-equality-result",
+    "bytes": 1017,
+    "original_roles": {
+      "C": "b6c3da0e9c7df8d7239cdf702600d334a8057c3a",
+      "P": "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2"
+    },
+    "sha256": "134086ff1edb51b1d8e8e391b3856f05f27e55814effb461d43dec03c896e6fa",
+    "signed": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+    "upstream": "a65831c7215662f270cd95a760b7163399835269"
+  },
   "kit": {
     "commit": "bc0e3e18ccf825c4eeaece4727b9ac3b4ecd8a89",
     "prepare.sh": "de6653dc519f7bc22d8115b87fe8fc9a21bacac9843690f4651a7fc24afe54ec",
@@ -80,14 +102,14 @@
   },
   "roles": {
     "C": {
-      "compiler": "27a445213f2f2e558199ed52a32d3ac51374dc7d",
-      "revision": "b6c3da0e9c7df8d7239cdf702600d334a8057c3a",
-      "tree": "eca2be1fda279d04fb40aff9b4a063fc513a5130"
+      "compiler": "8520bd9252ee498acc8fbc1f97dc607f78894c96",
+      "revision": "e157d8912adcdae91bd43df88959f3a510bfa34a",
+      "tree": "c998e9949b409ae7ece9020e6dff2a300882176b"
     },
     "P": {
-      "compiler": "ffa79fe56d9bace88c7d159289fb5229538651cf",
-      "revision": "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2",
-      "tree": "d9d8d190d49a742d7b990d46420bace16f9fd2db"
+      "compiler": "9bbc8e8744d531901ba6b7a919fb77677e30f94a",
+      "revision": "dad5fae340339ea631fdafc3ef27956df1ffb81a",
+      "tree": "73fdba95d4282b3b4b30601b537307f304658d49"
     }
   },
   "schema": "ohm-remat-builder-registration-v1",

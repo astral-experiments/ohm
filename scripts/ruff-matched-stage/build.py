@@ -15,7 +15,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from capsule import HOST, REG, need, reopen, save, seal, sha
 
-BRANCH = "charlie/qa-derive-consumed-rust-20261103"
+BRANCH = "charlie/qa-derive-sete-consumed-rust-20261103"
 BASE = "34e78f19c0d0c58c86e42d83e05a4dc6db6b0f6d"
 
 
@@ -57,6 +57,24 @@ def bundle(repo):
         == entry["baseline_commits"],
         "wrong packaging pin history between the prepared source and the parent",
     )
+    common = REG["common_sete"]
+    upstream = common["upstream"]
+    original = common["original_roles"]["P"]
+    packet = HERE / "upstream-sete.bundle"
+    need(sha(packet) == common["sha256"] and packet.stat().st_size == common["bytes"],
+         "different common upstream source packet")
+    need(git(repo, "bundle", "list-heads", str(packet)) == upstream + " " + common["branch"], "unexpected #349 ref")
+    git(repo, "bundle", "verify", str(packet))
+    git(repo, "fetch", "--no-tags", "--no-recurse-submodules", str(packet), common["branch"])
+    need(git(repo, "rev-parse", "FETCH_HEAD", upstream + "^", p + "^").splitlines()
+         == [upstream, common["signed"], original], "unexpected #349 ancestry")
+    expected = sorted(common["blobs"])
+    for before, after in ((common["signed"], upstream), (original, p)):
+        need(git(repo, "diff", "--name-only", before, after).splitlines() == expected, "unexpected common change")
+        for path in expected:
+            blobs = common["blobs"][path]
+            need(git(repo, "rev-parse", before + ":" + path, after + ":" + path, c + ":" + path).splitlines()
+                 == [blobs["old"], blobs["new"], blobs["new"]], ("different #349 input", path))
     changed = sorted(REG["changed_sources"])
     need(
         git(repo, "diff", "--name-status", "--no-renames", p, c).splitlines()
@@ -314,6 +332,11 @@ def build(workspace, root):
         consumed_log = root / "logs" / ("run-make-consumed-" + role + ".log")
         guarded(consumed, rust, env, consumed_log, root)
         need("1 passed; 0 failed; 0 ignored" in consumed_log.read_text(), "consumed-input regression did not run")
+
+        native = argv[:argv.index("build")] + ["test", "--stage", "1", "-j8", "tests/run-make/ohm-checked-dep-info"]
+        native_log = root / "logs" / ("run-make-sete-" + role + ".log")
+        guarded(native, rust, env, native_log, root)
+        need("1 passed; 0 failed; 0 ignored" in native_log.read_text(), "native dep-info regression did not run")
 
         if role == "C":
             run_make = argv[:argv.index("build")] + ["test", "--stage", "1", "-j8",
