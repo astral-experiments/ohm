@@ -1,12 +1,12 @@
-name: Confirm the normal Ruff ty_ide library build on six fresh hosts
-run-name: Ruff 29697 direct ty_ide build P/C ${{ inputs.reviewed_head }}
+name: 'Attribute the normal Ruff ty_ide library build after rustc #329'
+run-name: Ruff 29697 candidate-only native instruction attribution
 permissions:
   contents: read
   actions: read
 jobs:
   inspect:
-    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha
-      == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruff-ty-ide-lib-29697-20261103'
+    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head
+      && github.ref_name == 'charlie/qa-ruff-ty-ide-lib-residual-29697-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 165
     steps:
@@ -34,38 +34,19 @@ jobs:
         path: factory-src
         persist-credentials: false
         sparse-checkout: scripts/ruff-matched-stage
-    - name: Build and inspect both normal ty_ide library histories
+    - name: Check the real build and independently attribute both rustc invocations
       env:
         REVIEWED_HEAD: ${{ inputs.reviewed_head }}
         OHM_SDK_READ_TOKEN: ${{ github.token }}
-      run: python3 -IB qa/scripts/ruff-original-ty-instructions/standalone-buckets/study.py
+      run: python3 -IB qa/scripts/ruff-original-ty-instructions/standalone-buckets/residual/actor.py
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: matched-ty-ide-library-confirm-${{ github.run_id }}-${{ matrix.slot }}
+        name: ruff-ty-ide-build-residual-${{ github.run_id }}
         path: ${{ runner.temp }}/ohm-foreign-join/published/
         retention-days: 21
         if-no-files-found: error
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-        - slot: 0
-          order: PC
-        - slot: 1
-          order: CP
-        - slot: 2
-          order: CP
-        - slot: 3
-          order: PC
-        - slot: 4
-          order: PC
-        - slot: 5
-          order: CP
-    name: 'Ruff #29697 library ${{ matrix.slot }} ${{ matrix.order }}'
-    env:
-      OHM_29697_LIB_SLOT: ${{ matrix.slot }}
-      OHM_29697_LIB_ORDER: ${{ matrix.order }}
+    name: One unscored genuine library edit
 'on':
   workflow_dispatch:
     inputs:

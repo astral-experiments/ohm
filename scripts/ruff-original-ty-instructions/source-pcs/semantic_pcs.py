@@ -69,13 +69,13 @@ def symbol_ranges(path,values):
         if all(out.get(x) for x in addresses):break
     return out
 
-def analyze(raw,root,kit,minimum):
+def analyze(raw,root,kit,minimum,*,owner="ty_ide"):
     buf=raw.read_bytes();period,ips,records,depth,modes,skid=raw_records(buf)
     counted=json.loads((root/"record-counts.json").read_bytes())
     check(not any(records.get(k,0) for k in (2,5,6,13)) and records[9]==counted["PERF_RECORD_SAMPLE"],"lost or displaced kernel samples")
     with (root/"samples.ndjson.gz").open("rb")as f:frames,rows=symbol_rows(f)
     check(Counter(v[0]for v in rows)==ips,"perf Python source rows differ from original kernel PC/PID/TID/time/period")
-    target=json.loads((root/"owner-epochs.json").read_bytes())["ty_ide"];pid=target["pid"];start=target["start_ns"]
+    target=json.loads((root/"owner-epochs.json").read_bytes())[owner];pid=target["pid"];start=target["start_ns"]
     later=[int(s[4]) for l in (root/"exec/epochs.tsv").read_text().splitlines() if (s:=l.split())[0]=="I" and int(s[2])==pid and int(s[4])>start]
     check(not later,"later image in selected PID")
     maps=mappings(buf,pid);del buf
