@@ -1,0 +1,39 @@
+{
+  "cargo": {
+    "parent": {
+      "sha256": "b05c0f1a01f8cae3ccb7446647fcb7d9b5a36c3dfabc340a78a8b189561036b6",
+      "bytes": 51375392,
+      "source": "abc70d60a6fd89c10d5f65cf85820d9b78d5affe",
+      "tree": "68e5a1e9b52324ad2e6fb8382eaa7cf53428f97d",
+      "version": "cargo 1.99.0 (abc70d60a 2026-11-03)\nrelease: 1.99.0\ncommit-hash: abc70d60a6fd89c10d5f65cf85820d9b78d5affe\ncommit-date: 2026-11-03\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]\n"
+    },
+    "candidate": {
+      "sha256": "32df98560d4ac57c4c959c762095a3afe6a3bbe62b44d8fc6e6bf8071f53a53e",
+      "bytes": 51396624,
+      "source": "1b44b5d3dc540c491c79bbf47fae8b286e8f797a",
+      "tree": "4fa3ceed3d7bb1797a403d9bf1e3da466493f4c2",
+      "version": "cargo 1.99.0 (1b44b5d3d 2026-11-03)\nrelease: 1.99.0\ncommit-hash: 1b44b5d3dc540c491c79bbf47fae8b286e8f797a\ncommit-date: 2026-11-03\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]\n"
+    }
+  },
+  "sdk_sha256": "ecde6809d7f1fc1966798198479867c4a49bdf7a51f3873336d23a40fabce453",
+  "bootstrap_cargo": "a4faa288657042d02767a38812c7498218dfcafc945abfe3b4a44c07323a1a24",
+  "rustc": "f5a51d8cc3e76236c2d0f17d495d59ebb03306e4",
+  "command": [
+    "cargo",
+    "+ohm",
+    "-Zohm-defaults=no",
+    "build",
+    "--release",
+    "--locked",
+    "--offline",
+    "-p",
+    "cargo",
+    "--bin",
+    "cargo",
+    "--features",
+    "all-static,ohm-defaults",
+    "-j6"
+  ],
+  "qa": "29d7e95cd4426cac743860ca6a314cfa6c1924a9",
+  "run": "41734567724"
+}
