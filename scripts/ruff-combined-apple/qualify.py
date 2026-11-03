@@ -1,4 +1,4 @@
-"""Nonpublishing macOS qualification of the exact Cargo and Rust checksum heads."""
+"""Nonpublishing native qualification of the exact release Cargo and Rust source pins."""
 import hashlib
 import json
 import os
@@ -58,7 +58,7 @@ def check_cargo_files():
 
 def check_sources():
     check_cargo_files()
-    for repo, ref, tree in ((src, "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2", "d9d8d190d49a742d7b990d46420bace16f9fd2db"), (cargo, "d5185be60b88e36ffb5e9daeb543b9f14d077a37", "4b9a4d7ca2e5abb29c307fa501ec6a437e30dea3"), (workspace/"fixtures", "5b47d5755bd515e61a98b9f85eca3af0aaf7c137", "d22f09981bdd81fc892fd47d894233639d0f3dab")):
+    for repo, ref, tree in ((src, "364b82f01c52f77e870cdb1bb5b9f66e2fa89694", "531c5eefa10de5179d81207bdd50f4246dc725b9"), (cargo, "d5185be60b88e36ffb5e9daeb543b9f14d077a37", "4b9a4d7ca2e5abb29c307fa501ec6a437e30dea3"), (workspace/"fixtures", "5b47d5755bd515e61a98b9f85eca3af0aaf7c137", "d22f09981bdd81fc892fd47d894233639d0f3dab")):
         assert git_sha(repo, "HEAD") == ref and git_sha(repo, "HEAD^{tree}") == tree
         if repo!=src:
             sp.run(["git", "-C", repo, "diff", "--exit-code", "HEAD", "--"], check=True)
@@ -75,8 +75,13 @@ def check_sources():
         (logs/"untracked.json").write_text(json.dumps([os.fsdecode(n) for n in names if n],indent=2))
         print("Untracked names:",[os.fsdecode(n)for n in names[:12]],flush=True)
         raise
-    for field in ("gitlinks","authorized_differences"):
-        assert json.loads(json.dumps(checked[field]))==previous["layout"][field],field
+    previous_links=dict(previous["layout"]["gitlinks"])
+    links=dict(checked["gitlinks"])
+    assert previous_links.pop("src/tools/cargo")["commit"]=="7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed"
+    mounted=links.pop("src/tools/cargo")
+    assert mounted["populated"] and mounted["commit"]==git_sha(cargo,"HEAD") and mounted["tree"]==git_sha(cargo,"HEAD^{tree}")
+    assert links==previous_links
+    assert json.loads(json.dumps(checked["authorized_differences"]))==previous["layout"]["authorized_differences"]
 
 def source():
     assert git_sha(src,"HEAD")=="d57fd1515986dccecdcece8da85e651bfb4b81f9"
@@ -92,7 +97,31 @@ def source():
     assert git_sha(cargo,"FETCH_HEAD")=="d5185be60b88e36ffb5e9daeb543b9f14d077a37"
     sp.run(["git","-C",cargo,"checkout","--quiet","--detach","FETCH_HEAD"],check=True)
     assert [git_sha(cargo,r) for r in ("HEAD^1","HEAD^2")]==["4a6de7858c60e579fc30e01f5b60ddcaa84c2e30","aee854cc8cc48194c5cb4e240fd944e2fdd14bce"]
+    pin=Path(__file__).resolve().with_name("qualified-rust-pin.bundle")
+    assert smoke.sha(pin)=="7b13e8af3f6aa8caba3de87ab6b4e801c533b1d25d1f14e0b6ce325e5e2abf77" and git_sha(src,"HEAD")=="d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2"
+    sp.run(["git","-C",src,"bundle","verify",pin],check=True)
+    sp.run(["git","-C",src,"fetch","--no-tags","--no-recurse-submodules",pin,"refs/heads/charlie/qa-rc23-qualified-cargo-pin-20261103"],check=True)
+    assert git_sha(src,"FETCH_HEAD")=="364b82f01c52f77e870cdb1bb5b9f66e2fa89694" and git_sha(src,"FETCH_HEAD^")==git_sha(src,"HEAD")
+    assert sp.check_output(["git","-C",src,"diff","--name-only","HEAD","FETCH_HEAD","--"])==b"src/tools/cargo\n"
+    sp.run(["git","-C",src,"checkout","--quiet","--no-recurse-submodules","--detach","FETCH_HEAD"],check=True)
+    nested=src/"src/tools/cargo"
+    if (nested/".git").exists():
+        sp.run(["git","-C",nested,"fetch","--no-tags",cargo,git_sha(cargo,"HEAD")],check=True)
+        sp.run(["git","-C",nested,"checkout","--quiet","--detach",git_sha(cargo,"HEAD")],check=True)
+    else:
+        assert not nested.exists() or not any(nested.iterdir())
+        shutil.copytree(cargo,nested,symlinks=True,dirs_exist_ok=True)
     check_sources()
+    coordinator=workspace/"signed-coordinator"
+    manifest=json.loads((coordinator/"toolchains/1.99.0/23.json").read_bytes())
+    manifest["sources"]["rust"]["revision"]=git_sha(src,"HEAD")
+    manifest["sources"]["cargo"]["revision"]=git_sha(cargo,"HEAD")
+    proof=logs/"source-manifest-for-qa.json"
+    smoke.save(proof,manifest)
+    verifier=coordinator/"scripts/verify-release-sources.sh"
+    verified=sp.check_output(["bash",verifier,proof,src,nested,src/"src/tools/clippy",src/"src/tools/rustfmt"],stderr=sp.STDOUT)
+    assert git_sha(src,"HEAD").encode() in verified and git_sha(cargo,"HEAD").encode() in verified
+    (logs/"release-source-verifier.stdout").write_bytes(verified)
     smoke.save(logs/"sources.json",{"rust":git_sha(src,"HEAD"),"cargo":git_sha(cargo,"HEAD"),"packet":smoke.sha(packet)})
 
 def clean_env():
