@@ -10,8 +10,8 @@ import worker as w
 
 CLIENT = 'crates/ruff_db/src/diagnostic/mod.rs'
 CLIENT_SHA = '106596aef8474b6d340244abf0b7b1a13ddcb77e628323c22dcf5a6a235310f1'
-FIELD = b"    pub(crate) path: Option<Cow<'a, str>>,"
-PUBLIC = b"    pub path: Option<Cow<'a, str>>,"
+FIELD = b"pub struct Origin<'a> {\n    pub(crate) path: Option<Cow<'a, str>>,"
+PUBLIC = b"pub struct Origin<'a> {\n    pub path: Option<Cow<'a, str>>,"
 ACCESS = b"""
 #[allow(dead_code)]
 fn observe_origin_path_for_visibility(origin: &annotate_snippets::Origin<'_>) {
