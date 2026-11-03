@@ -28,11 +28,26 @@
   ],
   "counter_sha256": "096b9e9efb7457ff4c2fd194985f18c4e05520fce46c85e5919b084ae3d823ce",
   "edition": "2024",
-  "excluded": [
-    "Signed -23 timing, 41590898520 mechanism, both modern trial refusals, historical 41606912972 and all corrected-source compatibility runs. No prior sample scores."
-  ],
-  "factory_binding": "ca865b52bb6714b12468e5397e4d14c3fee16563e71782e77a10a3ab56e92786",
-  "factory_branch": "charlie/qa-derive-consumed-rust-20261103",
+  "excluded": {
+    "additions": [
+      41618130440,
+      41620595077,
+      41623337781,
+      41625608181,
+      41623623166,
+      41624199212
+    ],
+    "prior": [
+      "Signed -23 timing, 41590898520 mechanism, both modern trial refusals, historical 41606912972 and all corrected-source compatibility runs. No prior sample scores."
+    ]
+  },
+  "factory_binding": {
+    "capsule": "2fe4343814e6efbd5d5cb909219859ba96be7adf9ca0e849f1af38f17402393f",
+    "common": "Both #347 consumed-input writer and #349 exact sete run-makes on each compiler.",
+    "run": 41621745224,
+    "source": "6250ceba040bc15c2a296ae7ee1e5c6897f3ff06"
+  },
+  "factory_branch": "charlie/qa-derive-sete-consumed-rust-20261103",
   "gates": {
     "confirmation_all_improve": true,
     "confirmation_edited_median_reduction_min": 0.1,
@@ -51,17 +66,7 @@
       "tree": "d48ef0a25f09f2613d0098665bfc729ccd523ae5"
     }
   },
-  "independence": {
-    "external_products": "Each role seeds its own external inputs through normal Cargo check and build. Only physically identified registry/Git outputs survive resets. Every external body, Cargo.lock archive, Git checkout and declared build output is checked; the actual proc-macro section is retained. The additional fully empty native reference receives no compiled input from a seed.",
-    "history": "A fresh worker, fresh role-specific external seed and independent workspace histories per role. Both prior metadata refusals, the signed discovery, all earlier historical workers and the pilot contribute zero scored pairs.",
-    "invalid": "Real invalid historical source must produce E0308, distinct native RUF009 regressions/repairs must match separate clean reference. No CI trust override.",
-    "kernel": "Count true checked crates, all real compiler capability probes and executable maps independently of nominal Cargo units; whole command includes every probe.",
-    "metadata": "Verify the complete physical .rmeta, public hashes, per-definition public rows and dependency graph for every enrolled owner. A same-role same-source ruff_linter producer difference is allowed only when the stable opaque-lifetime keys biject, forward+reverse lookups and full identifier/source spans map exactly, every other byte is accounted, and public rows, expansion and dependency sets agree. Settled repeats still require raw identity. All other unexplained differences refuse the worker.",
-    "native": "Every successful native CLI tested on four checked diagnostics. All same-role whole ELF and all public metadata rows required. Cross-role full ELF or only the historically qualified true native compiler source dir/build ID (including all decoded DWARF and nonallowed bytes).",
-    "release": "Additional alias/checksum Cargo compatibility under separate qualification; this isolated exact-stack pilot does not qualify a release.",
-    "sources": "Freshly fetched locked registry and Git objects only. Independently empty local and third-party products in each full history; no uploaded or prebuilt dependency prefix.",
-    "statistics": "Eight separate hosts, 4 PC/4 CP, drawn uniformly once before any pricing. All eight reductions positive and median at least 10%. Primary blocked assignment p from all 70 allocations; independently exchangeable paired signs have one-sided 1/256 if all eight improve. Exact sample counts and ratios reported."
-  },
+  "independence": "One new CP-screen; conditional eight fresh boots with four PC/four CP. Earlier source-built or shipped counts never contribute.",
   "kernel_negotiation": "Require the actual loaded P2 or Q2 driver, an actual v2 sysroot capability probe and never the stale v1 option, a checksum-eligible Ruff library, a physically distinct result on the genuine initial consumer, and every real old/fixed Rust closure. PMU counts all ordinary descendants.",
   "lock": {
     "git": {
@@ -99,14 +104,14 @@
   },
   "matched_sources": {
     "C": {
-      "compiler": "27a445213f2f2e558199ed52a32d3ac51374dc7d",
-      "revision": "b6c3da0e9c7df8d7239cdf702600d334a8057c3a",
-      "tree": "eca2be1fda279d04fb40aff9b4a063fc513a5130"
+      "compiler": "8520bd9252ee498acc8fbc1f97dc607f78894c96",
+      "revision": "e157d8912adcdae91bd43df88959f3a510bfa34a",
+      "tree": "c998e9949b409ae7ece9020e6dff2a300882176b"
     },
     "P": {
-      "compiler": "ffa79fe56d9bace88c7d159289fb5229538651cf",
-      "revision": "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2",
-      "tree": "d9d8d190d49a742d7b990d46420bace16f9fd2db"
+      "compiler": "9bbc8e8744d531901ba6b7a919fb77677e30f94a",
+      "revision": "dad5fae340339ea631fdafc3ef27956df1ffb81a",
+      "tree": "73fdba95d4282b3b4b30601b537307f304658d49"
     }
   },
   "native_admission": {
@@ -238,18 +243,14 @@
     "scope": "Decode genuine derive panic help and spans on the historical get-size-derive2 macro, retain exact valid expansion bytes and two E0433 diagnostics from the intentionally unlinked expanded-only probe. Before the workload both signed-source stage1 roles must distinguish actual ordered results on four archived genuine plugin binaries and agree on each. The confirmation admission pins the frozen registered branch. Same case, native images, order, counter and all thresholds."
   },
   "prefix_provenance": {
-    "cross_role": "Every external product must be identical to its own seed throughout ordinary, traced and independently Ruff-empty histories. Each role must additionally build the whole native graph entirely empty, and match its fully cold executable. Cross-role all loadable/executable/native bytes and decoded debug must pass the complete existing ELF verifier.",
-    "enrolled_helper_file_sha256": "0cbc8078e658aaf5749014e060a577a6639f04e406479af43af28a54f7b50195",
-    "git_manifest_proof_sha256": "a7ed17f8a591f68ca6c5225993db68da47d971452cb6832fad5a8e8253c1513c",
-    "locked_git.py": "4bf244c9d6010e0d35ee1f3da720a47c936a0c6c3dedf62ec5b7f0cda20d87e3",
-    "offline_git": "All 11 original Git commit/tree/manifest objects reopen the four exact manifest paths from the Ruff lock and typed Cargo stream. The collector also checks every physical tracked file and mode in both actual checkouts.",
-    "parent_helper_file_sha256": "3893ab09b216967b53727b9faea7bcebd64fe610e808ddba8297c6873368ad75",
-    "prerequisite_workflow": "ordinary role-private Cargo check and build of original pre-edit Ruff, independent of every timing installation",
-    "source": "7a8775afbca6bf2b901e543d1d031bd47155de67"
+    "check": "One measured cold buggy check, two unchanged buggy controls, real edit and two unchanged fixed; trace the return, two buggy controls, real forward and two fixed controls, and the additional reverse/invalid/repair. Independently fully empty fixed check.",
+    "external": "Checked input files are compared byte-for-byte within the role, including the independent empty-check reference. The ordered native macro selection and unprojected result must also agree; any refusal is retained once.",
+    "logical_paths": "No compiled artifacts imported. Cargo uses a fresh target and build directory, the normal authorized Cargo home reconstructed from the original lock sources, and the same logical worktree paths for all arms.",
+    "native": "Each role fully empty from the original buggy Ruff, ordinary native edit/unchanged/reverse and invalid/repair, independently fully empty fixed Ruff. Full within-role binary equality, actual source spans and reversible cross-role proof."
   },
-  "qa_branch": "charlie/qa-ruf009-consumed-historical-20261103",
-  "qa_parent": "ddfeceeb6fd33fdea233a39a3d59ab523f5ab170",
-  "rust_parent": "d46c44b58d91b9d7b4b0d2fc4850c31ad5cbc8f2",
+  "qa_branch": "charlie/qa-ruf009-sete-counts-20261103",
+  "qa_parent": "829cca9e461ae7cffba8f929b76bed21d6fcba1a",
+  "rust_parent": "dad5fae340339ea631fdafc3ef27956df1ffb81a",
   "settled": [
     [
       "ty_python_semantic",

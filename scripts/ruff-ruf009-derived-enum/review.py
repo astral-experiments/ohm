@@ -23,6 +23,7 @@ import opaque_bijection
 import dependencies
 import elf_gate
 import external
+import empty_inputs
 
 REG=json.loads((HERE/'registration.json').read_bytes())
 PORT=json.loads((HERE/'historical-source.json').read_bytes())
@@ -81,10 +82,11 @@ def block(base):
         need(kit['config']['source']==worker['factory']['source'][role]==REG['matched_sources'][role]['revision'] and kit['driver']==kit['config']['driver']==read(base/'factory-safety.json')[role]['driver_sha256'],'different role')
         need(kit['config']['cargo']==kit['cargo']==bound_client['binary_sha256'], 'physical process used a different Cargo')
         version=kit['rustc_version'].splitlines()[0]+' (Ohm metadata 3)'
-        qualified_prefix=external.originals(folder)
+        qualified_prefix=empty_inputs.reopen(folder)
         data={}
         phases=['buggy-cold','buggy-idle1','buggy-idle2','edited','fixed-idle1','fixed-idle2']
-        for stage in [p+'-'+s for p in ('ordinary','kernel') for s in phases]+['reverse','restore-fixed','invalid','repair','empty-edit']:
+        phase_key=lambda prefix,stage:prefix+'-'+('buggy-return' if prefix=='kernel' and stage=='buggy-cold' else stage)
+        for stage in [phase_key(p,s) for p in ('ordinary','kernel') for s in phases]+['reverse','restore-fixed','invalid','repair','empty-edit']:
             d=folder/stage; got=orig_folder(d)
             rows=[json.loads(x) for x in (d/'stdout').read_bytes().splitlines()]
             valid=stage!='invalid'
@@ -157,11 +159,14 @@ def block(base):
             ref=data['ordinary-'+labels[0]]
             for name in ('ordinary-','kernel-'):
                 for label in labels:
-                    obj=data[name+label]
+                    obj=data[phase_key(name.rstrip('-'),label)]
                     need(all(semantic(v)==semantic(ref['meta'][n]) for n,v in obj['meta'].items()),'ordinary/traced metadata disagreement')
-                    need(obj['dirty']==(ref['dirty'] if label==labels[0] else REG['settled_nominal']),'two clean no-op or observer discrepancy')
+                    if name=='kernel-' and label=='buggy-cold':
+                        need(obj['physical']==data['reverse']['physical'] and obj['dirty']==data['reverse']['dirty'],'different actual reverse return')
+                    else:
+                        need(obj['dirty']==(ref['dirty'] if label==labels[0] else REG['settled_nominal']),'two clean no-op or observer discrepancy')
                 # Source-generated metadata remains identical between repeated unchanged commands.
-                same=[{n:v['full'] for n,v in data[name+label]['meta'].items()}for label in labels]
+                same=[{n:v['full'] for n,v in data[phase_key(name.rstrip('-'),label)]['meta'].items()}for label in labels]
                 need(same[0]==same[1]==same[2],'settled bytes changed')
         for label,ref in [('empty-edit','ordinary-edited'),('repair','ordinary-edited'),('restore-fixed','ordinary-edited'),('reverse','ordinary-buggy-cold')]:
             need(all(semantic(v)==semantic(data[ref]['meta'][k]) for k,v in data[label]['meta'].items()),'semantic reference mismatch '+label)
@@ -173,10 +178,10 @@ def block(base):
                 keyed=lambda media:{(v[0],v[1],tuple(v[2]),v[3]):v[4:] for v in media}
                 a,b=keyed(reference),keyed(observed['external']); keys=sorted(k for k in set(a)|set(b) if a.get(k)!=b.get(k))
                 raise ValueError(('independent external product bytes differ', role, stage, len(keys), [(k,a.get(k),b.get(k)) for k in keys[:6]]))
-        for state,labels,ref in [('buggy',('kernel-buggy-cold','kernel-buggy-idle1','kernel-buggy-idle2'),'ordinary-buggy-cold'),('fixed',('kernel-edited','kernel-fixed-idle1','kernel-fixed-idle2'),'ordinary-edited')]:
+        for state,labels,ref in [('buggy',('kernel-buggy-return','kernel-buggy-idle1','kernel-buggy-idle2'),'ordinary-buggy-cold'),('fixed',('kernel-edited','kernel-fixed-idle1','kernel-fixed-idle2'),'ordinary-edited')]:
             for stage in labels:require_producer_match(data[stage]['meta']['ruff_linter'], data[ref]['meta']['ruff_linter'],role,version)
         native={}
-        for key,state in [('native-buggy','buggy'),('native-edited','fixed'),('native-reverse','buggy'),('native-repair','fixed'),('native-empty-edit','fixed'),('native-fully-empty-fixed','fixed')]:
+        for key,state in [('native-buggy','buggy'),('native-edited','fixed'),('native-reverse','buggy'),('native-repair','fixed'),('native-fixed-idle','fixed'),('native-fully-empty-fixed','fixed')]:
             n=read(folder/key/'native.json');f=members/(n['sha256']+'.elf.zst');need(file_sha(f)==n['compressed'] and n['state']==state,'wrong stored ELF')
             with subprocess.Popen(['zstd','-dcq',f],stdout=subprocess.PIPE) as proc:
                 md=hashlib.sha256();size=0
@@ -193,7 +198,10 @@ def block(base):
                 need(p['code']==wanted and not p['stderr'] and [m['code']for m in diag]==['RUF009']*wanted,'native verdict')
                 if wanted:need(diag[0]['location']=={'row':4,'column':24} and diag[0]['end_location']=={'row':4,'column':24+len(expr)} and diag[0]['message']=='Do not perform function call `'+expr.split('(')[0]+'` in dataclass defaults','span/message')
             native[key]=n
-        need(native['native-fully-empty-fixed']==native['native-edited']==native['native-empty-edit']==native['native-repair'] and native['native-buggy']==native['native-reverse'] and native['native-buggy']['sha256']!=native['native-edited']['sha256'],'different same-role full CLI or dynamic probe')
+        need(native['native-fully-empty-fixed']==native['native-edited']==native['native-fixed-idle']==native['native-repair'] and native['native-buggy']==native['native-reverse'] and native['native-buggy']['sha256']!=native['native-edited']['sha256'],'different same-role full CLI or dynamic probe')
+        raw_invalid=[json.loads(line)for line in (folder/'native-invalid/stdout').read_bytes().splitlines()]
+        errors=[r['message']for r in raw_invalid if r.get('reason')=='compiler-message' and r['message']['level']=='error']
+        need(len(errors)==1 and errors[0]['code']['code']=='E0308' and any(v['is_primary'] and v['file_name']==REG['path'] and 'OHM_INVALID_CHECK_SENTINEL' in str(v['text'])for v in errors[0]['spans']),'independent native build error')
         empty=read(folder/'fully-empty-entry.json')
         need(empty['entries']==[] and not any('TRUST' in k or 'WRAPPER' in k for k in empty['env']) and empty['target']==empty['state']+'/target' and empty['build']==empty['state']+'/build','wrong fully cold native state')
         typed=[v for v in external.prefix.events(folder/'native-fully-empty-fixed')if v.get('reason')=='compiler-artifact']
@@ -207,7 +215,7 @@ def block(base):
         need(baseline['full']!=edited['full'],'real producer metadata did not change')
         read_client=read(base/'client-native.json')['binding']
         need(kit['cargo']==kit['config']['cargo']==read_client['binary_sha256'] and read_client['revision'] in kit['cargo_version'],'different executed Cargo client')
-        role_data[role]=dict(registry_prefix=qualified_prefix,source=kit['config']['source'],driver=kit['driver'],dirty=data['ordinary-edited']['dirty'],physical=data['kernel-edited']['physical'],cost={s:data['ordinary-'+s]['instructions'] for s in phases},
+        role_data[role]=dict(empty_input_witness=qualified_prefix,source=kit['config']['source'],driver=kit['driver'],dirty=data['ordinary-edited']['dirty'],physical=data['kernel-edited']['physical'],cost={s:data['ordinary-'+s]['instructions'] for s in phases},
             public=[baseline['public'],edited['public']],row_count=[baseline['definitions'],edited['definitions']],changed_rows=len(diff),row_changes_sha256=digest(json.dumps(diff,sort_keys=True).encode()),negotiation=read(folder/'kernel-edited-observer/negotiation.json'),native={k:v['sha256']for k,v in native.items()},
             equivalence={label:{n:v['full']==data['ordinary-edited']['meta'][n]['full']for n,v in data[label]['meta'].items()} for label in ('repair','empty-edit')})
     p,c=role_data['P'],role_data['C']

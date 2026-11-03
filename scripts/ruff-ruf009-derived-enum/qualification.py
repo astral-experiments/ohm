@@ -7,7 +7,6 @@ from pathlib import Path
 import re
 import subprocess
 import shutil
-import tomllib
 import sys
 
 HERE = Path(__file__).resolve().parent
@@ -20,28 +19,12 @@ import external
 import output_binding
 import negotiation
 import dependencies
-import prefix as registry_prefix
+import empty_inputs
 
 MEMBERS=BASE/'members'
 outputs={}
 watch=set(map(tuple,REG['observed_terminal_targets']))
 
-
-COLD={'local-cold-physical':'check','ordinary-buggy-cold':'check','kernel-buggy-cold':'check','empty-edit':'check','native-buggy':'build','native-empty-edit':'build'}
-LIVE=None
-BOUNDARIES=[]
-
-def verify_prefix(label,environment,*,already_verified=False):
-    if not already_verified:LIVE.verify(label)
-    check=external.actual_expansion(LIVE.work,label,LIVE.macro,environment,ROOT)
-    need(check['macro']==LIVE.macro_sha and (not BOUNDARIES or check==BOUNDARIES[0][1]),'external ordered macro changed between histories')
-    BOUNDARIES.append((label,check))
-
-def restart(label,environment):
-    LIVE.fresh(label)
-    for name in ('home','temp'):
-        p=ROOT/name;need(p.parent==ROOT and p.is_dir() and not p.is_symlink(),'private role HOME');shutil.rmtree(p);p.mkdir()
-    verify_prefix(label,environment,already_verified=True)
 
 def write_once(path, body):
     if not path.exists():
@@ -92,7 +75,6 @@ def check(label,state,environment,version,method='ordinary',invalid=False):
     elif method=='pmu':
         argv=[ROOT/'whole-count',dest/'hardware.json',ROOT/'proxies/cargo',*CHECK]
     else:need(method=='ordinary','unknown measurement')
-    if label=='kernel-buggy-cold':outputs.clear()
     present=lambda p:all(f.is_file() for f in p.values())
     before=output_binding.snapshot({k:v for k,v in outputs.items() if present(v)},MEMBERS) if method=='trace' else {}
     if method=='trace':save(trace/'outputs-before.json',before)
@@ -104,10 +86,9 @@ def check(label,state,environment,version,method='ordinary',invalid=False):
     finally:
         if invalid:f.write_bytes(original)
     source(state)
-    if LIVE and label in COLD:LIVE.cold('check',dest)
     dirty=sorted([[r['target']['name'],r['target']['kind'][0]] for r in arts if not r['fresh']])
     observed=None
-    if method=='trace' or label=='kernel-buggy-cold':outputs.update(output_binding.paths(arts,watch))
+    if not invalid:outputs.update(output_binding.paths(arts,watch))
     if method=='trace':
         observer.traced(trace,expected=None)
         native=json.loads((trace/'native-execs.json').read_bytes())
@@ -144,20 +125,19 @@ def check(label,state,environment,version,method='ordinary',invalid=False):
     if not invalid:save(dest / "external-products.json", dependencies.capture(arts, MEMBERS))
     data=dict(state=state,dirty=dirty,source=hashlib.sha256(original+(ERROR if invalid else b'')).hexdigest(),units=roster,metadata=bindings,method=method,physical=observed,invalid=invalid,instructions=instructions)
     save(dest/'check.json',data)
+    if not invalid:empty_inputs.capture(case,label,arts,environment)
     return data
 
 
 def core(prefix,mode,e,v):
     changes={}
-    restart('enter-'+prefix,e)
-    labels=[('buggy-cold','buggy'),('buggy-idle1','buggy'),('buggy-idle2','buggy'),('edited','fixed'),('fixed-idle1','fixed'),('fixed-idle2','fixed')]
+    first='buggy-cold' if mode=='pmu' else 'buggy-return'
+    labels=[(first,'buggy'),('buggy-idle1','buggy'),('buggy-idle2','buggy'),('edited','fixed'),('fixed-idle1','fixed'),('fixed-idle2','fixed')]
     for label,state in labels:
-        method='ordinary' if mode=='trace' and label=='buggy-cold' else mode
-        c=check(prefix+'-'+label,state,e,v,method)
+        c=check(prefix+'-'+label,state,e,v,mode)
         if 'idle' in label:need(c['dirty']==REG['settled_nominal'],('registered historical settled control',label,c['dirty']))
         if label=='edited':need(['ruff_linter','lib'] in c['dirty'],'no actual producer')
         changes[label]=c
-    verify_prefix('after-'+prefix,e)
     return changes
 
 
@@ -171,8 +151,7 @@ def native(label,state,environment):
     source(state);dest=w.OUT/label
     w.run(BUILD,environment,dest,timeout=3600)
     arts=typed_rows(dest,True)
-    if LIVE and label in COLD:LIVE.cold('build',dest)
-    if label=='native-fully-empty-fixed':
+    if label in ('native-buggy','native-fully-empty-fixed'):
         need(len(arts)==REG['native_unit_count'] and all(not r['fresh']for r in arts),'fully cold native controls reused compiled units')
     cli,=[r for r in arts if r['target']['name']=='ruff' and r['target']['kind']==['bin']]
     exe=Path(cli['executable'])
@@ -197,8 +176,7 @@ def native(label,state,environment):
 
 
 def run(role):
-    global LIVE,BOUNDARIES
-    LIVE=None;BOUNDARIES=[]
+    outputs.clear()
     w.checked_head()
     e=env();w.OUT=BASE/role;w.OUT.mkdir()
     aid=old.activate(role)
@@ -212,40 +190,28 @@ def run(role):
     for relative,key in aid['config']['files'].items():
         need(sha(w.SDK/relative)==key,'changed installed member: '+relative)
     version=subprocess.check_output(['rustc','+ohm','--version'],env=e,text=True).strip()+' (Ohm metadata 3)'
-    # The role's own normal Cargo check + build create the only allowed dependency prefix.
-    fresh_state();source('buggy')
-    phases={}
-    for name,argv in [('check',CHECK),('build',BUILD)]:
-        folder=w.OUT/('dependency-seed-'+name);w.run(argv,e,folder,timeout=3600);typed_rows(folder,True);phases[name]=folder
-    LIVE=registry_prefix.Prefix(w.STATE,w.SRC,ROOT/'cargo',w.OUT/'registry-prefix',tomllib.loads((w.SRC/'Cargo.lock').read_text()),phases)
-    with (LIVE.work/'compiled-macro.so.zst').open('xb')as out:
-        subprocess.run(['zstd','-q','-3','-c',LIVE.macro],check=True,stdout=out)
-    verify_prefix('after-registry-seed',e)
-    external.qualify_cold(LIVE,e,role,case)
-    verify_prefix('after-checked-local-cold',e)
+    empty_inputs.entry(case,'ordinary-buggy-cold',role,e)
     measured=core('ordinary','pmu',e,version)
     observed=core('kernel','trace',e,version)
-    for stage in measured:
-        m,t=measured[stage],observed[stage]
-        need(m['units']==t['units'] and m['dirty']==t['dirty'],'the observer changed Cargo work')
-        # Inspect all complete A/A metadata separately; public/row equality is verified by the independent reader.
+    for label in ('edited','buggy-idle1','buggy-idle2','fixed-idle1','fixed-idle2'):
+        need(measured[label]['units']==observed[label]['units'] and measured[label]['dirty']==observed[label]['dirty'],'the observer changed a comparable ordinary Cargo visit')
     check('reverse','buggy',e,version,'trace')
     check('restore-fixed','fixed',e,version,'trace')
     check('invalid','fixed',e,version,'trace',True)
     check('repair','fixed',e,version,'trace')
-    verify_prefix('after-invalid-repair',e)
-    restart('enter-empty-edit',e);check('empty-edit','fixed',e,version)
-    verify_prefix('after-empty-edit',e)
-    restart('enter-native',e)
-    for label,state in [('native-buggy','buggy'),('native-edited','fixed'),('native-reverse','buggy'),('native-repair','fixed')]:
+    empty_inputs.entry(case,'empty-edit',role,e)
+    check('empty-edit','fixed',e,version)
+    empty_inputs.entry(case,'native-buggy',role,e)
+    for label,state in [('native-buggy','buggy'),('native-edited','fixed'),('native-fixed-idle','fixed'),('native-reverse','buggy')]:
         native(label,state,e)
-    verify_prefix('after-native-round-trip',e)
-    restart('enter-native-empty-edit',e);native('native-empty-edit','fixed',e)
-    verify_prefix('after-native-empty-edit',e)
-    save(LIVE.work/'stages.json',dict(cold=COLD,observations=[n for n,_ in BOUNDARIES]))
-    LIVE=None
-    fresh_state()
-    need(not list(w.STATE.iterdir()) and not any('TRUST' in k for k in e) and not any('WRAPPER' in k for k in e),'fully empty native admission')
+    source('fixed')
+    src=w.SRC/REG['path'];good=src.read_bytes();src.write_bytes(good+ERROR)
+    try:
+        invalid=w.OUT/'native-invalid';w.run(BUILD,e,invalid,101,timeout=3600);typed_rows(invalid,False)
+    finally:
+        src.write_bytes(good)
+    native('native-repair','fixed',e)
+    empty_inputs.entry(case,'native-fully-empty-fixed',role,e)
     save(w.OUT/'fully-empty-entry.json',dict(state=str(w.STATE),entries=[],cargo_home=e['CARGO_HOME'],target=e['CARGO_TARGET_DIR'],build=e['CARGO_BUILD_BUILD_DIR'],env=e))
     native('native-fully-empty-fixed','fixed',e)
     save(w.OUT/'completed.json',dict(role=role,source=aid['config']['source'],driver=aid['driver'],edited=measured['edited']['instructions']))

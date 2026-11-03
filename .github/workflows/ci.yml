@@ -17,7 +17,7 @@ permissions:
   actions: read
 jobs:
   schedule:
-    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruf009-consumed-historical-20261103' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruf009-sete-counts-20261103' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     runs-on: namespace-profile-ubuntu-24-04-16
     outputs:
       matrix: ${{ steps.bind.outputs.matrix }}
@@ -105,7 +105,7 @@ jobs:
         with:
           python-version: '3.13'
       - name: Install the independent process observer
-        run: sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends strace zstd
+        run: sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends strace zstd b3sum llvm-18
       - name: Reopen source-built SDKs and registry and calibrate the inherited counter
         env:
           GH_TOKEN: ${{ github.token }}
@@ -143,7 +143,7 @@ jobs:
         with:
           python-version: '3.13'
       - name: Install the independent native ELF and DWARF readers
-        run: sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends llvm-18 zstd
+        run: sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends llvm-18 zstd b3sum
       - name: Independently open each authenticated original on this separate host
         env:
           GH_TOKEN: ${{ github.token }}

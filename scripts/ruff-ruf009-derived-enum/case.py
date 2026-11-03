@@ -48,8 +48,28 @@ def fresh_state():
         directory.mkdir()
 
 
+def check_native_release():
+    notice = json.loads((HERE / 'sete-prerequisites.json').read_bytes())
+    expected = {'ordinary-native': (41625608181, 'success'), 'literal-first': (41623623166, 'failure'),
+                'parked-and-alias': (41624199212, 'success')}
+    need(set(notice) == set(expected), 'missing native acquisition')
+    for name, (run, conclusion) in expected.items():
+        sealed = notice[name]
+        info = old.api(f'actions/runs/{run}')
+        need(info['status'] == 'completed' and info['conclusion'] == conclusion and info['run_attempt'] == 1
+             and info['head_sha'] == sealed['head'] and sealed['run'] == run, 'wrong native run or role')
+        asset = old.api(f"actions/artifacts/{sealed['artifact']}")
+        need(asset['workflow_run']['id'] == run and asset['digest'] == 'sha256:' + sealed['artifact_sha256'],
+             'wrong native raw archive')
+        projected = HERE / 'native-prerequisites' / (name + '.json')
+        need(sha(projected) == sealed['proof_sha256'], 'wrong independent native projection')
+        data = json.loads(projected.read_bytes())
+        need(data['passed'] is True and data['scope'] == name, 'native prerequisite refused')
+
+
 def enroll(phase, block):
     w.checked_head()
+    check_native_release()
     need(not ROOT.exists() and len(REG['confirm_orders'])==8, 'previous worker state')
     ROOT.mkdir()
     BASE.mkdir()
@@ -84,6 +104,9 @@ def enroll(phase, block):
         log=z.read('run-make-C.log');proof=(builder/'build.py').read_text()
         need('"tests/run-make/rdr-public-hash-private-native-derive"]' in proof and 'guarded(run_make, rust, env, run_make_log, root)' in proof and b'Testing stage1 with compiletest suite=run-make mode=run-make' in log and b'running 1 tests' in log and b'1 passed; 0 failed; 0 ignored' in log,'missing real product run-make')
         for k,label in [('P','parent'),('C','candidate')]:
+            for name in ('consumed','sete'):
+                record = z.read('run-make-' + name + '-' + k + '.log')
+                need(b'running 1 tests' in record and b'1 passed; 0 failed; 0 ignored' in record, 'missing common native/checksum run-make')
             g=json.loads(z.read('scope-guard-'+label+'.json'));ph=g['phases']
             need(g['role']==label and len(ph)==12 and sorted(ph['private-edit']['dirty']) in ([['dep'],['app','dep']] if k=='C' else [['app','dep']]) and
                  g['kernel']['old']['kernel']==['app','dep'] and g['kernel']['unchanged']['kernel']==[] and g['kernel']['edit']['kernel']==['app','dep'] and
