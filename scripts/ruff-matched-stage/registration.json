@@ -17,31 +17,19 @@
   ],
   "bundle": {
     "baseline_commits": [],
-    "branch": "refs/heads/charlie/check-private-builtin-derives",
-    "bytes": 2869,
+    "branch": "refs/heads/charlie/recognize-register-equality-result",
+    "bytes": 1017,
     "prerequisite": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
-    "sha256": "d383ce91fcf93d26fbc481e0864a339bf24681074646bbfe20aa6c88c87651fc"
+    "sha256": "134086ff1edb51b1d8e8e391b3856f05f27e55814effb461d43dec03c896e6fa"
   },
   "changed_sources": {
-    "compiler/rustc_incremental/src/persist/file_format.rs": {
-      "C": "81ce0d310326b2f381fb244b9c97c7f4e62291e0",
-      "P": "f96e27d853eaf23289d72479b990780eda43eacc"
+    "compiler/rustc_codegen_llvm/src/asm.rs": {
+      "C": "021d238ee77922eb522864b14940826d05afe26c",
+      "P": "033cf9df65b477ed566089157db7e315dabd6e61"
     },
-    "compiler/rustc_metadata/src/rmeta/encoder.rs": {
-      "C": "cebe55432abd77ccf04e95ae1c2b1e8443484f33",
-      "P": "2b2f08dbca687cd0352adeeffe80d38fb1a06a50"
-    },
-    "tests/run-make/rdr-public-hash-private-native-derive/dep.rs": {
-      "C": "43cd74a57bfa7d9a2e415d4f8c14a5120514d0e9",
-      "P": "81febc630f3d5923456a1ac93bd72c20e5f9b82e"
-    },
-    "tests/run-make/rdr-public-hash-private-native-derive/rmake.rs": {
-      "C": "ddb8113ee775fa031f5343414c67bd585786d90d",
-      "P": "08e37538012b212cee347cb5710774cfe961c510"
-    },
-    "tests/run-make/rdr-public-hash-private-native-derive/send.rs": {
-      "C": "6e0c4d65bbce160c5ac63130d5cc2f1b8cac8634",
-      "P": null
+    "tests/run-make/ohm-checked-dep-info/inline.rs": {
+      "C": "a2e5fd1f0c35dc9a8b9d7a97779e9f1d3fa8e63a",
+      "P": "9246a6a6c4af75f17c7b3bb4d0148c9958688c3a"
     }
   },
   "kit": {
@@ -51,9 +39,9 @@
   },
   "roles": {
     "C": {
-      "compiler": "00242f37d22326f470500b2b531d0eeb704ec542",
-      "revision": "16a25d901318369d5ff788dd5c6ac0656d6e0bd6",
-      "tree": "f1517182df5dfbb4425689d27bd6168eea6ebe1b"
+      "compiler": "976fa57d54a43b65a73240748cfacce678872788",
+      "revision": "a65831c7215662f270cd95a760b7163399835269",
+      "tree": "5b00d488aac3ff765072fa80041afd9d7f0df1ac"
     },
     "P": {
       "compiler": "01614e1dbcdedca33c620ad320c07b30207e256e",
