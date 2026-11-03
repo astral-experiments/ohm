@@ -17,7 +17,7 @@ def run(sdk, env, label, cmd, cwd):
     if p.returncode: print(b.read_text(errors='replace')[-4800:],flush=True);raise RuntimeError(label+' failed')
     return a
 def setup(sdk,e):
-    root=Path(os.environ['GITHUB_WORKSPACE'])/'cargo'; bundle=src/'candidate-v2.bundle'
+    root=Path(os.environ['GITHUB_WORKSPACE'])/'cargo'; bundle=src/'candidate-v3.bundle'
     git=lambda *args:subprocess.check_output(['git','-C',str(root),*args],text=True).strip()
     root.mkdir()
     git('init','--quiet','--template=')
@@ -31,7 +31,7 @@ def setup(sdk,e):
     assert git('rev-parse','HEAD^{tree}')==spec['signed_tree'] and git('write-tree')==spec['signed_tree']
     assert sdk.hf(bundle)==spec['bundle_sha256'] and git('rev-parse','HEAD')==spec['parent']
     git('fetch',str(bundle),'HEAD:refs/qa/input-recheck-candidate');git('switch','--detach',spec['candidate'])
-    assert git('rev-parse','HEAD^')==spec['first_candidate'] and git('rev-parse','HEAD^^')==spec['parent']and git('rev-parse','HEAD^{tree}')==spec['tree']and not git('status','--porcelain')
+    assert git('rev-parse','HEAD^')==spec['second_candidate'] and git('rev-parse','HEAD^^')==spec['first_candidate'] and git('rev-parse','HEAD^^^')==spec['parent']and git('rev-parse','HEAD^{tree}')==spec['tree']and not git('status','--porcelain')
     target=sdk.root/'factory-target';shared=sdk.root/'factory-shared'
     env={**e,'RUSTUP_TOOLCHAIN':'ohm','CARGO_TARGET_DIR':str(target),'CARGO_BUILD_BUILD_DIR':str(shared),'CARGO_PROFILE_DEV_DEBUG':'0','CARGO_INCREMENTAL':'0'}
     a=run(sdk,env,'factory',['cargo','+ohm','-Zohm-defaults=no','build','--locked','-p','cargo','--bin','cargo','--features',spec['default_feature'],'-j8','--message-format=json-render-diagnostics'],root)

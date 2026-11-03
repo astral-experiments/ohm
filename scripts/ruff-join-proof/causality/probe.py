@@ -54,7 +54,7 @@ def collect(argv,path,env):
    if f'"--crate-name", "{n}"' in s:hits.setdefault(n,[]).append(k)
  rows=[json.loads(ln)for ln in(path/'stdout').read_text().splitlines()if ln.startswith('{')]
  sdk.put(path/'exec-index.json',{'argv':argv,'exit':p.returncode,'rustcs':hits,'minimum_available':low});return p.returncode,rows,hits
-def observe(mode,label,path,flags,env,package='selected_client'):
+def observe(mode,label,path,flags,env,package='selected_client',historical_input=None):
  argv=['cargo','+ohm',*flags,mode,'-p',package,'--locked','--offline','-j2','--message-format=json'];rc,rows,hits=collect(argv,path,env)
  filenames=[Path(f)for r in rows if r['reason']=='compiler-artifact'and r['target']['name']=='selected_producer'for f in r['filenames']]
  choices=[p for p in filenames if p.suffix=='.rmeta'and p.is_file()]
@@ -65,14 +65,16 @@ def observe(mode,label,path,flags,env,package='selected_client'):
  if label=='discover':
   if alias.is_symlink():alias.unlink()
   alias.symlink_to(meta)
- assert alias.samefile(meta),(alias,meta)
+ if historical_input is None:assert alias.samefile(meta),(alias,meta)
+ else:assert (str(alias.readlink()),sdk.hf(alias))==historical_input
+ explicit=alias.read_bytes();(path/'literal-input.rmeta').write_bytes(explicit)
  ds=[]
  for d in (tgt,shared):
   if d.exists():
    for dep in d.rglob('selected_client*.d'):
     if dep.is_file()and not dep.is_symlink():
      content=dep.read_bytes();i=len(ds);(path/f'raw-{i}.d').write_bytes(content);ds.append(str(dep))
- out={'exit':rc,'rustc_execs':hits,'metadata_path':str(meta),'metadata_mtime_ns':meta.stat().st_mtime_ns,'lexical_include':str(alias),'private':h1,'public':h2,'rmeta':sdk.hf(meta),'bytes':len(raw),'fnv':fnv(raw),'nonfresh':[r['target']['name']for r in rows if r['reason']=='compiler-artifact'and not r['fresh']],'errors':[r['message']['code']['code']for r in rows if r['reason']=='compiler-message'and r['message']['level']=='error'and r['message'].get('code')],'depfiles':ds,'source_sha':sdk.hf(producer),'source_mtime_ns':producer.stat().st_mtime_ns,'client_source_sha':sdk.hf(client)}
+ out={'exit':rc,'rustc_execs':hits,'metadata_path':str(meta),'metadata_mtime_ns':meta.stat().st_mtime_ns,'lexical_include':str(alias),'explicit_target':str(alias.readlink()),'explicit_sha':sdk.hf(alias),'explicit_fnv':fnv(explicit),'private':h1,'public':h2,'rmeta':sdk.hf(meta),'bytes':len(raw),'fnv':fnv(raw),'nonfresh':[r['target']['name']for r in rows if r['reason']=='compiler-artifact'and not r['fresh']],'errors':[r['message']['code']['code']for r in rows if r['reason']=='compiler-message'and r['message']['level']=='error'and r['message'].get('code')],'depfiles':ds,'source_sha':sdk.hf(producer),'source_mtime_ns':producer.stat().st_mtime_ns,'client_source_sha':sdk.hf(client)}
  if label.startswith('old')or label=='discover':assert rc==0,(label,out)
  if mode=='build'and rc==0:
   exe=tgt/'debug/selected_client';sig=sdk.hf(exe);b=pub/'bodies'/sig;b.parent.mkdir(exist_ok=True)
