@@ -14,9 +14,17 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - block: PC
+        - block: B1
           fixture: rand
-        - block: CP
+        - block: B2
+          fixture: rand
+        - block: B3
+          fixture: rand
+        - block: B4
+          fixture: rand
+        - block: B5
+          fixture: rand
+        - block: B6
           fixture: rand
     steps:
     - name: Read this immutable measurement

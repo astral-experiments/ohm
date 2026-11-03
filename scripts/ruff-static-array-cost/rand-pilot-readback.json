@@ -1,0 +1,294 @@
+{
+  "decision": {
+    "admit_six": true,
+    "common_regressions": [],
+    "controls": {
+      "build-cold": [
+        [
+          47128770938,
+          43472265784,
+          0.077585412927706
+        ],
+        [
+          47129555988,
+          43472096185,
+          0.07760437641150815
+        ]
+      ],
+      "build-empty": [
+        [
+          33915006341,
+          30261756447,
+          0.1077178007065141
+        ],
+        [
+          33905211157,
+          30250148402,
+          0.10780238878545911
+        ]
+      ],
+      "build-empty_target_rustc": [
+        [
+          10101629969,
+          6447387215,
+          0.361747833291675
+        ],
+        [
+          10102308733,
+          6450331774,
+          0.36149924294735963
+        ]
+      ],
+      "build-target_rustc": [
+        [
+          10103006539,
+          6449282501,
+          0.36164720114708027
+        ],
+        [
+          10103692719,
+          6449889561,
+          0.36163047111765595
+        ]
+      ],
+      "build-unchanged": [
+        [
+          128206371,
+          128172604,
+          0.0002633800468465019
+        ],
+        [
+          128214579,
+          128210738,
+          2.9957591640183136e-05
+        ]
+      ],
+      "build-whole_edit": [
+        [
+          31446752401,
+          27795850441,
+          0.11609790141267186
+        ],
+        [
+          31438788973,
+          27792205140,
+          0.11598995865049792
+        ]
+      ],
+      "check-cold": [
+        [
+          46079681365,
+          42443580684,
+          0.07890898055909333
+        ],
+        [
+          46084477766,
+          42432218325,
+          0.0792514012970881
+        ]
+      ],
+      "check-empty": [
+        [
+          32867261837,
+          29209186401,
+          0.11129845419255331
+        ],
+        [
+          32861941681,
+          29206373934,
+          0.11124016293637218
+        ]
+      ],
+      "check-empty_target_rustc": [
+        [
+          9428789893,
+          5775327899,
+          0.3874794152229817
+        ],
+        [
+          9428358990,
+          5774626689,
+          0.3875257937118493
+        ]
+      ],
+      "check-target_rustc": [
+        [
+          9429279036,
+          5775253885,
+          0.3875190390537086
+        ],
+        [
+          9432351792,
+          5775603576,
+          0.38768149202211183
+        ]
+      ],
+      "check-unchanged": [
+        [
+          126030829,
+          126009058,
+          0.000172743448351038
+        ],
+        [
+          126053689,
+          126017667,
+          0.0002857671226107472
+        ]
+      ],
+      "check-whole_edit": [
+        [
+          30796279930,
+          27159984813,
+          0.1180757911431285
+        ],
+        [
+          30825129040,
+          27152317931,
+          0.11914990215398624
+        ]
+      ]
+    },
+    "criterion": "Both fresh counterbalanced pilots must save at least 20 percent of retired instructions in the full edited check compiler. Then six new independent boots, all in the same direction with paired median saving >=20 percent, exact two-sided sign p 2/64, paired min to max 96.875 percent median interval. Withhold for a consistent unchanged or cold regression exceeding five percent and ten million instructions.",
+    "median": 0.3876002655379102,
+    "primary": [
+      [
+        9429279036,
+        5775253885,
+        0.3875190390537086
+      ],
+      [
+        9432351792,
+        5775603576,
+        0.38768149202211183
+      ]
+    ]
+  },
+  "head": "e25543d4492321e008554ad916cb14ac1680092f",
+  "hosts": {
+    "rand-CP": {
+      "artifact": 13280664766,
+      "boot": "b7a2c1b7-8fb0-4900-bf24-d8d09e25f216",
+      "job": 126283738719,
+      "records": {
+        "C": {
+          "build": {
+            "all_products_checked": true,
+            "cold": 43472096185,
+            "empty": 30250148402,
+            "empty_target_rustc": 6450331774,
+            "observed_whole": 27787249899,
+            "target_rustc": 6449889561,
+            "unchanged": 128210738,
+            "whole_edit": 27792205140,
+            "whole_native": {
+              "elf": "08a30a2837c28c1171af3d4daab6a0c3dd0a4cd6a0bb5e675102cabcaf822ad8",
+              "stdout": "ca6795662dd8a18dbcbb84d7a510d56197955a3856493c1685dde266c3022862"
+            }
+          },
+          "check": {
+            "all_products_checked": true,
+            "cold": 42432218325,
+            "empty": 29206373934,
+            "empty_target_rustc": 5774626689,
+            "observed_whole": 27148899596,
+            "target_rustc": 5775603576,
+            "unchanged": 126017667,
+            "whole_edit": 27152317931,
+            "whole_native": null
+          }
+        },
+        "P": {
+          "build": {
+            "all_products_checked": true,
+            "cold": 47129555988,
+            "empty": 33905211157,
+            "empty_target_rustc": 10102308733,
+            "observed_whole": 31441168372,
+            "target_rustc": 10103692719,
+            "unchanged": 128214579,
+            "whole_edit": 31438788973,
+            "whole_native": {
+              "elf": "521f5d2515ab976d1bca4c98b6bc25ffe6f681281f8c7f250a0e031d16f7275f",
+              "stdout": "ca6795662dd8a18dbcbb84d7a510d56197955a3856493c1685dde266c3022862"
+            }
+          },
+          "check": {
+            "all_products_checked": true,
+            "cold": 46084477766,
+            "empty": 32861941681,
+            "empty_target_rustc": 9428358990,
+            "observed_whole": 30811722580,
+            "target_rustc": 9432351792,
+            "unchanged": 126053689,
+            "whole_edit": 30825129040,
+            "whole_native": null
+          }
+        }
+      },
+      "zip": "d5a80ec78d5ef1fdc920b24bd895f3cd8e7ab51134c3b8ce63d9993bf31c6402"
+    },
+    "rand-PC": {
+      "artifact": 13282645154,
+      "boot": "90d32231-0715-4b9e-bcb4-90259e625454",
+      "job": 126283738280,
+      "records": {
+        "C": {
+          "build": {
+            "all_products_checked": true,
+            "cold": 43472265784,
+            "empty": 30261756447,
+            "empty_target_rustc": 6447387215,
+            "observed_whole": 27778774966,
+            "target_rustc": 6449282501,
+            "unchanged": 128172604,
+            "whole_edit": 27795850441,
+            "whole_native": {
+              "elf": "08a30a2837c28c1171af3d4daab6a0c3dd0a4cd6a0bb5e675102cabcaf822ad8",
+              "stdout": "ca6795662dd8a18dbcbb84d7a510d56197955a3856493c1685dde266c3022862"
+            }
+          },
+          "check": {
+            "all_products_checked": true,
+            "cold": 42443580684,
+            "empty": 29209186401,
+            "empty_target_rustc": 5775327899,
+            "observed_whole": 27157029606,
+            "target_rustc": 5775253885,
+            "unchanged": 126009058,
+            "whole_edit": 27159984813,
+            "whole_native": null
+          }
+        },
+        "P": {
+          "build": {
+            "all_products_checked": true,
+            "cold": 47128770938,
+            "empty": 33915006341,
+            "empty_target_rustc": 10101629969,
+            "observed_whole": 31439536104,
+            "target_rustc": 10103006539,
+            "unchanged": 128206371,
+            "whole_edit": 31446752401,
+            "whole_native": {
+              "elf": "521f5d2515ab976d1bca4c98b6bc25ffe6f681281f8c7f250a0e031d16f7275f",
+              "stdout": "ca6795662dd8a18dbcbb84d7a510d56197955a3856493c1685dde266c3022862"
+            }
+          },
+          "check": {
+            "all_products_checked": true,
+            "cold": 46079681365,
+            "empty": 32867261837,
+            "empty_target_rustc": 9428789893,
+            "observed_whole": 30812655797,
+            "target_rustc": 9429279036,
+            "unchanged": 126030829,
+            "whole_edit": 30796279930,
+            "whole_native": null
+          }
+        }
+      },
+      "zip": "60d595177848b8b3a1cfd9baf4ebbc7f7ef6a187a447dbf247a8731f90423c53"
+    }
+  },
+  "run": 41741463395
+}
