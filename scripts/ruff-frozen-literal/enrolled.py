@@ -159,7 +159,11 @@ def fixed_inputs(base,source_dir,main,switch):
     base.mkdir();trace=source_dir.with_suffix(".epochs");av=main["argv"]
     raw=(trace/f"{main['owner']:05}.env").read_bytes();envs=dict(item.decode().split("=",1)for item in raw.split(b"\0")[:-1])
     removed={k:envs.pop(k)for k in ("CARGO_MAKEFLAGS","MAKEFLAGS","MFLAGS")if k in envs}
-    need(envs.get("CARGO_MANIFEST_DIR")==str(w.SRC/"crates/ty_vendored")and envs.get("OUT_DIR") and envs.get("PATH")==env()["PATH"],"different real rustc child context")
+    child_bin=ROOT/"cargo/bin"
+    need(not child_bin.is_symlink()and (not child_bin.exists()or child_bin.is_dir()and not any(child_bin.iterdir())),"child search prefix contains an installed tool")
+    # The actual rustup-launched Cargo adds its private CARGO_HOME/bin to the child PATH.
+    child_path=os.pathsep.join((str(child_bin),env()["PATH"]))
+    need(envs.get("CARGO_HOME")==str(ROOT/"cargo") and envs.get("CARGO_MANIFEST_DIR")==str(w.SRC/"crates/ty_vendored")and envs.get("OUT_DIR") and envs.get("PATH")==child_path,"different real rustc child context")
     arc=Path(envs["OUT_DIR"])/"zipped_typeshed.zip";before=p.sha(arc)
     save(base/"source.json",dict(argv=av,donor_image=main["owner"],removed_external_jobserver=removed,original_env=p.sha(trace/f"{main['owner']:05}.env"),archive=before,extern=main["extern"]))
     output=Path(av[av.index("--out-dir")+1]);incs=[Path(v.removeprefix("-C").removeprefix("incremental=")) for v in av if v.removeprefix("-C").startswith("incremental=")]
