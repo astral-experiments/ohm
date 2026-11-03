@@ -1,44 +1,64 @@
-name: Read signed Rust foreign-span observations on a Ruff check
-run-name: RUF009 native macro observation ${{ inputs.reviewed_head }}
+name: Trace the actual published Ron producer on the default Ruff test graph
+run-name: Published -24 Ron backend normal Cargo ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
       reviewed_head:
-        description: Exact reviewed nonrelease QA source
         required: true
+        description: Exact reviewed nonrelease QA commit
         type: string
 permissions:
   contents: read
+  actions: read
 jobs:
-  inspect:
-    if: github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruf009-foreign-join-debug-20261103'
+  replay:
+    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-ron-consumed-inputs-20261103'
+    strategy:
+      fail-fast: false
+      matrix:
+        block: [PC, CP]
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 55
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           ref: ${{ inputs.reviewed_head }}
           path: qa
           persist-credentials: false
-          sparse-checkout: scripts/ruff-foreign-span-observer
+          sparse-checkout: |
+            scripts/ron-ordinary-backend
+            scripts/ron-consumed-metadata
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: a95a505d25b0f7839a6104ff1514ed9a4ddf9f90
+          path: reference
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/ruff-original-ty-instructions
+            scripts/ruff-foreign-span-observer
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           repository: astral-sh/ruff
-          ref: b00f68a23cedbd3a38fc25bac63638f0f11fc3f0
+          ref: bfa2407e98ee1343caeefd02b4b69043509baa8c
           fetch-depth: 2
           path: ruff
           persist-credentials: false
-      - name: Build the public historical source and inspect the signed compiler
-        env:
-          OHM_SDK_READ_TOKEN: ${{ github.token }}
+      - name: Verify the source bundle and provision its normal host build tools
         run: |
-          sudo apt-get -qq update
-          sudo apt-get -qq install -y --no-install-recommends gdb libunwind-dev liblzma-dev
-          python3 -IB qa/scripts/ruff-foreign-span-observer/worker.py
+          cd qa/scripts/ron-ordinary-backend
+          sha256sum -c SHA256SUMS
+          sudo apt-get update -qq
+          sudo apt-get install -qy --no-install-recommends clang libssl-dev zstd
+      - name: Independently empty native history and whole-Ruff instruction pair
+        env:
+          REVIEWED_HEAD: ${{ inputs.reviewed_head }}
+          RON_BLOCK: ${{ matrix.block }}
+          OHM_SDK_READ_TOKEN: ${{ github.token }}
+        run: python3 -IB qa/scripts/ron-ordinary-backend/ordinary.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: ruf009-foreign-span-${{ github.run_id }}
+          name: full-ron-published-24-${{ matrix.block }}-${{ github.run_id }}
           path: ${{ runner.temp }}/ohm-foreign-join/published/
           retention-days: 15
           if-no-files-found: error
