@@ -16,8 +16,8 @@ import release23 as rel
 
 REPO = "astral-experiments/ohm"
 REPO_ID = 1319437234
-BRANCH = "charlie/codex-22536-signed23-projection"
-BASE = "ca8b83712b881b45cbb8e8b0513d0811971e4a98"
+BRANCH = "charlie/codex-22536-signed23-split-projection"
+BASE = "df9de15a3d84ba45f1799b2aa835c6f613818af5"
 PRIMARY_BASE = "8b2ffa46cb0b3d37188f7c286048865237ff6128"
 PAIRED = "eight-real-session-pairs"
 COORDINATOR_KIT = "scripts/uv-check-22536"
@@ -44,18 +44,47 @@ def git(path, *args):
     return subprocess.check_output(["git", "-C", str(path), *args], env=env, text=True).strip()
 
 
+def primary_pair(active, source):
+    """Require both completed #22958 comparisons and the signed run's actual first-host receipt."""
+    originals = source["primary_originals"]
+    assert set(originals) == {"marginal","signed"}
+    expected = {"marginal":"S","signed":"R"}
+    for name, receipt in originals.items():
+        assert (receipt["contrast"],receipt["control"],receipt["treatment"]) == (name,expected[name],"F")
+        assert receipt["registered"] == "4d17e7b41ca0e422174b0ae43a9a0b4aee25c72e58ac2be6989751e95a65d58c"
+        assert receipt["release_lock"] == source["primary_lock"] == active["primary_lock_sha256"]
+        assert receipt["source_choice"] == active["primary_choice_sha256"] == "9565a7bd1431188300fe3b227a8fe2e86096fef99000fc036fafe816c1c0f030"
+        assert receipt["head"] == source["primary_head"] and receipt["boot"] in active["excluded"]
+        assert receipt["sources"] == {r:active["roles"][r]["source"] for r in (expected[name],"F")}
+        assert any((j["run"],j["job"],j["runner_id"],j["runner_name"],j["head"]) ==
+                   (receipt["run"],receipt["job"],receipt["runner_id"],receipt["runner_name"],receipt["head"])
+                   for j in source["excluded_jobs"])
+        assert all(re.fullmatch("[0-9a-f]{64}",receipt[k]) for k in ("accepted_sha256","reopened_sha256","score_sha256"))
+        for kind,tail in (("boot","runner-boot"),("original","wall-eight-pairs")):
+            media=receipt["artifacts"][kind]
+            assert media["name"]=="uv-22958-release23-"+name+"-"+tail and media["id"]>0 and media["bytes"]>0
+            assert re.fullmatch("[0-9a-f]{64}",media["sha256"])
+    first,second=originals["marginal"],originals["signed"]
+    assert all(first[k]!=second[k] for k in ("run","job","boot","runner_id","runner_name"))
+    assert first["prior_marginal"] is None
+    prior=second["prior_marginal"]
+    for k in ("run","job","runner_id","runner_name","boot","artifact","artifact_bytes","artifact_sha256","member_sha256"):
+        assert prior[k]==first[k]
+    assert prior["coordinator"]==first["head"] and all(prior[k]==first["calibrations"][k] for k in ("inherited","threads","blocking"))
+    assert {first["boot"],second["boot"]}<=set(source["additional_boots"])
+
+
 def active_binding():
     active = rel.lock()
     source = rel.read(HERE / "hosted-inputs.json")
     population = rel.read(HERE / "registration.json")["source_population"]
     assert (active["release"]["tag"],active["release"]["rustc"],active["release"]["cargo"]) == (population["release_tag"],population["rust"],population["cargo"])
     assert active["roles"]["R"]["source"] == {"commit":population["rust"],"tree":population["tree"],"epoch":26655,"metadata_epoch":3}
-    assert set(active["roles"]) == ({"R","F"} if active["full_variant"] == "full_without_ctfe" else {"R","S","F"})
-    assert active["full_variant"] in ("full_with_ctfe","full_without_ctfe")
+    assert set(active["roles"]) == {"R","S","F"} and active["full_variant"] == "full_with_ctfe"
     assert source["registration"] == rel.REGISTRATION
     assert source["input_sha256"] == filehash(HERE / "release23-inputs.json")
     assert source["primary_lock"] == active["primary_lock_sha256"] and source["primary_choice"] == active["primary_choice_sha256"]
-    assert source["primary_native_score"] and source["primary_outer"]["digest"].startswith("sha256:")
+    primary_pair(active, source)
     assert source["completed_22_sha256"] == "a35ca64f0b2bc928a66cc4ecdaead56345ea454e1a2f1abbe5e21bc90cc9b21a"
     return active, source
 
@@ -79,10 +108,12 @@ def scope(active, source):
     assert filehash(HERE / "hosted-inputs.json") == e["ENROLLMENT_SHA"]
     assert e["PRIMARY_HEAD"] == source["primary_head"] == git(other, "rev-parse", "HEAD")
     assert not git(other, "status", "--porcelain", "--untracked-files=no")
+    assert git(other, "rev-parse", "HEAD^") == PRIMARY_BASE
     primary = other / PRIMARY_KIT
-    assert filehash(primary / "signed-23-lock.json") == source["primary_lock"]
-    assert filehash(primary / "signed-23-choice.json") == source["primary_choice"]
+    assert filehash(primary / "signed-23-split-lock.json") == source["primary_lock"]
+    assert filehash(primary / "signed-23-split-choice.json") == source["primary_choice"]
     assert filehash(primary / "release23_package.py") == PACKAGE_SHA and filehash(primary / "release_intake.py") == INTAKE_SHA
+    assert filehash(primary / "split-prospective.json") == "4d17e7b41ca0e422174b0ae43a9a0b4aee25c72e58ac2be6989751e95a65d58c"
     assert git(w / "previous", "rev-parse", "HEAD") == DONOR
     assert filehash(w / "previous/scripts/uv-resolver-whole-pmu/intake.py") == DONOR_SHA
     boot = Path("/proc/sys/kernel/random/boot_id").read_text().strip()
@@ -126,7 +157,7 @@ def verify_host(root, active):
     assert source["input_sha256"] == filehash(HERE / "release23-inputs.json")
     assert job["run_attempt"] == 1 and job["name"] == PAIRED
     assert re.fullmatch("[0-9a-f]{40}",job["head_sha"]) and job["runner_id"] > 0
-    assert job["run_id"] != source["primary_original"]["run"] and job["head_sha"] != source["primary_head"]
+    assert job["run_id"] not in {r["run"] for r in source["primary_originals"].values()} and job["head_sha"] != source["primary_head"]
     for previous in source["excluded_jobs"]:
         assert job["id"] != previous["job"] and job["runner_id"] != previous["runner_id"] and job["runner_name"] != previous["runner_name"]
     return job
@@ -211,7 +242,11 @@ def acquire(active, source, w, t, primary, boot):
     latest(proof / "initial-publication.json", active["release"])
     assert min(shutil.disk_usage(d).free for d in (t,w)) >= 80 << 30
     sys.path.insert(0, str(primary))
-    import release23_package as pkg
+    # Both measurements used the same three SDKs. This selects only the transport module;
+    # native #22536 admissions independently choose the control after the local edit opens.
+    with patch.dict(os.environ,{"UV_22958_CONTRAST":"marginal"}):
+        import release23_package as pkg
+    assert pkg.s.ROLES == ("S","F") and set(pkg.s.SOURCES) == {"R","S","F"}
     assert Path(pkg.__file__).resolve() == primary / "release23_package.py"
     assert Path(pkg.sdk.__file__).resolve() == primary / "release_intake.py"
     lock = pkg.s.lock
@@ -242,7 +277,7 @@ def acquire(active, source, w, t, primary, boot):
             assert filehash(dest / "bin/cargo") == raw["bin/cargo"]["sha256"]
             shutil.copy2(cargo, dest / "bin/cargo")
             installed[role] = pkg.sdk.role_sdk(role, dest, rd / "installed")
-    complete = {"source_lock":source["primary_lock"], "primary_native_score":source["primary_native_score"],
+    complete = {"source_lock":source["primary_lock"], "primary_native_scores":{k:v["score_sha256"] for k,v in source["primary_originals"].items()},
                 "registered":rel.REGISTRATION,"initial_publication":filehash(proof/"initial-publication.json"),
                 "actual_sdk_files":installed,"job":job,"boot":boot,"role_choice":"pending #22536 native opening"}
     write(proof / "installed-23.json",complete)
