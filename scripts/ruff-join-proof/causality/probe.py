@@ -121,8 +121,8 @@ if candidate:
    nb=out[arm][case]['build']
    assert nb['edit']['native']==nb['edit']['fnv']==nb['independent-clean']['native']
  for arm in ('shipped','fixed'):
-  x=pub/arm/'private/check/old'
-  for owner in ('selected_client','selected_producer'):
+  for owner,phase in [('selected_producer','discover'),('selected_client','old')]:
+   x=pub/arm/'private/check'/phase
    trace=''.join((x/h).read_text() for h in json.loads((x/'proof.json').read_bytes())['rustc_execs'][owner])
    assert '"-Zthreads=8"' in trace and '"checksum-hash-algorithm=blake3"'in trace and '"-Zpublic-api-hash"'in trace,(arm,owner,trace[:1800])
   assert any('# checksum:blake3=' in p.read_text()and 'selected.rmeta' in p.read_text()for p in x.glob('raw-*.d'))
