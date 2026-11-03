@@ -1,5 +1,5 @@
-name: Attribute a complete unchanged Ruff build
-run-name: Complete historical Ruff native instruction attribution ${{ inputs.reviewed_head }}
+name: Qualify register-equality assembly on an unchanged Ruff native build
+run-name: Historical Ruff native register-equality pilot ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
@@ -11,7 +11,7 @@ permissions:
   contents: read
 jobs:
   inspect:
-    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-whole-ruff-native-instructions-20261103'
+    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-historical-ruff-sete-native-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 55
     steps:
@@ -30,16 +30,22 @@ jobs:
           fetch-depth: 2
           path: ruff
           persist-credentials: false
-      - name: Measure ordinary signed checks and builds on the historical source
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: 059b4e3f0205cf449d3e9e56b8b1872f9108f930
+          path: factory
+          persist-credentials: false
+          sparse-checkout: scripts/ruff-matched-stage
+      - name: Measure both native compilers on the historical Ruff edit
         env:
           REVIEWED_HEAD: ${{ inputs.reviewed_head }}
           OHM_SDK_READ_TOKEN: ${{ github.token }}
         run: |
-          python3 -IB qa/scripts/ruff-original-ty-instructions/study.py
+          python3 -IB qa/scripts/ruff-original-ty-instructions/native_asm.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: stock-whole-build-instructions-${{ github.run_id }}
+          name: matched-sete-native-${{ github.run_id }}
           path: ${{ runner.temp }}/ohm-foreign-join/published/
           retention-days: 15
           if-no-files-found: error
