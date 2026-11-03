@@ -1,5 +1,5 @@
-name: Compare the native E2E input boundary to the exact released linker
-run-name: Bind actual native inputs and emitted bytes in the ordinary Ruff e2e link ${{ inputs.reviewed_head }}
+name: Reproduce genuine Ruff native grouping and jobserver assignments
+run-name: Reopen both full signed e2e ELF forms with real jobserver groups ${{ inputs.reviewed_head }}
 permissions:
   contents: read
   actions: read
@@ -36,16 +36,16 @@ jobs:
         path: wild-source
         persist-credentials: false
     - name: Provision the system SHA-256 library
-      run: sudo apt-get update -qq && sudo apt-get install -qy strace libssl-dev
-    - name: Run same-live-argv signed reference and fresh-output safety controls
+      run: sudo apt-get update -qq && sudo apt-get install -qy strace libssl-dev elfutils
+    - name: Run identical-live-argv signed E2E and controlled genuine section-group assignments
       env:
         REVIEWED_HEAD: ${{ inputs.reviewed_head }}
         OHM_SDK_READ_TOKEN: ${{ github.token }}
-      run: python3 -IB qa/scripts/ruff-original-ty-instructions/e2e-existing-output/audit.py
+      run: python3 -IB qa/scripts/ruff-original-ty-instructions/e2e-existing-output/groups_study.py
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: ty-server-native-boundary-${{ github.run_id }}
+        name: ty-server-native-jobserver-groups-${{ github.run_id }}
         path: ${{ runner.temp }}/ohm-foreign-join/published/
         retention-days: 10
         if-no-files-found: error
