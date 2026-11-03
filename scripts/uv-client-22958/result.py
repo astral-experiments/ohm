@@ -8,6 +8,7 @@ import json
 import service as s
 import collector as cc
 import scoped
+from release23_verdict import verdict
 
 m = s.m
 
@@ -162,20 +163,24 @@ def verify(out, meter, check_binary=False):
     metrics = {}
     for key in ("uv_client", "sum_two", "uv_configuration", "whole", "wall"):
         metrics[key] = stats([[x[s.ROLES[0]][key], x[s.ROLES[1]][key]] for x in states])
+    declaration = verdict(metrics)
     primary = metrics["wall"]["all_eight_strictly_above_2x"]
+    assert primary == declaration["qualifies_2x_on_this_host"]
     return dict(
         complete=True,
         actual_signed_Cargo=s.CHECK,
         sources=s.SOURCES,
         boot=ready["boot"],
         metrics=metrics,
+        predeclared=declaration,
+        signed_release=s.lock["signed_release"]["tag"],
+        control_kind=s.choice["physical_role_choice"],
         primary_wall_twofold_all_eight=primary,
         observed_Cargo_Finished_lines=cargo_lines,
-        original_exact_cold_gate_redeemed=False,
         independent_histories=len(history),
         registered=s.case["registered"],
-        release_lock=m.filesha(s.HERE/"release-lock.json"),
-        scope="The two private production compilers share the signed −22 source and CTFE serializer fix. The comparison covers the cumulative performance stack. It measures eight paired ordinary blocking Cargo wall visits and separately restored userspace counters.",
+        release_lock=m.filesha(s.LOCK_PATH),
+        scope="Eight paired, unwrapped first edits using the signed -23 Cargo. The candidate adds the remaining three rustc performance changes to the selected control. Whole-Cargo and per-rustc hardware visits independently restore the same cold-A histories.",
     )
 
 

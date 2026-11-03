@@ -150,7 +150,8 @@ def run():
         and len(scoped.cal_raw(out / "per-rustc-calibration")) == 3
     )
     migration=m.read(out/"intake/release-migration.json")
-    assert migration["fixtures_only"] and migration["ordinary_benchmark_caches_separate"] and set(migration["roles"]) == {"S-F","F-S"}
+    assert migration["fixtures_only"] and migration["ordinary_benchmark_caches_separate"]
+    assert set(migration["roles"]) == {s.CONTROL + "-F", "F-" + s.CONTROL}
     clk=m.read(out/"blocking-clock-pre/verified.json")
     assert clk["eligible_blocking_calibration"] and clk["boot"]==boot and clk["affinity"]==sorted(mask)
     load = m.read(out / "intake.json")
@@ -158,7 +159,7 @@ def run():
     assert list(sorted(sdks)) == list(sorted(s.ROLES))
     bank = m.ROOT / "bank"
     m.save(out / "uv-source.json", cc.initialize(w, bank))
-    pool = tmp / "ctfe22-root-sdks"
+    pool = tmp / "uv22958-release-sdks"
     for role in s.ROLES:
         assert sdks[role]["source"] == s.SOURCES[role]
         shutil.move(str(pool / role), bank / ("sdk-" + role))

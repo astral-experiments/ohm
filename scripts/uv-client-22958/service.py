@@ -1,4 +1,4 @@
-"""Enforce the corrected stock and full production comparison on one genuine edited Cargo check."""
+"""Compare a signed or matched-corrected -23 compiler with the remaining rustc changes."""
 from pathlib import Path
 import json
 import os
@@ -11,21 +11,30 @@ sys.path.insert(0,str(HERE.parent/"uv-callables-21041"))
 import core as old
 sys.path.insert(0,str(HERE))
 m=old.m
-register=m.read(HERE/"registration.json")
+import release23_binding as binding
+
+register=m.read(HERE/"prospective-23.json")
 case=m.read(HERE/"case.json")
-lock=m.read(HERE/"release-lock.json")
-ROLES=("S","F")
+LOCK_PATH=HERE/"signed-23-lock.json"
+lock=m.read(LOCK_PATH)
+assert m.filesha(HERE/"prospective-23.json")==binding.PROSPECTIVE
+assert m.filesha(HERE/"r2-amendment.json")==binding.AMENDMENT
+assert m.filesha(HERE/"signed-23-choice.json")==lock["choice_sha256"]
+choice=m.read(HERE/"signed-23-choice.json")
+CONTROL,ORDERS=binding.select(lock,register,m.read(HERE/"r2-amendment.json"),choice)
+ROLES=(CONTROL,"F")
 SOURCES=lock["sources"]
-ORDERS=register["orders"]
-assert ORDERS==[["S","F"],["F","S"],["F","S"],["S","F"],["F","S"],["S","F"],["S","F"],["F","S"]]
-assert case["registered"]==lock["registration"]==m.filesha(HERE/"registration.json")=="9746c053f4c503b1254da422fe3fe0d6c240b75801baec7fe987e0f1ae0436bf"
-assert m.filesha(HERE/"clock-amendment.json")==lock["clock"] and m.filesha(HERE/"trigger-carrier-addendum.json")==lock["trigger"]
-assert m.filesha(HERE/"prespecified-transfer.json") == register["authority_sha256"]
-assert m.filesha(HERE/"eligibility-addendum.json") == register["eligibility_addendum"]
-prior=m.read(HERE/"heldout-passed.json")
-assert prior["primary_and_secondary"]==[True,True] and prior["raw_sha256"]==lock["heldout_original"]
-assert {k:w["commit"] for k,w in SOURCES.items()}=={"S":"10d56274a98801b5ef8f80aab734e835749458e1","F":"ac67101cb973e35ce8ff044cc8014c2c76bab69e"}
-m.P.update(branch=case["branch"],roles=SOURCES)
+assert case["A"]==register["input"]["A"] and case["B"]==register["input"]["B"]
+assert m.filesha(HERE/"original-registry-22958.json")==register["input"]["registry"]
+assert m.filesha(HERE/"original-source-22958.json")==register["input"]["source_sha256"]
+source_record=m.read(HERE/"original-source-22958.json")
+registry_record=m.read(HERE/"original-registry-22958.json")
+assert m.filesha(HERE/"edit.patch")==case["source_patch"]==source_record["patch_sha256"]
+assert registry_record["source"]==register["input"]["source_sha256"]
+assert [entry["path"] for entry in source_record["files"]]==case["files"]==source_record["B"]["changed"]
+assert {state:source_record[state]["tree"] for state in ("A","B")}==case["trees"]
+case.update(registered=binding.PROSPECTIVE, branch=lock["branch"], parent=lock["parent"])
+m.P.update(branch=case["branch"],roles=SOURCES,signed_cargo_sha256=lock["signed_cargo"])
 old.P["edited_workspace_roster"]=["uv_client","uv_configuration"]
 CHECK=old.CHECK=[str(m.SDK/"bin/cargo"),*register["argv"][1:]]
 assert CHECK[1:]==["check","-p","uv-client","--locked","--offline","-j8"]
@@ -34,12 +43,11 @@ m.ENV.pop("CARGO_TERM_COLOR",None)
 
 def host():
     w,t=m.host();co=w/"coordinator";e=os.environ
-    assert e["GITHUB_REPOSITORY_ID"]=="1319437234" and e["RELEASE_LOCK"]==m.filesha(HERE/"release-lock.json")
+    assert e["GITHUB_REPOSITORY_ID"]=="1319437234" and e["RELEASE_LOCK"]==m.filesha(LOCK_PATH)
     assert m.sha_git(co,"rev-parse","HEAD").decode().strip()==e["REVIEWED_HEAD"] and m.sha_git(co,"rev-parse","HEAD^").decode().strip()==case["parent"]
     absent={r["boot"] for r in lock["excluded"].values()};boot=Path("/proc/sys/kernel/random/boot_id").read_text().strip()
     assert len(absent)==len(lock["excluded"])>=17 and all(str(uuid.UUID(x))==x for x in absent|{boot}) and boot not in absent
-    assert e["EXCLUDED_PRODUCTION_BOOT"]==lock["boot_list_sha256"]==m.digest(("\n".join(sorted(absent))+"\n").encode())
-    assert e["BUILD_RUN_ID"]==str(lock["production_compiler"]["run"]) and e["BUILD_HEAD"]==lock["production_compiler"]["coordinator"]
+    assert lock["boot_list_sha256"]==m.digest(("\n".join(sorted(absent))+"\n").encode())
     return w,t,boot
 
 def compact_host():
@@ -63,10 +71,13 @@ def main(mode):
         m.save(out/"boot-attestation.json",dict(boot=boot,workspace=str(w),excluded=sorted(x["boot"]for x in lock["excluded"].values()),
               run=int(os.environ["GITHUB_RUN_ID"]),coordinator=os.environ["REVIEWED_HEAD"],inherited=m.filesha(out/"calibration.json"),
               threads=m.filesha(out/"per-rustc-calibration/calibration.json"),blocking=m.filesha(where/"verified.json"),
-              affinity=sorted(mask),registered=case["registered"],release_lock=m.filesha(HERE/"release-lock.json")))
-    elif mode in ("admit","migration"):
+              affinity=sorted(mask),registered=case["registered"],release_lock=m.filesha(LOCK_PATH)))
+    elif mode=="admit":
+        import release23_package
+        release23_package.admit()
+    elif mode=="migration":
         import release_intake
-        getattr(release_intake,mode)()
+        release_intake.migration()
     elif mode=="study":
         import native
         native.run()

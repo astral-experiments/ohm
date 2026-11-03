@@ -70,6 +70,8 @@ def source(state):
         and git("rev-parse", target + "^{tree}").decode().strip() == tree
     )
     assert m.filesha(m.SRC / "Cargo.lock") == s.case["cargo_lock"]
+    for edited in s.source_record["files"]:
+        assert m.filesha(m.SRC / edited["path"]) == edited[state]
     return dict(
         revision=target,
         tree=tree,
@@ -145,7 +147,8 @@ def registry():
         for p in tomllib.loads((m.SRC / "Cargo.lock").read_text())["package"]
         if "source" in p
     }
-    assert len(bank) == 654 and bank.keys() == lock.keys()
+    assert len(bank) == s.registry_record["locked"] == 654 and bank.keys() == lock.keys()
+    assert sum(row["archive_bytes"] for row in bank.values()) == s.registry_record["archive_bytes"]
     reg = m.CARGO_HOME / "registry"
     (cache,) = (reg / "cache").iterdir()
     (index,) = (reg / "index").iterdir()
@@ -169,6 +172,7 @@ def registry():
         assert (
             r["cksum"] == lock[key] and m.digest(m.canon(r)) == v["index_record_sha256"]
         )
+    assert len(by) == s.registry_record["package_names"]
     return dict(archives=len(bank), names=len(by), identity=m.digest(bankdata))
 
 
@@ -307,7 +311,7 @@ def products(d, forms, blobs):
         for f in root.rglob("*.public-api-hash")
         if f.is_file()
     }
-    assert suffix
+    assert len(suffix) == s.register["cohort"]["ordinary_public_sidecars"]
     z = dict(workspace=work, externs=deps, declared=decl, all_public_sidecars=suffix)
     m.save(d / "products.json", z)
     return z

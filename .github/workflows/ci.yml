@@ -1,4 +1,4 @@
-name: Check uv 22958 with corrected stock and full production Rust
+name: Measure the remaining Ohm -23 rustc changes on uv 22958
 'on':
   workflow_dispatch:
     inputs:
@@ -6,22 +6,23 @@ name: Check uv 22958 with corrected stock and full production Rust
         required: true
         type: string
         description: Reviewed full SHA of this benchmark
+      release_lock:
+        required: true
+        type: string
+        description: SHA-256 of the signed -23 and private GNU build enrollment
 permissions:
   contents: read
   actions: read
   attestations: read
 jobs:
   root:
-    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22958-generated-impl-production'
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-22958-release23-check'
       && github.sha == inputs.reviewed_head && github.run_attempt == 1
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 120
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      EXCLUDED_PRODUCTION_BOOT: 'a4ae4d4e697c0194607498504549ca5b8ab8e2c05ec57145dab66abacdf546e7'
-      BUILD_RUN_ID: '41434876352'
-      BUILD_HEAD: '731d81a4cb3498cf4221d53a267bbf4a76ca250f'
-      RELEASE_LOCK: '58addfb4f602da689af4f716cded474d4642d0c5d7d6998f71a33a0afe968efd'
+      RELEASE_LOCK: ${{ inputs.release_lock }}
     steps:
     - name: Check out coordinator
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -110,10 +111,10 @@ jobs:
     - name: Seal the fresh physical runner and its blocking wall calibration
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-22958-corrected-production-runner-boot
+        name: uv-22958-release23-runner-boot
         path: trait-results/boot-attestation.json
         if-no-files-found: error
-        retention-days: 5
+        retention-days: 14
     - name: Admit the two original optimized GNU packages and the released Cargo binary
       env:
         GH_TOKEN: ${{ github.token }}
@@ -136,8 +137,8 @@ jobs:
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: uv-22958-corrected-production-wall-eight-pairs
+        name: uv-22958-release23-wall-eight-pairs
         path: trait-results/
         if-no-files-found: error
         compression-level: '1'
-        retention-days: 5
+        retention-days: 14
