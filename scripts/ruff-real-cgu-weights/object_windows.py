@@ -5,6 +5,7 @@ import csv
 import hashlib
 import os
 from pathlib import Path
+import archive_diagnostic as archives
 import subprocess
 import tarfile
 
@@ -216,8 +217,16 @@ def observe(prior, kit, loc, work, repo, env, cmd, suite, graph, which, extras, 
         require(observed.count((st.st_dev,st.st_ino,root_args)) == 1 and len(baseline["root_argv"])==1, "different genuine root compiler")
         cargo = prior.replay.cargo_rows((loc / "outer.stdout").read_bytes())
         ar = prior.study.artifact(prior.study.results(cargo,True),prior.study.OWNER)
+        complete=archives.capture(out,"observed",ar)
+        archives.compare(out)  # Persist all three exact physical layouts before either equality gate.
         physical = elf_members(ar, reference)
         probe = prior.pilot.phase_checks(suite,cargo,graph,work,repo,env,which,loc,extras,kit.evidence/"native-bodies",gold)
+        require((complete["sha256"],complete["bytes"])==(probe["owner_archive"]["sha256"],probe["owner_archive"]["bytes"]),
+                "observed archived bytes differ from the consumer's physical owner")
+        save(out/"archive-observed-witness.json",{"ordinary_argv":baseline["root_argv"],"matching_successful_execs":len(observed),
+             "native":len(physical),"library_owner":list((st.st_dev,st.st_ino)),
+             "baseline":{k:baseline[k] for k in ("elf","verdict","owner_archive","inventory","dirty")},
+             "observed":{k:probe[k] for k in ("elf","verdict","owner_archive","inventory","dirty")}})
         for k in ("elf","verdict","owner_archive","inventory","dirty"):
             require(probe[k]==baseline[k], ("changed normal compiler/consumer result",k))
         save(out/"record.json",{"sources":expected["source"],"ordinary_argv":baseline["root_argv"],"execs":len(observed),

@@ -14,6 +14,7 @@ HERE = Path(__file__).resolve().parent
 sys.path[:0] = [str(HERE), str(HERE.parent/"ruff-source-placement")]
 import common
 import object_windows
+import archive_diagnostic as archives
 import worker as prior
 
 BRANCH = "charlie/qa-real-cgu-weights-20261102"
@@ -94,7 +95,7 @@ def history(kit, where, work, repo, env, which, suite, graph, cmd, extras, gold,
     assert work.name=="work" and work.resolve().is_relative_to(Path(os.environ["RUNNER_TEMP"]).resolve())
     snap=out.parent/"cgu-profile-private-state";snap.mkdir()
     dirs=("build","target","cargo-home")
-    for label in ("old","ordinary","profiled"):
+    for label in ("old","ordinary","repeat","profiled"):
         (snap/label).mkdir()
     before=checkpoint(work,dirs)
     subprocess.run(["cp","-a","--reflink=auto",*[work/name for name in dirs],snap/"old"],check=True)
@@ -102,17 +103,49 @@ def history(kit, where, work, repo, env, which, suite, graph, cmd, extras, gold,
     baseline=normal(*args)
     rows=prior.replay.cargo_rows((where/"outer.stdout").read_bytes())
     archive=prior.study.artifact(prior.study.results(rows,True),prior.study.OWNER)
+    initial=archives.capture(out,"ordinary",archive)
+    assert (initial["sha256"],initial["bytes"])==(baseline["owner_archive"]["sha256"],baseline["owner_archive"]["bytes"])
     reference=elf_members(archive,EXPECTED["all_native"])
     save(out/"normal.json",{"argv":baseline["root_argv"],"roster":baseline["raw_roster"],"members":reference,"elf":baseline["elf"],"verdict":baseline["verdict"]})
 
     for name in dirs:
         (work/name).rename(snap/"ordinary"/name)
-        (snap/"old"/name).rename(work/name)
     try:
-        assert checkpoint(work,dirs)==before, "restored state differs from the ordinary starting state"
+        # Leaves the pristine checkpoint and the first ordinary result intact for the third history.
+        footprint=int(subprocess.check_output(["du","--apparent-size","-sb",snap/"old"]).split()[0])
+        prior.guards.admit(prior.guards.resources(work,out))
+        assert shutil.disk_usage(work).free-footprint > 15<<30, "additional independent plain replay exceeds the disk reserve"
+        subprocess.run(["cp","-a","--reflink=auto",*[snap/"old"/n for n in dirs],work],check=True)
+        assert checkpoint(work,dirs)==before, "ordinary repeat did not start from the same original checkpoint"
+        repeat_args=args.copy()
+        repeat_args[1]=where.parent/"new-plain-repeat"
+        second=normal(*repeat_args)
+        second_rows=prior.replay.cargo_rows((repeat_args[1]/"outer.stdout").read_bytes())
+        second_archive=prior.study.artifact(prior.study.results(second_rows,True),prior.study.OWNER)
+        second_layout=archives.capture(out,"ordinary-repeat",second_archive)
+        assert (second_layout["sha256"],second_layout["bytes"]) == (second["owner_archive"]["sha256"],second["owner_archive"]["bytes"])
+        assert elf_members(second_archive,EXPECTED["all_native"])==reference
+        first_cmd,repeated_cmd=[json.loads((loc/"command.json").read_bytes()) for loc in (where,repeat_args[1])]
+        assert all(first_cmd[k]==repeated_cmd[k] for k in ("ordinary","environment"))
+        first_exec,second_exec=[object_windows.ordinary_execs(loc/"trace",prior.support.EXEC) for loc in (where,repeat_args[1])]
+        assert object_windows.Counter(first_exec)==object_windows.Counter(second_exec)
+        gates=("root_argv","raw_roster","elf","verdict","inventory","dirty")
+        save(out/"archive-plain-witness.json",{"first":{k:baseline[k] for k in (*gates,"owner_archive")},
+             "repeat":{k:second[k] for k in (*gates,"owner_archive")},"complete_ordinary_execs":len(first_exec),
+             "environment_sha256":DIGEST(json.dumps(first_cmd["environment"],sort_keys=True).encode()),"checkpoint":before,
+             "source":EXPECTED["source"],"parent":"531eb1980c08c75ccbf3f6b77adbee53cd9b8bd5",
+             "boot":Path("/proc/sys/kernel/random/boot_id").read_text().strip(),"run":os.environ["GITHUB_RUN_ID"],
+             "sha":os.environ["GITHUB_SHA"]})
+        assert all(second[k]==baseline[k] for k in gates), "plain repeat changed the ordinary command or consumer"
+        for name in dirs:
+            (work/name).rename(snap/"repeat"/name)
+            (snap/"old"/name).rename(work/name)
+        shutil.rmtree(snap/"repeat")
+        assert checkpoint(work,dirs)==before, "observed command did not start from the same original checkpoint"
         save(out/"checkpoint.json",before)
         loc=where.parent/"new-profiled"
         object_windows.observe(prior,kit,loc,work,repo,env,cmd,suite,graph,which,extras,gold,baseline,reference,out,EXPECTED,elf_members,save)
+        assert all(p["whole_bytes_equal"] for p in archives.compare(out)["pairs"].values()), "original/repeated/observed rlibs differ"
     except Exception as error:
         save(out/"refusal.json",{"error":str(error)[:4000],"phase":"restored ordinary Cargo edit"})
         for which in ("outer.stderr","outer.stdout"):
@@ -122,10 +155,11 @@ def history(kit, where, work, repo, env, which, suite, graph, cmd, extras, gold,
         raise
     finally:
         for name in dirs:
-            (work/name).rename(snap/"profiled"/name)
+            if (work/name).exists():
+                (work/name).rename(snap/"profiled"/name)
             (snap/"ordinary"/name).rename(work/name)
         shutil.rmtree(snap)
-    return baseline
+    raise archives.DiscoveryComplete()
 
 
 def main():
@@ -142,14 +176,13 @@ def main():
             return history(*visit,normal=normal,bare=bare,out=out)
         with patch.object(prior.acquire,"phase",wrap):
             return original_suite(*args)
-    with patch.object(prior.transport,"BRANCH",BRANCH),patch.object(prior.acquire,"suite_run",suite):
-        prior.collect("admit",1,{"option":Path(sys.argv[1]).resolve(strict=True)})
-    object_windows.finalize(out,save)
-    assert (out/"counts.json").exists()
-    save(out/"terminal.json",{"sha":os.environ["GITHUB_SHA"],"run":os.environ["GITHUB_RUN_ID"],
-         "replicate":int(os.environ["NATIVE_WINDOW_REPLICATE"]),"boot":Path("/proc/sys/kernel/random/boot_id").read_text().strip(),
-         "ordered_counts":DIGEST((out/"counts.json").read_bytes()),"native_gate":DIGEST((out/"record.json").read_bytes()),
-         "source":EXPECTED["source"],"ordinary_parent":"531eb1980c08c75ccbf3f6b77adbee53cd9b8bd5"})
+    try:
+        with patch.object(prior.transport,"BRANCH",BRANCH),patch.object(prior.acquire,"suite_run",suite):
+            prior.collect("admit",1,{"option":Path(sys.argv[1]).resolve(strict=True)})
+    except archives.DiscoveryComplete:
+        save(out/"archive-only-terminal.json",{"all_three_complete_rlibs_equal":True,"real_unit_prices_opened":False})
+        return
+    raise RuntimeError("the enrolled real P archive diagnostic did not execute")
 
 if __name__=="__main__":
     # This run has its own head. The downloaded factory remains on its original branch.

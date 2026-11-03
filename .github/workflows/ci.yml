@@ -1,5 +1,5 @@
-name: Ruff native codegen-unit instructions
-run-name: "Per-unit #337 instructions on the real Ruff settings edit"
+name: Diagnose archive variation on the real Ruff settings edit
+run-name: "Compare two ordinary and one observed Ruff archive on #337"
 on:
   workflow_dispatch:
     inputs:
@@ -14,12 +14,12 @@ permissions:
   actions: read
 jobs:
   prices:
-    if: ${{ github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-real-cgu-weights-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1' && inputs.distributions == 'cgu-weights' }}
+    if: ${{ github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/qa-real-cgu-weights-20261102' && github.sha == inputs.reviewed_head && github.run_attempt == '1' && inputs.distributions == 'archive-diagnosis' }}
     runs-on: namespace-profile-ubuntu-24-04-16
     strategy:
       fail-fast: false
       matrix:
-        replicate: [1, 2]
+        replicate: [1]
     timeout-minutes: 155
     env:
       NATIVE_WINDOW_REPLICATE: ${{ matrix.replicate }}
@@ -70,13 +70,13 @@ jobs:
           test -z "$(git status --porcelain=v1 --untracked-files=all)"
           (cd scripts/ruff-source-placement && sha256sum --strict --quiet -c factory.sha256 && sha256sum --strict --quiet -c worker.sha256)
           python3 -IB scripts/ruff-real-cgu-weights/prices.py receive "$RUNNER_TEMP/placement-qualified-sdks"
-      - name: Prove native equality before reading the per-unit instruction counts
+      - name: Preserve three complete rlibs and explain any archive variation
         run: python3 -IB -u enrolled/scripts/ruff-real-cgu-weights/prices.py "$GITHUB_WORKSPACE/ruff-option"
       - name: Preserve the profile and native verdicts
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: actual-native-unit-instructions-${{ matrix.replicate }}
+          name: ruff-archive-diagnosis-${{ matrix.replicate }}
           path: |
             ${{ runner.temp }}/cgu-profile-report/*.json
             ${{ runner.temp }}/cgu-profile-report/*.gz
