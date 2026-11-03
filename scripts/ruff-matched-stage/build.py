@@ -308,7 +308,7 @@ def build(workspace, root):
             fixture = "tests/incremental/upstream-monomorphization-buckets/main.rs"
             test_cmd = argv[:argv.index("build")] + ["test", "--stage", "1", "-j8", fixture]
             test_log = root / "logs/upstream-owner-bucket-incremental-C.log"
-            guarded(test_cmd, rust, env, test_log)
+            guarded(test_cmd, rust, env, test_log, root)
             log = test_log.read_text(errors="replace")
             need(any("upstream-monomorphization-buckets" in line and "ok" in line for line in log.splitlines())
                  and re.search(r"test result: ok\. [1-9][0-9]* passed; 0 failed", log),
