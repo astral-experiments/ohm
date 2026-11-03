@@ -3,6 +3,7 @@ from collections import Counter, defaultdict
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import subprocess as sp
 
@@ -91,6 +92,7 @@ def processes(w, where):
     wild = w.sdk / "lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd"
     identities = {(p.stat().st_dev, p.stat().st_ino): p.name for p in (rust, wild)}
     images, counts, tids = {}, Counter(), defaultdict(set)
+    unclocked = defaultdict(list)
     for line in (where / "epochs.tsv").read_text().splitlines():
         fields = line.split()
         if fields[0] == "I":
@@ -109,19 +111,48 @@ def processes(w, where):
             images[n] = dict(name=owner, reason=fields[5], pid=pid, epoch=n, start_ns=start, argv=argv)
         elif fields[0] == "C":
             n, pid, tid, count, enabled, running = map(int, fields[1:])
-            assert enabled == running and (enabled or count == 0)
+            assert enabled == running, "multiplexed user-count interval"
+            if count and not enabled:
+                unclocked[n].append({"tid": tid, "instructions": count})
             counts[n] += count
             tids[n].add(tid)
     native = Counter(v["name"] for v in images.values() if v["reason"] == "exec")
     assert native == Counter({"ty_project": 1, "ty_ide": 1, "ty_server": 1, "e2e": 1, "ld.bfd": 1}), native
     for n, v in images.items():
-        v.update(threads=sorted(tids[n]), instructions=counts[n])
+        v.update(threads=sorted(tids[n]), instructions=counts[n], unclocked=unclocked[n])
     return list(images.values())
 
 
-def compare_argv(images):
-    by_name = {x["name"]: x["argv"] for x in images if x["reason"] == "exec" and x["name"] != "ld.bfd"}
-    assert by_name == REF["argv"], "different literal compiler command"
+def typed_argv(images):
+    return {x["name"]: x["argv"] for x in images if x["reason"] == "exec" and x["name"] != "ld.bfd"}
+
+
+def normalized(args):
+    # Signed Cargo compilation_files.rs:626,1016. Exactly this component may
+    # move across independent SDK installations. Preserve all source and unit
+    # hashes; both absolute roots and the command prefix stay fixed.
+    layout = re.compile(r"(/home/runner/work/_temp/ohm-foreign-join/(?:target/debug/build/workspaces/f44635c822fcb5f3|shared/debug/build/registries)/)v2-([a-f0-9]{16})(?=/)")
+    shards = set()
+    def replace(match):
+        shards.add(match[2])
+        return match[1] + "v2-{registered-compiler-namespace}"
+    stable = {owner: [layout.sub(replace, arg) for arg in argv] for owner, argv in args.items()}
+    assert len(shards) == 1 and len(stable) == 4
+    return stable, next(iter(shards))
+
+
+def inputs(w, td, artifacts):
+    owner, = (v for v in processes(w, td/"tasks") if v["name"] == "ty_ide" and v["reason"] == "exec")
+    extern = {}
+    args = owner["argv"]
+    for i, arg in enumerate(args):
+        if arg == "--extern" and "=" in args[i + 1]:
+            name, path = args[i+1].split("=", 1)
+            assert name not in extern
+            extern[name] = identity(Path(path))
+    assert len(extern) > 10
+    w.put(td/"actual-ty-ide-extern.json", extern)
+    return owner
 
 
 def preserve_profile(w, raw):
@@ -140,8 +171,13 @@ def close(w, path, raw, profiled, ordinary):
     baseline = processes(w, ordinary / "tasks")
     w.put(profiled / "actual-processes.json", measured)
     w.put(ordinary / "actual-processes.json", baseline)
-    compare_argv(measured)
-    compare_argv(baseline)
+    actual = typed_argv(measured)
+    assert actual == typed_argv(baseline), "different same-worker literal compiler argv"
+    stable, shard = normalized(actual)
+    registered, prior_shard = normalized(REF["argv"])
+    assert stable == registered, "different source command or non-layout input"
+    w.put(profiled/"cross-boot-layout.json", {"this": shard, "registered": prior_shard})
+    assert not any(v["unclocked"] for v in measured+baseline if v["name"] == primary), "zero-time interval on the selected actual compiler"
     target, = (x for x in measured if x["name"] == primary)
     unprofiled, = (x for x in baseline if x["name"] == primary)
     assert abs(target["instructions"] / unprofiled["instructions"] - 1) < .03

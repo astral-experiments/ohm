@@ -73,8 +73,9 @@ def receipt(tag,kind="whole"):
               dirty=sorted([v["package_id"],v["target"]["name"]]for v in arts if not v["fresh"]),elf=preserve(exe),executable=str(exe))
     if tag in ("old", "edit", "independent-NEW", "profile-OLD", "profile-NEW", "edit-again-observed"):
         inc = None
+        if tag in ("edit-again-observed", "profile-OLD", "profile-NEW"):
+            owner = study.inputs(w, td, arts)
         if tag.startswith("profile-"):
-            owner, = (v for v in study.processes(w, td/"tasks") if v["name"] == "ty_ide" and v["reason"] == "exec")
             inc, = (Path(arg.split("=",1)[1]) for arg in owner["argv"] if arg.startswith("incremental="))
         study.products(w, td, arts, inc)
     if kind in ("census", "profile"):
