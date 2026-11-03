@@ -187,20 +187,29 @@ def park(role, kind):
         path.rename(held/(role+'-'+kind+'-'+path.name))
 assert w.git('rev-parse','HEAD')==w.NEW and w.git('rev-parse','HEAD^')==w.OLD and w.hf(w.work/'Cargo.lock')==w.OLDLOCK and not w.git('status','--porcelain')
 assert os.environ['GITHUB_SHA']==os.environ['REVIEWED_HEAD'] and os.environ['GITHUB_RUN_ATTEMPT']=='1' and os.uname().machine=='x86_64'
-save('registered.json',R); manif=intake()
+save('registered.json',R); manif=intake();os.environ.pop('OHM_SDK_READ_TOKEN',None)
 env={k:os.environ[k]for k in ('PATH','HOME','LANG','USER')if k in os.environ}
 env.update(RUSTUP_HOME=str(w.ru),RUSTUP_TOOLCHAIN='ohm',CARGO_HOME=str(w.home),CARGO_TARGET_DIR=str(w.target),CARGO_BUILD_BUILD_DIR=str(w.shared),CARGO_NET_GIT_FETCH_WITH_CLI='true',LD_LIBRARY_PATH=str(w.sdk/'lib'))
 (w.ru/'toolchains').mkdir(parents=True);(w.ru/'toolchains/ohm').symlink_to(w.sdk,True)
 whole=w.root/'whole_count';tasks=w.root/'exec_count'
 for exe in (whole,tasks):
     sp.run(['/usr/bin/cc','-Wall','-Wextra','-Werror','-O2',str(HERE/(exe.name+'.c')),'-o',str(exe)],check=True)
-receipts={};safety={}
+receipts={};safety={};identity=None
 for role in R['order']:
-    label={'P':'normal','C':'defer'}[role];original=Path(manif['arms'][label]['root']);original.rename(w.sdk)
+    if role=='P':env['OHM_QA_CONSERVATIVE_SETE']='1'
+    else:env.pop('OHM_QA_CONSERVATIVE_SETE',None)
+    label='defer';original=Path(manif['arms'][label]['root']);original.rename(w.sdk)
     for name in ('cargo','rustc','rustdoc'):
         actual=Path(sp.check_output(['rustup','which','--toolchain','ohm',name],env=env,text=True).strip())
         assert actual.samefile(w.sdk/'bin'/name) and w.hf(actual)==manif['arms'][label]['files']['bin/'+name]
     driver,=(w.sdk/'lib').glob('librustc_driver-*.so');assert w.hf(driver)==manif['arms'][label]['files']['lib/'+driver.name]
+    actual={}
+    for rel,k in manif['arms'][label]['files'].items():
+        f=w.sdk/rel;st=f.stat();assert w.hf(f)==k
+        actual[rel]=[st.st_dev,st.st_ino,st.st_size,st.st_mtime_ns,st.st_ctime_ns,k]
+    if identity is None:identity=actual
+    else:assert identity==actual
+    save(role+'-identities.json',actual)
     w.git('switch','--detach',w.OLD)
     prepare_empty();hist={}
     hist['old']=phase(role,'old','ordinary');w.git('switch','--detach',w.NEW)
@@ -221,3 +230,8 @@ assert all(x['same_units']and x['same_verdicts'] and x['same_elf']for x in summa
 for role,h in receipts.items():
     assert h['old']['elf']!=h['edit']['elf'] and len({x['elf']for k,x in h.items()if k!='old'})==1
     assert all(row['owners']['portable_atomic']['marker']==(role=='P') for row in h.values())
+
+inputs={r:json.loads((w.proof/(r+'-holdouts.json')).read_bytes()) for r in 'PC'}
+assert inputs['P']['shadow_directory']==inputs['C']['shadow_directory'] and inputs['P']['library']==inputs['C']['library']
+assert len(receipts['P']['census']['typed_execs'])==18 and receipts['C']['census']['typed_execs']==['ruff','ty_python_semantic']
+save('accepted-single-driver.json',{'identical_abi_and_inodes':True,'same_directory':inputs['P']['shadow_directory'],'source':R['C'],'probes':sorted(receipts['P'])})

@@ -1,5 +1,5 @@
 name: Qualify register-equality assembly on an unchanged Ruff native build
-run-name: Historical Ruff native register-equality pilot ${{ inputs.reviewed_head }}
+run-name: One fixed compiler on historical Ruff ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
@@ -12,7 +12,7 @@ permissions:
   actions: read
 jobs:
   inspect:
-    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-historical-ruff-sete-native-20261103'
+    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-historical-ruff-sete-ablation-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 55
     steps:
@@ -33,7 +33,7 @@ jobs:
           persist-credentials: false
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: 059b4e3f0205cf449d3e9e56b8b1872f9108f930
+          ref: f28d74551e7656071b8cd10a870e3e71e4d653f2
           path: factory
           persist-credentials: false
           sparse-checkout: scripts/ruff-matched-stage
@@ -46,7 +46,7 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: matched-sete-native-${{ github.run_id }}
+          name: single-driver-sete-${{ github.run_id }}
           path: ${{ runner.temp }}/ohm-foreign-join/published/
           retention-days: 15
           if-no-files-found: error
