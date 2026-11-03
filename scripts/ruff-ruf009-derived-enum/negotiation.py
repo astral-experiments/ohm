@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import re
 
-FLAG = "-Zohm-checked-private-derives"
+FLAG = "-Zohm-checked-private-derives-v2"
 
 
 def read(directory, driver, role, root=None):
@@ -41,6 +41,7 @@ def read(directory, driver, role, root=None):
             if "--crate-name" in argv and "--out-dir" in argv and any(s.startswith("--emit=dep-info,metadata") for s in argv):
                 crate = argv[argv.index("--crate-name") + 1]
                 kind = argv[argv.index("--crate-type") + 1]
+                assert "-Zohm-checked-private-derives" not in argv
                 enabled = argv.count(FLAG)
                 assert enabled in (0, 1)
                 if role == "P" or kind not in ("lib", "rlib"):

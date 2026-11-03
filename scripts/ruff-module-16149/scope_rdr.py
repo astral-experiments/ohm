@@ -99,6 +99,7 @@ def decode(
     *,
     typed=None,
     selected_tables=(),
+    physical_layout=False,
     edition="2024",
 ):
     r = Reader(raw, symbols)
@@ -147,7 +148,7 @@ def decode(
         key: table()
         for key in (*table_names, "syntax_contexts", "expn_data", "expn_hashes")
     }
-    position()
+    path_hash_map = position()
     tables["source_map"] = table()
     array()
     array()
@@ -252,6 +253,10 @@ def decode(
         assert key not in deps
         deps[key] = (hashed, host, kind, private_dep)
     if typed is not None:
+        if physical_layout:
+            typed["wire_tables"] = tables
+            typed["slots"] = slots
+            typed["decode_positions"] = {"def_path_hash_map": path_hash_map}
         if selected_tables:
             typed["selected_tables"] = {k: dict(slots(k)) for k in selected_tables}
         typed["path_by_index"] = {i: (identities[i], defs[i][0]) for i in defs}

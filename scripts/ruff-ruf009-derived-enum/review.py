@@ -8,6 +8,7 @@ import json
 import math
 from pathlib import Path
 import re
+import tempfile
 import statistics
 import subprocess
 import sys
@@ -15,11 +16,13 @@ import sys
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
 import tempfile
-import elf_gate
 import metadata
 import output_binding
 import negotiation
+import opaque_bijection
 import dependencies
+import elf_gate
+import external
 
 REG=json.loads((HERE/'registration.json').read_bytes())
 PORT=json.loads((HERE/'historical-source.json').read_bytes())
@@ -58,11 +61,24 @@ def block(base):
         return dict(**actual['header'],requires=actual['requires'],rows=digest(json.dumps(actual['rows'],sort_keys=True).encode()),definitions=len(actual['rows']),compressed=file_sha(fn),decoded=file_sha(frozen))
     def orig_folder(folder):return read(folder/'check.json')
     role_data={}
+    representation = {}
+    def require_producer_match(a, b, role, version):
+        if a['full'] == b['full']:
+            return
+        pair = (role, a['full'], b['full'])
+        if pair in representation:
+            return
+        def body(digest):
+            blob = subprocess.check_output(['zstd','-qdc',members/(digest+'.rmeta.zst')])
+            need(hashlib.sha256(blob).hexdigest()==digest, 'unbound producer metadata bytes')
+            return blob
+        representation[pair] = opaque_bijection.compare(body(a['full']),body(b['full']),role,version,REG['edition'])
     for role in worker['order']:
         folder=base/role;kit=read(folder/'kit.json')
         need(kit['config']['source']==worker['factory']['source'][role]==REG['matched_sources'][role]['revision'] and kit['driver']==kit['config']['driver']==read(base/'factory-safety.json')[role]['driver_sha256'],'different role')
         need(kit['config']['cargo']==kit['cargo']==bound_client['binary_sha256'], 'physical process used a different Cargo')
         version=kit['rustc_version'].splitlines()[0]+' (Ohm metadata 3)'
+        qualified_prefix=external.originals(folder)
         data={}
         phases=['buggy-cold','buggy-idle1','buggy-idle2','edited','fixed-idle1','fixed-idle2']
         for stage in [p+'-'+s for p in ('ordinary','kernel') for s in phases]+['reverse','restore-fixed','invalid','repair','empty-edit']:
@@ -132,8 +148,8 @@ def block(base):
                     show=read(folder/(q['sha256']+'.display.json'))
                     need(show=={'body':q['sha256'],'raw_public':m['public'],'native':'Public hash: '+bytes.fromhex(m['public'])[::-1].hex()},'different native public hash display')
             need(set(snapshots)==(set(REG['observed_targets']) if valid else set()),'missing snapshots')
-            external=dependencies.verify(read(d/'external-products.json'),arts,members,external_verified) if valid else []
-            data[stage]=dict(external=external,dirty=dirty,physical=physical,instructions=count,meta=snapshots)
+            external_products=dependencies.verify(read(d/'external-products.json'),arts,members,external_verified) if valid else []
+            data[stage]=dict(external=external_products,dirty=dirty,physical=physical,instructions=count,meta=snapshots)
         for state,labels in [('buggy',['buggy-cold','buggy-idle1','buggy-idle2']),('fixed',['edited','fixed-idle1','fixed-idle2'])]:
             ref=data['ordinary-'+labels[0]]
             for name in ('ordinary-','kernel-'):
@@ -146,7 +162,7 @@ def block(base):
                 need(same[0]==same[1]==same[2],'settled bytes changed')
         for label,ref in [('empty-edit','ordinary-edited'),('repair','ordinary-edited'),('restore-fixed','ordinary-edited'),('reverse','ordinary-buggy-cold')]:
             need(all(semantic(v)==semantic(data[ref]['meta'][k]) for k,v in data[label]['meta'].items()),'semantic reference mismatch '+label)
-            need(data[label]['meta']['ruff_linter']['full']==data[ref]['meta']['ruff_linter']['full'],'different same-source producer rmeta '+label)
+            require_producer_match(data[label]['meta']['ruff_linter'], data[ref]['meta']['ruff_linter'], role, version)
         for stage, observed in data.items():
             if stage=='invalid':continue
             reference = data['ordinary-buggy-cold']['external']
@@ -155,9 +171,9 @@ def block(base):
                 a,b=keyed(reference),keyed(observed['external']); keys=sorted(k for k in set(a)|set(b) if a.get(k)!=b.get(k))
                 raise ValueError(('independent external product bytes differ', role, stage, len(keys), [(k,a.get(k),b.get(k)) for k in keys[:6]]))
         for state,labels,ref in [('buggy',('kernel-buggy-cold','kernel-buggy-idle1','kernel-buggy-idle2'),'ordinary-buggy-cold'),('fixed',('kernel-edited','kernel-fixed-idle1','kernel-fixed-idle2'),'ordinary-edited')]:
-            for stage in labels:need(data[stage]['meta']['ruff_linter']['full']==data[ref]['meta']['ruff_linter']['full'], ('same-source producer bytes differ',role,stage,ref))
+            for stage in labels:require_producer_match(data[stage]['meta']['ruff_linter'], data[ref]['meta']['ruff_linter'],role,version)
         native={}
-        for key,state in [('native-buggy','buggy'),('native-edited','fixed'),('native-reverse','buggy'),('native-repair','fixed'),('native-empty-edit','fixed')]:
+        for key,state in [('native-buggy','buggy'),('native-edited','fixed'),('native-reverse','buggy'),('native-repair','fixed'),('native-empty-edit','fixed'),('native-fully-empty-fixed','fixed')]:
             n=read(folder/key/'native.json');f=members/(n['sha256']+'.elf.zst');need(file_sha(f)==n['compressed'] and n['state']==state,'wrong stored ELF')
             with subprocess.Popen(['zstd','-dcq',f],stdout=subprocess.PIPE) as proc:
                 md=hashlib.sha256();size=0
@@ -174,7 +190,11 @@ def block(base):
                 need(p['code']==wanted and not p['stderr'] and [m['code']for m in diag]==['RUF009']*wanted,'native verdict')
                 if wanted:need(diag[0]['location']=={'row':4,'column':24} and diag[0]['end_location']=={'row':4,'column':24+len(expr)} and diag[0]['message']=='Do not perform function call `'+expr.split('(')[0]+'` in dataclass defaults','span/message')
             native[key]=n
-        need(native['native-edited']==native['native-empty-edit']==native['native-repair'] and native['native-buggy']==native['native-reverse'] and native['native-buggy']['sha256']!=native['native-edited']['sha256'],'different same-role full CLI or dynamic probe')
+        need(native['native-fully-empty-fixed']==native['native-edited']==native['native-empty-edit']==native['native-repair'] and native['native-buggy']==native['native-reverse'] and native['native-buggy']['sha256']!=native['native-edited']['sha256'],'different same-role full CLI or dynamic probe')
+        empty=read(folder/'fully-empty-entry.json')
+        need(empty['entries']==[] and not any('TRUST' in k or 'WRAPPER' in k for k in empty['env']) and empty['target']==empty['state']+'/target' and empty['build']==empty['state']+'/build','wrong fully cold native state')
+        typed=[v for v in external.prefix.events(folder/'native-fully-empty-fixed')if v.get('reason')=='compiler-artifact']
+        need(len(typed)==REG['native_unit_count'] and all(not r['fresh']for r in typed),'fully empty native had existing artifacts')
         baseline,edited=[data[n]['meta']['ruff_linter']for n in ['ordinary-buggy-cold','ordinary-edited']]
         need(baseline['private']!=edited['private'],'source body was not compiled')
         tables=[json.loads(gzip.decompress((members/(v['full']+'.rows.json.gz')).read_bytes()))for v in (baseline,edited)]
@@ -184,7 +204,7 @@ def block(base):
         need(baseline['full']!=edited['full'],'real producer metadata did not change')
         read_client=read(base/'client-native.json')['binding']
         need(kit['cargo']==kit['config']['cargo']==read_client['binary_sha256'] and read_client['revision'] in kit['cargo_version'],'different executed Cargo client')
-        role_data[role]=dict(source=kit['config']['source'],driver=kit['driver'],dirty=data['ordinary-edited']['dirty'],physical=data['kernel-edited']['physical'],cost={s:data['ordinary-'+s]['instructions'] for s in phases},
+        role_data[role]=dict(registry_prefix=qualified_prefix,source=kit['config']['source'],driver=kit['driver'],dirty=data['ordinary-edited']['dirty'],physical=data['kernel-edited']['physical'],cost={s:data['ordinary-'+s]['instructions'] for s in phases},
             public=[baseline['public'],edited['public']],row_count=[baseline['definitions'],edited['definitions']],changed_rows=len(diff),row_changes_sha256=digest(json.dumps(diff,sort_keys=True).encode()),negotiation=read(folder/'kernel-edited-observer/negotiation.json'),native={k:v['sha256']for k,v in native.items()},
             equivalence={label:{n:v['full']==data['ordinary-edited']['meta'][n]['full']for n,v in data[label]['meta'].items()} for label in ('repair','empty-edit')})
     p,c=role_data['P'],role_data['C']
@@ -208,7 +228,7 @@ def block(base):
     skipped=sorted(ds(p)-ds(c))
     shape=(p['dirty']==p['physical']==REG['observed_terminal_targets'] and set(map(tuple,c['dirty']))<=set(map(tuple,p['dirty'])) and ds(c)<=ds(p) and ('ruff_linter','lib')in ds(c) and any(tuple(s)!=('ruff_linter','lib') for s in skipped))
     reduction=1-c['cost']['edited']/p['cost']['edited']
-    return dict(worker=worker,roles=role_data,cross_native=cross,physical_skipped=skipped,eligible_shape=shape,reduction=reduction,pilot_admits=shape and reduction>=REG['gates']['pilot_edited_reduction_min'])
+    return dict(worker=worker,roles=role_data,within_role_opaque_lifetime_bijections=list(representation.values()),cross_native=cross,physical_skipped=skipped,eligible_shape=shape,reduction=reduction,pilot_admits=shape and reduction>=REG['gates']['pilot_edited_reduction_min'])
 
 
 def aggregate(rows):

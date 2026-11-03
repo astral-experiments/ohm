@@ -17,8 +17,8 @@ permissions:
   actions: read
 jobs:
   schedule:
-    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruf009-historical-capability-20261103' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
-    runs-on: ubuntu-24.04
+    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruf009-consumed-historical-20261103' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+    runs-on: namespace-profile-ubuntu-24-04-16
     outputs:
       matrix: ${{ steps.bind.outputs.matrix }}
       factory: ${{ steps.bind.outputs.factory }}
@@ -26,7 +26,19 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-          sparse-checkout: scripts/ruff-ruf009-derived-enum
+          sparse-checkout: |
+            scripts/ruff-ruf009-derived-enum
+            scripts/ruff-module-16149
+      - name: Reopen frozen compatibility and original metadata controls
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -IB scripts/ruff-ruf009-derived-enum/admission.py "${{ inputs.phase }}"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always() && inputs.phase == 'pilot'
+        with:
+          name: ruf009-opaque-reader-${{ github.run_id }}
+          path: ${{ runner.temp }}/ruf009-opaque-controls.json
+          if-no-files-found: ignore
       - id: bind
         env:
           STAGE: ${{ inputs.phase }}
