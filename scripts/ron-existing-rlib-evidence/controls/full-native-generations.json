@@ -1,0 +1,305 @@
+{
+  "clients": {
+    "invalid_E0308": true,
+    "literal_last_argv": [
+      "rustc",
+      "+ohm",
+      "--edition=2021",
+      "--crate-name",
+      "ron_consumer",
+      "/home/dev-user/.cache/ohm-llvm-dev-pipeline-20261102/ron-existing-rlib-backend-01/held-runtime-closure-01/native-v1/reader/reader.rs",
+      "--extern",
+      "ron=/home/dev-user/.cache/ohm-llvm-dev-pipeline-20261102/ron-existing-rlib-backend-01/held-runtime-closure-01/native-v1/reader/input/libron-0b42003ff6bbcee9.rmeta",
+      "--extern",
+      "ron=/home/dev-user/.cache/ohm-llvm-dev-pipeline-20261102/ron-existing-rlib-backend-01/held-runtime-closure-01/native-v1/reader/input/libron-0b42003ff6bbcee9.rlib",
+      "-Cdebuginfo=0",
+      "--error-format=json",
+      "-L",
+      "dependency=/home/dev-user/.cache/ohm-llvm-dev-pipeline-20261102/ron-existing-rlib-backend-01/held-runtime-closure-01/inputs/shared/debug/build/registries/v2-de56e134d9f76150/bitflags/367b786f8de371ca/out",
+      "-L",
+      "dependency=/home/dev-user/.cache/ohm-llvm-dev-pipeline-20261102/ron-existing-rlib-backend-01/held-runtime-closure-01/inputs/shared/debug/build/registries/v2-de56e134d9f76150/once_cell/fed376f30fe21593/out",
+      "-L",
+      "dependency=/home/dev-user/.cache/ohm-llvm-dev-pipeline-20261102/ron-existing-rlib-backend-01/held-runtime-closure-01/inputs/shared/debug/build/registries/v2-de56e134d9f76150/serde_core/8b1f50303d3fbc82/out",
+      "-L",
+      "dependency=/home/dev-user/.cache/ohm-llvm-dev-pipeline-20261102/ron-existing-rlib-backend-01/held-runtime-closure-01/inputs/shared/debug/build/registries/v2-de56e134d9f76150/typeid/eede586f7803950c/out",
+      "-L",
+      "dependency=/home/dev-user/.cache/ohm-llvm-dev-pipeline-20261102/ron-existing-rlib-backend-01/held-runtime-closure-01/inputs/shared/debug/build/registries/v2-de56e134d9f76150/unicode-ident/c6b7151656fd563d/out",
+      "-L",
+      "dependency=/home/dev-user/.cache/ohm-llvm-dev-pipeline-20261102/ron-existing-rlib-backend-01/held-runtime-closure-01/inputs/target/debug/build/workspaces/f44635c822fcb5f3/v2-de56e134d9f76150/serde/90583f82f4850bc4/out",
+      "-L",
+      "dependency=/home/dev-user/.cache/ohm-llvm-dev-pipeline-20261102/ron-existing-rlib-backend-01/held-runtime-closure-01/inputs/target/debug/build/workspaces/f44635c822fcb5f3/v2-de56e134d9f76150/serde_derive/6037f10264f9dbbd/out",
+      "-o",
+      "/home/dev-user/.cache/ohm-llvm-dev-pipeline-20261102/ron-existing-rlib-backend-01/held-runtime-closure-01/native-v1/reader/reader"
+    ],
+    "physical_artifacts": {
+      "all-unchanged": {
+        "ELF": "6f3a164d546ebda67aae339cd3d715d53e9606c0b11c3e693419c808386657ef",
+        "rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "rmeta": "f47390036004490f00a2b2844928fc3b7b9bbbd3428e2080c52af0da2ea92b78",
+        "size": 1283568,
+        "stdout": "valid=[8,13,21] roundtrip=3 malformed=1:5\n"
+      },
+      "changed-private-runtime": {
+        "ELF": "6f3a164d546ebda67aae339cd3d715d53e9606c0b11c3e693419c808386657ef",
+        "rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "rmeta": "489f18715c1255df110e32d9a5bcac50ce5986f8dcd82191abac74b565a579e1",
+        "size": 1283568,
+        "stdout": "valid=[8,13,21] roundtrip=3 malformed=1:5\n"
+      },
+      "empty-ordinary": {
+        "ELF": "6f3a164d546ebda67aae339cd3d715d53e9606c0b11c3e693419c808386657ef",
+        "rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "rmeta": "489f18715c1255df110e32d9a5bcac50ce5986f8dcd82191abac74b565a579e1",
+        "size": 1283568,
+        "stdout": "valid=[8,13,21] roundtrip=3 malformed=1:5\n"
+      },
+      "empty-receipt": {
+        "ELF": "6f3a164d546ebda67aae339cd3d715d53e9606c0b11c3e693419c808386657ef",
+        "rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "rmeta": "489f18715c1255df110e32d9a5bcac50ce5986f8dcd82191abac74b565a579e1",
+        "size": 1283568,
+        "stdout": "valid=[8,13,21] roundtrip=3 malformed=1:5\n"
+      },
+      "independent-changed-runtime": {
+        "ELF": "6f3a164d546ebda67aae339cd3d715d53e9606c0b11c3e693419c808386657ef",
+        "rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "rmeta": "489f18715c1255df110e32d9a5bcac50ce5986f8dcd82191abac74b565a579e1",
+        "size": 1283568,
+        "stdout": "valid=[8,13,21] roundtrip=3 malformed=1:5\n"
+      },
+      "preexisting-writable-mapping": {
+        "ELF": "6f3a164d546ebda67aae339cd3d715d53e9606c0b11c3e693419c808386657ef",
+        "rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "rmeta": "489f18715c1255df110e32d9a5bcac50ce5986f8dcd82191abac74b565a579e1",
+        "size": 1283568,
+        "stdout": "valid=[8,13,21] roundtrip=3 malformed=1:5\n"
+      },
+      "repair": {
+        "ELF": "6f3a164d546ebda67aae339cd3d715d53e9606c0b11c3e693419c808386657ef",
+        "rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "rmeta": "489f18715c1255df110e32d9a5bcac50ce5986f8dcd82191abac74b565a579e1",
+        "size": 1283568,
+        "stdout": "valid=[8,13,21] roundtrip=3 malformed=1:5\n"
+      }
+    },
+    "repair_elf": "6f3a164d546ebda67aae339cd3d715d53e9606c0b11c3e693419c808386657ef"
+  },
+  "commands": {
+    "all-unchanged": {
+      "after": {
+        ".ron-live-native-v2.tsv": "f14fd3e836d629b838fac07758cb0478bc431c92e18b07cd5aabba303632c742",
+        "libron-0b42003ff6bbcee9.rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "libron-0b42003ff6bbcee9.rmeta": "f47390036004490f00a2b2844928fc3b7b9bbbd3428e2080c52af0da2ea92b78",
+        "ron-0b42003ff6bbcee9.d": "362ad566aeab9a594b5e5cc6b82fbd78ec803157330a293c9e668175fcbc35ea"
+      },
+      "before": {
+        ".ron-live-native-v2.tsv": "f14fd3e836d629b838fac07758cb0478bc431c92e18b07cd5aabba303632c742",
+        "libron-0b42003ff6bbcee9.rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "libron-0b42003ff6bbcee9.rmeta": "489f18715c1255df110e32d9a5bcac50ce5986f8dcd82191abac74b565a579e1",
+        "ron-0b42003ff6bbcee9.d": "362ad566aeab9a594b5e5cc6b82fbd78ec803157330a293c9e668175fcbc35ea"
+      },
+      "calls": {
+        "emit": 10,
+        "opt": 10,
+        "replaced": 10,
+        "select": 10
+      },
+      "children": "3483941 3483952 0 350976 de2cf76d760b288229eb37ee2dfe061992c47ed232bf117b1a6347eb24222e08",
+      "gate": [
+        "acquired",
+        "66",
+        "3483952",
+        "3483952"
+      ],
+      "returncode": 0
+    },
+    "changed-private-runtime": {
+      "after": {
+        ".ron-live-native-v2.tsv": "f14fd3e836d629b838fac07758cb0478bc431c92e18b07cd5aabba303632c742",
+        "libron-0b42003ff6bbcee9.rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "libron-0b42003ff6bbcee9.rmeta": "489f18715c1255df110e32d9a5bcac50ce5986f8dcd82191abac74b565a579e1",
+        "ron-0b42003ff6bbcee9.d": "362ad566aeab9a594b5e5cc6b82fbd78ec803157330a293c9e668175fcbc35ea"
+      },
+      "before": {
+        ".ron-live-native-v2.tsv": "f14fd3e836d629b838fac07758cb0478bc431c92e18b07cd5aabba303632c742",
+        "libron-0b42003ff6bbcee9.rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "libron-0b42003ff6bbcee9.rmeta": "489f18715c1255df110e32d9a5bcac50ce5986f8dcd82191abac74b565a579e1",
+        "ron-0b42003ff6bbcee9.d": "362ad566aeab9a594b5e5cc6b82fbd78ec803157330a293c9e668175fcbc35ea"
+      },
+      "calls": {},
+      "children": "3484020 3484024 0 379392",
+      "gate": [
+        "different-tool-bytes",
+        "0",
+        "3484024",
+        "3484024"
+      ],
+      "returncode": 0
+    },
+    "custom-code-ordinary-fallback": {
+      "after": {
+        ".ron-live-native-v2.tsv": "f14fd3e836d629b838fac07758cb0478bc431c92e18b07cd5aabba303632c742",
+        "libron-0b42003ff6bbcee9.rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "libron-0b42003ff6bbcee9.rmeta": "489f18715c1255df110e32d9a5bcac50ce5986f8dcd82191abac74b565a579e1",
+        "ron-0b42003ff6bbcee9.d": "362ad566aeab9a594b5e5cc6b82fbd78ec803157330a293c9e668175fcbc35ea"
+      },
+      "before": {
+        ".ron-live-native-v2.tsv": "f14fd3e836d629b838fac07758cb0478bc431c92e18b07cd5aabba303632c742",
+        "libron-0b42003ff6bbcee9.rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "libron-0b42003ff6bbcee9.rmeta": "489f18715c1255df110e32d9a5bcac50ce5986f8dcd82191abac74b565a579e1",
+        "ron-0b42003ff6bbcee9.d": "362ad566aeab9a594b5e5cc6b82fbd78ec803157330a293c9e668175fcbc35ea"
+      },
+      "calls": {},
+      "children": "3484344 3484345 83 26368",
+      "gate": [
+        "custom-loader",
+        "0",
+        "3484345",
+        "3484345"
+      ],
+      "returncode": 83
+    },
+    "custom-code-stock": {
+      "after": {
+        ".ron-live-native-v2.tsv": "f14fd3e836d629b838fac07758cb0478bc431c92e18b07cd5aabba303632c742",
+        "libron-0b42003ff6bbcee9.rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "libron-0b42003ff6bbcee9.rmeta": "489f18715c1255df110e32d9a5bcac50ce5986f8dcd82191abac74b565a579e1",
+        "ron-0b42003ff6bbcee9.d": "362ad566aeab9a594b5e5cc6b82fbd78ec803157330a293c9e668175fcbc35ea"
+      },
+      "before": {
+        ".ron-live-native-v2.tsv": "f14fd3e836d629b838fac07758cb0478bc431c92e18b07cd5aabba303632c742",
+        "libron-0b42003ff6bbcee9.rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "libron-0b42003ff6bbcee9.rmeta": "489f18715c1255df110e32d9a5bcac50ce5986f8dcd82191abac74b565a579e1",
+        "ron-0b42003ff6bbcee9.d": "362ad566aeab9a594b5e5cc6b82fbd78ec803157330a293c9e668175fcbc35ea"
+      },
+      "calls": {},
+      "children": "3484342 3484343 83 26368",
+      "gate": [
+        "not-selected",
+        "0",
+        "3484343",
+        "3484343"
+      ],
+      "returncode": 83
+    },
+    "empty-ordinary": {
+      "after": {
+        "libron-0b42003ff6bbcee9.rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "libron-0b42003ff6bbcee9.rmeta": "489f18715c1255df110e32d9a5bcac50ce5986f8dcd82191abac74b565a579e1",
+        "ron-0b42003ff6bbcee9.d": "362ad566aeab9a594b5e5cc6b82fbd78ec803157330a293c9e668175fcbc35ea"
+      },
+      "before": {},
+      "calls": {},
+      "children": "3483876 3483877 0 381184",
+      "gate": [
+        "not-selected",
+        "0",
+        "3483877",
+        "3483877"
+      ],
+      "returncode": 0
+    },
+    "empty-receipt": {
+      "after": {
+        ".ron-live-native-v2.tsv": "f14fd3e836d629b838fac07758cb0478bc431c92e18b07cd5aabba303632c742",
+        "libron-0b42003ff6bbcee9.rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "libron-0b42003ff6bbcee9.rmeta": "489f18715c1255df110e32d9a5bcac50ce5986f8dcd82191abac74b565a579e1",
+        "ron-0b42003ff6bbcee9.d": "362ad566aeab9a594b5e5cc6b82fbd78ec803157330a293c9e668175fcbc35ea"
+      },
+      "before": {
+        "libron-0b42003ff6bbcee9.rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "libron-0b42003ff6bbcee9.rmeta": "489f18715c1255df110e32d9a5bcac50ce5986f8dcd82191abac74b565a579e1",
+        "ron-0b42003ff6bbcee9.d": "362ad566aeab9a594b5e5cc6b82fbd78ec803157330a293c9e668175fcbc35ea"
+      },
+      "calls": {
+        "emit": 10,
+        "opt": 10
+      },
+      "children": "3483913 3483914 0 387840 de2cf76d760b288229eb37ee2dfe061992c47ed232bf117b1a6347eb24222e08",
+      "gate": [
+        "acquired",
+        "66",
+        "3483914",
+        "3483914"
+      ],
+      "returncode": 0
+    },
+    "independent-changed-runtime": {
+      "after": {
+        ".ron-live-native-v2.tsv": "f14fd3e836d629b838fac07758cb0478bc431c92e18b07cd5aabba303632c742",
+        "libron-0b42003ff6bbcee9.rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "libron-0b42003ff6bbcee9.rmeta": "489f18715c1255df110e32d9a5bcac50ce5986f8dcd82191abac74b565a579e1",
+        "ron-0b42003ff6bbcee9.d": "362ad566aeab9a594b5e5cc6b82fbd78ec803157330a293c9e668175fcbc35ea"
+      },
+      "before": {
+        ".ron-live-native-v2.tsv": "f14fd3e836d629b838fac07758cb0478bc431c92e18b07cd5aabba303632c742",
+        "libron-0b42003ff6bbcee9.rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "libron-0b42003ff6bbcee9.rmeta": "489f18715c1255df110e32d9a5bcac50ce5986f8dcd82191abac74b565a579e1",
+        "ron-0b42003ff6bbcee9.d": "362ad566aeab9a594b5e5cc6b82fbd78ec803157330a293c9e668175fcbc35ea"
+      },
+      "calls": {},
+      "children": "3484174 3484176 0 385792",
+      "gate": [
+        "not-selected",
+        "0",
+        "3484176",
+        "3484176"
+      ],
+      "returncode": 0
+    },
+    "preexisting-writable-mapping": {
+      "after": {
+        ".ron-live-native-v2.tsv": "f14fd3e836d629b838fac07758cb0478bc431c92e18b07cd5aabba303632c742",
+        "libron-0b42003ff6bbcee9.rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "libron-0b42003ff6bbcee9.rmeta": "489f18715c1255df110e32d9a5bcac50ce5986f8dcd82191abac74b565a579e1",
+        "ron-0b42003ff6bbcee9.d": "362ad566aeab9a594b5e5cc6b82fbd78ec803157330a293c9e668175fcbc35ea"
+      },
+      "before": {
+        ".ron-live-native-v2.tsv": "f14fd3e836d629b838fac07758cb0478bc431c92e18b07cd5aabba303632c742",
+        "libron-0b42003ff6bbcee9.rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "libron-0b42003ff6bbcee9.rmeta": "f47390036004490f00a2b2844928fc3b7b9bbbd3428e2080c52af0da2ea92b78",
+        "ron-0b42003ff6bbcee9.d": "362ad566aeab9a594b5e5cc6b82fbd78ec803157330a293c9e668175fcbc35ea"
+      },
+      "calls": {},
+      "children": "3483987 3483989 0 384256",
+      "gate": [
+        "writer-or-lease-unavailable",
+        "0",
+        "3483989",
+        "3483989"
+      ],
+      "returncode": 0
+    },
+    "repair": {
+      "after": {
+        ".ron-live-native-v2.tsv": "f14fd3e836d629b838fac07758cb0478bc431c92e18b07cd5aabba303632c742",
+        "libron-0b42003ff6bbcee9.rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "libron-0b42003ff6bbcee9.rmeta": "489f18715c1255df110e32d9a5bcac50ce5986f8dcd82191abac74b565a579e1",
+        "ron-0b42003ff6bbcee9.d": "362ad566aeab9a594b5e5cc6b82fbd78ec803157330a293c9e668175fcbc35ea"
+      },
+      "before": {
+        ".ron-live-native-v2.tsv": "f14fd3e836d629b838fac07758cb0478bc431c92e18b07cd5aabba303632c742",
+        "libron-0b42003ff6bbcee9.rlib": "d2a1935ab83e724a318228b47b5f575482f75550e80f3a7ecca4dc0266a8108b",
+        "libron-0b42003ff6bbcee9.rmeta": "489f18715c1255df110e32d9a5bcac50ce5986f8dcd82191abac74b565a579e1",
+        "ron-0b42003ff6bbcee9.d": "362ad566aeab9a594b5e5cc6b82fbd78ec803157330a293c9e668175fcbc35ea"
+      },
+      "calls": {
+        "emit": 10,
+        "opt": 10,
+        "replaced": 10,
+        "select": 10
+      },
+      "children": "3484347 3484348 0 352000 de2cf76d760b288229eb37ee2dfe061992c47ed232bf117b1a6347eb24222e08",
+      "gate": [
+        "acquired",
+        "66",
+        "3484348",
+        "3484348"
+      ],
+      "returncode": 0
+    }
+  },
+  "identity": "d2bd2763e437327fe1594429732f830e761be488218d7220e322ec049f1e3156",
+  "physical_roles": 16,
+  "system_bytes": 6250344
+}
