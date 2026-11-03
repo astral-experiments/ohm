@@ -107,7 +107,12 @@ def snapshot_work_products(directory):
                 for path in sorted(state.glob('*.o')):
                     st=path.stat()
                     need(st.st_size<128*2**20 and len(objects)<1000,'bounded native inventory')
-                    objects.append([path.name,st.st_dev,st.st_ino,st.st_mtime_ns,st.st_size,hf(path)])
+                    object_hash=hf(path)
+                    objects.append([path.name,st.st_dev,st.st_ino,st.st_mtime_ns,st.st_size,object_hash])
+                    if directory.name in ('old','edit','independent-clean-new') and path.stem in {
+                            '26b50y1455r2nn7imncnrh1im','3xhp4sunmhbswr1ovpiqoyj96',
+                            '3u3vz84botgcprgohgbxpi18d','c3vf9hzmvyyz4hr2bieid2ks6'}:
+                        need(zsave(path,PUB/'four-native-bodies')==object_hash,'selected object changed during read')
                 if objects:sessions[str(state.relative_to(TARGET))]=objects
     put(directory/'incremental-native-sessions.json',sessions)
 def source_files(directory):

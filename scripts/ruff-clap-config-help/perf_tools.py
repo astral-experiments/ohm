@@ -11,7 +11,7 @@ import subprocess
 ROOT = Path(os.environ['RUNNER_TEMP']).resolve(strict=True) / 'ohm-clap-cli'
 B = ROOT / 'diagnostic'
 KITS = Path(__file__).resolve().parent
-PERIOD = 1000003
+PERIOD = 8000009
 
 def need(ok, why):
     if not ok:
