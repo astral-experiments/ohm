@@ -1,0 +1,183 @@
+{
+  "binding": {
+    "branch": "charlie/qa-ty-ide-mono-stage-29697-20261103",
+    "driver": {
+      "C": "11b12c572f2b101d7c23eb0678d842f14fb9956b9543b0baa43fdff1bb387691",
+      "P": "b0c7882fb84d8924b99896dfe214c7dfb19bdfede83850a769956234c29a45fc"
+    },
+    "head": "3166ffe9aa98befcb452cc25af269af53578604c",
+    "kit": [
+      "ohm-rc23-ty-ide-buckets-stage1",
+      13225775626,
+      195762543,
+      "2617b279f0ce68bd5ac6d325b64aa2cf4f7a8c430f5e39eeeb6896b8c7273bf9"
+    ],
+    "receipts": [
+      "ohm-rc23-ty-ide-buckets-stage1-receipts",
+      13225047916,
+      54227,
+      "73667e3dd0ff85dbf161274bbeeb310cb8956e7edf0c1bf6ebd2bfd0b5f80cf9"
+    ],
+    "run": 41624273152,
+    "source": {
+      "C": "5c5af1a053326e6ce5df048c4dcb30b53e01a069",
+      "P": "d57fd1515986dccecdcece8da85e651bfb4b81f9"
+    }
+  },
+  "drivers": {
+    "C": "11b12c572f2b101d7c23eb0678d842f14fb9956b9543b0baa43fdff1bb387691",
+    "P": "b0c7882fb84d8924b99896dfe214c7dfb19bdfede83850a769956234c29a45fc"
+  },
+  "epochs": {
+    "CP": {
+      "foreign_elf": "47f9f194437d2a34662bb95f2d84ad54101c37b04c81bbb46569f54f6f2d8127",
+      "foreign_stdout": "98\n",
+      "new_graphs": {
+        "inc/epoch-1dmzjimms4d7o/s-hntcbhiben-0n5jbo9-1p41qpksvnn667ei2wiik8ks8/dep-graph.bin": "525349431f68"
+      },
+      "old_graphs": {
+        "inc/epoch-1dmzjimms4d7o/s-hntcbhhg6m-1j70ckk-1p41qpksvnn667ei2wiik8ks8/dep-graph.bin": "52534943825f"
+      },
+      "producer_after": "124c4d3ee3149d25760d4d971b69e747803dd97c55cff4b981a4665bcc304fa7",
+      "producer_before": "10430c7108d87cefcb6d5b04f18db60bdbdc67a76b324bc2cb8baf4be7f1ea07",
+      "simulated": false
+    },
+    "PC": {
+      "foreign_elf": "a679ee591b7796b963873c10b679e6858ae045b567f3e14876df86350cc6e625",
+      "foreign_stdout": "97\n",
+      "new_graphs": {
+        "inc/epoch-1dmzjimms4d7o/s-hntcbhh5if-0r5ufnk-6bk5sm9mf9vjxspmu0xezqh9f/dep-graph.bin": "52534943825f"
+      },
+      "old_graphs": {
+        "inc/epoch-1dmzjimms4d7o/s-hntcbhg957-1h8p3yj-6bk5sm9mf9vjxspmu0xezqh9f/dep-graph.bin": "525349431f68"
+      },
+      "producer_after": "da86c13ea85da806543afe9e2198932ad76138e7196aa212fa570d2f5f130865",
+      "producer_before": "713d55267093c0eeea28bd5df74f49faf6a30ef3bbb8a326c54f7963b74b81b3",
+      "simulated": false
+    }
+  },
+  "qualified": {
+    "manifests": {
+      "C": "bd8cbd32fcc063df60390261abecb2b28ce798253727744dbe3616b457c5af57",
+      "P": "afddd6816e45c9dbfd3dacc4c04be6c21f03d94b7b4be973cbb743870907cf05"
+    },
+    "registration": "65d1de959184a8dd9835294febd4008fd7da4ff1413b5ed2608db3f0a971f516",
+    "schema": "ohm-remat-rustc-capsule-v1",
+    "signed_tools": {
+      "asset": {
+        "id": 704038224,
+        "name": "ohm-1.99.0-23-x86_64-unknown-linux-gnu.tar.gz",
+        "sha256": "fc85a2ca6d47711058cd89c790c8e57f1799472e38f0ee0a08b0a51d06c1ee7b",
+        "size": 359921838
+      },
+      "members": {
+        "bin/cargo": [
+          "rust-1.99.0-dev-x86_64-unknown-linux-gnu/cargo/bin/cargo",
+          493,
+          39238824,
+          "f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee"
+        ],
+        "lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd": [
+          "rust-1.99.0-dev-x86_64-unknown-linux-gnu/rustc/lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd",
+          493,
+          10319072,
+          "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
+        ]
+      }
+    },
+    "source_sha256": "9e97e15f88cfd524ffee1d960d8328749d1f8881c4924fcf7331790b8325df3b"
+  },
+  "smoke": {
+    "arms": {
+      "defer": {
+        "cargo_values": [
+          [
+            17,
+            "468e23617f1f27622565865ad8065c18e9156657aef70679d81f7ef33e8e62fb"
+          ],
+          [
+            29,
+            "ea9ba90943c9416cd0c545ae79c619dac05b17482e336b41586435faeee53cd5"
+          ]
+        ],
+        "invalid": "E0308",
+        "loaded": "\tlinux-vdso.so.1 (0x00007fef589b2000)\n\tlibrustc_driver-fa217dfcec654979.so => /home/runner/work/_temp/ohm-branch-object-qa/reopened/defer/lib/librustc_driver-fa217dfcec654979.so (0x00007fef5325e000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fef53041000)\n\tlibLLVM.so.23.1-rust-1.99.0-beta => /home/runner/work/_temp/ohm-branch-object-qa/reopened/defer/lib/libLLVM.so.23.1-rust-1.99.0-beta (0x00007fef48000000)\n\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007fef47d82000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fef53011000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fef589b4000)\n\tlibrt.so.1 => /lib/x86_64-linux-gnu/librt.so.1 (0x00007fef5300c000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007fef53007000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007fef53002000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fef47c99000)\n\tlibz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007fef52fe6000)\n",
+        "qualified_codegen": [
+          [
+            0,
+            true
+          ],
+          [
+            1,
+            true
+          ],
+          [
+            1,
+            false
+          ],
+          [
+            3,
+            false
+          ]
+        ],
+        "repair_test": "f10dc1b0309ef3f8a6ffc03ca29ecae79938355e0cbe65da051ead6586e61e6d",
+        "versions": {
+          "cargo": "cargo 1.99.0-dev (7024b0d2d 2026-11-02) (ohm-1.99.0-23)\nrelease: 1.99.0-dev\ncommit-hash: 7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed\ncommit-date: 2026-11-02\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]\n",
+          "rustc": "rustc 1.99.0-dev\nbinary: rustc\ncommit-hash: unknown\ncommit-date: unknown\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0-dev\nLLVM version: 23.1.1\n",
+          "rustdoc": "rustdoc 1.99.0-dev\nbinary: rustdoc\ncommit-hash: unknown\ncommit-date: unknown\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0-dev\nLLVM version: 23.1.1\n"
+        }
+      },
+      "normal": {
+        "cargo_values": [
+          [
+            17,
+            "468e23617f1f27622565865ad8065c18e9156657aef70679d81f7ef33e8e62fb"
+          ],
+          [
+            29,
+            "ea9ba90943c9416cd0c545ae79c619dac05b17482e336b41586435faeee53cd5"
+          ]
+        ],
+        "invalid": "E0308",
+        "loaded": "\tlinux-vdso.so.1 (0x00007f4de736a000)\n\tlibrustc_driver-fa217dfcec654979.so => /home/runner/work/_temp/ohm-branch-object-qa/reopened/normal/lib/librustc_driver-fa217dfcec654979.so (0x00007f4de1c14000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f4de19f7000)\n\tlibLLVM.so.23.1-rust-1.99.0-beta => /home/runner/work/_temp/ohm-branch-object-qa/reopened/normal/lib/libLLVM.so.23.1-rust-1.99.0-beta (0x00007f4dd6a00000)\n\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f4dd6782000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f4de19c7000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f4de736c000)\n\tlibrt.so.1 => /lib/x86_64-linux-gnu/librt.so.1 (0x00007f4de19c2000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f4de19bd000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f4de19b8000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f4dd6699000)\n\tlibz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007f4de199a000)\n",
+        "qualified_codegen": [
+          [
+            0,
+            true
+          ],
+          [
+            1,
+            true
+          ],
+          [
+            1,
+            false
+          ],
+          [
+            3,
+            false
+          ]
+        ],
+        "repair_test": "f10dc1b0309ef3f8a6ffc03ca29ecae79938355e0cbe65da051ead6586e61e6d",
+        "versions": {
+          "cargo": "cargo 1.99.0-dev (7024b0d2d 2026-11-02) (ohm-1.99.0-23)\nrelease: 1.99.0-dev\ncommit-hash: 7024b0d2dc5f64bba72c0d6d28f537a5cd9707ed\ncommit-date: 2026-11-02\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]\n",
+          "rustc": "rustc 1.99.0-dev\nbinary: rustc\ncommit-hash: unknown\ncommit-date: unknown\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0-dev\nLLVM version: 23.1.1\n",
+          "rustdoc": "rustdoc 1.99.0-dev\nbinary: rustdoc\ncommit-hash: unknown\ncommit-date: unknown\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0-dev\nLLVM version: 23.1.1\n"
+        }
+      }
+    },
+    "rustup_proxy": "5be191e8c70a5007074254cb74d78dbfdd25cd5a61c27de7b8e5410122ec24f4"
+  },
+  "source": {
+    "C": {
+      "compiler": "4db171a8fb5c14ad8cb16ceec49e385ca018c094",
+      "revision": "5c5af1a053326e6ce5df048c4dcb30b53e01a069",
+      "tree": "7331fc8bd148ba6ca7459751548b82a4b1f0bb50"
+    },
+    "P": {
+      "compiler": "01614e1dbcdedca33c620ad320c07b30207e256e",
+      "revision": "d57fd1515986dccecdcece8da85e651bfb4b81f9",
+      "tree": "f5bf03d73f71243fb88e34ecb0b155ef11e99a47"
+    }
+  }
+}

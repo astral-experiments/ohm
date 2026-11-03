@@ -1,0 +1,7 @@
+{
+  "scope": "Two crate-root Rust codegen units, regular and volatile, on the registered source. Consider only CGUs that pass the existing pre-split GlobalAsm and linkage admission. Leave every other logical unit alone.",
+  "bins": "Largest power of two fitting both original roots in the already available 256 cap. 245 original units including the two roots leaves four lanes per root (251 total if all are populated).",
+  "assignment": "For a non-inlined local root use its actual DefPathHash. For a foreign specialized root use the first local FnDef/closure/coroutine/coroutine-closure/coroutine-witness visited by the actual generic argument traversal (existing #59 input); otherwise use the root's actual stable definition identity. The lane number is the low two bits of local_hash of the selected DefPathHash. Unresolved typed shape is explicitly indeterminate.",
+  "weights": "Report root and inlined MonoItem counts and MIR size estimates separately. Exclusive kernel IP samples describe the two whole unsplit units. Root MIR weights/native bytes cannot establish backend instruction savings. Do not assign shared inline copies or extrapolate them by root count.",
+  "holdout": "Previously registered Ruff #29604. Project::replace_index_diagnostics and files::IndexedMut::set_diagnostics are native-contact controls only until a prospective matched compiler runs on the actual historical edit."
+}

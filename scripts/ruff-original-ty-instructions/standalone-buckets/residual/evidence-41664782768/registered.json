@@ -1,0 +1,62 @@
+{
+  "approximate_process_instruction_baselines": {
+    "ty_ide": 4180381437,
+    "ty_project": 14679898837
+  },
+  "authored_source_head": "5c5af1a053326e6ce5df048c4dcb30b53e01a069",
+  "boot": "5ad03751-dc19-4bba-ac4f-d969b4d7d266",
+  "branch": "charlie/qa-ruff-ty-ide-lib-residual-29697-20261103",
+  "candidate_driver": "11b12c572f2b101d7c23eb0678d842f14fb9956b9543b0baa43fdff1bb387691",
+  "command": [
+    "cargo",
+    "+ohm",
+    "build",
+    "-p",
+    "ty_ide",
+    "--lib",
+    "--locked",
+    "--offline",
+    "-j4",
+    "--message-format=json"
+  ],
+  "edit_median_whole": 19057310290,
+  "event": "instructions:u",
+  "graph_sha256": "6f857fca89ed462fb1984d6e23998f660c176d5a53fdd1517342027405383573",
+  "new_elf": "3755b8bab1d87e837a2d671d4a6c2333059d05f877e2f7e0940cf3b276d7e24f",
+  "old_elf": "2407856bb255264e0dca8dbd9ef31ccfbaffeb1c2bfe800543d98b899db2ca6a",
+  "period": 1000003,
+  "reference_run": 41660912896,
+  "scope": "One unscored ordinary candidate edit, an instruction-sampled exact replay, and independent clean/invalid/repair controls. Preserve every originally observed counter. Do not use these sample counts as a performance benchmark.",
+  "sha": "093eaa50e270b272bae5547ac3ee2d732a61e916",
+  "tools": {
+    "cargo": {
+      "bytes": 39238824,
+      "dev": 33,
+      "ino": 7616416,
+      "mtime_ns": 1793719932209072074,
+      "sha256": "f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee"
+    },
+    "driver": {
+      "bytes": 142955664,
+      "dev": 33,
+      "ino": 7616358,
+      "mtime_ns": 1793719931724790239,
+      "path": "/home/runner/work/_temp/ohm-foreign-join/sdk/lib/librustc_driver-fa217dfcec654979.so",
+      "sha256": "11b12c572f2b101d7c23eb0678d842f14fb9956b9543b0baa43fdff1bb387691"
+    },
+    "rustc": {
+      "bytes": 7032,
+      "dev": 33,
+      "ino": 7616391,
+      "mtime_ns": 1793719931969893076,
+      "sha256": "8bfdc9779937e9cd2c9ef5db9f50cee9aab03ddec5672b37a3a3c9278cf1f5d0"
+    },
+    "wild": {
+      "bytes": 10319072,
+      "dev": 33,
+      "ino": 7616355,
+      "mtime_ns": 1793719931588710512,
+      "sha256": "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5"
+    }
+  }
+}
