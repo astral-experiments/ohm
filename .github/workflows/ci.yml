@@ -249,7 +249,7 @@ jobs:
         include:
         - os: namespace-profile-ubuntu-24-04-16
           target: x86_64-unknown-linux-gnu
-          role: parent
+          role: candidate
     name: Train the ${{ matrix.role }} compiler with the shipped Linux recipe
 'on':
   workflow_dispatch:
