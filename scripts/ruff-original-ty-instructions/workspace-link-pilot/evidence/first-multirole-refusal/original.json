@@ -1,5 +1,95 @@
 {
   "candidate_first_unchanged": null,
+  "changed_edited_output_bytes_and_blake3": {
+    "/ruff/bc9586b6a7f8a38d/out/integration_test-bc9586b6a7f8a38d": [
+      [
+        "160764928",
+        "8a98eec872a50b169e84f2805d4bcf7436bda7e82a3ab481ac0c980ad3bb7d81"
+      ],
+      [
+        "160764928",
+        "aba68c334882b50627b38cea9f7f9e0234ca3fc1547cc8520ce92fe67bf87b5b"
+      ]
+    ],
+    "/ty/0099d1d7349a58e3/out/ty-0099d1d7349a58e3": [
+      [
+        "194240480",
+        "0c9113420f1d6d5bb5ee7095812e5bd5b84cc86811115dcd5726b67232101d47"
+      ],
+      [
+        "194246392",
+        "e97e739d5aebb6e1414b2a1e6d5b9e474fad83534294c1637352a393a55a07ba"
+      ]
+    ],
+    "/ty/1a709ed5f7dd31d8/out/ty-1a709ed5f7dd31d8": [
+      [
+        "194182768",
+        "e451d8490f078dd5fb3f73da6a5fa37445c99447f25aec170c1f814ab10c6c55"
+      ],
+      [
+        "194188680",
+        "939d3846acff0f6fbe528c2e59a8d74a45e457910820990ce6decd6e82427e71"
+      ]
+    ],
+    "/ty/5fee0aa1c7ea01e7/out/file_watching-5fee0aa1c7ea01e7": [
+      [
+        "197843136",
+        "19cfb6494db75c1a29b627fa465fad56e5ebf14eac6a8ba29edb18144746af92"
+      ],
+      [
+        "197849048",
+        "c3a8adc7abc58b46b491d5263054c559491210ada0a0d5d69821370954b72d10"
+      ]
+    ],
+    "/ty_ide/19327ac76b0a23b2/out/ty_ide-19327ac76b0a23b2": [
+      [
+        "211166032",
+        "dc9ee028f88a1918ee1fcc7df3a4647952a8712dd0d75786e991c3025a0bd2a8"
+      ],
+      [
+        "211171944",
+        "2074e4167f5b1db92bb6e752156b426e9349017715dadad533c05db094bb391f"
+      ]
+    ],
+    "/ty_server/997a0f89140c05d1/out/ty_server-997a0f89140c05d1": [
+      [
+        "194153840",
+        "be67d6864a5d6e7713b7bcf256629af8cb162835ff63bc1ba9da3ff6e9f32d68"
+      ],
+      [
+        "194159752",
+        "1c51ba9318b075d43b27ec6e31bb1e590bf0debb1f339a8b148b35fd4329bfd4"
+      ]
+    ],
+    "/ty_server/f5c6198f896cf7b0/out/e2e-f5c6198f896cf7b0": [
+      [
+        "227977696",
+        "2cb834fb2ed6b65be14519d4a0ca16c31210326aa78a2544e7179409af4a0bf7"
+      ],
+      [
+        "227979336",
+        "37a9acb1d7db4ced0823854caa9eb968f196e5e9342350b4be2695816374ddb3"
+      ]
+    ]
+  },
+  "changed_native_input_rows": [
+    "/ruff/5d937a0ff06a6ca9/out/config-5d937a0ff06a6ca9",
+    "/ruff/768a81132ddfba2b/out/cli-768a81132ddfba2b",
+    "/ruff/82a6b65b1d36d43c/out/ruff-82a6b65b1d36d43c",
+    "/ruff/9b7163f1aa25ebed/out/ruff-9b7163f1aa25ebed",
+    "/ruff/a5a26402c1b73239/out/analyze_graph-a5a26402c1b73239",
+    "/ruff/bc9586b6a7f8a38d/out/integration_test-bc9586b6a7f8a38d",
+    "/ruff/c4ac03854507c570/out/resolve_files-c4ac03854507c570",
+    "/ruff/eb440299b8692620/out/direxist_guard-eb440299b8692620",
+    "/ty/0099d1d7349a58e3/out/ty-0099d1d7349a58e3",
+    "/ty/1a709ed5f7dd31d8/out/ty-1a709ed5f7dd31d8",
+    "/ty/1c161eb317ef86e9/out/cli-1c161eb317ef86e9",
+    "/ty/5fee0aa1c7ea01e7/out/file_watching-5fee0aa1c7ea01e7",
+    "/ty/8bd60535ee1bec7b/out/self_environment-8bd60535ee1bec7b",
+    "/ty_ide/19327ac76b0a23b2/out/ty_ide-19327ac76b0a23b2",
+    "/ty_server/997a0f89140c05d1/out/ty_server-997a0f89140c05d1",
+    "/ty_server/f5c6198f896cf7b0/out/e2e-f5c6198f896cf7b0"
+  ],
   "clock_rows": {
     "C-old": {
       "elapsed_ns": 258511463838,
@@ -73,6 +163,36 @@
     }
   },
   "cold_candidate_receipt_bytes": 13496,
+  "edited_all_48_full_emissions": {
+    "coordinator-full": 14,
+    "coordinator-timeout": 34
+  },
+  "failed_supervisor_meter": {
+    "cancelled_write_bytes": 192233472,
+    "elapsed_ns": 1094534334746,
+    "enabled": 73025012594,
+    "inblock": 0,
+    "instructions": 319211763522,
+    "involuntary_switches": 313,
+    "majflt": 72,
+    "maxrss_kib": 1122444,
+    "minflt": 7038011,
+    "outblock": 12348536,
+    "pid": 67822,
+    "rchar": 13765794527,
+    "read_bytes": 0,
+    "reaped": 59,
+    "running": 73025012594,
+    "status": 256,
+    "syscr": 84468,
+    "syscw": 1650426,
+    "system_us": 23903997,
+    "user_us": 50832779,
+    "voluntary_switches": 1995982,
+    "wchar": 4831148854,
+    "write_bytes": 6322450432
+  },
+  "genuine_cargo_completed_edited_source": true,
   "native_cold_sha256": {
     "/mdtest/8eaa15ce3959c614/out/mdtest-8eaa15ce3959c614": "8b1991229b0c8d29c64c1b7f8c6f558bff9e54d2b31627d49a8aeca6e5f64e80",
     "/ruff/5d937a0ff06a6ca9/out/config-5d937a0ff06a6ca9": "13a2d770b8f11c32ae5056f11f3438fe8c7e3a249eb2aa51f668a855aab10c54",

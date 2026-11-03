@@ -74,6 +74,59 @@ def main(path):
                 pass
             else:
                 raise AssertionError("Accepted " + label)
+        scope = "C-edit/"
+        assert json.loads(z.read(scope + "stdout.jsonl").splitlines()[-1]) == {
+            "reason": "build-finished",
+            "success": True,
+        }
+        failed_meter = json.loads(z.read(scope + "hardware.json"))
+        assert (
+            failed_meter["status"] == 256
+            and failed_meter["running"] == failed_meter["enabled"]
+        )
+        image = json.loads(z.read("physical.json"))["image_b3"]
+        full = r.release_scope.for_release(23)
+        spec = {
+            k: full[k]
+            for k in json.loads((HERE.parent.parent / "accepted-48.json").read_bytes())
+        }
+        paired = {}
+        fallback = {}
+        for phase in ("C-old", "C-edit"):
+            raw_by_role = {}
+            for name in z.namelist():
+                if not r.re.fullmatch(phase + r"/actor-[0-9]+\.tsv\.gz", name):
+                    continue
+                raw = gzip.decompress(z.read(name)).decode()
+                before = r.coordinator.before(raw, spec, image)
+                rows = r.coordinator.rows(raw)
+                assert (
+                    rows["VERIFIED"] == [[]]
+                    and len(rows["EMITTED"]) == 1
+                    and not rows["FRESH-PUBLISH"]
+                )
+                role = before["role"]
+                assert role not in raw_by_role
+                raw_by_role[role] = (before, rows["EMITTED"][0][2:4])
+                if phase == "C-edit":
+                    assert len(rows["MISS"]) == 1
+                    reason = rows["MISS"][0][0]
+                    fallback[reason] = fallback.get(reason, 0) + 1
+            assert raw_by_role.keys() == spec.keys()
+            paired[phase] = raw_by_role
+        assert fallback == {"coordinator-timeout": 34, "coordinator-full": 14}
+        old, new = paired.values()
+        assert all(old[k][0]["key"] != new[k][0]["key"] for k in spec)
+        changed_native_input = [
+            k
+            for k in sorted(spec)
+            if old[k][0]["parts"]["native_inputs"]
+            != new[k][0]["parts"]["native_inputs"]
+        ]
+        changed_output = {
+            k: [old[k][1], new[k][1]] for k in sorted(spec) if old[k][1] != new[k][1]
+        }
+        assert len(changed_native_input) == 16 and len(changed_output) == 7
     return {
         "original_bytes": path.stat().st_size,
         "zip_sha256": sha,
@@ -83,6 +136,11 @@ def main(path):
         "source_arm_cold_fresh": 0,
         "clock_rows": value["clocks"],
         "candidate_first_unchanged": None,
+        "genuine_cargo_completed_edited_source": True,
+        "failed_supervisor_meter": failed_meter,
+        "edited_all_48_full_emissions": fallback,
+        "changed_native_input_rows": changed_native_input,
+        "changed_edited_output_bytes_and_blake3": changed_output,
         "terminal": "C-edit staged native ready marker observed before rename",
         "negative_argvs": ["duplicate -o", "different output", "different inode"],
     }

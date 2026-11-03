@@ -21,3 +21,9 @@ The forward-edit trace charged the same 48 roles 59,503,762,649 instructions out
 The genuine lib-test compiler for ty_ide retired 60.416B and its library compiler 24.303B; their typed rustc argv contained the actual crate name and distinct test mode. Together they account for 29.4% of this observed edit, excluding the native linker processes. The next five were ty_server lib (19.654B), file_watching test (15.712B), ty_project test (13.575B), ty_project lib (12.347B) and e2e test (12.302B). The typed-compiler costs include all its observed threads and are disjoint from the GNU and Wild process domains.
 
     python3 -IB ../../component_epochs.py ORIGINAL.zip d3e60812994bc68b823804060515b78fb041eb95f4ca9308fb70b9754b950ecc P-exec-warm P-exec-edit | cmp - <(gzip -dc component-counts.json.gz)
+
+## Actual link behavior after the supervisor stopped
+
+Every one of the 48 source actors still finished a full native emission on the edit, including those already orphaned. Fourteen received the ordinary full-link answer before the assertion. The remaining 34 took the conservative full-link timeout. All 48 raw actor streams contain terminal VERIFIED and EMITTED records, zero contain a fresh-output answer, and the genuine Cargo JSON stream ends in build-finished success. Compared with the same boot's cold source-arm originals, all 48 complete input-domain keys changed; sixteen roles had changed actual input bodies and seven emitted different full output BLAKE3/size pairs.
+
+The outer experiment nevertheless exited 1 after 1,094.5 seconds accumulated across those research-coordinator timeouts; it produced neither the subsequent runtime/clean verdict nor any candidate unchanged clock. The failed command and its raw resource usage remain in the original, outside comparison.
