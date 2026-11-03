@@ -1,0 +1,1499 @@
+{
+  "enrollment": {
+    "factory": 41475100027,
+    "head": "a7be222ecd26ecf69e9a9481c0a24f6c1d4c5a89",
+    "jobs": {
+      "1": {
+        "artifact": "typed-native-unit-instructions-1",
+        "id": 125685011566,
+        "name": "prices (1)",
+        "runner_id": 1828,
+        "runner_name": "nsc-runner-0vfojrodf6qn0"
+      },
+      "2": {
+        "artifact": "typed-native-unit-instructions-2",
+        "id": 125685011295,
+        "name": "prices (2)",
+        "runner_id": 1827,
+        "runner_name": "nsc-runner-ii7ddjuhrm1iu"
+      }
+    },
+    "parent": "531eb1980c08c75ccbf3f6b77adbee53cd9b8bd5",
+    "prior_reference": "340e917efa69c19b7cf2442f1ec12c743f27d60e286e911480687694dd02d056",
+    "repository": "astral-experiments/ohm",
+    "run": 41565223128,
+    "source": [
+      "3c77dcc2a5c04fc0c54ce95cd51068734015f3e0",
+      "088b7b5f77fcb05994fd2a17cbc940cd9edb341a"
+    ],
+    "source_hashes": {
+      "PLAN.md": "d2ef721d47ab6ec4eaa34345b5742dd8f95e6ac776e93861edbc8ddeec0bfd8b",
+      "archive_diagnostic.py": "a65d849ddf943de654942496ef4cb4acd42e64bd4c814d5a3a7edde298a0250e",
+      "calibrate-windows.c": "b3e9fa2674002b37c6c05ff9d644264e161a29321af54ac695ba2493b368a988",
+      "object_windows.py": "8dafa0de68d141c22cb5f47fc6b1d10e8a416366d0f8ec4cbbd1f4c8f1d1b259",
+      "observer.c": "89ae8ec3a3d9a07afe46521d951a715498eff33d5be400d83adbb2f4bc15d5c8",
+      "owners.json": "7c1846f8b6fc87663dfcdfb4412acf0156a79d1bcdbb6ccc4a04daff0cce15fb",
+      "prices.py": "f3dde3fee809aa4fd09cdd8fda5036e89ae89220ed58cead1e1e504bf42beb55",
+      "typed_archive.py": "71999697a791e6153f13c5bcf1bade6886dd1811fb2cab80d25ac95857030753"
+    }
+  },
+  "external_origins": {
+    "1": {
+      "digest": "sha256:bff2b4504bacc0a0001fe434e1903c130ae840eaf6c40c5ef86dd158f2482eb4",
+      "id": 13198719850,
+      "name": "typed-native-unit-instructions-1",
+      "size_in_bytes": 15794399,
+      "url": "https://api.github.com/repos/astral-experiments/ohm/actions/artifacts/13198719850"
+    },
+    "2": {
+      "digest": "sha256:06f5830302ff2e9637edbf7d672b38cd5cb99d99e689b61d80d501439a3d5c9e",
+      "id": 13199892687,
+      "name": "typed-native-unit-instructions-2",
+      "size_in_bytes": 15795187,
+      "url": "https://api.github.com/repos/astral-experiments/ohm/actions/artifacts/13199892687"
+    }
+  },
+  "historical_crossboot_qualification": {
+    "contract": "extra historical and cross-boot complete archive gate refused; complete per-boot three-way typed gate passed",
+    "groups": {
+      "discovery vs rank1": {
+        "lib.rmeta": {
+          "bytes": 44009,
+          "changes": null,
+          "elf_sections": [
+            [
+              "",
+              0,
+              0
+            ],
+            [
+              ".note.gnu.property",
+              64,
+              32
+            ],
+            [
+              ".rmeta",
+              96,
+              2952624
+            ],
+            [
+              ".symtab",
+              2952720,
+              24
+            ],
+            [
+              ".strtab",
+              2952744,
+              1
+            ],
+            [
+              ".shstrtab",
+              2952745,
+              53
+            ]
+          ],
+          "extent": [
+            1552,
+            2952707
+          ],
+          "runs": 2808
+        }
+      },
+      "discovery vs rank2": {
+        "lib.rmeta": {
+          "bytes": 42430,
+          "changes": null,
+          "elf_sections": [
+            [
+              "",
+              0,
+              0
+            ],
+            [
+              ".note.gnu.property",
+              64,
+              32
+            ],
+            [
+              ".rmeta",
+              96,
+              2952624
+            ],
+            [
+              ".symtab",
+              2952720,
+              24
+            ],
+            [
+              ".strtab",
+              2952744,
+              1
+            ],
+            [
+              ".shstrtab",
+              2952745,
+              53
+            ]
+          ],
+          "extent": [
+            1552,
+            2952707
+          ],
+          "runs": 4523
+        }
+      },
+      "rank1 vs rank2": {
+        "lib.rmeta": {
+          "bytes": 43147,
+          "changes": null,
+          "elf_sections": [
+            [
+              "",
+              0,
+              0
+            ],
+            [
+              ".note.gnu.property",
+              64,
+              32
+            ],
+            [
+              ".rmeta",
+              96,
+              2952624
+            ],
+            [
+              ".symtab",
+              2952720,
+              24
+            ],
+            [
+              ".strtab",
+              2952744,
+              1
+            ],
+            [
+              ".shstrtab",
+              2952745,
+              53
+            ]
+          ],
+          "extent": [
+            1552,
+            2952707
+          ],
+          "runs": 3823
+        }
+      }
+    },
+    "real_prices_opened": false,
+    "sources": {
+      "discovery": {
+        "all_125_native": true,
+        "main_rmeta": "e855007e5704887cad591bc7cdbbcd720b4d3b825712644839cafe7da31dd8e8",
+        "normalized_rlib": "0c76f101994c34828a5aaae7ff444af18e881e5c290d8b8d02a4db14912195c7",
+        "zip": "340e917efa69c19b7cf2442f1ec12c743f27d60e286e911480687694dd02d056"
+      },
+      "rank1": {
+        "all_125_native": true,
+        "main_rmeta": "4d35017476575df6dbc6af9bca22e35da61fe2abfe0bb107eb72b9f1d213a035",
+        "normalized_rlib": "de3f3a62e1b65f33954b83a0be96608d93d4f8ef1de2f88b37179a44aaecbbd6",
+        "zip": "bff2b4504bacc0a0001fe434e1903c130ae840eaf6c40c5ef86dd158f2482eb4"
+      },
+      "rank2": {
+        "all_125_native": true,
+        "main_rmeta": "a8f23131b3c0f6355e158afccd93739f20613793309910209ce1ccf93c524d71",
+        "normalized_rlib": "7fa47b1860bed7a50f483e52cffa5db532ce579c6fc559ee7dfd1ffc71c3b794",
+        "zip": "06f5830302ff2e9637edbf7d672b38cd5cb99d99e689b61d80d501439a3d5c9e"
+      }
+    }
+  },
+  "independent_open_sha256": {
+    "boots-before-prices.json": "89862c4e186ea6bec25e35f0f72af1f60b684f47af47fb052afd8a68515787f7",
+    "crossboot-archive-refusal.json": "ab384e46c2b83a404eae1ac27a9002a29b1db379b2861ade5d38d0c1858f13ed",
+    "enrolled.json": "2c2a334ba372f8f03aca66a8034a69a118cae5820d7771d00c91f33779eb9109",
+    "h4-host-prices.json": "f20701714fbafb6146d2c041e8bea541106b34bd6f04c43d482557e9e4cf7ebd",
+    "h4-native-before-prices.json": "aa844a7ff4fa83ae5ae3736c44d5d5475d610fcb7ae3f0be391915969ca469dc",
+    "root-crossboot-rmeta.json": "252dab2d341784d2fe970225bdda1828bd0cd590149d755de6fb605ce9264c51"
+  },
+  "within_boot_native_and_behavior": {
+    "1": {
+      "all_measured_rustc_threads": {
+        "all_native": 57543814911,
+        "all_threads": 111603233459,
+        "main_tid_instructions": 35155887,
+        "rank": 1,
+        "role": "observed selected physical rustc",
+        "six_native": 17867743683,
+        "threads": 138
+      },
+      "archives": {
+        "observed": {
+          "bytes": 27311384,
+          "canonical": "de3f3a62e1b65f33954b83a0be96608d93d4f8ef1de2f88b37179a44aaecbbd6",
+          "fields": 250,
+          "index": "29cee8870d5603856d42ed2dde23425d91e04d9af8c2788c0da6d692c39ca3a7",
+          "index_symbols": 6297,
+          "main_metadata": "4d35017476575df6dbc6af9bca22e35da61fe2abfe0bb107eb72b9f1d213a035",
+          "native_objects": 125,
+          "original": "3f575c0bd32b6b9c8100e1cbe26076409d3559abc1ac6480fcffdd8fee6c3e15",
+          "suffix": "0cm4inm"
+        },
+        "ordinary": {
+          "bytes": 27311384,
+          "canonical": "de3f3a62e1b65f33954b83a0be96608d93d4f8ef1de2f88b37179a44aaecbbd6",
+          "fields": 250,
+          "index": "29cee8870d5603856d42ed2dde23425d91e04d9af8c2788c0da6d692c39ca3a7",
+          "index_symbols": 6297,
+          "main_metadata": "4d35017476575df6dbc6af9bca22e35da61fe2abfe0bb107eb72b9f1d213a035",
+          "native_objects": 125,
+          "original": "215439204cdcd1763c58e6b644adcd5a1c659b6a6fd79852dd0b20823dff555d",
+          "suffix": "07qc05s"
+        },
+        "ordinary-repeat": {
+          "bytes": 27311384,
+          "canonical": "de3f3a62e1b65f33954b83a0be96608d93d4f8ef1de2f88b37179a44aaecbbd6",
+          "fields": 250,
+          "index": "29cee8870d5603856d42ed2dde23425d91e04d9af8c2788c0da6d692c39ca3a7",
+          "index_symbols": 6297,
+          "main_metadata": "4d35017476575df6dbc6af9bca22e35da61fe2abfe0bb107eb72b9f1d213a035",
+          "native_objects": 125,
+          "original": "253a3e604e3cbe35e4c15a3aad3d728546c3a5c0e2d13cdc73e0e456815abdfa",
+          "suffix": "0h0zoox"
+        }
+      },
+      "argv_record": "664fdbd3d11e59df32afe8f3b19fd80ec0af1fdab3a67cb391e6a15a68073014",
+      "boot": "f1bb8c01-c5f4-43b7-a468-f3c0790e1c6c",
+      "calibration": {
+        "main_tid": 1169,
+        "native": [
+          1500139,
+          6000141
+        ],
+        "ratio": 3.9997233589687355,
+        "worker_tids": [
+          1170,
+          1171
+        ]
+      },
+      "consumer_elf": "a39cc617f0865cbb50b19b7597e0069b3796a1f8a22d88e64fb3647981d40c42",
+      "consumer_verdict": "ccae78bb0fc82d54b4d0f1024bbb6ad9c811bc034f233ae58b9c4072742113bd",
+      "environment": "48041774bb37b3908de79de278b222400e85896414b84a9fb5d507cf6752e864",
+      "image": 5,
+      "main_tid": 9606,
+      "observations": {
+        "01b72yfmn6arojv1az235mos7": {
+          "bytes": 432488,
+          "close_entry": [
+            2748798129,
+            298256452,
+            298256452
+          ],
+          "object": "aeb0e83fc0798eb08b6f163a21e20ab8a71e7d156946e9ea09762f57e06a641b",
+          "object_id": {
+            "dev": 33,
+            "fd": 271,
+            "ino": 8002835
+          },
+          "open_return": [
+            1259834671,
+            150898964,
+            150898964
+          ],
+          "tid": 9648,
+          "window": 19,
+          "worker_terminal": [
+            2766271483,
+            302892283,
+            302892283
+          ]
+        },
+        "0wrsgo9esbuwdyfhrjd10085r": {
+          "bytes": 1734600,
+          "close_entry": [
+            8857348771,
+            1090758146,
+            1090758146
+          ],
+          "object": "d7689926f2469ec8deb08bd663e7b9297afff5a85c4c3c5915dfc28feb96fccf",
+          "object_id": {
+            "dev": 33,
+            "fd": 272,
+            "ino": 7985841
+          },
+          "open_return": [
+            3898606535,
+            520250554,
+            520250554
+          ],
+          "tid": 9621,
+          "window": 8,
+          "worker_terminal": [
+            8921275627,
+            1109273905,
+            1109273905
+          ]
+        },
+        "16os12t5hva2grho4jumxjwa5": {
+          "bytes": 23192,
+          "close_entry": [
+            320333773,
+            34352054,
+            34352054
+          ],
+          "object": "0530f169bf31bddb7c24c506b5807fe3bea4a8bf0735faa76a3542735a8a894e",
+          "object_id": {
+            "dev": 33,
+            "fd": 271,
+            "ino": 8002841
+          },
+          "open_return": [
+            283791903,
+            28423403,
+            28423403
+          ],
+          "tid": 9712,
+          "window": 25,
+          "worker_terminal": [
+            329199698,
+            35619678,
+            35619678
+          ]
+        },
+        "2a3lrnce3ygx7jyibf5yaf6fk": {
+          "bytes": 641456,
+          "close_entry": [
+            3383164570,
+            425659406,
+            425659406
+          ],
+          "object": "b0dcaf18f6e38a8ec1a3159b9054f49daf45d8bd45d0d7db61798d54d98f8c97",
+          "object_id": {
+            "dev": 33,
+            "fd": 271,
+            "ino": 8002833
+          },
+          "open_return": [
+            1644319588,
+            232981776,
+            232981776
+          ],
+          "tid": 9640,
+          "window": 17,
+          "worker_terminal": [
+            3405440789,
+            432282721,
+            432282721
+          ]
+        },
+        "30m6srh7b6kjvqu19s87db0yt": {
+          "bytes": 65840,
+          "close_entry": [
+            97847868,
+            10211133,
+            10211133
+          ],
+          "object": "257b07738da63d5b907aa24daf6858373fba139153dc7ba1e3b98b42a1fc6676",
+          "object_id": {
+            "dev": 33,
+            "fd": 271,
+            "ino": 8002842
+          },
+          "open_return": [
+            27183142,
+            2805010,
+            2805010
+          ],
+          "tid": 9730,
+          "window": 26,
+          "worker_terminal": [
+            98709333,
+            10593563,
+            10593563
+          ]
+        },
+        "38x842s88ya96d562jlc1jevb": {
+          "bytes": 712264,
+          "close_entry": [
+            4375389809,
+            506684643,
+            506684643
+          ],
+          "object": "ac50ff5e89bdf15f32a1b787f818b9b2055638323d2cf412071dee6836742edf",
+          "object_id": {
+            "dev": 33,
+            "fd": 13,
+            "ino": 8002830
+          },
+          "open_return": [
+            2009380812,
+            276023731,
+            276023731
+          ],
+          "tid": 9636,
+          "window": 14,
+          "worker_terminal": [
+            4410721517,
+            515489941,
+            515489941
+          ]
+        },
+        "5542r2z1w4zg4tdlqm1z5x2wo": {
+          "bytes": 646112,
+          "close_entry": [
+            5164708888,
+            543381992,
+            543381992
+          ],
+          "object": "4ed5bbfc01b7fc68c4b593450d445a7b7fb117a599452c669904bb2da9819ef7",
+          "object_id": {
+            "dev": 33,
+            "fd": 13,
+            "ino": 8002832
+          },
+          "open_return": [
+            2262789852,
+            287284580,
+            287284580
+          ],
+          "tid": 9638,
+          "window": 16,
+          "worker_terminal": [
+            5193744230,
+            550383311,
+            550383311
+          ]
+        },
+        "6f5gp9492zeok74kj02rv0lbh": {
+          "bytes": 849568,
+          "close_entry": [
+            7188675901,
+            695373031,
+            695373031
+          ],
+          "object": "0a0513ae4bf9b28635f3c3784dba68f9825af80ab7550a59133f849dd5387bea",
+          "object_id": {
+            "dev": 33,
+            "fd": 271,
+            "ino": 7989222
+          },
+          "open_return": [
+            2942396790,
+            293323632,
+            293323632
+          ],
+          "tid": 9632,
+          "window": 12,
+          "worker_terminal": [
+            7224359424,
+            706352922,
+            706352922
+          ]
+        },
+        "6p30kgvj4lu40zowlel28tnn7": {
+          "bytes": 897776,
+          "close_entry": [
+            8501891716,
+            804645395,
+            804645395
+          ],
+          "object": "c3f3c541a5c657641700f05f6e4e377d66bcd8750f6ca0726d82ce636d0e9403",
+          "object_id": {
+            "dev": 33,
+            "fd": 13,
+            "ino": 7989124
+          },
+          "open_return": [
+            3176822070,
+            318087068,
+            318087068
+          ],
+          "tid": 9630,
+          "window": 11,
+          "worker_terminal": [
+            8539867843,
+            815563328,
+            815563328
+          ]
+        },
+        "76u321zsuml5v37ktustj0dr0": {
+          "bytes": 676704,
+          "close_entry": [
+            2293878586,
+            265400122,
+            265400122
+          ],
+          "object": "649eeea244a95b6765b6eb6dc456e80b1066dc0b19b3caf5287a2c0eba5e0ffa",
+          "object_id": {
+            "dev": 33,
+            "fd": 13,
+            "ino": 8002834
+          },
+          "open_return": [
+            955665800,
+            129420754,
+            129420754
+          ],
+          "tid": 9644,
+          "window": 18,
+          "worker_terminal": [
+            2312798039,
+            270288774,
+            270288774
+          ]
+        },
+        "92ezh47i978bb5yfl2leg6c1y": {
+          "bytes": 1425224,
+          "close_entry": [
+            12100517110,
+            1408901871,
+            1408901871
+          ],
+          "object": "b64a874fa7375d35e2ea9ce6850e9821161f022a84e7ef5c1dccc2d432394277",
+          "object_id": {
+            "dev": 33,
+            "fd": 273,
+            "ino": 7985901
+          },
+          "open_return": [
+            4818467245,
+            639455192,
+            639455192
+          ],
+          "tid": 9619,
+          "window": 9,
+          "worker_terminal": [
+            12165269576,
+            1425566692,
+            1425566692
+          ]
+        },
+        "9kyw96uq3sm64m4kus09r4vbj": {
+          "bytes": 559192,
+          "close_entry": [
+            848669193,
+            106351625,
+            106351625
+          ],
+          "object": "d62e5dd9f1311817cc1394e39d4356074555785f1933518f4a19ce7a41ab01e7",
+          "object_id": {
+            "dev": 33,
+            "fd": 272,
+            "ino": 8002839
+          },
+          "open_return": [
+            337228174,
+            40939765,
+            40939765
+          ],
+          "tid": 9674,
+          "window": 23,
+          "worker_terminal": [
+            858926517,
+            108646673,
+            108646673
+          ]
+        },
+        "9z2i9ar8n4enu9f18sb2ij12n": {
+          "bytes": 724176,
+          "close_entry": [
+            6743039805,
+            649199308,
+            649199308
+          ],
+          "object": "36f24f8c96807b1fbf936ad200ad4d342656b4830a45ae50d5c5adb49a39f66a",
+          "object_id": {
+            "dev": 33,
+            "fd": 272,
+            "ino": 7990185
+          },
+          "open_return": [
+            2655124874,
+            264997168,
+            264997168
+          ],
+          "tid": 9634,
+          "window": 13,
+          "worker_terminal": [
+            6775724969,
+            658881442,
+            658881442
+          ]
+        },
+        "bj5a5qap5cgccauttckc1d8ev": {
+          "bytes": 934600,
+          "close_entry": [
+            7906196414,
+            822035013,
+            822035013
+          ],
+          "object": "f002131259cbbdeff62c6eea81d111373841788548059da84579acd9f10a90ed",
+          "object_id": {
+            "dev": 33,
+            "fd": 13,
+            "ino": 7985835
+          },
+          "open_return": [
+            3576805268,
+            384283882,
+            384283882
+          ],
+          "tid": 9625,
+          "window": 6,
+          "worker_terminal": [
+            7948248385,
+            833290825,
+            833290825
+          ]
+        },
+        "cmb7ch5zh8rb9a7zp39t2peoj": {
+          "bytes": 405824,
+          "close_entry": [
+            4263510909,
+            348708456,
+            348708456
+          ],
+          "object": "8a4ec2cac5b74caee62cd59abc13522025476c90a50bf25fddd02ce27646175b",
+          "object_id": {
+            "dev": 33,
+            "fd": 13,
+            "ino": 8002837
+          },
+          "open_return": [
+            964684637,
+            97193187,
+            97193187
+          ],
+          "tid": 9664,
+          "window": 21,
+          "worker_terminal": [
+            4275467306,
+            351973696,
+            351973696
+          ]
+        },
+        "d6sgujgj34eihq9747i20zsz8": {
+          "bytes": 284728,
+          "close_entry": [
+            776470790,
+            92973522,
+            92973522
+          ],
+          "object": "7f38a34ce7c24a06110d47e37c083659b18313ebeb5c60279e406d5dc48bf6bc",
+          "object_id": {
+            "dev": 33,
+            "fd": 272,
+            "ino": 8002836
+          },
+          "open_return": [
+            327102415,
+            38303654,
+            38303654
+          ],
+          "tid": 9654,
+          "window": 20,
+          "worker_terminal": [
+            784998021,
+            94772979,
+            94772979
+          ]
+        },
+        "d71mv4nycjip2m8xtb354n8ts": {
+          "bytes": 98880,
+          "close_entry": [
+            354809154,
+            43025541,
+            43025541
+          ],
+          "object": "2b0e55d80f03d5c707fbbc383937f08da0ada4bcf0571c322ade302604be28c9",
+          "object_id": {
+            "dev": 33,
+            "fd": 271,
+            "ino": 8002840
+          },
+          "open_return": [
+            172064907,
+            20769792,
+            20769792
+          ],
+          "tid": 9688,
+          "window": 24,
+          "worker_terminal": [
+            358480959,
+            43908407,
+            43908407
+          ]
+        },
+        "e70ib64n3fa87vndiikuosofa": {
+          "bytes": 1094752,
+          "close_entry": [
+            13369284183,
+            1328997802,
+            1328997802
+          ],
+          "object": "e6f5e2df47d518c088f3aa4c340dc7889f006e9b5649b64cf2af0fc9fd8df0f1",
+          "object_id": {
+            "dev": 33,
+            "fd": 271,
+            "ino": 7985836
+          },
+          "open_return": [
+            4601156864,
+            483044953,
+            483044953
+          ],
+          "tid": 9623,
+          "window": 7,
+          "worker_terminal": [
+            13418466957,
+            1341998150,
+            1341998150
+          ]
+        },
+        "eey040r67b36cfh5r69jey0u8": {
+          "bytes": 562176,
+          "close_entry": [
+            3097266817,
+            317188843,
+            317188843
+          ],
+          "object": "32773830dc62264ce73ee4867d178bf98363f2202228ed409c7e6f870b2e625c",
+          "object_id": {
+            "dev": 33,
+            "fd": 271,
+            "ino": 8002831
+          },
+          "open_return": [
+            1512079199,
+            157928449,
+            157928449
+          ],
+          "tid": 9642,
+          "window": 15,
+          "worker_terminal": [
+            3119110671,
+            321721075,
+            321721075
+          ]
+        },
+        "eg262qwwgrhzh4rttmhcv7vff": {
+          "bytes": 370424,
+          "close_entry": [
+            746923036,
+            97462581,
+            97462581
+          ],
+          "object": "bb784967e5d5c21627467fd3f2ea37d49fea6987aa4e89a72390bbab67a504ac",
+          "object_id": {
+            "dev": 33,
+            "fd": 271,
+            "ino": 8002838
+          },
+          "open_return": [
+            290667979,
+            31565561,
+            31565561
+          ],
+          "tid": 9670,
+          "window": 22,
+          "worker_terminal": [
+            754869267,
+            99300704,
+            99300704
+          ]
+        },
+        "eunp1v4hqzfte5vryd9wi7an7": {
+          "bytes": 1275936,
+          "close_entry": [
+            3309805214,
+            439287546,
+            439287546
+          ],
+          "object": "16537eebfe7f2ddd3b651120377213e2ff56ebef6cbf6f8794bf92a6775d207f",
+          "object_id": {
+            "dev": 33,
+            "fd": 13,
+            "ino": 7989123
+          },
+          "open_return": [
+            1188543000,
+            187634026,
+            187634026
+          ],
+          "tid": 9627,
+          "window": 10,
+          "worker_terminal": [
+            3340558839,
+            445806049,
+            445806049
+          ]
+        }
+      },
+      "owner_argv": {
+        "actual": "v2-5613c3a46ce9df7b",
+        "normalized": "d3375646dd14139abdab9b76089fe5874a418350be51fd0e892c8220dad2ab3b",
+        "original": "ac9b2cfb18061c11c74c94e26bb0950bbb64b209bf32b62f125fdc959b9b9c84",
+        "uses": {
+          "--extern": 35,
+          "--out-dir": 1,
+          "-L": 224
+        }
+      },
+      "physical_libraries": {
+        "driver": {
+          "path": "/home/runner/work/_temp/ohm-ruff-whole-census/rustup/toolchains/ohm/lib/librustc_driver-fa217dfcec654979.so",
+          "sha256": "cb6bd1e8074cfb4c092b270fa1450fcbf59941315615a5af48d537edeaf1933b"
+        },
+        "llvm": {
+          "path": "/home/runner/work/_temp/ohm-ruff-whole-census/rustup/toolchains/ohm/lib/libLLVM.so.23.1-rust-1.99.0-beta",
+          "sha256": "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51"
+        }
+      },
+      "raw_custody_sha256": "215f92e2b4fc3fc5d2990e568ee618b2928fa8ba002f4b5a522a21e043f5283e",
+      "source_files": [
+        "3c77dcc2a5c04fc0c54ce95cd51068734015f3e0",
+        "088b7b5f77fcb05994fd2a17cbc940cd9edb341a"
+      ],
+      "source_sha256": "215f92e2b4fc3fc5d2990e568ee618b2928fa8ba002f4b5a522a21e043f5283e"
+    },
+    "2": {
+      "all_measured_rustc_threads": {
+        "all_native": 57550794827,
+        "all_threads": 111608044783,
+        "main_tid_instructions": 35035234,
+        "rank": 2,
+        "role": "observed selected physical rustc",
+        "six_native": 17868109698,
+        "threads": 138
+      },
+      "archives": {
+        "observed": {
+          "bytes": 27311384,
+          "canonical": "7fa47b1860bed7a50f483e52cffa5db532ce579c6fc559ee7dfd1ffc71c3b794",
+          "fields": 250,
+          "index": "29cee8870d5603856d42ed2dde23425d91e04d9af8c2788c0da6d692c39ca3a7",
+          "index_symbols": 6297,
+          "main_metadata": "a8f23131b3c0f6355e158afccd93739f20613793309910209ce1ccf93c524d71",
+          "native_objects": 125,
+          "original": "ed7e6d86bbc28ed004afe3e3fae0579d419f6961dab2ba1ab621a0ac0efb43db",
+          "suffix": "0amvo01"
+        },
+        "ordinary": {
+          "bytes": 27311384,
+          "canonical": "7fa47b1860bed7a50f483e52cffa5db532ce579c6fc559ee7dfd1ffc71c3b794",
+          "fields": 250,
+          "index": "29cee8870d5603856d42ed2dde23425d91e04d9af8c2788c0da6d692c39ca3a7",
+          "index_symbols": 6297,
+          "main_metadata": "a8f23131b3c0f6355e158afccd93739f20613793309910209ce1ccf93c524d71",
+          "native_objects": 125,
+          "original": "fd4b95a94de75ae93aafb8d763ee568e0e67c03961b50605ac0019a14194cbd6",
+          "suffix": "0cf7wh8"
+        },
+        "ordinary-repeat": {
+          "bytes": 27311384,
+          "canonical": "7fa47b1860bed7a50f483e52cffa5db532ce579c6fc559ee7dfd1ffc71c3b794",
+          "fields": 250,
+          "index": "29cee8870d5603856d42ed2dde23425d91e04d9af8c2788c0da6d692c39ca3a7",
+          "index_symbols": 6297,
+          "main_metadata": "a8f23131b3c0f6355e158afccd93739f20613793309910209ce1ccf93c524d71",
+          "native_objects": 125,
+          "original": "adc7f62557136d4ba0d200bbe1c68aec8f5342f0c6a165425a3f94d02859c43e",
+          "suffix": "1c7m2yy"
+        }
+      },
+      "argv_record": "8a0ba4aa7fcacb65cb53d01a47006b8cfd35b95d4206e41a62e5cfb62e2817b7",
+      "boot": "a3fb406d-d62f-46a9-a762-713f3f63472a",
+      "calibration": {
+        "main_tid": 1171,
+        "native": [
+          1500138,
+          6000139
+        ],
+        "ratio": 3.999724691995003,
+        "worker_tids": [
+          1172,
+          1173
+        ]
+      },
+      "consumer_elf": "a39cc617f0865cbb50b19b7597e0069b3796a1f8a22d88e64fb3647981d40c42",
+      "consumer_verdict": "ccae78bb0fc82d54b4d0f1024bbb6ad9c811bc034f233ae58b9c4072742113bd",
+      "environment": "48041774bb37b3908de79de278b222400e85896414b84a9fb5d507cf6752e864",
+      "image": 5,
+      "main_tid": 9608,
+      "observations": {
+        "01b72yfmn6arojv1az235mos7": {
+          "bytes": 432488,
+          "close_entry": [
+            2752056561,
+            297093566,
+            297093566
+          ],
+          "object": "aeb0e83fc0798eb08b6f163a21e20ab8a71e7d156946e9ea09762f57e06a641b",
+          "object_id": {
+            "dev": 33,
+            "fd": 13,
+            "ino": 8143826
+          },
+          "open_return": [
+            1263973909,
+            157205538,
+            157205538
+          ],
+          "tid": 9650,
+          "window": 20,
+          "worker_terminal": [
+            2770409626,
+            300788877,
+            300788877
+          ]
+        },
+        "0wrsgo9esbuwdyfhrjd10085r": {
+          "bytes": 1734600,
+          "close_entry": [
+            8858812940,
+            1030566962,
+            1030566962
+          ],
+          "object": "d7689926f2469ec8deb08bd663e7b9297afff5a85c4c3c5915dfc28feb96fccf",
+          "object_id": {
+            "dev": 33,
+            "fd": 272,
+            "ino": 8143814
+          },
+          "open_return": [
+            3900387457,
+            502591675,
+            502591675
+          ],
+          "tid": 9623,
+          "window": 8,
+          "worker_terminal": [
+            8922732075,
+            1047904886,
+            1047904886
+          ]
+        },
+        "16os12t5hva2grho4jumxjwa5": {
+          "bytes": 23192,
+          "close_entry": [
+            321012273,
+            34491204,
+            34491204
+          ],
+          "object": "0530f169bf31bddb7c24c506b5807fe3bea4a8bf0735faa76a3542735a8a894e",
+          "object_id": {
+            "dev": 33,
+            "fd": 13,
+            "ino": 8143831
+          },
+          "open_return": [
+            284574608,
+            29225229,
+            29225229
+          ],
+          "tid": 9714,
+          "window": 25,
+          "worker_terminal": [
+            329878874,
+            35414729,
+            35414729
+          ]
+        },
+        "2a3lrnce3ygx7jyibf5yaf6fk": {
+          "bytes": 641456,
+          "close_entry": [
+            3383778348,
+            395232274,
+            395232274
+          ],
+          "object": "b0dcaf18f6e38a8ec1a3159b9054f49daf45d8bd45d0d7db61798d54d98f8c97",
+          "object_id": {
+            "dev": 33,
+            "fd": 272,
+            "ino": 8143823
+          },
+          "open_return": [
+            1643436507,
+            209875551,
+            209875551
+          ],
+          "tid": 9642,
+          "window": 17,
+          "worker_terminal": [
+            3406062792,
+            401550252,
+            401550252
+          ]
+        },
+        "30m6srh7b6kjvqu19s87db0yt": {
+          "bytes": 65840,
+          "close_entry": [
+            97811402,
+            10394194,
+            10394194
+          ],
+          "object": "257b07738da63d5b907aa24daf6858373fba139153dc7ba1e3b98b42a1fc6676",
+          "object_id": {
+            "dev": 33,
+            "fd": 13,
+            "ino": 8143832
+          },
+          "open_return": [
+            27280222,
+            2975431,
+            2975431
+          ],
+          "tid": 9732,
+          "window": 26,
+          "worker_terminal": [
+            98668289,
+            10676326,
+            10676326
+          ]
+        },
+        "38x842s88ya96d562jlc1jevb": {
+          "bytes": 712264,
+          "close_entry": [
+            4380834686,
+            453680907,
+            453680907
+          ],
+          "object": "ac50ff5e89bdf15f32a1b787f818b9b2055638323d2cf412071dee6836742edf",
+          "object_id": {
+            "dev": 33,
+            "fd": 13,
+            "ino": 8143820
+          },
+          "open_return": [
+            2013649882,
+            249866546,
+            249866546
+          ],
+          "tid": 9638,
+          "window": 14,
+          "worker_terminal": [
+            4416323406,
+            462452164,
+            462452164
+          ]
+        },
+        "5542r2z1w4zg4tdlqm1z5x2wo": {
+          "bytes": 646112,
+          "close_entry": [
+            5159781928,
+            517816235,
+            517816235
+          ],
+          "object": "4ed5bbfc01b7fc68c4b593450d445a7b7fb117a599452c669904bb2da9819ef7",
+          "object_id": {
+            "dev": 33,
+            "fd": 13,
+            "ino": 8143821
+          },
+          "open_return": [
+            2257971128,
+            274941212,
+            274941212
+          ],
+          "tid": 9640,
+          "window": 15,
+          "worker_terminal": [
+            5188815217,
+            523745976,
+            523745976
+          ]
+        },
+        "6f5gp9492zeok74kj02rv0lbh": {
+          "bytes": 849568,
+          "close_entry": [
+            7193111542,
+            672547522,
+            672547522
+          ],
+          "object": "0a0513ae4bf9b28635f3c3784dba68f9825af80ab7550a59133f849dd5387bea",
+          "object_id": {
+            "dev": 33,
+            "fd": 13,
+            "ino": 8143817
+          },
+          "open_return": [
+            2947120226,
+            290125790,
+            290125790
+          ],
+          "tid": 9634,
+          "window": 11,
+          "worker_terminal": [
+            7228792639,
+            681825892,
+            681825892
+          ]
+        },
+        "6p30kgvj4lu40zowlel28tnn7": {
+          "bytes": 897776,
+          "close_entry": [
+            8501227942,
+            819911733,
+            819911733
+          ],
+          "object": "c3f3c541a5c657641700f05f6e4e377d66bcd8750f6ca0726d82ce636d0e9403",
+          "object_id": {
+            "dev": 33,
+            "fd": 272,
+            "ino": 8143819
+          },
+          "open_return": [
+            3174791265,
+            342564017,
+            342564017
+          ],
+          "tid": 9632,
+          "window": 13,
+          "worker_terminal": [
+            8539208570,
+            827849741,
+            827849741
+          ]
+        },
+        "76u321zsuml5v37ktustj0dr0": {
+          "bytes": 676704,
+          "close_entry": [
+            2293407691,
+            249586532,
+            249586532
+          ],
+          "object": "649eeea244a95b6765b6eb6dc456e80b1066dc0b19b3caf5287a2c0eba5e0ffa",
+          "object_id": {
+            "dev": 33,
+            "fd": 13,
+            "ino": 8143824
+          },
+          "open_return": [
+            956007576,
+            121789656,
+            121789656
+          ],
+          "tid": 9646,
+          "window": 18,
+          "worker_terminal": [
+            2312338189,
+            254956152,
+            254956152
+          ]
+        },
+        "92ezh47i978bb5yfl2leg6c1y": {
+          "bytes": 1425224,
+          "close_entry": [
+            12108276616,
+            1306241553,
+            1306241553
+          ],
+          "object": "b64a874fa7375d35e2ea9ce6850e9821161f022a84e7ef5c1dccc2d432394277",
+          "object_id": {
+            "dev": 33,
+            "fd": 273,
+            "ino": 8143815
+          },
+          "open_return": [
+            4822480203,
+            619592433,
+            619592433
+          ],
+          "tid": 9621,
+          "window": 9,
+          "worker_terminal": [
+            12173030819,
+            1324467657,
+            1324467657
+          ]
+        },
+        "9kyw96uq3sm64m4kus09r4vbj": {
+          "bytes": 559192,
+          "close_entry": [
+            850596432,
+            97466307,
+            97466307
+          ],
+          "object": "d62e5dd9f1311817cc1394e39d4356074555785f1933518f4a19ce7a41ab01e7",
+          "object_id": {
+            "dev": 33,
+            "fd": 273,
+            "ino": 8143829
+          },
+          "open_return": [
+            339323261,
+            33200023,
+            33200023
+          ],
+          "tid": 9676,
+          "window": 23,
+          "worker_terminal": [
+            861407209,
+            99318170,
+            99318170
+          ]
+        },
+        "9z2i9ar8n4enu9f18sb2ij12n": {
+          "bytes": 724176,
+          "close_entry": [
+            6739339758,
+            629357239,
+            629357239
+          ],
+          "object": "36f24f8c96807b1fbf936ad200ad4d342656b4830a45ae50d5c5adb49a39f66a",
+          "object_id": {
+            "dev": 33,
+            "fd": 271,
+            "ino": 8143818
+          },
+          "open_return": [
+            2650709639,
+            260908008,
+            260908008
+          ],
+          "tid": 9636,
+          "window": 12,
+          "worker_terminal": [
+            6770868079,
+            636728384,
+            636728384
+          ]
+        },
+        "bj5a5qap5cgccauttckc1d8ev": {
+          "bytes": 934600,
+          "close_entry": [
+            7901341795,
+            788881139,
+            788881139
+          ],
+          "object": "f002131259cbbdeff62c6eea81d111373841788548059da84579acd9f10a90ed",
+          "object_id": {
+            "dev": 33,
+            "fd": 271,
+            "ino": 8143813
+          },
+          "open_return": [
+            3575387826,
+            372103428,
+            372103428
+          ],
+          "tid": 9627,
+          "window": 7,
+          "worker_terminal": [
+            7944967606,
+            798063924,
+            798063924
+          ]
+        },
+        "cmb7ch5zh8rb9a7zp39t2peoj": {
+          "bytes": 405824,
+          "close_entry": [
+            4259240212,
+            330337666,
+            330337666
+          ],
+          "object": "8a4ec2cac5b74caee62cd59abc13522025476c90a50bf25fddd02ce27646175b",
+          "object_id": {
+            "dev": 33,
+            "fd": 271,
+            "ino": 8143827
+          },
+          "open_return": [
+            960632767,
+            91944658,
+            91944658
+          ],
+          "tid": 9666,
+          "window": 21,
+          "worker_terminal": [
+            4270954827,
+            335084973,
+            335084973
+          ]
+        },
+        "d6sgujgj34eihq9747i20zsz8": {
+          "bytes": 284728,
+          "close_entry": [
+            777347223,
+            95029966,
+            95029966
+          ],
+          "object": "7f38a34ce7c24a06110d47e37c083659b18313ebeb5c60279e406d5dc48bf6bc",
+          "object_id": {
+            "dev": 33,
+            "fd": 271,
+            "ino": 8143825
+          },
+          "open_return": [
+            327776882,
+            37906919,
+            37906919
+          ],
+          "tid": 9656,
+          "window": 19,
+          "worker_terminal": [
+            785927304,
+            97601195,
+            97601195
+          ]
+        },
+        "d71mv4nycjip2m8xtb354n8ts": {
+          "bytes": 98880,
+          "close_entry": [
+            355044520,
+            43366906,
+            43366906
+          ],
+          "object": "2b0e55d80f03d5c707fbbc383937f08da0ada4bcf0571c322ade302604be28c9",
+          "object_id": {
+            "dev": 33,
+            "fd": 13,
+            "ino": 8143830
+          },
+          "open_return": [
+            172565599,
+            21461503,
+            21461503
+          ],
+          "tid": 9690,
+          "window": 24,
+          "worker_terminal": [
+            358770287,
+            44347593,
+            44347593
+          ]
+        },
+        "e70ib64n3fa87vndiikuosofa": {
+          "bytes": 1094752,
+          "close_entry": [
+            13373505408,
+            1215309872,
+            1215309872
+          ],
+          "object": "e6f5e2df47d518c088f3aa4c340dc7889f006e9b5649b64cf2af0fc9fd8df0f1",
+          "object_id": {
+            "dev": 33,
+            "fd": 13,
+            "ino": 8143812
+          },
+          "open_return": [
+            4600598340,
+            459770619,
+            459770619
+          ],
+          "tid": 9625,
+          "window": 6,
+          "worker_terminal": [
+            13423946647,
+            1225273082,
+            1225273082
+          ]
+        },
+        "eey040r67b36cfh5r69jey0u8": {
+          "bytes": 562176,
+          "close_entry": [
+            3097245395,
+            320322621,
+            320322621
+          ],
+          "object": "32773830dc62264ce73ee4867d178bf98363f2202228ed409c7e6f870b2e625c",
+          "object_id": {
+            "dev": 33,
+            "fd": 271,
+            "ino": 8143822
+          },
+          "open_return": [
+            1511447018,
+            164843023,
+            164843023
+          ],
+          "tid": 9644,
+          "window": 16,
+          "worker_terminal": [
+            3117881378,
+            325506072,
+            325506072
+          ]
+        },
+        "eg262qwwgrhzh4rttmhcv7vff": {
+          "bytes": 370424,
+          "close_entry": [
+            746513070,
+            90960542,
+            90960542
+          ],
+          "object": "bb784967e5d5c21627467fd3f2ea37d49fea6987aa4e89a72390bbab67a504ac",
+          "object_id": {
+            "dev": 33,
+            "fd": 272,
+            "ino": 8143828
+          },
+          "open_return": [
+            290156239,
+            30558927,
+            30558927
+          ],
+          "tid": 9672,
+          "window": 22,
+          "worker_terminal": [
+            754470332,
+            92935565,
+            92935565
+          ]
+        },
+        "eunp1v4hqzfte5vryd9wi7an7": {
+          "bytes": 1275936,
+          "close_entry": [
+            3312055927,
+            357288031,
+            357288031
+          ],
+          "object": "16537eebfe7f2ddd3b651120377213e2ff56ebef6cbf6f8794bf92a6775d207f",
+          "object_id": {
+            "dev": 33,
+            "fd": 271,
+            "ino": 8143816
+          },
+          "open_return": [
+            1191276288,
+            126358160,
+            126358160
+          ],
+          "tid": 9630,
+          "window": 10,
+          "worker_terminal": [
+            3342970688,
+            363689662,
+            363689662
+          ]
+        }
+      },
+      "owner_argv": {
+        "actual": "v2-1f4b41fd15d35e2b",
+        "normalized": "d3375646dd14139abdab9b76089fe5874a418350be51fd0e892c8220dad2ab3b",
+        "original": "5cddc1df84211aee62053d67d340687cb4167f1aa290f5f16759c34856e6a55c",
+        "uses": {
+          "--extern": 35,
+          "--out-dir": 1,
+          "-L": 224
+        }
+      },
+      "physical_libraries": {
+        "driver": {
+          "path": "/home/runner/work/_temp/ohm-ruff-whole-census/rustup/toolchains/ohm/lib/librustc_driver-fa217dfcec654979.so",
+          "sha256": "cb6bd1e8074cfb4c092b270fa1450fcbf59941315615a5af48d537edeaf1933b"
+        },
+        "llvm": {
+          "path": "/home/runner/work/_temp/ohm-ruff-whole-census/rustup/toolchains/ohm/lib/libLLVM.so.23.1-rust-1.99.0-beta",
+          "sha256": "43bac9749e539cd5988a4d5452b64582cf07ac9e7c059fde29c7bee76e106c51"
+        }
+      },
+      "raw_custody_sha256": "ee84fbd4c900f42ebaf89dc0cfb0e8ee4aa13b5c99a8f77358f94ab53198fb76",
+      "source_files": [
+        "3c77dcc2a5c04fc0c54ce95cd51068734015f3e0",
+        "088b7b5f77fcb05994fd2a17cbc940cd9edb341a"
+      ],
+      "source_sha256": "ee84fbd4c900f42ebaf89dc0cfb0e8ee4aa13b5c99a8f77358f94ab53198fb76"
+    }
+  }
+}
