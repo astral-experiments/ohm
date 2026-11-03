@@ -83,6 +83,14 @@ fi
 "$script_dir/verify-release-sources.sh" \
   "$release_manifest" "$rust_checkout" "$cargo_checkout" "$clippy_checkout" "$rustfmt_checkout"
 
+mkdir "$cargo_checkout/nested"
+if "$script_dir/verify-release-sources.sh" \
+  "$release_manifest" "$rust_checkout" "$cargo_checkout/nested" "$clippy_checkout" "$rustfmt_checkout" \
+  >/dev/null 2>&1; then
+  echo 'source verification accepted a subdirectory as the Cargo checkout' >&2
+  exit 1
+fi
+
 if "$script_dir/verify-release-sources.sh" \
   "$release_manifest" "$rust_checkout" "$cargo_checkout" "$clippy_checkout" >/dev/null 2>&1; then
   echo 'source verification accepted a missing rustfmt checkout' >&2
