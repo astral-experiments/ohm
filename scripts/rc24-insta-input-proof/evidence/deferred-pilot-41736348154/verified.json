@@ -1,0 +1,1230 @@
+{
+  "archive_digests": {
+    "CP": "sha256:e02621f51387dbab26f5da7d1df6c16d34e6c62d878c95b024d6375c9e9da395",
+    "PC": "sha256:c10d058f24df89cac3dc50b1f981b1d59b02e8c4aff906d4d2cb6c82073327e9"
+  },
+  "boots": [
+    "0ac5cc78-f276-4b12-8adb-5fe0e82a2eb5",
+    "fa2abc31-4aca-44a5-9bac-64dd54dbe346"
+  ],
+  "expected": {
+    "head": "488f0a70e0f75d10061ea39b217ae05d98fb5a17",
+    "new": "dfe14506d23010aa5dbc4ff6fea702a22ba312bd",
+    "old": "3bf4988cf062dc76895ff2f8421acf766172392b",
+    "release": "ecde6809d7f1fc1966798198479867c4a49bdf7a51f3873336d23a40fabce453",
+    "run": 41736348154
+  },
+  "gate": {
+    "all_primary_improve": true,
+    "blocks": 2,
+    "both_primary_minimum_two": true,
+    "hold": false,
+    "median_primary_ratio": 4.184486968776088,
+    "migration": true,
+    "minimum_primary_ratio": 4.1843798444667275,
+    "penalties": {
+      "build-unchanged": {
+        "adverse": [],
+        "both_orders": false
+      },
+      "check-unchanged": {
+        "adverse": [],
+        "both_orders": false
+      }
+    },
+    "stage": "pilot"
+  },
+  "migration": {
+    "compiler_identity": [
+      "33",
+      "7616114",
+      "/home/runner/work/_temp/insta-price/sdk/bin/rustc"
+    ],
+    "fixed_translated_path": "target/debug/build/workspaces/4d634e047a2bdf98/v2-97b2ce5cfb49b4cc/insta/42b3a17e596e9ee4/fingerprint/dep-lib-insta",
+    "kernel_required": true,
+    "native": [
+      "77b63b7782903950cfeed4c4e03185cb292c2481333d3aa3807b7aad43afb149",
+      "10f0e6891529bcd7d22da4a2f2f37d9bdae332cf0085a0e49f5b783e6a6617eb"
+    ],
+    "phases": [
+      {
+        "actual_rustcs": [
+          "___",
+          "build_script_build",
+          "build_script_build",
+          "unicode_ident",
+          "build_script_build",
+          "build_script_build",
+          "proc_macro2",
+          "quote",
+          "syn",
+          "build_script_build",
+          "build_script_build",
+          "build_script_build",
+          "build_script_build",
+          "thiserror_impl",
+          "thiserror_impl",
+          "serde_core",
+          "build_script_build",
+          "build_script_build",
+          "thiserror",
+          "memchr",
+          "memchr",
+          "ucd_trie",
+          "pest",
+          "libc",
+          "bitflags",
+          "build_script_build",
+          "build_script_build",
+          "build_script_build",
+          "build_script_build",
+          "build_script_build",
+          "build_script_build",
+          "build_script_build",
+          "build_script_build",
+          "pest_meta",
+          "serde_derive",
+          "serde_derive",
+          "syn",
+          "linux_raw_sys",
+          "build_script_build",
+          "build_script_build",
+          "regex_syntax",
+          "cfg_if",
+          "once_cell",
+          "getrandom",
+          "regex_automata",
+          "rustix",
+          "pest_generator",
+          "serde",
+          "thiserror",
+          "typeid",
+          "vte",
+          "build_script_build",
+          "build_script_build",
+          "fastrand",
+          "ucd_trie",
+          "unicode_ident",
+          "ron",
+          "pest",
+          "tempfile",
+          "strip_ansi_escapes",
+          "pest_derive",
+          "pest_derive",
+          "zmij",
+          "regex",
+          "console",
+          "similar",
+          "itoa",
+          "serde_json",
+          "insta",
+          "insta_cmd",
+          "ohm_insta_chain",
+          "ohm_insta_chain"
+        ],
+        "elf": "77b63b7782903950cfeed4c4e03185cb292c2481333d3aa3807b7aad43afb149",
+        "files": 0,
+        "label": "parent-old",
+        "role": "parent",
+        "status": 0,
+        "wire_bytes": 14,
+        "wire_version": 2
+      },
+      {
+        "actual_rustcs": [
+          "ron",
+          "insta",
+          "insta_cmd",
+          "ohm_insta_chain",
+          "ohm_insta_chain"
+        ],
+        "elf": "77b63b7782903950cfeed4c4e03185cb292c2481333d3aa3807b7aad43afb149",
+        "files": 0,
+        "label": "parent-unchanged",
+        "role": "parent",
+        "status": 0,
+        "wire_bytes": 14,
+        "wire_version": 2
+      },
+      {
+        "actual_rustcs": [
+          "ron",
+          "insta",
+          "insta_cmd",
+          "ohm_insta_chain",
+          "ohm_insta_chain"
+        ],
+        "elf": "10f0e6891529bcd7d22da4a2f2f37d9bdae332cf0085a0e49f5b783e6a6617eb",
+        "files": 22,
+        "label": "upgrade-valid",
+        "role": "candidate",
+        "status": 0,
+        "wire_bytes": 2424,
+        "wire_version": 6
+      },
+      {
+        "actual_rustcs": [
+          "ron",
+          "ohm_insta_chain",
+          "ohm_insta_chain"
+        ],
+        "elf": "10f0e6891529bcd7d22da4a2f2f37d9bdae332cf0085a0e49f5b783e6a6617eb",
+        "files": 22,
+        "label": "candidate-settled",
+        "role": "candidate",
+        "status": 0,
+        "wire_bytes": 2424,
+        "wire_version": 6
+      },
+      {
+        "actual_rustcs": [
+          "ron",
+          "insta"
+        ],
+        "elf": "10f0e6891529bcd7d22da4a2f2f37d9bdae332cf0085a0e49f5b783e6a6617eb",
+        "files": 22,
+        "label": "invalid",
+        "role": "candidate",
+        "status": 101,
+        "wire_bytes": 2424,
+        "wire_version": 6
+      },
+      {
+        "actual_rustcs": [
+          "ron",
+          "insta"
+        ],
+        "elf": "10f0e6891529bcd7d22da4a2f2f37d9bdae332cf0085a0e49f5b783e6a6617eb",
+        "files": 22,
+        "label": "invalid-repeated",
+        "role": "candidate",
+        "status": 101,
+        "wire_bytes": 2424,
+        "wire_version": 6
+      },
+      {
+        "actual_rustcs": [
+          "ron",
+          "insta",
+          "insta_cmd",
+          "ohm_insta_chain",
+          "ohm_insta_chain"
+        ],
+        "elf": "77b63b7782903950cfeed4c4e03185cb292c2481333d3aa3807b7aad43afb149",
+        "files": 22,
+        "label": "candidate-repair",
+        "role": "candidate",
+        "status": 0,
+        "wire_bytes": 2424,
+        "wire_version": 6
+      },
+      {
+        "actual_rustcs": [
+          "ron",
+          "insta",
+          "insta_cmd",
+          "ohm_insta_chain",
+          "ohm_insta_chain"
+        ],
+        "elf": "77b63b7782903950cfeed4c4e03185cb292c2481333d3aa3807b7aad43afb149",
+        "files": 0,
+        "label": "downgrade",
+        "role": "parent",
+        "status": 0,
+        "wire_bytes": 14,
+        "wire_version": 2
+      },
+      {
+        "actual_rustcs": [
+          "ron",
+          "insta",
+          "insta_cmd",
+          "ohm_insta_chain",
+          "ohm_insta_chain"
+        ],
+        "elf": "77b63b7782903950cfeed4c4e03185cb292c2481333d3aa3807b7aad43afb149",
+        "files": 22,
+        "label": "second-upgrade",
+        "role": "candidate",
+        "status": 0,
+        "wire_bytes": 2424,
+        "wire_version": 6
+      },
+      {
+        "actual_rustcs": [
+          "ron",
+          "ohm_insta_chain",
+          "ohm_insta_chain"
+        ],
+        "elf": "77b63b7782903950cfeed4c4e03185cb292c2481333d3aa3807b7aad43afb149",
+        "files": 22,
+        "label": "second-settled",
+        "role": "candidate",
+        "status": 0,
+        "wire_bytes": 2424,
+        "wire_version": 6
+      },
+      {
+        "actual_rustcs": [
+          "___",
+          "build_script_build",
+          "build_script_build",
+          "build_script_build",
+          "build_script_build",
+          "unicode_ident",
+          "proc_macro2",
+          "quote",
+          "syn",
+          "build_script_build",
+          "build_script_build",
+          "build_script_build",
+          "build_script_build",
+          "thiserror_impl",
+          "thiserror_impl",
+          "serde_core",
+          "build_script_build",
+          "build_script_build",
+          "thiserror",
+          "memchr",
+          "ucd_trie",
+          "memchr",
+          "pest",
+          "libc",
+          "bitflags",
+          "build_script_build",
+          "build_script_build",
+          "build_script_build",
+          "build_script_build",
+          "build_script_build",
+          "build_script_build",
+          "build_script_build",
+          "build_script_build",
+          "pest_meta",
+          "serde_derive",
+          "serde_derive",
+          "syn",
+          "once_cell",
+          "cfg_if",
+          "regex_syntax",
+          "linux_raw_sys",
+          "build_script_build",
+          "build_script_build",
+          "rustix",
+          "regex_automata",
+          "getrandom",
+          "pest_generator",
+          "serde",
+          "thiserror",
+          "typeid",
+          "vte",
+          "unicode_ident",
+          "build_script_build",
+          "build_script_build",
+          "ucd_trie",
+          "fastrand",
+          "tempfile",
+          "pest",
+          "ron",
+          "strip_ansi_escapes",
+          "pest_derive",
+          "pest_derive",
+          "regex",
+          "zmij",
+          "console",
+          "itoa",
+          "similar",
+          "insta",
+          "serde_json",
+          "insta_cmd",
+          "ohm_insta_chain",
+          "ohm_insta_chain"
+        ],
+        "elf": "77b63b7782903950cfeed4c4e03185cb292c2481333d3aa3807b7aad43afb149",
+        "files": 22,
+        "label": "empty-repair",
+        "role": "candidate",
+        "status": 0,
+        "wire_bytes": 2424,
+        "wire_version": 6
+      }
+    ]
+  },
+  "plan": {
+    "cargo": {
+      "candidate": "32df98560d4ac57c4c959c762095a3afe6a3bbe62b44d8fc6e6bf8071f53a53e",
+      "parent": "b05c0f1a01f8cae3ccb7446647fcb7d9b5a36c3dfabc340a78a8b189561036b6"
+    },
+    "control": "Unchanged cargo check and cargo build on the same actual history. Hold a broad fix if either common no-op command regresses more than 5% and 10M instructions on both pilot workers. Retain cold and edited command cost, translated bytes, and independent native/Error provenance.",
+    "counter_origin": "a95a505d25b0f7839a6104ff1514ed9a4ddf9f90/scripts/ruff-original-ty-instructions",
+    "counter_sources": {
+      "calibrate": "43ed100fc2c2aab89e1c9cb644e3c1a6d561981128b09403b78562ac4655ea8d",
+      "exec_count": "beb82d46f7abdfd6dd176751edfabd80cc24160ed2b5fc3b22fd1012ca51321c",
+      "whole_count": "096b9e9efb7457ff4c2fd194985f18c4e05520fce46c85e5919b084ae3d823ce"
+    },
+    "orders": {
+      "CP": [
+        "candidate",
+        "parent"
+      ],
+      "PC": [
+        "parent",
+        "candidate"
+      ]
+    },
+    "pair_asset": 13278622099,
+    "pair_zip": "88dbde63eaf7aebc578e4cf0634d716e7a59745701b3cb88456cf4a8b34e36f6",
+    "phase": "two unscored order-reversed pilot workers",
+    "primary": "instructions of the first unchanged cargo test -p ty_project --lib --no-run after the genuine #29604 edit",
+    "producer_head": "29d7e95cd4426cac743860ca6a314cfa6c1924a9",
+    "producer_run": 41734567724,
+    "promotion": "No product PR from these pilots. Six fresh counterbalanced worker pairs and an exact paired sign result on the registered primary follow a qualifying pilot. Every full binary mismatch must be located in the original immutable object.",
+    "registration": "29d7e95cd4426cac743860ca6a314cfa6c1924a9",
+    "ruff_lock": "46f8a4fa82d5ac6dfd4ebd9eabb399179f02ce5127a7addc1780e8fb4ff9c7d2",
+    "ruff_paths": [
+      "crates/ty_project/src/db.rs",
+      "crates/ty_project/src/files.rs",
+      "crates/ty_project/src/lib.rs"
+    ],
+    "stage": "pilot"
+  },
+  "raw": {
+    "CP": {
+      "archive_set": "cafc3cbbf4e0f8305022f74dbe4494e4ffdb9abed124ddae3246eda347cd6f28",
+      "archives": 502,
+      "boot": "0ac5cc78-f276-4b12-8adb-5fe0e82a2eb5",
+      "roles": {
+        "candidate": {
+          "census": [
+            [
+              "cargo",
+              null,
+              false,
+              "488623f8e498705b2ff3f642122c6a64a638b43abac258526ea24c247ef4f6c0",
+              9025,
+              [
+                518182481,
+                147987045,
+                147987045
+              ]
+            ],
+            [
+              "rustc",
+              "ron",
+              false,
+              "921eb4dfcf3b93746a3a1b92b03dea1feafe74eb9bf6697fe22f4cc66771996e",
+              9041,
+              [
+                9291231607,
+                2202015207,
+                2202015207
+              ]
+            ],
+            [
+              "rustc",
+              "ty_project",
+              true,
+              "4c9f5908f0389e3e7615bac68e5d3b07ea09a8916ffaa8da2db0419ed416439c",
+              9066,
+              [
+                34402676,
+                21467221,
+                21467221
+              ]
+            ],
+            [
+              "Wild",
+              null,
+              false,
+              "8c3e01b1b1f4c0d9b628ea84ff10cb2b09b4b134a6efd6dfd078750f569dfd16",
+              9079,
+              [
+                4024722,
+                1508813,
+                1508813
+              ]
+            ]
+          ],
+          "costs": {
+            "build-after-test": 1045945947116,
+            "build-second-unchanged": 460129138,
+            "build-unchanged": 460429562,
+            "check-after-test": 115141041839,
+            "check-second-unchanged": 990928326,
+            "check-unchanged": 991878054,
+            "edit": 30588844307,
+            "empty-new": 1808914663717,
+            "first-unchanged": 12667395288,
+            "old": 1809990148426,
+            "old-repeat": 12665049234,
+            "second-unchanged": 12669593893
+          },
+          "footprint": {
+            "registry": {
+              "insta": [
+                2321
+              ],
+              "insta_cmd": [],
+              "ron": [
+                4181
+              ]
+            },
+            "translated_bytes": 326390,
+            "translated_files": 144
+          },
+          "full": [
+            "ron"
+          ],
+          "invalid": [
+            "invalid",
+            "invalid-again"
+          ],
+          "native": {
+            "edit": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "empty-new": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "first-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "old": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "old-repeat": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "repaired": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "second-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "third-unchanged-observed": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ]
+          }
+        },
+        "parent": {
+          "census": [
+            [
+              "cargo",
+              null,
+              false,
+              "13eefd6cb509aa39dcc4b070cf5842f8f1599afac3722449056d58d3d3854642",
+              27810,
+              [
+                519731932,
+                142492095,
+                142492095
+              ]
+            ],
+            [
+              "rustc",
+              "ron",
+              false,
+              "d071e6a6b01e53d1afb550582fef1960723b2d96eca6102b240b9cc988dfa850",
+              27826,
+              [
+                9290179009,
+                2011395507,
+                2011395507
+              ]
+            ],
+            [
+              "rustc",
+              "insta",
+              false,
+              "649814ba7e853f2d85004b88ad2b5f4fff5b26d6fde9b1d16035fa3e6015ed50",
+              27850,
+              [
+                40329007451,
+                7492927412,
+                7492927412
+              ]
+            ],
+            [
+              "rustc",
+              "ty_project",
+              true,
+              "dc54ecd918dadb8ae03589f8834bb4d834010f7db5e0dc8271f464912a5558ac",
+              27880,
+              [
+                34402763,
+                21288787,
+                21288787
+              ]
+            ],
+            [
+              "Wild",
+              null,
+              false,
+              "d9e0c3ca18d0d316c1acf0174ecfc6b15613b4d10fbe1b2c8f43c31b71f82cef",
+              27893,
+              [
+                4012990,
+                1716165,
+                1716165
+              ]
+            ]
+          ],
+          "costs": {
+            "build-after-test": 1045081446730,
+            "build-second-unchanged": 461887693,
+            "build-unchanged": 461798303,
+            "check-after-test": 115018120899,
+            "check-second-unchanged": 997070270,
+            "check-unchanged": 998029637,
+            "edit": 70930662566,
+            "empty-new": 1809449447740,
+            "first-unchanged": 53005193525,
+            "old": 1809819156069,
+            "old-repeat": 53000036330,
+            "second-unchanged": 53002092148
+          },
+          "footprint": {
+            "registry": {
+              "insta": [
+                14
+              ],
+              "insta_cmd": [],
+              "ron": [
+                4181
+              ]
+            },
+            "translated_bytes": 248440,
+            "translated_files": 144
+          },
+          "full": [
+            "insta",
+            "ron"
+          ],
+          "invalid": [
+            "invalid",
+            "invalid-again"
+          ],
+          "native": {
+            "edit": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "empty-new": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "first-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "old": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "old-repeat": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "repaired": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "second-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "third-unchanged-observed": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ]
+          }
+        }
+      }
+    },
+    "PC": {
+      "archive_set": "cafc3cbbf4e0f8305022f74dbe4494e4ffdb9abed124ddae3246eda347cd6f28",
+      "archives": 502,
+      "boot": "fa2abc31-4aca-44a5-9bac-64dd54dbe346",
+      "roles": {
+        "candidate": {
+          "census": [
+            [
+              "cargo",
+              null,
+              false,
+              "8a9825feeffc632b974a7d2b70a143776018f21d2440ae7017acedb08728be53",
+              27830,
+              [
+                518101184,
+                109974158,
+                109974158
+              ]
+            ],
+            [
+              "rustc",
+              "ron",
+              false,
+              "5fd93c231b7a6a14d13ba5989d77eae5887b91258e77cb2fddf0e4b141222f4d",
+              27846,
+              [
+                9288930276,
+                1809329609,
+                1809329609
+              ]
+            ],
+            [
+              "rustc",
+              "ty_project",
+              true,
+              "a189b889fc9f0677afc4636a5d5223e2006a873ebfa8405d821a56bb040f0289",
+              27871,
+              [
+                34382394,
+                17960915,
+                17960915
+              ]
+            ],
+            [
+              "Wild",
+              null,
+              false,
+              "ecde14d287833a0479984472fc4c949b4dac6245e526e04be119109aad73471f",
+              27884,
+              [
+                3997230,
+                1357572,
+                1357572
+              ]
+            ]
+          ],
+          "costs": {
+            "build-after-test": 1044973780239,
+            "build-second-unchanged": 460113757,
+            "build-unchanged": 460242732,
+            "check-after-test": 115026746553,
+            "check-second-unchanged": 991002657,
+            "check-unchanged": 991717544,
+            "edit": 30593573355,
+            "empty-new": 1809092654861,
+            "first-unchanged": 12666167145,
+            "old": 1809388023325,
+            "old-repeat": 12664913108,
+            "second-unchanged": 12665723685
+          },
+          "footprint": {
+            "registry": {
+              "insta": [
+                2321
+              ],
+              "insta_cmd": [],
+              "ron": [
+                4181
+              ]
+            },
+            "translated_bytes": 326390,
+            "translated_files": 144
+          },
+          "full": [
+            "ron"
+          ],
+          "invalid": [
+            "invalid",
+            "invalid-again"
+          ],
+          "native": {
+            "edit": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "empty-new": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "first-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "old": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "old-repeat": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "repaired": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "second-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "third-unchanged-observed": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ]
+          }
+        },
+        "parent": {
+          "census": [
+            [
+              "cargo",
+              null,
+              false,
+              "809d5bce75847d091eba9d80b33b3b9f4ac1835e449562ccc1443bd0b69b3e2a",
+              9135,
+              [
+                519920035,
+                172888161,
+                172888161
+              ]
+            ],
+            [
+              "rustc",
+              "ron",
+              false,
+              "7201ed68f79fc1ac554c58b11a5dd9061d3ba48d960e34a8abb4cf2054ecab8d",
+              9151,
+              [
+                9285955491,
+                2338364434,
+                2338364434
+              ]
+            ],
+            [
+              "rustc",
+              "insta",
+              false,
+              "4644f077fa46821187aa6b384ee8a899f6540e84952c313be08aef78d06271ea",
+              9175,
+              [
+                40334496169,
+                7497439390,
+                7497439390
+              ]
+            ],
+            [
+              "rustc",
+              "ty_project",
+              true,
+              "39a8dbbeae8f00be8b170119a99eff39bd571ed156d3bd46628155499b17f64d",
+              9205,
+              [
+                34273779,
+                21527479,
+                21527479
+              ]
+            ],
+            [
+              "Wild",
+              null,
+              false,
+              "87ea39391f25faba07f800482d9bed11fe3836af712b135a0c1cfd9e9d6d817d",
+              9218,
+              [
+                3974757,
+                1209552,
+                1209552
+              ]
+            ]
+          ],
+          "costs": {
+            "build-after-test": 1045802483134,
+            "build-second-unchanged": 461778504,
+            "build-unchanged": 461918206,
+            "check-after-test": 115116521344,
+            "check-second-unchanged": 997140820,
+            "check-unchanged": 997840341,
+            "edit": 70927932584,
+            "empty-new": 1809388956788,
+            "first-unchanged": 53002768217,
+            "old": 1810412738519,
+            "old-repeat": 53005750817,
+            "second-unchanged": 52994974227
+          },
+          "footprint": {
+            "registry": {
+              "insta": [
+                14
+              ],
+              "insta_cmd": [],
+              "ron": [
+                4181
+              ]
+            },
+            "translated_bytes": 248440,
+            "translated_files": 144
+          },
+          "full": [
+            "insta",
+            "ron"
+          ],
+          "invalid": [
+            "invalid",
+            "invalid-again"
+          ],
+          "native": {
+            "edit": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "empty-new": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "first-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "old": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "old-repeat": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "repaired": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "second-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "third-unchanged-observed": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ]
+          }
+        }
+      }
+    }
+  },
+  "stages": {
+    "build-after-test": {
+      "blocks": {
+        "CP": {
+          "candidate": 1045945947116,
+          "change_percent": 0.08272086244618393,
+          "delta": 864500386,
+          "parent": 1045081446730,
+          "ratio": 0.9991734750840771
+        },
+        "PC": {
+          "candidate": 1044973780239,
+          "change_percent": -0.0792408612873663,
+          "delta": -828702895,
+          "parent": 1045802483134,
+          "ratio": 1.0007930370222404
+        }
+      },
+      "max_ratio": 1.0007930370222404,
+      "median_ratio": 0.9999832560531587,
+      "min_ratio": 0.9991734750840771
+    },
+    "build-second-unchanged": {
+      "blocks": {
+        "CP": {
+          "candidate": 460129138,
+          "change_percent": -0.3807321620929227,
+          "delta": -1758555,
+          "parent": 461887693,
+          "ratio": 1.003821872719567
+        },
+        "PC": {
+          "candidate": 460113757,
+          "change_percent": -0.36050768616981976,
+          "delta": -1664747,
+          "parent": 461778504,
+          "ratio": 1.003618120464066
+        }
+      },
+      "max_ratio": 1.003821872719567,
+      "median_ratio": 1.0037199965918164,
+      "min_ratio": 1.003618120464066
+    },
+    "build-unchanged": {
+      "blocks": {
+        "CP": {
+          "candidate": 460429562,
+          "change_percent": -0.29639368336960015,
+          "delta": -1368741,
+          "parent": 461798303,
+          "ratio": 1.002972747870607
+        },
+        "PC": {
+          "candidate": 460242732,
+          "change_percent": -0.3627209272630383,
+          "delta": -1675474,
+          "parent": 461918206,
+          "ratio": 1.0036404138153778
+        }
+      },
+      "max_ratio": 1.0036404138153778,
+      "median_ratio": 1.0033065808429924,
+      "min_ratio": 1.002972747870607
+    },
+    "check-after-test": {
+      "blocks": {
+        "CP": {
+          "candidate": 115141041839,
+          "change_percent": 0.10687093393564329,
+          "delta": 122920940,
+          "parent": 115018120899,
+          "ratio": 0.9989324315809833
+        },
+        "PC": {
+          "candidate": 115026746553,
+          "change_percent": -0.07798601795109272,
+          "delta": -89774791,
+          "parent": 115116521344,
+          "ratio": 1.0007804688360775
+        }
+      },
+      "max_ratio": 1.0007804688360775,
+      "median_ratio": 0.9998564502085304,
+      "min_ratio": 0.9989324315809833
+    },
+    "check-second-unchanged": {
+      "blocks": {
+        "CP": {
+          "candidate": 990928326,
+          "change_percent": -0.6159991110756935,
+          "delta": -6141944,
+          "parent": 997070270,
+          "ratio": 1.0061981717939104
+        },
+        "PC": {
+          "candidate": 991002657,
+          "change_percent": -0.6155763435700123,
+          "delta": -6138163,
+          "parent": 997140820,
+          "ratio": 1.0061938915669324
+        }
+      },
+      "max_ratio": 1.0061981717939104,
+      "median_ratio": 1.0061960316804215,
+      "min_ratio": 1.0061938915669324
+    },
+    "check-unchanged": {
+      "blocks": {
+        "CP": {
+          "candidate": 991878054,
+          "change_percent": -0.6163727781162032,
+          "delta": -6151583,
+          "parent": 998029637,
+          "ratio": 1.0062019549431427
+        },
+        "PC": {
+          "candidate": 991717544,
+          "change_percent": -0.6136048772956926,
+          "delta": -6122797,
+          "parent": 997840341,
+          "ratio": 1.0061739323228107
+        }
+      },
+      "max_ratio": 1.0062019549431427,
+      "median_ratio": 1.0061879436329768,
+      "min_ratio": 1.0061739323228107
+    },
+    "edit": {
+      "blocks": {
+        "CP": {
+          "candidate": 30588844307,
+          "change_percent": -56.87500553299145,
+          "delta": -40341818259,
+          "parent": 70930662566,
+          "ratio": 2.318840877220331
+        },
+        "PC": {
+          "candidate": 30593573355,
+          "change_percent": -56.86667827408052,
+          "delta": -40334359229,
+          "parent": 70927932584,
+          "ratio": 2.318393205035921
+        }
+      },
+      "max_ratio": 2.318840877220331,
+      "median_ratio": 2.318617041128126,
+      "min_ratio": 2.318393205035921
+    },
+    "empty-new": {
+      "blocks": {
+        "CP": {
+          "candidate": 1808914663717,
+          "change_percent": -0.029555068458420042,
+          "delta": -534784023,
+          "parent": 1809449447740,
+          "ratio": 1.0002956380606154
+        },
+        "PC": {
+          "candidate": 1809092654861,
+          "change_percent": -0.016375800564516485,
+          "delta": -296301927,
+          "parent": 1809388956788,
+          "ratio": 1.0001637848267217
+        }
+      },
+      "max_ratio": 1.0002956380606154,
+      "median_ratio": 1.0002297114436685,
+      "min_ratio": 1.0001637848267217
+    },
+    "first-unchanged": {
+      "blocks": {
+        "CP": {
+          "candidate": 12667395288,
+          "change_percent": -76.1015960029928,
+          "delta": -40337798237,
+          "parent": 53005193525,
+          "ratio": 4.1843798444667275
+        },
+        "PC": {
+          "candidate": 12666167145,
+          "change_percent": -76.10281958643534,
+          "delta": -40336601072,
+          "parent": 53002768217,
+          "ratio": 4.18459409308545
+        }
+      },
+      "max_ratio": 4.18459409308545,
+      "median_ratio": 4.184486968776088,
+      "min_ratio": 4.1843798444667275
+    },
+    "old": {
+      "blocks": {
+        "CP": {
+          "candidate": 1809990148426,
+          "change_percent": 0.009448035535841726,
+          "delta": 170992357,
+          "parent": 1809819156069,
+          "ratio": 0.9999055285703358
+        },
+        "PC": {
+          "candidate": 1809388023325,
+          "change_percent": -0.056601192214222884,
+          "delta": -1024715194,
+          "parent": 1810412738519,
+          "ratio": 1.000566332473074
+        }
+      },
+      "max_ratio": 1.000566332473074,
+      "median_ratio": 1.000235930521705,
+      "min_ratio": 0.9999055285703358
+    },
+    "old-repeat": {
+      "blocks": {
+        "CP": {
+          "candidate": 12665049234,
+          "change_percent": -76.10369707080538,
+          "delta": -40334987096,
+          "parent": 53000036330,
+          "ratio": 4.184747753504075
+        },
+        "PC": {
+          "candidate": 12664913108,
+          "change_percent": -76.10653011646784,
+          "delta": -40340837709,
+          "parent": 53005750817,
+          "ratio": 4.185243938508986
+        }
+      },
+      "max_ratio": 4.185243938508986,
+      "median_ratio": 4.18499584600653,
+      "min_ratio": 4.184747753504075
+    },
+    "second-unchanged": {
+      "blocks": {
+        "CP": {
+          "candidate": 12669593893,
+          "change_percent": -76.09604945853428,
+          "delta": -40332498255,
+          "parent": 53002092148,
+          "ratio": 4.183408923413391
+        },
+        "PC": {
+          "candidate": 12665723685,
+          "change_percent": -76.10014181581197,
+          "delta": -40329250542,
+          "parent": 52994974227,
+          "ratio": 4.184125245820883
+        }
+      },
+      "max_ratio": 4.184125245820883,
+      "median_ratio": 4.183767084617137,
+      "min_ratio": 4.183408923413391
+    }
+  }
+}
