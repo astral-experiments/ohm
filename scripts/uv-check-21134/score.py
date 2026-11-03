@@ -95,6 +95,7 @@ def check_native(proof, warm, cold, role):
         if typed["exact_complete_bytes"] or moved and moved <= set(known.get(row["crate"], ())):
             continue
         wire = row["exact_wire"]
+        require(wire is not None, "unverified private metadata encoding")
         if not moved and role == "F" and row["crate"] == "uv_dispatch":
             require([leg["reconstructed"] for leg in wire] == [b[1], a[1]], "original dispatch proof")
         else:
@@ -103,8 +104,10 @@ def check_native(proof, warm, cold, role):
             require([leg["reconstructed_sha256"] for leg in wire["both_directions"]] == [b[1], a[1]], "incomplete native reconstruction")
 
 
-def replay(src):
+def replay(src, native_proofs=None):
     f = Files(src)
+    need = {"panel/opening-" + r for r in ("F", "G")} | {f"panel/{i}-{r}" for i in range(1, 9) for r in ("F", "G")}
+    require(native_proofs is not None and set(native_proofs) == need, "all 18 original native comparisons must be independently verified before reading counters")
     boot = f.get("boot-attestation.json")
     idx = f.get("panel/complete.json")
     mode, control = idx["mode"], idx["control"]
@@ -143,16 +146,16 @@ def replay(src):
     ref = {}
     for label in (control, "G"):
         where = "panel/opening-" + label + "/"
-        o = f.get(where + "native-accepted.json")
+        o = f.get(where + "native-observed.json")
         require(
             o["score"] is None
             and o["role"] == label
-            and idx["native"][label] == f.sha(where + "native-accepted.json")
+            and idx["native"][label] == f.sha(where + "native-observed.json")
             and o["behavior"]
             and len(o["owners"]) == 3,
             "opening/native outcome",
         )
-        check_native(o["typed"], f.get(where + "first-B/products.json"), f.get(where + "fresh-B/products.json"), label)
+        check_native(native_proofs[where.rstrip("/")], f.get(where + "first-B/products.json"), f.get(where + "fresh-B/products.json"), label)
         ref[label] = f.get(where + "first-B/observed.json")["forms"]
     from cold import validate as cold_validate
 
@@ -176,7 +179,7 @@ def replay(src):
             label = control if tag == "control" else tag
             d = "panel/" + str(i) + "-" + label + "/"
             fi = f.get(d + "first-B/observed.json")
-            a = f.get(d + "native-accepted.json")
+            a = f.get(d + "native-observed.json")
             require(
                 a["role"] == label
                 and a["warm"] == f.sha(d + "first-B/products.json")
@@ -184,7 +187,7 @@ def replay(src):
                 and a["complete_separate_visits"],
                 "native warm/fresh gate",
             )
-            check_native(a["full_typed"], f.get(d + "first-B/products.json"), f.get(d + "independent-cold-B/products.json"), label)
+            check_native(native_proofs[d.rstrip("/")], f.get(d + "first-B/products.json"), f.get(d + "independent-cold-B/products.json"), label)
             require(
                 fi["forms"] == ref[label] and set(fi["forms"]) == set(S["observed_F_dirty_libs"]),
                 "actual first-edit scopes",
@@ -317,12 +320,6 @@ def jointly(first, second):
 
 
 if __name__ == "__main__":
-    results = [replay(Path(p)) for p in sys.argv[1:]]
-    require(len(results) in (1, 2), "one intact run or independent matching pair")
-    print(
-        json.dumps(
-            {"runs": results, "replicated": jointly(*results) if len(results) == 2 else None},
-            indent=1,
-            sort_keys=True,
-        )
-    )
+    import adjudicate
+
+    adjudicate.main()

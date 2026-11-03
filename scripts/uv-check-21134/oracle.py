@@ -176,7 +176,7 @@ def compare_owners(a, b, c, role):
             )
 
 
-def compare_native(left, right, store, decoder, r, headers, role):
+def compare_native(left, right, store, decoder, r, headers, role, *, capture_only=False):
     require(
         left["sidecars"] == right["sidecars"] and left["rmeta"].keys() == right["rmeta"].keys(),
         "incompatible native product set or public hash",
@@ -220,7 +220,7 @@ def compare_native(left, right, store, decoder, r, headers, role):
         supplemental = None
         moved = set(v["physical_moved"])
         registered = bool(moved) and moved <= set(SPEC["known_differing"].get(name, ()))
-        if not v["exact_complete_bytes"] and not registered:
+        if not capture_only and not v["exact_complete_bytes"] and not registered:
             if not moved:
                 require(name == "uv_dispatch", "unexplained wire changed: " + name)
             if not moved and role == "F":

@@ -183,11 +183,11 @@ def opening(role, out, store, dec, reader):
     )
     save(out / "extern-inputs.json", rooted_externs(forms))
     cold, ids_c = fresh(out / "fresh-B", store, reader)
-    checked = oracle.compare_native(warm, cold, store, dec, reader, out / "zls", role)
+    checked = oracle.compare_native(warm, cold, store, dec, reader, out / "zls", role, capture_only=True)
     oracle.compare_owners(ids_a, ids_b, ids_c, role)
     tested = behavior(role, out / "behavior")
     save(
-        out / "native-accepted.json",
+        out / "native-observed.json",
         {
             "role": role,
             "typed": checked,
@@ -276,10 +276,10 @@ def measure(d, role, opening_forms, store, dec, reader, cal):
     require(data == warm, "scoped products")
     kernel(d / "unchanged-B", False)
     cold, ids_c = fresh(d / "independent-cold-B", store, reader)
-    checked = oracle.compare_native(warm, cold, store, dec, reader, d / "zls", role)
+    checked = oracle.compare_native(warm, cold, store, dec, reader, d / "zls", role, capture_only=True)
     oracle.compare_owners(ids_a, ids, ids_c, role)
     save(
-        d / "native-accepted.json",
+        d / "native-observed.json",
         {
             "role": role,
             "full_typed": checked,
@@ -362,6 +362,6 @@ def main(out, donor, pool, control, mode):
             "mode": mode,
             "control": control,
             "orders": P["orders"][mode],
-            "native": {r: sha(d / ("opening-" + r) / "native-accepted.json") for r in roles},
+            "native": {r: sha(d / ("opening-" + r) / "native-observed.json") for r in roles},
         },
     )

@@ -164,10 +164,10 @@ def main(mode):
     require(mode == "finish", "unknown command")
     clock(out, "post", mask)
     release(out, "after")
-    import score
+    from custody import capture_receipt
+    from score import Files
 
-    result = score.replay(out)
-    save(out / "score.json", result)
+    save(out / "capture.json", capture_receipt(Files(out)))
 
 
 if __name__ == "__main__":

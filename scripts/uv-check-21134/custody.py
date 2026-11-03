@@ -6,7 +6,27 @@ import argparse, hashlib, json, sys, zipfile
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import HERE, require, read, blob, sha
 from placement import BRANCH, REPO, valid_uuid
-from score import replay
+from score import Files
+
+
+def capture_receipt(f):
+    boot = f.get("boot-attestation.json")
+    idx = f.get("panel/complete.json")
+    ended = f.get("blocking-clock-post/verified.json")
+    after = f.get("latest-after.json")
+    require(ended["eligible_blocking_calibration"] and ended["boot"] == boot["boot"]
+            and ended["affinity"] == boot["affinity"], "end calibration")
+    require(idx["control"] == "F" and idx["mode"] in ("initial", "repeat")
+            and boot["series"] == "marginal." + idx["mode"], "wrong panel")
+    require(after["id"] == f.get("latest-before.json")["id"] == 432227571 and after["immutable"]
+            and not after["draft"] and not after["prerelease"], "final signed release")
+    visits = [f"panel/opening-{r}" for r in ("F", "G")] + [
+        f"panel/{i}-{r}" for i in range(1, 9) for r in ("F", "G")
+    ]
+    return {"run": boot["run"], "head": boot["head"], "series": boot["series"], "score": None,
+            "complete": f.sha("panel/complete.json"), "boot": f.sha("boot-attestation.json"),
+            "post_clock": f.sha("blocking-clock-post/verified.json"), "release": after["id"],
+            "observations": {d: f.sha(d + "/native-observed.json") for d in visits}}
 
 
 def check(folder, head, lock, series):
@@ -59,9 +79,10 @@ def check(folder, head, lock, series):
             == (run["id"], job["id"], job["runner_id"], head, lock, series),
             "wrong calibrated placement",
         )
-        saved = json.loads(allzip.read("score.json"))
-    scored = replay(folder / "original.zip")
-    require(json.loads(json.dumps(scored)) == saved, "original score differs from independent count")
+        require("score.json" not in allzip.namelist(), "unblinded hosted result")
+        saved = json.loads(allzip.read("capture.json"))
+    captured = capture_receipt(Files(folder / "original.zip"))
+    require(captured == saved, "incorrect capture manifest")
     return {
         "run": run["id"],
         "job": job["id"],
@@ -71,7 +92,8 @@ def check(folder, head, lock, series):
         "series": series,
         "boot": boot["boot"],
         "originals": proofs,
-        "score": scored,
+        "capture": captured,
+        "score": None,
     }
 
 
