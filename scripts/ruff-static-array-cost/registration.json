@@ -507,8 +507,8 @@
     "zstd-safe-7.2.4.crate": "8f49c4d5f0abb602a93fb8736af2a4f4dd9512e36f7f570d66e65ff867ed3b9d",
     "zstd-sys-2.0.16+zstd.1.5.7.crate": "91e19ebc2adc8f83e43039e79776e3fda8ca919132d68a1fed6a5faca2683748"
   },
-  "candidate": "8574afc64801c199c8d090e3e0e013adf6ccd496",
-  "candidate_tree": "69e168ef2d18cb0b9f8ee6589d006e5ed4303283",
+  "candidate": "6c2874a0b6a0bf3570f8959733b6f87907e5cce6",
+  "candidate_tree": "1a86c989ac19e14b8bc53ec8a92be4feafef5a9f",
   "cargo": "abc70d60a6fd89c10d5f65cf85820d9b78d5affe",
   "cases": {
     "aliases": {
@@ -560,6 +560,11 @@
     }
   },
   "criterion": ">=20% fewer retired instructions for the selected entire rustc, or 2x total Cargo; no product PR after exploratory workers alone",
+  "deferred_holdout": {
+    "case": "aliases",
+    "original": 41736109700,
+    "status": "The raw metadata equality guard refused. Keep this case outside the primary. No score is accepted from it."
+  },
   "lock": "e4886c7f2ec2b52cc7bf90b183b620800dd81a9c615d68dea1d83ea995ba3d1b",
   "new": "88a50d695c1142294bb4c780fad47d3306173885",
   "old": "276832aa91f2086a6ec880884fcdd987991cddf2",

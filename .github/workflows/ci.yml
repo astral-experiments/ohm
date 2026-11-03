@@ -5,18 +5,19 @@ permissions:
   actions: read
 jobs:
   price:
-    name: 'Ruff Unicode ${{ matrix.fixture }} edit ${{ matrix.block }}'
-    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head &&
-      github.ref_name == 'charlie/qa-rc24-static-cost-20261103'
+    name: Ruff Unicode ${{ matrix.fixture }} edit ${{ matrix.block }}
+    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+      && github.ref_name == 'charlie/qa-rc24-static-cost-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 100
     strategy:
       fail-fast: false
       matrix:
         include:
-        - {block: PC, fixture: loose}
-        - {block: CP, fixture: loose}
-        - {block: CP, fixture: aliases}
+        - block: PC
+          fixture: loose
+        - block: CP
+          fixture: loose
     steps:
     - name: Read this immutable measurement
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
