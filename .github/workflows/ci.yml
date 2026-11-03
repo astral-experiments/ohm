@@ -1,68 +1,33 @@
 name: Exercise source-owned compiler partitions on two real Ruff edits
-run-name: Unscored lifetime trace of the completed 29697 ordinary edit
+run-name: Independently verify both closed Rust layout experiments
 permissions:
   contents: read
   actions: read
 jobs:
-  lifetime_original:
-    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head && github.ref_name
-      == 'charlie/qa-ruff-root-owner-lanes-20261103'
+  read_originals:
+    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head &&
+      github.ref_name == 'charlie/qa-ruff-root-owner-lanes-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 165
+    timeout-minutes: 35
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         ref: ${{ inputs.reviewed_head }}
         path: qa
         persist-credentials: false
-        sparse-checkout: 'scripts/ruff-foreign-span-observer
-
-          scripts/ruff-original-ty-instructions
-
-          '
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        repository: astral-sh/ruff
-        ref: bfa2407e98ee1343caeefd02b4b69043509baa8c
-        fetch-depth: 2
-        path: ruff
-        persist-credentials: false
-    - name: Read the exact nonrelease compiler source constructor
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        ref: df534d61d22a8876e13f57f6033f2f11768a4a60
-        path: factory-src
-        persist-credentials: false
-        sparse-checkout: scripts/ruff-matched-stage
-    - name: Retrieve the previously accepted ordinary comparison
+        sparse-checkout: scripts/ruff-original-ty-instructions
+    - name: Authenticate all four raw packets and replay both clients and each full query partition
       env:
         GH_TOKEN: ${{ github.token }}
-      run: 'set -euo pipefail
-
-        cd "$RUNNER_TEMP"
-
-        gh api repos/astral-experiments/ohm/actions/artifacts/13266000990 > original.json
-
-        python3 -IB -c ''import json; r=json.load(open("original.json")); assert r["workflow_run"]["id"]==41706721214 and r["workflow_run"]["head_sha"]=="1417b5aec4ae74c7bed6733efd3a34d49eaaa611"
-        and r["size_in_bytes"]==400903442 and r["digest"]=="sha256:9a1b4cffbe9c717b920c52fb3b57e6c82a7cad761ded3da6a15cad73fca209e2"''
-
-        gh api repos/astral-experiments/ohm/actions/artifacts/13266000990/zip > original.zip
-
-        '
-    - name: Qualify complete task-scoped PMU per real Rust compiler on one independently replayed edit
-      env:
-        REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-        OHM_OWNER_CASE: '29697'
-        OHM_SDK_READ_TOKEN: ${{ github.token }}
-      run: python3 -IB qa/scripts/ruff-original-ty-instructions/standalone-buckets/owner-lanes/lifetime_original.py
+      run: python3 -IB qa/scripts/ruff-original-ty-instructions/standalone-buckets/owner-lanes/evidence-two-edits/review_originals.py
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: ruff-root-owner-lanes-lifetime-29697-${{ github.run_id }}
-        path: ${{ runner.temp }}/ohm-foreign-join/diagnostic/
+        name: physical-owner-lanes-both-${{ github.run_id }}
+        path: ${{ runner.temp }}/owner-reopen/verified/
         retention-days: 21
-        if-no-files-found: ignore
-    name: Independently price the physical ty_project and ty_ide rustcs
+        if-no-files-found: error
+    name: Independently reopen both paired originals, native programs, partitions and task counters
 'on':
   workflow_dispatch:
     inputs:
