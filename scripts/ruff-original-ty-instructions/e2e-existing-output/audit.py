@@ -136,7 +136,7 @@ def main(enable=False):
     for tag,mode in phases:
         if tag=='edit':b.select(b.NEW);assert b.verdict(out,'withheld-old-fails',env,101)==contact.LITERALS['list']
         if tag=='corrupt':
-            stat=out.stat();i=donor.text_flip(out);os.utime(out,ns=(stat.st_atime_ns,stat.st_mtime_ns));assert w.hf(out)!=contact.LITERALS['new'];b.write(P/'corrupt-preset.json',{'text_offset':i,'sha256':w.hf(out)})
+            b.write(P/'corrupt-preset.json',witness.corrupt_text(out,donor.text_flip,contact.LITERALS['new']))
         cap=lease_cases.held(out,lambda v:b.write(P/'actual-lease-independent-controls.json',v))if tag=='capability'else None
         capability_start_ns=time.monotonic_ns() if cap is not None else None
         if cap is not None:old_id=os.fstat(cap)

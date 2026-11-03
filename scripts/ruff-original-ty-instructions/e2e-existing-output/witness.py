@@ -56,3 +56,39 @@ def output_collision(state,binary):
         assert actual==payload and after.st_size==before.st_size==len(payload)
         return {'mode':'exclusive-collision','dev':before.st_dev,'ino':before.st_ino,'size':after.st_size,'old_link_count_after_native_repair':after.st_nlink,'sentinel_sha256':__import__('hashlib').sha256(actual).hexdigest()}
     finally:os.close(fd)
+
+def corrupt_text(binary, flip, expected):
+    """Install a genuinely wrong text byte even when Linux still protects the executing inode."""
+    import errno,hashlib,shutil,tempfile
+    original=binary.stat()
+    start=time.monotonic_ns();deadline=time.monotonic()+1;busy=0;tmp=None;method='in-place'
+    stamp=lambda s:(s.st_dev,s.st_ino,s.st_size,s.st_ctime_ns,s.st_mtime_ns)
+    while True:
+        try:at=flip(binary);break
+        except OSError as e:
+            if e.errno!=errno.ETXTBSY:raise
+            busy+=1
+            if time.monotonic()<deadline:time.sleep(.02);continue
+            fd,name=tempfile.mkstemp(prefix='.ohm-corrupt-stimulus-',dir=binary.parent);tmp=Path(name)
+            try:
+                with os.fdopen(fd,'wb')as out,binary.open('rb')as src:
+                    assert stamp(os.fstat(src.fileno()))==stamp(original)
+                    shutil.copyfileobj(src,out,1024*1024)
+                    assert stamp(os.fstat(src.fileno()))==stamp(original)
+                at=flip(tmp);os.chmod(tmp,original.st_mode&0o7777)
+                assert stamp(binary.stat())==stamp(original)
+                os.replace(tmp,binary)
+            finally:tmp.unlink(missing_ok=True)
+            method='atomic-one-byte-copy-after-ETXTBSY';break
+    os.utime(binary,ns=(original.st_atime_ns,original.st_mtime_ns))
+    now=binary.stat();assert (now.st_size,now.st_mtime_ns,now.st_mode)==(original.st_size,original.st_mtime_ns,original.st_mode)
+    actual=hashlib.sha256();inverse=hashlib.sha256();changed=None;pos=0
+    with binary.open('rb')as source:
+        while block:=source.read(1024*1024):
+            actual.update(block)
+            if pos<=at<pos+len(block):
+                i=at-pos;changed=block[i];inverse.update(block[:i]);inverse.update(bytes([changed^1]));inverse.update(block[i+1:])
+            else:inverse.update(block)
+            pos+=len(block)
+    assert changed is not None and inverse.hexdigest()==expected and actual.hexdigest()!=expected and pos==original.st_size
+    return {'method':method,'busy_attempts':busy,'elapsed_ns':time.monotonic_ns()-start,'old':[original.st_dev,original.st_ino],'new':[now.st_dev,now.st_ino],'bytes':pos,'text_offset':at,'byte_before':changed^1,'byte_after':changed,'inverse_full_sha256':inverse.hexdigest(),'sha256':actual.hexdigest(),'mode':now.st_mode,'mtime_ns':now.st_mtime_ns}
