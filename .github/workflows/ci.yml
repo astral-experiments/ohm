@@ -1,28 +1,20 @@
-name: Profile the signed compiler on the historical Ruff linter check
-run-name: Ruff 28444 frontend source attribution ${{ inputs.reviewed_head }}
-
+name: Qualify a real private-module visibility change in Ruff
+run-name: Ruff 16149 ordinary check ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
-      experiment:
-        description: Registered experiment to execute
-        type: choice
-        options: [baseline, macro-host-o1, visibility-scope, visibility-matched, visibility-adt]
-        default: baseline
       reviewed_head:
-        description: Exact independently reviewed nonrelease QA commit
+        description: Exact reviewed nonrelease source head
         type: string
         required: true
-
 permissions:
   contents: read
-
 jobs:
-  profile:
-    name: Profile the Ruff linter check
-    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-linter-check-28444-source-pcs-20261102' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
+  inventory:
+    name: Historical Ruff scope edit
+    if: github.repository == 'astral-experiments/ohm' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qa-ruff-16149-visibility-20261103' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 90
+    timeout-minutes: 155
     permissions:
       contents: read
       actions: read
@@ -37,6 +29,7 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             .github/workflows
+            scripts/ruff-module-16149
             scripts/ruff-linter-check-attribution
             scripts/ruff-heldout-mono-fold/residual
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -47,128 +40,46 @@ jobs:
           sparse-checkout: scripts/ruff-default-owner-pmu
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          ref: 3a830cdc9f00b01c7110fac3653d8cd0b305c355
+          path: scope-inline
+          persist-credentials: false
+          sparse-checkout: scripts/ruff-matched-stage
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
           repository: astral-sh/ruff
-          ref: 04ae7c402b2a7f1c49a9a1dd264629c00e38f61b
-          fetch-depth: 2
+          ref: 2f2bc3cc0b2351986dab96b4bc5df8ea910b95ce
+          fetch-depth: 3
           path: ruff
           persist-credentials: false
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.13'
-      - name: Authenticate the signed SDK and enrolled worker
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: python3 -IB qa/scripts/ruff-linter-check-attribution/worker.py acquire
-      - name: Fetch the exact registry closure without compiling
-        if: inputs.experiment != 'visibility-scope' && inputs.experiment != 'visibility-matched' && inputs.experiment != 'visibility-adt'
-        run: python3 -IB qa/scripts/ruff-linter-check-attribution/worker.py prefetch
-      - name: Compare the ordinary and sampled edit with the independent clean result
-        if: inputs.experiment == 'baseline'
-        run: python3 -IB qa/scripts/ruff-linter-check-attribution/worker.py study
-      - name: Compare the fixed ordinary check with one recompiled native macro
-        if: inputs.experiment == 'macro-host-o1'
-        run: python3 -IB qa/scripts/ruff-linter-check-attribution/macro_host.py
-      - name: Install the off-clock native process reader
-        if: inputs.experiment == 'visibility-scope' || inputs.experiment == 'visibility-matched' || inputs.experiment == 'visibility-adt'
+      - name: Install the independent native process observer
         run: |
           sudo apt-get -qq update
           sudo apt-get install -y --no-install-recommends strace
           strace --version
-      - name: Check the actual downstream closure and run Ruff's native diagnostic
-        if: inputs.experiment == 'visibility-scope'
-        run: |
-          python3 -IB qa/scripts/ruff-linter-check-attribution/scope_inventory.py prefetch
-          python3 -IB qa/scripts/ruff-linter-check-attribution/scope_inventory.py study
-      - name: Check out the wide factory reader
-        if: inputs.experiment == 'visibility-matched'
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: a00637de704a07c57070799d306a4c4e9d2c6ccf
-          path: scope-wide
-          persist-credentials: false
-          sparse-checkout: scripts/ruff-matched-stage
-      - name: Check out the root factory reader
-        if: inputs.experiment == 'visibility-matched'
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: a126c17db143071a502603870986ff9b4d8c69f7
-          path: scope-root
-          persist-credentials: false
-          sparse-checkout: scripts/ruff-matched-stage
-      - name: Authenticate three source-built compiler roles
-        id: source_compilers
-        if: inputs.experiment == 'visibility-matched'
+      - name: Enroll the original sources and matched compiler capsule
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_matched.py acquire
-      - name: Authenticate normal source and dependencies for the matched roles
-        id: source_registry
-        if: inputs.experiment == 'visibility-matched'
-        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_inventory.py prefetch
-      - name: Run root-P fixture with exact source, diagnostics and native outputs
-        if: always() && inputs.experiment == 'visibility-matched' && steps.source_compilers.outcome == 'success'
-        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_matched.py fixture root-P
-      - name: Run root-P study with exact source, diagnostics and native outputs
-        if: always() && inputs.experiment == 'visibility-matched' && steps.source_compilers.outcome == 'success' && steps.source_registry.outcome == 'success'
-        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_matched.py study root-P
-      - name: Run root-C fixture with exact source, diagnostics and native outputs
-        if: always() && inputs.experiment == 'visibility-matched' && steps.source_compilers.outcome == 'success'
-        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_matched.py fixture root-C
-      - name: Run root-C study with exact source, diagnostics and native outputs
-        if: always() && inputs.experiment == 'visibility-matched' && steps.source_compilers.outcome == 'success' && steps.source_registry.outcome == 'success'
-        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_matched.py study root-C
-      - name: Run wide-C fixture with exact source, diagnostics and native outputs
-        if: always() && inputs.experiment == 'visibility-matched' && steps.source_compilers.outcome == 'success'
-        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_matched.py fixture wide-C
-      - name: Run wide-C study with exact source, diagnostics and native outputs
-        if: always() && inputs.experiment == 'visibility-matched' && steps.source_compilers.outcome == 'success' && steps.source_registry.outcome == 'success'
-        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_matched.py study wide-C
-      - name: Check out the frozen inline ADT factory reader
-        if: inputs.experiment == 'visibility-adt'
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: 3a830cdc9f00b01c7110fac3653d8cd0b305c355
-          path: scope-inline
-          persist-credentials: false
-          sparse-checkout: scripts/ruff-matched-stage
-      - name: Check out the fixed-path compiler upgrade receiver
-        if: inputs.experiment == 'visibility-adt'
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ref: ad5975b4a4aa91c2ff69a1728fa802dba99e3ecd
-          path: format-reader
-          persist-credentials: false
-          sparse-checkout: scripts/ruff-upstream-mono-pilot/cross-version
-      - name: Authenticate both source compilers for inline ADT scopes
-        id: inline_compilers
-        if: inputs.experiment == 'visibility-adt'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_matched.py acquire-adt
-      - name: Bind the ordinary Ruff target and locked registry inputs
-        id: inline_registry
-        if: inputs.experiment == 'visibility-adt'
-        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_inventory.py prefetch
-      - name: Exercise both native incremental format transitions
-        if: always() && inputs.experiment == 'visibility-adt' && steps.inline_compilers.outcome == 'success'
-        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_adt_crossover.py
-      - name: Verify visibility, reexports, trait and rustdoc on inline-P
-        if: always() && inputs.experiment == 'visibility-adt' && steps.inline_compilers.outcome == 'success'
-        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_matched.py fixture inline-P
-      - name: Verify the actual Ruff edit, clean binary and invalid repair on inline-P
-        if: always() && inputs.experiment == 'visibility-adt' && steps.inline_compilers.outcome == 'success' && steps.inline_registry.outcome == 'success'
-        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_matched.py study inline-P
-      - name: Verify visibility, reexports, trait and rustdoc on inline-C
-        if: always() && inputs.experiment == 'visibility-adt' && steps.inline_compilers.outcome == 'success'
-        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_matched.py fixture inline-C
-      - name: Verify the actual Ruff edit, clean binary and invalid repair on inline-C
-        if: always() && inputs.experiment == 'visibility-adt' && steps.inline_compilers.outcome == 'success' && steps.inline_registry.outcome == 'success'
-        run: python3 -IB qa/scripts/ruff-linter-check-attribution/scope_matched.py study inline-C
+        run: python3 -IB qa/scripts/ruff-module-16149/setup.py acquire
+      - name: Verify the complete lock and ordinary check and build graphs
+        id: inputs
+        run: python3 -IB qa/scripts/ruff-module-16149/setup.py prefetch
+      - name: Run the ordinary parent check and native lint oracles
+        if: always() && steps.inputs.outcome == 'success'
+        run: python3 -IB qa/scripts/ruff-module-16149/study.py P
+      - name: Run the ordinary candidate check and native lint oracles
+        if: always() && steps.inputs.outcome == 'success'
+        run: python3 -IB qa/scripts/ruff-module-16149/study.py C
+      - name: Reconcile the two complete private histories
+        if: always() && steps.inputs.outcome == 'success'
+        run: python3 -IB qa/scripts/ruff-module-16149/study.py compare
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: ruff-linter-check-attribution-${{ github.run_id }}
-          path: ${{ runner.temp }}/ohm-ruff28444/receipt
+          name: ruff-16149-private-scope-${{ github.run_id }}
+          path: ${{ runner.temp }}/ohm-ruff16149/receipt
           if-no-files-found: error
-          compression-level: 1
+          compression-level: 2
           retention-days: 7

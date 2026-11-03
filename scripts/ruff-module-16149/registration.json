@@ -1,0 +1,68 @@
+{
+  "edit": "16e642610c31206b12c8bd8ea66e4fdd54479726",
+  "expected_root_roster": [
+    "ruff_graph",
+    "ruff_linter",
+    "ruff_server",
+    "ruff_workspace"
+  ],
+  "lock": {
+    "git": {
+      "git+https://github.com/astral-sh/lsp-types.git?rev=3512a9f#3512a9f33eadc5402cfab1b8f7340824c8ca1439": {
+        "packages": [
+          "lsp-types"
+        ],
+        "tree": "ee717e01608bb1e9d61fbeaeba9586249167b92a"
+      },
+      "git+https://github.com/salsa-rs/salsa.git?rev=351d9cf0037be949d17800d0c7b4838e533c2ed6#351d9cf0037be949d17800d0c7b4838e533c2ed6": {
+        "packages": [
+          "salsa",
+          "salsa-macro-rules",
+          "salsa-macros"
+        ],
+        "tree": "d75eb4d05fe1cece9819a8c4593fe3b94d9caad5"
+      }
+    },
+    "git_packages": 4,
+    "registry_crates": 424,
+    "sha256": "18e9ebd7fd09afcdd4c7a225437b51b9f1a2232a49034dc900606dad6d664218",
+    "workspace": 37
+  },
+  "probe": "PLW3201",
+  "read_source": "c2a3156a07cc918e6902ba869e767e3d0cd607da",
+  "registered_predicates": {
+    "16e642610c31206b12c8bd8ea66e4fdd54479726": false,
+    "2f2bc3cc0b2351986dab96b4bc5df8ea910b95ce": true,
+    "bf8a3920c8ec8f55fc5a39f3d0b2e2559390e0a5": true
+  },
+  "repair": "2f2bc3cc0b2351986dab96b4bc5df8ea910b95ce",
+  "root": "bf8a3920c8ec8f55fc5a39f3d0b2e2559390e0a5",
+  "schema_compressed_sha256": "236f4a0f399c405ddde4b5112d5b75983916b6ce5a3ee8056274c2dcc9047c5e",
+  "sources": {
+    "16e642610c31206b12c8bd8ea66e4fdd54479726": {
+      "lock_blob": "26895f7982a119b56dc0b727b010d4be65ff2bfa",
+      "lock_sha256": "18e9ebd7fd09afcdd4c7a225437b51b9f1a2232a49034dc900606dad6d664218",
+      "parents": [
+        "bf8a3920c8ec8f55fc5a39f3d0b2e2559390e0a5"
+      ],
+      "tree": "26abc88024aee7f2338decb88fb69c42af95356e"
+    },
+    "2f2bc3cc0b2351986dab96b4bc5df8ea910b95ce": {
+      "lock_blob": "26895f7982a119b56dc0b727b010d4be65ff2bfa",
+      "lock_sha256": "18e9ebd7fd09afcdd4c7a225437b51b9f1a2232a49034dc900606dad6d664218",
+      "parents": [
+        "16e642610c31206b12c8bd8ea66e4fdd54479726"
+      ],
+      "tree": "e6f21a01062cd06eb36a3c197c83a969e1263d3b"
+    },
+    "bf8a3920c8ec8f55fc5a39f3d0b2e2559390e0a5": {
+      "lock_blob": "26895f7982a119b56dc0b727b010d4be65ff2bfa",
+      "lock_sha256": "18e9ebd7fd09afcdd4c7a225437b51b9f1a2232a49034dc900606dad6d664218",
+      "parents": [
+        "9304fdf4ecacfcd9f8bf76c850c276bfabcfaf66"
+      ],
+      "tree": "8027cc44aa15c94773a86c2b0d13f91e751ed080"
+    }
+  },
+  "upstream": "astral-sh/ruff"
+}

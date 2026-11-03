@@ -1,0 +1,21 @@
+# An ordinary Ruff check after widening a private module
+
+This unscored, paired Linux study asks whether the compiler's field-visibility dependency change keeps the complete producer public hash stable and lets Cargo skip an actual consumer. It uses the original review commit in Ruff #16149, which changes three ruff_linter files. The producer's crate version, Cargo manifests and lock stay identical.
+
+| State | Ruff source | Expected lint on a normal __add__ method |
+|---|---|---|
+| OLD | bf8a3920c8ec8f55fc5a39f3d0b2e2559390e0a5 | Pass |
+| EDIT | 16e642610c31206b12c8bd8ea66e4fdd54479726 | PLW3201 |
+| FIX | 2f2bc3cc0b2351986dab96b4bc5df8ea910b95ce | Pass |
+
+EDIT makes the existing pylint helpers module crate-visible and factors two private implementations. The original 134 known dunder names drop to 87. FIX explicitly adds the missing predicate call and restores the 47 operators. The regular Ruff binary must produce the expected JSON with --preview --select PLW3201 on all three sources. A misspelled method must continue to fail and __init__ must continue to pass. An independent empty-target build must reproduce the edited behavior.
+
+The ordinary command is cargo +ohm check -p ruff --bin ruff --locked --offline -j4 --message-format=json. Separate matched P and C source-built compilers from factory 41568934075 run on a single host, at the same physical SDK location, in separate empty target histories. The original Cargo, rustc driver, frozen Git sources, all 424 registry archives, and the actual two root unit graphs are bound before compilation. The isolated Cargo home has no prebuilt work products. A successful check by the source producer, a fresh unchanged repetition, the actual edit, invalid E0308 and repaired source, the real upstream repair, and a fully independent empty edited build are retained. Native build/run controls use their own targets. A restored checkpoint repeats the ordinary edit under syscall observation, recording physical compiler argv and file identity. All original Cargo output, the real nonfresh roster, and the four selected complete .rmeta members are retained.
+
+The registered positive requires the linter to recompile and its private hash to change under both compilers. The P public hash must change, the C public hash must stay equal, and at least one actual regular downstream compiler observed in P must disappear in C. Both unchanged rosters must be empty. The restored traced observations must match the ordinary roster and outputs. Published public/global/stable metadata in the repaired and independent clean histories must match the original edited check. Retain the actual result of every comparison, including any raw-metadata identity drift. This study does not infer a speedup from a count of units.
+
+Preselection came from a separate actual Ruff #28444 graph. All five of SequenceIndexVisitor's private fields encode the named helpers module as their visibility restriction. In that graph 57 of 59 public roots reach the module under the recorded rules and zero do after the two visibility edge classes are removed. Those numbers select the experiment; neither the earlier graph nor a source-level prediction qualifies the #16149 outcome.
+
+The input schemas were checked against both source compilers and reopened on 24 previous complete native .rmeta members. Checksum bindings live in registration.json. The full parser is the immutable Ohm QA reader from c2a3156a07cc918e6902ba869e767e3d0cd607da. The sorted source tables fit in a 12 KB gzip file. There are no binary build products in Git.
+
+[Original Ruff pull request](https://github.com/astral-sh/ruff/pull/16149) · [Matched compiler factory](https://github.com/astral-experiments/ohm/actions/runs/41568934075) · [Frozen reader](https://github.com/astral-experiments/ohm/blob/c2a3156a07cc918e6902ba869e767e3d0cd607da/scripts/ruff-linter-check-attribution/evidence/field-visibility/scope_rdr.py)
