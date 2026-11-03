@@ -9,6 +9,7 @@ on:
         type: string
 permissions:
   contents: read
+  actions: read
 jobs:
   inspect:
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-historical-ruff-sete-native-20261103'
