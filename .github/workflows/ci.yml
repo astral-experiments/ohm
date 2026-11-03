@@ -1,5 +1,5 @@
 name: Compare the actual Ruff derived-impl Cargo edits
-run-name: Repeat the separate Ruff CLI receiver from an authenticated initial OLD
+run-name: Six balanced source-built Rust compiler pairs for the Ruff CLI help edit
 permissions:
   contents: read
   actions: read
@@ -11,20 +11,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-        - case: '26372'
-          new: fa4a7bca2db70229710892c97b26ea6fb046cfc4
-    name: Real Ruff edit ${{ matrix.case }}
+        slot: [0, 1, 2, 3, 4, 5]
+    name: Independently initialized Ruff build ${{ matrix.slot }}
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       OHM_STUDY_MODE: build
-      RUFF_CASE: ${{ matrix.case }}
+      RUFF_CASE: "28392"
+      BOOT_SLOT: ${{ matrix.slot }}
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         ref: ${{ inputs.reviewed_head }}
         path: current-qa
+        persist-credentials: false
+        sparse-checkout: scripts/ruff-derived-impl-cgus
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 453a3893b5844334a5b7f1c770c14e94ad1a34f8
+        path: original-receiver
         persist-credentials: false
         sparse-checkout: scripts/ruff-derived-impl-cgus
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -36,18 +41,18 @@ jobs:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         repository: astral-sh/ruff
-        ref: ${{ matrix.new }}
+        ref: d136bd8d002a648de5f344df602e492658306f1e
         fetch-depth: 2
         path: ruff
         persist-credentials: false
     - name: Open the immutable SDKs and run both typical CLI build histories at the same paths
       env:
         GH_TOKEN: ${{ github.token }}
-      run: python3 -IB current-qa/scripts/ruff-derived-impl-cgus/paired.py
+      run: python3 -IB current-qa/scripts/ruff-derived-impl-cgus/confirm.py
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: derived-impl-${{ matrix.case }}-${{ github.run_id }}
+        name: confirmed-help-${{ matrix.slot }}-${{ github.run_id }}
         path: ${{ runner.temp }}/derived-owner-outputs
         compression-level: 1
         retention-days: 14

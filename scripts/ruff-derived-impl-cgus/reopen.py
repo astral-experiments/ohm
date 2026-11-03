@@ -18,7 +18,7 @@ import mono_rows
 import partitions
 
 STAGES = ('cold-old', 'old-unchanged', 'edit', 'edited-unchanged', 'repair', 'reverse', 'observed-edit', 'empty-new')
-OLD = {'cold-old', 'old-unchanged', 'reverse'}
+OLD = {'cold-old', 'old-unchanged', 'reverse', 'restored-old', 'second-cold-old', 'second-old-unchanged'}
 ELF = b'\x7fELF\x02\x01\x01'
 HERE = Path(__file__).resolve().parent
 def demand(value, reason):
@@ -139,6 +139,11 @@ def verify_role(z,role,reg,case):
     demand(src['source']==reg['registration'][name] and src['tree']==reg['registration'][name+'_tree'] and sdk['driver']==spec['driver'] and sha(z.read(role+'/factory/bootstrap.json'))=='3129eb48157c6b610c65b818ac9f86269ab1257020cf12d29701a36111460993','different immutable SDK')
     products={};states={};price={};cgas={};ars={};sizes={};runtime={};scanned={};have_elf={};scans={};partial=collections.Counter()
     actual_stages=tuple(('restored-old' if s=='reverse'else s) for s in STAGES) if role+'/initial-old-namespace.json'in z.namelist() else STAGES
+    concurrent = role+'/source-initial.json' in z.namelist()
+    if concurrent:
+        a, b = read('source-initial.json'), read('source-restored.json')
+        demand(a==b and len(a['sha256'])==64 and a['regular_paths']>10000 and a['logical_unique_bytes']>1000000,'different cold checkout or Git state')
+        actual_stages=tuple(p for p in STAGES if p!='reverse')+('second-cold-old','second-old-unchanged','observed-new-unchanged')
     if 'restored-old' in actual_stages:
         a=read('initial-old-namespace.json');b=read('restored-old-namespace.json');demand(a==b and len(a['sha256'])==64 and a['logical_unique_bytes']>0,'incomplete original namespace')
     for ph in actual_stages:
@@ -190,7 +195,7 @@ def verify_role(z,role,reg,case):
             f=lambda key:{k:(r[4],r[5])for k,r in states[key][kind].items()}
             demand(f(ph)==f(ref),'independently reconstructed native output changed')
     demand(products['cold-old']['elf']!=products['edit']['elf']and products['cold-old']['verdict']!=products['edit']['verdict'],'edit had no native effect')
-    for ph in (['old-unchanged','edited-unchanged','observed-edit']+(['restored-old']if 'restored-old'in actual_stages else [])):
+    for ph in (['old-unchanged','edited-unchanged','observed-edit']+(['restored-old']if 'restored-old'in actual_stages else [])+(['second-old-unchanged','observed-new-unchanged']if concurrent else [])):
         k=lifetimes(z,f'{role}/{ph}/kernel-execs');trusted=read(ph+'/lifetime.json');demand(k['whole']==trusted['whole']and list(map(list,k['rustcs']))==trusted['rustcs']and k['wild']==trusted['wild_lifetimes'],'derived lifetime prices differ')
         if ph=='observed-edit':
             demand(sorted((n,t)for n,t,_ in k['rustcs'])==[('ruff','bin'),('ruff','lib')] and k['wild'],'wrong re-edited Rust or linker workload')
@@ -201,17 +206,30 @@ def verify_role(z,role,reg,case):
         a,b=states['cold-old'][kind],states['edit'][kind];shared=a.keys()&b.keys()
         kept={k for k in shared if a[k][1:]==b[k][1:]};same={k for k in shared if a[k][4:]==b[k][4:]}
         transitions[kind]={'before':len(a),'after':len(b),'new_names':sorted(b.keys()-a.keys()),'removed_names':sorted(a.keys()-b.keys()),'physical_donors':len(kept),'rebuilt_unchanged':sorted(same-kept),'changed_in_place':sorted(shared-same),'non_donor_full_bytes':sum(r[4]for k,r in b.items()if k not in kept)}
+    proof=None
+    if concurrent:
+        def same(a,b):return {k:v for k,v in products[a].items()if k!='rlib'}=={k:v for k,v in products[b].items()if k!='rlib'}
+        recorded=read('independent-metadata.json')
+        proof={'first_to_second_old':same('cold-old','second-cold-old'),'first_to_second_edit':same('edit','observed-edit'),'first_to_empty_edit':same('edit','empty-new')}
+        demand(all(recorded[k]==v for k,v in proof.items())and recorded['primary_states']=={k:products[k]for k in recorded['primary_states']},'changed metadata/ABI qualification')
+        for n,m in [('second-cold-old','second-old-unchanged'),('observed-edit','observed-new-unchanged')]:demand(same(n,m),'second settled changed')
+        ordinary=read('ordinary-admission.json');demand(ordinary==dict(role=role,case=case,old=products['cold-old'],edit=products['edit'],clean=products['empty-new'],ordinary_controls=True),'incomplete initial native control')
     mini=read('mini/verdict.json');guards=read('guards/guard-verdict.json');demand(mini['edit']==mini['clean']and len(set(mini['named_native_units'].values()))==(1 if role=='P'else 3),'derive native control')
-    return dict(compiler=src,driver=sdk['driver'],ordinary=price,lifetime=detail,transitions=transitions,census=cgas,storage=sizes,runtime=runtime,native_clap=scans,guards=guards,metadata_warm_clean={k:products['edit'].get(k)==products['empty-new'].get(k)for k in ('rmeta','embedded_rmeta','rlib','canonical_archive')},elf={k:products[k]['elf']for k in('cold-old','edit','empty-new')},source_verdicts={k:products[k]['verdict']for k in('cold-old','edit','empty-new')},original_objects=len(scanned),raw_bodies=len(have_elf))
+    return dict(compiler=src,driver=sdk['driver'],independent_forward_proof=proof,ordinary=price,lifetime=detail,transitions=transitions,census=cgas,storage=sizes,runtime=runtime,native_clap=scans,guards=guards,metadata_warm_clean={k:products['edit'].get(k)==products['empty-new'].get(k)for k in ('rmeta','embedded_rmeta','rlib','canonical_archive')},elf={k:products[k]['elf']for k in('cold-old','edit','empty-new')},source_verdicts={k:products[k]['verdict']for k in('cold-old','edit','empty-new')},original_objects=len(scanned),raw_bodies=len(have_elf))
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('archive',type=Path);p.add_argument('digest');p.add_argument('output',type=Path);args=p.parse_args()
     with args.archive.open('rb')as f:demand(hashlib.file_digest(f,'sha256').hexdigest()==args.digest,'wrong complete Actions ZIP')
     with zipfile.ZipFile(args.archive)as z:
         demand(len(z.namelist())==len(set(z.namelist())),'duplicate ZIP members')
-        reg=json.loads(z.read('registration.json'));case=reg['case'];demand(reg['registration']==json.loads((HERE/'registration.json').read_bytes())and reg['transports']==json.loads((HERE/'transports.json').read_bytes())and reg['order']=={'28392':'PC','26372':'CP'}[case],'wrong source cohort')
+        reg=json.loads(z.read('registration.json'));case=reg['case'];order={'28392':'PC','26372':'CP'}[case];slot=None
+        if 'confirmation.json' in z.namelist():
+            conf=json.loads(z.read('confirmation.json'));raw=(HERE/'confirmation-plan.json').read_bytes();plan=json.loads(raw);slot=conf['slot']
+            demand(type(slot)is int and 0<=slot<6 and case=='28392'and conf['plan_sha256']==sha(raw)and conf['runner_head']==plan['primary_receiver_commit']and re.fullmatch('[0-9a-f]{40}',conf['recorded_receipt'])and conf['real_driver_sources']==plan['compilers'],'different frozen enrollment')
+            order=plan['orders'][slot];demand(conf['order']==order,'changed assigned order')
+        demand(reg['registration']==json.loads((HERE/'registration.json').read_bytes())and reg['transports']==json.loads((HERE/'transports.json').read_bytes())and reg['order']==order,'wrong source cohort')
         demand(json.loads(z.read('terminal.json'))=={'case':case,'paired':True,'order':reg['order']},'worker refusal')
         results={role:verify_role(z,role,reg,case)for role in reg['order']};a,b=results['P'],results['C'];demand(a['source_verdicts']==b['source_verdicts'],'cross-role native answers differ')
-    cu=lambda x:100*(1-b['ordinary'][x]/a['ordinary'][x]);delta={k:cu(k)for k in a['ordinary']};case_result={'sha256':args.digest,'case':case,'boot':reg['boot'],'order':reg['order'],'roles':results,'whole_reduction_pct':delta,'library_rustc_reduction_pct':100*(1-b['lifetime']['lib']/a['lifetime']['lib']),'whole_only_this_registered_pair':True}
+    cu=lambda x:100*(1-b['ordinary'][x]/a['ordinary'][x]);delta={k:cu(k)for k in a['ordinary']};case_result={'sha256':args.digest,'case':case,'confirmation_slot':slot,'boot':reg['boot'],'order':reg['order'],'roles':results,'whole_reduction_pct':delta,'library_rustc_reduction_pct':100*(1-b['lifetime']['lib']/a['lifetime']['lib']),'whole_only_this_registered_pair':True}
     args.output.write_text(json.dumps(case_result,sort_keys=True,indent=1)+'\n')
     print(case,reg['order'],a['ordinary']['edit'],b['ordinary']['edit'],round(delta['edit'],3),round(case_result['library_rustc_reduction_pct'],3))
 if __name__=='__main__':main()
