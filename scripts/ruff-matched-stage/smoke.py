@@ -4,7 +4,9 @@ import json
 import os
 from pathlib import Path
 import shutil
+import sys
 import subprocess
+import tarfile
 
 from capsule import REG, HOST, need, save, sha
 
@@ -65,7 +67,7 @@ def smoke(root, manifest, base):
             ver[tool] = execute([tool, "+ohm", "-vV"], work, env).stdout.decode()
         need(
             REG["signed_cargo"]["revision"] in ver["cargo"]
-            and "ohm-1.99.0-22" in ver["cargo"]
+            and REG["signed_cargo"]["tag"] in ver["cargo"]
             and "host: " + HOST in ver["rustc"]
             and "LLVM version:" in ver["rustc"],
             "foreign compiler/Cargo",
@@ -205,6 +207,7 @@ def smoke(root, manifest, base):
         )
         for n, key in manifest["arms"][label]["files"].items():
             need(sha(target / n) == key, ("smoke changed installed compiler", n))
+        role = "parent" if label == "normal" else "candidate"
         all_rows[label] = {
             "versions": ver,
             "loaded": libtrace,
