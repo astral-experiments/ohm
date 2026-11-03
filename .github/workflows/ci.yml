@@ -30,8 +30,8 @@ permissions:
   attestations: read
 jobs:
   root:
-    if: false && (github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21134-handwritten-check'
-      && github.sha == inputs.reviewed_head && github.run_attempt == 1 && startsWith(inputs.series, 'marginal.'))
+    if: github.event.repository.private == true && github.repository == 'astral-experiments/ohm' && github.ref == 'refs/heads/charlie/codex-21134-handwritten-check'
+      && github.sha == inputs.reviewed_head && github.run_attempt == 1 && startsWith(inputs.series, 'marginal.')
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 180
     env:
