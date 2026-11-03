@@ -25,49 +25,22 @@
       "dc0db7275adb2dbe921ce5df0811108e84d6408d",
       "5c3cea67eca46acbb95bf62a97485200f6c00c44",
       "c6b5bef8a0b36608968c568637529c68069d494f",
-      "a3fc6da13921586bc374586dee00883e9210aecd"
+      "a3fc6da13921586bc374586dee00883e9210aecd",
+      "259ad7069e47eaf08cf106f187b2b6393f7fd7c2"
     ],
-    "branch": "refs/heads/charlie/rc23-recover-upstream-mono-buckets",
-    "bytes": 20603,
+    "branch": "refs/heads/charlie/experiment-rdr-visibility-scope-20261103",
+    "bytes": 21694,
     "prerequisite": "28b64bc39032c1786908d98ea2df92f855226d0f",
-    "sha256": "ad8f5bd8fd3d91f0a115c78881a0fbd5347e4afa85b681bce5c9f00bf09d1758"
+    "sha256": "1d40a8354e7f0e9d5d652fcc7b998c354bb21511bbc915224eb40cea456c9e39"
   },
   "changed_sources": {
-    "compiler/rustc_codegen_ssa/src/back/symbol_export.rs": {
-      "C": "01c312eaffebd2a0a327d5644ddc7d3616849295",
-      "P": "6af2626bab17fa20c1f0cf4bc7a98e886896f345"
-    },
     "compiler/rustc_incremental/src/persist/file_format.rs": {
-      "C": "f1cc605908e55162469ad0dfd0c0efb0b2c8c238",
-      "P": "f96e27d853eaf23289d72479b990780eda43eacc"
+      "C": "725e37567705d735f27924bee8c1205ef931d7fa",
+      "P": "f1cc605908e55162469ad0dfd0c0efb0b2c8c238"
     },
-    "compiler/rustc_middle/src/dep_graph/dep_node.rs": {
-      "C": "9cb8b625a6c8ca6775851f1d0bb5875536ec053c",
-      "P": "8b4564c2ed0260bc1a644ebc8c40f2ac1004cbf3"
-    },
-    "compiler/rustc_middle/src/dep_graph/dep_node_key.rs": {
-      "C": "49515352b6a70647a0e086e74008891567684467",
-      "P": "9d03057235279f2ae21cd363554fd82d2fded34e"
-    },
-    "compiler/rustc_middle/src/dep_graph/mod.rs": {
-      "C": "49567c61e0d340ae47cad3c2e91c2004998540a4",
-      "P": "60c4b55ec6d348a3489cc6b06e50a5638b360147"
-    },
-    "compiler/rustc_middle/src/mono.rs": {
-      "C": "8e74b07bc8bcf630f6805eded2875d9182b14f12",
-      "P": "6ab4725289c190fa8743ac0b69c544572df5af93"
-    },
-    "compiler/rustc_middle/src/queries.rs": {
-      "C": "bd94799143ac12d72291a53457e8d618e7701d86",
-      "P": "b3dbd5b04f80a33909f190a5cef829d904523c37"
-    },
-    "compiler/rustc_middle/src/query/keys.rs": {
-      "C": "4b261517443a0ca79204bb493e977d98dc88514d",
-      "P": "7e18b765fd54901860a14f2583a5a2800f8355c5"
-    },
-    "compiler/rustc_middle/src/ty/instance.rs": {
-      "C": "223ff96515c56401b621a8d39fa4f288631647c9",
-      "P": "dcd0ee601aa9da5a91c35048bfdddb86e31199ea"
+    "compiler/rustc_metadata/src/rmeta/encoder.rs": {
+      "C": "96324d7c656df74bf8f587b39bd73bb05067cf59",
+      "P": "2b2f08dbca687cd0352adeeffe80d38fb1a06a50"
     }
   },
   "kit": {
@@ -77,14 +50,14 @@
   },
   "roles": {
     "C": {
+      "compiler": "15ff0c36f4833ce60adc8a72d1954f330d2fb06f",
+      "revision": "d680d170e211b3b9abc720ec3761d0c5dd61412b",
+      "tree": "90d7966236a2f485845bad7cf25e7e2d31b297ef"
+    },
+    "P": {
       "compiler": "d0262da6fe48ab665147e0e12014d92574897bdc",
       "revision": "259ad7069e47eaf08cf106f187b2b6393f7fd7c2",
       "tree": "2583ceb1254796772d3ae9099ed07a8a53747d2b"
-    },
-    "P": {
-      "compiler": "5f25f548bfc4983f74a29f0796093191b2220c1f",
-      "revision": "a3fc6da13921586bc374586dee00883e9210aecd",
-      "tree": "736b983382d446c40bd5bd853df881bef65cb6ad"
     }
   },
   "schema": "ohm-remat-builder-registration-v1",

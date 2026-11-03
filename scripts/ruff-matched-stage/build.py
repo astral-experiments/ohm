@@ -15,7 +15,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from capsule import HOST, REG, need, reopen, save, seal, sha
 
-BRANCH = "charlie/qa-upstream-mono-owner-20261102"
+BRANCH = "charlie/qa-rdr-visibility-scope-20261103"
 BASE = "00f4192b5507f8c028898ce5bd66958d20f341c5"
 
 
