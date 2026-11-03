@@ -1,5 +1,5 @@
 use ruff_db::files::system_path_to_file;
-use ruff_db::system::{OsSystem, SystemPath};
+use ruff_db::system::{InMemorySystem, SystemPath};
 use ty_project::{Db, ProjectDatabase, ProjectMetadata, UseUv};
 
 fn main() {
@@ -22,7 +22,9 @@ fn main() {
     }
     for mode in [UseUv::Off, UseUv::Scripts] {
         let metadata = ProjectMetadata::new("owner-oracle", root.to_path_buf()).with_use_uv(mode);
-        let system = OsSystem::new(root);
+        let system = InMemorySystem::default();
+        let path = root.join("script.py");
+        system.fs().write_file_all(&path, std::fs::read(path.as_str()).unwrap()).unwrap();
         let db = ProjectDatabase::use_defaults(metadata, system);
         let project = db.project();
         let file = system_path_to_file(&db, &root.join("script.py")).unwrap();
