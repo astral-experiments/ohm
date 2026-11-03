@@ -131,3 +131,56 @@ pub(crate) fn normalized_environment() {
         crate::frozen::log(format_args!("ENVKEY\t{name:?}\t{}",blake3::hash(use_bytes)));
     }
 }
+
+
+pub(crate) fn input_script(commands: &[crate::linker_script::Command<'_>]) -> bool {
+    use crate::linker_script::Command;
+    commands.iter().all(|c| match c {
+        Command::Arg(_) | Command::Ignored | Command::OutputFormat(_) => true,
+        Command::AsNeeded(nested) | Command::Group(nested) => input_script(nested),
+        _ => false,
+    })
+}
+
+pub(crate) fn symbols_only(bytes: &[u8]) -> bool {
+    // Restrict the changing path to a relocatable with only the GNU property, symbols
+    // and strings. No symbol defines bytes, references a file name, or has provenance
+    // in any input section. Its whole content still participates in the recipe.
+    fn inspect(b: &[u8]) -> Option<()> {
+        let u16at=|b:&[u8],i| Some(u16::from_le_bytes(b.get(i..i+2)?.try_into().ok()?));
+        let u32at=|b:&[u8],i| Some(u32::from_le_bytes(b.get(i..i+4)?.try_into().ok()?));
+        let u64at=|b:&[u8],i| Some(u64::from_le_bytes(b.get(i..i+8)?.try_into().ok()?));
+        if b.len()>1<<20 || b.get(..7)?!=b"\x7fELF\x02\x01\x01" || u16at(b,16)?!=1 || u16at(b,18)?!=62 ||
+            u16at(b,56)?!=0 || u16at(b,58)?!=64 || u16at(b,60)?!=5 || u16at(b,62)?!=4 {return None;}
+        let shoff:usize=u64at(b,40)?.try_into().ok()?;
+        let sh=b.get(shoff..shoff.checked_add(5*64)?)?;
+        if sh[..64].iter().any(|&v|v!=0) {return None;}
+        let region=|r:&[u8]| {
+            let off:usize=u64at(r,24)?.try_into().ok()?;
+            let size:usize=u64at(r,32)?.try_into().ok()?;
+            b.get(off..off.checked_add(size)?)
+        };
+        let names=region(&sh[4*64..5*64])?;
+        let strs=region(&sh[3*64..4*64])?;
+        let section_names:[&[u8];4]=[b".note.gnu.property",b".symtab",b".strtab",b".shstrtab"];
+        for (i,(r,n)) in sh[64..].chunks_exact(64).zip(section_names).enumerate() {
+            let off=u32at(r,0)? as usize;
+            if names.get(off..)?.split(|x|*x==0).next()?!=n || u32at(r,4)?!=[7,2,3,3][i] ||
+                u64at(r,8)?!=0 || region(r).is_none() {return None;}
+        }
+        let property=region(&sh[64..128])?;
+        if property.len()!=32 || u32at(property,0)?!=4 || u32at(property,4)?!=16 || u32at(property,8)?!=5 ||
+            &property[12..16]!=b"GNU\0" || u32at(property,16)?!=0xc0000002 || u32at(property,20)?!=4 ||
+            u32at(property,24)?!=3 || u32at(property,28)?!=0 {return None;}
+        let tab=&sh[2*64..3*64];let syms=region(tab)?;
+        if u32at(tab,40)?!=3 || u32at(tab,44)?!=1 || u64at(tab,56)?!=24 || syms.len()<48 ||
+            !syms.len().is_multiple_of(24) || syms[..24].iter().any(|x|*x!=0) ||
+            strs.first()!=Some(&0) || strs.last()!=Some(&0) {return None;}
+        for sym in syms[24..].chunks_exact(24) {
+            let name=u32at(sym,0)? as usize;
+            if name==0 || name>=strs.len() || sym[4]!=16 || sym[5..].iter().any(|x|*x!=0) {return None;}
+        }
+        Some(())
+    }
+    inspect(bytes).is_some()
+}

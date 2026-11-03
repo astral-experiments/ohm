@@ -1,0 +1,178 @@
+{
+  "acquired_original_pipe": [
+    [
+      5,
+      15,
+      19034,
+      4480,
+      0
+    ],
+    [
+      7,
+      15,
+      19034,
+      4480,
+      1
+    ]
+  ],
+  "actual_byte_count": 618900091,
+  "actual_file_count": 409,
+  "artifact": 13269471484,
+  "field": {
+    "different_section_payloads": [
+      ".note.gnu.build-id"
+    ],
+    "full_equal": false,
+    "headers": [
+      [
+        ".rodata",
+        "sh_entsize",
+        8,
+        0
+      ]
+    ],
+    "new_native_bytes": 227977696,
+    "old_native_bytes": 227977696,
+    "outside_section_byte_changes": [
+      [
+        227975768,
+        8,
+        0
+      ]
+    ],
+    "section_count": [
+      42,
+      42
+    ],
+    "whole": [
+      "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+      "6d3724468395065d8eb0721eac41893b01e38ffe69eeeb88a59419886ab7a893"
+    ]
+  },
+  "github_zip_sha256": "00afcd62c17d513e93e237b27034f989ecbf9ba684ebe85a331e2b8d4436d7d5",
+  "native_elfutils_effect": {
+    "exit": 1,
+    "stderr": "eu-strip: while writing '/dev/null': invalid section entry size\n",
+    "stdout": "",
+    "version": "eu-strip (elfutils) 0.190"
+  },
+  "old_prior_genuine_reference": "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+  "ordinary_group": {
+    "contributing_groups": 14,
+    "last_group_index": 14,
+    "last_group_inputs": [
+      {
+        "actual_attrs": "SectionAttributes { flags: SHF_ALLOC | SHF_MERGE, ty: SHT_PROGBITS, entsize: 8, overrides: LinkerScriptOverrides { avoid_progpogation: 0, has_fixed_type: false }, class: PhantomData<libwild::elf::Class64> }",
+        "count": 1,
+        "entsize": 8,
+        "file_or_member": "/home/runner/work/_temp/ohm-foreign-join/sdk/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-2c8a5c6ff1eaecd1.rlib @ compiler_builtins-2c8a5c6ff1eaecd1.compiler_builtins.864f02032cfdccbc-cgu.155.rcgu.o",
+        "section": ".rodata.cst8"
+      }
+    ],
+    "last_group_size": 8,
+    "sections_reduced": 37530,
+    "threads": 1
+  },
+  "physical_native_elf": "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+  "refusal": {
+    "all_following_controls_unqualified": true,
+    "role": "tokens-1-2",
+    "tokens_at_driver_return": 0,
+    "tokens_before": 1
+  },
+  "run": 41712333191,
+  "same_raw_argv_sha256": "b5ed643752c5bad69cb50e88aa14f8751744373ee39a743018ed7d900b2feb56",
+  "signed": {
+    "no-fds": {
+      "delivered": [
+        [
+          5,
+          null
+        ],
+        [
+          7,
+          null
+        ]
+      ],
+      "entsize": 0,
+      "libelf": {
+        "elf_update_null": {
+          "computed_size": 227977760,
+          "diagnostic": null,
+          "errno": 0
+        },
+        "errno": 0,
+        "readable": true
+      },
+      "rodata_bytes": 5851098,
+      "sha256": "6d3724468395065d8eb0721eac41893b01e38ffe69eeeb88a59419886ab7a893",
+      "token_post": null,
+      "token_pre": null
+    },
+    "real-first": {
+      "delivered": [
+        [
+          5,
+          15,
+          19034,
+          4480,
+          0
+        ],
+        [
+          7,
+          15,
+          19034,
+          4480,
+          1
+        ]
+      ],
+      "entsize": 8,
+      "libelf": {
+        "elf_update_null": {
+          "computed_size": -1,
+          "diagnostic": "invalid section entry size",
+          "errno": 37
+        },
+        "errno": 0,
+        "readable": true
+      },
+      "rodata_bytes": 5851098,
+      "sha256": "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+      "token_post": 0,
+      "token_pre": 0
+    },
+    "tokens-0-1": {
+      "delivered": [
+        [
+          5,
+          15,
+          196217,
+          4480,
+          0
+        ],
+        [
+          7,
+          15,
+          196217,
+          4480,
+          1
+        ]
+      ],
+      "entsize": 8,
+      "libelf": {
+        "elf_update_null": {
+          "computed_size": -1,
+          "diagnostic": "invalid section entry size",
+          "errno": 37
+        },
+        "errno": 0,
+        "readable": true
+      },
+      "rodata_bytes": 5851098,
+      "sha256": "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+      "token_post": 0,
+      "token_pre": 0
+    }
+  },
+  "source_sha": "f00f697e4d14521059b1b41ecefad5ab23c3e6b7"
+}

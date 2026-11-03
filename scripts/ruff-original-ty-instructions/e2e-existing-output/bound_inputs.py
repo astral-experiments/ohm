@@ -55,7 +55,7 @@ def receive(data,need_new=True):
     assert sorted(r['position']for r in requests if r['parent']is None)==list(range(402))
     sorted_requests=sorted(requests,key=lambda r:(r['parent']or'',r['position']))
     digest=lambda x:hashlib.sha256(json.dumps(x,sort_keys=True,separators=(',',':')).encode()).hexdigest()
-    context={k:groups.get(k,[])for k in ('CWD','TYPED','ADMISSION','ENVKEY')}
+    context={k:groups.get(k,[])for k in ('CWD','TYPED','ADMISSION','ENVKEY','DOMAINS','GROUPINPUT')}
     if need_new:
         assert len(context['CWD'])==len(context['TYPED'])==len(context['ADMISSION'])==1
         assert sorted(x[0]for x in context['ENVKEY'])==sorted(x[0]for x in groups['ENV'])

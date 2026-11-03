@@ -1,0 +1,1485 @@
+{
+  "archive": {
+    "bytes": 1780859,
+    "sha256": "3eadfc7c73d34ec3ad15d99d6dcded32e44406404387a77a69d218703d805d5d"
+  },
+  "complete": true,
+  "registration": {
+    "boot": "8644b633-db5e-47ef-97ed-f2a9a76301fc",
+    "fixed_order": "actual-then-disabled, private 1,2,2,1, traced/explicit/private source 1,2, real-last",
+    "head": "a3769c76040427f115a8fda7c376d5c019b81d72",
+    "inherited_fds_omitted_zero_thread_fallback": 41708042435,
+    "never_reuse": true,
+    "run": "41714102566",
+    "sdk": "645149ec05ae49e6038fe26c42710c1ef603159fefe0f85bf1fb843cc28d9a8d",
+    "source": "e856d81f6683cad80b9fe0ebf1a0c3c403c6fe11"
+  },
+  "stages": {
+    "edit": {
+      "actual_cargo_elf": "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+      "actual_cargo_groups": {
+        "contributing_groups": 14,
+        "last_group_index": 14,
+        "last_group_inputs": [
+          {
+            "actual_attrs": "SectionAttributes { flags: SHF_ALLOC | SHF_MERGE, ty: SHT_PROGBITS, entsize: 8, overrides: LinkerScriptOverrides { avoid_progpogation: 0, has_fixed_type: false }, class: PhantomData<libwild::elf::Class64> }",
+            "count": 1,
+            "entsize": 8,
+            "file_or_member": "/home/runner/work/_temp/ohm-foreign-join/sdk/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-2c8a5c6ff1eaecd1.rlib @ compiler_builtins-2c8a5c6ff1eaecd1.compiler_builtins.864f02032cfdccbc-cgu.155.rcgu.o",
+            "section": ".rodata.cst8"
+          }
+        ],
+        "last_group_size": 8,
+        "sections_reduced": 37530,
+        "threads": 1
+      },
+      "actual_cargo_source": "bfa2407e98ee1343caeefd02b4b69043509baa8c",
+      "actual_pipe": {
+        "accepted_original": true,
+        "affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "argv_digest": "96e5c43ba4d2949085411c5dfbc937f023138e0d8cabd0531621ef0522afe75c",
+        "expected_pipe_fds": [
+          5,
+          7
+        ],
+        "failure": null,
+        "pid": 30961,
+        "roles": {
+          "5": [
+            15,
+            187312,
+            4480,
+            "pipe:[187312]"
+          ],
+          "7": [
+            15,
+            187312,
+            4480,
+            "pipe:[187312]"
+          ]
+        },
+        "source_fds": [
+          [
+            5,
+            15,
+            187312,
+            4480,
+            0
+          ],
+          [
+            7,
+            15,
+            187312,
+            4480,
+            1
+          ]
+        ]
+      },
+      "complete": true,
+      "complete_native_inputs": 409,
+      "native_bytes": 618902647,
+      "pipe_controls": {
+        "native-one": {
+          "argv_sha256": "96e5c43ba4d2949085411c5dfbc937f023138e0d8cabd0531621ef0522afe75c",
+          "controlled_threads": 1,
+          "delta_vs_one": {
+            "complement": [],
+            "headers": [],
+            "sections": [],
+            "sha256": [
+              "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+              "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563"
+            ]
+          },
+          "entsize": 8,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": -1,
+              "diagnostic": "invalid section entry size",
+              "errno": 37
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "private",
+          "requested_diagnostic": null,
+          "rodata_bytes": 5851098,
+          "sha256": "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+          "signed_trace_token_count": null,
+          "source": "source",
+          "token_post": 0,
+          "token_pre": 0
+        },
+        "native-two": {
+          "argv_sha256": "96e5c43ba4d2949085411c5dfbc937f023138e0d8cabd0531621ef0522afe75c",
+          "controlled_threads": 2,
+          "delta_vs_one": {
+            "complement": [
+              [
+                227977408,
+                8,
+                0
+              ]
+            ],
+            "headers": [
+              [
+                ".rodata",
+                "sh_entsize",
+                8,
+                0
+              ]
+            ],
+            "sections": [
+              ".note.gnu.build-id"
+            ],
+            "sha256": [
+              "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+              "d236bd0319c48901d7a9363e0d35207dc6251e0a4dd1c12594e9a00c644c01e3"
+            ]
+          },
+          "entsize": 0,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": 227979400,
+              "diagnostic": null,
+              "errno": 0
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "private",
+          "requested_diagnostic": null,
+          "rodata_bytes": 5851098,
+          "sha256": "d236bd0319c48901d7a9363e0d35207dc6251e0a4dd1c12594e9a00c644c01e3",
+          "signed_trace_token_count": null,
+          "source": "source",
+          "token_post": 1,
+          "token_pre": 1
+        },
+        "no-fds": {
+          "argv_sha256": "96e5c43ba4d2949085411c5dfbc937f023138e0d8cabd0531621ef0522afe75c",
+          "controlled_threads": 0,
+          "delta_vs_one": {
+            "complement": [
+              [
+                227977408,
+                8,
+                0
+              ]
+            ],
+            "headers": [
+              [
+                ".rodata",
+                "sh_entsize",
+                8,
+                0
+              ]
+            ],
+            "sections": [
+              ".note.gnu.build-id"
+            ],
+            "sha256": [
+              "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+              "d236bd0319c48901d7a9363e0d35207dc6251e0a4dd1c12594e9a00c644c01e3"
+            ]
+          },
+          "entsize": 0,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": 227979400,
+              "diagnostic": null,
+              "errno": 0
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": null,
+          "mode": "closed",
+          "requested_diagnostic": null,
+          "rodata_bytes": 5851098,
+          "sha256": "d236bd0319c48901d7a9363e0d35207dc6251e0a4dd1c12594e9a00c644c01e3",
+          "signed_trace_token_count": null,
+          "source": "stock",
+          "token_post": null,
+          "token_pre": null
+        },
+        "one-explicit": {
+          "argv_sha256": "d81268b7ab90934966ccee9a55d02eab204dd7eb802ff0189d0757a52d4c90a4",
+          "controlled_threads": 1,
+          "delta_vs_one": {
+            "complement": [],
+            "headers": [],
+            "sections": [],
+            "sha256": [
+              "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+              "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563"
+            ]
+          },
+          "entsize": 8,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": -1,
+              "diagnostic": "invalid section entry size",
+              "errno": 37
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "private",
+          "requested_diagnostic": "override",
+          "rodata_bytes": 5851098,
+          "sha256": "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+          "signed_trace_token_count": null,
+          "source": "stock",
+          "token_post": 0,
+          "token_pre": 0
+        },
+        "one-trace": {
+          "argv_sha256": "96e5c43ba4d2949085411c5dfbc937f023138e0d8cabd0531621ef0522afe75c",
+          "controlled_threads": 1,
+          "delta_vs_one": {
+            "complement": [],
+            "headers": [],
+            "sections": [],
+            "sha256": [
+              "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+              "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563"
+            ]
+          },
+          "entsize": 8,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": -1,
+              "diagnostic": "invalid section entry size",
+              "errno": 37
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "private",
+          "requested_diagnostic": "trace",
+          "rodata_bytes": 5851098,
+          "sha256": "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+          "signed_trace_token_count": 0,
+          "source": "stock",
+          "token_post": 0,
+          "token_pre": 0
+        },
+        "real-first": {
+          "argv_sha256": "96e5c43ba4d2949085411c5dfbc937f023138e0d8cabd0531621ef0522afe75c",
+          "controlled_threads": 0,
+          "delta_vs_one": {
+            "complement": [],
+            "headers": [],
+            "sections": [],
+            "sha256": [
+              "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+              "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563"
+            ]
+          },
+          "entsize": 8,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": -1,
+              "diagnostic": "invalid section entry size",
+              "errno": 37
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "real",
+          "requested_diagnostic": null,
+          "rodata_bytes": 5851098,
+          "sha256": "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+          "signed_trace_token_count": null,
+          "source": "stock",
+          "token_post": 0,
+          "token_pre": 0
+        },
+        "real-last": {
+          "argv_sha256": "96e5c43ba4d2949085411c5dfbc937f023138e0d8cabd0531621ef0522afe75c",
+          "controlled_threads": 0,
+          "delta_vs_one": {
+            "complement": [
+              [
+                227977408,
+                8,
+                0
+              ]
+            ],
+            "headers": [
+              [
+                ".rodata",
+                "sh_entsize",
+                8,
+                0
+              ]
+            ],
+            "sections": [
+              ".note.gnu.build-id"
+            ],
+            "sha256": [
+              "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+              "d236bd0319c48901d7a9363e0d35207dc6251e0a4dd1c12594e9a00c644c01e3"
+            ]
+          },
+          "entsize": 0,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": 227979400,
+              "diagnostic": null,
+              "errno": 0
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "real",
+          "requested_diagnostic": null,
+          "rodata_bytes": 5851098,
+          "sha256": "d236bd0319c48901d7a9363e0d35207dc6251e0a4dd1c12594e9a00c644c01e3",
+          "signed_trace_token_count": null,
+          "source": "stock",
+          "token_post": 0,
+          "token_pre": 3
+        },
+        "real-trace": {
+          "argv_sha256": "96e5c43ba4d2949085411c5dfbc937f023138e0d8cabd0531621ef0522afe75c",
+          "controlled_threads": 0,
+          "delta_vs_one": {
+            "complement": [
+              [
+                227977408,
+                8,
+                0
+              ]
+            ],
+            "headers": [
+              [
+                ".rodata",
+                "sh_entsize",
+                8,
+                0
+              ]
+            ],
+            "sections": [
+              ".note.gnu.build-id"
+            ],
+            "sha256": [
+              "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+              "d236bd0319c48901d7a9363e0d35207dc6251e0a4dd1c12594e9a00c644c01e3"
+            ]
+          },
+          "entsize": 0,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": 227979400,
+              "diagnostic": null,
+              "errno": 0
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "real",
+          "requested_diagnostic": "trace",
+          "rodata_bytes": 5851098,
+          "sha256": "d236bd0319c48901d7a9363e0d35207dc6251e0a4dd1c12594e9a00c644c01e3",
+          "signed_trace_token_count": 3,
+          "source": "stock",
+          "token_post": 0,
+          "token_pre": 3
+        },
+        "tokens-0-1": {
+          "argv_sha256": "96e5c43ba4d2949085411c5dfbc937f023138e0d8cabd0531621ef0522afe75c",
+          "controlled_threads": 1,
+          "delta_vs_one": {
+            "complement": [],
+            "headers": [],
+            "sections": [],
+            "sha256": [
+              "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+              "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563"
+            ]
+          },
+          "entsize": 8,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": -1,
+              "diagnostic": "invalid section entry size",
+              "errno": 37
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "private",
+          "requested_diagnostic": null,
+          "rodata_bytes": 5851098,
+          "sha256": "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+          "signed_trace_token_count": null,
+          "source": "stock",
+          "system_elfutils": {
+            "exit": 1,
+            "stderr": "eu-strip: while writing '/dev/null': invalid section entry size\n",
+            "stdout": "",
+            "version": "eu-strip (elfutils) 0.190"
+          },
+          "token_post": 0,
+          "token_pre": 0
+        },
+        "tokens-1-2": {
+          "argv_sha256": "96e5c43ba4d2949085411c5dfbc937f023138e0d8cabd0531621ef0522afe75c",
+          "controlled_threads": 2,
+          "delta_vs_one": {
+            "complement": [
+              [
+                227977408,
+                8,
+                0
+              ]
+            ],
+            "headers": [
+              [
+                ".rodata",
+                "sh_entsize",
+                8,
+                0
+              ]
+            ],
+            "sections": [
+              ".note.gnu.build-id"
+            ],
+            "sha256": [
+              "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+              "d236bd0319c48901d7a9363e0d35207dc6251e0a4dd1c12594e9a00c644c01e3"
+            ]
+          },
+          "entsize": 0,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": 227979400,
+              "diagnostic": null,
+              "errno": 0
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "private",
+          "requested_diagnostic": null,
+          "rodata_bytes": 5851098,
+          "sha256": "d236bd0319c48901d7a9363e0d35207dc6251e0a4dd1c12594e9a00c644c01e3",
+          "signed_trace_token_count": null,
+          "source": "stock",
+          "system_elfutils": {
+            "exit": 1,
+            "stderr": "eu-strip: while writing '/dev/null': cannot write data to file\n",
+            "stdout": "",
+            "version": "eu-strip (elfutils) 0.190"
+          },
+          "token_post": 1,
+          "token_pre": 1
+        },
+        "tokens-2-2": {
+          "argv_sha256": "96e5c43ba4d2949085411c5dfbc937f023138e0d8cabd0531621ef0522afe75c",
+          "controlled_threads": 2,
+          "delta_vs_one": {
+            "complement": [
+              [
+                227977408,
+                8,
+                0
+              ]
+            ],
+            "headers": [
+              [
+                ".rodata",
+                "sh_entsize",
+                8,
+                0
+              ]
+            ],
+            "sections": [
+              ".note.gnu.build-id"
+            ],
+            "sha256": [
+              "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+              "d236bd0319c48901d7a9363e0d35207dc6251e0a4dd1c12594e9a00c644c01e3"
+            ]
+          },
+          "entsize": 0,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": 227979400,
+              "diagnostic": null,
+              "errno": 0
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "private",
+          "requested_diagnostic": null,
+          "rodata_bytes": 5851098,
+          "sha256": "d236bd0319c48901d7a9363e0d35207dc6251e0a4dd1c12594e9a00c644c01e3",
+          "signed_trace_token_count": null,
+          "source": "stock",
+          "token_post": 1,
+          "token_pre": 1
+        },
+        "tokens-3-1": {
+          "argv_sha256": "96e5c43ba4d2949085411c5dfbc937f023138e0d8cabd0531621ef0522afe75c",
+          "controlled_threads": 1,
+          "delta_vs_one": {
+            "complement": [],
+            "headers": [],
+            "sections": [],
+            "sha256": [
+              "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+              "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563"
+            ]
+          },
+          "entsize": 8,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": -1,
+              "diagnostic": "invalid section entry size",
+              "errno": 37
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "private",
+          "requested_diagnostic": null,
+          "rodata_bytes": 5851098,
+          "sha256": "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+          "signed_trace_token_count": null,
+          "source": "stock",
+          "token_post": 0,
+          "token_pre": 0
+        },
+        "two-explicit": {
+          "argv_sha256": "714b671b7648754cfe494ac05bae0168413aee70cbfffc15256f0fd54432bc7b",
+          "controlled_threads": 2,
+          "delta_vs_one": {
+            "complement": [
+              [
+                227977408,
+                8,
+                0
+              ]
+            ],
+            "headers": [
+              [
+                ".rodata",
+                "sh_entsize",
+                8,
+                0
+              ]
+            ],
+            "sections": [
+              ".note.gnu.build-id"
+            ],
+            "sha256": [
+              "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+              "d236bd0319c48901d7a9363e0d35207dc6251e0a4dd1c12594e9a00c644c01e3"
+            ]
+          },
+          "entsize": 0,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": 227979400,
+              "diagnostic": null,
+              "errno": 0
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 1,
+          "mode": "private",
+          "requested_diagnostic": "override",
+          "rodata_bytes": 5851098,
+          "sha256": "d236bd0319c48901d7a9363e0d35207dc6251e0a4dd1c12594e9a00c644c01e3",
+          "signed_trace_token_count": null,
+          "source": "stock",
+          "token_post": 1,
+          "token_pre": 1
+        },
+        "two-trace": {
+          "argv_sha256": "96e5c43ba4d2949085411c5dfbc937f023138e0d8cabd0531621ef0522afe75c",
+          "controlled_threads": 2,
+          "delta_vs_one": {
+            "complement": [
+              [
+                227977408,
+                8,
+                0
+              ]
+            ],
+            "headers": [
+              [
+                ".rodata",
+                "sh_entsize",
+                8,
+                0
+              ]
+            ],
+            "sections": [
+              ".note.gnu.build-id"
+            ],
+            "sha256": [
+              "86b94323a752a316a501f542a846408648ca8b74c56bc60298690b671b7b0563",
+              "d236bd0319c48901d7a9363e0d35207dc6251e0a4dd1c12594e9a00c644c01e3"
+            ]
+          },
+          "entsize": 0,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": 227979400,
+              "diagnostic": null,
+              "errno": 0
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "private",
+          "requested_diagnostic": "trace",
+          "rodata_bytes": 5851098,
+          "sha256": "d236bd0319c48901d7a9363e0d35207dc6251e0a4dd1c12594e9a00c644c01e3",
+          "signed_trace_token_count": 1,
+          "source": "stock",
+          "token_post": 1,
+          "token_pre": 1
+        }
+      },
+      "present_roles": [
+        "native-one",
+        "native-two",
+        "no-fds",
+        "one-explicit",
+        "one-trace",
+        "real-first",
+        "real-last",
+        "real-trace",
+        "tokens-0-1",
+        "tokens-1-2",
+        "tokens-2-2",
+        "tokens-3-1",
+        "two-explicit",
+        "two-trace"
+      ],
+      "source_inputs": {
+        "native-one": {
+          "contributing_groups": 14,
+          "last_group_index": 14,
+          "last_group_inputs": [
+            {
+              "actual_attrs": "SectionAttributes { flags: SHF_ALLOC | SHF_MERGE, ty: SHT_PROGBITS, entsize: 8, overrides: LinkerScriptOverrides { avoid_progpogation: 0, has_fixed_type: false }, class: PhantomData<libwild::elf::Class64> }",
+              "count": 1,
+              "entsize": 8,
+              "file_or_member": "/home/runner/work/_temp/ohm-foreign-join/sdk/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-2c8a5c6ff1eaecd1.rlib @ compiler_builtins-2c8a5c6ff1eaecd1.compiler_builtins.864f02032cfdccbc-cgu.155.rcgu.o",
+              "section": ".rodata.cst8"
+            }
+          ],
+          "last_group_size": 8,
+          "sections_reduced": 37530,
+          "threads": 1
+        },
+        "native-two": {
+          "contributing_groups": 159,
+          "last_group_index": 159,
+          "last_group_inputs": [
+            {
+              "actual_attrs": "SectionAttributes { flags: SHF_ALLOC | SHF_MERGE | SHF_STRINGS, ty: SHT_PROGBITS, entsize: 1, overrides: LinkerScriptOverrides { avoid_progpogation: 0, has_fixed_type: false }, class: PhantomData<libwild::elf::Class64> }",
+              "count": 2,
+              "entsize": 1,
+              "file_or_member": "/home/runner/work/_temp/ohm-foreign-join/sdk/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-af9b82d80b4c5cea.rlib @ core-af9b82d80b4c5cea.core.6d926cc90db79249-cgu.0.rcgu.o",
+              "section": ".rodata.str1.1"
+            },
+            {
+              "actual_attrs": "SectionAttributes { flags: SHF_ALLOC | SHF_MERGE, ty: SHT_PROGBITS, entsize: 16, overrides: LinkerScriptOverrides { avoid_progpogation: 0, has_fixed_type: false }, class: PhantomData<libwild::elf::Class64> }",
+              "count": 1,
+              "entsize": 16,
+              "file_or_member": "/home/runner/work/_temp/ohm-foreign-join/sdk/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-af9b82d80b4c5cea.rlib @ core-af9b82d80b4c5cea.core.6d926cc90db79249-cgu.0.rcgu.o",
+              "section": ".rodata.cst16"
+            },
+            {
+              "actual_attrs": "SectionAttributes { flags: SHF_ALLOC | SHF_MERGE, ty: SHT_PROGBITS, entsize: 32, overrides: LinkerScriptOverrides { avoid_progpogation: 0, has_fixed_type: false }, class: PhantomData<libwild::elf::Class64> }",
+              "count": 1,
+              "entsize": 32,
+              "file_or_member": "/home/runner/work/_temp/ohm-foreign-join/sdk/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-af9b82d80b4c5cea.rlib @ core-af9b82d80b4c5cea.core.6d926cc90db79249-cgu.0.rcgu.o",
+              "section": ".rodata.cst32"
+            },
+            {
+              "actual_attrs": "SectionAttributes { flags: SHF_ALLOC | SHF_MERGE, ty: SHT_PROGBITS, entsize: 4, overrides: LinkerScriptOverrides { avoid_progpogation: 0, has_fixed_type: false }, class: PhantomData<libwild::elf::Class64> }",
+              "count": 1,
+              "entsize": 4,
+              "file_or_member": "/home/runner/work/_temp/ohm-foreign-join/sdk/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-af9b82d80b4c5cea.rlib @ core-af9b82d80b4c5cea.core.6d926cc90db79249-cgu.0.rcgu.o",
+              "section": ".rodata.cst4"
+            },
+            {
+              "actual_attrs": "SectionAttributes { flags: SHF_ALLOC | SHF_MERGE, ty: SHT_PROGBITS, entsize: 8, overrides: LinkerScriptOverrides { avoid_progpogation: 0, has_fixed_type: false }, class: PhantomData<libwild::elf::Class64> }",
+              "count": 2,
+              "entsize": 8,
+              "file_or_member": "/home/runner/work/_temp/ohm-foreign-join/sdk/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-af9b82d80b4c5cea.rlib @ core-af9b82d80b4c5cea.core.6d926cc90db79249-cgu.0.rcgu.o",
+              "section": ".rodata.cst8"
+            },
+            {
+              "actual_attrs": "SectionAttributes { flags: SHF_ALLOC, ty: SHT_PROGBITS, entsize: 0, overrides: LinkerScriptOverrides { avoid_progpogation: 0, has_fixed_type: false }, class: PhantomData<libwild::elf::Class64> }",
+              "count": 244,
+              "entsize": 0,
+              "file_or_member": "/home/runner/work/_temp/ohm-foreign-join/sdk/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-af9b82d80b4c5cea.rlib @ core-af9b82d80b4c5cea.core.6d926cc90db79249-cgu.0.rcgu.o",
+              "section": ".rodata..Lanon.9a42e3a6917aa1ed20942bd9fedd6025.37"
+            }
+          ],
+          "last_group_size": 0,
+          "sections_reduced": 37530,
+          "threads": 2
+        }
+      }
+    },
+    "old": {
+      "actual_cargo_elf": "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+      "actual_cargo_groups": {
+        "contributing_groups": 14,
+        "last_group_index": 14,
+        "last_group_inputs": [
+          {
+            "actual_attrs": "SectionAttributes { flags: SHF_ALLOC | SHF_MERGE, ty: SHT_PROGBITS, entsize: 8, overrides: LinkerScriptOverrides { avoid_progpogation: 0, has_fixed_type: false }, class: PhantomData<libwild::elf::Class64> }",
+            "count": 1,
+            "entsize": 8,
+            "file_or_member": "/home/runner/work/_temp/ohm-foreign-join/sdk/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-2c8a5c6ff1eaecd1.rlib @ compiler_builtins-2c8a5c6ff1eaecd1.compiler_builtins.864f02032cfdccbc-cgu.155.rcgu.o",
+            "section": ".rodata.cst8"
+          }
+        ],
+        "last_group_size": 8,
+        "sections_reduced": 37530,
+        "threads": 1
+      },
+      "actual_cargo_source": "157caa55a51ebae4fa541d31697e3af9a6c32ccf",
+      "actual_pipe": {
+        "accepted_original": true,
+        "affinity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "argv_digest": "1d0dfa4135b51008a85e9e5515ab30f92dcf8b36211dc81424befeac79c66796",
+        "expected_pipe_fds": [
+          5,
+          7
+        ],
+        "failure": null,
+        "pid": 27549,
+        "roles": {
+          "5": [
+            15,
+            17114,
+            4480,
+            "pipe:[17114]"
+          ],
+          "7": [
+            15,
+            17114,
+            4480,
+            "pipe:[17114]"
+          ]
+        },
+        "source_fds": [
+          [
+            5,
+            15,
+            17114,
+            4480,
+            0
+          ],
+          [
+            7,
+            15,
+            17114,
+            4480,
+            1
+          ]
+        ]
+      },
+      "complete": true,
+      "complete_native_inputs": 409,
+      "native_bytes": 618900091,
+      "pipe_controls": {
+        "native-one": {
+          "argv_sha256": "1d0dfa4135b51008a85e9e5515ab30f92dcf8b36211dc81424befeac79c66796",
+          "controlled_threads": 1,
+          "delta_vs_one": {
+            "complement": [],
+            "headers": [],
+            "sections": [],
+            "sha256": [
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2"
+            ]
+          },
+          "entsize": 8,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": -1,
+              "diagnostic": "invalid section entry size",
+              "errno": 37
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "private",
+          "requested_diagnostic": null,
+          "rodata_bytes": 5851098,
+          "sha256": "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+          "signed_trace_token_count": null,
+          "source": "source",
+          "token_post": 0,
+          "token_pre": 0
+        },
+        "native-two": {
+          "argv_sha256": "1d0dfa4135b51008a85e9e5515ab30f92dcf8b36211dc81424befeac79c66796",
+          "controlled_threads": 2,
+          "delta_vs_one": {
+            "complement": [
+              [
+                227975768,
+                8,
+                0
+              ]
+            ],
+            "headers": [
+              [
+                ".rodata",
+                "sh_entsize",
+                8,
+                0
+              ]
+            ],
+            "sections": [
+              ".note.gnu.build-id"
+            ],
+            "sha256": [
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+              "6d3724468395065d8eb0721eac41893b01e38ffe69eeeb88a59419886ab7a893"
+            ]
+          },
+          "entsize": 0,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": 227977760,
+              "diagnostic": null,
+              "errno": 0
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "private",
+          "requested_diagnostic": null,
+          "rodata_bytes": 5851098,
+          "sha256": "6d3724468395065d8eb0721eac41893b01e38ffe69eeeb88a59419886ab7a893",
+          "signed_trace_token_count": null,
+          "source": "source",
+          "token_post": 1,
+          "token_pre": 1
+        },
+        "no-fds": {
+          "argv_sha256": "1d0dfa4135b51008a85e9e5515ab30f92dcf8b36211dc81424befeac79c66796",
+          "controlled_threads": 0,
+          "delta_vs_one": {
+            "complement": [
+              [
+                227975768,
+                8,
+                0
+              ]
+            ],
+            "headers": [
+              [
+                ".rodata",
+                "sh_entsize",
+                8,
+                0
+              ]
+            ],
+            "sections": [
+              ".note.gnu.build-id"
+            ],
+            "sha256": [
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+              "6d3724468395065d8eb0721eac41893b01e38ffe69eeeb88a59419886ab7a893"
+            ]
+          },
+          "entsize": 0,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": 227977760,
+              "diagnostic": null,
+              "errno": 0
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": null,
+          "mode": "closed",
+          "requested_diagnostic": null,
+          "rodata_bytes": 5851098,
+          "sha256": "6d3724468395065d8eb0721eac41893b01e38ffe69eeeb88a59419886ab7a893",
+          "signed_trace_token_count": null,
+          "source": "stock",
+          "token_post": null,
+          "token_pre": null
+        },
+        "one-explicit": {
+          "argv_sha256": "a00b5242c4f63ab2c21abdbd33e522670350801639bb869fd052c722c50c2ab5",
+          "controlled_threads": 1,
+          "delta_vs_one": {
+            "complement": [],
+            "headers": [],
+            "sections": [],
+            "sha256": [
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2"
+            ]
+          },
+          "entsize": 8,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": -1,
+              "diagnostic": "invalid section entry size",
+              "errno": 37
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "private",
+          "requested_diagnostic": "override",
+          "rodata_bytes": 5851098,
+          "sha256": "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+          "signed_trace_token_count": null,
+          "source": "stock",
+          "token_post": 0,
+          "token_pre": 0
+        },
+        "one-trace": {
+          "argv_sha256": "1d0dfa4135b51008a85e9e5515ab30f92dcf8b36211dc81424befeac79c66796",
+          "controlled_threads": 1,
+          "delta_vs_one": {
+            "complement": [],
+            "headers": [],
+            "sections": [],
+            "sha256": [
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2"
+            ]
+          },
+          "entsize": 8,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": -1,
+              "diagnostic": "invalid section entry size",
+              "errno": 37
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "private",
+          "requested_diagnostic": "trace",
+          "rodata_bytes": 5851098,
+          "sha256": "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+          "signed_trace_token_count": 0,
+          "source": "stock",
+          "token_post": 0,
+          "token_pre": 0
+        },
+        "real-first": {
+          "argv_sha256": "1d0dfa4135b51008a85e9e5515ab30f92dcf8b36211dc81424befeac79c66796",
+          "controlled_threads": 0,
+          "delta_vs_one": {
+            "complement": [],
+            "headers": [],
+            "sections": [],
+            "sha256": [
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2"
+            ]
+          },
+          "entsize": 8,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": -1,
+              "diagnostic": "invalid section entry size",
+              "errno": 37
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "real",
+          "requested_diagnostic": null,
+          "rodata_bytes": 5851098,
+          "sha256": "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+          "signed_trace_token_count": null,
+          "source": "stock",
+          "token_post": 0,
+          "token_pre": 0
+        },
+        "real-last": {
+          "argv_sha256": "1d0dfa4135b51008a85e9e5515ab30f92dcf8b36211dc81424befeac79c66796",
+          "controlled_threads": 0,
+          "delta_vs_one": {
+            "complement": [],
+            "headers": [],
+            "sections": [],
+            "sha256": [
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2"
+            ]
+          },
+          "entsize": 8,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": -1,
+              "diagnostic": "invalid section entry size",
+              "errno": 37
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "real",
+          "requested_diagnostic": null,
+          "rodata_bytes": 5851098,
+          "sha256": "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+          "signed_trace_token_count": null,
+          "source": "stock",
+          "token_post": 0,
+          "token_pre": 0
+        },
+        "real-trace": {
+          "argv_sha256": "1d0dfa4135b51008a85e9e5515ab30f92dcf8b36211dc81424befeac79c66796",
+          "controlled_threads": 0,
+          "delta_vs_one": {
+            "complement": [],
+            "headers": [],
+            "sections": [],
+            "sha256": [
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2"
+            ]
+          },
+          "entsize": 8,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": -1,
+              "diagnostic": "invalid section entry size",
+              "errno": 37
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "real",
+          "requested_diagnostic": "trace",
+          "rodata_bytes": 5851098,
+          "sha256": "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+          "signed_trace_token_count": 0,
+          "source": "stock",
+          "token_post": 0,
+          "token_pre": 0
+        },
+        "tokens-0-1": {
+          "argv_sha256": "1d0dfa4135b51008a85e9e5515ab30f92dcf8b36211dc81424befeac79c66796",
+          "controlled_threads": 1,
+          "delta_vs_one": {
+            "complement": [],
+            "headers": [],
+            "sections": [],
+            "sha256": [
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2"
+            ]
+          },
+          "entsize": 8,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": -1,
+              "diagnostic": "invalid section entry size",
+              "errno": 37
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "private",
+          "requested_diagnostic": null,
+          "rodata_bytes": 5851098,
+          "sha256": "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+          "signed_trace_token_count": null,
+          "source": "stock",
+          "system_elfutils": {
+            "exit": 1,
+            "stderr": "eu-strip: while writing '/dev/null': invalid section entry size\n",
+            "stdout": "",
+            "version": "eu-strip (elfutils) 0.190"
+          },
+          "token_post": 0,
+          "token_pre": 0
+        },
+        "tokens-1-2": {
+          "argv_sha256": "1d0dfa4135b51008a85e9e5515ab30f92dcf8b36211dc81424befeac79c66796",
+          "controlled_threads": 2,
+          "delta_vs_one": {
+            "complement": [
+              [
+                227975768,
+                8,
+                0
+              ]
+            ],
+            "headers": [
+              [
+                ".rodata",
+                "sh_entsize",
+                8,
+                0
+              ]
+            ],
+            "sections": [
+              ".note.gnu.build-id"
+            ],
+            "sha256": [
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+              "6d3724468395065d8eb0721eac41893b01e38ffe69eeeb88a59419886ab7a893"
+            ]
+          },
+          "entsize": 0,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": 227977760,
+              "diagnostic": null,
+              "errno": 0
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "private",
+          "requested_diagnostic": null,
+          "rodata_bytes": 5851098,
+          "sha256": "6d3724468395065d8eb0721eac41893b01e38ffe69eeeb88a59419886ab7a893",
+          "signed_trace_token_count": null,
+          "source": "stock",
+          "system_elfutils": {
+            "exit": 1,
+            "stderr": "eu-strip: while writing '/dev/null': cannot write data to file\n",
+            "stdout": "",
+            "version": "eu-strip (elfutils) 0.190"
+          },
+          "token_post": 1,
+          "token_pre": 1
+        },
+        "tokens-2-2": {
+          "argv_sha256": "1d0dfa4135b51008a85e9e5515ab30f92dcf8b36211dc81424befeac79c66796",
+          "controlled_threads": 2,
+          "delta_vs_one": {
+            "complement": [
+              [
+                227975768,
+                8,
+                0
+              ]
+            ],
+            "headers": [
+              [
+                ".rodata",
+                "sh_entsize",
+                8,
+                0
+              ]
+            ],
+            "sections": [
+              ".note.gnu.build-id"
+            ],
+            "sha256": [
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+              "6d3724468395065d8eb0721eac41893b01e38ffe69eeeb88a59419886ab7a893"
+            ]
+          },
+          "entsize": 0,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": 227977760,
+              "diagnostic": null,
+              "errno": 0
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "private",
+          "requested_diagnostic": null,
+          "rodata_bytes": 5851098,
+          "sha256": "6d3724468395065d8eb0721eac41893b01e38ffe69eeeb88a59419886ab7a893",
+          "signed_trace_token_count": null,
+          "source": "stock",
+          "token_post": 1,
+          "token_pre": 1
+        },
+        "tokens-3-1": {
+          "argv_sha256": "1d0dfa4135b51008a85e9e5515ab30f92dcf8b36211dc81424befeac79c66796",
+          "controlled_threads": 1,
+          "delta_vs_one": {
+            "complement": [],
+            "headers": [],
+            "sections": [],
+            "sha256": [
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2"
+            ]
+          },
+          "entsize": 8,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": -1,
+              "diagnostic": "invalid section entry size",
+              "errno": 37
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "private",
+          "requested_diagnostic": null,
+          "rodata_bytes": 5851098,
+          "sha256": "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+          "signed_trace_token_count": null,
+          "source": "stock",
+          "token_post": 0,
+          "token_pre": 0
+        },
+        "two-explicit": {
+          "argv_sha256": "209fef0616a1fbb8663850a6dfe6143fc7a0b1a7bf2311dd3c7d0a6558d00108",
+          "controlled_threads": 2,
+          "delta_vs_one": {
+            "complement": [
+              [
+                227975768,
+                8,
+                0
+              ]
+            ],
+            "headers": [
+              [
+                ".rodata",
+                "sh_entsize",
+                8,
+                0
+              ]
+            ],
+            "sections": [
+              ".note.gnu.build-id"
+            ],
+            "sha256": [
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+              "6d3724468395065d8eb0721eac41893b01e38ffe69eeeb88a59419886ab7a893"
+            ]
+          },
+          "entsize": 0,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": 227977760,
+              "diagnostic": null,
+              "errno": 0
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 1,
+          "mode": "private",
+          "requested_diagnostic": "override",
+          "rodata_bytes": 5851098,
+          "sha256": "6d3724468395065d8eb0721eac41893b01e38ffe69eeeb88a59419886ab7a893",
+          "signed_trace_token_count": null,
+          "source": "stock",
+          "token_post": 1,
+          "token_pre": 1
+        },
+        "two-trace": {
+          "argv_sha256": "1d0dfa4135b51008a85e9e5515ab30f92dcf8b36211dc81424befeac79c66796",
+          "controlled_threads": 2,
+          "delta_vs_one": {
+            "complement": [
+              [
+                227975768,
+                8,
+                0
+              ]
+            ],
+            "headers": [
+              [
+                ".rodata",
+                "sh_entsize",
+                8,
+                0
+              ]
+            ],
+            "sections": [
+              ".note.gnu.build-id"
+            ],
+            "sha256": [
+              "f203086dc58594dc33899d25dcbdcd5ec86d04e3dfb493efe7c7a59f6abd97e2",
+              "6d3724468395065d8eb0721eac41893b01e38ffe69eeeb88a59419886ab7a893"
+            ]
+          },
+          "entsize": 0,
+          "libelf": {
+            "elf_update_null": {
+              "computed_size": 227977760,
+              "diagnostic": null,
+              "errno": 0
+            },
+            "errno": 0,
+            "readable": true
+          },
+          "minimum_observed_tokens": 0,
+          "mode": "private",
+          "requested_diagnostic": "trace",
+          "rodata_bytes": 5851098,
+          "sha256": "6d3724468395065d8eb0721eac41893b01e38ffe69eeeb88a59419886ab7a893",
+          "signed_trace_token_count": 1,
+          "source": "stock",
+          "token_post": 1,
+          "token_pre": 1
+        }
+      },
+      "present_roles": [
+        "native-one",
+        "native-two",
+        "no-fds",
+        "one-explicit",
+        "one-trace",
+        "real-first",
+        "real-last",
+        "real-trace",
+        "tokens-0-1",
+        "tokens-1-2",
+        "tokens-2-2",
+        "tokens-3-1",
+        "two-explicit",
+        "two-trace"
+      ],
+      "source_inputs": {
+        "native-one": {
+          "contributing_groups": 14,
+          "last_group_index": 14,
+          "last_group_inputs": [
+            {
+              "actual_attrs": "SectionAttributes { flags: SHF_ALLOC | SHF_MERGE, ty: SHT_PROGBITS, entsize: 8, overrides: LinkerScriptOverrides { avoid_progpogation: 0, has_fixed_type: false }, class: PhantomData<libwild::elf::Class64> }",
+              "count": 1,
+              "entsize": 8,
+              "file_or_member": "/home/runner/work/_temp/ohm-foreign-join/sdk/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-2c8a5c6ff1eaecd1.rlib @ compiler_builtins-2c8a5c6ff1eaecd1.compiler_builtins.864f02032cfdccbc-cgu.155.rcgu.o",
+              "section": ".rodata.cst8"
+            }
+          ],
+          "last_group_size": 8,
+          "sections_reduced": 37530,
+          "threads": 1
+        },
+        "native-two": {
+          "contributing_groups": 159,
+          "last_group_index": 159,
+          "last_group_inputs": [
+            {
+              "actual_attrs": "SectionAttributes { flags: SHF_ALLOC | SHF_MERGE | SHF_STRINGS, ty: SHT_PROGBITS, entsize: 1, overrides: LinkerScriptOverrides { avoid_progpogation: 0, has_fixed_type: false }, class: PhantomData<libwild::elf::Class64> }",
+              "count": 2,
+              "entsize": 1,
+              "file_or_member": "/home/runner/work/_temp/ohm-foreign-join/sdk/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-af9b82d80b4c5cea.rlib @ core-af9b82d80b4c5cea.core.6d926cc90db79249-cgu.0.rcgu.o",
+              "section": ".rodata.str1.1"
+            },
+            {
+              "actual_attrs": "SectionAttributes { flags: SHF_ALLOC | SHF_MERGE, ty: SHT_PROGBITS, entsize: 16, overrides: LinkerScriptOverrides { avoid_progpogation: 0, has_fixed_type: false }, class: PhantomData<libwild::elf::Class64> }",
+              "count": 1,
+              "entsize": 16,
+              "file_or_member": "/home/runner/work/_temp/ohm-foreign-join/sdk/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-af9b82d80b4c5cea.rlib @ core-af9b82d80b4c5cea.core.6d926cc90db79249-cgu.0.rcgu.o",
+              "section": ".rodata.cst16"
+            },
+            {
+              "actual_attrs": "SectionAttributes { flags: SHF_ALLOC | SHF_MERGE, ty: SHT_PROGBITS, entsize: 32, overrides: LinkerScriptOverrides { avoid_progpogation: 0, has_fixed_type: false }, class: PhantomData<libwild::elf::Class64> }",
+              "count": 1,
+              "entsize": 32,
+              "file_or_member": "/home/runner/work/_temp/ohm-foreign-join/sdk/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-af9b82d80b4c5cea.rlib @ core-af9b82d80b4c5cea.core.6d926cc90db79249-cgu.0.rcgu.o",
+              "section": ".rodata.cst32"
+            },
+            {
+              "actual_attrs": "SectionAttributes { flags: SHF_ALLOC | SHF_MERGE, ty: SHT_PROGBITS, entsize: 4, overrides: LinkerScriptOverrides { avoid_progpogation: 0, has_fixed_type: false }, class: PhantomData<libwild::elf::Class64> }",
+              "count": 1,
+              "entsize": 4,
+              "file_or_member": "/home/runner/work/_temp/ohm-foreign-join/sdk/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-af9b82d80b4c5cea.rlib @ core-af9b82d80b4c5cea.core.6d926cc90db79249-cgu.0.rcgu.o",
+              "section": ".rodata.cst4"
+            },
+            {
+              "actual_attrs": "SectionAttributes { flags: SHF_ALLOC | SHF_MERGE, ty: SHT_PROGBITS, entsize: 8, overrides: LinkerScriptOverrides { avoid_progpogation: 0, has_fixed_type: false }, class: PhantomData<libwild::elf::Class64> }",
+              "count": 2,
+              "entsize": 8,
+              "file_or_member": "/home/runner/work/_temp/ohm-foreign-join/sdk/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-af9b82d80b4c5cea.rlib @ core-af9b82d80b4c5cea.core.6d926cc90db79249-cgu.0.rcgu.o",
+              "section": ".rodata.cst8"
+            },
+            {
+              "actual_attrs": "SectionAttributes { flags: SHF_ALLOC, ty: SHT_PROGBITS, entsize: 0, overrides: LinkerScriptOverrides { avoid_progpogation: 0, has_fixed_type: false }, class: PhantomData<libwild::elf::Class64> }",
+              "count": 244,
+              "entsize": 0,
+              "file_or_member": "/home/runner/work/_temp/ohm-foreign-join/sdk/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-af9b82d80b4c5cea.rlib @ core-af9b82d80b4c5cea.core.6d926cc90db79249-cgu.0.rcgu.o",
+              "section": ".rodata..Lanon.9a42e3a6917aa1ed20942bd9fedd6025.37"
+            }
+          ],
+          "last_group_size": 0,
+          "sections_reduced": 37530,
+          "threads": 2
+        }
+      }
+    }
+  }
+}

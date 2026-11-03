@@ -1,5 +1,5 @@
-name: Reproduce genuine Ruff native grouping and jobserver assignments
-run-name: Reopen both full signed e2e ELF forms with real jobserver groups ${{ inputs.reviewed_head }}
+name: One real complete-buffer Ruff link reuse with fresh native output
+run-name: Prove one ordinary e2e output hit, fresh signed equality and native repairs ${{ inputs.reviewed_head }}
 permissions:
   contents: read
   actions: read
@@ -7,7 +7,7 @@ jobs:
   inspect:
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1'
       && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head
-      && github.ref_name == 'charlie/qa-wild-e2e-jobserver-groups-29697-20261103'
+      && github.ref_name == 'charlie/qa-wild-e2e-actual-reuse-29697-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 120
     steps:
@@ -37,15 +37,15 @@ jobs:
         persist-credentials: false
     - name: Provision the system SHA-256 library
       run: sudo apt-get update -qq && sudo apt-get install -qy strace libssl-dev elfutils
-    - name: Run identical-live-argv signed E2E and controlled genuine section-group assignments
+    - name: Run actual unchanged output, stale capability, native mutation, race and clean guards
       env:
         REVIEWED_HEAD: ${{ inputs.reviewed_head }}
         OHM_SDK_READ_TOKEN: ${{ github.token }}
-      run: python3 -IB qa/scripts/ruff-original-ty-instructions/e2e-existing-output/groups_study.py
+      run: python3 -IB qa/scripts/ruff-original-ty-instructions/e2e-existing-output/audit.py --enable-one-proved-link
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: ty-server-native-jobserver-groups-${{ github.run_id }}
+        name: ty-server-one-physical-output-${{ github.run_id }}
         path: ${{ runner.temp }}/ohm-foreign-join/published/
         retention-days: 10
         if-no-files-found: error
