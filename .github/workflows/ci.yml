@@ -37,7 +37,7 @@ jobs:
     - name: Check out qa-code
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
-        ref: 5ad861aa628d029d91d80c888b40d9908989ede2
+        ref: ${{ github.sha }}
         path: qa-code
         sparse-checkout: '.github/workflows
 
@@ -133,6 +133,18 @@ jobs:
       uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
       with:
         enable-cache: false
+    - name: Verify the original source scripts and retained historical evidence
+      run: 'set -euo pipefail
+
+        test "$(git -C qa-code rev-parse HEAD)" = "$GITHUB_SHA"
+
+        test "$(git -C qa-code rev-parse HEAD:scripts/rc23-expanded-inputs)" = f80929b71c28137e4a6657b2ac7a7951c2c9a283
+
+        test "$(git -C qa-code rev-parse HEAD:scripts/ruff-combined-apple)" = 666a7f145926728631a7e3e716d2b3ea7c8a7b24
+
+        test "$(git -C qa-code rev-parse HEAD:scripts/ruff-matched-stage)" = f1a2c7b4ef41df09dca27e4b038c8c66773cdafb
+
+        '
     - name: Recover both exact source trees from the private packaging repository
       env:
         GH_TOKEN: ${{ github.token }}
