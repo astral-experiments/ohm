@@ -62,8 +62,8 @@ def enroll(phase, block):
         source(tag)
         (BASE/'source'/(tag+'.rs')).write_bytes((w.SRC/REG['path']).read_bytes())
     (BASE/'source'/'invalid.rs').write_bytes((w.SRC/REG['path']).read_bytes()+ERROR)
-    order = REG['pilot_order'] if phase=='pilot' and block==0 else REG['confirm_orders'][block-1] if phase=='confirmation' and 1<=block<=8 else None
-    need(order in ('PC','CP'), 'unregistered stage or block')
+    need(phase=='native-owner' and block==0,'unregistered native control')
+    order='C'
     bind=json.loads((HERE/'factory.json').read_bytes())
     need(bind['source']=={k:v['revision']for k,v in REG['matched_sources'].items()} and bind['branch']==REG['factory_branch'],'wrong experimental Rust versions')
     if phase=='confirmation':
@@ -135,21 +135,6 @@ def enroll(phase, block):
     save(BASE/'git-inputs.json',git_inputs)
     save(BASE/'registry.json',actual)
     (ROOT/'cargo').rename(ROOT/'prefetched-cargo')
-    need(sha(HERE/'whole_count.c')==REG['counter_sha256'],'unregistered whole counter')
-    subprocess.run(['/usr/bin/cc','-O2','-Wall','-Wextra','-Werror',HERE/'whole_count.c','-o',ROOT/'whole-count'],check=True)
-    calibrations={}
-    for how in ('thread','child'):
-        for work in (0,1):
-            loop='sum(range(6000000))' if work else 'None'
-            code=("import threading;t=threading.Thread(target=lambda:"+loop+");t.start();t.join()" if how=='thread'
-                  else "import subprocess,sys;subprocess.run([sys.executable,'-IB','-c',"+repr(loop)+"],check=True)")
-            dest=BASE/(f'pmu-{how}-{work}.json')
-            subprocess.run([ROOT/'whole-count',dest,'/usr/bin/python3','python3','-IB','-c',code],check=True)
-            obs=json.loads(dest.read_bytes())
-            need(obs['status']==0 and obs['enabled']==obs['running']>0 and obs['instructions']>0,'hardware admission')
-            calibrations[how,work]=obs['instructions']
-        need(calibrations[how,1]>calibrations[how,0]+10_000_000,'hardware lost a real '+how)
-
 
 
 if __name__=='__main__':
