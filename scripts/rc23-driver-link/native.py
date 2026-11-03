@@ -51,6 +51,7 @@ def main():
         hit=re.search(r"(?m)^\s*"+re.escape(Path(path).name)+r"\s+=>\s+(\S+)",ld)
         assert hit and Path(hit[1]).resolve()==(installed/path).resolve()
     for f in (inv,component,qa/"source.json"):shutil.copyfile(f,dest/f.name)
+    for f in (inv,component):shutil.copyfile(f,qa/f.name)
     signed=w/"official-cargo/cargo";assert not signed.is_symlink() and g.sha(signed)==g.SIGNED["cargo"]["sha256"]
     csrc=g.read(w/"official-cargo/signed-cargo.json");assert csrc["cargo"]==g.SIGNED["cargo"] and csrc["archive"]==g.SIGNED["archive"]
     signed.chmod(0o755);cargo_qa=smoke(signed,rustc,tmp,env);g.save(qa/"signed-cargo.json",csrc|{"native":cargo_qa})
@@ -63,7 +64,7 @@ def main():
     exp=qa/"driver-witness";before=w/"driver-audit-private/pre-bolt.so";image=installed/driver
     def census(img,label):
         gz=exp/(label+".json.gz");v=elf.scan(img,gz);return v,json.loads(gzip.decompress(gz.read_bytes()))
-    pre,pre_rows=census(before,"pre-bolt");post,post_rows=census(image,"installed")
+    post,post_rows=census(image,"installed")
     assert post["sha256"]==db[driver]["sha256"]
     signed_rows=json.loads(gzip.decompress((w/"official-cargo/signed-driver.json.gz").read_bytes()))
     signed_elf=g.read(w/"official-cargo/signed-driver.json")
@@ -73,15 +74,25 @@ def main():
     post_with_probes=elf.scan(image,None,probe_names)
     assert {k:v for k,v in post.items() if k!="probes"}=={k:v for k,v in post_with_probes.items() if k!="probes"}
     post=post_with_probes
+    g.save(exp/"installed.json",post)
+    modes=link_modes.check(w,installed,w/"source/rust",tmp,qa,env)
+    g.save(qa/"link-modes.json",modes)
+    probe=live.probe(image,post,arm,None,tmp)
+    g.save(exp/"actual-interposition.json",probe)
+    independent=("source.json","signed-cargo.json","eii.json","integration.json","link-modes.json","old-cc-inputs.json","sdk-inventory.json","component-inventory.json","driver-witness/installed.json","driver-witness/probe-domain.json","driver-witness/actual-interposition.json")
+    g.save(qa/"installed-native.json",{"source":src["commit"],"tree":src["tree"],"role":arm,"archive_sha256":g.sha(archive),"rustc_banner":rc,"cargo_banner":cc,"ldd":ld,"proofs":{name:g.sha(qa/name) for name in independent}})
+    # These proofs depend on the live production phase. Preserve the independent
+    # installed behavior above even when the phase trace is incomplete.
+    pre,pre_rows=census(before,"pre-bolt")
     pre_with_probes=elf.scan(before,None,probe_names)
     assert {k:v for k,v in pre.items() if k!="probes"}=={k:v for k,v in pre_with_probes.items() if k!="probes"}
     pre=pre_with_probes
-    g.save(exp/"pre-bolt.json",pre);g.save(exp/"installed.json",post)
+    g.save(exp/"pre-bolt.json",pre)
+    assert (exp/"pre-lto/cargo-config-closed.json").is_file(),"missing original complete pre-LTO compiler observation"
     policy_record,exceptions=policy.prove(w,arm,pre,post,pre_rows,post_rows)
     trace=trace_qa.check(w,installed,db)
     g.save(qa/"linker-executions.json",trace)
-    mode_result=link_modes.check(w,installed,w/"source/rust",tmp,qa,env)
-    g.save(qa/"link-modes.json",mode_result)
+    g.save(qa/"source-observation.json",trace["source_selection_before_lto"])
     final_stage=Path(policy_record["pre_bolt"]["live"])
     # Dist can strip debug data after copying the stage2 driver. Verify the
     # actual executable and dynamic lookup sections across that packaging step.
@@ -89,7 +100,7 @@ def main():
     for k in ("linker","bolt_note","text_and_dynamic_sha256","census_uncompressed_sha256"):
         assert staged[k]==post[k],("stage2 vs installed",k)
     policy_record["packaged_stage2"]={k:staged[k] for k in ("sha256","bytes","text_and_dynamic_sha256")}
-    probe=live.probe(image,post,arm,exceptions,tmp);g.save(exp/"actual-interposition.json",probe)
+    assert live.choose(post,arm,exceptions)==probe["selection"],"preloaded symbols outside the real emitted policy"
     policy_record["live_preload"]=probe;g.save(qa/"policy.json",policy_record)
     original_proofs={}
     for f in sorted(qa.rglob("*")):
@@ -100,7 +111,7 @@ def main():
              "launcher":db["bin/rustc"]|{"path":"bin/rustc"},"driver":db[driver]|{"path":driver},"llvm":db[llvm]|{"path":llvm},
              "bundled_cargo":db["bin/cargo"]|{"path":"bin/cargo"},"effective_cargo":g.SIGNED["cargo"],"signed_cargo_smoke":cargo_qa,
              "execution_pgo":g.PGO,"rustc_banner":rc,"cargo_banner":cc,"ldd":ld,"eii":eii,"integrated":integrated,
-             "pre_bolt":pre,"installed_elf":post,"policy_evidence":policy_record,"actual_linker_executions_sha256":g.sha(qa/"linker-executions.json"),"link_modes_sha256":g.sha(qa/"link-modes.json"),"qa":{k:g.sha(qa/k) for k in ("source.json","build.log","signed-cargo.json","eii.json","integration.json","policy.json","linker-executions.json","link-modes.json","old-cc-inputs.json","native-proofs.json")}}
+             "pre_bolt":pre,"installed_elf":post,"policy_evidence":policy_record,"actual_linker_executions_sha256":g.sha(qa/"linker-executions.json"),"link_modes_sha256":g.sha(qa/"link-modes.json"),"qa":{k:g.sha(qa/k) for k in ("source.json","build.log","signed-cargo.json","eii.json","integration.json","policy.json","linker-executions.json","link-modes.json","old-cc-inputs.json","installed-native.json","source-observation.json","native-proofs.json")}}
     g.save(dest/"role.json",product);shutil.copyfile(dest/"role.json",qa/"role.json")
     names=("ohm.tar.gz","source.json","role.json","sdk-inventory.json","component-inventory.json")
     (dest/"SHA256SUMS").write_text("".join(g.sha(dest/n)+"  "+n+"\n" for n in names))

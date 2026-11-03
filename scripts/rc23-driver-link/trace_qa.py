@@ -5,8 +5,12 @@ import os
 import shlex
 import gate as g
 import policy
+import lto
 
 def check(w,installed,inventory,evidence=None):
+    return check_links(w,installed,inventory,evidence,None)
+
+def check_links(w,installed,inventory,evidence,expected):
     out=evidence if evidence is not None else w/"trait-evidence/driver-witness";cap=g.read(out/"capture.json")
     assert cap["arm"]=="T" and cap["exit"]==0
     stage_root=w/"source/rust/build"/g.POLICY["target"]
@@ -73,10 +77,11 @@ def check(w,installed,inventory,evidence=None):
             origin=origins[k];assert (origin["bytes"],origin["mtime_ns"])==(rlib["bytes"],rlib["mtime_ns"])
             matched.append(rlib|{"origin_receipt":k,"cargo_manifest":origin["observed_native_sources"][0]["manifest"]})
         else:protected.append(rlib)
-    assert matched and protected
+    phase=lto.verify(w,out,q,rec,argv,installed,expected)
     previous=[s for s in full if s[2] is not q]
     assert {"stage0-sysroot","stage1"}<={s[0] for s in previous}
     assert all(not any(a.startswith(("-Bsymbolic","--export-dynamic-symbol-list=")) for a in a0) for _,a0,_,_ in previous)
     return {"stage_executables":{str(r["pid"]):{"stage":st,"output":r["output"],"actual_rust_lld":r["exe"],"lld_sha256":r["exe_sha256"],"gnu_wrapper":r["gnu_wrapper"],"outer_cc":r["outer_cc"],"argv":r["argv"],"policy_flags":[a for a in a0 if a.startswith(("-Bsymbolic","--export-dynamic-symbol-list="))]} for st,a0,r,_ in full},
             "installed_files":installed_files,"producing_rustc_pid":int(Path(file).stem),"final_lld_pid":q["pid"],"final_output":q["output"],"owner_record":rec["owners"],"closed_exceptions":rec["exceptions"],"prior_unmodified_driver_links":len(previous),
+            "source_selection_before_lto":phase,
             "final_link_input_rlibs":{"physically_matched_compiler_inputs":matched,"without_an_observed_compiler_artifact_link":protected}}

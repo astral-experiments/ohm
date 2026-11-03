@@ -42,6 +42,9 @@ def selected():
     assert reg.get("source_generation")=="rlink-and-old-cc-corrected"
     assert sha(HERE/"accepted-control.json")=="fc222a09c9c75b7d6ceb73160240c319a225214e610ed6cb4cb040736428d6bf"
     assert sha(HERE/"previous-treatment.json")=="ab78c2c2b5a97b89024310a3c2343ef58407edf300e81af08d96a079cfd90d66"
+    assert reg["previous_same_source_run"]==41629356922 and reg["roles"]==["T"]
+    assert sha(HERE/"previous-phase-refusal.json")=="fd4b328f9cebd51d0e84fe0a7697edf0e4bc4731111bf0821302c02f02047521"
+    assert read(HERE/"previous-phase-refusal.json")["complete_refusal_receipt_sha256"]=="379d5f2b8369bafbc4533526f0aa95505f9c252f85d43f79f45f2891b408b0eb"
     role=read(HERE/"source.json")
     assert role["commit"] not in (BASE,"1e84052bab906c68e8d63eecc806198d299b55c4")
     assert (role["parent"],role["parent_tree"])==(BASE,TREE)
@@ -85,6 +88,15 @@ def verify_sdk_receipts(w,src,role,proofs):
     assert role["policy_evidence"]["arm"]==arm and role["signed_cargo_smoke"]["stdout"]=="ordinary cargo 19"
     assert role["actual_linker_executions_sha256"]==proofs["linker-executions.json"]["sha256"]
     assert role["link_modes_sha256"]==proofs["link-modes.json"]["sha256"] and "old-cc-inputs.json" in role["qa"]
+    native=read(w/"trait-evidence/installed-native.json");assert native["source"]==src["commit"] and native["tree"]==src["tree"]
+    assert native["archive_sha256"]==role["archive_sha256"] and all(sha(w/"trait-evidence"/n)==digest for n,digest in native["proofs"].items())
+    shown=read(w/"trait-evidence/linker-executions.json")
+    observed=shown["source_selection_before_lto"];early=observed["early"]
+    assert observed==read(w/"trait-evidence/source-observation.json") and role["qa"]["source-observation.json"]==proofs["source-observation.json"]["sha256"]
+    assert early["target_pid"]==shown["producing_rustc_pid"] and early["lld_pid"]==shown["final_lld_pid"]
+    assert early["qualified_matches"] and early["protected_inputs"] and any(p["provenance"]["name"]=="blake3" for p in early["proven_foreign"])
+    assert shown["prior_unmodified_driver_links"]>=2 and observed["after_lto"]["object_count"]>0
+    assert native["proofs"]["link-modes.json"]==role["link_modes_sha256"] and native["proofs"]["driver-witness/actual-interposition.json"]==sha(w/"trait-evidence/driver-witness/actual-interposition.json")
     out=w/"trait-sdk"; assert set(x.name for x in out.iterdir())=={"ohm.tar.gz","source.json","role.json","component-inventory.json","sdk-inventory.json","SHA256SUMS"}
     sums=(out/"SHA256SUMS").read_text().splitlines()
     expect=("ohm.tar.gz","source.json","role.json","sdk-inventory.json","component-inventory.json")

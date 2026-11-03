@@ -1,0 +1,6 @@
+#!/bin/sh
+# Unchanged bootstrap shim supplies this program the actual compiler followed by its arguments.
+if [ -z "${OHM_RUSTC_DRIVER_LINK_DIR:-}" ] || [ "${CARGO_MANIFEST_DIR:-}" != "${OHM_PHASE_MANIFEST:-}" ]; then
+    exec "$@"
+fi
+exec /usr/bin/python3 -ISB "$(dirname "$0")/observe.py" "$@"

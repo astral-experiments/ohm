@@ -23,7 +23,7 @@ FLOOR = 32 * GIB
 INTERVAL = 0.25
 MAX_GAP = 2.0
 CHILD_GRACE_NS = 5_000_000_000
-BRANCH = "refs/heads/charlie/codex-21577-driver-link-production23-fixed-t"
+BRANCH = "refs/heads/charlie/codex-21577-driver-link-production23-prelto"
 STAGES = ("materialize", "prerequisites", "bolt-tools", "wild", "production", "native-qa")
 SENTINEL = ".ctfe22-physical-emergency-reserve"
 
@@ -123,7 +123,7 @@ def context():
     assert e["GITHUB_SHA"] == e["REVIEWED_HEAD"] and re.fullmatch("[0-9a-f]{40}",e["GITHUB_SHA"])
     w = Path(e["GITHUB_WORKSPACE"]).resolve()
     head=subprocess.check_output(["git","-C",w,"rev-parse","HEAD","HEAD^"],text=True).splitlines()
-    assert head==[e["GITHUB_SHA"],'24da1cefd940ef49ab92dd9d3218f92f493ddd36']
+    assert head==[e["GITHUB_SHA"],'e295118d5a8fd2fbe672d16c28d0df80ff1c2d20']
     assert e["GITHUB_RUN_ATTEMPT"]=="1"
     return w, w/"capacity-evidence"
 
