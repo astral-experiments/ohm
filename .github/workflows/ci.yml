@@ -1,65 +1,31 @@
-name: Compare the actual Ruff derived-impl Cargo edits
-run-name: Six balanced source-built Rust compiler pairs for the Ruff CLI help edit
-permissions:
-  contents: read
-  actions: read
-jobs:
-  paired:
-    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruff-derived-impl-cgus-20261103'
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      matrix:
-        slot: [0, 1, 2, 3, 4, 5]
-    name: Independently initialized Ruff build ${{ matrix.slot }}
-    env:
-      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      OHM_STUDY_MODE: build
-      RUFF_CASE: "28392"
-      BOOT_SLOT: ${{ matrix.slot }}
-      PYTHONDONTWRITEBYTECODE: '1'
-    steps:
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        ref: ${{ inputs.reviewed_head }}
-        path: current-qa
-        persist-credentials: false
-        sparse-checkout: scripts/ruff-derived-impl-cgus
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        ref: 453a3893b5844334a5b7f1c770c14e94ad1a34f8
-        path: original-receiver
-        persist-credentials: false
-        sparse-checkout: scripts/ruff-derived-impl-cgus
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        ref: e48abf3b09f415b296d0ee2e8ec81c0de7b50611
-        path: legacy-qa
-        persist-credentials: false
-        sparse-checkout: scripts/ruff-clap-config-help
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        repository: astral-sh/ruff
-        ref: d136bd8d002a648de5f344df602e492658306f1e
-        fetch-depth: 2
-        path: ruff
-        persist-credentials: false
-    - name: Open the immutable SDKs and run both typical CLI build histories at the same paths
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: python3 -IB current-qa/scripts/ruff-derived-impl-cgus/confirm.py
-    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-      if: always()
-      with:
-        name: confirmed-help-${{ matrix.slot }}-${{ github.run_id }}
-        path: ${{ runner.temp }}/derived-owner-outputs
-        compression-level: 1
-        retention-days: 14
-        if-no-files-found: error
+name: Independently reopen original Ruff derive codegen pilots
 'on':
   workflow_dispatch:
     inputs:
       reviewed_head:
         required: true
         type: string
+permissions:
+  contents: read
+  actions: read
+jobs:
+  review:
+    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruff-derived-impl-cgus-20261103'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: ${{ inputs.reviewed_head }}
+        sparse-checkout: scripts/ruff-derived-impl-cgus
+        persist-credentials: false
+    - name: Reopen registered original objects, metadata, hardware and real process arguments
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: python3 -IB scripts/ruff-derived-impl-cgus/read-pilots.py
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      if: always()
+      with:
+        name: derived-pilot-independent-proof-${{ github.run_id }}
+        path: ${{ runner.temp }}/verified-pilots
+        if-no-files-found: error
