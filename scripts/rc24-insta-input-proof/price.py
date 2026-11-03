@@ -120,7 +120,7 @@ def install():
     readings={}
     for mode in ("single","fork"):
         file=proof/("calibration-"+mode+".json")
-        sp.run([work/"whole_count",file,work/"calibrate",mode],check=True)
+        sp.run([work/"whole_count",file,work/"calibrate",work/"calibrate",mode],check=True)
         readings[mode]=hardware(file)
     assert 1.99<readings["fork"]/readings["single"]<2.01,readings
 
@@ -174,7 +174,7 @@ def visit(arm,label,command,commit,kind="whole",expect_error=False):
     assert git("rev-parse","HEAD")==commit
     e=standard()
     argv=[shutil.which("cargo",path=e["PATH"]),*command[1:]]
-    if kind=="whole": measured=[work/"whole_count",out/"hardware.json",*argv]
+    if kind=="whole": measured=[work/"whole_count",out/"hardware.json",argv[0],*argv]
     elif kind=="observe":
         tasks=out/"tasks"
         tasks.mkdir()
