@@ -14,8 +14,9 @@ import worker as w
 sys.path.insert(0,str(here))
 import live_tasks
 
-order=['whole','tasks','tasks','whole','whole','tasks','tasks','whole']
+order=['whole','simultaneous','simultaneous','whole','whole','simultaneous','simultaneous','whole']
 schedule=['build']
+owners=('ruff_linter','salsa')
 tree=w.proof/'instructions';tree.mkdir()
 def save(path, obj):
     path.write_text(json.dumps(obj,indent=2,sort_keys=True)+'\n')
@@ -23,28 +24,21 @@ def identity(path):
     stat=path.stat()
     return [stat.st_dev,stat.st_ino]
 def cost(folder):
-    images={}; totals=Counter(); creates={}; outer=[]
+    images={};totals=Counter();creates={}
     for line in (folder/'epochs.tsv').read_text().splitlines():
         row=line.split()
         if row[0]=='I':
             _,seq,group,tid,when,action=row
-            fields=(folder/f'{int(seq):05}.nul').read_bytes().split(b'\0')
+            fields=(folder/(f'{int(seq):05}.nul')).read_bytes().split(b'\0')
             assert fields[-1]==b'' and int(fields[0])==int(group) and int(seq) not in images
             images[int(seq)]=(list(map(int,fields[1:3])),os.fsdecode(fields[3]),list(map(os.fsdecode,fields[4:-1])))
             creates[int(seq)]=action
         elif row[0]=='C':
-            _,seq,group,tid,retired,enabled,running=row
+            _,seq,group,tid,retired,enabled,running=map(str,row)
             assert int(seq) in images and int(enabled)==int(running) and (not int(retired) or int(running)>0)
             totals[int(seq)]+=int(retired)
-        elif row[0]=='W':
-            _,count,enabled,running,code=map(str,row)
-            assert int(enabled)==int(running)>0 and int(code)==0 and int(count)>0
-            outer.append(int(count))
-        else: assert row[0]=='M'
-    counter,=outer
-    per_task=sum(totals.values())
-    assert abs(per_task-counter) <= max(30000,counter*.01), (folder,per_task,counter)
-    return images,totals,creates,counter
+        else:assert row[0] in ('M','W')
+    return images,totals,creates
 def capture(cmd, method, dst, env, cwd):
     dst.mkdir()
     actual=list(cmd)
@@ -59,7 +53,7 @@ def capture(cmd, method, dst, env, cwd):
     w.guard()
     with (dst/'stdout').open('wb')as o,(dst/'stderr').open('wb')as e:
         if method=='simultaneous':
-            observation=live_tasks.observe(actual,library=library,sdk=w.sdk,dst=dst,cwd=cwd,env=env,stdout=o,stderr=e)
+            observation=live_tasks.observe(actual,library=library,sdk=w.sdk,dst=dst,cwd=cwd,env=env,stdout=o,stderr=e,subjects=('ty_python_semantic',) if dst.name=='detector-calibration' else owners)
             save(dst/'live-threads.json',observation)
         else:
             answer=subprocess.run(actual,cwd=cwd,env=env,stdout=o,stderr=e)
@@ -69,7 +63,7 @@ def capture(cmd, method, dst, env, cwd):
         assert obs['status']==0 and obs['enabled']==obs['running']>0 and obs['instructions']>0
         return obs['instructions']
     if method=='tasks':
-        return cost(dst/'tasks')[3]
+        return sum(cost(dst/'tasks')[1].values())
     return None
 def probe(exe):
     results={}
@@ -109,23 +103,26 @@ def run_phase(mode,label,method):
         expected=[1,0,1,0] if data['source']==w.OLD else [0,1,1,0]
         assert [r[0]for r in result.values()]==expected
         data.update(binary=w.hf(exe),probes=result)
-    if method=='tasks':
-        images,counts,creates,checked=cost(dst/'tasks')
-        by_kind=Counter(); execs=Counter(); by_args={}
-        for seq,(physical,exe,argv) in images.items():
-            kind=Path(exe).name
-            if physical==runtime_ids['rustc']:
-                kind='rustc '+(argv[argv.index('--crate-name')+1] if '--crate-name' in argv else '<probe>')
-            elif physical==runtime_ids['wild']: kind='signed Wild'
-            elif physical==runtime_ids['cargo']: kind='signed Cargo'
-            elif kind in ('rustc','cargo'): raise AssertionError(('foreign SDK executable',seq,physical,exe))
-            elif kind.endswith('ld.bfd'): kind='system '+kind
-            by_kind[kind]+=counts[seq]
-            if creates[seq]=='exec': execs[kind]+=1
-            by_args[seq]=dict(program=kind,instructions=counts[seq],event=creates[seq],argv=argv,path=exe,identity=physical)
-        assert checked==total
-        save(dst/'images.json',by_args)
-        data.update(attribution=dict(by_kind),execs=dict(execs),task_sum=sum(counts.values()))
+    payloads={}
+    for owner in owners:
+        art,=[r for r in arts if r['target']['name']==owner and r['target']['kind']==['lib']]
+        path,={Path(n).with_suffix('.rmeta') for n in art['filenames'] if n.endswith(('.rmeta','.rlib'))}
+        info=path.with_name(path.stem.removeprefix('lib')+'.d')
+        payloads[owner]={'rmeta':w.hf(path),'depinfo':w.hf(info),'artifacts':{Path(n).name:w.hf(n) for n in art['filenames']}}
+    data['owner_inputs']=payloads
+    if label=='settled':
+        for art in arts:
+            if art['fresh']: continue
+            for name in art['filenames']:
+                file=Path(name)
+                for dep in (file.with_name(file.stem.removeprefix('lib')+'.d'),):
+                    if file.suffix=='.rlib' and dep.is_file():
+                        (dst/(dep.name+'.raw')).write_bytes(dep.read_bytes())
+    if method=='simultaneous':
+        observation=json.loads((dst/'live-threads.json').read_text())
+        lower=observation['instructions']
+        assert 0<lower<=total
+        data.update(owners_lower=observation['by_crate'],owner_fraction=lower/total)
     save(dst/'result.json',data)
     print(mode,label,method,'retired',total,'nonfresh',len(data['dirty']),flush=True)
     return data
@@ -133,9 +130,8 @@ def run_phase(mode,label,method):
 assert w.git('rev-parse','HEAD')==w.NEW and w.git('rev-parse','HEAD^')==w.OLD and w.hf(w.work/'Cargo.lock')==w.OLDLOCK and not w.git('status','--porcelain')
 assert os.environ['GITHUB_RUN_ATTEMPT']=='1' and os.environ['GITHUB_SHA']==os.environ['REVIEWED_HEAD'] and os.uname().machine=='x86_64'
 pre={'source':[w.OLD,w.NEW],'lock':w.OLDLOCK,'order':order,'modes':schedule,'sdk_manifest':w.hf(w.src/'sdk.json'),
-     'counter_sha256':{p.name:w.hf(p)for p in here.glob('*.c')},
-     'purpose':'Identify the dominant whole Rust build operation on unchanged historical Ruff; no speedup claim.',
-     'admit':'Four hardware pairs. Exact source, unit roster, RUF009 verdicts, ELF and dep-info. Per-task sum within 1% of independent inherited counter in the same command. Traced total within 5% of the independent untraced range. Require the same component above 50% in all four traces to nominate a 2x opportunity.'}
+     'counter_sha256':{p.name:w.hf(p)for p in here.glob('*.c')},'live_observer_sha256':w.hf(here/'live_tasks.py'),'purpose':'Test independently whether ordinary stock ruff_linter and salsa rustc together exceed half of the unchanged native Ruff build. No forced build or ptrace on the measured histories.',
+     'admit':'All four observed normal commands must have both exact compiler children and the same positive combined lower bound above 50%, with each owner above 10%, to nominate a 2x instruction opportunity. Count only fully scheduled physically authenticated threads, omit unverifiable samples entirely and report their raw values. Controls retain exact source/roster, both owner products, Ty, final ELF and four RUF009 verdicts. Observed whole totals must lie within 5% of the four untouched controls.'}
 save(tree/'registered.json',pre)
 env=w.install()
 whole=w.root/'whole_count';tasks=w.root/'exec_count'
@@ -143,6 +139,20 @@ for program in (whole,tasks):
     subprocess.run(['/usr/bin/cc','-O2','-Wall','-Wextra','-Werror',here/(program.name+'.c'),'-o',program],check=True)
 runtime_ids={'rustc':identity(w.sdk/'bin/rustc'),'cargo':identity(w.sdk/'bin/cargo'),'wild':identity(next((w.sdk/'lib/rustlib').glob('*/bin/wild-ld/ld.bfd')))}
 save(tree/'runtime-file-ids.json',runtime_ids)
+library_path=w.root/'libtask_count.so'
+subprocess.run(['/usr/bin/cc','-Wall','-Wextra','-Werror','-O2','-shared','-fPIC',here/'task_count.c','-o',library_path],check=True)
+library=live_tasks.load_library(library_path)
+fd=live_tasks.attach(library,os.getpid())
+before=live_tasks.count(fd)['instructions']
+sum(range(2000000))
+after=live_tasks.count(fd)['instructions']
+assert after>before+10000000
+child_before=live_tasks.count(fd)['instructions']
+subprocess.run(['/usr/bin/python3','-IB','-c','sum(range(6000000))'],check=True)
+child_after=live_tasks.count(fd)['instructions']
+os.close(fd)
+assert child_after-child_before<5000000
+save(tree/'single-thread-calibration.json',{'self_delta':after-before,'external_child_delta':child_after-child_before})
 for method in ('whole','tasks'):
     for kind in ('thread','child'):
         vals=[]
@@ -151,6 +161,14 @@ for method in ('whole','tasks'):
             code='import threading;t=threading.Thread(target=lambda:'+part+');t.start();t.join()' if kind=='thread' else 'import sys,subprocess;subprocess.run([sys.executable,"-IB","-c",'+repr(part)+'],check=True)'
             vals.append(capture(['/usr/bin/python3','-IB','-c',code],method,tree/f'calibrate-{method}-{kind}-{int(heavy)}',env,w.work))
         assert vals[1]>vals[0]+10000000
+# Check the live detector on this worker's procfs before fetching Ruff dependencies.
+fixture=w.root/'live-detector-fixture'
+(fixture/'src').mkdir(parents=True)
+(fixture/'Cargo.toml').write_text('[package]\nname="ty_python_semantic"\nversion="0.1.0"\nedition="2024"\n')
+(fixture/'src/lib.rs').write_text(''.join(f'pub fn f{i}(v:u64)->u64{{v.wrapping_add({i})}}\n' for i in range(8000)))
+test_output=tree/'detector-calibration'
+test_total=capture(['cargo','+ohm','check','--offline','-j1'],'simultaneous',test_output,dict(env,CARGO_TARGET_DIR=str(fixture/'target')),fixture)
+assert 0<json.loads((test_output/'live-threads.json').read_text())['instructions']<=test_total
 w.git('switch','--detach',w.OLD)
 subprocess.run(['cargo','+ohm','fetch','--locked','--target','x86_64-unknown-linux-gnu'],env=env,cwd=w.work,check=True)
 env['CARGO_NET_OFFLINE']='true'
@@ -162,11 +180,11 @@ for mode in schedule:
     if mode=='build':assert old['binary']!=edit['binary']==settled['binary']
     runs=[run_phase(mode,str(i),method) for i,method in enumerate(order)]
     for r in runs:
-        for k in ('source','roster_sha256','dirty','ty_rmeta','ty_depinfo')+(('binary','probes') if mode=='build' else ()):
+        for k in ('source','roster_sha256','dirty','ty_rmeta','ty_depinfo','owner_inputs')+(('binary','probes') if mode=='build' else ()):
             assert r[k]==settled[k],(mode,r['label'],k)
     controls=[r['total'] for r in runs if r['method']=='whole']
-    traced=[r for r in runs if r['method']=='tasks']
-    summary={'controls':controls,'traced':[{k:r[k] for k in ('total','task_sum','attribution','execs')}for r in traced],
-             'within_control_range':all(min(controls)*.95<=r['total']<=max(controls)*1.05 for r in traced)}
+    paired=[{'whole':r['total'],'owners_lower':r['owners_lower'],'fraction':r['owner_fraction']} for r in runs if r['method']=='simultaneous']
+    summary={'ordinary_whole':controls,'simultaneous':paired,'all_majority':all(r['fraction']>.5 and all(v/r['whole']>.1 for v in r['owners_lower'].values()) for r in paired),
+             'within_five_percent_of_control_range':all(min(controls)*.95<r['whole']<max(controls)*1.05 for r in paired)}
     save(tree/(mode+'-summary.json'),summary)
-    assert summary['within_control_range'], (mode,summary)
+    assert summary['within_five_percent_of_control_range'],(mode,summary)

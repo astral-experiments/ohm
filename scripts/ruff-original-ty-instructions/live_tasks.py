@@ -89,7 +89,7 @@ def matching_driver(process, driver, driver_stat, windows, image):
     image['signed_memory_windows'] = receipts
     return True
 
-def observe(command, *, library, sdk, dst, cwd, env, stdout, stderr):
+def observe(command, *, library, sdk, dst, cwd, env, stdout, stderr, subjects):
     cargo = sdk / 'bin/cargo'
     rustc = sdk / 'bin/rustc'
     driver, = (sdk / 'lib').glob('librustc_driver-*.so')
@@ -124,16 +124,19 @@ def observe(command, *, library, sdk, dst, cwd, env, stdout, stderr):
                             if not cargo.samefile(procfs / str(ppid) / 'exe'):
                                 continue
                             argv = list(map(os.fsdecode, (task / 'cmdline').read_bytes().rstrip(b'\0').split(b'\0')))
-                            if '--crate-name' not in argv or argv[argv.index('--crate-name')+1] != 'ty_python_semantic':
+                            if '--crate-name' not in argv:
                                 continue
-                            image['cargo_child_ty'] = True
+                            image['crate_name'] = argv[argv.index('--crate-name')+1]
+                            if image['crate_name'] not in subjects:
+                                continue
+                            image['selected_cargo_child'] = True
                             if 'driver_seen' not in image:
                                 maps = [line for line in (task / 'maps').read_text().splitlines() if 'librustc_driver-' in line]
                                 if maps:
                                     image['driver_seen'] = maps
                             if not any(arg == '--emit' or arg.startswith('--emit=') for arg in argv) or not matching_driver(task, driver, driver_stat, windows, image):
                                 continue
-                            programs[pid] = {'argv': argv, 'start': task_id(task), 'cargo_pid': int(fields[1])}
+                            programs[pid] = {'crate': image['crate_name'], 'argv': argv, 'start': task_id(task), 'cargo_pid': int(fields[1])}
                         if task_id(task) != programs[pid]['start'] or not rustc.samefile(task / 'exe'):
                             continue
                         for thread in (task / 'task').iterdir():
@@ -156,10 +159,16 @@ def observe(command, *, library, sdk, dst, cwd, env, stdout, stderr):
                         pass
                 time.sleep(.002)
             assert proc.returncode == 0, (dst, proc.returncode)
-            assert len(programs) == 1 and fds, (dst, programs, len(fds))
-            rows = [{'pid': pid, 'tid': tid, **count(fd)} for (pid, tid), fd in fds.items()]
+            assert sorted(d['crate'] for d in programs.values()) == sorted(subjects) and fds, (dst,programs,len(fds))
+            rows=[]
+            for (pid,tid),fd in fds.items():
+                raw,enabled,running=struct.unpack('=QQQ',os.read(fd,24))
+                admitted=enabled==running and (not raw or running>0)
+                rows.append({'pid':pid,'tid':tid,'crate':programs[pid]['crate'],'raw':raw,'enabled':enabled,'running':running,'admitted':admitted,'instructions':raw if admitted else 0})
             assert len({row['tid'] for row in rows}) == len(rows)
-            return {'processes': programs, 'threads': rows, 'instructions': sum(r['instructions'] for r in rows)}
+            by_crate={name:sum(r['instructions'] for r in rows if r['crate']==name)for name in subjects}
+            assert all(by_crate.values())
+            return {'processes':programs,'threads':rows,'by_crate':by_crate,'instructions':sum(by_crate.values())}
         finally:
             (dst/'observed-images.json').write_text(json.dumps({'polls':attempts,'observer_pid':proc.pid,'images':list(images.values()),
                 'driver':{'inode':driver_stat.st_ino,'major':os.major(driver_stat.st_dev),'minor':os.minor(driver_stat.st_dev)}},indent=2)+'\n')
