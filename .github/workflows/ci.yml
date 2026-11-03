@@ -3,6 +3,11 @@ run-name: RUF009 native macro observation ${{ inputs.reviewed_head }}
 on:
   workflow_dispatch:
     inputs:
+      lane:
+        description: Diagnostic fixtures or release-profile Ruff acceptance
+        type: choice
+        default: fixture
+        options: [fixture, release-ruff]
       reviewed_head:
         description: Exact reviewed nonrelease QA source
         required: true
@@ -13,7 +18,7 @@ jobs:
   inspect:
     if: github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruf009-join-proof-20261103'
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 65
+    timeout-minutes: 105
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -30,7 +35,24 @@ jobs:
           persist-credentials: false
           path: accepted-source
           sparse-checkout: scripts/ohm-apple-zmij/cargo293
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        if: inputs.lane == 'release-ruff'
+        with:
+          repository: astral-sh/ruff
+          ref: b00f68a23cedbd3a38fc25bac63638f0f11fc3f0
+          fetch-depth: 2
+          path: ruff
+          persist-credentials: false
+      - name: Build matched release-profile Cargo and check real Ruff
+        if: inputs.lane == 'release-ruff'
+        env:
+          OHM_SDK_READ_TOKEN: ${{ github.token }}
+        run: |
+          command -v strace || (sudo apt-get -qq update && sudo apt-get -qq install -y --no-install-recommends strace zstd)
+          sudo sysctl -w kernel.perf_event_paranoid=-1 || true
+          python3 -IB qa/scripts/ruff-join-proof/release/ruff.py
       - name: Build and validate actual Cargo after dependencies complete
+        if: inputs.lane == 'fixture'
         env:
           OHM_INPUT_RECHECK_QA: '1'
           OHM_SDK_READ_TOKEN: ${{ github.token }}

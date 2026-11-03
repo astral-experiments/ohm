@@ -1,5 +1,5 @@
 from pathlib import Path
-import hashlib, json, os, shutil, signal, subprocess, time
+import hashlib, json, os, shutil, signal, subprocess, sys, time
 
 src = Path(__file__).resolve().parent
 spec = json.loads((src/'plan.json').read_bytes())
@@ -16,7 +16,7 @@ def run(sdk, env, label, cmd, cwd):
     sdk.put(sdk.proof/(label+'.json'),{'argv':cmd,'rc':p.returncode,'low_memory':low})
     if p.returncode: print(b.read_text(errors='replace')[-4800:],flush=True);raise RuntimeError(label+' failed')
     return a
-def setup(sdk,e):
+def setup(sdk,e,release=False):
     root=Path(os.environ['GITHUB_WORKSPACE'])/'cargo'; bundle=src/'candidate-v3.bundle'
     git=lambda *args:subprocess.check_output(['git','-C',str(root),*args],text=True).strip()
     root.mkdir()
@@ -34,6 +34,10 @@ def setup(sdk,e):
     assert git('rev-parse','HEAD^')==spec['second_candidate'] and git('rev-parse','HEAD^^')==spec['first_candidate'] and git('rev-parse','HEAD^^^')==spec['parent']and git('rev-parse','HEAD^{tree}')==spec['tree']and not git('status','--porcelain')
     target=sdk.root/'factory-target';shared=sdk.root/'factory-shared'
     env={**e,'RUSTUP_TOOLCHAIN':'ohm','CARGO_TARGET_DIR':str(target),'CARGO_BUILD_BUILD_DIR':str(shared),'CARGO_PROFILE_DEV_DEBUG':'0','CARGO_INCREMENTAL':'0'}
+    if release:
+        sys.path.insert(0,str(src.parent/'release'))
+        from construct import build_matched
+        return build_matched(sdk,env,root,run)
     a=run(sdk,env,'factory',['cargo','+ohm','-Zohm-defaults=no','build','--locked','-p','cargo','--bin','cargo','--features',spec['default_feature'],'-j8','--message-format=json-render-diagnostics'],root)
     rows=[json.loads(l)for l in a.read_text().splitlines()if l.startswith('{')];exe,=[Path(r['executable'])for r in rows if r['reason']=='compiler-artifact' and r['target']['name']=='cargo'and r.get('executable') and 'bin'in r['target']['kind']]
     assert exe.is_file()and any(exe.resolve().is_relative_to(d)for d in (target,shared))
