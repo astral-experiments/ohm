@@ -74,7 +74,7 @@ def table_pos(raw, t, p, i):
     return at + 12 * ((n + 63) // 64) + (rank + (bits & ((1 << (i % 64)) - 1)).bit_count()) * w, w
 
 
-def compare(a, b, role, version, edition):
+def compare(a, b, role, version, edition, *, owner="ruff_linter"):
     assert a != b and len(a) == len(b)
 
     def load(raw):
@@ -83,7 +83,7 @@ def compare(a, b, role, version, edition):
             raw,
             lens.SCHEMA["symbols"],
             lens.SCHEMA["tables"],
-            "ruff_linter",
+            owner,
             version,
             edition=edition,
             typed=wire,
