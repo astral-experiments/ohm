@@ -5,7 +5,7 @@ permissions:
 jobs:
   qualify:
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head &&
-      github.ref_name == 'charlie/qa-rc24-static-int-array-20261103'
+      github.ref_name == 'charlie/qa-rc24-const-aggregate-20261104'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     steps:

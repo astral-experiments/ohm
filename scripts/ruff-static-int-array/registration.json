@@ -1,7 +1,7 @@
 {
-  "bundle": "b263c0cbe8ba2b97e856e2f1a292fe9722bfabfbaab5adc9a06b2b2f660c197a",
-  "candidate": "65390392975bd2668748fd8bd8ebc52915772f41",
-  "candidate_tree": "6c899b8166df087d142c6d392e2eea7933a2e814",
+  "bundle": "3d6ef732a77295f760dcf069f7cf7219a9488b8bbd3027bef93f8d5381c7372c",
+  "candidate": "06fe634feaa39288210a6f17b8994346a5fae1c1",
+  "candidate_tree": "2cff5a0eef365de6e4587006859dee9d4092ca87",
   "cargo": "abc70d60a6fd89c10d5f65cf85820d9b78d5affe",
   "compiler_commits": [
     "a60f4f4476d4819b62730e92ea07c1343f8e6dac",
@@ -9,8 +9,18 @@
     "dda36b958be0f0c393c22039fb2f53c0ff436968",
     "8574afc64801c199c8d090e3e0e013adf6ccd496",
     "6c2874a0b6a0bf3570f8959733b6f87907e5cce6",
-    "65390392975bd2668748fd8bd8ebc52915772f41"
+    "4a50cf68eb73a73bf8d31a69da54050132513339",
+    "06fe634feaa39288210a6f17b8994346a5fae1c1"
   ],
+  "const_tables": {
+    "base": "6c2874a0b6a0bf3570f8959733b6f87907e5cce6",
+    "base_factory": 41738460962,
+    "fixture": [
+      "4776a20c73ac633308df626105839fb9a3d825ea",
+      "c7d0c573cf5b79b7426aba6ad5458e2db283843b"
+    ],
+    "primary": "Retired instructions in the real unicode-normalization compiler reached by Ruff's parser cargo check during its historical Unicode upgrade. Require at least 20 percent savings in both counterbalanced hardware pilots, and in the median of six fresh favorable pairs for confirmation; require the whole Cargo command to improve in both pilots and all six confirmatory pairs. Preserve incremental/empty native equality on 1,112,064 Unicode scalars and actual Ruff parser calls, the precise range and source diagnostics of two invalid attempts, and retain all cold and unchanged controls. Refuse a common cold or unchanged regression exceeding both 2 percent and 10 million instructions."
+  },
   "criterion": "20% fewer instructions in a full affected compiler or 2x across a real ordinary command; no PR from the factory alone.",
   "initial_build": {
     "candidate": "a60f4f4476d4819b62730e92ea07c1343f8e6dac",
@@ -23,11 +33,10 @@
   "paths": [
     "compiler/rustc_data_structures/src/unord.rs",
     "compiler/rustc_hir_typeck/src/expr.rs",
-    "compiler/rustc_hir_typeck/src/fn_ctxt/_impl.rs",
     "compiler/rustc_hir_typeck/src/writeback.rs",
-    "compiler/rustc_incremental/src/persist/file_format.rs",
     "compiler/rustc_middle/src/thir.rs",
     "compiler/rustc_middle/src/thir/visit.rs",
+    "compiler/rustc_middle/src/ty/sty.rs",
     "compiler/rustc_middle/src/ty/typeck_results.rs",
     "compiler/rustc_mir_build/src/builder/expr/as_constant.rs",
     "compiler/rustc_mir_build/src/builder/expr/as_place.rs",
@@ -40,7 +49,8 @@
     "compiler/rustc_mir_build/src/thir/pattern/check_match.rs",
     "compiler/rustc_mir_build/src/thir/print.rs",
     "compiler/rustc_parse/src/parser/expr.rs",
-    "compiler/rustc_ty_utils/src/consts.rs"
+    "compiler/rustc_ty_utils/src/consts.rs",
+    "tests/run-make/static-integer-array-literals/rmake.rs"
   ],
   "priced_parent": {
     "artifact": 13274919319,
@@ -49,7 +59,7 @@
     "tar": "135b203802b810b96301a965e916296d9cea5ad9425ce6f306c07818521072bc",
     "zip": "de89166137076bfa80a1e103006e377a0765605454cae35d69c5d7f728030e60"
   },
-  "ref": "refs/heads/charlie/qa-compact-integer-arrays-20261103",
+  "ref": "refs/heads/charlie/qa-rc24-pack-const-aggregates-20261104",
   "release_members": {
     "bin/cargo": {
       "bytes": 39249096,
@@ -77,14 +87,5 @@
       16.42,
       16.45
     ]
-  },
-  "uniform": {
-    "incremental_format": 65135,
-    "previous": "6c2874a0b6a0bf3570f8959733b6f87907e5cce6",
-    "previous_factory": 41738460962,
-    "previous_rand": 41741463395,
-    "previous_rustc": 41740052938,
-    "price": "In addition to qualifying against the release source, require at least five percent fewer retired instructions in real edited rustc versus C5 on fresh paired hosts before proposing the additional representation. Check disk and other cold/unchanged workloads, on-disk upgrade/downgrade, typed HIR, frontend diagnostics, and every native behavior. Hold otherwise.",
-    "proposal": "Replace identical HIR type entries by one checked disjoint range. Preserve indexed lookups, full iteration, arbitrary later writes and prior on-disk refusal."
   }
 }
