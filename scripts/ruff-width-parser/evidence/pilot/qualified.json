@@ -1,0 +1,934 @@
+{
+  "blocks": [
+    {
+      "archive": 13343936201,
+      "archive_digest": "sha256:72552c6221209db228e606b5be126109bdb84ffafd516b060e4fc610d9285abd",
+      "boot": "e416e8fe-48fc-4065-a49e-fa6dc1eed6ad",
+      "head": "e59331fd50799eea426bf7a394bc3dcef100fe13",
+      "order": [
+        "C8",
+        "C7"
+      ],
+      "outputs": {
+        "C7": {
+          "build": {
+            "cold-old": {
+              "elf": "9af437aa2a5c42738b066c1b660aa6efba457bc081cc8b5e5416b967d3aa90eb",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "87a14aafb80fe99e9a41438652f64c5a192d1cd28024f5851722dd42e715462b",
+                  ".rmeta": "03c099011b6ad3088834d5fe80e7fb10371c7d4ba6db621f58ca7ba14be24d61"
+                },
+                "unicode_width": {
+                  ".rlib": "448d9f5925e47f7d95f04a57f03bff8b52d63ed5fd9443765a1d8180ff6905ee",
+                  ".rmeta": "8a786844ea93a7a70c331940682861113d6d924afadb85841121736739065e6c"
+                }
+              }
+            },
+            "empty-new": {
+              "elf": "a25204c9adf1085316b83d8de243279a7b405ab15e8900f1bb4409fc4b1db603",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "a6503da25af9fd0e5a0f211277ff0526b530f76e871f5914c57b1b80d112f593",
+                  ".rmeta": "a2830b4264e8cba116cb7c17561d6a0fd08519a159a735297d4eb8c8d2be51f0"
+                },
+                "unicode_width": {
+                  ".rlib": "cd4575122b56d43b4c75ba02f1c0e00f907708f98e9a1b7f2e759deae7d12188",
+                  ".rmeta": "6d0ca7ae3744503c4a57037bdfeead6cf52b993c8fbe09863a3278330d894015"
+                }
+              },
+              "retained": {
+                "bytes": 114475008,
+                "inodes": 907,
+                "paths": 933
+              }
+            },
+            "old-unchanged": {
+              "elf": "9af437aa2a5c42738b066c1b660aa6efba457bc081cc8b5e5416b967d3aa90eb",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "87a14aafb80fe99e9a41438652f64c5a192d1cd28024f5851722dd42e715462b",
+                  ".rmeta": "03c099011b6ad3088834d5fe80e7fb10371c7d4ba6db621f58ca7ba14be24d61"
+                },
+                "unicode_width": {
+                  ".rlib": "448d9f5925e47f7d95f04a57f03bff8b52d63ed5fd9443765a1d8180ff6905ee",
+                  ".rmeta": "8a786844ea93a7a70c331940682861113d6d924afadb85841121736739065e6c"
+                }
+              }
+            },
+            "ordinary-edit": {
+              "elf": "a25204c9adf1085316b83d8de243279a7b405ab15e8900f1bb4409fc4b1db603",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "2bd530c81450206bfc8e81cf8fdd973da5deab4b2b95349ec310c12aa7c468cf",
+                  ".rmeta": "a2830b4264e8cba116cb7c17561d6a0fd08519a159a735297d4eb8c8d2be51f0"
+                },
+                "unicode_width": {
+                  ".rlib": "cd4575122b56d43b4c75ba02f1c0e00f907708f98e9a1b7f2e759deae7d12188",
+                  ".rmeta": "6d0ca7ae3744503c4a57037bdfeead6cf52b993c8fbe09863a3278330d894015"
+                }
+              },
+              "retained": {
+                "bytes": 135950336,
+                "inodes": 1071,
+                "paths": 1102
+              }
+            },
+            "repaired": {
+              "elf": "a25204c9adf1085316b83d8de243279a7b405ab15e8900f1bb4409fc4b1db603",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "aeb700b4c2aab9596b82654df2007c4bd24a99fba02a864b4145af863047ea70",
+                  ".rmeta": "a2830b4264e8cba116cb7c17561d6a0fd08519a159a735297d4eb8c8d2be51f0"
+                },
+                "unicode_width": {
+                  ".rlib": "cd4575122b56d43b4c75ba02f1c0e00f907708f98e9a1b7f2e759deae7d12188",
+                  ".rmeta": "6d0ca7ae3744503c4a57037bdfeead6cf52b993c8fbe09863a3278330d894015"
+                }
+              }
+            },
+            "unchanged": {
+              "elf": "a25204c9adf1085316b83d8de243279a7b405ab15e8900f1bb4409fc4b1db603",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "2bd530c81450206bfc8e81cf8fdd973da5deab4b2b95349ec310c12aa7c468cf",
+                  ".rmeta": "a2830b4264e8cba116cb7c17561d6a0fd08519a159a735297d4eb8c8d2be51f0"
+                },
+                "unicode_width": {
+                  ".rlib": "cd4575122b56d43b4c75ba02f1c0e00f907708f98e9a1b7f2e759deae7d12188",
+                  ".rmeta": "6d0ca7ae3744503c4a57037bdfeead6cf52b993c8fbe09863a3278330d894015"
+                }
+              }
+            }
+          },
+          "check": {
+            "cold-old": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "353394c2641242a6ee40ebdf9e9c18ed9ef279fc3b6225f5d1b2061a6df3d437"
+                },
+                "unicode_width": {
+                  ".rmeta": "427ae2dabb763b039e781ecb225938adc157dd72339556b9252b3e851dae8a53"
+                }
+              }
+            },
+            "empty-new": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "c5c8c6917e29f1824a3a654f4ddb7e9667a10ad83c09d6925bd7f7c3df4c25b0"
+                },
+                "unicode_width": {
+                  ".rmeta": "1625de3166c84bf1a729a175cc12c73d4209f3cce72da762493b45f8cf76757f"
+                }
+              },
+              "retained": {
+                "bytes": 81346560,
+                "inodes": 739,
+                "paths": 765
+              }
+            },
+            "observed-edit": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "c5c8c6917e29f1824a3a654f4ddb7e9667a10ad83c09d6925bd7f7c3df4c25b0"
+                },
+                "unicode_width": {
+                  ".rmeta": "1625de3166c84bf1a729a175cc12c73d4209f3cce72da762493b45f8cf76757f"
+                }
+              }
+            },
+            "observed-empty-new": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "c5c8c6917e29f1824a3a654f4ddb7e9667a10ad83c09d6925bd7f7c3df4c25b0"
+                },
+                "unicode_width": {
+                  ".rmeta": "1625de3166c84bf1a729a175cc12c73d4209f3cce72da762493b45f8cf76757f"
+                }
+              }
+            },
+            "old-unchanged": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "353394c2641242a6ee40ebdf9e9c18ed9ef279fc3b6225f5d1b2061a6df3d437"
+                },
+                "unicode_width": {
+                  ".rmeta": "427ae2dabb763b039e781ecb225938adc157dd72339556b9252b3e851dae8a53"
+                }
+              }
+            },
+            "ordinary-edit": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "c5c8c6917e29f1824a3a654f4ddb7e9667a10ad83c09d6925bd7f7c3df4c25b0"
+                },
+                "unicode_width": {
+                  ".rmeta": "1625de3166c84bf1a729a175cc12c73d4209f3cce72da762493b45f8cf76757f"
+                }
+              },
+              "retained": {
+                "bytes": 92438528,
+                "inodes": 761,
+                "paths": 792
+              }
+            },
+            "repaired": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "c5c8c6917e29f1824a3a654f4ddb7e9667a10ad83c09d6925bd7f7c3df4c25b0"
+                },
+                "unicode_width": {
+                  ".rmeta": "1625de3166c84bf1a729a175cc12c73d4209f3cce72da762493b45f8cf76757f"
+                }
+              }
+            },
+            "unchanged": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "c5c8c6917e29f1824a3a654f4ddb7e9667a10ad83c09d6925bd7f7c3df4c25b0"
+                },
+                "unicode_width": {
+                  ".rmeta": "1625de3166c84bf1a729a175cc12c73d4209f3cce72da762493b45f8cf76757f"
+                }
+              }
+            }
+          }
+        },
+        "C8": {
+          "build": {
+            "cold-old": {
+              "elf": "c861f43e000858500650f6745a74fd2ba8463455999c2249096cd6adedebb09a",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "52e16ea85e19c763ae3cb5d82407eb2651d48973d0da21bce96cf360b904987a",
+                  ".rmeta": "b6e4046202587e519b84e53cc87d35a04a9488c739d5f073aec197c0bb482883"
+                },
+                "unicode_width": {
+                  ".rlib": "2e7bfaa2ac0eb0b0b36acba6a0a816ed25b1d9de2ac0c92197ecce6ebee5ad6c",
+                  ".rmeta": "22336f0f6ee5e7eaef4800bc241c3e22dffbdd37a4b62c92a5658bf23a2f305b"
+                }
+              }
+            },
+            "empty-new": {
+              "elf": "cf585f6eb038e8092851f846021a9cb91f8da537ee693bd3e9dbd10fb79bed70",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "7dcff9ebd8c60b2d8715db6c15279310da23a2d4c437c39eb8fc08ce5b35c3a8",
+                  ".rmeta": "be59f041c21ba126fcbccc5d80f0026a0c1430704378686018660e00479111cf"
+                },
+                "unicode_width": {
+                  ".rlib": "73d494e95ad9d9d92a44637be2520a0f90993069cf63b30c646f3609a8c34b9f",
+                  ".rmeta": "dab459b876a4cdfcfdf2827956be5a8ca40333e6541580519acecc388b54170e"
+                }
+              },
+              "retained": {
+                "bytes": 114450432,
+                "inodes": 907,
+                "paths": 933
+              }
+            },
+            "old-unchanged": {
+              "elf": "c861f43e000858500650f6745a74fd2ba8463455999c2249096cd6adedebb09a",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "52e16ea85e19c763ae3cb5d82407eb2651d48973d0da21bce96cf360b904987a",
+                  ".rmeta": "b6e4046202587e519b84e53cc87d35a04a9488c739d5f073aec197c0bb482883"
+                },
+                "unicode_width": {
+                  ".rlib": "2e7bfaa2ac0eb0b0b36acba6a0a816ed25b1d9de2ac0c92197ecce6ebee5ad6c",
+                  ".rmeta": "22336f0f6ee5e7eaef4800bc241c3e22dffbdd37a4b62c92a5658bf23a2f305b"
+                }
+              }
+            },
+            "ordinary-edit": {
+              "elf": "cf585f6eb038e8092851f846021a9cb91f8da537ee693bd3e9dbd10fb79bed70",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "52fc7ed1df0e07360ac5399b57940069afee7a19551b5889c779532dfe29bf8f",
+                  ".rmeta": "be59f041c21ba126fcbccc5d80f0026a0c1430704378686018660e00479111cf"
+                },
+                "unicode_width": {
+                  ".rlib": "73d494e95ad9d9d92a44637be2520a0f90993069cf63b30c646f3609a8c34b9f",
+                  ".rmeta": "dab459b876a4cdfcfdf2827956be5a8ca40333e6541580519acecc388b54170e"
+                }
+              },
+              "retained": {
+                "bytes": 135925760,
+                "inodes": 1071,
+                "paths": 1102
+              }
+            },
+            "repaired": {
+              "elf": "cf585f6eb038e8092851f846021a9cb91f8da537ee693bd3e9dbd10fb79bed70",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "a20353abbe2342288283120d3457847d348756cc9f8a9ca05a089cb302051fbb",
+                  ".rmeta": "be59f041c21ba126fcbccc5d80f0026a0c1430704378686018660e00479111cf"
+                },
+                "unicode_width": {
+                  ".rlib": "73d494e95ad9d9d92a44637be2520a0f90993069cf63b30c646f3609a8c34b9f",
+                  ".rmeta": "dab459b876a4cdfcfdf2827956be5a8ca40333e6541580519acecc388b54170e"
+                }
+              }
+            },
+            "unchanged": {
+              "elf": "cf585f6eb038e8092851f846021a9cb91f8da537ee693bd3e9dbd10fb79bed70",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "52fc7ed1df0e07360ac5399b57940069afee7a19551b5889c779532dfe29bf8f",
+                  ".rmeta": "be59f041c21ba126fcbccc5d80f0026a0c1430704378686018660e00479111cf"
+                },
+                "unicode_width": {
+                  ".rlib": "73d494e95ad9d9d92a44637be2520a0f90993069cf63b30c646f3609a8c34b9f",
+                  ".rmeta": "dab459b876a4cdfcfdf2827956be5a8ca40333e6541580519acecc388b54170e"
+                }
+              }
+            }
+          },
+          "check": {
+            "cold-old": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "7bac2e98a9eed3fe0898eb8f81028addb2e66f0779f51f05b465bffcd8107e35"
+                },
+                "unicode_width": {
+                  ".rmeta": "029bc211bad1d02f7fe33c5c3b4a936b8ef540e17f62fe98c89a035f3fbb98ad"
+                }
+              }
+            },
+            "empty-new": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "66e5202758d7c366abaaf570bd0cb0f3a01b6b09776696f0d29875f555678274"
+                },
+                "unicode_width": {
+                  ".rmeta": "58852050b9ecd03cb4454fdf0eb561a957794d665db2df3a4598d2aa971cf1ac"
+                }
+              },
+              "retained": {
+                "bytes": 81342464,
+                "inodes": 739,
+                "paths": 765
+              }
+            },
+            "observed-edit": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "66e5202758d7c366abaaf570bd0cb0f3a01b6b09776696f0d29875f555678274"
+                },
+                "unicode_width": {
+                  ".rmeta": "58852050b9ecd03cb4454fdf0eb561a957794d665db2df3a4598d2aa971cf1ac"
+                }
+              }
+            },
+            "observed-empty-new": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "66e5202758d7c366abaaf570bd0cb0f3a01b6b09776696f0d29875f555678274"
+                },
+                "unicode_width": {
+                  ".rmeta": "58852050b9ecd03cb4454fdf0eb561a957794d665db2df3a4598d2aa971cf1ac"
+                }
+              }
+            },
+            "old-unchanged": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "7bac2e98a9eed3fe0898eb8f81028addb2e66f0779f51f05b465bffcd8107e35"
+                },
+                "unicode_width": {
+                  ".rmeta": "029bc211bad1d02f7fe33c5c3b4a936b8ef540e17f62fe98c89a035f3fbb98ad"
+                }
+              }
+            },
+            "ordinary-edit": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "66e5202758d7c366abaaf570bd0cb0f3a01b6b09776696f0d29875f555678274"
+                },
+                "unicode_width": {
+                  ".rmeta": "58852050b9ecd03cb4454fdf0eb561a957794d665db2df3a4598d2aa971cf1ac"
+                }
+              },
+              "retained": {
+                "bytes": 92438528,
+                "inodes": 761,
+                "paths": 792
+              }
+            },
+            "repaired": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "66e5202758d7c366abaaf570bd0cb0f3a01b6b09776696f0d29875f555678274"
+                },
+                "unicode_width": {
+                  ".rmeta": "58852050b9ecd03cb4454fdf0eb561a957794d665db2df3a4598d2aa971cf1ac"
+                }
+              }
+            },
+            "unchanged": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "66e5202758d7c366abaaf570bd0cb0f3a01b6b09776696f0d29875f555678274"
+                },
+                "unicode_width": {
+                  ".rmeta": "58852050b9ecd03cb4454fdf0eb561a957794d665db2df3a4598d2aa971cf1ac"
+                }
+              }
+            }
+          }
+        }
+      },
+      "prices": {
+        "C7": {
+          "build": {
+            "cold-old": 103008758522,
+            "empty-new": 103016919989,
+            "old-unchanged": 124034620,
+            "ordinary-edit": 7002549104,
+            "repaired": 1090139452,
+            "unchanged": 124120882
+          },
+          "check": {
+            "cold-old": 86356148399,
+            "empty-new": 86365890394,
+            "observed-edit-rustc": 979822027,
+            "observed-empty-new-rustc": 977619037,
+            "old-unchanged": 123861435,
+            "ordinary-edit": 4382221984,
+            "repaired": 879972565,
+            "unchanged": 123861133
+          }
+        },
+        "C8": {
+          "build": {
+            "cold-old": 102831933928,
+            "empty-new": 102841452568,
+            "old-unchanged": 124162891,
+            "ordinary-edit": 6899331598,
+            "repaired": 1089697696,
+            "unchanged": 124163227
+          },
+          "check": {
+            "cold-old": 86186558390,
+            "empty-new": 86195134478,
+            "observed-edit-rustc": 877315487,
+            "observed-empty-new-rustc": 874457356,
+            "old-unchanged": 123795776,
+            "ordinary-edit": 4282312448,
+            "repaired": 879796343,
+            "unchanged": 123743848
+          }
+        }
+      },
+      "run": 41866980337,
+      "slot": "pilot-CP"
+    },
+    {
+      "archive": 13343246918,
+      "archive_digest": "sha256:9b64973d8b945de1ba1826b23fb27c5bd5bb5a2b0e41cdae1288fac0582397b1",
+      "boot": "1d30b04a-6be3-4176-bfb1-b4fe039a0e9c",
+      "head": "e59331fd50799eea426bf7a394bc3dcef100fe13",
+      "order": [
+        "C7",
+        "C8"
+      ],
+      "outputs": {
+        "C7": {
+          "build": {
+            "cold-old": {
+              "elf": "9af437aa2a5c42738b066c1b660aa6efba457bc081cc8b5e5416b967d3aa90eb",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "ad81ae9a7b48889b58b733291bc77a629eda8d03875a3b97f2f8da46965d844a",
+                  ".rmeta": "03c099011b6ad3088834d5fe80e7fb10371c7d4ba6db621f58ca7ba14be24d61"
+                },
+                "unicode_width": {
+                  ".rlib": "448d9f5925e47f7d95f04a57f03bff8b52d63ed5fd9443765a1d8180ff6905ee",
+                  ".rmeta": "8a786844ea93a7a70c331940682861113d6d924afadb85841121736739065e6c"
+                }
+              }
+            },
+            "empty-new": {
+              "elf": "a25204c9adf1085316b83d8de243279a7b405ab15e8900f1bb4409fc4b1db603",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "f186690f9ed9550ec592708f343be0dceae4f25464692f25ca3ddb7da9c8c2d2",
+                  ".rmeta": "a2830b4264e8cba116cb7c17561d6a0fd08519a159a735297d4eb8c8d2be51f0"
+                },
+                "unicode_width": {
+                  ".rlib": "cd4575122b56d43b4c75ba02f1c0e00f907708f98e9a1b7f2e759deae7d12188",
+                  ".rmeta": "6d0ca7ae3744503c4a57037bdfeead6cf52b993c8fbe09863a3278330d894015"
+                }
+              },
+              "retained": {
+                "bytes": 114475008,
+                "inodes": 907,
+                "paths": 933
+              }
+            },
+            "old-unchanged": {
+              "elf": "9af437aa2a5c42738b066c1b660aa6efba457bc081cc8b5e5416b967d3aa90eb",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "ad81ae9a7b48889b58b733291bc77a629eda8d03875a3b97f2f8da46965d844a",
+                  ".rmeta": "03c099011b6ad3088834d5fe80e7fb10371c7d4ba6db621f58ca7ba14be24d61"
+                },
+                "unicode_width": {
+                  ".rlib": "448d9f5925e47f7d95f04a57f03bff8b52d63ed5fd9443765a1d8180ff6905ee",
+                  ".rmeta": "8a786844ea93a7a70c331940682861113d6d924afadb85841121736739065e6c"
+                }
+              }
+            },
+            "ordinary-edit": {
+              "elf": "a25204c9adf1085316b83d8de243279a7b405ab15e8900f1bb4409fc4b1db603",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "6a1637cf1d0f41d983950fb422e27f38f55dea93286f35245759c3d5469efa83",
+                  ".rmeta": "a2830b4264e8cba116cb7c17561d6a0fd08519a159a735297d4eb8c8d2be51f0"
+                },
+                "unicode_width": {
+                  ".rlib": "cd4575122b56d43b4c75ba02f1c0e00f907708f98e9a1b7f2e759deae7d12188",
+                  ".rmeta": "6d0ca7ae3744503c4a57037bdfeead6cf52b993c8fbe09863a3278330d894015"
+                }
+              },
+              "retained": {
+                "bytes": 135954432,
+                "inodes": 1071,
+                "paths": 1102
+              }
+            },
+            "repaired": {
+              "elf": "a25204c9adf1085316b83d8de243279a7b405ab15e8900f1bb4409fc4b1db603",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "0b8a779589b4a45335ef41cfaeed2ea417822eb484b5bc8f7b7f987eb883cb18",
+                  ".rmeta": "a2830b4264e8cba116cb7c17561d6a0fd08519a159a735297d4eb8c8d2be51f0"
+                },
+                "unicode_width": {
+                  ".rlib": "cd4575122b56d43b4c75ba02f1c0e00f907708f98e9a1b7f2e759deae7d12188",
+                  ".rmeta": "6d0ca7ae3744503c4a57037bdfeead6cf52b993c8fbe09863a3278330d894015"
+                }
+              }
+            },
+            "unchanged": {
+              "elf": "a25204c9adf1085316b83d8de243279a7b405ab15e8900f1bb4409fc4b1db603",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "6a1637cf1d0f41d983950fb422e27f38f55dea93286f35245759c3d5469efa83",
+                  ".rmeta": "a2830b4264e8cba116cb7c17561d6a0fd08519a159a735297d4eb8c8d2be51f0"
+                },
+                "unicode_width": {
+                  ".rlib": "cd4575122b56d43b4c75ba02f1c0e00f907708f98e9a1b7f2e759deae7d12188",
+                  ".rmeta": "6d0ca7ae3744503c4a57037bdfeead6cf52b993c8fbe09863a3278330d894015"
+                }
+              }
+            }
+          },
+          "check": {
+            "cold-old": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "353394c2641242a6ee40ebdf9e9c18ed9ef279fc3b6225f5d1b2061a6df3d437"
+                },
+                "unicode_width": {
+                  ".rmeta": "427ae2dabb763b039e781ecb225938adc157dd72339556b9252b3e851dae8a53"
+                }
+              }
+            },
+            "empty-new": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "c5c8c6917e29f1824a3a654f4ddb7e9667a10ad83c09d6925bd7f7c3df4c25b0"
+                },
+                "unicode_width": {
+                  ".rmeta": "1625de3166c84bf1a729a175cc12c73d4209f3cce72da762493b45f8cf76757f"
+                }
+              },
+              "retained": {
+                "bytes": 81342464,
+                "inodes": 739,
+                "paths": 765
+              }
+            },
+            "observed-edit": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "c5c8c6917e29f1824a3a654f4ddb7e9667a10ad83c09d6925bd7f7c3df4c25b0"
+                },
+                "unicode_width": {
+                  ".rmeta": "1625de3166c84bf1a729a175cc12c73d4209f3cce72da762493b45f8cf76757f"
+                }
+              }
+            },
+            "observed-empty-new": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "c5c8c6917e29f1824a3a654f4ddb7e9667a10ad83c09d6925bd7f7c3df4c25b0"
+                },
+                "unicode_width": {
+                  ".rmeta": "1625de3166c84bf1a729a175cc12c73d4209f3cce72da762493b45f8cf76757f"
+                }
+              }
+            },
+            "old-unchanged": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "353394c2641242a6ee40ebdf9e9c18ed9ef279fc3b6225f5d1b2061a6df3d437"
+                },
+                "unicode_width": {
+                  ".rmeta": "427ae2dabb763b039e781ecb225938adc157dd72339556b9252b3e851dae8a53"
+                }
+              }
+            },
+            "ordinary-edit": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "c5c8c6917e29f1824a3a654f4ddb7e9667a10ad83c09d6925bd7f7c3df4c25b0"
+                },
+                "unicode_width": {
+                  ".rmeta": "1625de3166c84bf1a729a175cc12c73d4209f3cce72da762493b45f8cf76757f"
+                }
+              },
+              "retained": {
+                "bytes": 92438528,
+                "inodes": 761,
+                "paths": 792
+              }
+            },
+            "repaired": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "c5c8c6917e29f1824a3a654f4ddb7e9667a10ad83c09d6925bd7f7c3df4c25b0"
+                },
+                "unicode_width": {
+                  ".rmeta": "1625de3166c84bf1a729a175cc12c73d4209f3cce72da762493b45f8cf76757f"
+                }
+              }
+            },
+            "unchanged": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "c5c8c6917e29f1824a3a654f4ddb7e9667a10ad83c09d6925bd7f7c3df4c25b0"
+                },
+                "unicode_width": {
+                  ".rmeta": "1625de3166c84bf1a729a175cc12c73d4209f3cce72da762493b45f8cf76757f"
+                }
+              }
+            }
+          }
+        },
+        "C8": {
+          "build": {
+            "cold-old": {
+              "elf": "c861f43e000858500650f6745a74fd2ba8463455999c2249096cd6adedebb09a",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "3edb1595f9ac941a5893ec7cfdb0853ad6009e0e41e6f288881143a3bf8b470a",
+                  ".rmeta": "b6e4046202587e519b84e53cc87d35a04a9488c739d5f073aec197c0bb482883"
+                },
+                "unicode_width": {
+                  ".rlib": "2e7bfaa2ac0eb0b0b36acba6a0a816ed25b1d9de2ac0c92197ecce6ebee5ad6c",
+                  ".rmeta": "22336f0f6ee5e7eaef4800bc241c3e22dffbdd37a4b62c92a5658bf23a2f305b"
+                }
+              }
+            },
+            "empty-new": {
+              "elf": "cf585f6eb038e8092851f846021a9cb91f8da537ee693bd3e9dbd10fb79bed70",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "c93cb268645d11e3b344b8ed1ce2af10fb2714886d7369b10e9d71b169e4d545",
+                  ".rmeta": "be59f041c21ba126fcbccc5d80f0026a0c1430704378686018660e00479111cf"
+                },
+                "unicode_width": {
+                  ".rlib": "73d494e95ad9d9d92a44637be2520a0f90993069cf63b30c646f3609a8c34b9f",
+                  ".rmeta": "dab459b876a4cdfcfdf2827956be5a8ca40333e6541580519acecc388b54170e"
+                }
+              },
+              "retained": {
+                "bytes": 114446336,
+                "inodes": 907,
+                "paths": 933
+              }
+            },
+            "old-unchanged": {
+              "elf": "c861f43e000858500650f6745a74fd2ba8463455999c2249096cd6adedebb09a",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "3edb1595f9ac941a5893ec7cfdb0853ad6009e0e41e6f288881143a3bf8b470a",
+                  ".rmeta": "b6e4046202587e519b84e53cc87d35a04a9488c739d5f073aec197c0bb482883"
+                },
+                "unicode_width": {
+                  ".rlib": "2e7bfaa2ac0eb0b0b36acba6a0a816ed25b1d9de2ac0c92197ecce6ebee5ad6c",
+                  ".rmeta": "22336f0f6ee5e7eaef4800bc241c3e22dffbdd37a4b62c92a5658bf23a2f305b"
+                }
+              }
+            },
+            "ordinary-edit": {
+              "elf": "cf585f6eb038e8092851f846021a9cb91f8da537ee693bd3e9dbd10fb79bed70",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "4f97f07ac1a4f3d98bedb67337611eb846c57486d3bc09fce0807f101c6993d7",
+                  ".rmeta": "be59f041c21ba126fcbccc5d80f0026a0c1430704378686018660e00479111cf"
+                },
+                "unicode_width": {
+                  ".rlib": "73d494e95ad9d9d92a44637be2520a0f90993069cf63b30c646f3609a8c34b9f",
+                  ".rmeta": "dab459b876a4cdfcfdf2827956be5a8ca40333e6541580519acecc388b54170e"
+                }
+              },
+              "retained": {
+                "bytes": 135929856,
+                "inodes": 1071,
+                "paths": 1102
+              }
+            },
+            "repaired": {
+              "elf": "cf585f6eb038e8092851f846021a9cb91f8da537ee693bd3e9dbd10fb79bed70",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "a396b8bc07d149bc85257fac7bf801bf743b894700e054ff81b4ecef353635d3",
+                  ".rmeta": "be59f041c21ba126fcbccc5d80f0026a0c1430704378686018660e00479111cf"
+                },
+                "unicode_width": {
+                  ".rlib": "73d494e95ad9d9d92a44637be2520a0f90993069cf63b30c646f3609a8c34b9f",
+                  ".rmeta": "dab459b876a4cdfcfdf2827956be5a8ca40333e6541580519acecc388b54170e"
+                }
+              }
+            },
+            "unchanged": {
+              "elf": "cf585f6eb038e8092851f846021a9cb91f8da537ee693bd3e9dbd10fb79bed70",
+              "products": {
+                "ruff_formatter": {
+                  ".rlib": "4f97f07ac1a4f3d98bedb67337611eb846c57486d3bc09fce0807f101c6993d7",
+                  ".rmeta": "be59f041c21ba126fcbccc5d80f0026a0c1430704378686018660e00479111cf"
+                },
+                "unicode_width": {
+                  ".rlib": "73d494e95ad9d9d92a44637be2520a0f90993069cf63b30c646f3609a8c34b9f",
+                  ".rmeta": "dab459b876a4cdfcfdf2827956be5a8ca40333e6541580519acecc388b54170e"
+                }
+              }
+            }
+          },
+          "check": {
+            "cold-old": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "7bac2e98a9eed3fe0898eb8f81028addb2e66f0779f51f05b465bffcd8107e35"
+                },
+                "unicode_width": {
+                  ".rmeta": "029bc211bad1d02f7fe33c5c3b4a936b8ef540e17f62fe98c89a035f3fbb98ad"
+                }
+              }
+            },
+            "empty-new": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "66e5202758d7c366abaaf570bd0cb0f3a01b6b09776696f0d29875f555678274"
+                },
+                "unicode_width": {
+                  ".rmeta": "58852050b9ecd03cb4454fdf0eb561a957794d665db2df3a4598d2aa971cf1ac"
+                }
+              },
+              "retained": {
+                "bytes": 81346560,
+                "inodes": 739,
+                "paths": 765
+              }
+            },
+            "observed-edit": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "66e5202758d7c366abaaf570bd0cb0f3a01b6b09776696f0d29875f555678274"
+                },
+                "unicode_width": {
+                  ".rmeta": "58852050b9ecd03cb4454fdf0eb561a957794d665db2df3a4598d2aa971cf1ac"
+                }
+              }
+            },
+            "observed-empty-new": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "66e5202758d7c366abaaf570bd0cb0f3a01b6b09776696f0d29875f555678274"
+                },
+                "unicode_width": {
+                  ".rmeta": "58852050b9ecd03cb4454fdf0eb561a957794d665db2df3a4598d2aa971cf1ac"
+                }
+              }
+            },
+            "old-unchanged": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "7bac2e98a9eed3fe0898eb8f81028addb2e66f0779f51f05b465bffcd8107e35"
+                },
+                "unicode_width": {
+                  ".rmeta": "029bc211bad1d02f7fe33c5c3b4a936b8ef540e17f62fe98c89a035f3fbb98ad"
+                }
+              }
+            },
+            "ordinary-edit": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "66e5202758d7c366abaaf570bd0cb0f3a01b6b09776696f0d29875f555678274"
+                },
+                "unicode_width": {
+                  ".rmeta": "58852050b9ecd03cb4454fdf0eb561a957794d665db2df3a4598d2aa971cf1ac"
+                }
+              },
+              "retained": {
+                "bytes": 92438528,
+                "inodes": 761,
+                "paths": 792
+              }
+            },
+            "repaired": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "66e5202758d7c366abaaf570bd0cb0f3a01b6b09776696f0d29875f555678274"
+                },
+                "unicode_width": {
+                  ".rmeta": "58852050b9ecd03cb4454fdf0eb561a957794d665db2df3a4598d2aa971cf1ac"
+                }
+              }
+            },
+            "unchanged": {
+              "products": {
+                "ruff_formatter": {
+                  ".rmeta": "66e5202758d7c366abaaf570bd0cb0f3a01b6b09776696f0d29875f555678274"
+                },
+                "unicode_width": {
+                  ".rmeta": "58852050b9ecd03cb4454fdf0eb561a957794d665db2df3a4598d2aa971cf1ac"
+                }
+              }
+            }
+          }
+        }
+      },
+      "prices": {
+        "C7": {
+          "build": {
+            "cold-old": 103000120128,
+            "empty-new": 103015152054,
+            "old-unchanged": 124018547,
+            "ordinary-edit": 7004385188,
+            "repaired": 1089953793,
+            "unchanged": 124085232
+          },
+          "check": {
+            "cold-old": 86358696865,
+            "empty-new": 86369761732,
+            "observed-edit-rustc": 980515345,
+            "observed-empty-new-rustc": 977652572,
+            "old-unchanged": 123768608,
+            "ordinary-edit": 4382485705,
+            "repaired": 879789251,
+            "unchanged": 123833927
+          }
+        },
+        "C8": {
+          "build": {
+            "cold-old": 102837208422,
+            "empty-new": 102843182848,
+            "old-unchanged": 124115754,
+            "ordinary-edit": 6901378774,
+            "repaired": 1089857345,
+            "unchanged": 124034672
+          },
+          "check": {
+            "cold-old": 86187478826,
+            "empty-new": 86193777430,
+            "observed-edit-rustc": 877124885,
+            "observed-empty-new-rustc": 874469662,
+            "old-unchanged": 123859924,
+            "ordinary-edit": 4282360960,
+            "repaired": 879823059,
+            "unchanged": 123737654
+          }
+        }
+      },
+      "run": 41866980337,
+      "slot": "pilot-PC"
+    }
+  ],
+  "cohort": "pilot",
+  "gates": {
+    "common_build/cold-old": true,
+    "common_build/empty-new": true,
+    "common_build/old-unchanged": true,
+    "common_build/unchanged": true,
+    "common_check/cold-old": true,
+    "common_check/empty-new": true,
+    "common_check/observed-empty-new-rustc": true,
+    "common_check/old-unchanged": true,
+    "common_check/unchanged": true,
+    "full_rustc": true,
+    "positive_edited_build": true,
+    "storage_build_empty-new": true,
+    "storage_build_ordinary-edit": true,
+    "storage_check_empty-new": true,
+    "storage_check_ordinary-edit": true,
+    "whole_edit": true
+  },
+  "median_rustc": 10.503126455522086,
+  "median_whole": 2.2822697778812797,
+  "plan": "4cc85ad2749998c1697eb24bdd721461da7bd7ad29f01157e8be51a172523122",
+  "qualified": true,
+  "savings_pct": {
+    "build/cold-old": [
+      0.17165976615690873,
+      0.15816652038613824
+    ],
+    "build/empty-new": [
+      0.17032873921947594,
+      0.16693583669114487
+    ],
+    "build/old-unchanged": [
+      -0.10341548190335892,
+      -0.07838101828430549
+    ],
+    "build/ordinary-edit": [
+      1.4739990318816907,
+      1.4705989353137214
+    ],
+    "build/repaired": [
+      0.04052288899273778,
+      0.00884881548368537
+    ],
+    "build/unchanged": [
+      -0.03411593546362328,
+      0.040746186459964875
+    ],
+    "check/cold-old": [
+      0.19638440590984468,
+      0.1982638057492416
+    ],
+    "check/empty-new": [
+      0.19771221627081464,
+      0.2037568455335889
+    ],
+    "check/observed-edit-rustc": [
+      10.461750927752924,
+      10.544501983291246
+    ],
+    "check/observed-empty-new-rustc": [
+      10.552339622658145,
+      10.554149086818953
+    ],
+    "check/old-unchanged": [
+      0.053010043037205246,
+      -0.07377961300170718
+    ],
+    "check/ordinary-edit": [
+      2.279883044829342,
+      2.284656510933217
+    ],
+    "check/repaired": [
+      0.020025851601407595,
+      -0.0038427384696474317
+    ],
+    "check/unchanged": [
+      0.09469072109973352,
+      0.0777436380580905
+    ]
+  },
+  "sign_two_sided": 0.5
+}
