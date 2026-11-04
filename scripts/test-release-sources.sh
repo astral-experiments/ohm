@@ -94,6 +94,14 @@ fi
 
 verify_sources=("$script_dir/verify-release-sources.sh" "$release_manifest" "$rust_checkout"
   "$cargo_checkout" "$clippy_checkout" "$rustfmt_checkout")
+printf '/build.rs\n' >> "$cargo_checkout/.git/info/exclude"
+printf 'fn main() {}\n' > "$cargo_checkout/build.rs"
+if "${verify_sources[@]}" >/dev/null 2>&1; then
+  echo 'source verification accepted a locally ignored build script' >&2
+  exit 1
+fi
+rm -- "$cargo_checkout/build.rs"
+
 readme="$cargo_checkout/README.md"
 git -C "$cargo_checkout" config core.trustctime false
 touch -t 200001010000 "$readme"
