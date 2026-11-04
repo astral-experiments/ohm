@@ -5,7 +5,7 @@ permissions:
   actions: read
 jobs:
   paired:
-    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruff-derived-impl-caps-20261103'
+    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruff-derived-impl-stage2-20261104'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 120
     strategy:
@@ -16,7 +16,7 @@ jobs:
           new: d136bd8d002a648de5f344df602e492658306f1e
         - case: '26372'
           new: fa4a7bca2db70229710892c97b26ea6fb046cfc4
-    name: Real Ruff edit ${{ matrix.case }}
+    name: Trained compiler, real Ruff edit ${{ matrix.case }}
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       OHM_STUDY_MODE: build
@@ -27,6 +27,12 @@ jobs:
       with:
         ref: ${{ inputs.reviewed_head }}
         path: current-qa
+        persist-credentials: false
+        sparse-checkout: scripts/ruff-derived-impl-cgus
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: 2672756eb5b9d4e890b678d439dc6c40a29a4008
+        path: original-receiver
         persist-credentials: false
         sparse-checkout: scripts/ruff-derived-impl-cgus
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -45,11 +51,11 @@ jobs:
     - name: Open the immutable SDKs and run both typical CLI build histories at the same paths
       env:
         GH_TOKEN: ${{ github.token }}
-      run: python3 -IB current-qa/scripts/ruff-derived-impl-cgus/paired.py
+      run: python3 -IB current-qa/scripts/ruff-derived-impl-cgus/release_adapter.py
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: derived-impl-${{ matrix.case }}-${{ github.run_id }}
+        name: release-derived-impl-${{ matrix.case }}-${{ github.run_id }}
         path: ${{ runner.temp }}/derived-owner-outputs
         compression-level: 1
         retention-days: 14
