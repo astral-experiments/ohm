@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 
 def trial(source, kernel, cargo_home, root, proof, meter=None):
     root.mkdir(parents=True)
@@ -42,6 +43,7 @@ def trial(source, kernel, cargo_home, root, proof, meter=None):
     assert products[0]==products[1]
 
 if __name__=="__main__":
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
     import price
     assert price.git("rev-parse","HEAD")==price.new and not price.git("status","--porcelain")
     for role in price.order:

@@ -764,10 +764,11 @@
       "source": "rust-1.99.0-dev-x86_64-unknown-linux-gnu/rustc/lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd"
     }
   },
+  "runner_correction": "The earlier confirmation 41749941054 is excluded in full. Its first completed control failed to import the frozen measurement module in isolated Python. Only the control import path was repaired, before examining any hardware results from that run. All original performance, native, six fresh boots, and ordinary control gates apply.",
   "secondary": "normal full cargo check/build, full build rustc, cold state and settled",
   "sources": {
     "ast_control.py": {
-      "sha256": "c30c4cc52fbbd8f77b772ce98630d136a1a1640e4b455739ae334d816946d093"
+      "sha256": "cde523bfd3b4307ffda375c876a16bd6b210862e0392cf5cea5896159c0bba81"
     },
     "calibrate.c": {
       "commit": "d40f789799162a7e58bd96826a5f9caa3bdc008d",
