@@ -1,14 +1,15 @@
 {
-  "bundle": "058531c6a0940b70cc19276b29bb8b47aa2c77778dc6be7719a71b5c271c2da6",
-  "candidate": "6c2874a0b6a0bf3570f8959733b6f87907e5cce6",
-  "candidate_tree": "1a86c989ac19e14b8bc53ec8a92be4feafef5a9f",
+  "bundle": "b263c0cbe8ba2b97e856e2f1a292fe9722bfabfbaab5adc9a06b2b2f660c197a",
+  "candidate": "65390392975bd2668748fd8bd8ebc52915772f41",
+  "candidate_tree": "6c899b8166df087d142c6d392e2eea7933a2e814",
   "cargo": "abc70d60a6fd89c10d5f65cf85820d9b78d5affe",
   "compiler_commits": [
     "a60f4f4476d4819b62730e92ea07c1343f8e6dac",
     "2bc7e7b7c898e7fa82a1dde03978c59263d8167d",
     "dda36b958be0f0c393c22039fb2f53c0ff436968",
     "8574afc64801c199c8d090e3e0e013adf6ccd496",
-    "6c2874a0b6a0bf3570f8959733b6f87907e5cce6"
+    "6c2874a0b6a0bf3570f8959733b6f87907e5cce6",
+    "65390392975bd2668748fd8bd8ebc52915772f41"
   ],
   "criterion": "20% fewer instructions in a full affected compiler or 2x across a real ordinary command; no PR from the factory alone.",
   "initial_build": {
@@ -22,7 +23,9 @@
   "paths": [
     "compiler/rustc_data_structures/src/unord.rs",
     "compiler/rustc_hir_typeck/src/expr.rs",
+    "compiler/rustc_hir_typeck/src/fn_ctxt/_impl.rs",
     "compiler/rustc_hir_typeck/src/writeback.rs",
+    "compiler/rustc_incremental/src/persist/file_format.rs",
     "compiler/rustc_middle/src/thir.rs",
     "compiler/rustc_middle/src/thir/visit.rs",
     "compiler/rustc_middle/src/ty/typeck_results.rs",
@@ -74,5 +77,14 @@
       16.42,
       16.45
     ]
+  },
+  "uniform": {
+    "incremental_format": 65135,
+    "previous": "6c2874a0b6a0bf3570f8959733b6f87907e5cce6",
+    "previous_factory": 41738460962,
+    "previous_rand": 41741463395,
+    "previous_rustc": 41740052938,
+    "price": "In addition to qualifying against the release source, require at least five percent fewer retired instructions in real edited rustc versus C5 on fresh paired hosts before proposing the additional representation. Check disk and other cold/unchanged workloads, on-disk upgrade/downgrade, typed HIR, frontend diagnostics, and every native behavior. Hold otherwise.",
+    "proposal": "Replace identical HIR type entries by one checked disjoint range. Preserve indexed lookups, full iteration, arbitrary later writes and prior on-disk refusal."
   }
 }
