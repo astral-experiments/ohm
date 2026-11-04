@@ -1,5 +1,5 @@
-name: Qualify a fixed-HEAD Ruff test build
-run-name: 'Ruff #28392 working-tree test-build pilot (HEAD stays f328042)'
+name: Confirm the fixed-HEAD Ruff package test build
+run-name: 'Six fresh fixed-HEAD Ruff #28392 test-build pairs'
 permissions:
   contents: read
   actions: read
@@ -7,7 +7,7 @@ jobs:
   paired:
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1'
       && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head
-      && github.ref_name == 'charlie/qa-ruff-cli-fixed-head-norun-20261104'
+      && github.ref_name == 'charlie/qa-ruff-cli-fixed-head-six-20261104'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 120
     name: Paired working-tree edit slot ${{ matrix.slot }}
@@ -61,6 +61,10 @@ jobs:
         slot:
         - 0
         - 1
+        - 2
+        - 3
+        - 4
+        - 5
 'on':
   workflow_dispatch:
     inputs:
