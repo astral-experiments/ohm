@@ -35,6 +35,19 @@ On the first unchanged call, the kernel accounted for 0.615→17.146 GB of read-
 
 Signed -23's own last ordinary warm and traced warm e2e executables differed at equal size. Of 42 recorded sections, only the 48-byte GNU build-ID payload changed. The complete ordinary hash begins `86b94323` and the separate traced hash begins `d236bd03`. The archive preserved complete-file digests and section hashes, so this observation does not cover unrecorded ELF header fields or padding. The -24 signed warm and traced comparison matched all 50 raw executable digests.
 
+## Second ordinary edit forecast
+
+The earlier histories also supply a prospective, named-target check for the second *ordinary* edit on two new hosts. On each original host both C native executions completed for every selected role. The earlier OLD ran through the whole-command meter; its real forward NEW ran through a distinct exec-census launcher. For this diagnostic only, `forecast.py` changes exactly the current logged `CARGO_MAKEFLAGS` digest to the original OLD spelling before computing the typed key. It keeps all actual ordered input bytes and the actual projected worker/group geometry. The live workers use every original environment byte.
+
+The very same 32 named roles retained their other typed inputs on -23 and -24. All 32 independent, full native emissions produced the same entire ELF as their OLD output. In the other 16, the argv, lookup transcript and native buffers changed. Seven of those produced a different ELF; nine produced the same output despite the changed inputs. The prior signed native instructions for those 32 roles totaled 31,762,388,070 and 31,686,163,416 on the two hosts. This measures the full signed work on the earlier hosts. It does not measure a saving on the edited command. Actual worker grouping can refuse additional roles.
+
+The two fresh registrations preserve the ordinary complete OLD→NEW native result, changed-source verdicts, and typed admission with the original jobserver. This roster was recorded against the earlier archives before the new raw observations appeared. `prospective-second-edit.json` has SHA-256 `053891f28aa18f5c90819fd65ea5cecf3b99358b8bc106e9a5c88f21e85c424d`.
+
+~~~sh
+python3 -IB forecast.py release23-41737649726.zip release24-41737656295.zip > forecast-reproduced.json
+cmp prospective-second-edit.json forecast-reproduced.json
+~~~
+
 ## Reopen
 
 Download the two original Actions ZIP archives and use a GNU x86-64 host with Python, GNU as/ar/objdump, and the signed kit's LLVM BLAKE3 API. The reader checks the complete archive hashes and opens the original native streams, compiler inventories, GNU hardware clocks and signed native process epochs. Output must compare byte-for-byte with `originals.json`.
