@@ -1,5 +1,4 @@
 """Registered trained-compiler pair on an uncommitted Ruff change at the original HEAD."""
-import hashlib
 import json
 import os
 from pathlib import Path
@@ -8,6 +7,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import fixed_build_script
 import fixed_source as s
 import pilot as q
 
@@ -29,21 +29,7 @@ def version(exe, directory, state):
 
 
 def build_script():
-    out = {}
-    for base in (b.TARGET, b.BUILD):
-        for path in base.rglob("output"):
-            if not path.parent.name.startswith("ruff-") or not path.is_file():
-                continue
-            data = path.read_bytes()
-            if b"RUFF_COMMIT_HASH=" not in data:
-                continue
-            lines = data.decode().splitlines()
-            b.need(any(line.endswith("RUFF_COMMIT_HASH=" + s.OLD) for line in lines)
-                   and any("rerun-if-changed=" in line and line.endswith("/.git/HEAD") for line in lines), "unexpected Ruff build-script output")
-            st = path.stat()
-            out[str(path)] = {"sha256": hashlib.sha256(data).hexdigest(),"device":st.st_dev,"inode":st.st_ino,"mtime_ns":st.st_mtime_ns,"lines":lines}
-    b.need(bool(out), "no genuine Ruff build-script stdout")
-    return out
+    return fixed_build_script.collect((b.TARGET,b.BUILD),s.OLD,b.WORK/".git/HEAD")
 
 
 def ordinary(label, state, kind="ordinary"):
