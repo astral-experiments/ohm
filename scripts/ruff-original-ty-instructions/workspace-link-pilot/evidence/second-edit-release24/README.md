@@ -8,6 +8,8 @@ The strict experiment **failed four full-file comparisons**. The first unchanged
 
 The real four-byte `symbols.o` edit changed offsets 8731 through 8734. The selected earlier `libutil.a` then produced an executable that returned 83 with zero stdout. The study also exercised the earlier archive before that mutation, a malformed library, a save during input acquisition, two separately held old output inodes, corruption of both newly named outputs, and a genuine Rust type error followed by repair. The malformed library, concurrent save, and ill-typed Rust edit each returned Cargo status 101, then repaired. The previous e2e output failed the edited fixture in both source histories. A separately empty build in each arm compiled all 623 units; the actual native test was run outside Cargo's build after the source transitions.
 
+The post-warm and independent-empty scans checked both the private shared build root and the target root. On both releases and both arms, each scan found 50 distinct single-link canonical inodes and zero other regular files with any of those complete ELF digests. On -24 the candidate retained 13,531 anonymous receipt bytes across its second edit. Its writes temporarily held 1,818,656,768 bytes of previously allocated output, summed across successive files. The scan supplies no peak estimate. [Eight physical scans and transient bytes](storage.json.gz)
+
 This was a direct-Cargo safety study. It has no instruction or elapsed-time speedup result. A previous metered attempt stopped when one kernel event reported running time above enabled time. Its separately completed signed unchanged command supplies a component ceiling. The -23 study found the genuine second edit cost 4.59% more retired instructions even though 31 native outputs were reused. [Signed -24 counter coverage and budget](../second-edit-release23/DIGEST.md) · [Signed -23 complete-command result](../second-edit-release23/README.md)
 
 ## Reopen
@@ -19,4 +21,11 @@ r=scripts/ruff-original-ty-instructions/workspace-link-pilot/evidence/second-edi
 gh-auto api repos/astral-experiments/ohm/actions/artifacts/13285298735/zip > /tmp/41747172339.zip
 python3 -IB "$r/verify.py" /tmp/41747172339.zip > /tmp/actual-24.json
 gzip -cd "$r/original.json.gz" | cmp - /tmp/actual-24.json
+~~~
+
+To reproduce the eight storage scans, also download the [signed -23 verdict archive](../second-edit-release23/README.md) to `/tmp/41741905666.zip`.
+
+~~~sh
+python3 -IB "$r/storage.py" /tmp/41741905666.zip /tmp/41747172339.zip > /tmp/actual-storage.json
+gzip -cd "$r/storage.json.gz" | cmp - /tmp/actual-storage.json
 ~~~
