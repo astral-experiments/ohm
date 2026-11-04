@@ -7,6 +7,7 @@ name: Reopen both release-optimized real Ruff edits
         type: string
 permissions:
   contents: read
+  actions: read
 jobs:
   read:
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head && github.ref_name
