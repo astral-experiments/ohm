@@ -25,7 +25,7 @@ Each role and boot checked all eight complete native test executables and the CL
 
 ## Reproduce
 
-From a read-authorized Ohm packaging checkout, a fresh historical Ruff worktree at the exact NEW source, and an isolated signed −24 Cargo home, replay the completed six workers with the following command. The default reader uses at most one full archive and one materialized native executable at a time for local verification. Downloaded originals are retained at the supplied location. Set `RUSTUP_HOME` to the admitted −24 Rustup installation.
+From a read-authorized Ohm packaging checkout, a fresh historical Ruff worktree at the exact NEW source, and an isolated signed −24 Cargo home, replay the completed six workers with the following command. The reader opens one original archive at a time and streams each binary into a private verification directory. It removes those temporary executables after each boot. Downloaded originals are retained at the supplied location. Set `RUSTUP_HOME` to the admitted −24 Rustup installation.
 
 ```sh
 e=scripts/ruff-derived-impl-cgus/evidence-release-norun
