@@ -1,68 +1,38 @@
-name: Compare the actual Ruff derived-impl Cargo edits
-run-name: Two preregistered Ruff CLI edits on the -24 source pair
-permissions:
-  contents: read
-  actions: read
-jobs:
-  paired:
-    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruff-derived-impl-stage2-20261104'
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-        - case: '28392'
-          new: d136bd8d002a648de5f344df602e492658306f1e
-        - case: '26372'
-          new: fa4a7bca2db70229710892c97b26ea6fb046cfc4
-    name: Trained compiler, real Ruff edit ${{ matrix.case }}
-    env:
-      REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-      OHM_STUDY_MODE: build
-      RUFF_CASE: ${{ matrix.case }}
-      PYTHONDONTWRITEBYTECODE: '1'
-    steps:
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        ref: ${{ inputs.reviewed_head }}
-        path: current-qa
-        persist-credentials: false
-        sparse-checkout: scripts/ruff-derived-impl-cgus
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        ref: 2672756eb5b9d4e890b678d439dc6c40a29a4008
-        path: original-receiver
-        persist-credentials: false
-        sparse-checkout: scripts/ruff-derived-impl-cgus
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        ref: e48abf3b09f415b296d0ee2e8ec81c0de7b50611
-        path: legacy-qa
-        persist-credentials: false
-        sparse-checkout: scripts/ruff-clap-config-help
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        repository: astral-sh/ruff
-        ref: ${{ matrix.new }}
-        fetch-depth: 2
-        path: ruff
-        persist-credentials: false
-    - name: Open the immutable SDKs and run both typical CLI build histories at the same paths
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: python3 -IB current-qa/scripts/ruff-derived-impl-cgus/release_adapter.py
-    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-      if: always()
-      with:
-        name: release-derived-impl-${{ matrix.case }}-${{ github.run_id }}
-        path: ${{ runner.temp }}/derived-owner-outputs
-        compression-level: 1
-        retention-days: 14
-        if-no-files-found: error
+name: Reopen both release-optimized real Ruff edits
 'on':
   workflow_dispatch:
     inputs:
       reviewed_head:
         required: true
         type: string
+permissions:
+  contents: read
+jobs:
+  read:
+    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head && github.ref_name
+      == 'charlie/qa-ruff-trained-derive-reader-20261104'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 60
+    steps:
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: ${{ inputs.reviewed_head }}
+        sparse-checkout: scripts/ruff-derived-impl-cgus
+        persist-credentials: false
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        ref: e48abf3b09f415b296d0ee2e8ec81c0de7b50611
+        sparse-checkout: scripts/ruff-clap-config-help/evidence-release-24
+        path: schema
+        persist-credentials: false
+    - name: Authenticate both original jobs, full native files, counters and typed metadata
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: python3 -IB scripts/ruff-derived-impl-cgus/read_release.py
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      if: always()
+      with:
+        name: trained-reader-41746716369-${{ github.run_id }}
+        path: ${{ runner.temp }}/reopened
+        retention-days: 14
+        if-no-files-found: error

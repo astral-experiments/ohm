@@ -1,0 +1,51 @@
+"""Open complete enrolled Actions originals sequentially and summarize their independent pairs."""
+import hashlib,json,os,shutil,statistics,subprocess as sp,sys,zipfile
+from pathlib import Path
+q=Path(__file__).resolve().parent;out=Path(os.environ['RUNNER_TEMP'])/'reopened';out.mkdir();r=41746716369;kind='pilots';live=lambda p:json.loads(sp.check_output(['gh','api','repos/astral-experiments/ohm/'+p]));sha=lambda p:hashlib.file_digest(p.open('rb'),'sha256').hexdigest()
+def put(n,d):(out/n).write_text(json.dumps(d,sort_keys=True,indent=1)+'\n')
+sys.path.insert(0,str(q))
+transports=json.loads((q/'release-transports.json').read_bytes())
+reg=json.loads((q/'registration.json').read_bytes())
+plan={'compilers':[reg['parent'],reg['candidate']], 'driver_sha256':[transports[k]['driver'] for k in 'PC']}
+head='c688d2d522196f3b7c6e9fc386dce3c25598c600'
+cases={n:('release-derived-impl-'+n+'-'+str(r),'Trained compiler, real Ruff edit '+n)for n in('28392','26372')}
+run=live('actions/runs/'+str(r));assert run['run_attempt']==1 and run['head_sha']==head and run['conclusion']=='success' and run['head_branch']=='charlie/qa-ruff-derived-impl-stage2-20261104',run['conclusion'];jobs={v['name']:v for v in live('actions/runs/'+str(r)+'/jobs')['jobs']};assets={v['name']:v for v in live('actions/runs/'+str(r)+'/artifacts')['artifacts']};results={}
+with zipfile.ZipFile(out/'raw-hardware-and-controls.zip','x',compression=zipfile.ZIP_DEFLATED)as raw:
+ for key,(an,jn)in cases.items():
+  j=jobs[jn];v=assets[an];h=v['digest'].removeprefix('sha256:');assert j['conclusion']=='success'and v['workflow_run']['id']==r and not v['expired']and v['size_in_bytes']<320*2**20
+  assert shutil.disk_usage(out).free>15*2**30 and int(next(s.split()[1]for s in Path('/proc/meminfo').read_text().splitlines()if s.startswith('MemAvailable:')))>8*2**20
+  a=out.parent/('original-'+key+'.zip')
+  with a.open('xb')as f:sp.run(['gh','api','repos/astral-experiments/ohm/actions/artifacts/'+str(v['id'])+'/zip'],stdout=f,check=True)
+  assert (a.stat().st_size,sha(a))==(v['size_in_bytes'],h);binding={'run':r,'head':head,'job':j['id'],'original':v['id'],'size':v['size_in_bytes'],'sha256':h};put(key+'-binding.json',binding)
+  path=out/(key+'.json');sp.run([sys.executable,'-IB',q/'release_reopen.py',a,h,path],check=True,timeout=720);x=json.loads(path.read_bytes());assert x['sha256']==h and [x['roles'][k]['compiler']['source']for k in 'PC']==plan['compilers']and [x['roles'][k]['driver']for k in 'PC']==plan['driver_sha256']
+  with zipfile.ZipFile(a)as z:
+   if kind=='confirm':
+    c=json.loads(z.read('confirmation.json'));assert c['recorded_receipt']==head and x['case']=='28392'and x['confirmation_slot']==int(key)and x['order']==plan['orders'][int(key)]
+   else:assert x['case']==key and x['confirmation_slot']is None
+   ns=[n for n in z.namelist()if n in('registration.json','terminal.json','confirmation.json')or (len(n.split('/'))==3 and n.split('/')[0]in ('P','C')and (n.endswith('/hardware.json')or n.endswith('/footprint.json')or n.endswith('/caps.json')or n.endswith('/program-verdict.json')or n.endswith('/lifetime.json')or n.endswith('/result.json')))]
+   for n in z.namelist():
+    parts=n.split('/')
+    if len(parts)==3 and parts[0]in ('P','C')and parts[1]in ('cold-old','edit','empty-new','observed-edit','repair','old-unchanged','edited-unchanged','invalid','invalid-unchanged')and parts[2]in ('products.json','complete-cgu-table.json','selected-ruff-members.json','incremental-native-sessions.json','real-ruff-rustcs.json','help.stdout','check-help.stdout','format-help.stdout','valid-config.stderr','invalid-config.stderr','stderr','version.stdout'):
+     ns.append(n)
+    if len(parts)==4 and parts[0]in ('P','C')and parts[1]in ('observed-edit','old-unchanged','edited-unchanged')and parts[2]=='kernel-execs' and (parts[3].endswith('.nul')or parts[3]=='epochs.tsv'):ns.append(n)
+   assert {'P/edit/hardware.json','C/edit/hardware.json','P/caps/caps.json','C/caps/caps.json'}<=set(ns);ns=set(ns);assert sum(z.getinfo(n).file_size for n in ns)<48*2**20
+   # Keep every native library body behind a rebuilt physical WIP across all six boots. All full CLI ELFs and the other donor bodies stay in the authenticated original Actions archives.
+   from reopen import roster
+   native=out/'changed-object-originals';native.mkdir(exist_ok=True);manifest={}
+   for k in 'PC':
+    t=x['roles'][k]['transitions']['lib'];wanted=set(t['new_names']+t['changed_in_place']+t['rebuilt_unchanged']+t['removed_names'])
+    for stage in ('cold-old','edit','empty-new'):
+     by_kind,_,_=roster(z,f'{k}/{stage}');rows=[r for name,r in by_kind['lib'].items()if name in wanted];manifest[k+'/'+stage]=[[r[0],r[4],r[5]]for r in rows]
+     for obj in rows:
+      digest=obj[5];dest=native/(digest+'.o.zst')
+      if not dest.exists():
+       src=f'{k}/native/{digest}.zst';assert z.getinfo(src).file_size<16*2**20;data=z.read(src);raw_elf=sp.check_output(['zstd','-qdc'],input=data);assert len(raw_elf)==obj[4]and raw_elf[:4]==b'\x7fELF'and hashlib.sha256(raw_elf).hexdigest()==digest;dest.write_bytes(data)
+   put(key+'-changed-object-bindings.json',manifest);assert sum(p.stat().st_size for p in native.iterdir())<160*2**20
+   for n in sorted(ns):
+    e=zipfile.ZipInfo(key+'/'+n,(1980,1,1,0,0,0));e.compress_type=zipfile.ZIP_DEFLATED;raw.writestr(e,z.read(n))
+  from metadata_controls import read as meta_read
+  legacy=Path(os.environ['GITHUB_WORKSPACE'])/'schema/scripts/ruff-clap-config-help/evidence-release-24'
+  put(key+'-typed-metadata.json',meta_read(a,legacy))
+  results[key]=x;a.unlink()
+assert len({x['boot']for x in results.values()})==2;primary=results['28392'];decision=(primary['library_rustc_reduction_pct']>=20 or primary['whole_reduction_pct']['edit']>=50)and all(x['whole_reduction_pct']['edit']>0 for x in results.values());put('decision.json',{'registered_two_edit_gate':decision,'cases':{k:{'first_whole_reduction':v['whole_reduction_pct']['edit'],'repeat_whole_reduction':v['whole_reduction_pct']['observed-edit'],'library_rustc_reduction_secondary':v['library_rustc_reduction_pct'],'second_forward_same_metadata':{r:x['independent_forward_proof']for r,x in v['roles'].items()}}for k,v in results.items()}})
+print((out/"decision.json").read_text(),flush=True)
