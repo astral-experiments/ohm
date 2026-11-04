@@ -1,11 +1,11 @@
-name: Qualify the literal-array parser compiler
-run-name: Build the C7 parser successor ${{ inputs.reviewed_head }}
+name: Qualify the delimited literal lexer
+run-name: Build the C8 lexer successor ${{ inputs.reviewed_head }}
 permissions:
   contents: read
 jobs:
   qualify:
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head &&
-      github.ref_name == 'charlie/qa-rc24-width-parser-stage-20261104'
+      github.ref_name == 'charlie/qa-rc24-delimited-lexer-stage-20261104'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     steps:
@@ -192,6 +192,9 @@ jobs:
         rustc +ohm --edition=2024 source/rust/tests/ui/parser/large-literal-array.rs -o "$RUNNER_TEMP/static-int-array/array-reader"
         "$RUNNER_TEMP/static-int-array/array-reader"
         sha256sum "$RUNNER_TEMP/static-int-array/array-reader" > "$RUNNER_TEMP/static-int-array/array-reader.sha256"
+        rustc +ohm --edition=2024 source/rust/tests/ui/parser/delimited-literal-lexing.rs -o "$RUNNER_TEMP/static-int-array/lexer-reader"
+        "$RUNNER_TEMP/static-int-array/lexer-reader"
+        sha256sum "$RUNNER_TEMP/static-int-array/lexer-reader" > "$RUNNER_TEMP/static-int-array/lexer-reader.sha256"
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       with:
         name: array-sdk-${{ matrix.role }}-${{ github.run_id }}
@@ -208,6 +211,8 @@ jobs:
           ${{ runner.temp }}/static-int-array/sdk-sha256
 
           ${{ runner.temp }}/static-int-array/array-reader.sha256
+
+          ${{ runner.temp }}/static-int-array/lexer-reader.sha256
 
           ${{ runner.temp }}/static-int-array/probes/verdict.json'
         retention-days: 7
