@@ -1,131 +1,62 @@
-name: Price deferred Cargo registry checks (confirmation)
-run-name: Deferred registry inputs ${{ inputs.study }} ${{ inputs.reviewed_head }}
-permissions:
-  contents: read
-  actions: read
-jobs:
-  price:
-    name: 'Ruff #29604 ${{ matrix.block }}'
-    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-rc24-insta-input-proof-20261103'
-      && inputs.study == 'confirmation'
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 85
-    strategy:
-      fail-fast: false
-      matrix:
-        block:
-        - block-1-PC
-        - block-2-CP
-        - block-3-CP
-        - block-4-PC
-        - block-5-PC
-        - block-6-CP
-      max-parallel: 2
-    steps:
-    - name: Read this immutable measurement
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        ref: ${{ github.sha }}
-        path: qa
-        sparse-checkout: scripts/rc24-insta-input-proof
-        persist-credentials: false
-    - name: Read the genuine Ruff edit and its parent
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        repository: astral-sh/ruff
-        ref: dfe14506d23010aa5dbc4ff6fea702a22ba312bd
-        fetch-depth: 2
-        path: ruff
-        persist-credentials: false
-    - name: Measure both source-built Cargo programs
-      env:
-        PRICE_BLOCK: ${{ matrix.block }}
-        OHM_READ_TOKEN: ${{ github.token }}
-      run: python3 -IB qa/scripts/rc24-insta-input-proof/price.py
-    - name: Preserve the original counters, inventories and refusals
-      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-      if: always()
-      with:
-        name: insta-price-${{ matrix.block }}-${{ github.run_id }}
-        path: ${{ runner.temp }}/insta-price/proof
-        retention-days: 7
-        compression-level: 6
-        if-no-files-found: error
-  workspace29697:
-    name: 'Full 55-member #29697 ${{ matrix.block }}'
-    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-rc24-insta-input-proof-20261103'
-      && inputs.study == 'workspace'
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 150
-    strategy:
-      fail-fast: false
-      max-parallel: 1
-      matrix:
-        block:
-        - PC
-        - CP
-    steps:
-    - name: Read the frozen paired workspace worker
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        path: qa
-        ref: ${{ github.sha }}
-        fetch-depth: 1
-        persist-credentials: false
-        sparse-checkout: scripts/rc24-insta-input-proof
-    - name: 'Read the source-bound #29697 workspace, native and hardware reader'
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        path: reference
-        ref: a95a505d25b0f7839a6104ff1514ed9a4ddf9f90
-        fetch-depth: 1
-        persist-credentials: false
-        sparse-checkout: 'scripts/ruff-original-ty-instructions
-
-          scripts/ruff-foreign-span-observer'
-    - name: Read the published 79-file toolchain installer
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        path: sdk-ingress
-        ref: b516f017e2963cfd60cef606d17a125da712db24
-        fetch-depth: 1
-        persist-credentials: false
-        sparse-checkout: scripts/ron-ordinary-backend
-    - name: Read the actual full Ruff workspace and its source edit
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        path: ruff
-        ref: bfa2407e98ee1343caeefd02b4b69043509baa8c
-        fetch-depth: 2
-        persist-credentials: false
-        repository: astral-sh/ruff
-    - name: Measure both Cargo binaries on the genuine full workspace
-      env:
-        REVIEWED_HEAD: ${{ inputs.reviewed_head }}
-        PRICE_BLOCK: ${{ matrix.block }}
-        OHM_PAIR_READ_TOKEN: ${{ github.token }}
-        OHM_SDK_READ_TOKEN: ${{ github.token }}
-      run: python3 -IB qa/scripts/rc24-insta-input-proof/workspace.py
-    - name: Retain all ordinary outputs and native verdicts, including refusals
-      if: always()
-      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-      with:
-        name: insta-workspace-${{ matrix.block }}-${{ github.run_id }}
-        path: ${{ runner.temp }}/ohm-foreign-join/published
-        if-no-files-found: error
-        retention-days: 7
-'on':
+name: Exact Cargo 444 registry migration
+run-name: Registry migration on merged Cargo from ${{ inputs.reviewed_head }}
+on:
   workflow_dispatch:
     inputs:
       reviewed_head:
-        required: true
+        description: Exact nonrelease QA head
         type: string
-        description: Exact QA source commit
-      study:
-        description: Run exactly one independently enrolled workflow
         required: true
-        type: choice
-        default: confirmation
-        options:
-        - confirmation
-        - workspace
+permissions:
+  contents: read
+jobs:
+  qualify:
+    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-25-restack-registry-20261104'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 75
+    steps:
+      - name: Check out the frozen merged Cargo and its verifiers
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.sha }}
+          path: qa
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /scripts/rc25-registry-validation/
+            /scripts/rc24-insta-input-proof/release-compiler.json
+            /scripts/rc24-insta-input-proof/exec_count.c
+            /scripts/rc24-insta-input-proof/migration/run.py
+            /scripts/rc24-insta-input-proof/migration/fixture/
+            /scripts/rc24-insta-input-proof/evidence/nonempty-registry-history/replay.py
+      - name: Check out both authentic Ruff locks
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: astral-sh/ruff
+          ref: dfe14506d23010aa5dbc4ff6fea702a22ba312bd
+          path: ruff
+          fetch-depth: 2
+          sparse-checkout-cone-mode: false
+          sparse-checkout: /Cargo.lock
+          persist-credentials: false
+      - name: Install the kernel exec tracer
+        run: |
+          if ! command -v strace >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y strace
+          fi
+      - name: Require real native verdicts on both registry histories
+        env:
+          OHM_SDK_READ_TOKEN: ${{ github.token }}
+        run: |
+          test "$(git -C qa rev-parse HEAD)" = "$GITHUB_SHA"
+          python3 -IB qa/scripts/rc25-registry-validation/run.py
+      - name: Keep original Cargo records, compiler invocations and native images
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: cargo25-merged-registry-${{ github.run_id }}
+          path: ${{ runner.temp }}/cargo25-registry/proof
+          retention-days: 7
+          compression-level: 6
+          if-no-files-found: error

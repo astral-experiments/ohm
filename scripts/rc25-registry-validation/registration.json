@@ -1,0 +1,46 @@
+{
+  "asset": 707031606,
+  "head": "9da60dfb39fbd3135682c4519714471e45c2921b",
+  "parents": [
+    "9928f40294b47eb706559641f21d2e4724364b79",
+    "1b44b5d3dc540c491c79bbf47fae8b286e8f797a"
+  ],
+  "policy": "With only Cargo replaced, require real published insta equal-stat source change, two E0308s, missing module twice, repair, an independent empty native executable and an old nonempty generated-file-only v5 record rejected after its prerequisite actually rebuilds. No timings or full release inference.",
+  "prior_files": {
+    "evidence/nonempty-registry-history/replay.py": "229d5b5b4a2739cb807c79c68c2a9fabf815371c502c2f526877047c1f484c66",
+    "exec_count.c": "beb82d46f7abdfd6dd176751edfabd80cc24160ed2b5fc3b22fd1012ca51321c",
+    "migration/fixture/Cargo.lock": "cbb7826d602ce5a03a6c4c796a5b874f0c4e544f4b775e50c5294aca38956d89",
+    "migration/fixture/Cargo.toml": "37c9e1a0244c638be4d20c587e12a09cff8551858eb6cbff9ddd327a5e13de40",
+    "migration/run.py": "f06f0e2ba7f5176d373746d0c758ff94523e62a91b7b67a520574786d52a637c",
+    "release-compiler.json": "47919d5c6bf266b70c65c291f0fa5c37859b73fa9ec457bf47a50cc07448cd7c"
+  },
+  "release": "ecde6809d7f1fc1966798198479867c4a49bdf7a51f3873336d23a40fabce453",
+  "root": "abc70d60a6fd89c10d5f65cf85820d9b78d5affe",
+  "ruff": {
+    "command": [
+      "cargo",
+      "+ohm",
+      "test",
+      "-p",
+      "ty_project",
+      "--lib",
+      "--no-run",
+      "--offline",
+      "--locked",
+      "-j4",
+      "--message-format=json"
+    ],
+    "new": "dfe14506d23010aa5dbc4ff6fea702a22ba312bd",
+    "old": "3bf4988cf062dc76895ff2f8421acf766172392b",
+    "verdict": "the new unrelated_file_change_does_not_advance_revision test appears and executes successfully"
+  },
+  "rust_package": "20c43356eaf5b666b843dc1b7e403e30ec23aba07ab46a67af0d542e23930248",
+  "signed_rust": "f5a51d8cc3e76236c2d0f17d495d59ebb03306e4",
+  "source": {
+    "bytes": 5342817,
+    "objects": 3117,
+    "pack": "2da0b7592806bf40a3483f0192077f019ab2b9ecd0c832d61e1500552d30f995",
+    "roster": "59e6d8b0f2edc8f55f10dc7ff184a8f39180dc5d706d18c66e094edd5bd0571b"
+  },
+  "tree": "c9077473330957658253ed027e34fde81114f44a"
+}
