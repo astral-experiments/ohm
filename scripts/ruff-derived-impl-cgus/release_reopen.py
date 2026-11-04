@@ -23,5 +23,9 @@ def main():
     assert digest(raw)=='011e82cda0b575ac42388040475a5247b5db641bc66828d691739ddd0674de38'
     stage1="sha(z.read(role+'/factory/bootstrap.json'))=='3129eb48157c6b610c65b818ac9f86269ab1257020cf12d29701a36111460993'"
     body=raw.decode();assert body.count(stage1)==1
-    sys.path.insert(0,str(here));exec(compile(body.replace(stage1,'release_recipe(z,role,reg)'),original,'exec'),{'__name__':'__main__','__file__':str(original),'release_recipe':release_recipe})
+    stage1_kits="reg['transports']==json.loads((HERE/'transports.json').read_bytes())"
+    stage2_kits=stage1_kits.replace("'transports.json'","'release-transports.json'")
+    assert body.count(stage1_kits)==1
+    body=body.replace(stage1_kits,stage2_kits).replace(stage1,'release_recipe(z,role,reg)')
+    sys.path.insert(0,str(here));exec(compile(body,original,'exec'),{'__name__':'__main__','__file__':str(original),'release_recipe':release_recipe})
 if __name__=='__main__':main()
