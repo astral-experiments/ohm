@@ -11,6 +11,13 @@ Both Wild processes selected, opened, froze, and consumed the same 1,094-byte ar
 
 Both returned the coordinator response `full`, executed the actual projected group, and emitted a full executable. Both deliberately withheld a subsequent donor receipt, since the additional input fell outside the registered domain. The earlier QA assertion expected a subsequently reusable full output. The replacement checks the changed input bytes, full output, admission refusal, real native execution, clean symbol/ELF relation and actual runtime separately. Its offline negative mutations reject forged hits, missing emissions, wrong open generations and wrong input or output digests.
 
+A separate first-attempt single-target study executed the *same complete changed ELF* under `--list` and recorded exit 83 with empty stdout. Its raw output BLAKE3 and SHA-256, byte length, both selected native buffers and four changed offsets all match this -23 workspace challenge. The dedicated reader joins the two original archives and reproduces `cross-run-exit.json`. Later workspace trials still require their own observed exit 83. [Independent actual execution](https://github.com/astral-experiments/ohm/actions/runs/41723091119) · [Command and return-code check](https://github.com/astral-experiments/ohm/blob/575582bd4f55f4410720e31ef04261b8238b8042/scripts/ruff-original-ty-instructions/e2e-existing-output/audit.py#L252)
+
+~~~sh
+python3 -IB verify_prior_exit.py functional-4-original.zip release23-41737649726.zip > cross-run-reproduced.json
+cmp cross-run-exit.json cross-run-reproduced.json
+~~~
+
 ## Whole unchanged command
 
 | Signed release | Native outputs reused (of 50) | P ordinary instructions, billions | Research C ordinary instructions, billions | P → C elapsed seconds |
