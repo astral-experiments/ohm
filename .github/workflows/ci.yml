@@ -1,5 +1,5 @@
-name: Measure Ruff Unicode compiler instructions
-run-name: Count the full Ruff Unicode compiler and command ${{ inputs.reviewed_head }}
+name: Measure the trained Ruff Unicode compiler
+run-name: Count the fully trained Ruff Unicode compiler and command ${{ inputs.reviewed_head }}
 permissions:
   contents: read
   actions: read
@@ -7,7 +7,7 @@ jobs:
   price:
     name: Ruff Unicode ${{ matrix.fixture }} edit ${{ matrix.block }}
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
-      && github.ref_name == 'charlie/qa-rc24-static-rand-cost-20261103'
+      && github.ref_name == 'charlie/qa-rc24-trained-rand-20261104'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 100
     strategy:

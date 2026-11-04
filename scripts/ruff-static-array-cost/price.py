@@ -14,6 +14,8 @@ import urllib.request
 kit=Path(__file__).resolve().parent
 sys.path.insert(0,str(kit))
 import transport
+import stage2_open
+transport.fetch=stage2_open.fetch
 reg=transport.REGISTER
 gitroot=Path(os.environ["GITHUB_WORKSPACE"])/"ruff"
 work=Path(os.environ["RUNNER_TEMP"])/"unicode-price"

@@ -660,6 +660,9 @@
   },
   "secondary": "normal full cargo check/build, full build rustc, cold state and settled",
   "sources": {
+    "array_probe.py": {
+      "sha256": "0ffa4d63207d86d3f06d40bec0cb6cc04b017bdcd805989f2f00dac887cb3143"
+    },
     "calibrate.c": {
       "commit": "d40f789799162a7e58bd96826a5f9caa3bdc008d",
       "file": "scripts/rc24-insta-input-proof/calibrate.c",
@@ -669,6 +672,9 @@
       "commit": "e48abf3b09f415b296d0ee2e8ec81c0de7b50611",
       "file": "scripts/ruff-clap-config-help/exec_count.c",
       "sha256": "3a870fd13a70b4d5ca35f6962a376052a00889220ab1d925b839407d9f5758fb"
+    },
+    "stage2_open.py": {
+      "sha256": "4695e714d6b70edbd73dcfd6bb63104f422e4d8c6cc0faeb2e3872c4af39a81e"
     },
     "transport.py": {
       "commit": "453a3893b5844334a5b7f1c770c14e94ad1a34f8",
@@ -680,5 +686,16 @@
       "file": "scripts/ruff-clap-config-help/whole_count.c",
       "sha256": "096b9e9efb7457ff4c2fd194985f18c4e05520fce46c85e5919b084ae3d823ce"
     }
+  },
+  "trained": {
+    "array_probe": "0ffa4d63207d86d3f06d40bec0cb6cc04b017bdcd805989f2f00dac887cb3143",
+    "design": "Repeat the already-registered full RNG histories and measurements on six different kernel boots with two independently built stage2 SDKs. Change only how the fully trained SDKs are opened. Require the same primary, six favorable pairs, median >=20 percent, all ordinary native and empty guards and both invalid checks. Report every common and held-out refusal. Boots must also be disjoint from both measured stage1 studies.",
+    "original_sdk_open_sha256": "9eeb6f65daae6655f05cdf545ceb7df91e34278e7dd6dc4332a96bd85e289ceb",
+    "paired_receiver_sha256": "58f3c2a031a80fe18b06a0aa204609b8a8c922eab7b55b84302a010b1d30a5b8",
+    "paired_receiver_source": "2730f118ffbe51cb7091360c6ea44b9c1b2bc600",
+    "reference_pilot": 41741463395,
+    "reference_qualification": 41742406689,
+    "release_candidate_factory": 41742694783,
+    "release_parent_factory": 41737296261
   }
 }
