@@ -2,6 +2,7 @@
 import hashlib
 import json
 from pathlib import Path
+import shutil
 import subprocess as sp
 import sys
 root=Path(sys.argv[1]).resolve();root.mkdir()
@@ -23,12 +24,13 @@ def source(last):
         "fn main() { let i = std::hint::black_box(1023); assert_eq!(PAD[i],(0x98765432,255)); assert_eq!(ATTR[i], EXPR[i]); assert!(!std::ptr::eq(&NAMED_A, &NAMED_B)); println!(\"{:?}\", (CH[i],PA[i],NE[i],NAMED_A[i])); }\n")
 args=["rustc","+ohm","--edition=2024",str(src)]
 def native(label,last,incremental):
-    src.write_text(source(last));exe=root/("program-"+label)
-    options=["-C","incremental="+str(incr)] if incremental else []
+    src.write_text(source(last));exe=root/"program"
+    options=["-C","incremental="+str(incr if incremental else root/"empty-incr")]
     sp.run([*args,*options,"-o",exe],check=True)
     output=sp.check_output([exe]).decode().strip()
     assert output==f"('🦀', (3735928559, 'λ'), (305419896, (43981, {last})), (42, (14, 77)))",output
     with exe.open("rb") as f:digest=hashlib.file_digest(f,"sha256").hexdigest()
+    shutil.copy2(exe,root/("program-"+label))
     return {"output":output,"elf":digest}
 old=native("old","255",True)
 thir=sp.check_output([*args,"-Zunpretty=thir-tree"],text=True)
