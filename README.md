@@ -5,26 +5,26 @@
 
 An experimental fork of the Rust toolchain, designed for fast, highly parallel local development.
 
-With Ohm, incremental builds can be up to 46× faster, replayed development sessions take around
-42% less time, and `target/` disk usage decreases by around 55%.
+With Ohm, incremental builds can be up to 41× faster, replayed development sessions take around
+44% less time, and `target/` disk usage decreases by around 55%.
 
-Comparing stock Rust and Ohm 1.99.0-23 on replayed development sessions:
+Comparing stock Rust and Ohm 1.99.0-24 on replayed development sessions:
 
 <!-- benchmark:sessions -->
 
 | Scope                                      | Rust 1.99.0 | Ohm      | Time saved |
 | ------------------------------------------ | ----------- | -------- | ---------- |
-| Ruff session                               | 406.00 s    | 223.10 s | 45.05%     |
-| uv session                                 | 136.89 s    | 80.17 s  | 41.44%     |
-| Codex session                              | 364.92 s    | 200.71 s | 45.00%     |
-| ty session                                 | 273.17 s    | 180.50 s | 33.92%     |
-| All sessions                               | 1,180.98 s  | 684.49 s | 42.04%     |
-| `cargo check`                              | 101.27 s    | 35.47 s  | 64.98%     |
-| `cargo test`, `cargo nextest`, `just test` | 696.43 s    | 481.31 s | 30.89%     |
-| `cargo clippy`                             | 340.42 s    | 129.66 s | 61.91%     |
-| `cargo fmt`                                | 14.00 s     | 8.68 s   | 37.98%     |
-| Other commands                             | 26.87 s     | 26.95 s  | −0.28%     |
-| All commands                               | 1,178.99 s  | 682.06 s | 42.15%     |
+| Ruff session                               | 417.50 s    | 227.87 s | 45.42%     |
+| uv session                                 | 139.92 s    | 78.09 s  | 44.19%     |
+| Codex session                              | 522.78 s    | 288.60 s | 44.80%     |
+| ty session                                 | 275.99 s    | 168.35 s | 39.00%     |
+| All sessions                               | 1,356.20 s  | 762.90 s | 43.75%     |
+| `cargo check`                              | 140.71 s    | 44.46 s  | 68.40%     |
+| `cargo test`, `cargo nextest`, `just test` | 783.33 s    | 538.69 s | 31.23%     |
+| `cargo clippy`                             | 389.45 s    | 142.27 s | 63.47%     |
+| `cargo fmt`                                | 13.94 s     | 8.43 s   | 39.57%     |
+| Other commands                             | 27.10 s     | 26.89 s  | 0.79%      |
+| All commands                               | 1,354.53 s  | 760.74 s | 43.84%     |
 
 <!-- /benchmark:sessions -->
 
@@ -148,23 +148,23 @@ Times are medians of four runs, with each toolchain pair measured on the same ho
 
 <!-- benchmark:developer-workflows -->
 
-| Project | Workflow                          | Rust 1.99.0 | Ohm 1.99.0-23 | Time saved |
+| Project | Workflow                          | Rust 1.99.0 | Ohm 1.99.0-24 | Time saved |
 | ------- | --------------------------------- | ----------- | ------------- | ---------- |
-| Ruff/ty | Edit → focused test               | 13.75 s     | 12.58 s       | 8.57%      |
-| Ruff/ty | Edit dependency → downstream test | 14.19 s     | 12.65 s       | 10.89%     |
-| Ruff/ty | Edit → check → test → check       | 21.08 s     | 19.33 s       | 8.32%      |
-| Ruff/ty | Check → build → check             | 74.77 s     | 49.95 s       | 33.20%     |
-| Ruff/ty | Edit → fmt → clippy → test        | 26.50 s     | 20.53 s       | 22.50%     |
-| uv      | Edit → focused test               | 17.23 s     | 9.12 s        | 47.06%     |
-| uv      | Edit dependency → downstream test | 20.24 s     | 2.31 s        | 88.60%     |
-| uv      | Edit → check → test → check       | 19.87 s     | 11.51 s       | 42.06%     |
-| uv      | Check → build → check             | 110.30 s    | 57.56 s       | 47.81%     |
-| uv      | Edit → fmt → clippy → test        | 22.45 s     | 12.87 s       | 42.66%     |
-| Codex   | Edit → focused test               | 20.85 s     | 17.90 s       | 14.16%     |
-| Codex   | Edit dependency → downstream test | 34.79 s     | 2.27 s        | 93.48%     |
-| Codex   | Edit → check → test → check       | 23.77 s     | 21.44 s       | 9.78%      |
-| Codex   | Check → build → check             | 110.65 s    | 72.54 s       | 34.45%     |
-| Codex   | Edit → fmt → clippy → test        | 27.92 s     | 21.84 s       | 21.77%     |
+| Ruff/ty | Edit → focused test               | 13.94 s     | 12.48 s       | 10.51%     |
+| Ruff/ty | Edit dependency → downstream test | 14.53 s     | 12.13 s       | 16.54%     |
+| Ruff/ty | Edit → check → test → check       | 20.39 s     | 19.05 s       | 6.57%      |
+| Ruff/ty | Check → build → check             | 76.65 s     | 51.11 s       | 33.31%     |
+| Ruff/ty | Edit → fmt → clippy → test        | 27.78 s     | 20.15 s       | 27.47%     |
+| uv      | Edit → focused test               | 16.82 s     | 8.23 s        | 51.10%     |
+| uv      | Edit dependency → downstream test | 18.15 s     | 2.13 s        | 88.26%     |
+| uv      | Edit → check → test → check       | 19.10 s     | 10.67 s       | 44.11%     |
+| uv      | Check → build → check             | 108.20 s    | 55.83 s       | 48.40%     |
+| uv      | Edit → fmt → clippy → test        | 20.56 s     | 12.58 s       | 38.81%     |
+| Codex   | Edit → focused test               | 26.53 s     | 24.43 s       | 7.91%      |
+| Codex   | Edit dependency → downstream test | 49.91 s     | 3.36 s        | 93.27%     |
+| Codex   | Edit → check → test → check       | 36.92 s     | 30.37 s       | 17.74%     |
+| Codex   | Check → build → check             | 154.25 s    | 102.06 s      | 33.83%     |
+| Codex   | Edit → fmt → clippy → test        | 41.02 s     | 32.27 s       | 21.34%     |
 
 <!-- /benchmark:developer-workflows -->
 
@@ -172,14 +172,14 @@ Times are medians of four runs, with each toolchain pair measured on the same ho
 
 <!-- benchmark:direct -->
 
-| Project | Workflow               | Edited crate | Rust 1.99.0 | Ohm 1.99.0-23 | Speedup |
+| Project | Workflow               | Edited crate | Rust 1.99.0 | Ohm 1.99.0-24 | Speedup |
 | ------- | ---------------------- | ------------ | ----------- | ------------- | ------- |
-| uv      | `cargo check`          | `uv`         | 1.88 s      | 1.69 s        | 1.11×   |
-| uv      | `cargo clippy`         | `uv`         | 3.04 s      | 2.31 s        | 1.32×   |
-| uv      | `cargo test --test it` | `uv`         | 17.02 s     | 8.40 s        | 2.03×   |
-| Codex   | `cargo check`          | `codex-core` | 2.70 s      | 2.57 s        | 1.05×   |
-| Codex   | `just clippy`          | `codex-core` | 13.37 s     | 8.97 s        | 1.49×   |
-| Codex   | `just test`            | `codex-core` | 19.53 s     | 18.52 s       | 1.05×   |
+| uv      | `cargo check`          | `uv`         | 1.98 s      | 1.71 s        | 1.16×   |
+| uv      | `cargo clippy`         | `uv`         | 3.09 s      | 2.35 s        | 1.31×   |
+| uv      | `cargo test --test it` | `uv`         | 17.20 s     | 8.36 s        | 2.06×   |
+| Codex   | `cargo check`          | `codex-core` | 4.22 s      | 3.99 s        | 1.06×   |
+| Codex   | `just clippy`          | `codex-core` | 19.87 s     | 13.06 s       | 1.52×   |
+| Codex   | `just test`            | `codex-core` | 26.87 s     | 25.82 s       | 1.04×   |
 
 <!-- /benchmark:direct -->
 
@@ -188,14 +188,14 @@ avoid rebuilding unchanged dependents:
 
 <!-- benchmark:dependency -->
 
-| Project | Workflow               | Edited dependency    | Rust 1.99.0 | Ohm 1.99.0-23 | Speedup |
+| Project | Workflow               | Edited dependency    | Rust 1.99.0 | Ohm 1.99.0-24 | Speedup |
 | ------- | ---------------------- | -------------------- | ----------- | ------------- | ------- |
-| uv      | `cargo check`          | `uv-normalize`       | 8.38 s      | 0.41 s        | 20.35×  |
-| uv      | `cargo clippy`         | `uv-normalize`       | 12.18 s     | 0.46 s        | 26.63×  |
-| uv      | `cargo test --test it` | `uv-normalize`       | 19.54 s     | 2.18 s        | 8.98×   |
-| Codex   | `cargo check`          | `codex-utils-string` | 11.62 s     | 0.42 s        | 27.38×  |
-| Codex   | `just clippy`          | `codex-utils-string` | 26.92 s     | 0.58 s        | 46.66×  |
-| Codex   | `just test`            | `codex-utils-string` | 35.21 s     | 1.92 s        | 18.34×  |
+| uv      | `cargo check`          | `uv-normalize`       | 8.73 s      | 0.43 s        | 20.48×  |
+| uv      | `cargo clippy`         | `uv-normalize`       | 12.41 s     | 0.54 s        | 22.95×  |
+| uv      | `cargo test --test it` | `uv-normalize`       | 18.62 s     | 2.06 s        | 9.05×   |
+| Codex   | `cargo check`          | `codex-utils-string` | 16.93 s     | 0.71 s        | 23.85×  |
+| Codex   | `just clippy`          | `codex-utils-string` | 40.12 s     | 0.97 s        | 41.58×  |
+| Codex   | `just test`            | `codex-utils-string` | 48.81 s     | 3.05 s        | 16.03×  |
 
 <!-- /benchmark:dependency -->
 
@@ -205,14 +205,14 @@ avoid rebuilding unchanged dependents:
 
 | Project | Workflow                 | Package              | Rust 1.99.0 | Ohm     | Speedup |
 | ------- | ------------------------ | -------------------- | ----------- | ------- | ------- |
-| uv      | Check after build        | `uv`                 | 58.32 s     | 12.05 s | 4.84×   |
-| uv      | Shared-worktree build    | `uv-normalize`       | 6.83 s      | 0.73 s  | 9.40×   |
-| Codex   | Check after build        | `codex-core`         | 73.79 s     | 19.92 s | 3.70×   |
-| Codex   | No-op formatting         | Workspace            | 6.95 s      | 0.08 s  | 82.10×  |
-| Codex   | Formatting after an edit | `codex-core`         | 6.78 s      | 0.14 s  | 48.84×  |
-| Codex   | Shared-worktree build    | `codex-utils-string` | 1.92 s      | 0.42 s  | 4.59×   |
-| ty      | Worktree startup (ext4)  | `ty_python_semantic` | 89.22 s     | 51.15 s | 1.74×   |
-| ty      | Worktree startup (Btrfs) | `ty_python_semantic` | 88.61 s     | 8.91 s  | 9.95×   |
+| uv      | Check after build        | `uv`                 | 57.99 s     | 12.64 s | 4.59×   |
+| uv      | Shared-worktree build    | `uv-normalize`       | 6.56 s      | 0.65 s  | 10.17×  |
+| Codex   | Check after build        | `codex-core`         | 104.50 s    | 28.75 s | 3.63×   |
+| Codex   | No-op formatting         | Workspace            | 9.54 s      | 0.18 s  | 52.49×  |
+| Codex   | Formatting after an edit | `codex-core`         | 9.68 s      | 0.25 s  | 38.05×  |
+| Codex   | Shared-worktree build    | `codex-utils-string` | 2.58 s      | 0.60 s  | 4.30×   |
+| ty      | Worktree startup (ext4)  | `ty_python_semantic` | 88.80 s     | 49.46 s | 1.80×   |
+| ty      | Worktree startup (Btrfs) | `ty_python_semantic` | 88.59 s     | 8.89 s  | 9.96×   |
 
 <!-- /benchmark:features -->
 
@@ -220,9 +220,9 @@ avoid rebuilding unchanged dependents:
 
 <!-- benchmark:ruff-doctests -->
 
-| Workload                           | Rust 1.99.0 | Ohm 1.99.0-23 | Speedup |
+| Workload                           | Rust 1.99.0 | Ohm 1.99.0-24 | Speedup |
 | ---------------------------------- | ----------- | ------------- | ------- |
-| Ruff doctests (`cargo test --doc`) | 13.562 s    | 1.643 s       | 8.25×   |
+| Ruff doctests (`cargo test --doc`) | 13.567 s    | 1.542 s       | 8.80×   |
 
 <!-- /benchmark:ruff-doctests -->
 
