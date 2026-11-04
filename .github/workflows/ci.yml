@@ -9,13 +9,32 @@ on:
         required: true
 permissions:
   contents: read
+  actions: read
 jobs:
   qualify:
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-25-restack-registry-20261104'
-    runs-on: namespace-profile-ubuntu-24-04-16
+    runs-on: ubuntu-24.04
     timeout-minutes: 75
     steps:
+      - name: Verify 29 GiB of free local space before yielding the other runner
+        run: |
+          python3 -c 'import os,shutil; p=os.environ["RUNNER_TEMP"]; n=shutil.disk_usage(p).free; print(n); assert n>=29*2**30'
+      - name: Wait for the idle original to be withdrawn before building
+        id: selection
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for attempt in $(seq 1 80); do
+            state=$(gh api repos/astral-experiments/ohm/actions/runs/41862529645 --jq '.status + "/" + (.conclusion // "")')
+            case "$state" in
+              completed/cancelled) echo 'selected=true' >> "$GITHUB_OUTPUT"; exit 0 ;;
+              queued/|pending/|waiting/) sleep 5 ;;
+              *) echo 'selected=false' >> "$GITHUB_OUTPUT"; exit 0 ;;
+            esac
+          done
+          echo 'selected=false' >> "$GITHUB_OUTPUT"
       - name: Check out the frozen merged Cargo and its verifiers
+        if: steps.selection.outputs.selected == 'true'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: ${{ github.sha }}
@@ -30,6 +49,7 @@ jobs:
             /scripts/rc24-insta-input-proof/migration/fixture/
             /scripts/rc24-insta-input-proof/evidence/nonempty-registry-history/replay.py
       - name: Check out both authentic Ruff locks
+        if: steps.selection.outputs.selected == 'true'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: astral-sh/ruff
@@ -40,19 +60,21 @@ jobs:
           sparse-checkout: /Cargo.lock
           persist-credentials: false
       - name: Install the kernel exec tracer
+        if: steps.selection.outputs.selected == 'true'
         run: |
           if ! command -v strace >/dev/null; then
             sudo apt-get update -qq
             sudo apt-get install -y strace
           fi
       - name: Require real native verdicts on both registry histories
+        if: steps.selection.outputs.selected == 'true'
         env:
           OHM_SDK_READ_TOKEN: ${{ github.token }}
         run: |
           test "$(git -C qa rev-parse HEAD)" = "$GITHUB_SHA"
           python3 -IB qa/scripts/rc25-registry-validation/run.py
       - name: Keep original Cargo records, compiler invocations and native images
-        if: always()
+        if: always() && steps.selection.outputs.selected == 'true'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: cargo25-merged-registry-${{ github.run_id }}

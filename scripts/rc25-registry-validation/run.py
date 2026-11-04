@@ -8,6 +8,7 @@ import subprocess as sp
 import sys
 import tarfile
 import tomllib
+import traceback
 import urllib.request
 
 here = Path(__file__).resolve().parent
@@ -161,13 +162,17 @@ def run():
     print("Compiling exact Cargo on", rustc.splitlines()[0], flush=True)
     deps = locked_inputs(src, env)
     assert len(deps) == 524
-    argv = ["cargo", "+ohm", "-Zohm-defaults=no", "build", "--release", "--locked", "--offline", "-p", "cargo", "--bin", "cargo", "--features", "all-static,ohm-defaults", "-j8"]
+    jobs = os.cpu_count()
+    assert jobs and jobs > 0
+    argv = ["cargo", "+ohm", "-Zohm-defaults=no", "build", "--release", "--locked", "--offline", "-p", "cargo", "--bin", "cargo", "--features", "all-static,ohm-defaults", f"-j{min(8, jobs)}"]
     sp.run(argv, cwd=src, env=env, check=True)
     assert not out(["git", "status", "--porcelain"], src)
     candidate = root / "compiler-target/release/cargo"
     vv = out([candidate, "-vV"], src, env)
     assert "commit-hash: " + reg["head"] in vv
     digest = sha(candidate)
+    (proof / "physical").mkdir()
+    shutil.copy2(candidate, proof / "physical/cargo")
     dump(proof / "compiler.json", {"source": reg["head"], "tree": reg["tree"], "cargo": vv, "sha256": digest, "build": argv, "rustc": rustc,
          "parent_cargo": old_cargo, "dependencies": deps, "qa": os.environ["GITHUB_SHA"], "run": os.environ["GITHUB_RUN_ID"]})
     fixture = prior / "migration/fixture"
@@ -187,11 +192,15 @@ def run():
     dump(proof / "fixture-inputs.json", sources)
     ctl = ["--signed", sdk, "--parent", sdk / "bin/cargo", "--candidate", candidate]
     case = root / "insta"
+    refusals = {}
     try:
         sp.run(["strace", "-f", "-qq", "-s", "192", "-e", "trace=execve", "-o", proof / "insta.exec",
                 sys.executable, "-IB", prior / "migration/run.py", "--work", case, "--sdk", sdk, *ctl[2:],
                 "--fixture", fixture, "--registry", Path(fenv["CARGO_HOME"]) / "registry"], check=True)
         deleted(case, proof)
+    except Exception:
+        refusals["insta"] = traceback.format_exc()
+        dump(proof / "refusals.json", refusals)
     finally:
         if (case / "proof").exists():
             (case / "proof").rename(proof / "insta")
@@ -204,9 +213,19 @@ def run():
         case = root / label
         try:
             sp.run([sys.executable, "-IB", replay, case, "--published-parent", control, *ctl], check=True)
+        except Exception:
+            refusals[label] = traceback.format_exc()
+            dump(proof / "refusals.json", refusals)
         finally:
             if (case / "evidence").exists():
                 (case / "evidence").rename(proof / label)
+                for actual, preserved in (("objects/v5consumer/0.1.0/download", "v5consumer.crate"), ("application/Cargo.lock", "application/Cargo.lock"),
+                                          ("index/v5/co/v5consumer", "registry/v5/co/v5consumer")):
+                    if (case / actual).is_file():
+                        dst = proof / label / preserved
+                        dst.parent.mkdir(parents=True, exist_ok=True)
+                        shutil.copyfile(case / actual, dst)
+    assert not refusals, refusals
     dump(proof / "complete.json", {"root": reg["root"], "candidate": reg["head"], "cargo": digest, "rustc": reg["signed_rust"],
          "boot": Path("/proc/sys/kernel/random/boot_id").read_text().strip(), "first_clean": True, "inherited": True, "deleted": True})
 
