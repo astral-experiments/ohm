@@ -164,7 +164,8 @@ def run(argv,env,td,allowed=0,*,pass_fds=()):
 
 def inventory(name,env,graph,kind='whole'):
     td=PROOF/name;td.mkdir();a=list(CMD)
-    if kind=='whole':a=[w.root/'whole_count',td/'hardware.json',shutil.which('cargo',path=env['PATH']),*a]
+    if kind=='plain':assert a[0]=='cargo' and shutil.which(a[0],path=env['PATH'])
+    elif kind=='whole':a=[w.root/'whole_count',td/'hardware.json',shutil.which('cargo',path=env['PATH']),*a]
     else:
         (td/'tasks').mkdir();a=[w.root/'exec_count',td/'tasks',*a]
     run(a,env,td)
@@ -192,7 +193,7 @@ def inventory(name,env,graph,kind='whole'):
     if kind=='whole':
         hw=json.loads((td/'hardware.json').read_bytes())
         assert hw['instructions']>0 and hw['running']==hw['enabled']>0 and hw['status']==0
-    else:write(td/'owner-census.json.gz',exec_proof(td/'tasks'))
+    elif kind != 'plain':write(td/'owner-census.json.gz',exec_proof(td/'tasks'))
     write(td/'inventory.json.gz',data)
     assert not w.git('status','--porcelain')
     return data

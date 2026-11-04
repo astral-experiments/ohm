@@ -1,0 +1,43 @@
+{
+  "actual_memfd_empty": true,
+  "commands": {
+    "C": {
+      "actual_driver": [
+        "cargo",
+        "+ohm",
+        "test",
+        "--no-run",
+        "--locked",
+        "--offline",
+        "-j4",
+        "--message-format=json"
+      ],
+      "arm": "C",
+      "coordinator": true,
+      "has_hardware_or_epochs": false,
+      "returncode": 101
+    },
+    "P": {
+      "actual_driver": [
+        "cargo",
+        "+ohm",
+        "test",
+        "--no-run",
+        "--locked",
+        "--offline",
+        "-j4",
+        "--message-format=json"
+      ],
+      "arm": "P",
+      "coordinator": false,
+      "has_hardware_or_epochs": false,
+      "returncode": 101
+    }
+  },
+  "negative_extra_argv": true,
+  "no_target_compiled": true,
+  "real_signed_cargo": [
+    "cargo 1.99.0-dev (abc70d60a 2026-11-03) (ohm-1.99.0-24)",
+    "release: 1.99.0-dev"
+  ]
+}

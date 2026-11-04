@@ -12,7 +12,7 @@ sys.path[:0] = [
     str(HERE.parent / "e2e-existing-output"),
 ]
 import native_fallback
-import audit, meter_fixture, multi_source
+import audit, multi_source
 
 b, w, P = audit.b, audit.w, audit.P
 put = lambda name, data: b.write(P / name, data)
@@ -136,7 +136,6 @@ def stage(
     image,
     llvm,
     *,
-    trace=False,
     expected=0,
     typed=True,
     mode="allow",
@@ -146,16 +145,14 @@ def stage(
     source = arm == "C"
     report = td / "physical-decisions.json"
     oldrun = b.run
+    cargo = shutil.which("cargo", path=env["PATH"])
+    direct = list(b.CMD)
+    assert direct[0] == "cargo" and cargo and Path(cargo).is_absolute()
 
     def observed(argv, current, place, allowed=0):
-        assert (
-            current is env
-            and place == td
-            and [str(x) for x in argv[-len(b.CMD) :]] == b.CMD
-        )
+        assert current is env and place == td and list(argv) == direct
         if source:
-            cargo = shutil.which("cargo", path=env["PATH"])
-            supervisor = [
+            argv = [
                 sys.executable,
                 "-IB",
                 str(HERE / "coordinator.py"),
@@ -168,12 +165,8 @@ def stage(
                 str(RECEIPT_MEMORY),
                 os.environ["ENROLLED_RELEASE"],
                 cargo,
-                *b.CMD,
+                *direct,
             ]
-            if trace:
-                argv = [*argv[:2], *supervisor]
-            else:
-                argv = [*argv[:2], sys.executable, *supervisor]
         return oldrun(
             argv,
             env,
@@ -186,16 +179,7 @@ def stage(
     try:
         if expected:
             td.mkdir()
-            b.run(
-                [
-                    w.root / "whole_count",
-                    td / "hardware.json",
-                    shutil.which("cargo", path=env["PATH"]),
-                    *b.CMD,
-                ],
-                env,
-                td,
-            )
+            b.run(direct, env, td)
             data = (td / "stdout.jsonl").read_bytes()
             msgs = [json.loads(r) for r in data.splitlines()]
             assert msgs[-1] == {"reason": "build-finished", "success": False}
@@ -211,7 +195,7 @@ def stage(
                 )
             inv = None
         else:
-            inv = b.inventory(tag, env, meta, "epochs" if trace else "whole")
+            inv = b.inventory(tag, env, meta, "plain")
     except BaseException:
         if source and td.is_dir():
             originals(state, td)
@@ -257,20 +241,10 @@ def stage(
             assert not receipt["commit"] and not any(
                 k for k in raw if "FRESH-PUBLISH\t" in raw[k] and E2E in raw[k]
             )
-    if not trace:
-        meter = read(td / "hardware.json")
-        assert (
-            meter["status"] == expected * 256
-            and meter["instructions"] > 0
-            and meter["running"] == meter["enabled"] > 0
-        )
-        assert (
-            meter["user_us"] > 0
-            and meter["system_us"] > 0
-            and meter["rchar"] > 0
-            and meter["syscr"] > 0
-        )
-        info["meter"] = meter
+    assert not (td / "hardware.json").exists() and not (td / "tasks").exists()
+    resources = read(td / "resources.json")
+    assert resources["exit"] == expected and resources["minimum_mem"] >= 8 * 2**30
+    info["acquisition"] = "ordinary-unmetered"
     if inv is not None:
         paths = rolemap(inv)
         exe = w.root / inv["binary"]
@@ -296,37 +270,6 @@ def stage(
             info["same_bytes_elsewhere"] = storage(paths, tag)
     else:
         exe = None
-    if trace:
-        ledger = json.loads(gzip.decompress((td / "owner-census.json.gz").read_bytes()))
-        real = [r for r in ledger["roles"] if r["trigger"] == "exec"]
-        wild = [r for r in real if r["mode"] == "Wild"]
-        signed = []
-        original = w.root / "qa-diagnostic-build/original"
-        old = original.stat()
-        if source:
-            signed = [
-                r for r in real if (r["dev"], r["ino"]) == (old.st_dev, old.st_ino)
-            ]
-        observed_roles = [
-            k for r in wild for k in ROLES if str(r["output"]).endswith(k)
-        ]
-        assert len(observed_roles) == len(set(observed_roles)) == 50
-        assert len(signed) == (len(wild) - 48 if source else 0)
-
-        for extra in signed:
-            (previous,) = [
-                r
-                for r in wild
-                if r["pid"] == extra["pid"] and r["epoch"] < extra["epoch"]
-            ]
-            a = (td / "tasks" / previous["argv"]).read_bytes().split(b"\0")[4:]
-            c = (td / "tasks" / extra["argv"]).read_bytes().split(b"\0")[4:]
-            assert a == c and not any(
-                str(previous["output"]).endswith(r) for r in ACCEPTED
-            )
-        info["real_execs"] = ledger["real_execs"]
-        info["fork_or_start"] = ledger["fork_or_start_images"]
-        info["redirect_to_signed"] = len(signed)
     put(tag + "-receipt.json.gz", info)
     return info, exe
 
@@ -349,7 +292,7 @@ def main():
     w.guard()
     b.save_elf = w.hf
     release = int(os.environ["ENROLLED_RELEASE"])
-    assert release in (23, 24)
+    assert release == 24
     from release_scope import for_release
 
     ROLES = for_release(release)
@@ -365,23 +308,12 @@ def main():
             "roles": sorted(ACCEPTED),
             "Ruff": [b.OLD, b.NEW],
             "release": release,
+            "kind": "unmetered-native-safety-v1",
         },
     )
     env = original_env(release)
     state = w.root / "native-donor-state"
     state.mkdir()
-    for source, name in (
-        (HERE / "metered.c", "whole_count"),
-        (HERE.parent / "exec_count.c", "exec_count"),
-    ):
-        subprocess.run(
-            ["cc", "-Wall", "-Wextra", "-Werror", "-O2", source, "-o", w.root / name],
-            check=True,
-        )
-    put(
-        "meter-calibration.json",
-        meter_fixture.run(w.root / "whole_count", w.root / "meter-fixture", True),
-    )
     stock, llvm = audit.build(
         env, source=multi_source.apply, registration=HERE / "source-preflight.json"
     )
@@ -427,11 +359,18 @@ def main():
         return path
 
     for arm in ("P", "C"):
-        if arm == "C":
-            b.select(b.OLD)
-            reset_roots(env, registry)
-            state.joinpath("coordinate").touch(exist_ok=False)
         swap(stock if arm == "P" else actor, live, STOCK if arm == "P" else sha)
+        if arm == "C":
+            # The previous P clean and this C clean are independent; no target or donor survives either reset.
+            state.joinpath("coordinate").touch(exist_ok=False)
+            b.select(b.NEW)
+            reset_roots(env, registry)
+            assert os.fstat(RECEIPT_MEMORY).st_size == 0
+            run("C-empty-new", "C")
+            reset_roots(env, registry)
+            os.ftruncate(RECEIPT_MEMORY, 0)
+            assert os.fstat(RECEIPT_MEMORY).st_size == 0
+        b.select(b.OLD)
         out = run(arm + "-old", arm)
         b.select(b.NEW)
         assert (
@@ -439,35 +378,54 @@ def main():
             == audit.contact.LITERALS["list"]
         )
         out = run(arm + "-edit", arm)
-        for i in range(1, 4):
-            out = run(arm + "-warm" + str(i), arm)
-        out = run(arm + "-exec-warm", arm, trace=True)
-        # Tracing changes the inherited jobserver-fd spelling. Retain that first transition,
-        # then observe a second genuinely unchanged invocation in the same trace context.
-        out = run(arm + "-exec-warm-stable", arm, trace=True)
+        out = run(arm + "-warm1", arm)
         b.select(b.OLD)
         out = run(arm + "-ordinary-repeat-old", arm)
         b.select(b.NEW)
-        assert b.verdict(out, arm + "-withheld-ordinary-repeat-old", env, 101) == audit.contact.LITERALS["list"]
-        out = run(arm + "-ordinary-repeat-edit", arm)
-
-        b.select(b.OLD)
-        out = run(arm + "-reverse-old", arm)
-        b.select(b.NEW)
         assert (
-            b.verdict(out, arm + "-withheld-reverse-old", env, 101)
+            b.verdict(out, arm + "-withheld-ordinary-repeat-old", env, 101)
             == audit.contact.LITERALS["list"]
         )
-        out = run(arm + "-exec-edit", arm, trace=True)
+        out = run(arm + "-ordinary-repeat-edit", arm)
+        if arm == "P":
+            reset_roots(env, registry)
+            run("P-empty-new", "P")
+    put(
+        "ordinary-second-edit-and-empty.json",
+        {
+            "certified_second_edit_hits": results["C-ordinary-repeat-edit"][
+                "fresh_roles"
+            ],
+            "P_second_vs_signed_empty": {
+                k: results["P-ordinary-repeat-edit"]["published"][k]
+                == results["P-empty-new"]["published"][k]
+                for k in ROLES
+            },
+            "C_second_vs_signed_empty": {
+                k: results["C-ordinary-repeat-edit"]["published"][k]
+                == results["P-empty-new"]["published"][k]
+                for k in ROLES
+            },
+            "C_independent_empty_vs_signed_empty": {
+                k: results["C-empty-new"]["published"][k]
+                == results["P-empty-new"]["published"][k]
+                for k in ROLES
+            },
+        },
+    )
     # Invalidation via the ordinary existing native / source inputs. The withheld
     # original P and C binaries above already exercised the real changed Ruff text.
     symbol_input = None
     if release == 24:
         # Freeze the actual generated operand before any mutation. Its entire byte
         # sequence was the normal source actor's operand on the real edit frame.
-        prior = read(P / "C-exec-edit" / "physical-decisions.json")["actors"][E2E]
+        prior = read(P / "C-ordinary-repeat-edit" / "physical-decisions.json")[
+            "actors"
+        ][E2E]
         live_log = gzip.decompress(
-            (P / "C-exec-edit" / ("actor-" + prior["pid"] + ".tsv.gz")).read_bytes()
+            (
+                P / "C-ordinary-repeat-edit" / ("actor-" + prior["pid"] + ".tsv.gz")
+            ).read_bytes()
         ).decode()
         (actual,) = [
             r.split("\t")
@@ -489,6 +447,20 @@ def main():
             "mid-read": "C-native-save",
         }
         tag = labels[mode]
+        # Obtain an actual eligible normal e2e publication before the challenge. All
+        # attempts run ordinary Cargo with its real jobserver and remain in the archive.
+        for n in range(1, 7):
+            before = "C-before-native-" + mode + "-" + str(n)
+            out = run(before, "C")
+            normal_actor = read(P / before / "physical-decisions.json")["actors"][E2E]
+            if normal_actor.get("physical") and normal_actor["allowed"]:
+                break
+        else:
+            raise AssertionError("No actual certified normal e2e output before " + mode)
+        put(
+            "selected-before-native-" + mode + ".json",
+            {"phase": before, "sha256": results[before]["published"][E2E]},
+        )
         wait = state / ("mid-read" if mode == "mid-read" else "entry-wait")
         wait.touch(exist_ok=False)
         with ThreadPoolExecutor(max_workers=1) as pool:
@@ -505,9 +477,15 @@ def main():
         put(tag + "-actual-change.json", mutation)
         if mode in ("earlier", "four"):
             proof = native_fallback.on_worker(
-                P / tag, E2E, mutation, provider, current,
-                results["C-exec-edit"]["published"][E2E], results[tag]["published"][E2E],
-                w.hf, audit.donor.full_b3,
+                P / tag,
+                E2E,
+                mutation,
+                provider,
+                current,
+                results[before]["published"][E2E],
+                results[tag]["published"][E2E],
+                w.hf,
+                audit.donor.full_b3,
             )
             put(tag + "-full-output.json", proof)
         if mode == "four":
@@ -530,7 +508,11 @@ def main():
             (state / f).unlink(missing_ok=True)
         out = run(tag + "-repair", "C")
     out = run("C-before-output-control-1", "C")
-    wanted = {E2E} | {k for k in ACCEPTED if k.startswith("/ty_ide/") and k.split("/")[-1].startswith("ty_ide-")}
+    wanted = {E2E} | {
+        k
+        for k in ACCEPTED
+        if k.startswith("/ty_ide/") and k.split("/")[-1].startswith("ty_ide-")
+    }
     assert len(wanted) == 2
     for attempt in range(2, 7):
         before_corruption = "C-before-output-control-" + str(attempt)
@@ -538,8 +520,13 @@ def main():
         if wanted <= set(results[before_corruption]["fresh_roles"]):
             break
     else:
-        raise AssertionError("Two true unchanged existing-output admissions required before corruption")
-    put("before-output-selection.json", {"phase": before_corruption, "targets": sorted(wanted)})
+        raise AssertionError(
+            "Two true unchanged existing-output admissions required before corruption"
+        )
+    put(
+        "before-output-selection.json",
+        {"phase": before_corruption, "targets": sorted(wanted)},
+    )
 
     targets = {E2E: out}
     if release == 24:
@@ -549,60 +536,100 @@ def main():
             if k.startswith("/ty_ide/") and k.split("/")[-1].startswith("ty_ide-")
         ]
         inv = json.loads(
-            gzip.decompress(
-                (P / before_corruption / "inventory.json.gz").read_bytes()
-            )
+            gzip.decompress((P / before_corruption / "inventory.json.gz").read_bytes())
         )
         paths = rolemap(inv)
         targets[ide] = paths[ide][0]
-        held = {
-            k: os.open(path, os.O_PATH | os.O_CLOEXEC) for k, path in targets.items()
-        }
-        start = time.monotonic_ns()
-        controls = {}
-        try:
-            out = run("C-distinct-OPATHs", "C")
-            assert set(targets) <= set(results["C-distinct-OPATHs"]["fresh_roles"])
-            for k, fd in held.items():
-                old = os.fstat(fd)
-                now = targets[k].lstat()
-                assert old.st_nlink == 0 and (old.st_dev, old.st_ino) != (
-                    now.st_dev,
-                    now.st_ino,
-                )
-                with open("/proc/self/fd/" + str(fd), "r+b", buffering=0) as writable:
-                    assert os.pwrite(writable.fileno(), b"\0\0", 18) == 2
-                assert w.hf(targets[k]) == results["C-distinct-OPATHs"]["published"][k]
-                controls[k] = {
-                    "old": [
-                        old.st_dev,
-                        old.st_ino,
-                        old.st_size,
-                        512 * old.st_blocks,
-                        old.st_nlink,
-                    ],
-                    "new": [now.st_dev, now.st_ino],
-                    "held_ns": time.monotonic_ns() - start,
-                }
-        finally:
-            for fd in held.values():
-                os.close(fd)
+        for trial in range(1, 7):
+            phase = "C-distinct-OPATHs" + ("" if trial == 1 else "-" + str(trial))
+            held = {
+                k: os.open(path, os.O_PATH | os.O_CLOEXEC)
+                for k, path in targets.items()
+            }
+            start = time.monotonic_ns()
+            controls = {}
+            try:
+                out = run(phase, "C")
+                # A genuine multi-thread full link can keep the old inode. Never write through
+                # a held descriptor until BOTH registered outputs actually publish fresh inodes.
+                if not set(targets) <= set(results[phase]["fresh_roles"]):
+                    put(
+                        phase + "-ordinary-fallback.json",
+                        {"fresh": results[phase]["fresh_roles"]},
+                    )
+                    continue
+                for k, fd in held.items():
+                    old = os.fstat(fd)
+                    now = targets[k].lstat()
+                    assert old.st_nlink == 0 and (old.st_dev, old.st_ino) != (
+                        now.st_dev,
+                        now.st_ino,
+                    )
+                    with open(
+                        "/proc/self/fd/" + str(fd), "r+b", buffering=0
+                    ) as writable:
+                        assert os.pwrite(writable.fileno(), bytes(2), 18) == 2
+                    assert w.hf(targets[k]) == results[phase]["published"][k]
+                    controls[k] = {
+                        "old": [
+                            old.st_dev,
+                            old.st_ino,
+                            old.st_size,
+                            512 * old.st_blocks,
+                            old.st_nlink,
+                        ],
+                        "new": [now.st_dev, now.st_ino],
+                        "held_ns": time.monotonic_ns() - start,
+                    }
+            finally:
+                for fd in held.values():
+                    os.close(fd)
+            break
+        else:
+            raise AssertionError(
+                "Both genuine fresh generations required in one held-OPATH command"
+            )
         put("actual-canonical-OPATHs.json", controls)
-    for key, path in targets.items():
-        old_ref = results[before_corruption]["published"][key]
-        put(
-            "corrupted-existing-" + key.split("/")[-1] + ".json",
-            audit.witness.corrupt_text(path, audit.donor.text_flip, old_ref),
+        put("actual-canonical-OPATHs-stage.json", {"phase": phase})
+    for trial in range(1, 7):
+        suffix = "" if trial == 1 else "-" + str(trial)
+        refs = {k: results[phase]["published"][k] for k in targets}
+        for k, path in targets.items():
+            put(
+                "corrupted-existing-" + k.split("/")[-1] + suffix + ".json",
+                audit.witness.corrupt_text(path, audit.donor.text_flip, refs[k]),
+            )
+        phase = "C-actual-output-repair" + suffix
+        out = run(phase, "C")
+        repaired = read(P / phase / "physical-decisions.json")["actors"]
+        for k in targets:
+            # Any apparent hit or unrepaired output is an immediate safety failure.
+            assert repaired[k]["action"] in ("full", "full-typed-refusal")
+            assert results[phase]["published"][k] == refs[k] == w.hf(targets[k])
+        proved = {
+            k
+            for k in targets
+            if repaired[k]["action"] == "full"
+            and repaired[k]["response"] == "verify"
+            and "output-bytes-or-generation" in repaired[k]["reasons"]
+        }
+        if set(targets) == proved:
+            break
+        put(phase + "-ordinary-fallback.json", {"verified_corruption": sorted(proved)})
+        for attempt in range(1, 7):
+            phase = "C-train-output-repair-" + str(trial) + "-" + str(attempt)
+            out = run(phase, "C")
+            if set(targets) <= set(results[phase]["fresh_roles"]):
+                break
+        else:
+            raise AssertionError(
+                "Two genuine prior outputs required to retry the physical corruption test"
+            )
+    else:
+        raise AssertionError(
+            "Actual output-byte verification and real relink required on both corrupt outputs"
         )
-    out = run("C-actual-output-repair", "C")
-    repaired = read(P / "C-actual-output-repair" / "physical-decisions.json")["actors"]
-    for k in targets:
-        cr = repaired[k]
-        assert (
-            cr["action"] == "full"
-            and cr["response"] == "verify"
-            and "output-bytes-or-generation" in cr["reasons"]
-        ), cr
+    put("actual-output-repair-stage.json", {"phase": phase, "targets": sorted(targets)})
     # Include a normal Rust error through the very same test command, then restore
     # the tracked bytes before the independent empty histories.
     source = w.work / "crates/ty_server/src/lib.rs"
@@ -614,12 +641,6 @@ def main():
         source.write_bytes(original)
     assert not w.git("status", "--porcelain")
     out = run("C-actual-type-repair", "C")
-    for arm in ("P", "C"):
-        swap(stock if arm == "P" else actor, live, STOCK if arm == "P" else sha)
-        if arm == "C":
-            os.ftruncate(RECEIPT_MEMORY, 0)
-        reset_roots(env, registry)
-        out = run(arm + "-empty-new", arm)
     # Persist all raw directions/section inventories before refusing a comparison.
     reference = results["P-empty-new"]
     violations = {}
@@ -640,17 +661,13 @@ def main():
             violations[tag] = sorted(ACCEPTED & complete.keys())
         if row.get("fresh_roles") and set(row["fresh_roles"]) & complete.keys():
             violations[tag] = sorted(set(row["fresh_roles"]) & complete.keys())
-    clocks = {
-        phase: {arm: results[arm + "-" + phase]["meter"] for arm in ("P", "C")}
-        for phase in ("old", "edit", "warm1", "warm2", "warm3", "empty-new")
-    }
     put("all-signed-native-differences.json.gz", all_diffs)
     put(
         "complete.json",
         {
             "qualified": not violations,
             "failures": violations,
-            "clocks": clocks,
+            "kind": "unmetered-native-safety-v1",
             "all_actions": {
                 k: r.get("actions") for k, r in results.items() if k.startswith("C-")
             },

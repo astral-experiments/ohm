@@ -1,5 +1,5 @@
-name: Workspace existing-output research pilot
-run-name: Charge actual Cargo and resolved existing output on signed release ${{ inputs.reviewed_head }}
+name: Unmetered signed -24 workspace native safety
+run-name: Verify actual Cargo native outputs, lookup and repair on signed release ${{ inputs.reviewed_head }}
 permissions:
   contents: read
   actions: read
@@ -7,7 +7,7 @@ jobs:
   inspect:
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1'
       && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head
-      && github.ref_name == 'charlie/qa-wild-workspace-reuse24-29697-20261103'
+      && github.ref_name == 'charlie/qa-wild-workspace-reuse24-safety-29697-20261104'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 120
     steps:
@@ -37,7 +37,7 @@ jobs:
         persist-credentials: false
     - name: Provision the system SHA-256 library
       run: sudo apt-get update -qq && sudo apt-get install -qy strace libssl-dev elfutils
-    - name: Run signed and source histories, charged native writes, unchanged, invalid, repair and empty NEW
+    - name: Run underlying Cargo directly, twice on genuine OLD to NEW, with independent empty NEW and native controls
       env:
         ENROLLED_RELEASE: ${{ inputs.release }}
         REVIEWED_HEAD: ${{ inputs.reviewed_head }}
