@@ -31,10 +31,15 @@ for kind in ("qualification","sdk"):
     assert not m["expired"] and m["digest"]=="sha256:"+digest and m["workflow_run"]["head_sha"]==c["qa"]
     assert m["workflow_run"]["id"]==c["run"]
     if kind=="qualification":
-        assert m["size_in_bytes"]<1024*1024
+        # The archive also carries the three independently runnable native guards.
+        assert 0 < m["size_in_bytes"] < 4*1024*1024
         raw=call(f"artifacts/{ident}/zip","--allow-escape-sequences")
         assert len(raw)==m["size_in_bytes"] and hashlib.sha256(raw).hexdigest()==digest
         with ZipFile(io.BytesIO(raw))as z:
+            assert len(z.namelist()) == len(set(z.namelist()))
+            assert sum(i.file_size for i in z.infolist()) < 32*1024*1024
+            assert all(z.getinfo(name).file_size < 64*1024 for name in (
+                "source.json", "sdk.json", "training.json", "sdk-sha256", "bootstrap.toml"))
             assert z.testzip() is None
             src=json.loads(z.read("source.json"));sdk=json.loads(z.read("sdk.json"));trained=json.loads(z.read("training.json"))
             assert src["role"]==arm["factory_role"] and src["source"]==arm["source"] and src["tree"]==arm["tree"]
