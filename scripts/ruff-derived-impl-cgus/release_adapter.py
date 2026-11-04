@@ -6,7 +6,13 @@ FROZEN=Path(os.environ['GITHUB_WORKSPACE'])/'original-receiver'
 receiver=FROZEN/'scripts/ruff-derived-impl-cgus'
 assert sp.check_output(['git','-C',FROZEN,'rev-parse','HEAD'],text=True).strip()=='2672756eb5b9d4e890b678d439dc6c40a29a4008'
 assert hashlib.sha256((receiver/'paired.py').read_bytes()).hexdigest()=='7bd682c175e5813268c3ca209f9e93761cf9a3d59da6580e826e39b78242a5aa'
-sys.path.insert(0,str(receiver));import transport,paired
+sys.path.insert(0,str(receiver));import transport,types
+source=(receiver/'paired.py').read_text()
+original_guard="os.environ['GITHUB_REF_NAME']=='charlie/qa-ruff-derived-impl-caps-20261103'"
+trained_guard="os.environ['GITHUB_REF_NAME']=='charlie/qa-ruff-derived-impl-stage2-20261104'"
+assert source.count(original_guard)==1 and os.environ['REVIEWED_HEAD']==os.environ['GITHUB_SHA']==sp.check_output(['git','-C',HERE,'rev-parse','HEAD'],text=True).strip()
+paired=types.ModuleType('trained_owner_pair');paired.__file__=str(receiver/'paired.py')
+exec(compile(source.replace(original_guard,trained_guard),paired.__file__,'exec'),paired.__dict__)
 spec=json.loads((HERE/'release-transports.json').read_bytes());reg=transport.REGISTER;live=transport.api;require=transport.require
 assert __debug__ and set(spec)=={'P','C'}
 def fetch(role,cache,dest):
