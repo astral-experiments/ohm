@@ -216,6 +216,11 @@ def visit(role,mode,label,commit,trace=False,invalid_at=None):
         put(at/"storage.json",triplet.storage({"target":target,"shared":shared}))
     rec={"commit":commit,"command":args,"dirty":sorted(a["target"]["name"] for a in artifacts if not a["fresh"]),
          "hardware":hw(at/"hardware.json"),"wall_ns":elapsed,"generated":generated,"product_sha256":sha(lib),"unit_count":len(artifacts)}
+    copy = proof/"products"/(rec["product_sha256"] + lib.suffix)
+    copy.parent.mkdir(exist_ok=True)
+    if not copy.exists():
+        shutil.copyfile(lib,copy)
+    assert sha(copy)==rec["product_sha256"]
     if mode=="build":rec.update(native=reader(at,artifacts,lib,commit),members=object_payloads(lib))
     if trace:rec["lifetime"]=lifetimes(tasks)
     put(at/"result.json",rec)

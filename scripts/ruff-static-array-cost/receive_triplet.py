@@ -10,6 +10,7 @@ from zipfile import ZipFile
 kit = Path(__file__).resolve().parent
 sys.path.insert(0, str(kit))
 import triplet
+import product
 
 def sha(path):
     with path.open("rb") as f:
@@ -80,6 +81,7 @@ def open_job(z, role_reg, trans, fixture, host, native_witness):
         assert {"file_sha256":checksum(data),**triplet.census(data)} == frozen_tables[state]
         assert checksum(data) == fixture[state+"_generated"]["generated_phf.rs"]
     records, stores, native = {}, {}, {}
+    retained = {}
     bootstraps = set()
     for arm in triplet.ARMS:
         before = f"sdk-{arm}/"
@@ -136,13 +138,24 @@ def open_job(z, role_reg, trans, fixture, host, native_witness):
                 if phase in ("ordinary-edit","unchanged","empty-new"):
                     snapshots[phase] = disk(read(at+"/storage.json"))
                 products[phase] = result["product_sha256"]
+                artifact = "products/" + products[phase] + (".rlib" if mode=="build" else ".rmeta")
+                if artifact not in retained:
+                    raw = z.read(artifact)
+                    assert checksum(raw) == products[phase]
+                    if mode == "build":
+                        retained[artifact] = product.rlib(raw)
+                    else:
+                        assert raw.startswith(b"rust\0")
+                        retained[artifact] = None
                 if mode == "build":
+                    members, symbols, canonical_archive = retained[artifact]
+                    assert members == result["members"] and symbols
                     elf = z.read(at+"/reader")
                     stream = z.read(at+"/native.bin")
                     assert len(stream) == fixture["native_bytes"] and checksum(stream) == fixture[state+"_stdout"]
                     assert elf.startswith(b"\x7fELF") and {"elf":checksum(elf),"stdout":checksum(stream)} == result["native"]
                     native_witness(elf,stream)
-                    bodies[phase] = (result["native"],result["members"]["verified_renames"])
+                    bodies[phase] = (result["native"],result["members"]["verified_renames"],canonical_archive)
             if mode == "check":
                 assert len({v for k,v in products.items() if k!="cold-old"}) == 1
             else:
@@ -162,7 +175,9 @@ def open_job(z, role_reg, trans, fixture, host, native_witness):
             assert all(v == totals[arm][mode][k] for k,v in fields.items())
             records[arm][mode], stores[arm][mode] = fields,snapshots
     assert len(bootstraps) == 1
-    return {"boot":host["boot"],"order":host["order"],"results":records,"storage":stores,"native":native}
+    assert set(retained) == {n for n in z.namelist() if n.startswith("products/") and not n.endswith("/")}
+    return {"boot":host["boot"],"order":host["order"],"results":records,"storage":stores,"native":native,
+            "cargo_products":{n: None if v is None else {"index":v[1],"whole_verified_renames":v[2]} for n,v in retained.items()}}
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
