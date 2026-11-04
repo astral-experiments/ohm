@@ -1,0 +1,294 @@
+{
+  "decision": {
+    "admit_six": true,
+    "common_regressions": [],
+    "controls": {
+      "build-cold": [
+        [
+          43482226032,
+          43159859440,
+          0.00741375549087022
+        ],
+        [
+          43481643731,
+          43176009147,
+          0.007029048531164417
+        ]
+      ],
+      "build-empty": [
+        [
+          30252206415,
+          29954213767,
+          0.009850278155323106
+        ],
+        [
+          30268578102,
+          29933619520,
+          0.011066214635892248
+        ]
+      ],
+      "build-empty_target_rustc": [
+        [
+          6448717916,
+          6141048695,
+          0.04771013789215959
+        ],
+        [
+          6448040805,
+          6139688920,
+          0.04782101948872515
+        ]
+      ],
+      "build-target_rustc": [
+        [
+          6450278585,
+          6143404667,
+          0.04757529678076687
+        ],
+        [
+          6449732108,
+          6141271361,
+          0.0478253579892717
+        ]
+      ],
+      "build-unchanged": [
+        [
+          128203758,
+          128196435,
+          5.712001047582396e-05
+        ],
+        [
+          128211498,
+          128206512,
+          3.888886782993519e-05
+        ]
+      ],
+      "build-whole_edit": [
+        [
+          27805469282,
+          27473915792,
+          0.011924038635615933
+        ],
+        [
+          27787121298,
+          27466457385,
+          0.01154001918950417
+        ]
+      ],
+      "check-cold": [
+        [
+          42420080633,
+          42123958302,
+          0.006980711176905132
+        ],
+        [
+          42437164677,
+          42113440213,
+          0.007628324523185015
+        ]
+      ],
+      "check-empty": [
+        [
+          29206429910,
+          28918993453,
+          0.009841547148547057
+        ],
+        [
+          29198715566,
+          28900453621,
+          0.010214899498774754
+        ]
+      ],
+      "check-empty_target_rustc": [
+        [
+          5774467631,
+          5467396845,
+          0.05317733263435449
+        ],
+        [
+          5775243378,
+          5467056907,
+          0.05336337377122395
+        ]
+      ],
+      "check-target_rustc": [
+        [
+          5775727206,
+          5467109514,
+          0.05343356446602925
+        ],
+        [
+          5776526622,
+          5466948704,
+          0.05359239872988159
+        ]
+      ],
+      "check-unchanged": [
+        [
+          125932201,
+          125935427,
+          -2.561695876339047e-05
+        ],
+        [
+          126018501,
+          126058617,
+          -0.00031833421030773887
+        ]
+      ],
+      "check-whole_edit": [
+        [
+          27159600377,
+          26836559829,
+          0.011894156891703223
+        ],
+        [
+          27147069402,
+          26836070003,
+          0.01145609474063848
+        ]
+      ]
+    },
+    "criterion": "Retired user-mode instructions of the entire physical unicode_names2 rustc in edited cargo check -p ruff_unicode_names2 --lib. Require >=5% saving in both independent opposite-order pilots before enrolling six fresh boots. In confirmation, all six favorable and median >=5%, exact two-sided sign p=0.03125. Retain all whole-command, selected compiler, cold OLD, ordinary edited, settled, empty NEW, independently observed edited and empty histories for build and check. Withhold for a consistent cold or settled regression exceeding both 5 percent and 10 million instructions. The parent already uses bulk MIR lowering. Both factory roles must independently demonstrate four packed test arrays.",
+    "median": 0.05351298159795542,
+    "primary": [
+      [
+        5775727206,
+        5467109514,
+        0.05343356446602925
+      ],
+      [
+        5776526622,
+        5466948704,
+        0.05359239872988159
+      ]
+    ]
+  },
+  "head": "eee67d2c8fd0ce34380009a1e570b6a723c450b9",
+  "hosts": {
+    "rand-CP": {
+      "artifact": 13285601016,
+      "boot": "6e6565a7-3c35-4b8b-b0c0-64a2ae047536",
+      "job": 126303400105,
+      "records": {
+        "C": {
+          "build": {
+            "all_products_checked": true,
+            "cold": 43159859440,
+            "empty": 29954213767,
+            "empty_target_rustc": 6141048695,
+            "observed_whole": 27475938178,
+            "target_rustc": 6143404667,
+            "unchanged": 128196435,
+            "whole_edit": 27473915792,
+            "whole_native": {
+              "elf": "11ccc547d9d0bdad993068daf46ed1363336f107d61f811ad6a740ec99675983",
+              "stdout": "ca6795662dd8a18dbcbb84d7a510d56197955a3856493c1685dde266c3022862"
+            }
+          },
+          "check": {
+            "all_products_checked": true,
+            "cold": 42123958302,
+            "empty": 28918993453,
+            "empty_target_rustc": 5467396845,
+            "observed_whole": 26836260845,
+            "target_rustc": 5467109514,
+            "unchanged": 125935427,
+            "whole_edit": 26836559829,
+            "whole_native": null
+          }
+        },
+        "P": {
+          "build": {
+            "all_products_checked": true,
+            "cold": 43482226032,
+            "empty": 30252206415,
+            "empty_target_rustc": 6448717916,
+            "observed_whole": 27784547119,
+            "target_rustc": 6450278585,
+            "unchanged": 128203758,
+            "whole_edit": 27805469282,
+            "whole_native": {
+              "elf": "08a30a2837c28c1171af3d4daab6a0c3dd0a4cd6a0bb5e675102cabcaf822ad8",
+              "stdout": "ca6795662dd8a18dbcbb84d7a510d56197955a3856493c1685dde266c3022862"
+            }
+          },
+          "check": {
+            "all_products_checked": true,
+            "cold": 42420080633,
+            "empty": 29206429910,
+            "empty_target_rustc": 5774467631,
+            "observed_whole": 27151045301,
+            "target_rustc": 5775727206,
+            "unchanged": 125932201,
+            "whole_edit": 27159600377,
+            "whole_native": null
+          }
+        }
+      },
+      "zip": "a379dce0547c46f0c989bd42049dcece3a2d0a35e00563232e5f1dff13d5d1ed"
+    },
+    "rand-PC": {
+      "artifact": 13284832668,
+      "boot": "4db8c15c-476c-45f2-8ed7-c29a071ac46a",
+      "job": 126303400529,
+      "records": {
+        "C": {
+          "build": {
+            "all_products_checked": true,
+            "cold": 43176009147,
+            "empty": 29933619520,
+            "empty_target_rustc": 6139688920,
+            "observed_whole": 27478137782,
+            "target_rustc": 6141271361,
+            "unchanged": 128206512,
+            "whole_edit": 27466457385,
+            "whole_native": {
+              "elf": "11ccc547d9d0bdad993068daf46ed1363336f107d61f811ad6a740ec99675983",
+              "stdout": "ca6795662dd8a18dbcbb84d7a510d56197955a3856493c1685dde266c3022862"
+            }
+          },
+          "check": {
+            "all_products_checked": true,
+            "cold": 42113440213,
+            "empty": 28900453621,
+            "empty_target_rustc": 5467056907,
+            "observed_whole": 26838057646,
+            "target_rustc": 5466948704,
+            "unchanged": 126058617,
+            "whole_edit": 26836070003,
+            "whole_native": null
+          }
+        },
+        "P": {
+          "build": {
+            "all_products_checked": true,
+            "cold": 43481643731,
+            "empty": 30268578102,
+            "empty_target_rustc": 6448040805,
+            "observed_whole": 27775816144,
+            "target_rustc": 6449732108,
+            "unchanged": 128211498,
+            "whole_edit": 27787121298,
+            "whole_native": {
+              "elf": "08a30a2837c28c1171af3d4daab6a0c3dd0a4cd6a0bb5e675102cabcaf822ad8",
+              "stdout": "ca6795662dd8a18dbcbb84d7a510d56197955a3856493c1685dde266c3022862"
+            }
+          },
+          "check": {
+            "all_products_checked": true,
+            "cold": 42437164677,
+            "empty": 29198715566,
+            "empty_target_rustc": 5775243378,
+            "observed_whole": 27146357900,
+            "target_rustc": 5776526622,
+            "unchanged": 126018501,
+            "whole_edit": 27147069402,
+            "whole_native": null
+          }
+        }
+      },
+      "zip": "c0d3378a51924684e2faf2f03ddae52e2ae6e073c5e82e839cce741e5c8c99e9"
+    }
+  },
+  "run": 41747290958
+}

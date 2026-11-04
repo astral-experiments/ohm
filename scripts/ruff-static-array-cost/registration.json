@@ -610,14 +610,124 @@
   "new": "bfedc614b7670b8766576b64afd426c292f8c2ce",
   "old": "523d83c941cbae9b7c8a10739c839a8eeda3245d",
   "orders": {
-    "CP": [
+    "B1": [
       "C",
       "P"
     ],
-    "PC": [
+    "B2": [
+      "P",
+      "C"
+    ],
+    "B3": [
+      "P",
+      "C"
+    ],
+    "B4": [
+      "C",
+      "P"
+    ],
+    "B5": [
+      "C",
+      "P"
+    ],
+    "B6": [
       "P",
       "C"
     ]
+  },
+  "ordinary_ast": {
+    "C": {
+      "cold_inventory": [
+        "aho_corasick",
+        "arrayvec",
+        "bitflags",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "castaway",
+        "cfg_if",
+        "char_str",
+        "compact_str",
+        "either",
+        "heck",
+        "is_macro",
+        "itertools",
+        "itoa",
+        "memchr",
+        "proc_macro2",
+        "quote",
+        "ruff_python_ast",
+        "ruff_python_trivia",
+        "ruff_source_file",
+        "ruff_text_size",
+        "rustc_hash",
+        "rustversion",
+        "ryu",
+        "static_assertions",
+        "syn",
+        "syn",
+        "thin_vec",
+        "thiserror",
+        "thiserror_impl",
+        "tinyvec",
+        "tinyvec_macros",
+        "unicode_ident",
+        "unicode_ident",
+        "unicode_normalization",
+        "zmij"
+      ],
+      "local_metadata": "b5569a10c6661b35550ffd6984c6387ea417077b5bc237ef50aa50b991d405a1"
+    },
+    "P": {
+      "cold_inventory": [
+        "aho_corasick",
+        "arrayvec",
+        "bitflags",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "build-script-build",
+        "castaway",
+        "cfg_if",
+        "char_str",
+        "compact_str",
+        "either",
+        "heck",
+        "is_macro",
+        "itertools",
+        "itoa",
+        "memchr",
+        "proc_macro2",
+        "quote",
+        "ruff_python_ast",
+        "ruff_python_trivia",
+        "ruff_source_file",
+        "ruff_text_size",
+        "rustc_hash",
+        "rustversion",
+        "ryu",
+        "static_assertions",
+        "syn",
+        "syn",
+        "thin_vec",
+        "thiserror",
+        "thiserror_impl",
+        "tinyvec",
+        "tinyvec_macros",
+        "unicode_ident",
+        "unicode_ident",
+        "unicode_normalization",
+        "zmij"
+      ],
+      "local_metadata": "b32b8a3d88aa8e4a47d721b1c92716abe0157a4e1da24d42a59afcec995eaa0b"
+    },
+    "crate": "ruff_python_ast",
+    "requirements": "All 39 cold and zero settled units, matching check metadata within arm. Measure each full ordinary Cargo process tree on the same six fresh boots. Withhold promotion for a consistent regression on all hosts exceeding both 2 percent and 10 million instructions per command.",
+    "source": "bfedc614b7670b8766576b64afd426c292f8c2ce",
+    "units": 39
   },
   "parent": "6c2874a0b6a0bf3570f8959733b6f87907e5cce6",
   "parent_tree": "1a86c989ac19e14b8bc53ec8a92be4feafef5a9f",
@@ -635,6 +745,11 @@
     "crates/ruff_unicode_names2_generator/src/lib.rs",
     "crates/ruff_unicode_names2_generator/src/phf.rs"
   ],
+  "pilot": {
+    "head": "eee67d2c8fd0ce34380009a1e570b6a723c450b9",
+    "readback_sha256": "188adfb203b61fa0867ca9dfe59a64b1bc4d7309d74c2fca2e9a48d2fa0b1064",
+    "run": 41747290958
+  },
   "primary": "Retired user-mode instructions of the entire physical unicode_names2 rustc in edited cargo check -p ruff_unicode_names2 --lib. Require >=5% saving in both independent opposite-order pilots before enrolling six fresh boots. In confirmation, all six favorable and median >=5%, exact two-sided sign p=0.03125.",
   "prior_observations": "The parent is the already-measured bulk lowering from #353. No hardware pilot using the new uniform-type compiler has run. Both compilers passed the ordinary historical edit and empty native controls before dispatch.",
   "release_members": {
@@ -651,6 +766,9 @@
   },
   "secondary": "normal full cargo check/build, full build rustc, cold state and settled",
   "sources": {
+    "ast_control.py": {
+      "sha256": "c30c4cc52fbbd8f77b772ce98630d136a1a1640e4b455739ae334d816946d093"
+    },
     "calibrate.c": {
       "commit": "d40f789799162a7e58bd96826a5f9caa3bdc008d",
       "file": "scripts/rc24-insta-input-proof/calibrate.c",
@@ -667,6 +785,9 @@
     },
     "uniform-native-preprice.json": {
       "sha256": "dd764d3b5f28ff1409a95917b250dc86d514075942f7fe591184336ee45d3126"
+    },
+    "uniform-pilot.json": {
+      "sha256": "188adfb203b61fa0867ca9dfe59a64b1bc4d7309d74c2fca2e9a48d2fa0b1064"
     },
     "whole_count.c": {
       "commit": "e48abf3b09f415b296d0ee2e8ec81c0de7b50611",

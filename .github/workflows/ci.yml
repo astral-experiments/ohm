@@ -14,9 +14,17 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - block: PC
+        - block: B1
           fixture: rand
-        - block: CP
+        - block: B2
+          fixture: rand
+        - block: B3
+          fixture: rand
+        - block: B4
+          fixture: rand
+        - block: B5
+          fixture: rand
+        - block: B6
           fixture: rand
     steps:
     - name: Read this immutable measurement
@@ -39,7 +47,9 @@ jobs:
         PRICE_BLOCK: ${{ matrix.block }}
         ARRAY_CASE: ${{ matrix.fixture }}
         GH_TOKEN: ${{ github.token }}
-      run: python3 -IB qa/scripts/ruff-static-array-cost/price.py
+      run: |
+        python3 -IB qa/scripts/ruff-static-array-cost/price.py
+        python3 -IB qa/scripts/ruff-static-array-cost/ast_control.py
     - name: Preserve the original counters, inventories and refusals
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
