@@ -83,6 +83,11 @@ the linter's own code.
 In a release benchmark, we changed a dependency, then rebuilt and ran a uv test. The median time for
 the command fell from 26.27 to 3.79 seconds.
 
+On x86-64, older versions of `portable-atomic` use `sete cl` to write a comparison result to a
+register. Ohm 1.99.0-24 recognizes this form. On a Ruff workload using `portable-atomic` 1.11.0,
+an unchanged repeat of `cargo test -p ruff_linter --lib --no-run` went from four compiler calls and
+one linker call to zero of either. Changing the source still compiled and linked the test.
+
 See:
 
 - [Cargo #51](https://github.com/astral-sh/ohm-cargo/pull/51)
@@ -103,6 +108,7 @@ See:
 - [Cargo #330](https://github.com/astral-experiments/ohm-cargo/pull/330)
 - [Cargo #382](https://github.com/astral-experiments/ohm-cargo/pull/382)
 - [Cargo #424](https://github.com/astral-experiments/ohm-cargo/pull/424)
+- [Rust #349](https://github.com/astral-experiments/ohm-rust/pull/349)
 
 ### 3. Reuse builds during checks
 
@@ -484,6 +490,13 @@ reuses the lockfile bytes it has just encoded. When a build script needs a list 
 Cargo can recognize a Git index it has already verified. It still walks the working tree, so new
 untracked files are visible.
 
+From 1.99.0-25, Cargo saves checksums of registry source files when it records a successful build.
+If a prerequisite rebuilds, Cargo can verify those files before deciding whether to recompile the
+dependent crate. Older records that lack the checksums require compilation. On a Ruff edit, the
+first unchanged repeat of `cargo test -p ty_project --lib --no-run` went from 53.00 to 12.67 billion
+retired instructions across Cargo and its children. The 144 dependency records grew from 248,440
+to 326,390 bytes.
+
 See:
 
 - [Cargo #66](https://github.com/astral-sh/ohm-cargo/pull/66)
@@ -524,6 +537,7 @@ See:
 - [Cargo #286](https://github.com/astral-experiments/ohm-cargo/pull/286)
 - [Cargo #287](https://github.com/astral-experiments/ohm-cargo/pull/287)
 - [Cargo #288](https://github.com/astral-experiments/ohm-cargo/pull/288)
+- [Cargo #444](https://github.com/astral-experiments/ohm-cargo/pull/444)
 
 ### 16. Cache unchanged ThinLTO objects
 
@@ -561,6 +575,13 @@ When a module changes, Ohm can format or verify just that module if it can deter
 owns it and how the modules connect. Otherwise, it formats the whole crate. Set `OHM_INCREMENTAL_FMT=0`
 to disable the cache.
 
+Ohm 1.99.0-25 runs rustfmt each time the command names a file, so replacing a symlink formats its
+new target and deleting it produces the usual error. Cargo also accounts for options that take
+values when it recognizes `--check`. Replacing the formatter invalidates its cached results, even
+when the replacement has the same size and modification time. If a changed-module list is too long
+for the operating system to pass to rustfmt, Cargo formats the whole target with the original
+options.
+
 Ohm also reduces filesystem and parsing work during formatting. For example, on Linux it can resolve
 eligible paths with a single filesystem lookup, and it can skip scanning for comments when the text
 contains no `/` character.
@@ -585,6 +606,11 @@ See:
 - [rustfmt #32](https://github.com/astral-sh/ohm-rustfmt/pull/32)
 - [rustfmt #33](https://github.com/astral-sh/ohm-rustfmt/pull/33)
 - [rustfmt #34](https://github.com/astral-sh/ohm-rustfmt/pull/34)
+- [rustfmt #57](https://github.com/astral-experiments/ohm-rustfmt/pull/57)
+- [rustfmt #60](https://github.com/astral-experiments/ohm-rustfmt/pull/60)
+- [rustfmt #61](https://github.com/astral-experiments/ohm-rustfmt/pull/61)
+- [rustfmt #63](https://github.com/astral-experiments/ohm-rustfmt/pull/63)
+- [rustfmt #65](https://github.com/astral-experiments/ohm-rustfmt/pull/65)
 
 ## Rust compiler
 
@@ -639,6 +665,12 @@ The compiler groups generated code into units that it can compile separately. Oh
 groups stable across edits and reuses compatible decisions about where generic code belongs. It also
 retains cached query results from those decisions so they can be reused after a later edit. This can
 increase the size of the query cache; set `OHM_RETAIN_MONO_QUERY_VALUES=0` to disable the retention.
+
+Starting in 1.99.0-24, rustc tracks which crate provides each group of generic instantiations.
+For example, moving the provider of `width::<u16>` can rebuild its callers while reusing compiled
+code for callers of `width::<u8>`. After a Ruff edit to `ty_project`, this saved 56% of instructions
+compiling `ty_ide` and 60% building the `ty_server` end-to-end test. Each workload retained about
+12 MB more on disk.
 
 For incremental builds at optimization levels 0 and 1, Ohm can split large codegen units into
 smaller stable groups. A later edit may then need to recompile only one group. Splitting can
@@ -695,6 +727,7 @@ See:
 - [Rust #207](https://github.com/astral-sh/ohm-rust/pull/207)
 - [Rust #280](https://github.com/astral-experiments/ohm-rust/pull/280)
 - [Rust #300](https://github.com/astral-experiments/ohm-rust/pull/300)
+- [Rust #329](https://github.com/astral-experiments/ohm-rust/pull/329)
 
 ### 21. Reuse async code after it moves
 
@@ -767,6 +800,18 @@ caches, reduced total rebuild time across 13 uv development commits from 478.19 
 or 6.5%. Focused Ruff measurements of the query-cache change saved about 36 MiB during a check and
 114 MiB during a build, with no consistent wall-time improvement.
 
+Rustc also avoids repeated work on large literals. Since 1.99.0-24 it fingerprints each distinct
+byte literal of at least 64 KiB once and reuses the fingerprint when hashing MIR. After an update
+to Ruff's bundled typeshed, checking `ty_vendored` used 8.27% fewer instructions.
+
+In 1.99.0-25, rustc can lower a table with at least 1,024 literal rows to a single MIR constant.
+It handles eligible arrays of integers, characters, and padding-free tuples in immutable statics
+and ordinary non-generic constants. It checks the values and uses the target's layout. On a Ruff
+Unicode table edit, the complete check used 7.79% fewer instructions across six Linux machines
+with release-optimized compilers. In a separate stage-1 comparison against the integer-array
+change alone, support for character and tuple tables saved 2.75% of instructions on a Ruff parser
+check.
+
 See:
 
 - [Rust #72](https://github.com/astral-sh/ohm-rust/pull/72)
@@ -786,6 +831,9 @@ See:
 - [Rust #251](https://github.com/astral-sh/ohm-rust/pull/251)
 - [Rust #296](https://github.com/astral-experiments/ohm-rust/pull/296)
 - [Rust #306](https://github.com/astral-experiments/ohm-rust/pull/306)
+- [Rust #348](https://github.com/astral-experiments/ohm-rust/pull/348)
+- [Rust #353](https://github.com/astral-experiments/ohm-rust/pull/353)
+- [Rust #355](https://github.com/astral-experiments/ohm-rust/pull/355)
 
 ### 23. Reduce allocator page-clearing work
 
@@ -838,9 +886,17 @@ The macro still runs and can observe the new location, but Ohm can reuse checks 
 generated methods. Ohm does not cache native derive or attribute macro expansions. Cargo's trust
 settings for sharing compiled macros across worktrees control a separate cache.
 
+The backend can also avoid sending unrelated derived methods through LLVM again. In 1.99.0-25,
+when there are spare codegen units, rustc groups substantial derived methods by receiver type within
+the crate's existing budget. Editing the help for Ruff's `GlobalConfigArgs` can then leave
+`CheckCommand` and `FormatCommand` compiled. That edit used 39.57% fewer instructions for the full
+Ruff build in one pair of release-optimized Linux runs. The cold build used 0.13% more instructions
+and retained 1.79 MiB more build output.
+
 See:
 
 - [Rust #278](https://github.com/astral-experiments/ohm-rust/pull/278)
+- [Rust #354](https://github.com/astral-experiments/ohm-rust/pull/354)
 
 ## Clippy
 
@@ -911,6 +967,11 @@ cache.
 Libraries with `compile_fail` examples, custom rustdoc flags, or unsupported test arguments use
 ordinary rustdoc. Pass `-Zohm-cached-doctests=no` to run eligible examples through rustdoc as well.
 
+From 1.99.0-25, a configured target runner or a custom rustdoc gets the normal doctest invocation.
+With the bundled rustdoc, Cargo compiles cached examples using rustdoc's own compiler. This lets a
+workspace wrapper change the library's configuration while examples still see the same configuration
+they would receive from rustdoc.
+
 In a Ruff benchmark, the median warm `cargo test --doc` took 13.56 seconds with stock Rust and
 1.64 seconds with Ohm.
 
@@ -918,3 +979,6 @@ See:
 
 - [Cargo #429](https://github.com/astral-experiments/ohm-cargo/pull/429)
 - [Ohm #254](https://github.com/astral-experiments/ohm/pull/254)
+- [Cargo #443](https://github.com/astral-experiments/ohm-cargo/pull/443)
+- [Cargo #446](https://github.com/astral-experiments/ohm-cargo/pull/446)
+- [Cargo #448](https://github.com/astral-experiments/ohm-cargo/pull/448)
