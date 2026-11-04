@@ -1,5 +1,7 @@
 # Ruff parser test-build instructions
 
+The six independent confirmations saved 5.555% at the paired median. The permanent packet includes the original native programs and an offline replay. [Results and raw evidence](evidence/RESULTS.md)
+
 This secondary Rust #353 study uses Ruff #29261, which changes both the Unicode data generator and its locked RNG dependencies. The primary outcome is the full `cargo +ohm test -p ruff_python_parser --lib --no-run --locked --offline` OLD-to-NEW command. Linux's inherited user-instruction counter covers Cargo, rustc, the linkers and their children. Cargo emits JSON messages. Listing and running the genuine parser test happen after the counter stops.
 
 Each block uses an independent machine boot and both fully authenticated stage1 SDKs. The historical Rust sources are `f5a51d8c` and `6c2874a0`, with common released Ohm Cargo `abc70d60`. The original receiver, hardware calibration, 502 archives and Ruff transition come from packaging `2730f118`. Every role runs a cold OLD, real edit, settled NEW, the overflow twice, repair and an independently empty NEW. A copy of that role's OLD state supports one separate physical compiler/linker census. Each successful physical ELF is stored by full SHA-256. The verifier executes the retained ELF, checks all 246 names and runs one exact lexer test. Each role's edited, settled, repaired and independent empty ELF must match byte for byte. The table generator and physical artifact roster must match the prior two unpriced rehearsals.
