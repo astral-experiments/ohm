@@ -1,0 +1,434 @@
+{
+  "assays": [
+    "config::lint_select",
+    "config::lint_select_json",
+    "integration_test::stdin_success"
+  ],
+  "eligibility": {
+    "build": {
+      "local_units": [
+        {
+          "direct_dependencies": 51,
+          "target": [
+            "ruff",
+            "build",
+            [
+              "lib"
+            ],
+            "src/lib.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "5176bdc9b9672fb484e004c1751ea86f6e20152e2299e90e16717f9fe2065a59"
+        },
+        {
+          "direct_dependencies": 52,
+          "target": [
+            "ruff",
+            "build",
+            [
+              "bin"
+            ],
+            "src/main.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "af16c97d21a08d12f01d1aa84f8e16bf99fcd852df45b64d1ac516a582b77afb"
+        },
+        {
+          "direct_dependencies": 0,
+          "target": [
+            "build-script-build",
+            "build",
+            [
+              "custom-build"
+            ],
+            "build.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "41095f5df106f289d97399df99c7edd8aacac7b0932788f0c7a70576973d6f85"
+        },
+        {
+          "direct_dependencies": 1,
+          "target": [
+            "build-script-build",
+            "run-custom-build",
+            [
+              "custom-build"
+            ],
+            "build.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "ff92d7a3a72407a7a22d10d43139e4bb93ede60ae2327f57c0b673db265a6902"
+        }
+      ],
+      "roots": [
+        [
+          "ruff",
+          "build",
+          [
+            "bin"
+          ],
+          "src/main.rs"
+        ]
+      ],
+      "source_graph_sha256": "7cdc38f5b8c47554b6a011820a5cff2ce1db26c7d4dbdb7c4b4721b8e4cd0b5b",
+      "units": 412
+    },
+    "config": {
+      "local_units": [
+        {
+          "direct_dependencies": 51,
+          "target": [
+            "ruff",
+            "build",
+            [
+              "lib"
+            ],
+            "src/lib.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "c1193102f53c921f9907c653c3d8b9ff7f82bbeef40cd15fdce814d77d7d2420"
+        },
+        {
+          "direct_dependencies": 52,
+          "target": [
+            "ruff",
+            "build",
+            [
+              "bin"
+            ],
+            "src/main.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "53140b2ccb49567286693fedb165da3a260609b4e1185a483a7bda02dc679176"
+        },
+        {
+          "direct_dependencies": 60,
+          "target": [
+            "config",
+            "test",
+            [
+              "test"
+            ],
+            "tests/config.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "88dd3e784e0845964e20695e5bb5e11fa56d503853638edd08a0370876c2bb11"
+        },
+        {
+          "direct_dependencies": 0,
+          "target": [
+            "build-script-build",
+            "build",
+            [
+              "custom-build"
+            ],
+            "build.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "41095f5df106f289d97399df99c7edd8aacac7b0932788f0c7a70576973d6f85"
+        },
+        {
+          "direct_dependencies": 1,
+          "target": [
+            "build-script-build",
+            "run-custom-build",
+            [
+              "custom-build"
+            ],
+            "build.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "ff92d7a3a72407a7a22d10d43139e4bb93ede60ae2327f57c0b673db265a6902"
+        }
+      ],
+      "roots": [
+        [
+          "config",
+          "test",
+          [
+            "test"
+          ],
+          "tests/config.rs"
+        ]
+      ],
+      "source_graph_sha256": "83f55197625426991a7ab98e43ef01054dce99e0c5e54fb9abee60a01e97e2a6",
+      "units": 427
+    },
+    "full": {
+      "local_units": [
+        {
+          "direct_dependencies": 58,
+          "target": [
+            "ruff",
+            "test",
+            [
+              "lib"
+            ],
+            "src/lib.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "5f70158a42829239d5aa640cebe7ef9d1ddcab2320638306c799bdb439a84dc7"
+        },
+        {
+          "direct_dependencies": 51,
+          "target": [
+            "ruff",
+            "build",
+            [
+              "lib"
+            ],
+            "src/lib.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "c1193102f53c921f9907c653c3d8b9ff7f82bbeef40cd15fdce814d77d7d2420"
+        },
+        {
+          "direct_dependencies": 59,
+          "target": [
+            "ruff",
+            "test",
+            [
+              "bin"
+            ],
+            "src/main.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "84706b5fddd0ca9817442671780026177ecaf52338df12610fe0c0d9f56205d5"
+        },
+        {
+          "direct_dependencies": 52,
+          "target": [
+            "ruff",
+            "build",
+            [
+              "bin"
+            ],
+            "src/main.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "53140b2ccb49567286693fedb165da3a260609b4e1185a483a7bda02dc679176"
+        },
+        {
+          "direct_dependencies": 60,
+          "target": [
+            "analyze_graph",
+            "test",
+            [
+              "test"
+            ],
+            "tests/analyze_graph.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "1aad12b2adfab8f2d0c696905713daec53629547a710d966522e938c0c53a41c"
+        },
+        {
+          "direct_dependencies": 60,
+          "target": [
+            "cli",
+            "test",
+            [
+              "test"
+            ],
+            "tests/cli/main.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "981acb9ace157b60ef2c96842b01e8a5a1b325e266835b8a1d77fc5c6e1dd084"
+        },
+        {
+          "direct_dependencies": 60,
+          "target": [
+            "config",
+            "test",
+            [
+              "test"
+            ],
+            "tests/config.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "88dd3e784e0845964e20695e5bb5e11fa56d503853638edd08a0370876c2bb11"
+        },
+        {
+          "direct_dependencies": 60,
+          "target": [
+            "direxist_guard",
+            "test",
+            [
+              "test"
+            ],
+            "tests/direxist_guard.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "b28d6b04e42de163db42a0db9f1e6ad3797874c2919a14b3c55224180075ebf5"
+        },
+        {
+          "direct_dependencies": 60,
+          "target": [
+            "integration_test",
+            "test",
+            [
+              "test"
+            ],
+            "tests/integration_test.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "5a82ea89e4a947a3064de2f8cdbd76c6588198c5f4db8664bfbd7def8566e0be"
+        },
+        {
+          "direct_dependencies": 60,
+          "target": [
+            "resolve_files",
+            "test",
+            [
+              "test"
+            ],
+            "tests/resolve_files.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "d7a584a228b0a6994992a57647d8126bd92daeea3f0f94d6021b4522e6b4bc73"
+        },
+        {
+          "direct_dependencies": 0,
+          "target": [
+            "build-script-build",
+            "build",
+            [
+              "custom-build"
+            ],
+            "build.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "41095f5df106f289d97399df99c7edd8aacac7b0932788f0c7a70576973d6f85"
+        },
+        {
+          "direct_dependencies": 1,
+          "target": [
+            "build-script-build",
+            "run-custom-build",
+            [
+              "custom-build"
+            ],
+            "build.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "ff92d7a3a72407a7a22d10d43139e4bb93ede60ae2327f57c0b673db265a6902"
+        }
+      ],
+      "roots": [
+        [
+          "ruff",
+          "test",
+          [
+            "lib"
+          ],
+          "src/lib.rs"
+        ],
+        [
+          "ruff",
+          "test",
+          [
+            "bin"
+          ],
+          "src/main.rs"
+        ],
+        [
+          "analyze_graph",
+          "test",
+          [
+            "test"
+          ],
+          "tests/analyze_graph.rs"
+        ],
+        [
+          "cli",
+          "test",
+          [
+            "test"
+          ],
+          "tests/cli/main.rs"
+        ],
+        [
+          "config",
+          "test",
+          [
+            "test"
+          ],
+          "tests/config.rs"
+        ],
+        [
+          "direxist_guard",
+          "test",
+          [
+            "test"
+          ],
+          "tests/direxist_guard.rs"
+        ],
+        [
+          "integration_test",
+          "test",
+          [
+            "test"
+          ],
+          "tests/integration_test.rs"
+        ],
+        [
+          "resolve_files",
+          "test",
+          [
+            "test"
+          ],
+          "tests/resolve_files.rs"
+        ]
+      ],
+      "source_graph_sha256": "9c0cdaf548261f11a041780d42648c19f77383726d8be3d59310129f55164182",
+      "units": 434
+    },
+    "lib": {
+      "local_units": [
+        {
+          "direct_dependencies": 58,
+          "target": [
+            "ruff",
+            "test",
+            [
+              "lib"
+            ],
+            "src/lib.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "5f70158a42829239d5aa640cebe7ef9d1ddcab2320638306c799bdb439a84dc7"
+        },
+        {
+          "direct_dependencies": 0,
+          "target": [
+            "build-script-build",
+            "build",
+            [
+              "custom-build"
+            ],
+            "build.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "41095f5df106f289d97399df99c7edd8aacac7b0932788f0c7a70576973d6f85"
+        },
+        {
+          "direct_dependencies": 1,
+          "target": [
+            "build-script-build",
+            "run-custom-build",
+            [
+              "custom-build"
+            ],
+            "build.rs"
+          ],
+          "transitive_key_ignoring_only_profile_label": "ff92d7a3a72407a7a22d10d43139e4bb93ede60ae2327f57c0b673db265a6902"
+        }
+      ],
+      "roots": [
+        [
+          "ruff",
+          "test",
+          [
+            "lib"
+          ],
+          "src/lib.rs"
+        ]
+      ],
+      "source_graph_sha256": "41b670dad8fc0c06623af3dc1a27a105120e80b17cbfb189be5d0a3222f487bc",
+      "units": 425
+    }
+  },
+  "lock": "fea1c04b2bce37f54c14449e8402528e652f4e5b9fcd366c118c360d439924c8",
+  "order": "PC",
+  "ordinary": [
+    "cargo",
+    "+ohm",
+    "test",
+    "--no-run",
+    "-p",
+    "ruff"
+  ],
+  "resources": "At least 8 GiB available memory and 15 GiB free disk. Two checked disjoint SDKs at the same literal paths. No Rust flags, wrappers, proc-macro or external-tool trust; all Cargo dependency bytes are fetched with --locked before the normal offline commands.",
+  "schema": 1,
+  "selection": "All eight genuine package test roots in the signed native Linux graph. No test execution inside Cargo or the measured window. Primary is the first fully ordinary OLD-to-NEW whole Cargo command. Repeat process costs from an independent OLD history are conditional on native, inventory, and verdict parity. No confidence interval from this one pilot.",
+  "source": [
+    "f3280423f6c535690287e8169c25929f8d6433ce",
+    "d136bd8d002a648de5f344df602e492658306f1e"
+  ]
+}
