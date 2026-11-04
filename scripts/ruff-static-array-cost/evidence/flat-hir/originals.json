@@ -1,0 +1,232 @@
+{
+  "factory": {
+    "C": {
+      "driver": "f3c1a26f42487f2659b9139546aa7e51f7e41173ba0c48b2f711fc4e05d035cf",
+      "job": 126291752743,
+      "job_name": "Compile candidate and run the typed probes",
+      "qa": "c8d1485e16e1b5d86cc9444971016168e4ee64da",
+      "qualification": {
+        "bytes": 2240,
+        "id": 13283572502,
+        "name": "array-qualification-candidate-41743833358",
+        "sha256": "3dd7010da95d200edb02e61317fa4701858b4341d929fd9eeded7ce4c4ec8ace"
+      },
+      "run": 41743833358,
+      "sdk": {
+        "bytes": 466002638,
+        "id": 13284280189,
+        "name": "array-sdk-candidate-41743833358",
+        "sha256": "b9e3bae1d27279dbfdebcfcb9eb57d6fd0ece8968f9053413fa517ff9482ea54"
+      },
+      "tar": "0676cb201c48169d70073731073452db2ba7e8eded8579b656812c0d20b95bf2"
+    },
+    "P": {
+      "driver": "e2d82be3436c6fc5728b53f5c602cf2014fc7a5c7cd9987fbcc1dfe6b1bf2382",
+      "job": 126273629631,
+      "job_name": "Compile candidate and run the typed probes",
+      "qa": "7b89e345605d3ae8a2bf54ba8998c327549e9758",
+      "qualification": {
+        "bytes": 2228,
+        "id": 13279293748,
+        "name": "array-qualification-candidate-41738460962",
+        "sha256": "575d2be989664d761f399792b692343893117ee77901f0c6cf8cc9e3a9c66763"
+      },
+      "run": 41738460962,
+      "sdk": {
+        "bytes": 464730709,
+        "id": 13279803032,
+        "name": "array-sdk-candidate-41738460962",
+        "sha256": "ef9f5d59d0b28781286a19bbf7e558fadf29bbab1894028c344694ad155ab0ee"
+      },
+      "tar": "03eef8a0bb404a3052f0ad4cc2689c5db6ceb27c42d38d0d9a018e45ad694a50"
+    }
+  },
+  "rejected_confirmation_setup": {
+    "artifacts": [
+      {
+        "bytes": 129345,
+        "digest": "sha256:fe24dc37db337212af5caefa7ed52c4790b3790a018f3db5b1bc90da338cd7e3",
+        "id": 13286210027
+      },
+      {
+        "bytes": 78225,
+        "digest": "sha256:e3d5a3f046f7deca11c7a5b0c26d853a36b70d60fa157afa884bb42e9857e6be",
+        "id": 13286110128
+      },
+      {
+        "bytes": 21793312,
+        "digest": "sha256:1519cd7e28e3d53a9fa8aa090336e27a2d1c25f3181caa455500aca83e332218",
+        "id": 13285922821
+      },
+      {
+        "bytes": 21792258,
+        "digest": "sha256:306b91c870e0524ad5ce8bf56547b2e7bf971ce02ec5fb64fba29be81bcbb392",
+        "id": 13285667925
+      },
+      {
+        "bytes": 12543228,
+        "digest": "sha256:891b27c2dfcb39383011f6317e96e417fc1171170b9e1fbe83ff0cb51bb74686",
+        "id": 13284669998
+      },
+      {
+        "bytes": 21792410,
+        "digest": "sha256:d52b29c33c14eb3d6914e6a15ca9a3e0ccc5c5425c62d1bfa628f944db9924e8",
+        "id": 13284329215
+      }
+    ],
+    "conclusion": "cancelled",
+    "error": "ModuleNotFoundError: No module named 'price'",
+    "jobs": [
+      {
+        "conclusion": "failure",
+        "id": 126312253386
+      },
+      {
+        "conclusion": "failure",
+        "id": 126312253724
+      },
+      {
+        "conclusion": "cancelled",
+        "id": 126312253743
+      },
+      {
+        "conclusion": "failure",
+        "id": 126312253758
+      },
+      {
+        "conclusion": "cancelled",
+        "id": 126312253784
+      },
+      {
+        "conclusion": "cancelled",
+        "id": 126312253871
+      }
+    ],
+    "observed_job": 126312253386,
+    "qa": "b867fd274d7dc11f0cac0c359da7065c80a26bcd",
+    "raw_log_sha256": "f5a1b1ed7277f2d3517a3daa6229024bea34eaa4aa7b59fd6f0c5e47da8fbe6e",
+    "run": 41749941054
+  },
+  "studies": {
+    "confirm": {
+      "head": "86b6b33f50284c5ee3ecd67f5fe4894390f93301",
+      "head_branch": "charlie/qa-rc24-uniform-types-price-20261104",
+      "records": [
+        {
+          "artifact": 13286655943,
+          "boot": "1797b514-c7ca-4b43-8901-865e1cd2fa9a",
+          "job": 126314726162,
+          "label": "rand-B1",
+          "order": [
+            "C",
+            "P"
+          ],
+          "original_bytes": 21809095,
+          "original_sha256": "be5ce43666f0571c42dc014d43973f026c603f8dfbfb8358d9b4c36e3d59b636",
+          "runner": "nsc-runner-to5gol7ei31ne"
+        },
+        {
+          "artifact": 13286880393,
+          "boot": "9c2868ca-1fdd-4d83-9e93-0aaa946ca56a",
+          "job": 126314725915,
+          "label": "rand-B2",
+          "order": [
+            "P",
+            "C"
+          ],
+          "original_bytes": 21808728,
+          "original_sha256": "8557ef8d98f844c313795441c42d735be02e38e81609fc0c12996d5fb0fa252d",
+          "runner": "nsc-runner-000976drg05v2"
+        },
+        {
+          "artifact": 13286920991,
+          "boot": "9e99e1d9-c91d-4e0d-aebb-3db11d346aad",
+          "job": 126314725870,
+          "label": "rand-B3",
+          "order": [
+            "P",
+            "C"
+          ],
+          "original_bytes": 21809364,
+          "original_sha256": "85bc658a8232ecfb76be663951453a886e9b6f707bfd018d533a11b814cb7494",
+          "runner": "nsc-runner-gcvvg79lvei80"
+        },
+        {
+          "artifact": 13286506259,
+          "boot": "49d06341-1f1e-418e-bb3f-ecc993bfe813",
+          "job": 126314726278,
+          "label": "rand-B4",
+          "order": [
+            "C",
+            "P"
+          ],
+          "original_bytes": 21808826,
+          "original_sha256": "e3eed4afd5b213a12becac81b034bcac7cbe33c77def9c4ce7dcdcf0debe2046",
+          "runner": "nsc-runner-okak9klt4j4eo"
+        },
+        {
+          "artifact": 13285739370,
+          "boot": "b7eb9594-6e26-4a0a-839e-76cc5da6310d",
+          "job": 126314726030,
+          "label": "rand-B5",
+          "order": [
+            "C",
+            "P"
+          ],
+          "original_bytes": 21808976,
+          "original_sha256": "2eedec49745abb48b4429bdc56080e044e62739637d3b731a52ce10b005b9268",
+          "runner": "nsc-runner-13oca4cvc8h86"
+        },
+        {
+          "artifact": 13286381241,
+          "boot": "269ad91d-5aad-42bb-a139-770f43216eb4",
+          "job": 126314726065,
+          "label": "rand-B6",
+          "order": [
+            "P",
+            "C"
+          ],
+          "original_bytes": 21809369,
+          "original_sha256": "da1bc092e99c357f0190f9e3f4e6957e27892979f89e3a38b486e868e697dd33",
+          "runner": "nsc-runner-9enjfm1vr75iq"
+        }
+      ],
+      "registration_sha256": "600c93c2884ee7cf8161086594915d109c4f5259bde1d4ae397aa05ca3651ae9",
+      "run": 41750680580
+    },
+    "pilot": {
+      "head": "eee67d2c8fd0ce34380009a1e570b6a723c450b9",
+      "head_branch": "charlie/qa-rc24-uniform-types-price-20261104",
+      "records": [
+        {
+          "artifact": 13285601016,
+          "boot": "6e6565a7-3c35-4b8b-b0c0-64a2ae047536",
+          "job": 126303400105,
+          "label": "rand-CP",
+          "order": [
+            "C",
+            "P"
+          ],
+          "original_bytes": 21792541,
+          "original_sha256": "a379dce0547c46f0c989bd42049dcece3a2d0a35e00563232e5f1dff13d5d1ed",
+          "runner": "nsc-runner-oij68lb5f09o8"
+        },
+        {
+          "artifact": 13284832668,
+          "boot": "4db8c15c-476c-45f2-8ed7-c29a071ac46a",
+          "job": 126303400529,
+          "label": "rand-PC",
+          "order": [
+            "P",
+            "C"
+          ],
+          "original_bytes": 21792403,
+          "original_sha256": "c0d3378a51924684e2faf2f03ddae52e2ae6e073c5e82e839cce741e5c8c99e9",
+          "runner": "nsc-runner-h5eobo3pcefvm"
+        }
+      ],
+      "registration_sha256": "02502944ca1593616256db72157b61058a4bc8dbe67c90e3b75b5d3c33bb37b1",
+      "run": 41747290958
+    }
+  }
+}
