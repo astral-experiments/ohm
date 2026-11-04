@@ -1,7 +1,7 @@
 {
-  "bundle": "3d6ef732a77295f760dcf069f7cf7219a9488b8bbd3027bef93f8d5381c7372c",
-  "candidate": "06fe634feaa39288210a6f17b8994346a5fae1c1",
-  "candidate_tree": "2cff5a0eef365de6e4587006859dee9d4092ca87",
+  "bundle": "aed8216390b0dc84e206b512068c28aa94a53c20ae1cb65be994206f6a73ad94",
+  "candidate": "eda9434eda0b4f8519fc2257867ab7c7dd4b59fd",
+  "candidate_tree": "aecb22cbd0b208780ea3e8d68180097065e15502",
   "cargo": "abc70d60a6fd89c10d5f65cf85820d9b78d5affe",
   "compiler_commits": [
     "a60f4f4476d4819b62730e92ea07c1343f8e6dac",
@@ -10,7 +10,8 @@
     "8574afc64801c199c8d090e3e0e013adf6ccd496",
     "6c2874a0b6a0bf3570f8959733b6f87907e5cce6",
     "4a50cf68eb73a73bf8d31a69da54050132513339",
-    "06fe634feaa39288210a6f17b8994346a5fae1c1"
+    "06fe634feaa39288210a6f17b8994346a5fae1c1",
+    "eda9434eda0b4f8519fc2257867ab7c7dd4b59fd"
   ],
   "const_tables": {
     "base": "6c2874a0b6a0bf3570f8959733b6f87907e5cce6",
@@ -31,7 +32,59 @@
   },
   "parent": "f5a51d8cc3e76236c2d0f17d495d59ebb03306e4",
   "parent_tree": "b4f0ad237b667d5227e63b44f6e8d3ba885bf7a1",
+  "parser_batch": {
+    "base_factory": {
+      "driver": "91f205cf52a5fe97d471cab8d47c4638ee1c3be5aa88aa8ad74b0be70fd0c304",
+      "job": 126324738389,
+      "qa": "9bc3cd6994485569c5e87e1a4d7283b782bb79c6",
+      "qualification": [
+        13287551493,
+        "5fd18e5768a81d4eafc94c13ba3e5a6c31a6b9a76a8d5f96fc649d907ec1905d"
+      ],
+      "run": 41753724558,
+      "sdk": [
+        13287670809,
+        "e7cc12e7dcf04e49cd9e1f492539bd6ebf33608aa7ae412e3c5ab10cea17c3ff"
+      ],
+      "tar": "e4022678b12bf27be349d9f6c3598e0f82a79602053a39e310eaf389bba7bf10"
+    },
+    "calibration": {
+      "C7_edited_unicode_width_guest_instructions": 1013681156,
+      "C7_profile_sha256": "6364ed6cf1fc7dcca5f614f0d9a7bee294d4a5fea9a7472199f01a004439fc36",
+      "counter_unit": "Callgrind whole physical unicode-width rustc, single process; separate from any hosted hardware or entire Cargo claim"
+    },
+    "candidate": "eda9434eda0b4f8519fc2257867ab7c7dd4b59fd",
+    "delta": {
+      "compiler/rustc_ast/src/tokenstream.rs": "c2a29b0540dd01858aa5523af1838e5dbbe6e6943784a1b3fa2948a1049c427b",
+      "compiler/rustc_parse/src/parser/expr.rs": "b5cc4b5c804d56aa056a58bde94ad7dac225816f0404e84841a22f83506f13a7",
+      "tests/ui/parser/large-literal-array.rs": "9cb39ac5fc20fcf061f77ab2e786bdfa74aa227778a5d0fd383120879110d988"
+    },
+    "immediate_parent": "06fe634feaa39288210a6f17b8994346a5fae1c1",
+    "qualification": "Require unmodified registry inputs, true ordinary Cargo OLD/edit/settled/empty; exact P/C native visible widths across the historical releases and true syntax/token/span/disabled, continuation, macro and repair controls. Report observed source-matched compiler effect including original C7. No publication or hardware fleet from this factory. 20% whole actual affected rustc remains separate from any smaller measured local result.",
+    "workload": {
+      "command": [
+        "cargo",
+        "+ohm",
+        "check",
+        "-p",
+        "ruff_formatter",
+        "--lib",
+        "--locked",
+        "--offline"
+      ],
+      "edit": "64a255df497bede66fa4cdac80b9464d73a787ba",
+      "expected_edited_owners": [
+        "unicode_width",
+        "ruff_formatter"
+      ],
+      "held_head": "old",
+      "old": "b5305b5f328b03e3ba0ab1ba629dedb5c9f4415e",
+      "ordinary_repeat": [],
+      "trusted_registry_and_locks_sha256": "38576e353371128076178b3df74f4a3772d399bbe11c1a03abbc9e0ed67e2e91"
+    }
+  },
   "paths": [
+    "compiler/rustc_ast/src/tokenstream.rs",
     "compiler/rustc_data_structures/src/unord.rs",
     "compiler/rustc_hir_typeck/src/expr.rs",
     "compiler/rustc_hir_typeck/src/writeback.rs",
@@ -51,7 +104,8 @@
     "compiler/rustc_mir_build/src/thir/print.rs",
     "compiler/rustc_parse/src/parser/expr.rs",
     "compiler/rustc_ty_utils/src/consts.rs",
-    "tests/run-make/static-integer-array-literals/rmake.rs"
+    "tests/run-make/static-integer-array-literals/rmake.rs",
+    "tests/ui/parser/large-literal-array.rs"
   ],
   "priced_parent": {
     "artifact": 13274919319,
@@ -60,7 +114,7 @@
     "tar": "135b203802b810b96301a965e916296d9cea5ad9425ce6f306c07818521072bc",
     "zip": "de89166137076bfa80a1e103006e377a0765605454cae35d69c5d7f728030e60"
   },
-  "ref": "refs/heads/charlie/qa-rc24-pack-const-aggregates-20261104",
+  "ref": "refs/heads/charlie/qa-rc24-literal-table-parse-20261104",
   "release_members": {
     "bin/cargo": {
       "bytes": 39249096,

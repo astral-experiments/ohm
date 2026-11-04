@@ -1,11 +1,11 @@
-name: Build matched integer-array compilers
-run-name: Price integer-array lowering on -24 ${{ inputs.reviewed_head }}
+name: Qualify the literal-array parser compiler
+run-name: Build the C7 parser successor ${{ inputs.reviewed_head }}
 permissions:
   contents: read
 jobs:
   qualify:
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head &&
-      github.ref_name == 'charlie/qa-rc24-const-aggregate-20261104'
+      github.ref_name == 'charlie/qa-rc24-width-parser-stage-20261104'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     steps:
@@ -185,6 +185,13 @@ jobs:
         python3 -IB array-qa/scripts/ruff-static-int-array/factory.py build
 
         '
+    - name: Compile and run the checked-in parser case
+      run: |
+        set -euo pipefail
+        export RUSTUP_HOME="$RUNNER_TEMP/static-int-array/rustup"
+        rustc +ohm --edition=2024 source/rust/tests/ui/parser/large-literal-array.rs -o "$RUNNER_TEMP/static-int-array/array-reader"
+        "$RUNNER_TEMP/static-int-array/array-reader"
+        sha256sum "$RUNNER_TEMP/static-int-array/array-reader" > "$RUNNER_TEMP/static-int-array/array-reader.sha256"
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       with:
         name: array-sdk-${{ matrix.role }}-${{ github.run_id }}
@@ -199,6 +206,8 @@ jobs:
         path: '${{ runner.temp }}/static-int-array/*.json
 
           ${{ runner.temp }}/static-int-array/sdk-sha256
+
+          ${{ runner.temp }}/static-int-array/array-reader.sha256
 
           ${{ runner.temp }}/static-int-array/probes/verdict.json'
         retention-days: 7
