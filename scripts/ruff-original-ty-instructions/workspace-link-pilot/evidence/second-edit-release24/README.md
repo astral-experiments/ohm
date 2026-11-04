@@ -1,0 +1,22 @@
+# Signed -24 reused 32 native outputs on the second Ruff edit
+
+The ordinary virtual-workspace `cargo +ohm test --no-run --locked --offline -j4` built Ruff #29697 on Linux. The edit moved `157caa55a51ebae4fa541d31697e3af9a6c32ccf` to `bfa2407e98ee1343caeefd02b4b69043509baa8c`. The job ran the original signed tools and the research linker against independent source histories, then completed comparisons against 50 signed native outputs. Cargo reported 55 default members and 102 test/program executables. The first unchanged command reused 46 native outputs. Eight signed executables changed across the second source edit. On a second real OLD→NEW transition the research linker reused all 32 previously forecast named roles. Every reused ELF matched the signed independently empty NEW. All 50 second-edit ELFs matched between signed and research runs, as did all 50 independently empty builds. The ineligible ty_project test executable differed between edited and empty builds in both arms. [Frozen forecast](../full-native-challenge/prospective-second-edit.json) · [Original run](https://github.com/astral-experiments/ohm/actions/runs/41747172339)
+
+Across 20 checked source stages, all 623 actual existing-output hits matched the corresponding signed OLD or independently empty NEW whole-file SHA-256. The deliberately altered native-output case and failing Cargo commands are separate controls.
+
+The strict experiment **failed four full-file comparisons**. The first unchanged ruff_server, ty_server e2e after both four-byte and mid-read repair, and ty_module_resolver after malformed-input repair all ran a real two-worker full native link. Their projected and actual jobserver groups matched, the eligibility check rejected reuse, and Wild emitted the files normally. Across each of these 42-section ELFs the GNU build ID was the only differing recorded section. None of the same-state signed commands reproduced any of those four complete file hashes. The archive contains the whole-file SHA-256, lengths and original section-content digests. Differences in unrecorded section-header fields and padding remain possible. All four independent clean-output refusals remain part of the verdict. [Complete source decisions, raw digests and section comparisons](original.json.gz)
+
+The real four-byte `symbols.o` edit changed offsets 8731 through 8734. The selected earlier `libutil.a` then produced an executable that returned 83 with zero stdout. The study also exercised the earlier archive before that mutation, a malformed library, a save during input acquisition, two separately held old output inodes, corruption of both newly named outputs, and a genuine Rust type error followed by repair. The malformed library, concurrent save, and ill-typed Rust edit each returned Cargo status 101, then repaired. The previous e2e output failed the edited fixture in both source histories. A separately empty build in each arm compiled all 623 units; the actual native test was run outside Cargo's build after the source transitions.
+
+This was a direct-Cargo safety study. It has no instruction or elapsed-time speedup result. A previous metered attempt stopped when one kernel event reported running time above enabled time. Its separately completed signed unchanged command supplies a component ceiling. The -23 study found the genuine second edit cost 4.59% more retired instructions even though 31 native outputs were reused. [Signed -24 counter coverage and budget](../second-edit-release23/DIGEST.md) · [Signed -23 complete-command result](../second-edit-release23/README.md)
+
+## Reopen
+
+The single first-attempt job ran QA commit `31b89aefc9a96e9ec7d340cf990e3ada0e5644ef`. All 79 installed files bound the signed Linux SDK tarball with digest `ecde6809d7f1fc1966798198479867c4a49bdf7a51f3873336d23a40fabce453`. Its 72,455,006-byte original verdict artifact 13285298735 has SHA-256 `6df78409d5903049c988e3f4219f823e0e1e50f0d643ea4919c42b8238bb34ae`. The portable reader compares the complete native role sets, both empty histories, all 30 registered phases and the four refusals. Its complete JSON readback has SHA-256 `e30c004bece98bbce6a73cc60e9fae325295471417766e734c313bd4e7d409c8`.
+
+~~~sh
+r=scripts/ruff-original-ty-instructions/workspace-link-pilot/evidence/second-edit-release24
+gh-auto api repos/astral-experiments/ohm/actions/artifacts/13285298735/zip > /tmp/41747172339.zip
+python3 -IB "$r/verify.py" /tmp/41747172339.zip > /tmp/actual-24.json
+gzip -cd "$r/original.json.gz" | cmp - /tmp/actual-24.json
+~~~
