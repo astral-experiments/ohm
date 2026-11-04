@@ -9,6 +9,7 @@ on:
         required: true
 permissions:
   contents: read
+  actions: read
 jobs:
   qualify:
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-25-restack-registry-20261104'
@@ -35,6 +36,12 @@ jobs:
             sudo apt-get update -qq
             sudo apt-get install -y strace
           fi
+      - name: Download the original first-parent Cargo from its completed worker
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/astral-experiments/ohm/actions/artifacts/13342987310/zip > "$RUNNER_TEMP/first-parent-original.zip"
+          echo "e8522941fb2b486f7a209b58dfec401e08e599468efc1532c25c6744f2000db3  $RUNNER_TEMP/first-parent-original.zip" | sha256sum -c -
       - name: Prove normal v5 migration and the inherited history on the true first parent
         env:
           OHM_SDK_READ_TOKEN: ${{ github.token }}

@@ -7,6 +7,7 @@ import shutil
 import subprocess as sp
 import sys
 import traceback
+import zipfile
 
 here = Path(__file__).resolve().parent
 sys.path.insert(0, str(here))
@@ -54,6 +55,24 @@ def runner(reference, old, new):
     return text
 
 
+def verified_parent(archive, destination, current_sdk, rustc, dependencies):
+    """Read the authenticated first parent from the prior worker's original upload."""
+    assert helper.sha(archive) == "e8522941fb2b486f7a209b58dfec401e08e599468efc1532c25c6744f2000db3"
+    with zipfile.ZipFile(archive) as original:
+        assert original.testzip() is None
+        data = json.loads(original.read("compiler.json"))
+        assert data["qa"] == "e3e3ad915d588498a7ca458c124e66218e8d453d"
+        assert int(data["run"]) == 41867097954 and data["dependencies"] == dependencies and data["rustc"] == rustc
+        assert json.loads(original.read("sdk.json")) == current_sdk
+        record = data["roles"]["before"]
+        assert record["source"] == pair["before"] and record["tree"] == pair["tree"]
+        with original.open("physical/cargo-before") as src, destination.open("xb") as dst:
+            shutil.copyfileobj(src, dst)
+    assert helper.sha(destination) == record["sha256"] == "70e27c0843f7bce42232024532f78b62fa365e17785e66122bd64b1a1de121ac"
+    destination.chmod(0o755)
+    return record
+
+
 def main():
     root = Path(os.environ["RUNNER_TEMP"]) / "cargo25-registry"
     root.mkdir()
@@ -85,10 +104,16 @@ def main():
         sp.run(["git","checkout","--quiet","--detach",revision],cwd=src,check=True)
         assert git(src,"rev-parse","HEAD") == revision and not git(src,"status","--porcelain")
         assert helper.sha(src/"Cargo.lock") == helper.reg["rust_package"]
-        sp.run(argv,cwd=src,env=env,check=True)
-        assert not git(src,"status","--porcelain")
         path = physical / ("cargo-"+role)
-        shutil.copy2(root/"compiler-target/release/cargo", path)
+        if role == "before":
+            verified_parent(root.parent / "first-parent-original.zip", path, json.loads((proof/"sdk.json").read_bytes()), rustc, deps)
+        else:
+            # Cargo's Git build stamp does not declare .git/HEAD as an input.
+            # The candidate must have empty compiler outputs throughout this checkout.
+            assert not (root/"compiler-target/release").exists() and not (root/"compiler-build/release").exists()
+            sp.run(argv,cwd=src,env=env,check=True)
+            assert not git(src,"status","--porcelain")
+            shutil.copy2(root/"compiler-target/release/cargo", path)
         vv = helper.out([path,"-vV"],src,env)
         assert "commit-hash: "+revision in vv
         records[role] = {"source":revision,"tree":git(src,"rev-parse","HEAD^{tree}"),"cargo":vv,"sha256":helper.sha(path)}
