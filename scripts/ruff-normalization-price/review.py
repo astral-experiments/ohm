@@ -1,5 +1,6 @@
 """Independently reopen the complete kernel, Cargo, native, source and PMU originals."""
 import argparse
+import io
 import hashlib
 import json
 import os
@@ -14,6 +15,8 @@ import zipfile
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from records import calibrate_lifetime, digest, dump, file_hash, from_counter, load, overflow, physical, roster
+
+from factory import enrolled, open_proof
 
 PLAN = load(HERE/"registration.json")
 LOCKED = load(HERE/"locked.json")
@@ -47,6 +50,7 @@ def read_block(z,cohort,slot,meta,run,head,originals):
     assert (bind["cohort"],bind["slot"],bind["head"],int(bind["run"]),bind["attempt"])==(cohort,slot,head,run,"1")
     expected_scripts={p.name:file_hash(p) for p in HERE.iterdir() if p.suffix in (".py",".rs",".json")}
     assert bind["scripts"]==expected_scripts
+    assert bind["transports"]=={p.name:file_hash(p) for p in (HERE/"transport").glob("*.json")}
     assert obj("locked-archives.json")==LOCKED["archives"] and len(LOCKED["archives"])==506
     a,b=[from_counter(obj("calibrate-"+p+".json")) for p in ("single","fork")]
     assert 1.99<b/a<2.01
@@ -69,13 +73,14 @@ def read_block(z,cohort,slot,meta,run,head,originals):
     prices={}
     metadata={}
     for role in bind["order"]:
-        spec=PLAN["roles"][role]
-        s=obj("sdk-"+role+"/source.json")
-        assert s=={"factory":spec["qa"],"run":str(spec["run"]),"role":"candidate","source":spec["source"],"tree":spec["tree"]}
-        sdk=obj("sdk-"+role+"/sdk.json")
-        assert sdk["versions"]==obj("sdk-"+role+"/reported-versions.json")
-        assert spec["source"] in sdk["versions"]["rustc"] and PLAN["config"] in sdk["versions"]["cargo"]
-        assert z.read("sdk-"+role+"/sdk-sha256").decode().strip()==spec["tar"]
+        spec=enrolled(role,PLAN)
+        original=z.read("sdk-"+role+"/qualification.zip")
+        assert digest(original)==spec["qualification"][1]
+        with zipfile.ZipFile(io.BytesIO(original)) as root_proof:
+            sdk=open_proof(root_proof,spec,PLAN)
+        physical_members=obj("physical-members-"+role+".json")
+        assert physical_members==load(HERE/"transport"/(role+"-members.json"))
+        assert physical_members["bin/rustc"][0]==sdk["rustc"]
         installed=obj("installed-"+role+".json")
         assert installed["driver"]["sha256"]==sdk["driver"]==spec["driver"]
         assert installed["rustc"]["sha256"]==sdk["rustc"]
@@ -219,20 +224,23 @@ def main():
         download(args.directory,args.download)
     official=load(args.directory/"official.json")
     run=official["run"]
-    assert run["head_sha"]==args.head and run["head_branch"]=="charlie/qa-rc24-normalization-price-20261104"
+    assert run["head_sha"]==args.head and run["head_branch"]=="charlie/qa-rc24-normalization-trained-price-20261104"
     assert all(j["conclusion"]=="success" for j in official["jobs"])
     blocks=[]
     with tempfile.TemporaryDirectory() as scratch:
         for slot in PLAN["schedule"][args.cohort]:
-            meta,=[a for a in official["artifacts"] if a["name"]==f"norm21229-{slot}-{run['id']}"]
+            meta,=[a for a in official["artifacts"] if a["name"]==f"trained-norm21229-{slot}-{run['id']}"]
             path=args.directory/(str(meta["id"])+".zip")
             assert meta["workflow_run"]["id"]==run["id"] and path.stat().st_size==meta["size_in_bytes"] and "sha256:"+file_hash(path)==meta["digest"]
             with zipfile.ZipFile(path) as z:
                 blocks.append(read_block(z,args.cohort,slot,meta,run["id"],args.head,Path(scratch)))
-    if args.cohort=="confirmation":
-        pilot=load(HERE/"evidence/pilot/qualified.json")
-        assert pilot["cohort"]=="pilot" and pilot["qualified"] and pilot["plan"]==file_hash(HERE/"registration.json")
-        assert not ({b["boot"] for b in pilot["blocks"]} & {b["boot"] for b in blocks})
+    assert args.cohort=="trained-confirmation"
+    for name,sha in PLAN["stage1"]["readbacks"].items():
+        path=HERE/"reference"/("stage1-"+name+".json")
+        assert file_hash(path)==sha
+        prior=load(path)
+        assert prior["qualified"] and prior["plan"]==PLAN["stage1"]["registered_plan"]
+        assert not ({b["boot"] for b in prior["blocks"]} & {b["boot"] for b in blocks})
     verdict=score(args.cohort,blocks)
     dump(args.out,verdict)
     print(json.dumps({k:v for k,v in verdict.items() if k not in ("blocks","savings_pct")},indent=2))

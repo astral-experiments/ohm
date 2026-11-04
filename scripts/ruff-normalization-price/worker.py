@@ -236,13 +236,17 @@ def main():
     shutil.copyfile(HERE / "observer.rs", WORK / "observer.rs")
     binding = {"boot":BOOT,"order":ORDER,"cohort":COHORT,"slot":SLOT,"head":os.environ["GITHUB_SHA"],
                "run":os.environ["GITHUB_RUN_ID"],"attempt":os.environ["GITHUB_RUN_ATTEMPT"],"source":str(SOURCE),
+               "transports":{p.name:file_hash(p) for p in (HERE / "transport").glob("*.json")},
                "scripts":{p.name:file_hash(p) for p in HERE.iterdir() if p.suffix in (".py",".rs",".json")},
                "cpu":Path("/proc/cpuinfo").read_text().split("\n\n")[0], "affinity":sorted(os.sched_getaffinity(0))}
     dump(PROOF / "binding.json", binding)
-    if COHORT == "confirmation":
-        pilot = load(HERE / "evidence/pilot/qualified.json")
-        assert pilot["qualified"] and pilot["cohort"] == "pilot" and pilot["plan"] == file_hash(HERE / "registration.json")
-        assert BOOT not in {b["boot"] for b in pilot["blocks"]}
+    assert COHORT == "trained-confirmation"
+    for cohort, expected in PLAN["stage1"]["readbacks"].items():
+        path = HERE / "reference" / ("stage1-" + cohort + ".json")
+        assert file_hash(path) == expected
+        prior = load(path)
+        assert prior["qualified"] and prior["plan"] == PLAN["stage1"]["registered_plan"]
+        assert BOOT not in {b["boot"] for b in prior["blocks"]}
     for name in ("whole_count","exec_count","calibrate"):
         sp.run(["cc","-O2","-pthread","-Wall","-Wextra","-Werror",DONOR/(name+".c"),"-o",WORK/name], check=True)
     readings = {}
@@ -261,12 +265,14 @@ def main():
         sp.run([WORK/"exec_count","--lifetime",path,tasks,WORK/"whole_count",PROOF/("lifetime-whole-"+action+".json"),path,path,action], check=True)
         lifetime[action] = calibrate_lifetime(lambda p:(tasks/p).read_bytes(),ident,action)
     assert 0.99 < lifetime["fork"] / lifetime["single"] < 1.01
-    cases = {role:acquire(PLAN["roles"][role],PLAN,WORK / "archives",PROOF / ("sdk-"+role)) for role in ORDER}
-    assert (PROOF/"sdk-C5/bootstrap.json").read_bytes() == (PROOF/"sdk-C7/bootstrap.json").read_bytes()
+    cases = {role:acquire(role, PLAN, WORK / "archives", PROOF / ("sdk-"+role)) for role in ORDER}
     os.environ.pop("GH_TOKEN",None)
     for idx, role in enumerate(ORDER):
         tar, proof = cases[role]
         transport.install(tar, proof, SDK, ALIAS)
+        files = {str(p.relative_to(SDK)):[file_hash(p), p.stat().st_size] for p in SDK.rglob("*") if p.is_file()}
+        assert files == load(HERE / "transport" / (role + "-members.json"))
+        dump(PROOF / ("physical-members-" + role + ".json"), files)
         def ident(path):
             stat = path.stat()
             return {"path":str(path), "device":stat.st_dev,"inode":stat.st_ino,"sha256":file_hash(path)}

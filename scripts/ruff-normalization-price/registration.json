@@ -9,9 +9,8 @@
   "gates": {
     "confirmation": "six additional independently booted pairs; each primary positive and median >=20%; every whole check edit positive; two-sided exact sign p=2/64 for six favorable; list actual blocked assignment",
     "native": "Registry unicode-normalization warm, observed/repair and empty match in each role. Parser warm and settled bodies must match. Record and keep each physical parser .rlib/.rmeta separately including known warm/cold divergences; require exact edited/repair and independent empty observer ELF within role as well as 1,112,064 scalars and six Ruff parser calls. Bench C5/C7 are distinct compiler source domains.",
-    "pilot": "both primary savings >=20% and both whole savings >0; both installations in every boot pass all native, input, physical and repair gates",
     "primary": "actual unicode-normalization 0.1.25 rustc, thread descendants and its main thread only, from exec stop to exit, independent genuine check edit",
-    "regressions": "common cold-old, empty-new and unchanged for ordinary check and build, plus independently observed empty NEW check compiler. Reject >2% and >10M retired instructions together in both pilots, or in both paired median percent and paired median absolute on six; print every raw difference",
+    "regressions": "For ordinary check/build cold OLD, empty NEW and unchanged, and independently observed empty NEW check rustc, refuse paired median regression above both 2% and 10,000,000 instructions. Retain every individual outcome, including failed acquisition.",
     "whole": "separate untraced complete check edit; all process descendants and threads from the rustup Cargo proxy"
   },
   "invalid": {
@@ -64,6 +63,24 @@
       "observed-empty-new"
     ]
   },
+  "recipe": {
+    "config": "384cf03a4e68f8df5cfaf8285b22e3607e1e997e77166ab5975c446ca1a5b679",
+    "coordinator": "8f25c47ff9e7c4ab2f22a1cad0638a26c7e26e1c",
+    "native": "Row(42), two matching E0308, integer-array four packed and observed byte range, unchanged/edited/empty whole native observer in each role",
+    "script": "88c1655898536f1e1a0ee232afffd0dfb33f0025e6546c7dc8a5d6d353a99591",
+    "signed_members": {
+      "bin/cargo": {
+        "bytes": 39249096,
+        "sha256": "a4faa288657042d02767a38812c7498218dfcafc945abfe3b4a44c07323a1a24",
+        "source": "rust-1.99.0-dev-x86_64-unknown-linux-gnu/cargo/bin/cargo"
+      },
+      "lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd": {
+        "bytes": 10319072,
+        "sha256": "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5",
+        "source": "rust-1.99.0-dev-x86_64-unknown-linux-gnu/rustc/lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd"
+      }
+    }
+  },
   "release_members": {
     "bin/cargo": {
       "bytes": 39249096,
@@ -78,37 +95,17 @@
   },
   "roles": {
     "C5": {
-      "driver": "e2d82be3436c6fc5728b53f5c602cf2014fc7a5c7cd9987fbcc1dfe6b1bf2382",
-      "job": 126273629631,
-      "qa": "7b89e345605d3ae8a2bf54ba8998c327549e9758",
-      "qualification": [
-        13279293748,
-        "575d2be989664d761f399792b692343893117ee77901f0c6cf8cc9e3a9c66763"
-      ],
-      "run": 41738460962,
-      "sdk": [
-        13279803032,
-        "ef9f5d59d0b28781286a19bbf7e558fadf29bbab1894028c344694ad155ab0ee"
-      ],
+      "factory_role": "candidate",
+      "qa": "1e84a3455be218cc5441991ac376988d0afdbcc6",
+      "run": 41742694783,
       "source": "6c2874a0b6a0bf3570f8959733b6f87907e5cce6",
-      "tar": "03eef8a0bb404a3052f0ad4cc2689c5db6ceb27c42d38d0d9a018e45ad694a50",
       "tree": "1a86c989ac19e14b8bc53ec8a92be4feafef5a9f"
     },
     "C7": {
-      "driver": "91f205cf52a5fe97d471cab8d47c4638ee1c3be5aa88aa8ad74b0be70fd0c304",
-      "job": 126324738389,
-      "qa": "9bc3cd6994485569c5e87e1a4d7283b782bb79c6",
-      "qualification": [
-        13287551493,
-        "5fd18e5768a81d4eafc94c13ba3e5a6c31a6b9a76a8d5f96fc649d907ec1905d"
-      ],
-      "run": 41753724558,
-      "sdk": [
-        13287670809,
-        "e7cc12e7dcf04e49cd9e1f492539bd6ebf33608aa7ae412e3c5ab10cea17c3ff"
-      ],
+      "factory_role": "candidate",
+      "qa": "d5962c582a009cec01b41f8f1d76e9aa725bf0fa",
+      "run": 41756960897,
       "source": "06fe634feaa39288210a6f17b8994346a5fae1c1",
-      "tar": "e4022678b12bf27be349d9f6c3598e0f82a79602053a39e310eaf389bba7bf10",
       "tree": "2cff5a0eef365de6e4587006859dee9d4092ca87"
     }
   },
@@ -351,7 +348,7 @@
     }
   },
   "schedule": {
-    "confirmation": {
+    "trained-confirmation": {
       "B1": [
         "C7",
         "C5"
@@ -376,24 +373,23 @@
         "C7",
         "C5"
       ]
-    },
-    "pilot": {
-      "pilot-CP": [
-        "C7",
-        "C5"
-      ],
-      "pilot-PC": [
-        "C5",
-        "C7"
-      ]
     }
   },
   "source_change": [
     "Cargo.lock"
   ],
+  "stage1": {
+    "head": "563b59e7c41a451d619cd406e9a1972f86797f0d",
+    "readbacks": {
+      "confirmation": "be6925f0e05fdd7c1cef21283edacab055ac6a75be6e31de8ff8c0cb31cfd7b0",
+      "pilot": "cbb05ba9d4976ed598fc889cc9db484e9fbb195a157744109362b81fc2ba720a"
+    },
+    "registered_plan": "14cda4060bd1092c7f0a2cb6d925374cb7f7061ed0c65d852319a56cbefe7588"
+  },
+  "study": "release-trained stage2 #355, direct six fresh pairs only",
   "trees": {
     "4776a20c73ac633308df626105839fb9a3d825ea": "526aa78aa1b563f5d2a00f14ff59d1c27de0bc9c",
     "c7d0c573cf5b79b7426aba6ad5458e2db283843b": "751a8153b4f2bf52c01ab43cc46d04d537d306e7"
   },
-  "version": 1
+  "version": 2
 }

@@ -1,12 +1,14 @@
 # Ruff Unicode normalization dependency update
 
-This private QA branch measures a source-built compiler treatment on the real Ruff #21229
-upgrade from unicode-normalization 0.1.24 to 0.1.25. C5 is the immediate product parent,
-C7 its experimental child. Both source factories call their artifact “candidate”.
-Their separate commits, Git trees, immutable archives, and actual rustc driver hashes are
-bound in registration.json. Both carry the same released Linux Cargo and Wild and use the
-same stage1 bootstrap and normal developer profile. The compiler pair and two pilot
-observations are separate from any release or prior benchmark.
+This separate six-boot confirmation measures source-built C5 and C7 Linux compilers
+trained with the original signed -24 release recipe (PGO, ThinLTO, single codegen unit,
+and BOLT). The same signed Cargo and Wild run in both roles. Each role is the candidate
+output of its own source factory. The physical SDK files, full original qualification ZIP,
+four training profiles, compiled script/configuration, real driver ELF and version,
+and signed common Cargo/Wild are checked before the ordinary historical Ruff edit.
+
+The original stage1 pilot and confirmation passed on eight separate boots. Their
+observations are prospectively excluded from this estimate. [Stage1 results and full originals](https://github.com/astral-experiments/ohm/blob/563b59e7c41a451d619cd406e9a1972f86797f0d/scripts/ruff-normalization-price/evidence/RESULTS.md)
 
 The primary counts user instructions retired by the one actual unicode_normalization
 rustc and its threads during the edited Ruff check. A kernel exec-stop counter binds that
@@ -28,22 +30,25 @@ that compiler. Both observed registry library formats must match their respectiv
 controls. Prior C5 and C7 individually produced differing private Ruff parser metadata
 between warm and empty builds; the raw parser bodies are retained separately.
 
-The two pilots each require at least 20% fewer owner instructions and strictly fewer whole
-edited-check instructions. Only then may six independent hosts be measured. Every
-confirmation must improve both endpoints, and the median of six owner savings must reach
-20%. The common cold/settled regression guard, phase roster and blocked assignment are
-frozen in registration.json. Six positive outcomes have two-sided exact sign p=0.03125;
-the two pilot observations are excluded. All actual paired and absolute values remain
-available, including rejected outcomes. This measures instructions, not elapsed time.
+The enrolled order has three C5→C7 and three C7→C5 assignments on six new boots.
+The selected compiler must improve in all six and its median paired saving must reach
+20%. The complete untraced check edit must improve in all six. A common cold or
+settled endpoint is refused if its paired median rises by both more than 2% and more
+than 10,000,000 instructions. A six-of-six exact sign test gives two-sided p = 0.03125
+and one-sided p = 0.015625 for the preregistered direction. Report raw values,
+confidence limited by six boots, and all adverse controls. The original stage1 prices
+and independently trained set have separate provenance and outcomes.
 
-From the authorized packaging QA checkout, dispatch the reviewed branch head, then reopen
-the official results on Linux x86_64. The reader also executes every distinct retained
-observer and compares its complete stdout to the original native observation.
+The only hardware action is a six-job manual dispatch. It requires both original SDKs
+to have passed their complete physical intake and the explicit C7 release from the
+study coordinator. After the run the independent reader authenticates the official
+ZIPs, recomputes the hardware prices from the kernel records and executes each
+distinct saved native program.
 
 ~~~sh
 repo=astral-experiments/ohm
-branch=charlie/qa-rc24-normalization-price-20261104
+branch=charlie/qa-rc24-normalization-trained-price-20261104
 head=$(git rev-parse HEAD)
-gh-auto workflow run ci.yml -R "$repo" --ref "$branch" -f reviewed_head="$head" -f cohort=pilot
-python3 -IB scripts/ruff-normalization-price/review.py pilot /tmp/ohm-norm-pilot --download "$run_id" --head "$head" --out /tmp/ohm-norm-pilot/qualified.json
+gh-auto workflow run ci.yml -R "$repo" --ref "$branch" -f reviewed_head="$head" -f cohort=trained-confirmation
+python3 -IB scripts/ruff-normalization-price/review.py trained-confirmation /tmp/ohm-norm-trained --download "$run_id" --head "$head" --out /tmp/ohm-norm-trained/qualified.json
 ~~~

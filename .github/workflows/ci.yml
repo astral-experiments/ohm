@@ -1,4 +1,4 @@
-name: Measure the Ruff Unicode normalization edit on two source-built compilers
+name: Measure the Ruff Unicode normalization edit on release-trained compilers
 run-name: Ruff Unicode normalization ${{ inputs.cohort }} at ${{ inputs.reviewed_head }}
 permissions:
   contents: read
@@ -11,22 +11,22 @@ on:
         type: string
         required: true
       cohort:
-        description: Original pilot or separately admitted confirmation
+        description: Six independently booted release-trained pairs
         type: choice
         required: true
-        options: [pilot, confirmation]
+        options: [trained-confirmation]
 jobs:
   price:
     if: >-
       github.repository == 'astral-experiments/ohm' && github.run_attempt == '1'
-      && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-rc24-normalization-price-20261104'
+      && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-rc24-normalization-trained-price-20261104'
     name: Normalization ${{ matrix.slot }}
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 80
     strategy:
       fail-fast: false
       matrix:
-        slot: ${{ fromJSON(inputs.cohort == 'pilot' && '["pilot-PC","pilot-CP"]' || '["B1","B2","B3","B4","B5","B6"]') }}
+        slot: [B1, B2, B3, B4, B5, B6]
     steps:
       - name: Open the exact measurement and its original SDK receiver
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -55,7 +55,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: norm21229-${{ matrix.slot }}-${{ github.run_id }}
+          name: trained-norm21229-${{ matrix.slot }}-${{ github.run_id }}
           path: ${{ runner.temp }}/normalization-price/proof
           compression-level: 1
           retention-days: 14
