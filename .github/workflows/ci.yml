@@ -43,9 +43,6 @@ jobs:
             /scripts/ruff-static-array-cost/*.c
             /scripts/ruff-static-array-cost/*.json
             /scripts/ruff-static-array-cost/transport.py
-          sparse-checkout: |
-            scripts/ruff-width-parser
-            scripts/ruff-static-array-cost
           persist-credentials: false
       - name: Open the original Ruff edit
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
