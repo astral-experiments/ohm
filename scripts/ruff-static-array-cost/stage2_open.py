@@ -4,7 +4,8 @@ from pathlib import Path
 import transport
 reg=transport.REGISTER;spec=transport.KIT;live=transport.api;require=transport.require
 def fetch(role,cache,dest):
-    record=spec[role];role_name={'P':'parent','C':'candidate'}[role]
+    arm=reg['compiler_arms'][role];record=spec[role];role_name=arm['factory_role']
+    require(record and (record['run'],record['qa'])==(arm['factory_run'],arm['factory_head']),'missing or unregistered release-recipe transport')
     run=live('actions/runs/'+str(record['run']));job=live('actions/jobs/'+str(record['job']))
     require(run['head_sha']==record['qa'] and run['run_attempt']==1 and run['conclusion']=='success' and job['run_id']==record['run'] and job['conclusion']=='success','wrong release-recipe factory')
     cache.mkdir(parents=True,exist_ok=True);dest.mkdir(parents=True)
@@ -21,7 +22,7 @@ def fetch(role,cache,dest):
                     require(z.getinfo(name).file_size<1<<20,'wrong source/training qualification');(dest/name).write_bytes(z.read(name))
                 rd=lambda key:json.loads((dest/(key+'.json')).read_bytes())
                 source=rd('source');proof=rd('sdk');trained=rd('training');native=rd('native')
-                require(source['source']==reg[role_name]and source['tree']==reg[role_name+'_tree']and source['role']==role_name and source['factory']==record['qa']and str(source['run'])==str(record['run']),'wrong trained source')
+                require(source['source']==arm['source']and source['tree']==arm['tree']and source['role']==role_name and source['factory']==record['qa']and str(source['run'])==str(record['run']),'wrong trained source')
                 require(proof['driver']==record['driver'] and proof['role']==role_name and source['source']in proof['versions']['rustc']and reg['cargo']in proof['versions']['cargo'],'wrong trained driver')
                 require(proof['release_cargo']==reg['release_members']['bin/cargo']['sha256']and proof['wild']==reg['release_members']['lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd']['sha256'],'changed signed cargo or Wild')
                 require(trained['script']==record['script'] and trained['config']==transport.sha(dest/'bootstrap.toml')==record['config'] and set(trained['profiles'])=={'rustc','rustdoc','clippy','rustfmt'}and all(len(v[0])==64 and v[1]>0 for v in trained['profiles'].values()),'missing real trained native compiler profiles')
@@ -41,7 +42,11 @@ def fetch(role,cache,dest):
         env["RUSTUP_HOME"]=str(alias.parent.parent)
         producer=Path(__file__).with_name("array_probe.py")
         require(transport.sha(producer)==reg["trained"]["array_probe"],"changed array behavior probe")
-        sp.run([sys.executable,"-IB",producer,at/"probes",role_name],env=env,check=True)
+        sp.run([sys.executable,"-IB",producer,at/"probes",role],env=env,check=True)
+        extra=Path(__file__).with_name("aggregate_probe.py")
+        require(transport.sha(extra)==reg["sources"]["aggregate_probe.py"]["sha256"],"changed tuple/char probe")
+        sp.run([sys.executable,"-IB",extra,at/"aggregate",role],env=env,check=True)
+        shutil.copy2(at/"aggregate/verdict.json",dest/"aggregate-verdict.json")
         (dest/"probes").mkdir()
         shutil.copy2(at/"probes/verdict.json",dest/"probes/verdict.json")
     return packed,proof

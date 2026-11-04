@@ -1,4 +1,4 @@
-name: Measure the trained Ruff Unicode compiler
+name: Measure three trained Ruff Unicode compilers
 run-name: Count the fully trained Ruff Unicode compiler and command ${{ inputs.reviewed_head }}
 permissions:
   contents: read
@@ -7,24 +7,16 @@ jobs:
   price:
     name: Ruff Unicode ${{ matrix.fixture }} edit ${{ matrix.block }}
     if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.sha == inputs.reviewed_head
-      && github.ref_name == 'charlie/qa-rc24-trained-rand-20261104'
+      && github.ref_name == 'charlie/qa-rc24-trained-rng-triple-20261104'
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 100
+    timeout-minutes: 140
     strategy:
       fail-fast: false
       matrix:
         include:
-        - block: B1
+        - block: H1
           fixture: rand
-        - block: B2
-          fixture: rand
-        - block: B3
-          fixture: rand
-        - block: B4
-          fixture: rand
-        - block: B5
-          fixture: rand
-        - block: B6
+        - block: H2
           fixture: rand
     steps:
     - name: Read this immutable measurement
@@ -42,7 +34,7 @@ jobs:
         fetch-depth: 3
         path: ruff
         persist-credentials: false
-    - name: Measure both source-built rustc programs on the same Ruff edit
+    - name: Measure the three source-built rustc programs on the same Ruff edit
       env:
         PRICE_BLOCK: ${{ matrix.block }}
         ARRAY_CASE: ${{ matrix.fixture }}

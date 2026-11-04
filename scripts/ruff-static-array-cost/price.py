@@ -15,6 +15,7 @@ kit=Path(__file__).resolve().parent
 sys.path.insert(0,str(kit))
 import transport
 import stage2_open
+import triplet
 transport.fetch=stage2_open.fetch
 reg=transport.REGISTER
 gitroot=Path(os.environ["GITHUB_WORKSPACE"])/"ruff"
@@ -53,6 +54,10 @@ def ident(path):
     s=path.stat();return (s.st_dev,s.st_ino)
 def enroll():
     proof.mkdir(parents=True)
+    missing = [a for a in triplet.ARMS if not isinstance(transport.KIT.get(a), dict)]
+    if missing:
+        put(proof/"refused-registration.json", {"missing_trained_transports":missing})
+        raise ValueError(f"Missing trained factory transport for {missing}")
     assert git("rev-parse",new+"^")==old and git("diff","--name-only",old,new).splitlines()==fixture["paths"]
     assert sha(gitroot/"Cargo.lock")==reg["lock"] and not git("status","--porcelain")
     for name,spec in reg["sources"].items():assert sha(kit/name)==spec["sha256"]
@@ -67,13 +72,16 @@ def enroll():
     put(proof/"host.json",{"boot":boot,"order":order,"head":os.environ["GITHUB_SHA"],"case":case,"target_case":[old,new],
         "cpuinfo":Path("/proc/cpuinfo").read_text().split("\n\n")[0],"affinity":sorted(os.sched_getaffinity(0)),
         "registration_sha256":sha(kit/"registration.json"),"transports_sha256":sha(kit/"transports.json")})
+    assert len(set(order)) == len(triplet.ARMS) and set(order) == set(triplet.ARMS)
     cases={}
     for role in order:
         cases[role]=transport.fetch(role,work/"archives",proof/("sdk-"+role))
         verdict=json.loads((proof/("sdk-"+role)/"probes/verdict.json").read_bytes())
-        assert verdict["marked_arrays"]==(4 if role=="C" else 0)
+        assert verdict["marked_arrays"]==(0 if role=="F5" else 4)
+        extra=json.loads((proof/("sdk-"+role)/"aggregate-verdict.json").read_bytes())
+        assert extra["marker_count"]==(4 if role=="C7" else 0) and extra["repair"]==extra["empty"]!=extra["old"]
         assert verdict["native_repaired"]==verdict["native_empty"]!=verdict["native_old"]
-    assert (proof/"sdk-C/bootstrap.json").read_bytes()==(proof/"sdk-P/bootstrap.json").read_bytes()
+    assert len({(proof/("sdk-"+arm)/"bootstrap.json").read_bytes() for arm in triplet.ARMS})==1
     os.environ.pop("GH_TOKEN",None)
     return cases
 def seed():
@@ -180,8 +188,11 @@ def visit(role,mode,label,commit,trace=False,invalid_at=None):
     assert msgs and msgs[-1]=={"reason":"build-finished","success":rc==0},(at,rc,(at/"stderr").read_text()[-900:])
     diag=[m["message"] for m in msgs if m["reason"]=="compiler-message"]
     if invalid_at is not None:
-        errors=[d for d in diag if d["level"]=="error" and (d.get("code") or {}).get("code")=="overflowing_literals"]
-        assert rc!=0 and any(any(s["is_primary"] and (s["byte_start"],s["byte_end"])==(invalid_at,invalid_at+3) for s in e["spans"]) for e in errors),diag
+        error_code, start_byte, token = invalid_at
+        errors=[d for d in diag if d["level"]=="error" and (d.get("code") or {}).get("code")==error_code]
+        assert rc==101 and len(errors)==1,diag
+        span, = [s for s in errors[0]["spans"] if s["is_primary"]]
+        assert span["file_name"]=="crates/ruff_unicode_names2/src/lib.rs" and (span["byte_start"],span["byte_end"])==(start_byte,start_byte+len(token)),span
         put(at/"error.json",errors)
         return
     assert rc==0 and not diag,(at,diag[:2])
@@ -192,6 +203,17 @@ def visit(role,mode,label,commit,trace=False,invalid_at=None):
     assert len(gens)==1,gens
     generated={p.name:sha(p) for p in gens[0].glob("generated*.rs")}
     assert generated==fixture["old_generated" if commit==old else "new_generated"]
+    typed = triplet.census((gens[0]/"generated_phf.rs").read_bytes())
+    tables = json.loads((kit/"rng-tables.json").read_bytes())
+    state = "old" if commit==old else "new"
+    assert {"file_sha256":generated["generated_phf.rs"],**typed} == tables[state]
+    retained = proof/"generated"/(state+"-phf.rs")
+    retained.parent.mkdir(exist_ok=True)
+    if not retained.exists():
+        shutil.copyfile(gens[0]/"generated_phf.rs",retained)
+    assert sha(retained)==generated["generated_phf.rs"]
+    if label in ("ordinary-edit","unchanged","empty-new"):
+        put(at/"storage.json",triplet.storage({"target":target,"shared":shared}))
     rec={"commit":commit,"command":args,"dirty":sorted(a["target"]["name"] for a in artifacts if not a["fresh"]),
          "hardware":hw(at/"hardware.json"),"wall_ns":elapsed,"generated":generated,"product_sha256":sha(lib),"unit_count":len(artifacts)}
     if mode=="build":rec.update(native=reader(at,artifacts,lib,commit),members=object_payloads(lib))
@@ -222,11 +244,25 @@ def trial(role,mode):
     if mode=="build":
         rust=gitroot/"crates/ruff_unicode_names2/src/lib.rs"
         original=rust.read_bytes()
-        suffix=b'\n#[deny(overflowing_literals)]\nstatic OHM_ARRAY_RANGE_GUARD: &[u8] = &['+b'1,'*1023+b'256];\n'
+        invalids = [
+            ("invalid", "overflowing_literals", b"256",
+             b"static OHM_ARRAY_RANGE_GUARD: &[u8] = &[" + b"1," * 1023 + b"256];"),
+            ("invalid-tuple", "overflowing_literals", b"65536",
+             b"static OHM_PAIR_RANGE_GUARD: &[(u16,u16)] = &[" + b"(1,2)," * 1023 + b"(3,65536)];"),
+            ("invalid-char", "E0308", b"65u32",
+             b"static OHM_CHAR_TYPE_GUARD: &[char] = &[" + b"'x'," * 1023 + b"65u32];"),
+        ]
         try:
-            rust.write_bytes(original+suffix)
-            for mark in ("invalid","invalid-again"):visit(role,mode,mark,new,invalid_at=len(original)+suffix.rindex(b"256"))
-        finally:rust.write_bytes(original)
+            for label, error_code, token, declaration in invalids:
+                suffix = b"\n#[deny(overflowing_literals)]\n" + declaration + b"\n"
+                rust.write_bytes(original + suffix)
+                fail = (error_code, len(original) + suffix.rindex(token), token)
+                for mark in (label, label + "-again"):
+                    visit(role, mode, mark, new, invalid_at=fail)
+                first = (proof/role/mode/label/"error.json").read_bytes()
+                assert first == (proof/role/mode/(label+"-again")/"error.json").read_bytes()
+        finally:
+            rust.write_bytes(original)
         assert not git("status","--porcelain")
         matches.append(visit(role,mode,"repaired",new))
     stash(role+"-"+mode+"-observed")
@@ -254,13 +290,19 @@ def main():
     for role in order:
         tar,spec=sdks[role]
         transport.install(tar,spec,sdk,alias)
-        assert reg["parent" if role=="P" else "candidate"] in sp.check_output(["rustc","+ohm","-vV"],env=standard(),text=True)
+        assert reg["compiler_arms"][role]["source"] in sp.check_output(["rustc","+ohm","-vV"],env=standard(),text=True)
         if not (work/"enrolled-cargo-home").exists():seed()
         results[role]={}
         for mode in ("check","build"):
             results[role][mode]=trial(role,mode)
             put(proof/"result.json",results)
         assert alias.resolve()==sdk.resolve()
-        alias.unlink();sdk.rename(work/("used-sdk-"+role))
+        alias.unlink()
+        shutil.rmtree(sdk)
+        # All receipts and measured native bodies are in proof; release only this runner's completed trial trees.
+        role_history = work/"histories"
+        for folder in role_history.glob(role+"-*"):
+            assert folder.is_dir() and not folder.is_symlink()
+            shutil.rmtree(folder)
     print("Complete",block,boot,flush=True)
 if __name__=="__main__":main()

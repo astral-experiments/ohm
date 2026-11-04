@@ -5,7 +5,7 @@ import subprocess
 import sys
 root=Path(sys.argv[1]).resolve()
 role=sys.argv[2]
-assert role in ("parent","candidate")
+assert role in ("F5","C5","C7")
 root.mkdir()
 n=1025
 vals={"A":[(i*13+11)%256 for i in range(n)],"B":[(i*97+257)%65536 for i in range(n)],
@@ -19,8 +19,10 @@ src=root/"probe.rs"
 src.write_text(source(vals))
 args=["rustc","+ohm","--edition=2024",str(src)]
 trace=subprocess.check_output([*args,"-Zunpretty=thir-tree"],text=True)
-count=trace.count("IntArrayLiteral(")
-assert count==(4 if role=="candidate" else 0),(role,count)
+old_count = trace.count("IntArrayLiteral(")
+new_count = trace.count("LiteralArray(")
+assert (old_count, new_count) == {"F5": (0, 0), "C5": (4, 0), "C7": (0, 4)}[role], (role, old_count, new_count)
+count = old_count + new_count
 exe=root/"probe"
 cmd=[*args,"-C","incremental="+str(root/"incremental"),"-o",str(exe)]
 def run_program(cmd,values):

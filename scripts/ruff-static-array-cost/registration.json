@@ -504,8 +504,6 @@
     "zstd-safe-7.2.4.crate": "8f49c4d5f0abb602a93fb8736af2a4f4dd9512e36f7f570d66e65ff867ed3b9d",
     "zstd-sys-2.0.16+zstd.1.5.7.crate": "91e19ebc2adc8f83e43039e79776e3fda8ca919132d68a1fed6a5faca2683748"
   },
-  "candidate": "6c2874a0b6a0bf3570f8959733b6f87907e5cce6",
-  "candidate_tree": "1a86c989ac19e14b8bc53ec8a92be4feafef5a9f",
   "cargo": "abc70d60a6fd89c10d5f65cf85820d9b78d5affe",
   "cases": {
     "rand": {
@@ -558,33 +556,62 @@
       "reader_sha256": "0220b9e3a2215b6892fafbaefaf435a3b1cef649953984ec1a065f909fe6ab01"
     }
   },
+  "compiler_arms": {
+    "C5": {
+      "factory_head": "1e84a3455be218cc5441991ac376988d0afdbcc6",
+      "factory_role": "candidate",
+      "factory_run": 41742694783,
+      "source": "6c2874a0b6a0bf3570f8959733b6f87907e5cce6",
+      "tree": "1a86c989ac19e14b8bc53ec8a92be4feafef5a9f"
+    },
+    "C7": {
+      "factory_head": "d5962c582a009cec01b41f8f1d76e9aa725bf0fa",
+      "factory_role": "candidate",
+      "factory_run": 41756960897,
+      "source": "06fe634feaa39288210a6f17b8994346a5fae1c1",
+      "tree": "2cff5a0eef365de6e4587006859dee9d4092ca87"
+    },
+    "F5": {
+      "factory_head": "200073f40d5992399d93d92de12caa71b4c519cf",
+      "factory_role": "parent",
+      "factory_run": 41737296261,
+      "source": "f5a51d8cc3e76236c2d0f17d495d59ebb03306e4",
+      "tree": "b4f0ad237b667d5227e63b44f6e8d3ba885bf7a1"
+    }
+  },
   "confirmation_orders": {
     "B1": [
-      "C",
-      "P"
+      "F5",
+      "C5",
+      "C7"
     ],
     "B2": [
-      "P",
-      "C"
+      "C5",
+      "C7",
+      "F5"
     ],
     "B3": [
-      "P",
-      "C"
+      "C7",
+      "F5",
+      "C5"
     ],
     "B4": [
-      "C",
-      "P"
+      "C7",
+      "C5",
+      "F5"
     ],
     "B5": [
-      "C",
-      "P"
+      "C5",
+      "F5",
+      "C7"
     ],
     "B6": [
-      "P",
-      "C"
+      "F5",
+      "C7",
+      "C5"
     ]
   },
-  "criterion": "Both fresh counterbalanced pilots must save at least 20 percent of retired instructions in the full edited check compiler. Then six new independent boots, all in the same direction with paired median saving >=20 percent, exact two-sided sign p 2/64, paired min to max 96.875 percent median interval. Withhold for a consistent unchanged or cold regression exceeding five percent and ten million instructions.",
+  "criterion": "After two admitted pilots only: six independent new boots use each three-compiler order exactly once. All six must favor each check-rustc contrast and both ordinary edited Cargo check comparisons. Median fractional check-rustc savings must reach 1/3 for F5->C7, 1/10 for C5->C7 and 1/5 for the C5 positive control. A cumulative 2x claim additionally requires F5 counts STRICTLY above twice C7 on all six new boots: exact two-sided sign p=.03125 at ratio 2 and minimum/maximum distribution-free 96.875% interval with lower bound above 2.",
   "deferred_holdout": {
     "case": "aliases",
     "original": 41736109700,
@@ -598,33 +625,17 @@
   "new": "bfedc614b7670b8766576b64afd426c292f8c2ce",
   "old": "523d83c941cbae9b7c8a10739c839a8eeda3245d",
   "orders": {
-    "B1": [
-      "C",
-      "P"
+    "H1": [
+      "F5",
+      "C5",
+      "C7"
     ],
-    "B2": [
-      "P",
-      "C"
-    ],
-    "B3": [
-      "P",
-      "C"
-    ],
-    "B4": [
-      "C",
-      "P"
-    ],
-    "B5": [
-      "C",
-      "P"
-    ],
-    "B6": [
-      "P",
-      "C"
+    "H2": [
+      "C7",
+      "C5",
+      "F5"
     ]
   },
-  "parent": "f5a51d8cc3e76236c2d0f17d495d59ebb03306e4",
-  "parent_tree": "b4f0ad237b667d5227e63b44f6e8d3ba885bf7a1",
   "paths": [
     ".cargo/deny.toml",
     "Cargo.lock",
@@ -639,13 +650,44 @@
     "crates/ruff_unicode_names2_generator/src/lib.rs",
     "crates/ruff_unicode_names2_generator/src/phf.rs"
   ],
-  "pilot": {
-    "head": "e25543d4492321e008554ad916cb14ac1680092f",
-    "readback_sha256": "64e02250789342c5b79e37f312a3b6fcc489b6b423ac623bf162eb952e8b08c6",
-    "run": 41741463395
+  "pilot": "Two independent first-attempt pilots use F5/C5/C7 and C7/C5/F5 on fresh boots. In each, require F5/C7 >= 1.5x, C5/C7 savings >=10%, F5/C5 savings >=20%, and C7 below each earlier arm in complete ordinary edited Cargo check. Retain any refused pilot, withhold promotion on any veto.",
+  "primary": "Whole exec-to-exit user-mode retired instructions of unicode_names2 rustc on a separately observed, original Ruff #29261 edited cargo check. Cumulative F5/C7 and incremental C5/C7 must be reported separately; never substitute simulated or traced whole Cargo for ordinary Cargo.",
+  "prior_boots_by_run": {
+    "41741463395": [
+      "90d32231-0715-4b9e-bcb4-90259e625454",
+      "b7a2c1b7-8fb0-4900-bf24-d8d09e25f216"
+    ],
+    "41742406689": [
+      "19127c3b-11c7-4913-9b2b-014eb96090b7",
+      "2fd51776-86a9-408f-a6ce-bd7cb69e1940",
+      "384e1885-fc10-4694-bc74-afee2d73145d",
+      "4432409d-f6c9-4189-b184-4ac4c75b7ca3",
+      "58a9bdc9-80f4-41c1-8255-b779d945fa56",
+      "6d3ba233-832f-4e1b-9e6c-749c0dc441ea"
+    ],
+    "41747290958": [
+      "4db8c15c-476c-45f2-8ed7-c29a071ac46a",
+      "6e6565a7-3c35-4b8b-b0c0-64a2ae047536"
+    ],
+    "41750680580": [
+      "1797b514-c7ca-4b43-8901-865e1cd2fa9a",
+      "269ad91d-5aad-42bb-a139-770f43216eb4",
+      "49d06341-1f1e-418e-bb3f-ecc993bfe813",
+      "9c2868ca-1fdd-4d83-9e93-0aaa946ca56a",
+      "9e99e1d9-c91d-4e0d-aebb-3db11d346aad",
+      "b7eb9594-6e26-4a0a-839e-76cc5da6310d"
+    ],
+    "41751693389": [
+      "0245ae4f-f8f4-4a90-8d8d-7afea773ed8b",
+      "03d525b2-38df-49a4-a672-2ce985e09ac1",
+      "071a037c-a6b9-4956-aa7d-23dc2b8b7393",
+      "2e2f307b-112a-4517-8e52-85242542697f",
+      "ddb5e3b1-f6ea-46f2-a598-ec94bb767ef1",
+      "e321abbc-6de3-466b-bb63-fa2f82680283"
+    ]
   },
-  "primary": "Complete physical unicode_names2 rustc lifetime in the ordinary Ruff #29261 edited cargo check.",
-  "prior_observations": "No hardware counts from the RNG edit were collected before these arms and outcomes were registered. The signed release, matched source parent and candidate independently passed ordinary old, edit, unchanged and empty source histories.",
+  "prior_observations": "Registered with earlier two-arm generic/native-trained C5 history, three stage-1 program-behavior histories and F5=9,489,390,493, C5=5,830,046,582, C7=4,744,397,650 selected-compiler Callgrind instructions on the locked RNG edit. Earlier C7 #21229 two-order work is a distinct workload. These observations do not enter any hardware estimate.",
+  "reference_price_receiver": "71ee962005d6518812457ef1122712d7f93b196e",
   "release_members": {
     "bin/cargo": {
       "bytes": 39249096,
@@ -658,10 +700,20 @@
       "source": "rust-1.99.0-dev-x86_64-unknown-linux-gnu/rustc/lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd"
     }
   },
-  "secondary": "normal full cargo check/build, full build rustc, cold state and settled",
+  "secondary": "Report complete uninstrumented Cargo check/build, true build rustc, cold OLD, settled, independent empty NEW (both Cargo and additional traced rustc), every raw host result and both role ratios. This study makes no inference about unrelated parser or repeated test-build jobs.",
+  "six_activation": "Changing the pilot matrix to the exact pre-enrolled six orders is a separate decision after both pilot originals pass. No job dispatch or promotion while the C7 release-recipe transport is missing.",
   "sources": {
+    "NameAliases.txt": {
+      "sha256": "793f6f1e4d15fd90f05ae66460191dc4d75d1fea90136a25f30dd6a4cb950eac"
+    },
+    "aggregate_probe.py": {
+      "sha256": "f5fc9b5427f13f972971eb522bbf5b8d97f8ae7b9e8ab6cfe9135e98defbac88"
+    },
     "array_probe.py": {
-      "sha256": "0ffa4d63207d86d3f06d40bec0cb6cc04b017bdcd805989f2f00dac887cb3143"
+      "sha256": "ebf9f41cb26fa23cfeee3f9846a8cf163d86b8f4d1b7c5b57148cc688e44d29e"
+    },
+    "bind_triplet_c7.py": {
+      "sha256": "d86689a802928b7afbf16a26646c9bf4e477384c4d46f96f9a3ff3466fdadc66"
     },
     "calibrate.c": {
       "commit": "d40f789799162a7e58bd96826a5f9caa3bdc008d",
@@ -673,13 +725,31 @@
       "file": "scripts/ruff-clap-config-help/exec_count.c",
       "sha256": "3a870fd13a70b4d5ca35f6962a376052a00889220ab1d925b839407d9f5758fb"
     },
+    "preexisting-software.json": {
+      "sha256": "b050a6a1e528803054928f6234177983806cbff5db6aa3352b3a8d31f4573e13"
+    },
+    "price.py": {
+      "sha256": "ac07aa7cf264b7c0257478d3bdc8577eb71c04cb243a0568b9cebe54da078a8f"
+    },
+    "receive_triplet.py": {
+      "sha256": "4f663f7bad2a312efbf9d1033d56445883c1a63a4494057e45974ab1ba12684f"
+    },
+    "rng-tables.json": {
+      "sha256": "3c2deb67c6c06a9fc051cc8cbd80bef90b044a2e0b361fb5addd212ee5fc8584"
+    },
     "stage2_open.py": {
-      "sha256": "4695e714d6b70edbd73dcfd6bb63104f422e4d8c6cc0faeb2e3872c4af39a81e"
+      "sha256": "e5dc905f36164982829e2924d2c53f13d381dfe45029be26b75f100a58971400"
+    },
+    "test_triplet.py": {
+      "sha256": "1ffa7932fefd898fc9d4095f4705925c24de166a323c9d2b6f7cca181577c458"
     },
     "transport.py": {
       "commit": "453a3893b5844334a5b7f1c770c14e94ad1a34f8",
       "file": "scripts/ruff-derived-impl-cgus/transport.py",
       "sha256": "a3309e78ddcfd05bb343f646a25cb5c5f2d0bc372268f52d3b0c3a285d45b90e"
+    },
+    "triplet.py": {
+      "sha256": "ed4cbfdf81a81c45b817024c3a4e958c34a82f188a0250a22de18ac7d03f15c2"
     },
     "whole_count.c": {
       "commit": "e48abf3b09f415b296d0ee2e8ec81c0de7b50611",
@@ -688,14 +758,16 @@
     }
   },
   "trained": {
-    "array_probe": "0ffa4d63207d86d3f06d40bec0cb6cc04b017bdcd805989f2f00dac887cb3143",
-    "design": "Repeat the already-registered full RNG histories and measurements on six different kernel boots with two independently built stage2 SDKs. Change only how the fully trained SDKs are opened. Require the same primary, six favorable pairs, median >=20 percent, all ordinary native and empty guards and both invalid checks. Report every common and held-out refusal. Boots must also be disjoint from both measured stage1 studies.",
+    "array_probe": "ebf9f41cb26fa23cfeee3f9846a8cf163d86b8f4d1b7c5b57148cc688e44d29e",
+    "design": "All three independently trained stage2 SDKs bindings use the same original release build script, release configuration, LLVM, signed Cargo/Wild, stable installed SDK and work paths; F5=parent and C5,C7=separate candidate roles.",
     "original_sdk_open_sha256": "9eeb6f65daae6655f05cdf545ceb7df91e34278e7dd6dc4332a96bd85e289ceb",
     "paired_receiver_sha256": "58f3c2a031a80fe18b06a0aa204609b8a8c922eab7b55b84302a010b1d30a5b8",
     "paired_receiver_source": "2730f118ffbe51cb7091360c6ea44b9c1b2bc600",
     "reference_pilot": 41741463395,
     "reference_qualification": 41742406689,
+    "release_aggregate_factory": 41756960897,
     "release_candidate_factory": 41742694783,
     "release_parent_factory": 41737296261
-  }
+  },
+  "veto": "C7 versus either F5 or C5: withhold on a consistent cold or settled whole-command increase above BOTH 5% and 10M instructions at either mode. Record logical and allocated target+shared bytes on ordinary edit, settled, and independent empty NEW per mode, deduplicating regular files by dev/inode; withhold on any consistent increase above BOTH 2% and 1 MiB at an enrolled endpoint. Require every exact source, PMU, complete native output, repeated typed invalid, repair and independent empty gate before counting any result."
 }
