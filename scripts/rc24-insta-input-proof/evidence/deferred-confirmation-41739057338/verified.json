@@ -1,0 +1,2444 @@
+{
+  "archive_digests": {
+    "block-1-PC": "sha256:44d393e0dce5c041aa8b5c00f8c06af190ee7300083b29c8596f87832166cdb3",
+    "block-2-CP": "sha256:088fa71530e610e23ebd1231bf98ff2b8fa4f903446220550753cf2592d76015",
+    "block-3-CP": "sha256:bbdaa31287376a2ace6abae3903a1fc3f9c878b57973b08204b5592c91c5450e",
+    "block-4-PC": "sha256:418e4fdf8ba863a250b71038b9d5ff8682923a91cfffe7490f02472badce4f41",
+    "block-5-PC": "sha256:283e7b20d8e37e43dd43a96c5c983dea37cad02bbd38b838e045e5b78378a22c",
+    "block-6-CP": "sha256:fbd5ac24de82e7d99d80b13078bd489d5c7e3722c75b35b85fb90a0c8a673879"
+  },
+  "boots": [
+    "149fff07-be8c-463c-ad2b-5568d6ef5d76",
+    "9998ae3c-36b5-4262-84ae-5b2900d4c0a9",
+    "61e49859-1791-488c-a2a6-aa292557e31c",
+    "a2b46899-1eed-4db4-866a-3590d77fe1fb",
+    "b31406cc-ae34-4241-86bf-cda7d82cba3f",
+    "45f01b36-3e1a-4e14-901e-5e248b635488"
+  ],
+  "expected": {
+    "head": "c00b41f0b57a56354c8710f7e37fe69b74e2f8af",
+    "new": "dfe14506d23010aa5dbc4ff6fea702a22ba312bd",
+    "old": "3bf4988cf062dc76895ff2f8421acf766172392b",
+    "release": "ecde6809d7f1fc1966798198479867c4a49bdf7a51f3873336d23a40fabce453",
+    "run": 41739057338
+  },
+  "gate": {
+    "all_primary_improve": true,
+    "blocks": 6,
+    "both_primary_minimum_two": true,
+    "hold": false,
+    "median_primary_ratio": 4.1840955257711325,
+    "migration": false,
+    "minimum_primary_ratio": 4.183570147448072,
+    "penalties": {
+      "build-unchanged": {
+        "adverse": [],
+        "both_orders": false
+      },
+      "check-unchanged": {
+        "adverse": [],
+        "both_orders": false
+      }
+    },
+    "stage": "confirmation"
+  },
+  "migration": null,
+  "plan": {
+    "cargo": {
+      "candidate": "32df98560d4ac57c4c959c762095a3afe6a3bbe62b44d8fc6e6bf8071f53a53e",
+      "parent": "b05c0f1a01f8cae3ccb7446647fcb7d9b5a36c3dfabc340a78a8b189561036b6"
+    },
+    "control": "Unchanged cargo check and cargo build on the same actual history. Hold a broad fix if either common no-op command regresses more than 5% and 10M instructions on both pilot workers. Retain cold and edited command cost, translated bytes, and independent native/Error provenance.",
+    "counter_origin": "a95a505d25b0f7839a6104ff1514ed9a4ddf9f90/scripts/ruff-original-ty-instructions",
+    "counter_sources": {
+      "calibrate": "43ed100fc2c2aab89e1c9cb644e3c1a6d561981128b09403b78562ac4655ea8d",
+      "exec_count": "beb82d46f7abdfd6dd176751edfabd80cc24160ed2b5fc3b22fd1012ca51321c",
+      "whole_count": "096b9e9efb7457ff4c2fd194985f18c4e05520fce46c85e5919b084ae3d823ce"
+    },
+    "orders": {
+      "block-1-PC": [
+        "parent",
+        "candidate"
+      ],
+      "block-2-CP": [
+        "candidate",
+        "parent"
+      ],
+      "block-3-CP": [
+        "candidate",
+        "parent"
+      ],
+      "block-4-PC": [
+        "parent",
+        "candidate"
+      ],
+      "block-5-PC": [
+        "parent",
+        "candidate"
+      ],
+      "block-6-CP": [
+        "candidate",
+        "parent"
+      ]
+    },
+    "pair_asset": 13278622099,
+    "pair_zip": "88dbde63eaf7aebc578e4cf0634d716e7a59745701b3cb88456cf4a8b34e36f6",
+    "phase": "two unscored order-reversed pilot workers",
+    "primary": "instructions of the first unchanged cargo test -p ty_project --lib --no-run after the genuine #29604 edit",
+    "producer_head": "29d7e95cd4426cac743860ca6a314cfa6c1924a9",
+    "producer_run": 41734567724,
+    "promotion": "No product PR from these pilots. Six fresh counterbalanced worker pairs and an exact paired sign result on the registered primary follow a qualifying pilot. Every full binary mismatch must be located in the original immutable object.",
+    "registration": "29d7e95cd4426cac743860ca6a314cfa6c1924a9",
+    "ruff_lock": "46f8a4fa82d5ac6dfd4ebd9eabb399179f02ce5127a7addc1780e8fb4ff9c7d2",
+    "ruff_paths": [
+      "crates/ty_project/src/db.rs",
+      "crates/ty_project/src/files.rs",
+      "crates/ty_project/src/lib.rs"
+    ],
+    "stage": "confirmation"
+  },
+  "raw": {
+    "block-1-PC": {
+      "archive_set": "cafc3cbbf4e0f8305022f74dbe4494e4ffdb9abed124ddae3246eda347cd6f28",
+      "archives": 502,
+      "boot": "149fff07-be8c-463c-ad2b-5568d6ef5d76",
+      "roles": {
+        "candidate": {
+          "census": [
+            [
+              "cargo",
+              null,
+              false,
+              "bf3dc7566fe3bd184509d0f8132854f0d4e13eda43406ed95b2ef4cd407949da",
+              27830,
+              [
+                518165774,
+                138909552,
+                138909552
+              ]
+            ],
+            [
+              "rustc",
+              "ron",
+              false,
+              "f85b18b01690933d9d61a3ee8e480b0e03ed484de6d956c3a327b2f244884342",
+              27846,
+              [
+                9284726812,
+                1827322312,
+                1827322312
+              ]
+            ],
+            [
+              "rustc",
+              "ty_project",
+              true,
+              "fff8b2196c6ce400ac0e38e8703c5a1b2edf72143db68fec338d3f2bcfacfd2e",
+              27871,
+              [
+                34403391,
+                18740287,
+                18740287
+              ]
+            ],
+            [
+              "Wild",
+              null,
+              false,
+              "9d03c7827d6a677d7c39a28aeb28cd6f3bcb93fc4f08ddf73a7c0eb6d9401e3b",
+              27884,
+              [
+                4032084,
+                1296562,
+                1296562
+              ]
+            ]
+          ],
+          "costs": {
+            "build-after-test": 1045580769013,
+            "build-second-unchanged": 460187713,
+            "build-unchanged": 460166340,
+            "check-after-test": 115017440489,
+            "check-second-unchanged": 990974356,
+            "check-unchanged": 991622386,
+            "edit": 30589316311,
+            "empty-new": 1809911484774,
+            "first-unchanged": 12666884982,
+            "old": 1809403055847,
+            "old-repeat": 12665952073,
+            "second-unchanged": 12670297928
+          },
+          "footprint": {
+            "registry": {
+              "insta": [
+                2321
+              ],
+              "insta_cmd": [],
+              "ron": [
+                4181
+              ]
+            },
+            "translated_bytes": 326390,
+            "translated_files": 144
+          },
+          "full": [
+            "ron"
+          ],
+          "invalid": [
+            "invalid",
+            "invalid-again"
+          ],
+          "native": {
+            "edit": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "empty-new": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "first-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "old": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "old-repeat": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "repaired": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "second-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "third-unchanged-observed": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ]
+          }
+        },
+        "parent": {
+          "census": [
+            [
+              "cargo",
+              null,
+              false,
+              "d027967a8dd3d4b13e80559ea755cecf7231e09371769e7d79d220998fef9599",
+              9129,
+              [
+                519614119,
+                141530533,
+                141530533
+              ]
+            ],
+            [
+              "rustc",
+              "ron",
+              false,
+              "d5fa52c64ebcb1fa8d98958e06c32c644c285f9799c510e85c57fdb135f0598f",
+              9145,
+              [
+                9285843087,
+                1774606656,
+                1774606656
+              ]
+            ],
+            [
+              "rustc",
+              "insta",
+              false,
+              "2c78332b0343e4fdb263c540769c6771ac8ca040c335024bd21937a87aee17c7",
+              9169,
+              [
+                40325412923,
+                7132788519,
+                7132788519
+              ]
+            ],
+            [
+              "rustc",
+              "ty_project",
+              true,
+              "ef3d0113bdc163f23b2e24829a5df30b37a1977781323d8c6a473002b97f6a82",
+              9199,
+              [
+                34401629,
+                20125157,
+                20125157
+              ]
+            ],
+            [
+              "Wild",
+              null,
+              false,
+              "94cba9542566e78bdb5680d7422302996e138e3329748503f7acb14fbcaee9dd",
+              9212,
+              [
+                4033864,
+                1286564,
+                1286564
+              ]
+            ]
+          ],
+          "costs": {
+            "build-after-test": 1046001179577,
+            "build-second-unchanged": 461739507,
+            "build-unchanged": 461885043,
+            "check-after-test": 115018388692,
+            "check-second-unchanged": 997081344,
+            "check-unchanged": 997961396,
+            "edit": 70921125318,
+            "empty-new": 1809285586916,
+            "first-unchanged": 52999012580,
+            "old": 1809112072521,
+            "old-repeat": 52997146573,
+            "second-unchanged": 53010520065
+          },
+          "footprint": {
+            "registry": {
+              "insta": [
+                14
+              ],
+              "insta_cmd": [],
+              "ron": [
+                4181
+              ]
+            },
+            "translated_bytes": 248440,
+            "translated_files": 144
+          },
+          "full": [
+            "insta",
+            "ron"
+          ],
+          "invalid": [
+            "invalid",
+            "invalid-again"
+          ],
+          "native": {
+            "edit": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "empty-new": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "first-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "old": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "old-repeat": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "repaired": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "second-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "third-unchanged-observed": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ]
+          }
+        }
+      }
+    },
+    "block-2-CP": {
+      "archive_set": "cafc3cbbf4e0f8305022f74dbe4494e4ffdb9abed124ddae3246eda347cd6f28",
+      "archives": 502,
+      "boot": "9998ae3c-36b5-4262-84ae-5b2900d4c0a9",
+      "roles": {
+        "candidate": {
+          "census": [
+            [
+              "cargo",
+              null,
+              false,
+              "753dbdd974169f7d9c1df0a06a0ba2d6932eb688e08f7054c4df76bf1d26cdae",
+              9017,
+              [
+                518313219,
+                124421595,
+                124421595
+              ]
+            ],
+            [
+              "rustc",
+              "ron",
+              false,
+              "80530ac99647a87cce7d5672c7f83d605971a8cc4a33d48169deea34711171c8",
+              9033,
+              [
+                9289119343,
+                1921609085,
+                1921609085
+              ]
+            ],
+            [
+              "rustc",
+              "ty_project",
+              true,
+              "f4d3c489b03260d88036468ec787dd8ab882abc6203d200f4aa300f488bb2f26",
+              9058,
+              [
+                34394516,
+                24978145,
+                24978145
+              ]
+            ],
+            [
+              "Wild",
+              null,
+              false,
+              "8d423a91f739da68595782a07dfd77a1b646c9c57840ba35111ed0ca9b9e7955",
+              9071,
+              [
+                4022555,
+                1503511,
+                1503511
+              ]
+            ]
+          ],
+          "costs": {
+            "build-after-test": 1044998366021,
+            "build-second-unchanged": 460333198,
+            "build-unchanged": 460300906,
+            "check-after-test": 115006784428,
+            "check-second-unchanged": 991250956,
+            "check-unchanged": 991948718,
+            "edit": 30588122982,
+            "empty-new": 1809209334501,
+            "first-unchanged": 12664384331,
+            "old": 1809131715670,
+            "old-repeat": 12667195786,
+            "second-unchanged": 12664674573
+          },
+          "footprint": {
+            "registry": {
+              "insta": [
+                2321
+              ],
+              "insta_cmd": [],
+              "ron": [
+                4181
+              ]
+            },
+            "translated_bytes": 326390,
+            "translated_files": 144
+          },
+          "full": [
+            "ron"
+          ],
+          "invalid": [
+            "invalid",
+            "invalid-again"
+          ],
+          "native": {
+            "edit": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "empty-new": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "first-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "old": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "old-repeat": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "repaired": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "second-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "third-unchanged-observed": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ]
+          }
+        },
+        "parent": {
+          "census": [
+            [
+              "cargo",
+              null,
+              false,
+              "ac0828ffe3c9af6be48a4beaa92ece1cdb8f11f71ec4d592d418192672a158eb",
+              27801,
+              [
+                519648643,
+                135985278,
+                135985278
+              ]
+            ],
+            [
+              "rustc",
+              "ron",
+              false,
+              "fa90153733bd9b1b04a61367cfcaaa0db3d802781902e9dd0b7d3841654adc76",
+              27817,
+              [
+                9291269165,
+                1915961080,
+                1915961080
+              ]
+            ],
+            [
+              "rustc",
+              "insta",
+              false,
+              "e290af1bda35164f105243fbedac9a660b19348d7057ae40b7dffab46efec25b",
+              27841,
+              [
+                40331899667,
+                6956738189,
+                6956738189
+              ]
+            ],
+            [
+              "rustc",
+              "ty_project",
+              true,
+              "14380c836046abfa33188d875beefb12e729755a790fcbb8e487256d52b54d21",
+              27871,
+              [
+                34373811,
+                18404740,
+                18404740
+              ]
+            ],
+            [
+              "Wild",
+              null,
+              false,
+              "b7663254a156842884f6a180677b0275237eb6edbd6d90a1a741bbf149c792c3",
+              27884,
+              [
+                3992361,
+                1519962,
+                1519962
+              ]
+            ]
+          ],
+          "costs": {
+            "build-after-test": 1045413740461,
+            "build-second-unchanged": 461911853,
+            "build-unchanged": 461940861,
+            "check-after-test": 114986362620,
+            "check-second-unchanged": 997033101,
+            "check-unchanged": 997771727,
+            "edit": 70914156012,
+            "empty-new": 1809656598276,
+            "first-unchanged": 52983441423,
+            "old": 1809281257704,
+            "old-repeat": 53003208006,
+            "second-unchanged": 52983052551
+          },
+          "footprint": {
+            "registry": {
+              "insta": [
+                14
+              ],
+              "insta_cmd": [],
+              "ron": [
+                4181
+              ]
+            },
+            "translated_bytes": 248440,
+            "translated_files": 144
+          },
+          "full": [
+            "insta",
+            "ron"
+          ],
+          "invalid": [
+            "invalid",
+            "invalid-again"
+          ],
+          "native": {
+            "edit": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "empty-new": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "first-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "old": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "old-repeat": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "repaired": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "second-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "third-unchanged-observed": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ]
+          }
+        }
+      }
+    },
+    "block-3-CP": {
+      "archive_set": "cafc3cbbf4e0f8305022f74dbe4494e4ffdb9abed124ddae3246eda347cd6f28",
+      "archives": 502,
+      "boot": "61e49859-1791-488c-a2a6-aa292557e31c",
+      "roles": {
+        "candidate": {
+          "census": [
+            [
+              "cargo",
+              null,
+              false,
+              "b71ad1e7791685b576dca0f1fb40b4e78b35317cbcf703ad2a37ad6ccb4441f4",
+              9028,
+              [
+                518282149,
+                96235065,
+                96235065
+              ]
+            ],
+            [
+              "rustc",
+              "ron",
+              false,
+              "833c9e01a3ffd54ca7ab1f6804727108b9b77701559187d611818cc248492680",
+              9044,
+              [
+                9289253183,
+                1467590262,
+                1467590262
+              ]
+            ],
+            [
+              "rustc",
+              "ty_project",
+              true,
+              "a43ea47ffe18f57cc171c7b56b313106e0e04efecfdf14b878eb963c63c8b7f8",
+              9069,
+              [
+                34387089,
+                13306576,
+                13306576
+              ]
+            ],
+            [
+              "Wild",
+              null,
+              false,
+              "feb44c9ff19373b51324ce2b7bdbedc05b10f625cd2101e3aed335f6c3f3bd2a",
+              9082,
+              [
+                4039383,
+                892998,
+                892998
+              ]
+            ]
+          ],
+          "costs": {
+            "build-after-test": 1046099790434,
+            "build-second-unchanged": 460175358,
+            "build-unchanged": 460120943,
+            "check-after-test": 115008791931,
+            "check-second-unchanged": 990587485,
+            "check-unchanged": 991877619,
+            "edit": 30582794039,
+            "empty-new": 1809552113689,
+            "first-unchanged": 12664983126,
+            "old": 1809342077072,
+            "old-repeat": 12666893274,
+            "second-unchanged": 12668654102
+          },
+          "footprint": {
+            "registry": {
+              "insta": [
+                2321
+              ],
+              "insta_cmd": [],
+              "ron": [
+                4181
+              ]
+            },
+            "translated_bytes": 326390,
+            "translated_files": 144
+          },
+          "full": [
+            "ron"
+          ],
+          "invalid": [
+            "invalid",
+            "invalid-again"
+          ],
+          "native": {
+            "edit": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "empty-new": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "first-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "old": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "old-repeat": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "repaired": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "second-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "third-unchanged-observed": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ]
+          }
+        },
+        "parent": {
+          "census": [
+            [
+              "cargo",
+              null,
+              false,
+              "5d0e1181a92e5cea46b2fbb2dce666a7295aa0259b5504430bef5e9e6541191e",
+              27810,
+              [
+                519846324,
+                103843021,
+                103843021
+              ]
+            ],
+            [
+              "rustc",
+              "ron",
+              false,
+              "22f6ebe81f4973ab91beddb0488869eb2c69b27229915ceee810b62a86a0ec1f",
+              27826,
+              [
+                9287849990,
+                1513392458,
+                1513392458
+              ]
+            ],
+            [
+              "rustc",
+              "insta",
+              false,
+              "48e59dc7f8721ec73930ccdc0a39d474253d432461ac24c894c634e86e094f17",
+              27850,
+              [
+                40339798639,
+                5942457128,
+                5942457128
+              ]
+            ],
+            [
+              "rustc",
+              "ty_project",
+              true,
+              "8e4b715d23b4d9b031f1db4a35e17ef20c81f36228b5c7a6e11c2cd43f131c44",
+              27880,
+              [
+                34404880,
+                14196293,
+                14196293
+              ]
+            ],
+            [
+              "Wild",
+              null,
+              false,
+              "305dcef2e275387d74cd5a29356636abf8836dfac02c189e44709d19e8b5d677",
+              27893,
+              [
+                4008155,
+                954633,
+                954633
+              ]
+            ]
+          ],
+          "costs": {
+            "build-after-test": 1045001385980,
+            "build-second-unchanged": 461961716,
+            "build-unchanged": 461838189,
+            "check-after-test": 115126924605,
+            "check-second-unchanged": 997048178,
+            "check-unchanged": 997867664,
+            "edit": 70915996261,
+            "empty-new": 1809089437598,
+            "first-unchanged": 53002554201,
+            "old": 1809393468560,
+            "old-repeat": 52994059686,
+            "second-unchanged": 53006931903
+          },
+          "footprint": {
+            "registry": {
+              "insta": [
+                14
+              ],
+              "insta_cmd": [],
+              "ron": [
+                4181
+              ]
+            },
+            "translated_bytes": 248440,
+            "translated_files": 144
+          },
+          "full": [
+            "insta",
+            "ron"
+          ],
+          "invalid": [
+            "invalid",
+            "invalid-again"
+          ],
+          "native": {
+            "edit": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "empty-new": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "first-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "old": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "old-repeat": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "repaired": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "second-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "third-unchanged-observed": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ]
+          }
+        }
+      }
+    },
+    "block-4-PC": {
+      "archive_set": "cafc3cbbf4e0f8305022f74dbe4494e4ffdb9abed124ddae3246eda347cd6f28",
+      "archives": 502,
+      "boot": "a2b46899-1eed-4db4-866a-3590d77fe1fb",
+      "roles": {
+        "candidate": {
+          "census": [
+            [
+              "cargo",
+              null,
+              false,
+              "c2b9c2996f9b96202853da1166e11c6e245a52a49a955dd961b0c2a830276758",
+              27820,
+              [
+                518125882,
+                130205208,
+                130205208
+              ]
+            ],
+            [
+              "rustc",
+              "ron",
+              false,
+              "d71169c7705b75546e47eae9b651ea106fa23710f8d28625a466bc062c710225",
+              27836,
+              [
+                9290648521,
+                1740388019,
+                1740388019
+              ]
+            ],
+            [
+              "rustc",
+              "ty_project",
+              true,
+              "afe300fed70a3fadd9bcd91ce5f14d3b11db8dc22d458f76169cadd3a854a713",
+              27861,
+              [
+                34400924,
+                19724260,
+                19724260
+              ]
+            ],
+            [
+              "Wild",
+              null,
+              false,
+              "a15c6f9a89bfc2d72a0ba84bed648561b0da850320369415cc46893ee33dc1bb",
+              27874,
+              [
+                3999274,
+                1344268,
+                1344268
+              ]
+            ]
+          ],
+          "costs": {
+            "build-after-test": 1045264222114,
+            "build-second-unchanged": 460108540,
+            "build-unchanged": 460211366,
+            "check-after-test": 115000158744,
+            "check-second-unchanged": 990863205,
+            "check-unchanged": 991778315,
+            "edit": 30584533708,
+            "empty-new": 1809357391719,
+            "first-unchanged": 12667425757,
+            "old": 1809362621149,
+            "old-repeat": 12665746205,
+            "second-unchanged": 12665864651
+          },
+          "footprint": {
+            "registry": {
+              "insta": [
+                2321
+              ],
+              "insta_cmd": [],
+              "ron": [
+                4181
+              ]
+            },
+            "translated_bytes": 326390,
+            "translated_files": 144
+          },
+          "full": [
+            "ron"
+          ],
+          "invalid": [
+            "invalid",
+            "invalid-again"
+          ],
+          "native": {
+            "edit": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "empty-new": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "first-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "old": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "old-repeat": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "repaired": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "second-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "third-unchanged-observed": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ]
+          }
+        },
+        "parent": {
+          "census": [
+            [
+              "cargo",
+              null,
+              false,
+              "fc16afe103bf31c0d0ee5fae484c90ce1b9dc0a79dddbe0db9d478f02bfd7fe8",
+              9125,
+              [
+                519910515,
+                130637973,
+                130637973
+              ]
+            ],
+            [
+              "rustc",
+              "ron",
+              false,
+              "87c61835a1f2f98077c4c43d903ea0a32d02d23826e8f2adfc0aeabf337f1c48",
+              9141,
+              [
+                9288045083,
+                1685180125,
+                1685180125
+              ]
+            ],
+            [
+              "rustc",
+              "insta",
+              false,
+              "c4329f4a2f0e10f55e884c5277f1eb030075e07485e5665688cd8a29a76f356a",
+              9166,
+              [
+                40333495112,
+                6481308840,
+                6481308840
+              ]
+            ],
+            [
+              "rustc",
+              "ty_project",
+              true,
+              "020d9f2433ce7ab9451d453d8ed5111be14d96d55154d6e1fc3ad351ecb37f7a",
+              9196,
+              [
+                34215602,
+                17182491,
+                17182491
+              ]
+            ],
+            [
+              "Wild",
+              null,
+              false,
+              "91f1c16914022f122f0627888db958cdfc6d58c99af0abe38f46bd15abf585fd",
+              9209,
+              [
+                4028066,
+                1259429,
+                1259429
+              ]
+            ]
+          ],
+          "costs": {
+            "build-after-test": 1045611503955,
+            "build-second-unchanged": 461801507,
+            "build-unchanged": 461739770,
+            "check-after-test": 114981000112,
+            "check-second-unchanged": 996954616,
+            "check-unchanged": 998076543,
+            "edit": 70926668912,
+            "empty-new": 1809228493171,
+            "first-unchanged": 52995064242,
+            "old": 1809680659545,
+            "old-repeat": 52995094233,
+            "second-unchanged": 53001810847
+          },
+          "footprint": {
+            "registry": {
+              "insta": [
+                14
+              ],
+              "insta_cmd": [],
+              "ron": [
+                4181
+              ]
+            },
+            "translated_bytes": 248440,
+            "translated_files": 144
+          },
+          "full": [
+            "insta",
+            "ron"
+          ],
+          "invalid": [
+            "invalid",
+            "invalid-again"
+          ],
+          "native": {
+            "edit": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "empty-new": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "first-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "old": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "old-repeat": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "repaired": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "second-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "third-unchanged-observed": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ]
+          }
+        }
+      }
+    },
+    "block-5-PC": {
+      "archive_set": "cafc3cbbf4e0f8305022f74dbe4494e4ffdb9abed124ddae3246eda347cd6f28",
+      "archives": 502,
+      "boot": "b31406cc-ae34-4241-86bf-cda7d82cba3f",
+      "roles": {
+        "candidate": {
+          "census": [
+            [
+              "cargo",
+              null,
+              false,
+              "63eb84a5ac582aa0f0a84f80ebde1092848ea7281f6f6a3a8fe49218c1004844",
+              27827,
+              [
+                518391079,
+                114566225,
+                114566225
+              ]
+            ],
+            [
+              "rustc",
+              "ron",
+              false,
+              "9b86502c39e2907dd958dd4e16b721b25b38cbd8ae538a78b79e6074c27ec210",
+              27843,
+              [
+                9290783405,
+                1803779586,
+                1803779586
+              ]
+            ],
+            [
+              "rustc",
+              "ty_project",
+              true,
+              "95fe9ee10cf58ad9d7d213cfae0bf50b64e132dbaf082cb521024617029d59b6",
+              27868,
+              [
+                34399246,
+                17222393,
+                17222393
+              ]
+            ],
+            [
+              "Wild",
+              null,
+              false,
+              "869f3031e3b283eed5cbae915af6a3d7571705207f6d4318877eabb9021bdccf",
+              27881,
+              [
+                4058237,
+                1042823,
+                1042823
+              ]
+            ]
+          ],
+          "costs": {
+            "build-after-test": 1045265320219,
+            "build-second-unchanged": 460169688,
+            "build-unchanged": 460263506,
+            "check-after-test": 115090931467,
+            "check-second-unchanged": 991021340,
+            "check-unchanged": 991687651,
+            "edit": 30587182759,
+            "empty-new": 1810102397351,
+            "first-unchanged": 12665522110,
+            "old": 1809482937460,
+            "old-repeat": 12668830749,
+            "second-unchanged": 12666689717
+          },
+          "footprint": {
+            "registry": {
+              "insta": [
+                2321
+              ],
+              "insta_cmd": [],
+              "ron": [
+                4181
+              ]
+            },
+            "translated_bytes": 326390,
+            "translated_files": 144
+          },
+          "full": [
+            "ron"
+          ],
+          "invalid": [
+            "invalid",
+            "invalid-again"
+          ],
+          "native": {
+            "edit": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "empty-new": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "first-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "old": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "old-repeat": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "repaired": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "second-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "third-unchanged-observed": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ]
+          }
+        },
+        "parent": {
+          "census": [
+            [
+              "cargo",
+              null,
+              false,
+              "fee520f359c3e2fa97fcdcf763fb0a8656863356725a9e9d214db1837864822c",
+              9135,
+              [
+                519737581,
+                127716593,
+                127716593
+              ]
+            ],
+            [
+              "rustc",
+              "ron",
+              false,
+              "a6ae337fdd7f92934864237b833e42a0dd84fd3f3b7348118dcc8beee53db304",
+              9151,
+              [
+                9291486466,
+                1860980379,
+                1860980379
+              ]
+            ],
+            [
+              "rustc",
+              "insta",
+              false,
+              "14b4cd2f4847a9322b747c5bea3a87281975f73d500e3c7b48cbc946e548ae76",
+              9175,
+              [
+                40338183009,
+                6632152099,
+                6632152099
+              ]
+            ],
+            [
+              "rustc",
+              "ty_project",
+              true,
+              "8f06137467e596048b5a02d2976fc79203f53c96edf1d7884ec11e9f25b4f395",
+              9205,
+              [
+                34397792,
+                18026207,
+                18026207
+              ]
+            ],
+            [
+              "Wild",
+              null,
+              false,
+              "6c3043c31cfd765e3967fb13eda9c89378d05d76ec90406e26323c7b88301a16",
+              9218,
+              [
+                4005513,
+                1399963,
+                1399963
+              ]
+            ]
+          ],
+          "costs": {
+            "build-after-test": 1045858668358,
+            "build-second-unchanged": 461850889,
+            "build-unchanged": 461894400,
+            "check-after-test": 115008178115,
+            "check-second-unchanged": 997235062,
+            "check-unchanged": 998569458,
+            "edit": 70931654296,
+            "empty-new": 1809067352058,
+            "first-unchanged": 52996373603,
+            "old": 1809344411738,
+            "old-repeat": 52994769608,
+            "second-unchanged": 52986285550
+          },
+          "footprint": {
+            "registry": {
+              "insta": [
+                14
+              ],
+              "insta_cmd": [],
+              "ron": [
+                4181
+              ]
+            },
+            "translated_bytes": 248440,
+            "translated_files": 144
+          },
+          "full": [
+            "insta",
+            "ron"
+          ],
+          "invalid": [
+            "invalid",
+            "invalid-again"
+          ],
+          "native": {
+            "edit": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "empty-new": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "first-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "old": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "old-repeat": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "repaired": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "second-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "third-unchanged-observed": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ]
+          }
+        }
+      }
+    },
+    "block-6-CP": {
+      "archive_set": "cafc3cbbf4e0f8305022f74dbe4494e4ffdb9abed124ddae3246eda347cd6f28",
+      "archives": 502,
+      "boot": "45f01b36-3e1a-4e14-901e-5e248b635488",
+      "roles": {
+        "candidate": {
+          "census": [
+            [
+              "cargo",
+              null,
+              false,
+              "c6dda51a7badba858196ee9f38a3ec5fc757f581da07b344ac09460563dd0922",
+              9012,
+              [
+                518406769,
+                108953477,
+                108953477
+              ]
+            ],
+            [
+              "rustc",
+              "ron",
+              false,
+              "52c0360d230a78574c8bdfa3ce6d6bbf8d2430deedd5d6767b61d984c349a9d6",
+              9029,
+              [
+                9283027582,
+                1700898239,
+                1700898239
+              ]
+            ],
+            [
+              "rustc",
+              "ty_project",
+              true,
+              "5d3d5a9e96cbd1fd2fe01dc37f513ab2d3e31d148955c1f72023746dd47d99e9",
+              9054,
+              [
+                34365880,
+                15087746,
+                15087746
+              ]
+            ],
+            [
+              "Wild",
+              null,
+              false,
+              "c415adfaa620d41cb5dbb4b44faf137db0df335ec99c2ef4ec689e0614be4d81",
+              9067,
+              [
+                3994331,
+                1032095,
+                1032095
+              ]
+            ]
+          ],
+          "costs": {
+            "build-after-test": 1045689106210,
+            "build-second-unchanged": 460235121,
+            "build-unchanged": 460220784,
+            "check-after-test": 115052318636,
+            "check-second-unchanged": 991091477,
+            "check-unchanged": 992045953,
+            "edit": 30590624356,
+            "empty-new": 1809112131518,
+            "first-unchanged": 12668391156,
+            "old": 1809532417326,
+            "old-repeat": 12667628611,
+            "second-unchanged": 12666399906
+          },
+          "footprint": {
+            "registry": {
+              "insta": [
+                2321
+              ],
+              "insta_cmd": [],
+              "ron": [
+                4181
+              ]
+            },
+            "translated_bytes": 326390,
+            "translated_files": 144
+          },
+          "full": [
+            "ron"
+          ],
+          "invalid": [
+            "invalid",
+            "invalid-again"
+          ],
+          "native": {
+            "edit": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "empty-new": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "first-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "old": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "old-repeat": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "repaired": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "second-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "third-unchanged-observed": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ]
+          }
+        },
+        "parent": {
+          "census": [
+            [
+              "cargo",
+              null,
+              false,
+              "4a3f7ca4df043e37a48cc4d2bc77af9d13e931683f991a2547d386907615ed87",
+              27801,
+              [
+                519924441,
+                121392749,
+                121392749
+              ]
+            ],
+            [
+              "rustc",
+              "ron",
+              false,
+              "6d560ae367d8ad2897fad5c350dcffa9568dd574dfbc7d598b26f0f2a1c30377",
+              27817,
+              [
+                9290455603,
+                1890751713,
+                1890751713
+              ]
+            ],
+            [
+              "rustc",
+              "insta",
+              false,
+              "32363e08175b661526aabeb3b979c5f016570b1b2cb74db1b2979b4894b166a5",
+              27841,
+              [
+                40333852800,
+                7313002042,
+                7313002042
+              ]
+            ],
+            [
+              "rustc",
+              "ty_project",
+              true,
+              "7a23a264095cf543a5e380523c084da8258d75b1c5a172b3130895efce6220fa",
+              27871,
+              [
+                34252051,
+                19345885,
+                19345885
+              ]
+            ],
+            [
+              "Wild",
+              null,
+              false,
+              "b67d7c46858aaaa3527dd26c596be6597c010484c2b22c240685eb99db2b8b06",
+              27884,
+              [
+                4023014,
+                1588016,
+                1588016
+              ]
+            ]
+          ],
+          "costs": {
+            "build-after-test": 1045652937983,
+            "build-second-unchanged": 461848813,
+            "build-unchanged": 461917058,
+            "check-after-test": 115049751368,
+            "check-second-unchanged": 997366382,
+            "check-unchanged": 998318577,
+            "edit": 70911917003,
+            "empty-new": 1809345086742,
+            "first-unchanged": 53006203006,
+            "old": 1809365580120,
+            "old-repeat": 52994268116,
+            "second-unchanged": 53008055468
+          },
+          "footprint": {
+            "registry": {
+              "insta": [
+                14
+              ],
+              "insta_cmd": [],
+              "ron": [
+                4181
+              ]
+            },
+            "translated_bytes": 248440,
+            "translated_files": 144
+          },
+          "full": [
+            "insta",
+            "ron"
+          ],
+          "invalid": [
+            "invalid",
+            "invalid-again"
+          ],
+          "native": {
+            "edit": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "empty-new": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "first-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "old": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "old-repeat": [
+              "73445eeb595596df08262767ab50046a994b4958aa39c61bb0b5c8cc05da8c1a",
+              "75c0d45205fa68d1e3d9aec30a4d15006ead9a9ac731f85eafd66f48894ea48a",
+              77,
+              182253552
+            ],
+            "repaired": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "second-unchanged": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ],
+            "third-unchanged-observed": [
+              "1a941001b167970f98b787bbc6e5574f46e6439bd3d030ca4d1be31f448dc185",
+              "c831ee45d9336d53df177d5188635711e92380b6c364dc856799bcb966f30100",
+              78,
+              182258808
+            ]
+          }
+        }
+      }
+    }
+  },
+  "stages": {
+    "build-after-test": {
+      "blocks": {
+        "block-1-PC": {
+          "candidate": 1045580769013,
+          "change_percent": -0.040192169206731965,
+          "delta": -420410564,
+          "parent": 1046001179577,
+          "ratio": 1.000402083298067
+        },
+        "block-2-CP": {
+          "candidate": 1044998366021,
+          "change_percent": -0.039733018987953006,
+          "delta": -415374440,
+          "parent": 1045413740461,
+          "ratio": 1.0003974881239113
+        },
+        "block-3-CP": {
+          "candidate": 1046099790434,
+          "change_percent": 0.10511033465949726,
+          "delta": 1098404454,
+          "parent": 1045001385980,
+          "ratio": 0.9989500003115914
+        },
+        "block-4-PC": {
+          "candidate": 1045264222114,
+          "change_percent": -0.03321327660287254,
+          "delta": -347281841,
+          "parent": 1045611503955,
+          "ratio": 1.0003322431148534
+        },
+        "block-5-PC": {
+          "candidate": 1045265320219,
+          "change_percent": -0.05673310906640916,
+          "delta": -593348139,
+          "parent": 1045858668358,
+          "ratio": 1.000567653137938
+        },
+        "block-6-CP": {
+          "candidate": 1045689106210,
+          "change_percent": 0.0034589131523654615,
+          "delta": 36168227,
+          "parent": 1045652937983,
+          "ratio": 0.999965412064843
+        }
+      },
+      "max_ratio": 1.000567653137938,
+      "median_ratio": 1.0003648656193822,
+      "min_ratio": 0.9989500003115914
+    },
+    "build-second-unchanged": {
+      "blocks": {
+        "block-1-PC": {
+          "candidate": 460187713,
+          "change_percent": -0.33607563928896855,
+          "delta": -1551794,
+          "parent": 461739507,
+          "ratio": 1.003372089163102
+        },
+        "block-2-CP": {
+          "candidate": 460333198,
+          "change_percent": -0.34176542336964433,
+          "delta": -1578655,
+          "parent": 461911853,
+          "ratio": 1.0034293746504896
+        },
+        "block-3-CP": {
+          "candidate": 460175358,
+          "change_percent": -0.3866896191025537,
+          "delta": -1786358,
+          "parent": 461961716,
+          "ratio": 1.0038819071228928
+        },
+        "block-4-PC": {
+          "candidate": 460108540,
+          "change_percent": -0.3666005793263927,
+          "delta": -1692967,
+          "parent": 461801507,
+          "ratio": 1.0036794948426735
+        },
+        "block-5-PC": {
+          "candidate": 460169688,
+          "change_percent": -0.36401380619622836,
+          "delta": -1681201,
+          "parent": 461850889,
+          "ratio": 1.0036534370773245
+        },
+        "block-6-CP": {
+          "candidate": 460235121,
+          "change_percent": -0.34939832139397886,
+          "delta": -1613692,
+          "parent": 461848813,
+          "ratio": 1.003506233936458
+        }
+      },
+      "max_ratio": 1.0038819071228928,
+      "median_ratio": 1.0035798355068912,
+      "min_ratio": 1.003372089163102
+    },
+    "build-unchanged": {
+      "blocks": {
+        "block-1-PC": {
+          "candidate": 460166340,
+          "change_percent": -0.3721062255743979,
+          "delta": -1718703,
+          "parent": 461885043,
+          "ratio": 1.0037349602754517
+        },
+        "block-2-CP": {
+          "candidate": 460300906,
+          "change_percent": -0.35501405882343295,
+          "delta": -1639955,
+          "parent": 461940861,
+          "ratio": 1.0035627889900351
+        },
+        "block-3-CP": {
+          "candidate": 460120943,
+          "change_percent": -0.3718284977078823,
+          "delta": -1717246,
+          "parent": 461838189,
+          "ratio": 1.0037321622197928
+        },
+        "block-4-PC": {
+          "candidate": 460211366,
+          "change_percent": -0.33100982399675294,
+          "delta": -1528404,
+          "parent": 461739770,
+          "ratio": 1.003321091378695
+        },
+        "block-5-PC": {
+          "candidate": 460263506,
+          "change_percent": -0.3530880651508195,
+          "delta": -1630894,
+          "parent": 461894400,
+          "ratio": 1.0035433919455696
+        },
+        "block-6-CP": {
+          "candidate": 460220784,
+          "change_percent": -0.36722480164393945,
+          "delta": -1696274,
+          "parent": 461917058,
+          "ratio": 1.0036857831262136
+        }
+      },
+      "max_ratio": 1.0037349602754517,
+      "median_ratio": 1.0036242860581244,
+      "min_ratio": 1.003321091378695
+    },
+    "check-after-test": {
+      "blocks": {
+        "block-1-PC": {
+          "candidate": 115017440489,
+          "change_percent": -0.0008243925260886797,
+          "delta": -948203,
+          "parent": 115018388692,
+          "ratio": 1.0000082439932236
+        },
+        "block-2-CP": {
+          "candidate": 115006784428,
+          "change_percent": 0.017760200022576278,
+          "delta": 20421808,
+          "parent": 114986362620,
+          "ratio": 0.9998224295366437
+        },
+        "block-3-CP": {
+          "candidate": 115008791931,
+          "change_percent": -0.10261081359144164,
+          "delta": -118132674,
+          "parent": 115126924605,
+          "ratio": 1.001027162115318
+        },
+        "block-4-PC": {
+          "candidate": 115000158744,
+          "change_percent": 0.016662432907477154,
+          "delta": 19158632,
+          "parent": 114981000112,
+          "ratio": 0.999833403429967
+        },
+        "block-5-PC": {
+          "candidate": 115090931467,
+          "change_percent": 0.07195431955913101,
+          "delta": 82753352,
+          "parent": 115008178115,
+          "ratio": 0.9992809741745489
+        },
+        "block-6-CP": {
+          "candidate": 115052318636,
+          "change_percent": 0.0022314415889512773,
+          "delta": 2567268,
+          "parent": 115049751368,
+          "ratio": 0.9999776860820326
+        }
+      },
+      "max_ratio": 1.001027162115318,
+      "median_ratio": 0.9999055447559998,
+      "min_ratio": 0.9992809741745489
+    },
+    "check-second-unchanged": {
+      "blocks": {
+        "block-1-PC": {
+          "candidate": 990974356,
+          "change_percent": -0.6124864372148986,
+          "delta": -6106988,
+          "parent": 997081344,
+          "ratio": 1.0061626095196352
+        },
+        "block-2-CP": {
+          "candidate": 991250956,
+          "change_percent": -0.579935108894647,
+          "delta": -5782145,
+          "parent": 997033101,
+          "ratio": 1.0058331797462599
+        },
+        "block-3-CP": {
+          "candidate": 990587485,
+          "change_percent": -0.6479820276046877,
+          "delta": -6460693,
+          "parent": 997048178,
+          "ratio": 1.0065220821965057
+        },
+        "block-4-PC": {
+          "candidate": 990863205,
+          "change_percent": -0.611001835212932,
+          "delta": -6091411,
+          "parent": 996954616,
+          "ratio": 1.0061475801798494
+        },
+        "block-5-PC": {
+          "candidate": 991021340,
+          "change_percent": -0.6230950190959095,
+          "delta": -6213722,
+          "parent": 997235062,
+          "ratio": 1.0062700183630757
+        },
+        "block-6-CP": {
+          "candidate": 991091477,
+          "change_percent": -0.6291474340068492,
+          "delta": -6274905,
+          "parent": 997366382,
+          "ratio": 1.006331307599369
+        }
+      },
+      "max_ratio": 1.0065220821965057,
+      "median_ratio": 1.0062163139413554,
+      "min_ratio": 1.0058331797462599
+    },
+    "check-unchanged": {
+      "blocks": {
+        "block-1-PC": {
+          "candidate": 991622386,
+          "change_percent": -0.6351959129288764,
+          "delta": -6339010,
+          "parent": 997961396,
+          "ratio": 1.006392564437326
+        },
+        "block-2-CP": {
+          "candidate": 991948718,
+          "change_percent": -0.5836013230709591,
+          "delta": -5823009,
+          "parent": 997771727,
+          "ratio": 1.005870272217036
+        },
+        "block-3-CP": {
+          "candidate": 991877619,
+          "change_percent": -0.6002845082672237,
+          "delta": -5990045,
+          "parent": 997867664,
+          "ratio": 1.0060390968454749
+        },
+        "block-4-PC": {
+          "candidate": 991778315,
+          "change_percent": -0.6310365717111188,
+          "delta": -6298228,
+          "parent": 998076543,
+          "ratio": 1.0063504393116318
+        },
+        "block-5-PC": {
+          "candidate": 991687651,
+          "change_percent": -0.6891665817401749,
+          "delta": -6881807,
+          "parent": 998569458,
+          "ratio": 1.0069394904666409
+        },
+        "block-6-CP": {
+          "candidate": 992045953,
+          "change_percent": -0.6283188697990161,
+          "delta": -6272624,
+          "parent": 998318577,
+          "ratio": 1.0063229167772232
+        }
+      },
+      "max_ratio": 1.0069394904666409,
+      "median_ratio": 1.0063366780444274,
+      "min_ratio": 1.005870272217036
+    },
+    "edit": {
+      "blocks": {
+        "block-1-PC": {
+          "candidate": 30589316311,
+          "change_percent": -56.86854068679542,
+          "delta": -40331809007,
+          "parent": 70921125318,
+          "ratio": 2.3184933130557277
+        },
+        "block-2-CP": {
+          "candidate": 30588122982,
+          "change_percent": -56.86598459012342,
+          "delta": -40326033030,
+          "parent": 70914156012,
+          "ratio": 2.318355920490133
+        },
+        "block-3-CP": {
+          "candidate": 30582794039,
+          "change_percent": -56.87461834923286,
+          "delta": -40333202222,
+          "parent": 70915996261,
+          "ratio": 2.31882005844744
+        },
+        "block-4-PC": {
+          "candidate": 30584533708,
+          "change_percent": -56.87865484568748,
+          "delta": -40342135204,
+          "parent": 70926668912,
+          "ratio": 2.3190371182101006
+        },
+        "block-5-PC": {
+          "candidate": 30587182759,
+          "change_percent": -56.87795094788184,
+          "delta": -40344471537,
+          "parent": 70931654296,
+          "ratio": 2.3189992636745536
+        },
+        "block-6-CP": {
+          "candidate": 30590624356,
+          "change_percent": -56.861095216611005,
+          "delta": -40321292647,
+          "parent": 70911917003,
+          "ratio": 2.3180931574903094
+        }
+      },
+      "max_ratio": 2.3190371182101006,
+      "median_ratio": 2.318656685751584,
+      "min_ratio": 2.3180931574903094
+    },
+    "empty-new": {
+      "blocks": {
+        "block-1-PC": {
+          "candidate": 1809911484774,
+          "change_percent": 0.0345936463832075,
+          "delta": 625897858,
+          "parent": 1809285586916,
+          "ratio": 0.9996541831668203
+        },
+        "block-2-CP": {
+          "candidate": 1809209334501,
+          "change_percent": -0.02471539492222563,
+          "delta": -447263775,
+          "parent": 1809656598276,
+          "ratio": 1.000247215049398
+        },
+        "block-3-CP": {
+          "candidate": 1809552113689,
+          "change_percent": 0.025575081109008302,
+          "delta": 462676091,
+          "parent": 1809089437598,
+          "ratio": 0.9997443145806634
+        },
+        "block-4-PC": {
+          "candidate": 1809357391719,
+          "change_percent": 0.007124503537636606,
+          "delta": 128898548,
+          "parent": 1809228493171,
+          "ratio": 0.999928760040117
+        },
+        "block-5-PC": {
+          "candidate": 1810102397351,
+          "change_percent": 0.05721430392420235,
+          "delta": 1035045293,
+          "parent": 1809067352058,
+          "ratio": 0.9994281841212327
+        },
+        "block-6-CP": {
+          "candidate": 1809112131518,
+          "change_percent": -0.012875112973587122,
+          "delta": -232955224,
+          "parent": 1809345086742,
+          "ratio": 1.0001287677087238
+        }
+      },
+      "max_ratio": 1.000247215049398,
+      "median_ratio": 0.9998365373103901,
+      "min_ratio": 0.9994281841212327
+    },
+    "first-unchanged": {
+      "blocks": {
+        "block-1-PC": {
+          "candidate": 12666884982,
+          "change_percent": -76.09977174031343,
+          "delta": -40332127598,
+          "parent": 52999012580,
+          "ratio": 4.184060458061559
+        },
+        "block-2-CP": {
+          "candidate": 12664384331,
+          "change_percent": -76.09746745234555,
+          "delta": -40319057092,
+          "parent": 52983441423,
+          "ratio": 4.183657099959185
+        },
+        "block-3-CP": {
+          "candidate": 12664983126,
+          "change_percent": -76.10495698382579,
+          "delta": -40337571075,
+          "parent": 53002554201,
+          "ratio": 4.184968402539031
+        },
+        "block-4-PC": {
+          "candidate": 12667425757,
+          "change_percent": -76.09697065531486,
+          "delta": -40327638485,
+          "parent": 52995064242,
+          "ratio": 4.183570147448072
+        },
+        "block-5-PC": {
+          "candidate": 12665522110,
+          "change_percent": -76.10115325082727,
+          "delta": -40330851493,
+          "parent": 52996373603,
+          "ratio": 4.184302324272679
+        },
+        "block-6-CP": {
+          "candidate": 12668391156,
+          "change_percent": -76.10017236177809,
+          "delta": -40337811850,
+          "parent": 53006203006,
+          "ratio": 4.184130593480705
+        }
+      },
+      "max_ratio": 4.184968402539031,
+      "median_ratio": 4.1840955257711325,
+      "min_ratio": 4.183570147448072
+    },
+    "old": {
+      "blocks": {
+        "block-1-PC": {
+          "candidate": 1809403055847,
+          "change_percent": 0.01608431729684945,
+          "delta": 290983326,
+          "parent": 1809112072521,
+          "ratio": 0.9998391826933973
+        },
+        "block-2-CP": {
+          "candidate": 1809131715670,
+          "change_percent": -0.008265272928864587,
+          "delta": -149542034,
+          "parent": 1809281257704,
+          "ratio": 1.000082659561327
+        },
+        "block-3-CP": {
+          "candidate": 1809342077072,
+          "change_percent": -0.002840260501268954,
+          "delta": -51391488,
+          "parent": 1809393468560,
+          "ratio": 1.0000284034117435
+        },
+        "block-4-PC": {
+          "candidate": 1809362621149,
+          "change_percent": -0.017574282751076087,
+          "delta": -318038396,
+          "parent": 1809680659545,
+          "ratio": 1.000175773718481
+        },
+        "block-5-PC": {
+          "candidate": 1809482937460,
+          "change_percent": 0.00765612788262704,
+          "delta": 138525722,
+          "parent": 1809344411738,
+          "ratio": 0.9999234445823543
+        },
+        "block-6-CP": {
+          "candidate": 1809532417326,
+          "change_percent": 0.009220757144556835,
+          "delta": 166837206,
+          "parent": 1809365580120,
+          "ratio": 0.9999078009300068
+        }
+      },
+      "max_ratio": 1.000175773718481,
+      "median_ratio": 0.9999759239970489,
+      "min_ratio": 0.9998391826933973
+    },
+    "old-repeat": {
+      "blocks": {
+        "block-1-PC": {
+          "candidate": 12665952073,
+          "change_percent": -76.10069052386905,
+          "delta": -40331194500,
+          "parent": 52997146573,
+          "ratio": 4.1842213098195735
+        },
+        "block-2-CP": {
+          "candidate": 12667195786,
+          "change_percent": -76.10107715637501,
+          "delta": -40336012220,
+          "parent": 53003208006,
+          "ratio": 4.184289001404719
+        },
+        "block-3-CP": {
+          "candidate": 12666893274,
+          "change_percent": -76.09752234674268,
+          "delta": -40327166412,
+          "parent": 52994059686,
+          "ratio": 4.183666708140293
+        },
+        "block-4-PC": {
+          "candidate": 12665746205,
+          "change_percent": -76.10015344191416,
+          "delta": -40329348028,
+          "parent": 52995094233,
+          "ratio": 4.184127281192431
+        },
+        "block-5-PC": {
+          "candidate": 12668830749,
+          "change_percent": -76.09418657216402,
+          "delta": -40325938859,
+          "parent": 52994769608,
+          "ratio": 4.1830829267478435
+        },
+        "block-6-CP": {
+          "candidate": 12667628611,
+          "change_percent": -76.09622877841879,
+          "delta": -40326639505,
+          "parent": 52994268116,
+          "ratio": 4.183440306260807
+        }
+      },
+      "max_ratio": 4.184289001404719,
+      "median_ratio": 4.1838969946663624,
+      "min_ratio": 4.1830829267478435
+    },
+    "second-unchanged": {
+      "blocks": {
+        "block-1-PC": {
+          "candidate": 12670297928,
+          "change_percent": -76.09852174160142,
+          "delta": -40340222137,
+          "parent": 53010520065,
+          "ratio": 4.183841640207405
+        },
+        "block-2-CP": {
+          "candidate": 12664674573,
+          "change_percent": -76.09674421682416,
+          "delta": -40318377978,
+          "parent": 52983052551,
+          "ratio": 4.183530515971987
+        },
+        "block-3-CP": {
+          "candidate": 12668654102,
+          "change_percent": -76.10000494806415,
+          "delta": -40338277801,
+          "parent": 53006931903,
+          "ratio": 4.184101284652787
+        },
+        "block-4-PC": {
+          "candidate": 12665864651,
+          "change_percent": -76.10295865633256,
+          "delta": -40335946196,
+          "parent": 53001810847,
+          "ratio": 4.184618445517289
+        },
+        "block-5-PC": {
+          "candidate": 12666689717,
+          "change_percent": -76.0943995497718,
+          "delta": -40319595833,
+          "parent": 52986285550,
+          "ratio": 4.183120194290932
+        },
+        "block-6-CP": {
+          "candidate": 12666399906,
+          "change_percent": -76.10476408883461,
+          "delta": -40341655562,
+          "parent": 53008055468,
+          "ratio": 4.18493461925913
+        }
+      },
+      "max_ratio": 4.18493461925913,
+      "median_ratio": 4.183971462430096,
+      "min_ratio": 4.183120194290932
+    }
+  }
+}
