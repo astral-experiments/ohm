@@ -38,7 +38,7 @@ def fetch(role,cache,dest):
                 proof=json.loads((dest/'sdk.json').read_bytes());source=json.loads((dest/'source.json').read_bytes());versions=json.loads((dest/'reported-versions.json').read_bytes())
                 name={'P':'parent','C':'candidate'}[role]
                 require(source['source']==REGISTER[name] and source['tree']==REGISTER[name+'_tree'] and source['factory']==spec['qa'] and str(source['run'])==str(spec['run']),'wrong physical source role')
-                require(proof['role']==name and proof['driver']==spec['driver'] and proof['versions']==versions and REGISTER[name] in versions['rustc'] and REGISTER['cargo'] in versions['cargo'],'wrong source binary')
+                require(source['role']==REGISTER['factory_roles'][role] and proof['role']==REGISTER['factory_roles'][role] and proof['driver']==spec['driver'] and proof['versions']==versions and REGISTER[name] in versions['rustc'] and REGISTER['cargo'] in versions['cargo'],'wrong source binary')
                 require((dest/'sdk-sha256').read_text().strip()==spec['tar'],'wrong declared SDK digest')
                 require(sha(dest/'bootstrap.json')=='3129eb48157c6b610c65b818ac9f86269ab1257020cf12d29701a36111460993','actual bootstrap argv differ from source-matched parent')
             else:

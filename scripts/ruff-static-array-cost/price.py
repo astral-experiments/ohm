@@ -69,7 +69,7 @@ def enroll():
     for role in order:
         cases[role]=transport.fetch(role,work/"archives",proof/("sdk-"+role))
         verdict=json.loads((proof/("sdk-"+role)/"probes/verdict.json").read_bytes())
-        assert verdict["marked_arrays"]==(4 if role=="C" else 0)
+        assert verdict["marked_arrays"]==4
         assert verdict["native_repaired"]==verdict["native_empty"]!=verdict["native_old"]
     assert (proof/"sdk-C/bootstrap.json").read_bytes()==(proof/"sdk-P/bootstrap.json").read_bytes()
     os.environ.pop("GH_TOKEN",None)
