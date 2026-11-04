@@ -29,17 +29,17 @@ with zipfile.ZipFile(out/'raw-hardware-and-controls.zip','x',compression=zipfile
      ns.append(n)
     if len(parts)==4 and parts[0]in ('P','C')and parts[1]in ('observed-edit','old-unchanged','edited-unchanged')and parts[2]=='kernel-execs' and (parts[3].endswith('.nul')or parts[3]=='epochs.tsv'):ns.append(n)
    assert {'P/edit/hardware.json','C/edit/hardware.json','P/caps/caps.json','C/caps/caps.json'}<=set(ns);ns=set(ns);assert sum(z.getinfo(n).file_size for n in ns)<48*2**20
-   # Keep every native body behind a rebuilt physical WIP across all six boots. All full CLI ELFs and the other donor bodies stay in the authenticated original Actions archives.
+   # Keep every native library body behind a rebuilt physical WIP across all six boots. All full CLI ELFs and the other donor bodies stay in the authenticated original Actions archives.
+   from reopen import roster
    native=out/'changed-object-originals';native.mkdir(exist_ok=True);manifest={}
    for k in 'PC':
-    groups=x['roles'][k]['transitions'];wanted=set()
-    for t in groups.values():wanted.update(t['new_names']+t['changed_in_place']+t['rebuilt_unchanged']+t['removed_names'])
+    t=x['roles'][k]['transitions']['lib'];wanted=set(t['new_names']+t['changed_in_place']+t['rebuilt_unchanged']+t['removed_names'])
     for stage in ('cold-old','edit','empty-new'):
-     sessions=json.loads(z.read(f'{k}/{stage}/incremental-native-sessions.json'));rows=[r for rs in sessions.values()for r in rs if r[0]in wanted];manifest[k+'/'+stage]=[[r[0],r[4],r[5]]for r in rows]
-     for r in rows:
-      h=r[5];dest=native/(h+'.o.zst')
+     by_kind,_,_=roster(z,f'{k}/{stage}');rows=[r for name,r in by_kind['lib'].items()if name in wanted];manifest[k+'/'+stage]=[[r[0],r[4],r[5]]for r in rows]
+     for obj in rows:
+      digest=obj[5];dest=native/(digest+'.o.zst')
       if not dest.exists():
-       src=f'{k}/native/{h}.zst';assert z.getinfo(src).file_size<16*2**20;data=z.read(src);raw_elf=sp.check_output(['zstd','-qdc'],input=data);assert len(raw_elf)==r[4]and raw_elf[:4]==b'\x7fELF'and hashlib.sha256(raw_elf).hexdigest()==h;dest.write_bytes(data)
+       src=f'{k}/native/{digest}.zst';assert z.getinfo(src).file_size<16*2**20;data=z.read(src);raw_elf=sp.check_output(['zstd','-qdc'],input=data);assert len(raw_elf)==obj[4]and raw_elf[:4]==b'\x7fELF'and hashlib.sha256(raw_elf).hexdigest()==digest;dest.write_bytes(data)
    put(key+'-changed-object-bindings.json',manifest);assert sum(p.stat().st_size for p in native.iterdir())<160*2**20
    for n in sorted(ns):
     e=zipfile.ZipInfo(key+'/'+n,(1980,1,1,0,0,0));e.compress_type=zipfile.ZIP_DEFLATED;raw.writestr(e,z.read(n))
