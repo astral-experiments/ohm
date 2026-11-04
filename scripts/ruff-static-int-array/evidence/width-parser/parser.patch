@@ -1,0 +1,136 @@
+diff --git a/compiler/rustc_ast/src/tokenstream.rs b/compiler/rustc_ast/src/tokenstream.rs
+index 57a1248e8d6a5..f71c8748dd7a9 100644
+--- a/compiler/rustc_ast/src/tokenstream.rs
++++ b/compiler/rustc_ast/src/tokenstream.rs
+@@ -980,0 +981,6 @@ pub fn look_ahead_past_close_delim(&self) -> Option<&TokenTree> {
++    /// The enclosing token tree, before its first child has been read.
++    #[inline]
++    pub fn opening_delim_tree(&self) -> Option<&TokenTree> {
++        if self.curr.index == 0 { self.stack.last()?.curr() } else { None }
++    }
++
+diff --git a/compiler/rustc_parse/src/parser/expr.rs b/compiler/rustc_parse/src/parser/expr.rs
+index 066854d0dc49b..e98320d1d1564 100644
+--- a/compiler/rustc_parse/src/parser/expr.rs
++++ b/compiler/rustc_parse/src/parser/expr.rs
+@@ -9,0 +10 @@
++use rustc_ast::tokenstream::{TokenStream, TokenTree};
+@@ -1671,0 +1673,3 @@ fn parse_expr_array_or_repeat(&mut self, close: ExpTokenPair) -> PResult<'a, Box
++        if let Some(array) = self.parse_literal_array() {
++            return self.maybe_recover_from_bad_qpath(array);
++        }
+@@ -1701,0 +1706,74 @@ fn parse_expr_array_or_repeat(&mut self, close: ExpTokenPair) -> PResult<'a, Box
++    fn parse_literal_array(&mut self) -> Option<Box<Expr>> {
++        fn literal(tree: &TokenTree) -> bool {
++            matches!(
++                tree,
++                TokenTree::Token(
++                    Token {
++                        kind: token::Literal(token::Lit {
++                            kind: token::Integer | token::Char | token::Str | token::StrRaw(_),
++                            suffix: None,
++                            ..
++                        }),
++                        span,
++                    },
++                    _,
++                ) if !span.is_dummy()
++            )
++        }
++
++        fn comma_list(tokens: &TokenStream, element: impl Fn(&TokenTree) -> bool) -> bool {
++            tokens.iter().enumerate().all(|(index, tree)| {
++                if index % 2 == 0 {
++                    element(tree)
++                } else {
++                    matches!(tree, TokenTree::Token(Token { kind: token::Comma, span }, _) if !span.is_dummy())
++                }
++            })
++        }
++
++        let TokenTree::Delimited(span, _, Delimiter::Bracket, tokens) =
++            self.token_cursor.opening_delim_tree()?
++        else {
++            return None;
++        };
++        if tokens.len() < 32
++            || self.token != token::OpenBracket
++            || span.open != self.token.span
++            || span.open.is_dummy()
++            || span.close.is_dummy()
++            || !comma_list(tokens, |tree| match tree {
++                TokenTree::Delimited(span, _, Delimiter::Parenthesis, fields) => {
++                    fields.len() >= 2
++                        && !span.open.is_dummy()
++                        && !span.close.is_dummy()
++                        && comma_list(fields, literal)
++                }
++                _ => literal(tree),
++            })
++        {
++            return None;
++        }
++
++        let make_literal = |tree: &TokenTree| {
++            let TokenTree::Token(Token { kind: token::Literal(lit), span }, _) = tree else {
++                unreachable!()
++            };
++            self.mk_expr(span.to(*span), ExprKind::Lit(*lit))
++        };
++        let elements = tokens
++            .iter()
++            .step_by(2)
++            .map(|tree| match tree {
++                TokenTree::Delimited(span, _, _, fields) => {
++                    let fields = fields.iter().step_by(2).map(make_literal).collect();
++                    self.mk_expr(span.open.to(span.close), ExprKind::Tup(fields))
++                }
++                _ => make_literal(tree),
++            })
++            .collect();
++        let span = span.open.to(span.close);
++        self.current_closure.take();
++        self.parse_token_tree();
++        Some(self.mk_expr(span, ExprKind::Array(elements)))
++    }
++
+diff --git a/tests/ui/parser/large-literal-array.rs b/tests/ui/parser/large-literal-array.rs
+new file mode 100644
+index 0000000000000..877cb12ed8b17
+--- /dev/null
++++ b/tests/ui/parser/large-literal-array.rs
+@@ -0,0 +1,34 @@
++//@ run-pass
++//@ edition: 2024
++
++fn main() {
++    let values = [
++        (r#"a"#, 'a', 0),
++        (r#"b"#, 'b', 1),
++        (r#"c"#, 'c', 2),
++        (r#"d"#, 'd', 3),
++        (r#"e"#, 'e', 4),
++        (r#"f"#, 'f', 5),
++        (r#"g"#, 'g', 6),
++        (r#"h"#, 'h', 7),
++        (r#"i"#, 'i', 8),
++        (r#"j"#, 'j', 9),
++        (r#"k"#, 'k', 10),
++        (r#"l"#, 'l', 11),
++        (r#"m"#, 'm', 12),
++        (r#"n"#, 'n', 13),
++        (r#"o"#, 'o', 14),
++        (r#"p"#, 'p', 15),
++        (r#"q"#, 'q', 16),
++    ]
++    .map(|(s, c, i)| (s.chars().next().unwrap(), c, i));
++    for (i, (text, ch, value)) in values.into_iter().enumerate() {
++        assert_eq!(text, ch);
++        assert_eq!(ch as usize, b'a' as usize + i);
++        assert_eq!(value, i);
++    }
++
++    let array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0x10];
++    let operators = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1 << 4];
++    assert_eq!(array, operators);
++}
