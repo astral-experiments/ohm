@@ -117,6 +117,21 @@ cp -p "$test_root/original-readme" "$readme"
 "${verify_sources[@]}" >/dev/null
 git -C "$cargo_checkout" config --unset core.trustctime
 
+printf 'README.md filter=ohm-test\n' > "$cargo_checkout/.git/info/attributes"
+git -C "$cargo_checkout" config filter.ohm-test.clean 'git show HEAD:README.md'
+git -C "$cargo_checkout" config filter.ohm-test.required true
+printf 'hidden cargo!\n' > "$readme"
+git -C "$cargo_checkout" add -- README.md
+git -C "$cargo_checkout" diff --cached --quiet HEAD -- README.md
+if "${verify_sources[@]}" >/dev/null 2>&1; then
+  echo 'source verification accepted a tracked edit hidden by a clean filter' >&2
+  exit 1
+fi
+cp -p "$test_root/original-readme" "$readme"
+"${verify_sources[@]}" >/dev/null
+git -C "$cargo_checkout" config --remove-section filter.ohm-test
+rm -- "$cargo_checkout/.git/info/attributes"
+
 embedded_cargo="$rust_checkout/src/tools/cargo"
 nested_dependency="$embedded_cargo/vendor/fixture code"
 mv "$nested_dependency/.git" "$test_root/dependency-gitfile"

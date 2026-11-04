@@ -44,8 +44,22 @@ verify_clean_checkout() {
     trap 'rm -rf -- "$index_directory"' EXIT
     GIT_INDEX_FILE="$(cd -- "$index_directory" && pwd -P)/index" || exit 1
     export GIT_INDEX_FILE
+
+    # Clean filters can return a pinned blob for different bytes on disk.
+    filter_config="${GIT_INDEX_FILE%/*}/filters"
+    : > "$filter_config" || exit 1
+    git -C "$checkout" config --null --name-only --list > "$index_directory/config-keys" || exit 1
+    while IFS= read -r -d '' key; do
+      case "$key" in
+        filter.*.clean|filter.*.process) value="" ;;
+        filter.*.required) value=false ;;
+        *) continue ;;
+      esac
+      git config --file "$filter_config" --replace-all "$key" "$value" || exit 1
+    done < "$index_directory/config-keys"
     git -C "$checkout" -c core.sparseCheckout=false read-tree HEAD &&
-      git -C "$checkout" "${mode_config[@]}" -c core.sparseCheckout=false diff --no-ext-diff --no-textconv --quiet --ignore-submodules=none HEAD -- "$@"
+      git -C "$checkout" "${mode_config[@]}" -c "include.path=$filter_config" -c core.sparseCheckout=false \
+        diff --no-ext-diff --no-textconv --quiet --ignore-submodules=none HEAD -- "$@"
   ); then
     echo "could not verify tracked source files against HEAD: $checkout" >&2
     exit 1
