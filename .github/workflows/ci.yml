@@ -1,19 +1,22 @@
-name: Qualify the ordinary Ruff test build
-run-name: 'Ruff #28392 full test build on matched stage2 compilers'
+name: Qualify a fixed-HEAD Ruff test build
+run-name: 'Ruff #28392 working-tree test-build pilot (HEAD stays f328042)'
 permissions:
   contents: read
   actions: read
 jobs:
   paired:
-    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1' && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-ruff-cli-help-norun-stage2-20261104'
+    if: github.repository == 'astral-experiments/ohm' && github.run_attempt == '1'
+      && github.event_name == 'workflow_dispatch' && github.sha == inputs.reviewed_head
+      && github.ref_name == 'charlie/qa-ruff-cli-fixed-head-norun-20261104'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 120
-    name: Whole ordinary cargo test --no-run, parent then candidate
+    name: Paired working-tree edit slot ${{ matrix.slot }}
     env:
       REVIEWED_HEAD: ${{ inputs.reviewed_head }}
       OHM_STUDY_MODE: build
       RUFF_CASE: '28392'
       PYTHONDONTWRITEBYTECODE: '1'
+      BOOT_SLOT: ${{ matrix.slot }}
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
@@ -43,15 +46,21 @@ jobs:
     - name: Build and validate all eight test executables on both authenticated compilers
       env:
         GH_TOKEN: ${{ github.token }}
-      run: python3 -IB current-qa/scripts/ruff-derived-impl-cgus/norun/pilot.py
+      run: python3 -IB current-qa/scripts/ruff-derived-impl-cgus/norun/fixed_head.py
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       if: always()
       with:
-        name: ruff-28392-norun-${{ github.run_id }}
+        name: ruff-28392-fixed-head-${{ matrix.slot }}-${{ github.run_id }}
         path: ${{ runner.temp }}/ruff-norun-evidence
         compression-level: 1
         retention-days: 14
         if-no-files-found: error
+    strategy:
+      fail-fast: false
+      matrix:
+        slot:
+        - 0
+        - 1
 'on':
   workflow_dispatch:
     inputs:
