@@ -7,7 +7,7 @@ from zipfile import ZipFile
 
 HERE = Path(__file__).resolve().parent
 sys.path[:0] = [str(HERE), str(HERE.parent / "workspace-link-proof")]
-import coordinator, native_fallback, release_scope
+import coordinator, native_fallback, release_scope, unmetered_reader
 
 E2E = "/ty_server/f5c6198f896cf7b0/out/e2e-f5c6198f896cf7b0"
 
@@ -87,6 +87,17 @@ def intake(path, expected_sha, head, run, release):
         "157caa55a51ebae4fa541d31697e3af9a6c32ccf",
         "bfa2407e98ee1343caeefd02b4b69043509baa8c",
     ]
+    plain = enroll.get("kind") == "unmetered-native-safety-v1"
+    assert plain == (head == unmetered_reader.HEAD)
+    if plain:
+        assert release == 24 and int(run) == unmetered_reader.RUN
+        assert "meter-calibration.json" not in members
+        assert not any(
+            n.endswith("/hardware.json")
+            or "/tasks/" in n
+            or n.endswith("/owner-census.json.gz")
+            for n in members
+        )
     full = release_scope.for_release(release)
     subset = set(enroll["roles"])
     spec = {k: full[k] for k in subset}
@@ -103,25 +114,26 @@ def intake(path, expected_sha, head, run, release):
     )
     assert actor["source"] == enroll["source_registration"]["after"]
     assert actor["source_pin"] == "e856d81f6683cad80b9fe0ebf1a0c3c403c6fe11"
-    calibrate = j("meter-calibration.json")
-    assert (
-        calibrate["instructions"] > 0
-        and calibrate["enabled"] == calibrate["running"] > 0
-        and calibrate["reaped"] == 2
-    )
-    assert (
-        calibrate["write_bytes"] >= 6291456
-        and calibrate["wchar"] >= 6291456
-        and calibrate["rchar"] >= 6291456
-    )
-    assert calibrate["system_us"] > 0 and calibrate["outblock"] >= 12288
+    if not plain:
+        calibrate = j("meter-calibration.json")
+        assert (
+            calibrate["instructions"] > 0
+            and calibrate["enabled"] == calibrate["running"] > 0
+            and calibrate["reaped"] == 2
+        )
+        assert (
+            calibrate["write_bytes"] >= 6291456
+            and calibrate["wchar"] >= 6291456
+            and calibrate["rchar"] >= 6291456
+        )
+        assert calibrate["system_us"] > 0 and calibrate["outblock"] >= 12288
     ledger = {}
     prior_bytes = 0
     phases = {}
     refusal = {}
     list_sha = None
     complement = {}
-    strong_native = head in {
+    strong_native = plain or head in {
         "d68c5ce147ce6089d48f2524836ab663737c175f",
         "db84fc8eed1057088d9c186cdb06ee839ce8fde0",
     }
@@ -162,6 +174,8 @@ def intake(path, expected_sha, head, run, release):
         "P-empty-new",
         "C-empty-new",
     ]
+    if plain:
+        names, extra = unmetered_reader.plans(members)
     for tag in names:
         if tag + "-receipt.json.gz" not in members:
             continue
@@ -176,6 +190,8 @@ def intake(path, expected_sha, head, run, release):
         out = [json.loads(line) for line in data(prefix + "stdout.jsonl").splitlines()]
         assert out[-1] == {"reason": "build-finished", "success": code == 0}
         record = {"code": code, "source": row["state"]}
+        if plain:
+            unmetered_reader.resources(j, members, tag, row)
         if prefix + "hardware.json" in members:
             m = j(prefix + "hardware.json")
             assert m == row["meter"] and m["instructions"] > 0
@@ -186,7 +202,7 @@ def intake(path, expected_sha, head, run, release):
                 and m["system_us"] > 0
             )
             record["meter"] = m
-        else:
+        elif not plain:
             assert "exec-" in tag
             e = j(prefix + "owner-census.json.gz")
             actual = [r for r in e["roles"] if r["trigger"] == "exec"]
@@ -284,11 +300,15 @@ def intake(path, expected_sha, head, run, release):
                     j(tag + "-actual-change.json"),
                     provider,
                     actual,
-                    phases["C-exec-edit"]["elfs"][E2E][0],
+                    (
+                        unmetered_reader.before_native(j, phases, tag, E2E)
+                        if plain
+                        else phases["C-exec-edit"]["elfs"][E2E][0]
+                    ),
                 )
                 guarded_outputs[tag] = received
         if tag.startswith("C-"):
-            if tag == "C-empty-new":
+            if tag == "C-empty-new" or (plain and tag == "C-old"):
                 ledger = {}
                 prior_bytes = 0
             answer = j(prefix + "physical-decisions.json")
@@ -427,6 +447,13 @@ def intake(path, expected_sha, head, run, release):
         for k, v in phases.items()
         if "meter" in v
     }
+    ordinary = (
+        unmetered_reader.second_edit(
+            j, data, phases, subset, members, "complete.json" in members
+        )
+        if plain
+        else None
+    )
     accepted = False
     if "complete.json" in members:
         assert len(phases) == len(names)
@@ -440,16 +467,14 @@ def intake(path, expected_sha, head, run, release):
             if tag.startswith("C-") and subset & set(bad):
                 refusal[tag] = sorted(subset & set(bad))
         expected = j("complete.json")
-        # The producer closes on wrong admitted hits. Preserve that verdict separately from the
-        # independent requirement that even a real full fallback among these 48 match the empty build.
-        wrong_hits = {
-            k: sorted(set(v) & phases[k]["native"]["fresh"].keys())
+        # Report even real full fallbacks that differ from the signed clean output.
+        # The producer's compact failing row prefers changed hits if there were any.
+        projected_failures = {
+            k: sorted(set(v) & phases[k]["native"]["fresh"].keys()) or sorted(v)
             for k, v in refusal.items()
-            if set(v) & phases[k]["native"]["fresh"].keys()
         }
-        assert expected["failures"] == wrong_hits and expected["qualified"] == (
-            not wrong_hits
-        )
+        assert expected["failures"] == projected_failures
+        assert expected["qualified"] == (not refusal)
         if strong_native:
             assert set(guarded_outputs) == (
                 {"C-native-four", "C-native-earlier"}
@@ -486,7 +511,12 @@ def intake(path, expected_sha, head, run, release):
                 len(mut["changed_offsets"]) == 4
                 and mut["symbol_before"] != mut["symbol_after"]
             )
-        corrupt = j("C-actual-output-repair/physical-decisions.json")["actors"][E2E]
+        opath_phase, repair_phase = ("C-distinct-OPATHs", "C-actual-output-repair")
+        if plain:
+            opath_phase, repair_phase = unmetered_reader.output_controls(
+                j, phases, subset, E2E
+            )
+        corrupt = j(repair_phase + "/physical-decisions.json")["actors"][E2E]
         assert (
             corrupt["action"] == "full"
             and "output-bytes-or-generation" in corrupt["reasons"]
@@ -494,14 +524,14 @@ def intake(path, expected_sha, head, run, release):
         if release == 24:
             opath = j("actual-canonical-OPATHs.json")
             assert len(opath) == 2 and E2E in opath
-            repaired = j("C-actual-output-repair/physical-decisions.json")["actors"]
+            repaired = j(repair_phase + "/physical-decisions.json")["actors"]
             for k, obs in opath.items():
                 assert (
                     obs["held_ns"] > 0
                     and obs["old"][4] == 0
                     and obs["old"][:2] != obs["new"]
                 )
-                assert k in phases["C-distinct-OPATHs"]["native"]["fresh"]
+                assert k in phases[opath_phase]["native"]["fresh"]
                 assert (
                     repaired[k]["action"] == "full"
                     and "output-bytes-or-generation" in repaired[k]["reasons"]
@@ -509,6 +539,7 @@ def intake(path, expected_sha, head, run, release):
         accepted = not refusal
     return {
         "admission": enroll,
+        "ordinary_second_edit": ordinary,
         "sha256": expected_sha,
         "archive_bytes": path.stat().st_size,
         "stage_count": len(phases),

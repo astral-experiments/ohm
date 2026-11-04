@@ -60,3 +60,7 @@ cmp originals.json reproduced.json
 
 * [Signed -23 first-attempt run](https://github.com/astral-experiments/ohm/actions/runs/41737649726), artifact 13279449314, 41,514,240 bytes, SHA-256 `b793f66dcaa3d935abca0fc2d5d9fd6de9737da7c3e3c1b05836581ffe481c7f`.
 * [Signed -24 first-attempt run](https://github.com/astral-experiments/ohm/actions/runs/41737656295), artifact 13280727843, 41,550,228 bytes, SHA-256 `cd34338da0ad5cb2812ac7f87baea7f93d97e49196ac448fb82cc0a7781d5505`.
+
+## Later child-counter audit
+
+The original signed warm domain subtotals above have explicit unassigned work. A native child of the Ruff CLI accounts for the missing child observation on the -24 host. A different signed unchanged -24 original now has all 945 reported descendants and exact counter conservation, yielding 60.730B in the 48 eligible native roles and 63.393B in the rest of the 124.122B whole command. See the [complete per-child audit and ceiling](../second-edit-release23/DIGEST.md).
