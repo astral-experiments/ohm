@@ -8,7 +8,7 @@ The edit adds `--extend-exclude` to `ruff format`. Each ordinary Cargo history b
 |---|---:|
 | Stable definition identities and indices | 3,027 identical |
 | Published per-definition rows | 1,098 changed of 1,671 |
-| Expansion rows and required crate hashes | 391 and 288 identical |
+| Expansion rows and required crate hashes | 391 expansions, 288 requirements for Ruff and 291 for the ruff_dev feature set, all identical |
 | Final metadata graph nodes | 16,351 → 16,369 |
 | Serialized allocation records | 214 → 232 |
 | Changed rows after removing the 18 repeated leaf contributions in an offline graph calculation | 0 of 1,671 |
