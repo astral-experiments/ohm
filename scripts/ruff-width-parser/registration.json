@@ -1,0 +1,283 @@
+{
+  "common_sources": {
+    "calibrate.c": "43ed100fc2c2aab89e1c9cb644e3c1a6d561981128b09403b78562ac4655ea8d",
+    "exec_count.c": "3a870fd13a70b4d5ca35f6962a376052a00889220ab1d925b839407d9f5758fb",
+    "transport.py": "a3309e78ddcfd05bb343f646a25cb5c5f2d0bc372268f52d3b0c3a285d45b90e",
+    "whole_count.c": "096b9e9efb7457ff4c2fd194985f18c4e05520fce46c85e5919b084ae3d823ce"
+  },
+  "config": "abc70d60a6fd89c10d5f65cf85820d9b78d5affe",
+  "gates": {
+    "common_increase_ir": 10000000,
+    "common_increase_percent": 2,
+    "extra_bytes": 1048576,
+    "extra_percent": 1,
+    "ordinary_check_percent": 1.5,
+    "rustc_percent": 10
+  },
+  "invalid": {
+    "clean": "bc1c9059b74fbeded98fbf86bfc646fa30b156f4077c5aee22814c5a71e9eb74",
+    "message": "literal out of range for `u16`",
+    "path": "crates/ruff_formatter/src/lib.rs",
+    "span": [
+      29567,
+      29572
+    ],
+    "suffix": "c01dcfb3533f46a9ec331c180d8e41f2d90a36adfab8272c6f7196caba925694"
+  },
+  "locked_sha": "df7576544c2ee44be8fac4b1e9f58137d7870403375f37398d9b96cbd7ddf71f",
+  "new": "64a255df497bede66fa4cdac80b9464d73a787ba",
+  "old": "b5305b5f328b03e3ba0ab1ba629dedb5c9f4415e",
+  "oracle": {
+    "new": "3a62d132ef0bb8fc6f81ec91afcd3dea9897f6c25b1c190e9624ee8cfe395f4c",
+    "old": "fbd5ad590ab95b2dea6cc5b115dca5a85e7108a79e6675dc27923127a85ba6e5",
+    "scalars": 1112064,
+    "source": "969f1f642c5207024c3a1da7869189cd8c0309cdc8073f78050a192c2c0823ce",
+    "width_changes": 197,
+    "wrap_changes": 197
+  },
+  "phase_plan": {
+    "build": [
+      "cold-old",
+      "old-unchanged",
+      "ordinary-edit",
+      "unchanged",
+      "invalid",
+      "invalid-again",
+      "repaired",
+      "empty-new"
+    ],
+    "check": [
+      "cold-old",
+      "old-unchanged",
+      "ordinary-edit",
+      "unchanged",
+      "invalid",
+      "invalid-again",
+      "repaired",
+      "observed-edit",
+      "empty-new",
+      "observed-empty-new"
+    ]
+  },
+  "protocol_sha": "a50dc875af44faae6092765c057ae6bc1e0a3cf871e3376d506f507239459268",
+  "release_members": {
+    "bin/cargo": {
+      "bytes": 39249096,
+      "sha256": "a4faa288657042d02767a38812c7498218dfcafc945abfe3b4a44c07323a1a24",
+      "source": "rust-1.99.0-dev-x86_64-unknown-linux-gnu/cargo/bin/cargo"
+    },
+    "lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd": {
+      "bytes": 10319072,
+      "sha256": "0d6335808b647d499f3d74993b602e64ff0625206c809bf4913c487eea380cd5",
+      "source": "rust-1.99.0-dev-x86_64-unknown-linux-gnu/rustc/lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd"
+    }
+  },
+  "roles": {
+    "C7": {
+      "driver": "91f205cf52a5fe97d471cab8d47c4638ee1c3be5aa88aa8ad74b0be70fd0c304",
+      "job": 126324738389,
+      "qa": "9bc3cd6994485569c5e87e1a4d7283b782bb79c6",
+      "qualification": [
+        13287551493,
+        "5fd18e5768a81d4eafc94c13ba3e5a6c31a6b9a76a8d5f96fc649d907ec1905d"
+      ],
+      "run": 41753724558,
+      "sdk": [
+        13287670809,
+        "e7cc12e7dcf04e49cd9e1f492539bd6ebf33608aa7ae412e3c5ab10cea17c3ff"
+      ],
+      "source": "06fe634feaa39288210a6f17b8994346a5fae1c1",
+      "tar": "e4022678b12bf27be349d9f6c3598e0f82a79602053a39e310eaf389bba7bf10",
+      "tree": "2cff5a0eef365de6e4587006859dee9d4092ca87"
+    },
+    "C8": {
+      "array_reader_receipt": "c2cce85dddbbd3f2d5850919becc09965c311286c01c5b0ca5521844a5efbba1",
+      "driver": "a9ebb4434a42427ba78ff74c2ddad473bc95ec95e4c6de88fedfd7287ffbfc5d",
+      "job": 126683567767,
+      "qa": "536b308a897a161771d3d9ce4f7de737a27dd81e",
+      "qualification": [
+        13340247261,
+        "e931a2c983f288e0baed9d93371d604b7d56102d91c65d71c89fb42e6a3fe728"
+      ],
+      "run": 41861317302,
+      "sdk": [
+        13341165604,
+        "3c5d9897d281f3f22f499566570acd04d061fbf30ef6aa0159f12d70e30547b8"
+      ],
+      "source": "eda9434eda0b4f8519fc2257867ab7c7dd4b59fd",
+      "tar": "4aef4a433da10827a374a66d5d37937080852300d2665228cf8b5ff894d73fd6",
+      "tree": "aecb22cbd0b208780ea3e8d68180097065e15502"
+    }
+  },
+  "rosters": {
+    "build": {
+      "edit": {
+        "all_sha256": "59b8c3d914d5f9771315cdc685e70423eeee9c473683abd34978a24b8ebf683f",
+        "dirty": 2,
+        "dirty_names": [
+          "ruff_formatter",
+          "unicode_width"
+        ],
+        "dirty_sha256": "3bc46dec26db6011b9bbe4352a9eb82beb5f260fe07fea3c0fd633dbf25f772f",
+        "total": 39
+      },
+      "old": {
+        "all_sha256": "1a250b609dd98cdf1c8189a729597893e8198b59c6ac3421330a07e62c0bb4bd",
+        "dirty": 39,
+        "dirty_names": [
+          "aho_corasick",
+          "bstr",
+          "build-script-build",
+          "build-script-build",
+          "build-script-build",
+          "cfg_if",
+          "drop_bomb",
+          "either",
+          "filetime",
+          "glob",
+          "globset",
+          "heck",
+          "itertools",
+          "libc",
+          "log",
+          "memchr",
+          "memchr",
+          "once_cell",
+          "pin_project_lite",
+          "proc_macro2",
+          "quote",
+          "regex",
+          "regex_automata",
+          "regex_syntax",
+          "ruff_cache",
+          "ruff_formatter",
+          "ruff_macros",
+          "ruff_python_trivia",
+          "ruff_source_file",
+          "ruff_text_size",
+          "rustc_hash",
+          "seahash",
+          "static_assertions",
+          "syn",
+          "tracing",
+          "tracing_attributes",
+          "tracing_core",
+          "unicode_ident",
+          "unicode_width"
+        ],
+        "dirty_sha256": "1a250b609dd98cdf1c8189a729597893e8198b59c6ac3421330a07e62c0bb4bd",
+        "total": 39
+      }
+    },
+    "check": {
+      "edit": {
+        "all_sha256": "c50517dcd3d896787d70af584b046837a6bb263b09f6a2957fc9c49ea9e44b22",
+        "dirty": 2,
+        "dirty_names": [
+          "ruff_formatter",
+          "unicode_width"
+        ],
+        "dirty_sha256": "3bc46dec26db6011b9bbe4352a9eb82beb5f260fe07fea3c0fd633dbf25f772f",
+        "total": 42
+      },
+      "old": {
+        "all_sha256": "18600f8eee49560e45643411add3eeb7d094fd94fe005fb9190421eed84b3d90",
+        "dirty": 42,
+        "dirty_names": [
+          "aho_corasick",
+          "bstr",
+          "build-script-build",
+          "build-script-build",
+          "build-script-build",
+          "cfg_if",
+          "drop_bomb",
+          "either",
+          "either",
+          "filetime",
+          "glob",
+          "globset",
+          "heck",
+          "itertools",
+          "itertools",
+          "libc",
+          "log",
+          "memchr",
+          "memchr",
+          "once_cell",
+          "pin_project_lite",
+          "proc_macro2",
+          "quote",
+          "regex",
+          "regex_automata",
+          "regex_syntax",
+          "ruff_cache",
+          "ruff_formatter",
+          "ruff_macros",
+          "ruff_python_trivia",
+          "ruff_source_file",
+          "ruff_text_size",
+          "ruff_text_size",
+          "rustc_hash",
+          "seahash",
+          "static_assertions",
+          "syn",
+          "tracing",
+          "tracing_attributes",
+          "tracing_core",
+          "unicode_ident",
+          "unicode_width"
+        ],
+        "dirty_sha256": "18600f8eee49560e45643411add3eeb7d094fd94fe005fb9190421eed84b3d90",
+        "total": 42
+      }
+    }
+  },
+  "schedule": {
+    "confirmation": {
+      "B1": [
+        "C8",
+        "C7"
+      ],
+      "B2": [
+        "C7",
+        "C8"
+      ],
+      "B3": [
+        "C7",
+        "C8"
+      ],
+      "B4": [
+        "C8",
+        "C7"
+      ],
+      "B5": [
+        "C7",
+        "C8"
+      ],
+      "B6": [
+        "C8",
+        "C7"
+      ]
+    },
+    "pilot": {
+      "pilot-CP": [
+        "C8",
+        "C7"
+      ],
+      "pilot-PC": [
+        "C7",
+        "C8"
+      ]
+    }
+  },
+  "sdk_files_sha": "0ed019fe8917d32f3fea76363a6f5d28b8a93c256384b9b321e6219e902d7c1d",
+  "software_admission_sha": "696d6b92f4e89a17688cc60a3bb7ab00a1689d28575f313ce07c8a771246a6fa",
+  "source_change": [
+    "Cargo.lock"
+  ],
+  "trees": {
+    "64a255df497bede66fa4cdac80b9464d73a787ba": "9ded65fdb21518d811c2700b27c766c822ab731e",
+    "b5305b5f328b03e3ba0ab1ba629dedb5c9f4415e": "c60d0819db7441b1f4cf9438796e5fa71113d563"
+  },
+  "version": 1
+}

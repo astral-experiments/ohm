@@ -1,5 +1,5 @@
-name: Measure the Ruff Unicode normalization edit on two source-built compilers
-run-name: Ruff Unicode normalization ${{ inputs.cohort }} at ${{ inputs.reviewed_head }}
+name: Measure the Ruff Unicode width parser edit on two source-built compilers
+run-name: Ruff Unicode width parser ${{ inputs.cohort }} at ${{ inputs.reviewed_head }}
 permissions:
   contents: read
   actions: read
@@ -19,8 +19,8 @@ jobs:
   price:
     if: >-
       github.repository == 'astral-experiments/ohm' && github.run_attempt == '1'
-      && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-rc24-normalization-price-20261104'
-    name: Normalization ${{ matrix.slot }}
+      && github.sha == inputs.reviewed_head && github.ref_name == 'charlie/qa-width-parser-pmu-20261104'
+    name: Parser ${{ matrix.slot }}
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 80
     strategy:
@@ -33,30 +33,40 @@ jobs:
         with:
           ref: ${{ github.sha }}
           path: qa
+          sparse-checkout-cone-mode: false
           sparse-checkout: |
-            scripts/ruff-normalization-price
+            /scripts/ruff-width-parser/*.py
+            /scripts/ruff-width-parser/*.rs
+            /scripts/ruff-width-parser/*.json
+            /scripts/ruff-width-parser/PROTOCOL.md
+            /scripts/ruff-width-parser/evidence/pilot/qualified.json
+            /scripts/ruff-static-array-cost/*.c
+            /scripts/ruff-static-array-cost/*.json
+            /scripts/ruff-static-array-cost/transport.py
+          sparse-checkout: |
+            scripts/ruff-width-parser
             scripts/ruff-static-array-cost
           persist-credentials: false
       - name: Open the original Ruff edit
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: astral-sh/ruff
-          ref: c7d0c573cf5b79b7426aba6ad5458e2db283843b
+          ref: 64a255df497bede66fa4cdac80b9464d73a787ba
           fetch-depth: 3
           path: ruff
           persist-credentials: false
       - name: Count the ordinary Ruff check, its edited rustc and build controls
         env:
-          NORM_COHORT: ${{ inputs.cohort }}
-          NORM_SLOT: ${{ matrix.slot }}
+          WIDTH_COHORT: ${{ inputs.cohort }}
+          WIDTH_SLOT: ${{ matrix.slot }}
           GH_TOKEN: ${{ github.token }}
-        run: python3 -IB qa/scripts/ruff-normalization-price/worker.py
+        run: python3 -IB qa/scripts/ruff-width-parser/worker.py
       - name: Save the complete counters, programs and refusals
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: norm21229-${{ matrix.slot }}-${{ github.run_id }}
-          path: ${{ runner.temp }}/normalization-price/proof
+          name: width21231-${{ matrix.slot }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/width-parser/proof
           compression-level: 1
           retention-days: 14
           if-no-files-found: error
