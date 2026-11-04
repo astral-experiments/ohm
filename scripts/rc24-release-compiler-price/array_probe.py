@@ -19,7 +19,7 @@ src=root/"probe.rs"
 src.write_text(source(vals))
 args=["rustc","+ohm","--edition=2024",str(src)]
 trace=subprocess.check_output([*args,"-Zunpretty=thir-tree"],text=True)
-count=trace.count("IntArrayLiteral(")
+count=trace.count("LiteralArray(")
 assert count==(4 if role=="candidate" else 0),(role,count)
 exe=root/"probe"
 cmd=[*args,"-C","incremental="+str(root/"incremental"),"-o",str(exe)]
@@ -47,3 +47,6 @@ empty=run_program([*args,"-o",str(exe)],vals)
 assert before!=repaired==empty
 (root/"verdict.json").write_text(json.dumps({"marked_arrays":count,"native_old":before,"native_repaired":repaired,
     "native_empty":empty,"invalid":{"message":hit["message"],"byte_start":mark["byte_start"],"byte_end":mark["byte_end"]}},indent=2)+"\n")
+
+if role=="candidate":
+    subprocess.run([sys.executable,"-IB",Path(__file__).with_name("aggregate_probe.py"),root/"aggregate"],check=True)

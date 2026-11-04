@@ -1,20 +1,29 @@
 {
+  "aggregate_probe": "b0a27482394f0062f8d1e42515fdce99318d5c20dee2192919eadef63de17821",
   "bootstrap_config": "5822d2ae682a27193ef413f013281b0849797c88c78545607ab563ea48f87684",
   "build_script": "88c1655898536f1e1a0ee232afffd0dfb33f0025e6546c7dc8a5d6d353a99591",
-  "bundle": "058531c6a0940b70cc19276b29bb8b47aa2c77778dc6be7719a71b5c271c2da6",
-  "candidate": "6c2874a0b6a0bf3570f8959733b6f87907e5cce6",
-  "candidate_tree": "1a86c989ac19e14b8bc53ec8a92be4feafef5a9f",
+  "bundle": "3d6ef732a77295f760dcf069f7cf7219a9488b8bbd3027bef93f8d5381c7372c",
+  "candidate": "06fe634feaa39288210a6f17b8994346a5fae1c1",
+  "candidate_tree": "2cff5a0eef365de6e4587006859dee9d4092ca87",
   "commits": [
     "a60f4f4476d4819b62730e92ea07c1343f8e6dac",
     "2bc7e7b7c898e7fa82a1dde03978c59263d8167d",
     "dda36b958be0f0c393c22039fb2f53c0ff436968",
     "8574afc64801c199c8d090e3e0e013adf6ccd496",
-    "6c2874a0b6a0bf3570f8959733b6f87907e5cce6"
+    "6c2874a0b6a0bf3570f8959733b6f87907e5cce6",
+    "4a50cf68eb73a73bf8d31a69da54050132513339",
+    "06fe634feaa39288210a6f17b8994346a5fae1c1"
   ],
   "enabled_roles": [
     "candidate"
   ],
   "manifest": "a6a66d9bd45c064d4fb04fa2800a1485c2e56e6564933b8f87b64ad2ea863ee3",
+  "matched_trained_parent": {
+    "driver": "b237a5bee267d58ed468eceba2b6089b7749aa7cb007ea9c812fe8cbe3e05689",
+    "factory": 41742694783,
+    "role": "candidate",
+    "source": "6c2874a0b6a0bf3570f8959733b6f87907e5cce6"
+  },
   "members": {
     "bin/cargo": {
       "bytes": 39249096,
@@ -27,7 +36,7 @@
       "source": "rust-1.99.0-dev-x86_64-unknown-linux-gnu/rustc/lib/rustlib/x86_64-unknown-linux-gnu/bin/wild-ld/ld.bfd"
     }
   },
-  "native_array_probe": "0ffa4d63207d86d3f06d40bec0cb6cc04b017bdcd805989f2f00dac887cb3143",
+  "native_array_probe": "1b1543eb3ba66bce86cb519fad3dd1a43f1303cc39b119ef9d4a4b48509a0c62",
   "parent": "f5a51d8cc3e76236c2d0f17d495d59ebb03306e4",
   "parent_tree": "b4f0ad237b667d5227e63b44f6e8d3ba885bf7a1",
   "paths": [
@@ -36,6 +45,7 @@
     "compiler/rustc_hir_typeck/src/writeback.rs",
     "compiler/rustc_middle/src/thir.rs",
     "compiler/rustc_middle/src/thir/visit.rs",
+    "compiler/rustc_middle/src/ty/sty.rs",
     "compiler/rustc_middle/src/ty/typeck_results.rs",
     "compiler/rustc_mir_build/src/builder/expr/as_constant.rs",
     "compiler/rustc_mir_build/src/builder/expr/as_place.rs",
@@ -48,13 +58,14 @@
     "compiler/rustc_mir_build/src/thir/pattern/check_match.rs",
     "compiler/rustc_mir_build/src/thir/print.rs",
     "compiler/rustc_parse/src/parser/expr.rs",
-    "compiler/rustc_ty_utils/src/consts.rs"
+    "compiler/rustc_ty_utils/src/consts.rs",
+    "tests/run-make/static-integer-array-literals/rmake.rs"
   ],
   "published_run": 41691269002,
-  "ref": "refs/heads/charlie/qa-compact-integer-arrays-20261103",
+  "ref": "refs/heads/charlie/qa-rc24-pack-const-aggregates-20261104",
   "release": "8f25c47ff9e7c4ab2f22a1cad0638a26c7e26e1c",
   "signed": "ecde6809d7f1fc1966798198479867c4a49bdf7a51f3873336d23a40fabce453",
-  "stage1_driver": "e2d82be3436c6fc5728b53f5c602cf2014fc7a5c7cd9987fbcc1dfe6b1bf2382",
-  "stage1_price": 41741463395,
-  "stage1_receipt_run": 41738460962
+  "stage1_driver": "91f205cf52a5fe97d471cab8d47c4638ee1c3be5aa88aa8ad74b0be70fd0c304",
+  "stage1_price": 41755609477,
+  "stage1_receipt_run": 41753724558
 }
