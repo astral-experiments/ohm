@@ -35,6 +35,8 @@ expect_history_failure() {
 }
 
 check_history
+GIT_ICASE_PATHSPECS=1 check_history
+GIT_GLOB_PATHSPECS=1 check_history
 
 jq '
   .sources.rustfmt = {

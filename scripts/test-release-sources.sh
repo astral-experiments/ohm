@@ -312,25 +312,21 @@ mv "$rust_checkout/src/tools/clippy" "$test_root/original-clippy"
 git clone --quiet "$clippy_checkout" "$rust_checkout/src/tools/clippy"
 mv "$rust_checkout/src/tools/rustfmt" "$test_root/original-rustfmt"
 git clone --quiet "$rustfmt_checkout" "$rust_checkout/src/tools/rustfmt"
-"$script_dir/verify-release-sources.sh" \
-  "$release_manifest" "$rust_checkout" "$cargo_checkout" \
-  "$rust_checkout/src/tools/clippy" "$rust_checkout/src/tools/rustfmt"
+verify_overlays=("$script_dir/verify-release-sources.sh" "$release_manifest" "$rust_checkout" "$cargo_checkout"
+  "$rust_checkout/src/tools/clippy" "$rust_checkout/src/tools/rustfmt")
+"${verify_overlays[@]}"
+GIT_LITERAL_PATHSPECS=1 "${verify_overlays[@]}"
+GIT_ICASE_PATHSPECS=1 "${verify_overlays[@]}"
 
 printf 'unexpected rustfmt change\n' >> "$rust_checkout/src/tools/rustfmt/README.md"
-if "$script_dir/verify-release-sources.sh" \
-  "$release_manifest" "$rust_checkout" "$cargo_checkout" \
-  "$rust_checkout/src/tools/clippy" "$rust_checkout/src/tools/rustfmt" \
-  >/dev/null 2>&1; then
+if "${verify_overlays[@]}" >/dev/null 2>&1; then
   echo 'source verification accepted a dirty rustfmt checkout' >&2
   exit 1
 fi
 git -C "$rust_checkout/src/tools/rustfmt" restore README.md
 
 printf 'unexpected Rust change\n' >> "$rust_checkout/src/version"
-if "$script_dir/verify-release-sources.sh" \
-  "$release_manifest" "$rust_checkout" "$cargo_checkout" \
-  "$rust_checkout/src/tools/clippy" "$rust_checkout/src/tools/rustfmt" \
-  >/dev/null 2>&1; then
+if "${verify_overlays[@]}" >/dev/null 2>&1; then
   echo 'source verification ignored a dirty Rust checkout outside tool overlays' >&2
   exit 1
 fi
