@@ -6,7 +6,9 @@ if [[ $# -ne 3 ]]; then
   echo "usage: assemble-release.sh MANIFEST RELEASE_DIRECTORY TOOLCHAIN" >&2
   exit 2
 fi
-script_directory="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+script_path="${BASH_SOURCE[0]}"
+[[ "$script_path" == */* ]] || script_path="./$script_path"
+IFS= read -r -d '' script_directory < <(cd -P -- "${script_path%/*}/" && printf '%s\0' "$PWD")
 manifest=$1
 if [[ "$manifest" != /* ]]; then
   manifest="$PWD/$manifest"
@@ -17,7 +19,7 @@ if [[ ! "$OHM_TOOLCHAIN" =~ ^ohm-[0-9]+\.[0-9]+\.[0-9]+-[1-9][0-9]*$ ]]; then
   exit 1
 fi
 jq -e --arg toolchain "$OHM_TOOLCHAIN" '.release.toolchain_name == $toolchain' "$manifest" >/dev/null
-cd -- "$2"
+cd -P -- "$2"
 
 targets=(aarch64-apple-darwin x86_64-unknown-linux-gnu)
 for target in "${targets[@]}"; do

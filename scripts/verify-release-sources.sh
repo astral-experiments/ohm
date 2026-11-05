@@ -17,7 +17,9 @@ rust_checkout="$2"
 cargo_checkout="$3"
 clippy_checkout="$4"
 rustfmt_checkout="$5"
-script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+script_path="${BASH_SOURCE[0]}"
+[[ "$script_path" == */* ]] || script_path="./$script_path"
+IFS= read -r -d '' script_dir < <(cd -P -- "${script_path%/*}/" && printf '%s\0' "$PWD")
 
 "$script_dir/validate-release-manifest.sh" --require-pinned "$manifest"
 

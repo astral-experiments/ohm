@@ -49,6 +49,14 @@ for target in aarch64-apple-darwin x86_64-unknown-linux-gnu; do
 done
 cmp "$manifest" "$valid/$toolchain.json"
 
+# Resolve both the installer template and the output directory through the symlinks.
+paths="$temporary_directory/paths"
+mkdir -p "$paths/scripts" "$paths/valid"
+ln -s "$script_directory" "$paths/commands"
+ln -s "$temporary_directory/empty" "$paths/assets"
+bash "$paths/commands/../scripts/assemble-release.sh" "$manifest" "$paths/assets/../valid" "$toolchain"
+test ! -e "$paths/valid/SHA256SUMS"
+
 linked="$temporary_directory/linked"
 cp -R "$inputs" "$linked"
 archive="$toolchain-x86_64-unknown-linux-gnu.tar.gz"
