@@ -27,10 +27,10 @@ expected_cargo_repository="$(jq -er '.sources.cargo.repository' "$manifest")"
 
 verify_clean_checkout() {
   local checkout="$1" checkout_status entry submodule
-  # Release builds depend on the executable bits and symlinks in the pinned tree.
-  local mode_config=(-c core.fileMode=true -c core.symlinks=true)
+  # Check path case, executable bits and symlinks even when the checkout ignores them.
+  local worktree_config=(-c core.ignoreCase=false -c core.fileMode=true -c core.symlinks=true)
   shift
-  checkout_status="$(git -C "$checkout" "${mode_config[@]}" status --porcelain --untracked-files=normal --ignored=matching \
+  checkout_status="$(git -C "$checkout" "${worktree_config[@]}" status --porcelain --untracked-files=normal --ignored=matching \
     --ignore-submodules=none -- "$@")"
   if [[ -n "$checkout_status" ]]; then
     echo "source checkout is not clean: $checkout" >&2
@@ -58,7 +58,7 @@ verify_clean_checkout() {
       git config --file "$filter_config" --replace-all "$key" "$value" || exit 1
     done < "$index_directory/config-keys"
     git -C "$checkout" -c core.sparseCheckout=false read-tree HEAD &&
-      git -C "$checkout" "${mode_config[@]}" -c "include.path=$filter_config" -c core.sparseCheckout=false \
+      git -C "$checkout" "${worktree_config[@]}" -c "include.path=$filter_config" -c core.sparseCheckout=false \
         diff --no-ext-diff --no-textconv --quiet --ignore-submodules=none HEAD -- "$@"
   ); then
     echo "could not verify tracked source files against HEAD: $checkout" >&2

@@ -102,6 +102,17 @@ if "${verify_sources[@]}" >/dev/null 2>&1; then
 fi
 rm -- "$cargo_checkout/build.rs"
 
+# A case-sensitive filesystem can contain two paths that Git treats as one.
+if [[ ! -e "$cargo_checkout/readme.md" ]]; then
+  printf 'untracked source\n' > "$cargo_checkout/readme.md"
+  if GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.ignoreCase GIT_CONFIG_VALUE_0=true \
+      "${verify_sources[@]}" >/dev/null 2>&1; then
+    echo 'source verification accepted an untracked file with different case' >&2
+    exit 1
+  fi
+  rm -- "$cargo_checkout/readme.md"
+fi
+
 readme="$cargo_checkout/README.md"
 git -C "$cargo_checkout" config core.trustctime false
 touch -t 200001010000 "$readme"
