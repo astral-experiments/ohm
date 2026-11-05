@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# A Git hook can supply its own repository, temporary index and object store.
+unset GIT_DIR GIT_WORK_TREE GIT_COMMON_DIR GIT_INDEX_FILE
+unset GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_QUARANTINE_PATH
 # Release revisions name the original objects, even in checkouts with replacement refs.
 export GIT_NO_REPLACE_OBJECTS=1
 unset CDPATH
@@ -48,7 +51,6 @@ verify_clean_checkout() {
     format="$(git config --local --default sha1 --get extensions.objectFormat)" || exit 1
     objects="$(git rev-parse --git-path objects)" || exit 1
     objects="$(cd -P -- "$objects" && printf '%s/' "$PWD")" || exit 1
-    unset GIT_DIR GIT_COMMON_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_OBJECT_DIRECTORY
     unset GIT_CONFIG_COUNT GIT_CONFIG_PARAMETERS GIT_ATTR_SOURCE
     export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_ATTR_NOSYSTEM=1
     GIT_DEFAULT_HASH="$format" git init --bare --quiet --template= "$temporary_repo" || exit 1

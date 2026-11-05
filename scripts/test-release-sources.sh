@@ -100,6 +100,11 @@ fi
 
 verify_sources=("$script_dir/verify-release-sources.sh" "$release_manifest" "$rust_checkout"
   "$cargo_checkout" "$clippy_checkout" "$rustfmt_checkout")
+# A commit hook supplies an index, and a receive hook supplies the calling repository.
+GIT_INDEX_FILE="$clippy_checkout/.git/index" "${verify_sources[@]}" >/dev/null
+GIT_DIR="$clippy_checkout/.git" GIT_WORK_TREE="$clippy_checkout" \
+  GIT_OBJECT_DIRECTORY="$clippy_checkout/.git/objects" GIT_QUARANTINE_PATH="$clippy_checkout/.git/objects" \
+  "${verify_sources[@]}" >/dev/null
 printf '/build.rs\n' >> "$cargo_checkout/.git/info/exclude"
 printf 'fn main() {}\n' > "$cargo_checkout/build.rs"
 if "${verify_sources[@]}" >/dev/null 2>&1; then
