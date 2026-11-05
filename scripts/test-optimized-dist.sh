@@ -575,12 +575,10 @@ git -C "$perf_source" replace -d "$pinned_perf_blob"
 pinned_rust_head="$(git -C "$rust_checkout" rev-parse HEAD)"
 (
   export GIT_INDEX_FILE="$test_directory/replacement-index"
-  export GIT_AUTHOR_NAME=fixture GIT_COMMITTER_NAME=fixture
-  export GIT_AUTHOR_EMAIL=fixture@example.com GIT_COMMITTER_EMAIL=fixture@example.com
   git -C "$rust_checkout" read-tree HEAD
   git -C "$rust_checkout" update-index --cacheinfo 160000 "$original_head" src/tools/rustc-perf
   replacement_tree="$(git -C "$rust_checkout" write-tree)"
-  replacement_head="$(printf 'Replace collector selection\n' | git -C "$rust_checkout" commit-tree "$replacement_tree" -p "$pinned_rust_head")"
+  replacement_head="$(printf 'Replace collector selection\n' | git -C "$rust_checkout" -c user.name=fixture -c user.email=fixture@example.com commit-tree "$replacement_tree" -p "$pinned_rust_head")"
   git -C "$rust_checkout" replace "$pinned_rust_head" "$replacement_head"
 )
 : > "$trace"
