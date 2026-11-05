@@ -11,6 +11,10 @@ fi
 base_revision="$1"
 zero_revision="0000000000000000000000000000000000000000"
 
+same_identity() {
+  printf '%s\n' "$1" "$2" | jq -es 'length == 2 and .[0] == .[1]' >/dev/null
+}
+
 path_to_root="$(git rev-parse --show-cdup)"
 cd -P -- "./$path_to_root"
 
@@ -79,7 +83,7 @@ git ls-tree -r --name-only "$base_revision" -- toolchains | while IFS= read -r m
           "
       )"
       current_identity="$(jq -S "$revision_fields" "$manifest")"
-      if [[ "$previous_identity" != "$current_identity" ]]; then
+      if ! same_identity "$previous_identity" "$current_identity"; then
         echo "unpublished pinned manifest changed beyond its source revisions: $manifest" >&2
         exit 1
       fi
@@ -93,7 +97,7 @@ git ls-tree -r --name-only "$base_revision" -- toolchains | while IFS= read -r m
     draft:pinned)
       previous_identity="$(git show "$base_revision:$manifest" | jq -S 'del(.status, .sources)')"
       current_identity="$(jq -S 'del(.status, .sources)' "$manifest")"
-      if [[ "$previous_identity" != "$current_identity" ]]; then
+      if ! same_identity "$previous_identity" "$current_identity"; then
         echo "draft-to-pinned transition changed release identity: $manifest" >&2
         exit 1
       fi

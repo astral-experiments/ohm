@@ -55,7 +55,6 @@ jq -e '
   .schema_version == 1 and
   (.status == "draft" or .status == "pinned") and
   (.release.upstream_rust_version | type == "string" and test("^[0-9]+\\.[0-9]+\\.[0-9]+$")) and
-  (.release.ohm_revision | type == "number" and . >= 1 and floor == .) and
   (.release.toolchain_name | type == "string") and
   .sources.rust.repository == "https://github.com/astral-sh/ohm-rust" and
   (.sources.rust.revision | type == "string" and test("^[0-9a-f]{40}$")) and
@@ -74,23 +73,28 @@ jq -e '
 
 status="$(jq -er '.status' "$manifest")"
 rust_version="$(jq -er '.release.upstream_rust_version' "$manifest")"
-ohm_revision="$(jq -er '.release.ohm_revision' "$manifest")"
 toolchain_name="$(jq -er '.release.toolchain_name' "$manifest")"
 rust_revision="$(jq -er '.sources.rust.revision' "$manifest")"
 cargo_revision="$(jq -er '.sources.cargo.revision' "$manifest")"
 clippy_revision="$(jq -er '.sources.clippy.revision' "$manifest")"
 rustfmt_revision="$(jq -r '.sources.rustfmt.revision // empty' "$manifest")"
 zero_revision="0000000000000000000000000000000000000000"
-expected_toolchain_name="ohm-$rust_version-$ohm_revision"
 path_revision="${manifest_name%.json}"
+expected_toolchain_name="ohm-$rust_version-$path_revision"
 
 if [[ "$toolchain_name" != "$expected_toolchain_name" ]]; then
   echo "toolchain name $toolchain_name does not match $expected_toolchain_name" >&2
   exit 1
 fi
 
-if [[ ! "/$manifest" =~ /"$rust_version"/+[^/]+$ || "$path_revision" != "$ohm_revision" ]]; then
-  echo "$manifest does not match release $rust_version revision $ohm_revision" >&2
+# Compare the integer value, accepting equivalent spellings such as 25.0 and 2.5e1.
+# Round-trip the filename's digits so a limited-precision jq cannot round it to another revision.
+if [[ ! "/$manifest" =~ /"$rust_version"/+[^/]+$ || ! "$path_revision" =~ ^[1-9][0-9]*$ ]] ||
+  ! jq -e --arg revision "$path_revision" '
+  ($revision | tonumber) as $number |
+  ($number | tostring) == $revision and .release.ohm_revision == $number
+' "$manifest" >/dev/null; then
+  echo "$manifest does not match the declared release revision" >&2
   exit 1
 fi
 
