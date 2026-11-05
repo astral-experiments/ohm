@@ -44,8 +44,8 @@ parent = fetch('https://api.github.com/repos/astral-experiments/ohm/releases/ass
                'parent357-sdk.tar.zst', 'c9245fff238b278c1d1263985c375b4d1f3c3e0a5f5660728eb6598780257821')
 zip_path = fetch('https://api.github.com/repos/astral-experiments/ohm/actions/artifacts/13455710028/zip',
                  'candidate-artifact.zip', '2cdeac5d3087f9f7c83f5ee353e3370badea1ab0a54a70dbbc1c504ac83e348c')
-worker = fetch('https://raw.githubusercontent.com/astral-experiments/ohm/89e4fccd98131342340c909d78b9ab8baacc9581/scripts/benchmark_results/uv-21577-release23-driver-source/worker.zip',
-               '351-original-worker.zip', '3adb1e8ff5c2b438e40b518503327a9876c4db4c7a4dd90c72b4830689457098', False)
+worker = fetch('https://api.github.com/repos/astral-experiments/ohm/releases/assets/714983864',
+               '351-original-worker.zip', '3adb1e8ff5c2b438e40b518503327a9876c4db4c7a4dd90c72b4830689457098')
 for archive, dest in ((zip_path, INPUT), (worker, ROOT / 'frozen351')):
     with zipfile.ZipFile(archive) as z:
         assert all(not Path(n).is_absolute() and '..' not in Path(n).parts for n in z.namelist())
