@@ -25,7 +25,8 @@ def fetch(url, name, digest, authenticated=True):
     headers = ''
     if authenticated:
         args += ['--header', '@-']
-        headers = 'Authorization: Bearer ' + os.environ['GH_TOKEN'] + '\nAccept: application/octet-stream\n'
+        media = 'application/vnd.github+json' if '/actions/artifacts/' in url else 'application/octet-stream'
+        headers = 'Authorization: Bearer ' + os.environ['GH_TOKEN'] + '\nAccept: ' + media + '\n'
     result = subprocess.run([*args, url], input=headers, text=True)
     proof = {'url': url, 'name': name, 'exit': result.returncode,
              'bytes': dest.stat().st_size if dest.exists() else None,
