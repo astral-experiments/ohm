@@ -69,7 +69,7 @@ arguments = sys.argv[1:]
 if "--rustc-perf-checkout-dir" in arguments:
     perf = pathlib.Path(arguments[arguments.index("--rustc-perf-checkout-dir") + 1])
     collector = (perf / "collector/src/compile/benchmark/mod.rs").read_text()
-    if ".run_rustc(false)" not in collector or "local edit" in collector:
+    if ".run_rustc(false)" not in collector or "local edit" in collector or "local commit" in collector:
         raise SystemExit("expected the prepared copy of the pinned collector")
 
 artifact_directory = checkout / arguments[arguments.index("--artifact-dir") + 1]
@@ -560,6 +560,36 @@ if grep -Fq '.run_rustc(false)' "$original_collector"; then
   echo 'profile training modified the original collector' >&2
   exit 1
 fi
+pinned_perf_blob="$(git -C "$perf_remote" rev-parse "HEAD:$collector_path")"
+edited_perf_blob="$(git -C "$perf_source" hash-object -w -- "$original_collector")"
+git -C "$perf_source" replace "$pinned_perf_blob" "$edited_perf_blob"
+: > "$trace"
+replacement_output="$test_directory/replaced-collector-blob.log"
+if ! run_optimized_build "$linux_target" "$replacement_output"; then
+  cat "$replacement_output" >&2
+  exit 1
+fi
+assert_optimized_build "$linux_target" "$bolt_directory" true true "$replacement_output" relocated
+git -C "$perf_source" replace -d "$pinned_perf_blob"
+
+pinned_rust_head="$(git -C "$rust_checkout" rev-parse HEAD)"
+(
+  export GIT_INDEX_FILE="$test_directory/replacement-index"
+  git -C "$rust_checkout" read-tree HEAD
+  git -C "$rust_checkout" update-index --cacheinfo 160000 "$original_head" src/tools/rustc-perf
+  replacement_tree="$(git -C "$rust_checkout" write-tree)"
+  replacement_head="$(printf 'Replace collector selection\n' | git -C "$rust_checkout" -c user.name=fixture -c user.email=fixture@example.com commit-tree "$replacement_tree" -p "$pinned_rust_head")"
+  git -C "$rust_checkout" replace "$pinned_rust_head" "$replacement_head"
+)
+: > "$trace"
+replacement_output="$test_directory/replaced-rust-commit.log"
+if ! run_optimized_build "$macos_target" "$replacement_output"; then
+  cat "$replacement_output" >&2
+  exit 1
+fi
+assert_optimized_build "$macos_target" "$rust_checkout/build/$macos_target/ci-llvm" false true "$replacement_output" relocated
+git -C "$rust_checkout" replace -d "$pinned_rust_head"
+
 staged_checkout="$test_directory/staged-checkout"
 cp -R "$rust_checkout" "$staged_checkout"
 git -C "$staged_checkout" submodule deinit --quiet -f -- src/tools/rustc-perf
