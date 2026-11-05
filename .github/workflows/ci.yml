@@ -1,26 +1,51 @@
-name: Check native instruction counters for the -26 compiler comparison
+name: Qualify Rust 351 on the -26 compiler with native instructions
 on:
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
+  actions: read
 jobs:
-  probe:
+  compare:
+    strategy:
+      fail-fast: false
+      matrix:
+        history: [1, 2]
     runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 10
+    timeout-minutes: 60
+    env:
+      RC26_HISTORY: ${{ matrix.history }}
+      PYTHONUNBUFFERED: "1"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
-      - name: Check the native counter on a fixed loop
+      - name: Check host tools
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p pmu-probe
-          cat /proc/sys/kernel/random/boot_id > pmu-probe/boot.txt
-          cat /proc/sys/kernel/perf_event_paranoid > pmu-probe/paranoid.txt
-          id > pmu-probe/identity.txt
-          gcc -O2 -Wall -Wextra -Werror scripts/rc26-native-counter.c -o pmu-probe/counter
-          cat > pmu-probe/loop.c <<'C'
+          echo "RC26_ROOT=$RUNNER_TEMP/rc26-native" >> "$GITHUB_ENV"
+          echo "RC26_EXPECTED_BOOT=$(cat /proc/sys/kernel/random/boot_id)" >> "$GITHUB_ENV"
+          echo "RC26_EXPECTED_UID=$(id -u)" >> "$GITHUB_ENV"
+          bash scripts/rc26-host-prerequisites.sh | tee "$RUNNER_TEMP/rc26-host-prerequisites.log"
+      - name: Fetch and verify the two existing trained SDKs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: /usr/bin/python3.12 scripts/rc26-fetch-inputs.py
+      - name: Install the candidate and prepare the frozen workload
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp scripts/rc26-native-counter.c "$RC26_ROOT/inputs/"
+          gcc -O2 -Wall -Wextra -Werror scripts/rc26-native-counter.c -o "$RC26_ROOT/inputs/native-counter"
+          /usr/bin/python3.12 scripts/rc26-install-candidate.py
+          /usr/bin/python3.12 scripts/rc26-prepare-inputs.py
+      - name: Validate inherited native counters
+        shell: bash
+        run: |
+          set -euo pipefail
+          p="$RC26_ROOT/proofs/counter-calibration"
+          mkdir "$p"
+          cat > "$p/loop.c" <<'C'
           #include <stdlib.h>
           int main(int argc, char **argv) {
             unsigned long n = strtoul(argv[1], 0, 10);
@@ -28,24 +53,57 @@ jobs:
             return 0;
           }
           C
-          gcc -O2 pmu-probe/loop.c -o pmu-probe/loop
+          gcc -O2 "$p/loop.c" -o "$p/loop"
           for n in 1000000 2000000; do
-            pmu-probe/counter "pmu-probe/$n.json" -- pmu-probe/loop "$n"
+            "$RC26_ROOT/inputs/native-counter" "$p/$n.json" -- /bin/sh -c '"$1" "$2" & "$1" "$2" & wait' sh "$p/loop" "$n"
           done
-          python3 - <<'PY'
-          import json
+          /usr/bin/python3.12 - <<'PY'
+          import json, os
           from pathlib import Path
-          a, b = [json.loads(Path(f'pmu-probe/{n}.json').read_text()) for n in (1000000, 2000000)]
+          root = Path(os.environ['RC26_ROOT'])
+          a, b = [json.loads((root / f'proofs/counter-calibration/{n}.json').read_text()) for n in (1000000, 2000000)]
           assert all(r['instructions'] > 0 and r['time_running'] == r['time_enabled'] > 0 for r in (a, b))
-          delta = b['instructions'] - a['instructions']
-          assert abs(delta - 2000000) < 2000, delta
-          print('Native instruction counter passed; loop delta:', delta)
+          assert abs(b['instructions'] - a['instructions'] - 4000000) < 4000, (a, b)
           PY
-      - name: Preserve the probe and any failure
+      - name: Verify both native histories and count the eight command samples
+        run: /usr/bin/python3.12 scripts/rc26-instruction-check.py "$RC26_HISTORY"
+      - name: Seal the evidence
+        if: always()
+        shell: bash
+        run: |
+          /usr/bin/python3.12 - <<'PY'
+          import hashlib, json, os, platform
+          from pathlib import Path
+          root = Path(os.environ['RC26_ROOT'])
+          if not root.exists():
+              root.mkdir()
+          import shutil
+          (root / 'proofs').mkdir(exist_ok=True)
+          host = Path(os.environ['RUNNER_TEMP']) / 'rc26-host-prerequisites.log'
+          if host.exists():
+              shutil.copyfile(host, root / 'proofs/host-prerequisites.log')
+          names = ('GITHUB_RUN_ID', 'GITHUB_RUN_ATTEMPT', 'GITHUB_SHA', 'GITHUB_JOB', 'RC26_HISTORY', 'RC26_EXPECTED_BOOT', 'RC26_EXPECTED_UID')
+          proof = {'context': {k: os.environ.get(k) for k in names}, 'platform': platform.uname()._asdict(), 'boot': Path('/proc/sys/kernel/random/boot_id').read_text().strip()}
+          (root / 'actual-context.json').write_text(json.dumps(proof, indent=2) + '\n')
+          paths = [p for p in (root / 'native-instruction-results').rglob('*') if p.is_file()]
+          manifest = {}
+          for p in paths:
+              with p.open('rb') as f:
+                  manifest[str(p.relative_to(root))] = {'bytes': p.stat().st_size, 'sha256': hashlib.file_digest(f, 'sha256').hexdigest()}
+          (root / 'evidence-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
+          PY
+      - name: Retain the complete proofs and any failures
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: rc26-native-counter-probe
-          path: pmu-probe/
+          name: rc26-native-instructions-${{ matrix.history }}-${{ github.run_id }}
+          path: |
+            ${{ env.RC26_ROOT }}/native-instruction-results/
+            ${{ env.RC26_ROOT }}/input-preparation/
+            ${{ env.RC26_ROOT }}/candidate-install/
+            ${{ env.RC26_ROOT }}/candidate-verified.json
+            ${{ env.RC26_ROOT }}/actual-context.json
+            ${{ env.RC26_ROOT }}/evidence-manifest.json
+            ${{ env.RC26_ROOT }}/proofs/
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 30
