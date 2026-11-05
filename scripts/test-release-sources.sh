@@ -29,9 +29,15 @@ git -C "$cargo_checkout" init --quiet
 git -C "$cargo_checkout" -c protocol.file.allow=always submodule add --quiet \
   --name fixture "$dependency" 'vendor/fixture code'
 printf 'fixture cargo\n' > "$cargo_checkout/README.md"
+printf 'expanded.txt ident\n' > "$cargo_checkout/.gitattributes"
+printf '%s\n' "\$Id\$" > "$cargo_checkout/expanded.txt"
 ln -s README.md "$cargo_checkout/readme-link"
-git -C "$cargo_checkout" add README.md readme-link
+git -C "$cargo_checkout" add README.md readme-link .gitattributes expanded.txt
 commit_fixture "$cargo_checkout" -m 'Add Cargo fixture'
+rm -- "$cargo_checkout/expanded.txt"
+git -C "$cargo_checkout" checkout-index -u -- expanded.txt
+expanded_object="$(git -C "$cargo_checkout" rev-parse HEAD:expanded.txt)"
+[[ "$(cat "$cargo_checkout/expanded.txt")" == "\$Id: $expanded_object \$" ]]
 cargo_revision="$(git -C "$cargo_checkout" rev-parse HEAD)"
 
 git -C "$clippy_checkout" init --quiet
@@ -143,6 +149,28 @@ cp -p "$test_root/original-readme" "$readme"
 git -C "$cargo_checkout" config --remove-section filter.ohm-test
 rm -- "$cargo_checkout/.git/info/attributes"
 
+printf 'README.md text eol=crlf\n' > "$cargo_checkout/.git/info/attributes"
+printf 'fixture cargo\r\n' > "$readme"
+git -C "$cargo_checkout" add -- README.md
+git -C "$cargo_checkout" diff --cached --quiet HEAD -- README.md
+if "${verify_sources[@]}" >/dev/null 2>&1; then
+  echo 'source verification accepted line endings from unversioned attributes' >&2
+  exit 1
+fi
+rm -- "$cargo_checkout/.git/info/attributes" "$readme"
+git -C "$cargo_checkout" checkout-index -u -- README.md
+
+printf '%s\n' "\$Id: forged expansion \$" > "$cargo_checkout/expanded.txt"
+git -C "$cargo_checkout" add -- expanded.txt
+git -C "$cargo_checkout" diff --cached --quiet HEAD -- expanded.txt
+if "${verify_sources[@]}" >/dev/null 2>&1; then
+  echo 'source verification accepted an incorrect expansion of a committed attribute' >&2
+  exit 1
+fi
+rm -- "$cargo_checkout/expanded.txt"
+git -C "$cargo_checkout" checkout-index -u -- expanded.txt
+"${verify_sources[@]}" >/dev/null
+
 embedded_cargo="$rust_checkout/src/tools/cargo"
 nested_dependency="$embedded_cargo/vendor/fixture code"
 mv "$nested_dependency/.git" "$test_root/dependency-gitfile"
@@ -205,14 +233,21 @@ if "${verify_sources[@]}" >/dev/null 2>&1; then
   exit 1
 fi
 git -C "$cargo_checkout" replace -d "$pinned_tree" >/dev/null
-git -C "$cargo_checkout" restore --staged --worktree README.md
+git -C "$cargo_checkout" restore --source=HEAD --staged --worktree README.md
+
+# Git follows symlinks before resolving a parent component in a checkout path.
+mkdir -p "$test_root/logical" "$test_root/physical-child"
+ln -s "$test_root/physical-child" "$test_root/logical/link"
+cp -R "$cargo_checkout" "$test_root/logical/cargo"
+flagged_sources=("${verify_sources[@]}")
+flagged_sources[3]="$test_root/logical/link/../cargo"
 
 for flag in assume-unchanged skip-worktree; do
   git -C "$cargo_checkout" update-index "--$flag" README.md
   flagged_entry="$(git -C "$cargo_checkout" ls-files -v -- README.md)"
-  "${verify_sources[@]}"
+  "${flagged_sources[@]}"
   printf 'uncommitted Cargo source\n' >> "$cargo_checkout/README.md"
-  if "${verify_sources[@]}" >/dev/null 2>&1; then
+  if "${flagged_sources[@]}" >/dev/null 2>&1; then
     echo "source verification accepted an edit hidden by $flag" >&2
     exit 1
   fi
