@@ -3,6 +3,8 @@ set -euo pipefail
 # A Git hook can supply its own repository, temporary index and object store.
 unset GIT_DIR GIT_WORK_TREE GIT_COMMON_DIR GIT_INDEX_FILE
 unset GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_QUARANTINE_PATH
+# Use the verifier's own pathspecs, including its exclusions for overlaid tools.
+unset GIT_LITERAL_PATHSPECS GIT_GLOB_PATHSPECS GIT_NOGLOB_PATHSPECS GIT_ICASE_PATHSPECS
 # Release revisions name the original objects, even in checkouts with replacement refs.
 export GIT_NO_REPLACE_OBJECTS=1
 unset CDPATH

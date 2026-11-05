@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# The path passed to ls-tree belongs to this script.
+unset GIT_LITERAL_PATHSPECS GIT_GLOB_PATHSPECS GIT_NOGLOB_PATHSPECS GIT_ICASE_PATHSPECS
 # Release revisions name the original objects, even in checkouts with replacement refs.
 export GIT_NO_REPLACE_OBJECTS=1
 
