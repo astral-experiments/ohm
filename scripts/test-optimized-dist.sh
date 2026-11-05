@@ -533,10 +533,12 @@ printf '%s\n' '// local edit' >> "$original_collector"
 toolchain=ohm-1.99.0-23
 : > "$trace"
 relocated_output="$test_directory/relocated-output.log"
-mkdir -p "$test_directory/profile tmp"
+mkdir -p "$test_directory/profile tmp" "$test_directory/invocation/scripts"
+ln -s "$script_directory" "$test_directory/invocation/commands"
 (
   cd -- "$test_directory"
-  rust_checkout="${rust_checkout##*/}" run_optimized_build "$linux_target" "$relocated_output" TMPDIR="profile tmp" CDPATH=.
+  script_directory="$test_directory/invocation/commands/../scripts" rust_checkout="${rust_checkout##*/}" \
+    run_optimized_build "$linux_target" "$relocated_output" TMPDIR="profile tmp" CDPATH=.
 )
 assert_optimized_build "$linux_target" "$bolt_directory" true true "$relocated_output" relocated
 [[ "$(git -C "$perf_source" rev-parse HEAD)" == "$original_head" ]]

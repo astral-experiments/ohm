@@ -100,6 +100,14 @@ fi
 
 verify_sources=("$script_dir/verify-release-sources.sh" "$release_manifest" "$rust_checkout"
   "$cargo_checkout" "$clippy_checkout" "$rustfmt_checkout")
+# Each spelling invokes the same script and must find its own manifest validator.
+mkdir -p "$test_root/invocation/scripts" "$test_root/invocation/bin"
+ln -s "$script_dir" "$test_root/invocation/link"
+newline_scripts="$test_root/invocation/bin"$'\n'
+ln -s "$script_dir" "$newline_scripts"
+"$test_root/invocation/link/../scripts/verify-release-sources.sh" "${verify_sources[@]:1}" >/dev/null
+"$newline_scripts/verify-release-sources.sh" "${verify_sources[@]:1}" >/dev/null
+
 # A commit hook supplies an index, and a receive hook supplies the calling repository.
 GIT_INDEX_FILE="$clippy_checkout/.git/index" "${verify_sources[@]}" >/dev/null
 GIT_DIR="$clippy_checkout/.git" GIT_WORK_TREE="$clippy_checkout" \

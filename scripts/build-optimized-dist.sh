@@ -41,7 +41,9 @@ fi
 
 # A NUL delimiter preserves trailing newlines in the physical directory name.
 IFS= read -r -d '' rust_checkout < <(cd -P -- "$rust_checkout" && printf '%s\0' "$PWD")
-script_directory="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+script_path="${BASH_SOURCE[0]}"
+[[ "$script_path" == */* ]] || script_path="./$script_path"
+IFS= read -r -d '' script_directory < <(cd -P -- "${script_path%/*}/" && printf '%s\0' "$PWD")
 if [[ "$bootstrap_config" != /* ]]; then
   bootstrap_config="$PWD/$bootstrap_config"
 fi
