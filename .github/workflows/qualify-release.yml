@@ -31,6 +31,9 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          enable-cache: true
       - name: Validate the candidate commit
         env:
           CANDIDATE_REVISION: ${{ inputs.candidate_revision }}
@@ -60,9 +63,6 @@ jobs:
           \ \"$manifest\")\"\n  echo \"rustfmt-revision=$(jq -er '.sources.rustfmt.revision' \"$manifest\")\"\n  echo\
           \ \"manifest=$manifest\"\n  echo \"toolchain=$(jq -er '.release.toolchain_name' \"$manifest\")\"\n} >> \"\
           $GITHUB_OUTPUT\"\n"
-      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
-        with:
-          enable-cache: true
       - name: Create read-only source repository token
         id: source-token
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
