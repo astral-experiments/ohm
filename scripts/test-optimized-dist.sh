@@ -74,6 +74,11 @@ if "--rustc-perf-checkout-dir" in arguments:
 
 artifact_directory = checkout / arguments[arguments.index("--artifact-dir") + 1]
 artifact_directory.mkdir(parents=True, exist_ok=True)
+bolt_tools = {}
+if "--use-bolt" in arguments:
+    llvm_dir = pathlib.Path(arguments[arguments.index("--llvm-dir") + 1])
+    for name in ("bin/llvm-profdata", "bin/llvm-bolt", "bin/merge-fdata", "lib"):
+        bolt_tools[name] = str((llvm_dir / name).resolve(strict=True))
 
 
 def fixture_component(name: str) -> str:
@@ -139,6 +144,7 @@ with (checkout / "commands.jsonl").open("a", encoding="utf-8") as output:
     json.dump(
         {
             "kind": "opt-dist",
+            "bolt_tools": bolt_tools,
             "arguments": arguments,
             "environment": dict(os.environ),
             "profiles": profiles,
@@ -356,7 +362,15 @@ if option(pipeline_arguments, "--std-target") != "wasm32-unknown-unknown":
     raise SystemExit("opt-dist must build Wasm std before preserving stage1 for packaging")
 if option(pipeline_arguments, "--checkout-dir") != str(checkout):
     raise SystemExit("opt-dist used the wrong pinned Rust checkout")
-if option(pipeline_arguments, "--llvm-dir") != str(pathlib.Path(expected_llvm).resolve()):
+llvm_dir = pathlib.Path(option(pipeline_arguments, "--llvm-dir"))
+if expect_bolt == "true":
+    if llvm_dir.exists():
+        raise SystemExit("the temporary BOLT directory was not removed")
+    for name, actual in optimized["bolt_tools"].items():
+        root = checkout / "build" / target / "ci-llvm" if name == "bin/llvm-profdata" else pathlib.Path(expected_llvm)
+        if not pathlib.Path(actual).samefile(root / name):
+            raise SystemExit(f"opt-dist received the wrong {name}: {actual}")
+elif llvm_dir != pathlib.Path(expected_llvm).resolve():
     raise SystemExit("opt-dist used the wrong matching LLVM installation")
 if option(pipeline_arguments, "--artifact-dir") != "build/opt-artifacts":
     raise SystemExit("optimization artifacts escaped the isolated Rust build directory")
@@ -459,9 +473,8 @@ legacy_linux_output="$test_directory/legacy-linux-output.log"
 run_optimized_build "$linux_target" "$legacy_linux_output"
 assert_optimized_build "$linux_target" "$bolt_directory" true false "$legacy_linux_output"
 
-if [[ ! "$bolt_directory/bin/llvm-profdata" -ef \
-  "$rust_checkout/build/$linux_target/ci-llvm/bin/llvm-profdata" ]]; then
-  echo 'Linux BOLT did not use the exact matching Rust LLVM profile tool' >&2
+if [[ -e "$bolt_directory/bin/llvm-profdata" || -L "$bolt_directory/bin/llvm-profdata" ]]; then
+  echo 'Linux release build modified the shared BOLT installation' >&2
   exit 1
 fi
 

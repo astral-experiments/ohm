@@ -147,6 +147,17 @@ if [[ ! -x "$llvm_profdata" ]]; then
   exit 1
 fi
 
+release_name="${toolchain#ohm-}"
+manifest="$script_directory/../toolchains/${release_name%-*}/${release_name##*-}.json"
+prepare_relocated_dependencies=false
+if [[ -f "$manifest" ]]; then
+  prepare_relocated_dependencies="$(jq -r '.prepare_relocated_pgo_dependencies // false' "$manifest")"
+fi
+if [[ "$use_bolt" == true || "$prepare_relocated_dependencies" == true ]]; then
+  work_directory="$(mktemp -d "${TMPDIR:-/tmp}/ohm-opt-dist.XXXXXX")"
+  trap 'rm -rf -- "$work_directory"' EXIT
+fi
+
 llvm_dir="$ci_llvm_dir"
 if [[ "$use_bolt" == true ]]; then
   llvm_version="$("$llvm_profdata" --version)"
@@ -180,17 +191,11 @@ if [[ "$use_bolt" == true ]]; then
     exit 1
   fi
 
-  bolt_profdata="$bolt_llvm_dir/bin/llvm-profdata"
-  if [[ -e "$bolt_profdata" || -L "$bolt_profdata" ]]; then
-    if [[ ! "$bolt_profdata" -ef "$llvm_profdata" ]]; then
-      echo "LLVM BOLT profile tool does not match downloaded Rust LLVM: $bolt_profdata" >&2
-      exit 1
-    fi
-  else
-    ln -s "$llvm_profdata" "$bolt_profdata"
-  fi
-
-  llvm_dir="$bolt_llvm_dir"
+  # Pair the shared BOLT installation with this checkout's matching profile tool.
+  llvm_dir="$work_directory/llvm"
+  mkdir -p -- "$llvm_dir/bin"
+  ln -s -- "$llvm_profdata" "$bolt_llvm_dir/bin/llvm-bolt" "$bolt_llvm_dir/bin/merge-fdata" "$llvm_dir/bin/"
+  ln -s -- "$bolt_llvm_dir/lib" "$llvm_dir/lib"
 fi
 
 # Upstream opt-dist logs every environment variable before doing any work.
@@ -250,12 +255,6 @@ if [[ "$use_bolt" == true ]]; then
   opt_dist_arguments+=(--use-bolt)
 fi
 
-release_name="${toolchain#ohm-}"
-manifest="$script_directory/../toolchains/${release_name%-*}/${release_name##*-}.json"
-prepare_relocated_dependencies=false
-if [[ -f "$manifest" ]]; then
-  prepare_relocated_dependencies="$(jq -r '.prepare_relocated_pgo_dependencies // false' "$manifest")"
-fi
 if [[ "$prepare_relocated_dependencies" == true ]]; then
   # rustc-perf moves each benchmark after preparing its dependencies. A build
   # script can embed that original path. Prepare the moved dependencies before
@@ -263,8 +262,8 @@ if [[ "$prepare_relocated_dependencies" == true ]]; then
   perf_path=src/tools/rustc-perf
   perf_revision="$(git -C "$rust_checkout" rev-parse "HEAD:$perf_path")"
   perf_source="$rust_checkout/$perf_path"
-  perf_checkout="$(mktemp -d "${TMPDIR:-/tmp}/ohm-rustc-perf.XXXXXX")"
-  trap 'rm -rf -- "$perf_checkout"' EXIT
+  perf_checkout="$work_directory/rustc-perf"
+  mkdir -- "$perf_checkout"
   if [[ ! -e "$perf_source/.git" ]]; then
     # Read the committed gitlink even if the caller staged a different revision or removal.
     (
