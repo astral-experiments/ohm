@@ -17,13 +17,19 @@ work.
 
 ## Run the sessions
 
+Choose an installed Ohm release and its corresponding stock Rust version before running the examples.
+
+```sh
+stock=1.99.0
+ohm=ohm-1.99.0-26
+```
+
 ```sh
 ulimit -n 65536
 install -d -m 700 /tmp/ohm-replay-1
 export TMPDIR=/tmp/ohm-replay-1
 python3 scripts/replay_sessions.py \
-  --upstream 1.99.0 \
-  --ohm ohm-1.99.0-5 \
+  --upstream "$stock" --ohm "$ohm" \
   --source-path ruff=/path/to/ruff \
   --source-path uv=/path/to/uv \
   --source-path codex=/path/to/codex \
@@ -76,7 +82,7 @@ modes. Setup time is excluded from session and warmup totals.
 ```sh
 python3 scripts/replay_sessions.py \
   --project ruff --scenario scripts/session_replays/ty-29327.json \
-  --upstream 1.99.0 --ohm ohm-1.99.0-5 \
+  --upstream "$stock" --ohm "$ohm" \
   --source-path ruff=/path/to/ruff --output-dir /path/to/new-ty-results \
   --jobs 8 --repetitions 4 --native-tool-trust all \
   --compiler-accounting verbose --offline --require-idle
@@ -90,7 +96,7 @@ This enables both Ohm trust opt-ins. Expected failures must match the fixture's 
 
 ```sh
 python3 scripts/benchmark_worktree_start.py \
-  --upstream 1.99.0 --ohm ohm-1.99.0-5 \
+  --upstream "$stock" --ohm "$ohm" \
   --source-path /path/to/ruff --output-dir /path/to/new-worktree-results \
   --jobs 8 --repetitions 3 --compiler-accounting verbose --offline --require-idle
 ```
@@ -135,8 +141,7 @@ python3 scripts/replay_sessions.py \
   --project uv \
   --scenario scripts/session_replays/uv-feature-ablation.json \
   --source-path uv=/path/to/uv \
-  --upstream 1.99.0 \
-  --ohm ohm-1.99.0-5 \
+  --upstream "$stock" --ohm "$ohm" \
   --output-dir /path/to/new-empty-ablation-results \
   --feature-matrix \
   --jobs 8 \

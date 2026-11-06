@@ -16,7 +16,14 @@ import threading
 import time
 
 import replay_sessions as replay
-from benchmark import BenchmarkError, Edit, REPOSITORIES, WORKLOADS, edit_contents
+from benchmark import (
+    DEFAULT_UPSTREAM,
+    REPOSITORIES,
+    WORKLOADS,
+    BenchmarkError,
+    Edit,
+    edit_contents,
+)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -911,8 +918,8 @@ def parser():
     result.add_argument("--workflow", action="append", choices=WORKFLOWS)
     result.add_argument("--source-path", action="append", default=[])
     result.add_argument("--output-dir", type=Path, required=True)
-    result.add_argument("--upstream", default="1.99.0")
-    result.add_argument("--ohm", default="ohm-1.99.0-6")
+    result.add_argument("--upstream", default=DEFAULT_UPSTREAM)
+    result.add_argument("--ohm", required=True, help="Ohm toolchain to benchmark")
     result.add_argument("--jobs", type=int, default=8)
     result.add_argument("--repetitions", type=int, default=4)
     result.add_argument("--timeout", type=int, default=3600)

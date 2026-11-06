@@ -54,6 +54,9 @@ class Workload:
     selected_test: str
 
 
+# Stock Rust version used with the default benchmark workloads.
+DEFAULT_UPSTREAM = "1.99.0"
+
 REPOSITORIES = {
     "uv": {
         "url": "https://github.com/astral-sh/uv.git",
@@ -282,7 +285,7 @@ def parser() -> argparse.ArgumentParser:
     argument_parser.add_argument(
         "--codex-rev", default=REPOSITORIES["codex"]["revision"]
     )
-    argument_parser.add_argument("--upstream", default="1.98.0")
+    argument_parser.add_argument("--upstream", default=DEFAULT_UPSTREAM)
     argument_parser.add_argument("--ohm", default="ohm")
     argument_parser.add_argument(
         "--project",

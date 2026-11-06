@@ -27,7 +27,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from benchmark import COMPILER_PROCESSES, BenchmarkError
+from benchmark import COMPILER_PROCESSES, DEFAULT_UPSTREAM, BenchmarkError
 
 SCENARIO_DIRECTORY = Path(__file__).with_name("session_replays")
 PROJECTS = ("ruff", "uv", "codex")
@@ -1510,7 +1510,7 @@ def parser() -> argparse.ArgumentParser:
         action="store_true",
         help="preserve completed results and restart interrupted cells from fresh artifacts",
     )
-    result.add_argument("--upstream", default="1.99.0")
+    result.add_argument("--upstream", default=DEFAULT_UPSTREAM)
     result.add_argument("--ohm", default="ohm")
     result.add_argument(
         "--feature-matrix",
