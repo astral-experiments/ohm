@@ -27,10 +27,9 @@ source revisions are finalized.
 
 ## Testing
 
-Validate shell scripts and run the coordinator's focused tests:
+Check the installer's shell syntax and run the release tests.
 
 ```console
-bash -n scripts/*.sh
 sh -n scripts/install.sh
 ./scripts/test-release-sources.sh
 bash scripts/test-installer.sh
