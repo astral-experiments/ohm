@@ -21,16 +21,9 @@ manifest. Source repositories retain an `upstream-<rust-version>` branch for ups
 
 ## Incremental compilation
 
-Ohm combines three experimental optimizations:
-
-1. Public-API hashes limit dependency rebuilds when a change does not alter the relevant public
-   interface.
-2. Cached relinking reuses prior code generation when a downstream target only needs a new link.
-3. Proc-macro caching reuses derive macro expansions.
-
-These backported and forward-ported optimizations can be unsound. Rust explicitly labels proc-macro
-caching as potentially unsound, for example, because macro expansions can depend on inputs that are
-not represented by the cache. Cached build output may become stale or incorrect.
+See [How Ohm speeds up development](optimizations.md) for the changes to Cargo and rustc.
+Reusing build output can be unsound. For example, if a procedural macro reads an input its cache
+does not track, the compiler can reuse a stale expansion.
 
 Use Ohm only for local iteration, never for production builds, releases, CI correctness validation,
 or final test results. Use the normal Rust toolchain as the authoritative source of truth. Ohm's
