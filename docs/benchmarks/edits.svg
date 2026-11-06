@@ -1,53 +1,53 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="680" height="286" viewBox="0 0 680 286" role="img" aria-labelledby="title">
-<title id="title">Speedup over stock Rust after a direct or dependency edit</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="223" viewBox="0 0 640 223" role="img" aria-labelledby="title desc">
+<title id="title">Ohm speedup over stock Rust after one edit</title>
+<desc id="desc">Direct and dependency edits use the same linear scale. A speedup of 1× is parity.</desc>
 <style>
-text { font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #24292f }
-.number, .key { font-size: 13px; font-variant-numeric: tabular-nums }
-.key { fill: #59636e }
-.stock { fill: #9aa4af }
-.ohm { fill: #298365 }
-.axis { stroke: #d1d9e0 }
+text { font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #26232b }
+.heading { font-size: 16px; font-weight: 550 }
+.label { fill: #625f67 }
+.value, .change { font-size: 13px; font-variant-numeric: tabular-nums }
+.change { fill: #625f67 }
+.rust { fill: #b8b8bd }
+.ohm { fill: #7546a8 }
 @media (prefers-color-scheme: dark) {
-  text { fill: #e6edf3 }
-  .key { fill: #a4adb7 }
-  .stock { fill: #788390 }
-  .ohm { fill: #6dc2a1 }
-  .axis { stroke: #3d444d }
+  text { fill: #ece9ef }
+  .label, .change { fill: #c2bec6 }
+  .rust { fill: #88888e }
+  .ohm { fill: #c49aeb }
 }
 </style>
-<rect x="182.00" y="8.0" width="14.00" height="7" class="stock"/>
-<text x="202.0" y="16.0" class="key" text-anchor="start">Direct edit</text>
-<rect x="328.00" y="8.0" width="14.00" height="7" class="ohm"/>
-<text x="348.0" y="16.0" class="key" text-anchor="start">Dependency edit</text>
-<path d="M182.00 31V282" class="axis"/>
-<text x="2.0" y="59.0" class="" text-anchor="start">uv · cargo check</text>
-<rect x="182.00" y="44.0" width="10.14" height="8" class="stock"/>
-<text x="198.1" y="52.0" class="number" text-anchor="start">1.13×</text>
-<rect x="182.00" y="58.0" width="177.16" height="8" class="ohm"/>
-<text x="365.2" y="66.0" class="number" text-anchor="start">19.68×</text>
-<text x="2.0" y="101.0" class="" text-anchor="start">uv · cargo clippy</text>
-<rect x="182.00" y="86.0" width="11.63" height="8" class="stock"/>
-<text x="199.6" y="94.0" class="number" text-anchor="start">1.29×</text>
-<rect x="182.00" y="100.0" width="209.55" height="8" class="ohm"/>
-<text x="397.6" y="108.0" class="number" text-anchor="start">23.27×</text>
-<text x="2.0" y="143.0" class="" text-anchor="start">uv · cargo test --test it</text>
-<rect x="182.00" y="128.0" width="19.24" height="8" class="stock"/>
-<text x="207.2" y="136.0" class="number" text-anchor="start">2.14×</text>
-<rect x="182.00" y="142.0" width="81.71" height="8" class="ohm"/>
-<text x="269.7" y="150.0" class="number" text-anchor="start">9.07×</text>
-<text x="2.0" y="185.0" class="" text-anchor="start">Codex · cargo check</text>
-<rect x="182.00" y="170.0" width="9.74" height="8" class="stock"/>
-<text x="197.7" y="178.0" class="number" text-anchor="start">1.08×</text>
-<rect x="182.00" y="184.0" width="232.52" height="8" class="ohm"/>
-<text x="420.5" y="192.0" class="number" text-anchor="start">25.82×</text>
-<text x="2.0" y="227.0" class="" text-anchor="start">Codex · just clippy</text>
-<rect x="182.00" y="212.0" width="13.93" height="8" class="stock"/>
-<text x="201.9" y="220.0" class="number" text-anchor="start">1.55×</text>
-<rect x="182.00" y="226.0" width="414.00" height="8" class="ohm"/>
-<text x="602.0" y="234.0" class="number" text-anchor="start">45.98×</text>
-<text x="2.0" y="269.0" class="" text-anchor="start">Codex · just test</text>
-<rect x="182.00" y="254.0" width="9.19" height="8" class="stock"/>
-<text x="197.2" y="262.0" class="number" text-anchor="start">1.02×</text>
-<rect x="182.00" y="268.0" width="181.96" height="8" class="ohm"/>
-<text x="370.0" y="276.0" class="number" text-anchor="start">20.21×</text>
+<text x="185.0" y="18" class="heading" text-anchor="start">Direct edit</text>
+<text x="419.0" y="18" class="heading" text-anchor="start">Dependency edit</text>
+<text x="2.0" y="48" class="heading" text-anchor="start">uv</text>
+<text x="2.0" y="72" class="label" text-anchor="start">cargo check</text>
+<rect x="185" y="64" width="3.67" height="8" class="ohm"/>
+<text x="194.7" y="72" class="value ohm" text-anchor="start">1.13×</text>
+<rect x="419" y="64" width="64.19" height="8" class="ohm"/>
+<text x="489.2" y="72" class="value ohm" text-anchor="start">19.68×</text>
+<text x="2.0" y="96" class="label" text-anchor="start">cargo clippy</text>
+<rect x="185" y="88" width="4.22" height="8" class="ohm"/>
+<text x="195.2" y="96" class="value ohm" text-anchor="start">1.29×</text>
+<rect x="419" y="88" width="75.92" height="8" class="ohm"/>
+<text x="500.9" y="96" class="value ohm" text-anchor="start">23.27×</text>
+<text x="2.0" y="120" class="label" text-anchor="start">cargo test --test it</text>
+<rect x="185" y="112" width="6.97" height="8" class="ohm"/>
+<text x="198.0" y="120" class="value ohm" text-anchor="start">2.14×</text>
+<rect x="419" y="112" width="29.60" height="8" class="ohm"/>
+<text x="454.6" y="120" class="value ohm" text-anchor="start">9.07×</text>
+<text x="2.0" y="142" class="heading" text-anchor="start">Codex</text>
+<text x="2.0" y="166" class="label" text-anchor="start">cargo check</text>
+<rect x="185" y="158" width="3.53" height="8" class="ohm"/>
+<text x="194.5" y="166" class="value ohm" text-anchor="start">1.08×</text>
+<rect x="419" y="158" width="84.25" height="8" class="ohm"/>
+<text x="509.2" y="166" class="value ohm" text-anchor="start">25.82×</text>
+<text x="2.0" y="190" class="label" text-anchor="start">just clippy</text>
+<rect x="185" y="182" width="5.05" height="8" class="ohm"/>
+<text x="196.0" y="190" class="value ohm" text-anchor="start">1.55×</text>
+<rect x="419" y="182" width="150.00" height="8" class="ohm"/>
+<text x="575.0" y="190" class="value ohm" text-anchor="start">45.98×</text>
+<text x="2.0" y="214" class="label" text-anchor="start">just test</text>
+<rect x="185" y="206" width="3.33" height="8" class="ohm"/>
+<text x="194.3" y="214" class="value ohm" text-anchor="start">1.02×</text>
+<rect x="419" y="206" width="65.93" height="8" class="ohm"/>
+<text x="490.9" y="214" class="value ohm" text-anchor="start">20.21×</text>
 </svg>

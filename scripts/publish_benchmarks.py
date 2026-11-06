@@ -244,6 +244,7 @@ def render_tables(reports, ty_worktree, ty_scenario):
     totals = [a + b for a, b in zip(totals, ty_pair, strict=True)]
     session_rows = [[label, *seconds(pair)] for label, pair in session_times.items()]
     session_rows.append(["All sessions", *seconds(totals)])
+    command_rows = []
     command_chart = []
     for category, label in (
         ("check", "`cargo check`"),
@@ -263,13 +264,13 @@ def render_tables(reports, ty_worktree, ty_scenario):
             + ty_categories[category][index]
             for index, lane in enumerate(lanes)
         ]
-        session_rows.append([label, *seconds(pair)])
+        command_rows.append([label, *seconds(pair)])
         stock, ohm = pair
         delta = stock - ohm
         change = "less" if delta >= 0 else "more"
         command = "Tests" if category == "test" else label.strip("`")
-        command_chart.append((command, [delta], f"{100 * abs(delta) / stock:.1f}% {change}"))
-    session_rows.append(
+        command_chart.append((command, pair, f"{100 * abs(delta) / stock:.1f}% {change} time"))
+    command_rows.append(
         [
             "All commands",
             *seconds(
@@ -306,7 +307,9 @@ def render_tables(reports, ty_worktree, ty_scenario):
         if row["worktrees"] == 10:
             savings.append(row["percent_less_disk"])
             sizes = [row[f"{lane}_retained_bytes"] / 2**30 for lane in lanes]
-            disk_chart.append((project, sizes, f"{row['percent_less_disk']:.1f}%"))
+            percent = row["percent_less_disk"]
+            change = "less" if percent >= 0 else "more"
+            disk_chart.append((project, sizes, f"{abs(percent):.1f}% {change} space"))
 
     comparisons = reports["workflow"]["comparisons"]
     indexed = {(r["project"], r["workflow"], r["phase"]): r for r in comparisons}
@@ -320,10 +323,12 @@ def render_tables(reports, ty_worktree, ty_scenario):
             f"{row['speedup']:.2f}×",
         ]
 
+    timing_columns = [f"Rust {rust}", f"Ohm {version}" if ty_worktree["ohm"] == release else "Ohm", "Time saved"]
     rendered = {
         "sessions": table(
-            ["Scope", f"Rust {rust}", "Ohm", "Time saved"], session_rows
+            ["Session", *timing_columns], session_rows
         ),
+        "commands": table(["Command group", *timing_columns], command_rows),
         "disk": table(
             ["Scope", f"Rust {disk_rust}", f"Ohm {disk_version}", "Space saved"],
             disk_rows,
@@ -352,7 +357,7 @@ def render_tables(reports, ty_worktree, ty_scenario):
                 ("check", "clippy", "test"), commands, strict=True
             ):
                 key = (project, workflow, phase)
-                edits.setdefault(f"{label} · {command}", []).append(indexed[key]["speedup"])
+                edits.setdefault((label, command), []).append(indexed[key]["speedup"])
                 rows.append(
                     workflow_row(
                         key,
@@ -421,30 +426,27 @@ def render_tables(reports, ty_worktree, ty_scenario):
         r"incremental builds can be up to \d+×": f"incremental builds can be up to {math.floor(max(r['speedup'] for r in comparisons if r['workflow'] in ('check', 'clippy', 'test') and r['phase'] in ('direct', 'dependency', 'noop')))}×",
         r"\d+% (?:less|more) time": f"{abs(session_percent)}% {session_direction} time",
         r"disk usage decreases by around \d+%": f"disk usage decreases by around {5 * round(mean(savings) / 5)}%",
+        r"four development sessions with Rust [\d.]+ and Ohm [\d.-]+": f"four development sessions with Rust {rust} and Ohm {version}",
+        r"disk study compared Rust [\d.]+ and Ohm [\d.-]+": f"disk study compared Rust {disk_rust} and Ohm {disk_version}",
     }
     charts = {
-        "sessions": benchmark_charts.bars(
+        "sessions": benchmark_charts.toolchains(
             "Mean replay time by project",
-            [(label.removesuffix(" session"), (stock, ohm), f"{stock / ohm:.2f}×")
-             for label, (stock, ohm) in sorted(session_times.items(), key=lambda r: -r[1][0])],
-            legend=(f"Rust {rust}", f"Ohm {version}"), value_label=benchmark_charts.elapsed,
-            left=88, column="Speedup",
+            [
+                (label.removesuffix(" session"), (stock, ohm), f"{stock / ohm:.2f}× speedup")
+                for label, (stock, ohm) in sorted(session_times.items(), key=lambda r: -r[1][0])
+            ],
+            rust=rust, ohm=version, value_label=benchmark_charts.elapsed,
         ),
-        "commands": benchmark_charts.bars(
-            "Wall time saved by command across the four replays",
-            sorted(command_chart, key=lambda r: -r[1][0]), legend=(),
-            value_label=lambda delta: benchmark_charts.elapsed(abs(delta)) + (" longer" if delta < 0 else ""),
-            left=140, column="Time vs. Rust",
+        "commands": benchmark_charts.toolchains(
+            "Total command time across the four replays",
+            sorted(command_chart, key=lambda row: -row[1][0]),
+            rust=rust, ohm=version, value_label=benchmark_charts.elapsed,
         ),
-        "edits": benchmark_charts.bars(
-            "Speedup over stock Rust after a direct or dependency edit",
-            [(label, pair, "") for label, pair in edits.items()],
-            legend=("Direct edit", "Dependency edit"), value_label=lambda v: f"{v:.2f}×", left=182,
-        ),
-        "disk": benchmark_charts.bars(
+        "edits": benchmark_charts.edit_speedups(edits),
+        "disk": benchmark_charts.toolchains(
             "Disk space retained by ten worktrees on APFS", disk_chart,
-            legend=(f"Rust {disk_rust}", f"Ohm {disk_version}"), value_label=lambda v: f"{v:.2f} GiB",
-            left=88, column="Space saved",
+            rust=disk_rust, ohm=disk_version, value_label=lambda v: f"{v:.2f} GiB",
         ),
     }
     return rendered, headlines, charts

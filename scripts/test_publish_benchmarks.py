@@ -55,7 +55,8 @@ class PublicationTests(unittest.TestCase):
         )
         rows = {
             cells[0]: cells[1:3]
-            for line in tables["sessions"].splitlines()[2:]
+            for section in ("sessions", "commands")
+            for line in tables[section].splitlines()[2:]
             if (cells := [cell.strip() for cell in line.strip("|").split("|")])
         }
         for index, lane in enumerate(("stock", "ohm")):
@@ -308,16 +309,19 @@ class PublicationTests(unittest.TestCase):
                 "scripts/benchmark_results/disk.json", run.call_args.args[0]
             )
             readme = (root / "README.md").read_text()
+            results = (root / "BENCHMARKS.md").read_text()
             self.assertIn(
-                f"| Scope | Rust {disk_rust} | Ohm {disk_version} | Space saved |", readme
+                f"| Scope | Rust {disk_rust} | Ohm {disk_version} | Space saved |", results
             )
             self.assertRegex(
                 readme, r"and `target/` disk usage decreases by around \d+%\."
             )
-            self.assertIn(f"| Rust {rust} | Ohm {version} | Speedup |", readme)
+            self.assertIn(f"| Rust {rust} | Ohm {version} | Speedup |", results)
+            self.assertIn(f"disk study compared Rust {disk_rust} and Ohm {disk_version}", readme)
+            self.assertIn(f"four development sessions with Rust {rust} and Ohm {version}", readme)
             charts = root / "docs/benchmarks"
-            self.assertIn(f"Ohm {version}</text>", (charts / "sessions.svg").read_text())
-            self.assertIn(f"Ohm {disk_version}</text>", (charts / "disk.svg").read_text())
+            self.assertIn(f"Rust {rust} and Ohm {version}.", (charts / "sessions.svg").read_text())
+            self.assertIn(f"Rust {disk_rust} and Ohm {disk_version}.", (charts / "disk.svg").read_text())
 
 
 if __name__ == "__main__":

@@ -1,48 +1,51 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="680" height="202" viewBox="0 0 680 202" role="img" aria-labelledby="title">
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="160" viewBox="0 0 640 160" role="img" aria-labelledby="title desc">
 <title id="title">Mean replay time by project</title>
+<desc id="desc">Rust 1.99.0 and Ohm 1.99.0-26. All bars share a linear scale starting at zero.</desc>
 <style>
-text { font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #24292f }
-.number, .key { font-size: 13px; font-variant-numeric: tabular-nums }
-.key { fill: #59636e }
-.stock { fill: #9aa4af }
-.ohm { fill: #298365 }
-.axis { stroke: #d1d9e0 }
+text { font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #26232b }
+.heading { font-size: 16px; font-weight: 550 }
+.label { fill: #625f67 }
+.value, .change { font-size: 13px; font-variant-numeric: tabular-nums }
+.change { fill: #625f67 }
+.rust { fill: #b8b8bd }
+.ohm { fill: #7546a8 }
 @media (prefers-color-scheme: dark) {
-  text { fill: #e6edf3 }
-  .key { fill: #a4adb7 }
-  .stock { fill: #788390 }
-  .ohm { fill: #6dc2a1 }
-  .axis { stroke: #3d444d }
+  text { fill: #ece9ef }
+  .label, .change { fill: #c2bec6 }
+  .rust { fill: #88888e }
+  .ohm { fill: #c49aeb }
 }
 </style>
-<rect x="88.00" y="8.0" width="14.00" height="7" class="stock"/>
-<text x="108.0" y="16.0" class="key" text-anchor="start">Rust 1.99.0</text>
-<rect x="234.00" y="8.0" width="14.00" height="7" class="ohm"/>
-<text x="254.0" y="16.0" class="key" text-anchor="start">Ohm 1.99.0-26</text>
-<text x="677.0" y="16.0" class="key" text-anchor="end">Speedup</text>
-<path d="M88.00 31V198" class="axis"/>
-<text x="2.0" y="59.0" class="" text-anchor="start">Ruff</text>
-<rect x="88.00" y="44.0" width="390.00" height="8" class="stock"/>
-<text x="484.0" y="52.0" class="number" text-anchor="start">6m 45s</text>
-<rect x="88.00" y="58.0" width="215.51" height="8" class="ohm"/>
-<text x="309.5" y="66.0" class="number" text-anchor="start">3m 44s</text>
-<text x="677.0" y="59.0" class="number" text-anchor="end">1.81×</text>
-<text x="2.0" y="101.0" class="" text-anchor="start">Codex</text>
-<rect x="88.00" y="86.0" width="346.32" height="8" class="stock"/>
-<text x="440.3" y="94.0" class="number" text-anchor="start">6m 00s</text>
-<rect x="88.00" y="100.0" width="180.36" height="8" class="ohm"/>
-<text x="274.4" y="108.0" class="number" text-anchor="start">3m 07s</text>
-<text x="677.0" y="101.0" class="number" text-anchor="end">1.92×</text>
-<text x="2.0" y="143.0" class="" text-anchor="start">ty</text>
-<rect x="88.00" y="128.0" width="191.91" height="8" class="stock"/>
-<text x="285.9" y="136.0" class="number" text-anchor="start">3m 19s</text>
-<rect x="88.00" y="142.0" width="122.55" height="8" class="ohm"/>
-<text x="216.5" y="150.0" class="number" text-anchor="start">2m 07s</text>
-<text x="677.0" y="143.0" class="number" text-anchor="end">1.57×</text>
-<text x="2.0" y="185.0" class="" text-anchor="start">uv</text>
-<rect x="88.00" y="170.0" width="129.98" height="8" class="stock"/>
-<text x="224.0" y="178.0" class="number" text-anchor="start">2m 15s</text>
-<rect x="88.00" y="184.0" width="74.04" height="8" class="ohm"/>
-<text x="168.0" y="192.0" class="number" text-anchor="start">1m 17s</text>
-<text x="677.0" y="185.0" class="number" text-anchor="end">1.76×</text>
+<text x="2.0" y="18" class="heading" text-anchor="start">Ruff</text>
+<text x="300.0" y="18" class="change" text-anchor="end">1.81× speedup</text>
+<text x="2.0" y="41" class="label" text-anchor="start">Rust</text>
+<rect x="46" y="33" width="183.00" height="8" class="rust"/>
+<text x="235.0" y="41" class="value" text-anchor="start">6m 45s</text>
+<text x="2.0" y="61" class="label" text-anchor="start">Ohm</text>
+<rect x="46" y="53" width="101.12" height="8" class="ohm"/>
+<text x="153.1" y="61" class="value ohm" text-anchor="start">3m 44s</text>
+<text x="330.0" y="18" class="heading" text-anchor="start">Codex</text>
+<text x="628.0" y="18" class="change" text-anchor="end">1.92× speedup</text>
+<text x="330.0" y="41" class="label" text-anchor="start">Rust</text>
+<rect x="374" y="33" width="162.50" height="8" class="rust"/>
+<text x="542.5" y="41" class="value" text-anchor="start">6m 00s</text>
+<text x="330.0" y="61" class="label" text-anchor="start">Ohm</text>
+<rect x="374" y="53" width="84.63" height="8" class="ohm"/>
+<text x="464.6" y="61" class="value ohm" text-anchor="start">3m 07s</text>
+<text x="2.0" y="105" class="heading" text-anchor="start">ty</text>
+<text x="300.0" y="105" class="change" text-anchor="end">1.57× speedup</text>
+<text x="2.0" y="128" class="label" text-anchor="start">Rust</text>
+<rect x="46" y="120" width="90.05" height="8" class="rust"/>
+<text x="142.0" y="128" class="value" text-anchor="start">3m 19s</text>
+<text x="2.0" y="148" class="label" text-anchor="start">Ohm</text>
+<rect x="46" y="140" width="57.50" height="8" class="ohm"/>
+<text x="109.5" y="148" class="value ohm" text-anchor="start">2m 07s</text>
+<text x="330.0" y="105" class="heading" text-anchor="start">uv</text>
+<text x="628.0" y="105" class="change" text-anchor="end">1.76× speedup</text>
+<text x="330.0" y="128" class="label" text-anchor="start">Rust</text>
+<rect x="374" y="120" width="60.99" height="8" class="rust"/>
+<text x="441.0" y="128" class="value" text-anchor="start">2m 15s</text>
+<text x="330.0" y="148" class="label" text-anchor="start">Ohm</text>
+<rect x="374" y="140" width="34.74" height="8" class="ohm"/>
+<text x="414.7" y="148" class="value ohm" text-anchor="start">1m 17s</text>
 </svg>
