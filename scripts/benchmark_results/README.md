@@ -1,10 +1,10 @@
 # Published benchmarks
 
-We compared published Ohm 1.99.0-25 with stock Rust 1.99.0 on x86_64 Linux. Each project ran both toolchains on the same machine. The four recorded session means totaled 753.21 s with Ohm and 1,316.38 s with stock Rust. Ohm took 42.78% less time across the four sessions. [Release results](1.99.0-25.md) · [Slower replay steps](1.99.0-25.md#slower-replay-steps) · [Recorded sessions](sessions.json) · [ty session and worktree startup](ty-worktree.md)
+We compared published Ohm 1.99.0-26 with stock Rust 1.99.0 on x86_64 Linux. Each project ran both toolchains on the same machine. The four recorded session means totaled 615.51 s with Ohm and 1,099.38 s with stock Rust. Ohm took 44.01% less time across the four sessions. [Release results](1.99.0-26.md) · [Slower replay steps](1.99.0-26.md#slower-replay-steps) · [Recorded sessions](sessions.json) · [ty session and worktree startup](ty-worktree.md)
 
 The individual-command study covers 216 samples across uv and Codex. The developer study covers five workflows per project for Ruff, uv, and Codex, with four repetitions per toolchain. [Individual commands](workflow.json) · [Developer workflows](developer-workflows.json) · [Historical Ruff replay](historical.json) · [uv feature ablation](ablation.json)
 
-[1.99.0-23 Codex replay and endpoint tests](1.99.0-23-codex.md) · [Ruff doctests](../../BENCHMARKS.md#ruff-doctests)
+[1.99.0-25 results](1.99.0-25.md) · [1.99.0-23 Codex replay and endpoint tests](1.99.0-23-codex.md) · [Ruff doctests](../../BENCHMARKS.md#ruff-doctests)
 
 The APFS disk study compares Ohm 1.99.0-11 with stock Rust 1.99.0. All eight cohorts completed in that release. The formatter comparison below measures -10 against -11. [Disk measurements](disk.json) · [Formatter measurements](formatting-comparison.json)
 
@@ -14,17 +14,17 @@ The [historical reports and fixtures](https://github.com/astral-sh/ohm/tree/9cbe
 
 The separate [Ruff edited-check study](ruff-edited-check.json) retains 64 matched pairs for an earlier experimental version of the [public-API metadata optimization](https://github.com/astral-sh/ohm-rust/pull/194), which is included in Ohm 1.99.0-7. Its [build record](ruff-edited-check-build.json) identifies that experimental compiler. The release tables exclude this earlier study.
 
-## Linux session replays with 1.99.0-25
+## Linux session replays with 1.99.0-26
 
 Each entry gives the wall time in seconds for a complete session replay. The last column compares the mean time for each toolchain on the same host.
 
-| Session         |          Stock Rust 1.99.0 (s) |              Ohm 1.99.0-25 (s) | Time saved |
+| Session         |          Stock Rust 1.99.0 (s) |              Ohm 1.99.0-26 (s) | Time saved |
 | --------------- | -----------------------------: | -----------------------------: | ---------: |
-| Codex           |                 493.21, 514.73 |                 268.31, 283.78 |     45.23% |
-| Ruff            |                 403.29, 402.62 |                 222.74, 223.42 |     44.64% |
-| Ruff historical |                 396.36, 396.47 |                 249.38, 248.35 |     37.22% |
-| uv              |                 132.72, 132.84 |                   79.94, 79.91 |     39.81% |
-| ty              | 279.04, 277.52, 275.56, 274.57 | 172.46, 172.20, 177.05, 174.95 |     37.05% |
+| Codex           |                 361.33, 358.26 |                 186.56, 188.20 |     47.92% |
+| Ruff            |                 406.93, 403.42 |                 224.12, 223.67 |     44.74% |
+| Ruff historical |                 399.79, 400.12 |                 251.85, 251.21 |     37.11% |
+| uv              |                 136.65, 133.42 |                   76.76, 77.09 |     43.03% |
+| ty              | 204.53, 198.70, 195.87, 198.40 | 125.41, 126.82, 128.73, 128.30 |     36.14% |
 
 ## Ruff compiler and Cargo changes in 1.99.0-15
 

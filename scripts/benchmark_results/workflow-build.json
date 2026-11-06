@@ -1,21 +1,38 @@
 {
-  "coordinator_revision": "4de29a6fe20f49dd67680902d1bc219c359c6e76",
+  "coordinator_revision": "41e88299a916f7e0c2dc7dc180090ed7ab7d4154",
   "manifest": {
-    "path": "toolchains/1.99.0/25.json",
-    "sha256": "0fdca5f2ff4d3bf6e8ad9f2cd1372c1bf529827dc65397a822ab444e3b56c152"
+    "path": "toolchains/1.99.0/26.json",
+    "sha256": "35612a2e4d1186ac0d0a29a6083e178f3e9eb1b75ff886b5c615093033d2ccf0"
   },
   "measurement": {
-    "codex_session_resume": {
-      "accepted_before_resume": 2,
-      "earlier_clean_cpu_intervals": 649,
-      "evidence_directory": "rejected/codex-session-attempt-3/",
-      "seconds_from_last_timed_command_to_contamination": 7.45395565032959
+    "excluded_developer_samples": {
+      "host CPU contention exceeded the measurement limits": 15,
+      "unrelated compiler processes overlapped session command: 1299234 rustc": 1,
+      "unrelated compiler processes overlapped session command: 1839664 cc1": 1
+    },
+    "linux_host_processors": {
+      "codex": {
+        "logical_cpus": 32,
+        "models": ["AMD EPYC-Rome Processor"]
+      },
+      "ruff": {
+        "logical_cpus": 32,
+        "models": ["AMD EPYC-Genoa Processor"]
+      },
+      "ty": {
+        "logical_cpus": 32,
+        "models": ["AMD EPYC-Rome Processor"]
+      },
+      "uv": {
+        "logical_cpus": 32,
+        "models": ["AMD EPYC-Genoa Processor"]
+      }
     },
     "linux_hosts": [
-      "charlie-ohm-full-25-codex",
-      "charlie-ohm-full-25-ruff",
-      "charlie-ohm-full-25-ty",
-      "charlie-ohm-full-25-uv"
+      "charlie-ohm-full-26-codex",
+      "charlie-ohm-full-26-ruff",
+      "charlie-ohm-full-26-ty",
+      "charlie-ohm-full-26-uv"
     ],
     "publication_scope": {
       "complete_suites": [
@@ -33,83 +50,54 @@
     "raw_archives": {
       "codex": [
         {
-          "archive": "linux-codex-1.99.0-25-raw.zip",
-          "bytes": 13857577,
-          "sha256": "bb5490ac911546fed70ffa90e1238d91c0a5d0be9de8f22596271badeba127c9",
-          "verified_entries": 774
+          "archive": "linux-codex-1.99.0-26-raw.zip",
+          "bytes": 9464770,
+          "sha256": "1588ba4c284781a327f23889a33ab7f8219bf50b1aa1d8eed49a12e3183da5d1",
+          "verified_entries": 663
         }
       ],
       "ruff": [
         {
-          "archive": "linux-ruff-1.99.0-25-raw.zip",
-          "bytes": 10867826,
-          "sha256": "c5acf79637f7eb3de465b806b1375839f576829ea4a0798ef3d2c19b1a571761",
-          "verified_entries": 625
+          "archive": "linux-ruff-1.99.0-26-raw.zip",
+          "bytes": 10384377,
+          "sha256": "daccc2b86edc0f9c4dd36a30c6eed72f5b31bc1120173f29d2eb5afe41006877",
+          "verified_entries": 606
         }
       ],
       "ruff_doctests": [
         {
           "archive": "attempt-1-raw.zip",
-          "bytes": 87035,
-          "sha256": "85753a240e340d7f672cb5de7704cf3799475c9d59eb8a113c7cb56528b1d407"
+          "bytes": 82008,
+          "sha256": "09bb0d41ed9ec440d770ac9cc92b7fd1922db61462e05c2f17121765bbe2ab2f"
         }
       ],
       "ty": [
         {
           "archive": "ty-29327-evidence.zip",
-          "bytes": 6295941,
-          "sha256": "546b85809f873ffd573abc9cfe0e67548182bd998360826f72d11da723c5b87e",
-          "verified_entries": 292
+          "bytes": 6147709,
+          "sha256": "71aa0915f447bf8f20921da1be0c6c8aace80506e9060b9f26a3fb7869944e64",
+          "verified_entries": 299
         },
         {
           "archive": "ty-29327-copy-on-write-evidence.zip",
-          "bytes": 1683056,
-          "sha256": "9d6da3ef581a6b2eeae3b9aedd3019c20b00b3dab7185d438a1c7cb04610e4b6",
-          "verified_entries": 142
+          "bytes": 1527976,
+          "sha256": "cab500d5b9c6ee2831ad65a7db44380b56347046683f668d35555a0149dddd45",
+          "verified_entries": 138
         }
       ],
       "uv": [
         {
-          "archive": "linux-uv-1.99.0-25-raw.zip",
-          "bytes": 7253711,
-          "sha256": "d3b38336b1a47c409538cbafbc9e8019c0d04e320b48c2f1056051ddc8224ad8",
-          "verified_entries": 785
+          "archive": "linux-uv-1.99.0-26-raw.zip",
+          "bytes": 7183919,
+          "sha256": "5dd6998c34a500c6171c9677638c895e8d9387fee9bc7d6e1eedc776deb645a2",
+          "verified_entries": 787
         }
       ]
     },
-    "rejected_session_attempts": [
-      {
-        "archive": "linux-codex-1.99.0-25-raw.zip",
-        "checkpoint_sha256": "637f5cc4ef064a9c1b2666ae42f6e9b6d66248bc9e8c5b202def7b10fc552054",
-        "directory": "rejected/codex-session-attempt-1/",
-        "excluded_stock_samples": 1,
-        "external_user_cpu_fraction": 0.06070045225293642,
-        "project": "codex",
-        "reason": "Unrelated same-user CPU exceeded 5%.",
-        "trace_sha256": "0b394dbf35ba1936637d146baa42ad475cebbab58618e7fec0f5c63cda50db4c"
-      },
-      {
-        "accepted_replacement_samples": 4,
-        "archive": "linux-codex-1.99.0-25-raw.zip",
-        "checkpoint_sha256": "9708ae65643b513d14f96c563616f393b6f272dbe0ae15b49b27daa2a1bc9399",
-        "directory": "rejected/codex-session-attempt-2/",
-        "excluded_stock_samples": 1,
-        "project": "codex",
-        "reason": "The earlier attempt occupied the cell audit path; this sample failed its postcheck.",
-        "trace_sha256": "6278e5d7a08d27e7e034b4d89b40d5fc2ae013fdb89e25a1e911ffdc57df6060"
-      }
-    ],
     "ruff_doctests": {
-      "raw_sha256": "85753a240e340d7f672cb5de7704cf3799475c9d59eb8a113c7cb56528b1d407",
+      "raw_sha256": "09bb0d41ed9ec440d770ac9cc92b7fd1922db61462e05c2f17121765bbe2ab2f",
       "report": "ruff-doctests.json",
       "verified_tools": ["cargo", "rustc", "rustdoc"]
-    },
-    "ruff_session_cpu_accounting": {
-      "interval_index": 721,
-      "intervals": 933,
-      "iowait_ticks": -17,
-      "reason": "Linux reported a decrease in cumulative iowait. The process CPU counters, command clocks and neighboring intervals were verified separately.",
-      "trace_sha256": "0ffcbb04b15f3e365fdc9c3a6b5aefd94dcc1b2badd5692a419b3c09457e0834"
     },
     "runner_revision": "04c83d53483607aec4f93fd2bb55b412f101d677",
     "same_linux_release_components_on_all_hosts": true,
@@ -134,71 +122,81 @@
     },
     "study_hosts": {
       "developer_workflows": {
-        "codex": "charlie-ohm-full-25-codex",
-        "ruff": "charlie-ohm-full-25-ruff",
-        "uv": "charlie-ohm-full-25-uv"
+        "codex": "charlie-ohm-full-26-codex",
+        "ruff": "charlie-ohm-full-26-ruff",
+        "uv": "charlie-ohm-full-26-uv"
       },
-      "feature_ablation": "charlie-ohm-full-25-uv",
-      "historical_ruff": "charlie-ohm-full-25-ruff",
+      "feature_ablation": "charlie-ohm-full-26-uv",
+      "historical_ruff": "charlie-ohm-full-26-ruff",
       "individual_commands": {
-        "codex": "charlie-ohm-full-25-codex",
-        "uv": "charlie-ohm-full-25-uv"
+        "codex": "charlie-ohm-full-26-codex",
+        "uv": "charlie-ohm-full-26-uv"
       },
       "main_sessions": {
-        "codex": "charlie-ohm-full-25-codex",
-        "ruff": "charlie-ohm-full-25-ruff",
-        "uv": "charlie-ohm-full-25-uv"
+        "codex": "charlie-ohm-full-26-codex",
+        "ruff": "charlie-ohm-full-26-ruff",
+        "uv": "charlie-ohm-full-26-uv"
       },
-      "ruff_doctests": "charlie-ohm-full-25-ruff",
-      "ty_session_and_worktrees": "charlie-ohm-full-25-ty"
+      "ruff_doctests": "charlie-ohm-full-26-ruff",
+      "ty_session_and_worktrees": "charlie-ohm-full-26-ty"
     },
-    "ty_btrfs_resume": {
-      "accepted_before_resume": 7,
-      "excluded_attempt": "cells/worktree/2-stock/1",
-      "reason": "The inner worktree harness observed an unrelated rustc during validation.",
-      "remaining_cells": 2
+    "ty_excluded_attempts": {
+      "btrfs_loopback": {
+        "attempts": 24,
+        "host_interference_reasons": {},
+        "host_interference_rejections": 0,
+        "preflight_rejections": 15
+      },
+      "ext4": {
+        "final_protocol": {
+          "attempts": 37,
+          "host_interference_reasons": {},
+          "host_interference_rejections": 0,
+          "preflight_rejections": 20
+        }
+      }
     }
   },
   "provenance_inputs": {
     "project_verification_sha256": {
-      "codex": "d411690f44f8cfd1dc11f4f2ca853efd6c6f22ef71a2a12a4e1e0cd4a90440b1",
-      "ruff": "ae408209d717f9d81ccfa9c75df43330f1d313d2b5269d7a540255d758df170a",
-      "ruff_doctests": "a9289b42dbcd620f0a80cad88e651bb821875e73cc94436bfe73a89c5dcfbb89",
-      "ty": "77e02d006fd4e158d0bc007ebbef32516391d50a7849475935695cdfcd8e1a9e",
-      "uv": "6b2ec58d159e449a455b68d0f17360be5b0738bd0c6c2a26a1498b84944721dd"
+      "codex": "188869af1bddf01ff4086db0170e9dd174e0b63b0c98e2cc293f08dc2a35eea8",
+      "ruff": "7be634162697beb323d7ff4d47dfe3bd033bc3a808a475053992d0c62a3f6d16",
+      "ruff_doctests": "ce2b597e573a2cc8b0200cbf758a4e0ecd2094148a285bcd1611ae28d7ca80f7",
+      "ty": "dbc4ed139a11278fc2c4d10dee18ea1de46b6da94bcbe2f079fd62cde11eefc7",
+      "uv": "ef824a31edbe727437ff0bf6f2592680372e14c427f5360fb8c39b4c9d59b178"
     },
-    "published_verification_sha256": "b3fb0da2e59dc6cdfe15584f3b6ce4a3ca830d812250ec642fa812a569eb296a"
+    "published_verification_sha256": "9358bb92b8ce4a3a4f96edf6520d1757f6671d7b03af2f772006589f04bbe31e"
   },
-  "published_at": "2026-11-05T00:11:54Z",
-  "release": "https://github.com/astral-experiments/ohm/releases/tag/ohm-1.99.0-25",
-  "release_workflow": "https://github.com/astral-experiments/ohm/actions/runs/41918055237",
+  "published_at": "2026-11-06T00:49:41Z",
+  "release": "https://github.com/astral-experiments/ohm/releases/tag/ohm-1.99.0-26",
+  "release_workflow": "https://github.com/astral-experiments/ohm/actions/runs/42120970602",
   "released": true,
   "schema_version": 1,
   "sources": {
-    "cargo": "9da60dfb39fbd3135682c4519714471e45c2921b",
+    "cargo": "1312b3b8611a397a41f628b3b76df193cdd0324f",
     "clippy": "6ca9ddc53c5a39e911e6c93637c093bd1d2eba05",
-    "rust": "e9a345479da8838f597c780794026ae5fc0e84ea",
-    "rustfmt": "6634b69b0555d79bbbeb7a880bc590bbf7eeca0d"
+    "rust": "9d17d61278fa0e01a092e45aa8126e2c02eb196f",
+    "rustfmt": "b7c58d8bec901c33381c6ffea6ea5ac480244004"
   },
   "targets": {
     "aarch64-apple-darwin": {
       "archive": {
-        "sha256": "cf3b9c71ec1f1f86047db6e49e7b67f23455203021afdccfedab0d21e19d0cca",
-        "size": 295216972,
-        "url": "https://github.com/astral-experiments/ohm/releases/download/ohm-1.99.0-25/ohm-1.99.0-25-aarch64-apple-darwin.tar.gz"
+        "sha256": "41f89a162273cb790d4270691b468b13b053a2192e87bdf704d880771afae2cd",
+        "size": 295225514,
+        "url": "https://github.com/astral-experiments/ohm/releases/download/ohm-1.99.0-26/ohm-1.99.0-26-aarch64-apple-darwin.tar.gz"
       },
       "bundled_tools": {},
       "published_provenance": {
-        "sha256": "e42ef8db8710b40fe098950fb8f92a8ebfc454461e9ac2e8f98ba83836d8e3d8",
+        "sha256": "b7aee51314b61b79cc8bf1e4f6dd0727e0ec8c97b33a2305e3ed36a8eed1e75f",
         "size": 740,
-        "url": "https://github.com/astral-experiments/ohm/releases/download/ohm-1.99.0-25/ohm-1.99.0-25-aarch64-apple-darwin-provenance.json"
+        "url": "https://github.com/astral-experiments/ohm/releases/download/ohm-1.99.0-26/ohm-1.99.0-26-aarch64-apple-darwin-provenance.json"
       }
     },
     "x86_64-unknown-linux-gnu": {
       "archive": {
-        "sha256": "8b7b715e7a16acfc1d0fb56352ff6c29fcbabc8293c7873b22192f82c208e8de",
-        "size": 360069536,
-        "url": "https://github.com/astral-experiments/ohm/releases/download/ohm-1.99.0-25/ohm-1.99.0-25-x86_64-unknown-linux-gnu.tar.gz"
+        "sha256": "ea3504e872eefa119532e8f438326926888030097b25e3519dcf3c5aea28a66b",
+        "size": 360151749,
+        "url": "https://github.com/astral-experiments/ohm/releases/download/ohm-1.99.0-26/ohm-1.99.0-26-x86_64-unknown-linux-gnu.tar.gz"
       },
       "bundled_tools": {
         "wild": {
@@ -208,28 +206,28 @@
       },
       "components": {
         "cargo": {
-          "sha256": "e095525d408717c5ca32f808177e2c0f0620f0d66b2e20ca6077b5bdbd989a87",
-          "version": "cargo 1.99.0-dev (9da60dfb3 2026-11-04) (ohm-1.99.0-25)"
+          "sha256": "3bd0b81b4cf35c8b142c466f69535310adab3837fdd80299f3adc4967acc99ea",
+          "version": "cargo 1.99.0-dev (1312b3b86 2026-11-04) (ohm-1.99.0-26)"
         },
         "clippy-driver": {
-          "sha256": "20376ed7848ec025d806ae8f7d6e9c1c5f41833c429439eb29d625a7e8feb740",
+          "sha256": "74fcd74f029b73a43f643794d6ba50f8c33cbd814000ea85755b9360c54bab36",
           "version": "clippy 0.1.99 (6ca9ddc53c 2026-10-29)"
         },
         "rustc": {
-          "sha256": "c04eac6367c663099d801e8587e53502fde8ae3a04bed5b3afcce8750c974f2c",
-          "version": "rustc 1.99.0-dev (e9a345479 2026-11-04) (ohm-1.99.0-25)"
+          "sha256": "5271516cc86f547b015dbebb4c5a69eec6b2457fc181c91d984e5eb035360f02",
+          "version": "rustc 1.99.0-dev (9d17d6127 2026-11-05) (ohm-1.99.0-26)"
         },
         "rustfmt": {
-          "sha256": "9baba811a0cef24afab1f9ccff896d8c113bb680b63710915fdfe19309c3a262",
-          "version": "rustfmt 1.10.0-dev (6634b69b05 2026-11-03)"
+          "sha256": "6e5d92e20374c7305fcd5d48eaefb95b88dff919ff781d5ce40d4a1fe6d1f292",
+          "version": "rustfmt 1.10.0-dev (b7c58d8bec 2026-11-05)"
         }
       },
       "published_provenance": {
-        "sha256": "897d17c0ae4dc2e4e48af1c0930c8e42659abf64c8ed19f6ac0034c380dc5187",
+        "sha256": "92cf7a302e57c7d4eee3f846774d6677dc384aec09ba0bee15934ceff6b1a001",
         "size": 877,
-        "url": "https://github.com/astral-experiments/ohm/releases/download/ohm-1.99.0-25/ohm-1.99.0-25-x86_64-unknown-linux-gnu-provenance.json"
+        "url": "https://github.com/astral-experiments/ohm/releases/download/ohm-1.99.0-26/ohm-1.99.0-26-x86_64-unknown-linux-gnu-provenance.json"
       }
     }
   },
-  "toolchain": "ohm-1.99.0-25"
+  "toolchain": "ohm-1.99.0-26"
 }
