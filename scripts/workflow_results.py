@@ -417,17 +417,6 @@ def build_report(runs, *, omitted_projects=None):
     return report
 
 
-def toolchain_label(report):
-    version, *build = re.split(
-        r"-(?=[a-z])", report["ohm_release"].removeprefix("ohm-"), maxsplit=1
-    )
-    if not build:
-        return version
-    return version + (
-        " + fix" if build[0].startswith("workflow-cache-fix-") else " + fixes"
-    )
-
-
 def table_rows(report):
     validate(report)
     labels = {"ruff": "Ruff/ty", "uv": "uv", "codex": "Codex"}
