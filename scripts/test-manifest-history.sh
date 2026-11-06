@@ -35,6 +35,8 @@ expect_history_failure() {
 }
 
 check_history
+GIT_ICASE_PATHSPECS=1 check_history
+GIT_GLOB_PATHSPECS=1 check_history
 
 jq '
   .sources.rustfmt = {
@@ -44,6 +46,14 @@ jq '
 ' "$manifest" > "$test_root/with-rustfmt.json"
 cp "$test_root/with-rustfmt.json" "$manifest"
 check_history
+
+# JSON serializers can write the same integer differently while updating an unpublished pin.
+cp "$repository_root/toolchains/manifest.schema.json" "$test_root/toolchains/"
+sed 's/"ohm_revision": 1,/"ohm_revision": 1.0,/' "$test_root/with-rustfmt.json" > "$manifest"
+grep -Fq '"ohm_revision": 1.0,' "$manifest"
+"$script_dir/validate-release-manifest.sh" --require-pinned "$manifest"
+check_history
+cp "$test_root/with-rustfmt.json" "$manifest"
 
 jq '.sources.rustfmt.repository = "https://github.com/example/rustfmt"' \
   "$manifest" > "$test_root/wrong-rustfmt.json"

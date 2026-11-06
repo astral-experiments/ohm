@@ -1,0 +1,216 @@
+name: Qualify Linux release compiler
+run-name: Qualify Linux release compiler from ${{ inputs.candidate_revision }}
+"on":
+  workflow_dispatch:
+    inputs:
+      candidate_revision:
+        description: Exact coordinator commit containing the candidate manifest
+        required: true
+        type: string
+      manifest:
+        description: Versioned manifest path in the candidate commit
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: linux-release-qualification-${{ inputs.candidate_revision }}
+  cancel-in-progress: false
+jobs:
+  compiler:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
+    environment: release
+    timeout-minutes: 360
+    runs-on: namespace-profile-ubuntu-24-04-16
+    permissions:
+      contents: read
+    env:
+      OHM_TARGET: x86_64-unknown-linux-gnu
+    steps:
+      - name: Check out release coordinator
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          enable-cache: true
+      - name: Validate the candidate commit
+        env:
+          CANDIDATE_REVISION: ${{ inputs.candidate_revision }}
+          MANIFEST_PATH: ${{ inputs.manifest }}
+        run:
+          "if [[ ! \"$CANDIDATE_REVISION\" =~ ^[0-9a-f]{40}$ || ! \"$MANIFEST_PATH\" =~ ^toolchains/[0-9]+\\.[0-9]+\\\
+          .[0-9]+/[1-9][0-9]*\\.json$ ]]; then\n  echo \"select an exact candidate commit and versioned manifest path\"\
+          \ >&2\n  exit 1\nfi\n"
+      - name: Read the candidate manifest
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ inputs.candidate_revision }}
+          path: qualification-input
+          sparse-checkout: ${{ inputs.manifest }}
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - name: Validate the qualification manifest
+        id: manifest
+        env:
+          MANIFEST_PATH: ${{ inputs.manifest }}
+        run:
+          "manifest=\"$MANIFEST_PATH\"\ncandidate=\"qualification-input/$manifest\"\nif [[ -e \"$manifest\" ]];\
+          \ then\n  cmp -- \"$candidate\" \"$manifest\"\nelse\n  mkdir -p -- \"$(dirname -- \"$manifest\")\"\n  cp\
+          \ -- \"$candidate\" \"$manifest\"\nfi\n./scripts/validate-release-manifest.sh --require-pinned \"$manifest\"\
+          \n{\n  echo \"rust-revision=$(jq -er '.sources.rust.revision' \"$manifest\")\"\n  echo \"cargo-revision=$(jq\
+          \ -er '.sources.cargo.revision' \"$manifest\")\"\n  echo \"clippy-revision=$(jq -er '.sources.clippy.revision'\
+          \ \"$manifest\")\"\n  echo \"rustfmt-revision=$(jq -er '.sources.rustfmt.revision' \"$manifest\")\"\n  echo\
+          \ \"manifest=$manifest\"\n  echo \"toolchain=$(jq -er '.release.toolchain_name' \"$manifest\")\"\n} >> \"\
+          $GITHUB_OUTPUT\"\n"
+      - name: Create read-only source repository token
+        id: source-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
+        with:
+          client-id: ${{ vars.OHM_RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.OHM_RELEASE_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: "ohm-rust
+
+            ohm-cargo
+
+            ohm-rust-clippy
+
+            ohm-rustfmt
+
+            "
+          permission-contents: read
+      - name: Check out pinned ohm-rust
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: ${{ github.repository_owner }}/ohm-rust
+          ref: ${{ steps.manifest.outputs.rust-revision }}
+          token: ${{ steps.source-token.outputs.token }}
+          fetch-depth: 0
+          persist-credentials: false
+          path: source/rust
+      - name: Check out pinned ohm-cargo into the Rust source tree
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: ${{ github.repository_owner }}/ohm-cargo
+          ref: ${{ steps.manifest.outputs.cargo-revision }}
+          token: ${{ steps.source-token.outputs.token }}
+          persist-credentials: false
+          path: source/rust/src/tools/cargo
+      - name: Check out pinned ohm-rust-clippy into the Rust source tree
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: ${{ github.repository_owner }}/ohm-rust-clippy
+          ref: ${{ steps.manifest.outputs.clippy-revision }}
+          token: ${{ steps.source-token.outputs.token }}
+          persist-credentials: false
+          path: source/rust/src/tools/clippy
+      - name: Check out pinned ohm-rustfmt into the Rust source tree
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: ${{ github.repository_owner }}/ohm-rustfmt
+          ref: ${{ steps.manifest.outputs.rustfmt-revision }}
+          token: ${{ steps.source-token.outputs.token }}
+          persist-credentials: false
+          path: source/rust/src/tools/rustfmt
+      - name: Verify source revisions
+        env:
+          MANIFEST_PATH: ${{ steps.manifest.outputs.manifest }}
+        run:
+          "./scripts/verify-release-sources.sh \\\n  \"$MANIFEST_PATH\" \\\n  source/rust \\\n  source/rust/src/tools/cargo\
+          \ \\\n  source/rust/src/tools/clippy \\\n  source/rust/src/tools/rustfmt\n"
+      - name: Install pinned LLVM BOLT tools
+        env:
+          MANIFEST_PATH: ${{ steps.manifest.outputs.manifest }}
+        run:
+          "if [[ \"$(dpkg --print-architecture)\" != amd64 ]]; then\n  echo 'LLVM BOLT tools require an amd64 Linux\
+          \ runner' >&2\n  exit 1\nfi\n\ncase \"$(jq -er '.release.upstream_rust_version' \"$MANIFEST_PATH\")\" in\n\
+          \  1.97.* | 1.98.*)\n    bolt_major=22\n    bolt_version='22.1.8~++20260714014902+ca7933e47d3a-1~exp1~20260714135019.80'\n\
+          \    bolt_sha256='97a9e4e8d2b2219757c38abef93e913793ebc64580aa51207bd23941c44ec070'\n    runtime_sha256='48639dafeb45892eec58f5d8a2d0d612ce791a2f713f06c794b71d6a72fa582d'\n\
+          \    ;;\n  1.99.*)\n    bolt_major=23\n    bolt_version='23.1.2'\n    bolt_sha256='b5ed9675149cc837c282e9b6962c276c9fa62863d5b2f91537b60848552995b7'\n\
+          \    ;;\n  *)\n    echo 'Pin matching LLVM BOLT tools for this Rust version' >&2\n    exit 1\n    ;;\nesac\n\
+          bolt_root=\"$(mktemp -d \"${RUNNER_TEMP:?}/ohm-bolt.XXXXXX\")\"\nif [[ \"$bolt_major\" == 23 ]]; then\n\
+          \  bolt_archive=\"$bolt_root/llvm.tar.xz\"\n  bolt_directory=\"LLVM-$bolt_version-Linux-X64\"\n  curl --proto\
+          \ '=https' --proto-redir '=https' --tlsv1.2 \\\n    --fail --location --retry 3 --show-error --silent \\\
+          \n    --output \"$bolt_archive\" \\\n    \"https://github.com/llvm/llvm-project/releases/download/llvmorg-$bolt_version/$bolt_directory.tar.xz\"\
+          \n  printf '%s  %s\\n' \"$bolt_sha256\" \"$bolt_archive\" | sha256sum --check --strict\n  # Leave llvm-profdata\
+          \ for the build to link from Rust's matching LLVM.\n  tar -xJf \"$bolt_archive\" -C \"$bolt_root\" --strip-components=1\
+          \ --occurrence=1 \\\n    \"$bolt_directory/bin/llvm-bolt\" \\\n    \"$bolt_directory/bin/merge-fdata\" \\\
+          \n    \"$bolt_directory/lib/libbolt_rt_hugify.a\" \\\n    \"$bolt_directory/lib/libbolt_rt_instr.a\"\n \
+          \ rm \"$bolt_archive\"\n  bolt_llvm_dir=\"$bolt_root\"\nelse\n  bolt_base_url=\"https://apt.llvm.org/noble/pool/main/l/llvm-toolchain-$bolt_major\"\
+          \n  for package in \"bolt-$bolt_major\" \"libbolt-$bolt_major-dev\"; do\n    curl --proto '=https' --proto-redir\
+          \ '=https' --tlsv1.2 \\\n      --fail --location --retry 3 --show-error --silent \\\n      --output \"$bolt_root/$package.deb\"\
+          \ \\\n      \"$bolt_base_url/${package}_${bolt_version}_amd64.deb\"\n  done\n\n  printf '%s  %s\\n' \\\n\
+          \    \"$bolt_sha256\" \\\n    \"$bolt_root/bolt-$bolt_major.deb\" \\\n    \"$runtime_sha256\" \\\n    \"\
+          $bolt_root/libbolt-$bolt_major-dev.deb\" \\\n    | sha256sum --check --strict\n\n  dpkg-deb --extract \"\
+          $bolt_root/bolt-$bolt_major.deb\" \"$bolt_root\"\n  dpkg-deb --extract \"$bolt_root/libbolt-$bolt_major-dev.deb\"\
+          \ \"$bolt_root\"\n  bolt_llvm_dir=\"$bolt_root/usr/lib/llvm-$bolt_major\"\nfi\n\"$bolt_llvm_dir/bin/llvm-bolt\"\
+          \ --version\n\"$bolt_llvm_dir/bin/merge-fdata\" --version\nif [[ ! -f \"$bolt_llvm_dir/lib/libbolt_rt_instr.a\"\
+          \ ]]; then\n  echo 'LLVM BOLT instrumentation runtime is missing' >&2\n  exit 1\nfi\n\nprintf 'OHM_BOLT_LLVM_DIR=%s\\\
+          n' \"$bolt_llvm_dir\" >> \"$GITHUB_ENV\"\n"
+      - name: Prepare pinned Wild linker
+        env:
+          MANIFEST_PATH: ${{ steps.manifest.outputs.manifest }}
+        run:
+          "wild_directory=\"$(python3 scripts/prepare-wild.py \\\n  \"$MANIFEST_PATH\" \"$OHM_TARGET\" \"$RUNNER_TEMP/ohm-wild\"\
+          )\"\nprintf 'OHM_WILD_LINKER_DIR=%s\\n' \"$wild_directory\" >> \"$GITHUB_ENV\"\n"
+      - name: Build optimized extended Rust distribution
+        id: distribution
+        env:
+          OHM_TOOLCHAIN: ${{ steps.manifest.outputs.toolchain }}
+        run:
+          "./scripts/build-optimized-dist.sh \\\n  \"$OHM_TARGET\" \\\n  \"$OHM_TOOLCHAIN\" \\\n  \"$GITHUB_WORKSPACE/source/rust\"\
+          \ \\\n  \"$GITHUB_WORKSPACE/release/bootstrap.toml\"\n"
+      - name: Write build provenance
+        env:
+          CARGO_REVISION: ${{ steps.manifest.outputs.cargo-revision }}
+          CLIPPY_REVISION: ${{ steps.manifest.outputs.clippy-revision }}
+          COORDINATOR_REPOSITORY: ${{ github.repository }}
+          COORDINATOR_REVISION: ${{ github.sha }}
+          MANIFEST_PATH: ${{ steps.manifest.outputs.manifest }}
+          OHM_TOOLCHAIN: ${{ steps.manifest.outputs.toolchain }}
+          RUST_REVISION: ${{ steps.manifest.outputs.rust-revision }}
+          RUSTFMT_REVISION: ${{ steps.manifest.outputs.rustfmt-revision }}
+        run:
+          "manifest_sha256=\"$(shasum -a 256 \"$MANIFEST_PATH\" | awk '{print $1}')\"\njq -n \\\n  --arg toolchain\
+          \ \"$OHM_TOOLCHAIN\" \\\n  --arg target \"$OHM_TARGET\" \\\n  --arg coordinator_repository \"$COORDINATOR_REPOSITORY\"\
+          \ \\\n  --arg coordinator_revision \"$COORDINATOR_REVISION\" \\\n  --arg manifest_path \"$MANIFEST_PATH\"\
+          \ \\\n  --arg manifest_sha256 \"$manifest_sha256\" \\\n  --arg rust_revision \"$RUST_REVISION\" \\\n  --arg\
+          \ cargo_revision \"$CARGO_REVISION\" \\\n  --arg clippy_revision \"$CLIPPY_REVISION\" \\\n  --arg rustfmt_revision\
+          \ \"$RUSTFMT_REVISION\" \\\n  --argjson bundled_tools \"$(jq --arg target \"$OHM_TARGET\" \\\n    'if $target\
+          \ == \"x86_64-unknown-linux-gnu\" then .bundled_tools // {} else {} end' \"$MANIFEST_PATH\")\" \\\n  '{\n\
+          \    schema_version: 1,\n    toolchain: $toolchain,\n    target: $target,\n    bundled_tools: $bundled_tools,\n\
+          \    coordinator: {\n      repository: $coordinator_repository,\n      revision: $coordinator_revision\n\
+          \    },\n    manifest: {\n      path: $manifest_path,\n      sha256: $manifest_sha256\n    },\n    sources:\
+          \ {\n      rust: { revision: $rust_revision },\n      cargo: { revision: $cargo_revision },\n      clippy:\
+          \ { revision: $clippy_revision },\n      rustfmt: { revision: $rustfmt_revision }\n    }\n  }' > source/rust/build/dist/ohm-provenance.json\n"
+      - name: Stage versioned distribution assets
+        id: assets
+        env:
+          OHM_TOOLCHAIN: ${{ steps.manifest.outputs.toolchain }}
+        run:
+          "rust_version=\"$(tr -d '\\r\\n' < source/rust/src/version)\"\ncombined_archive=\"source/rust/build/dist/rust-$rust_version-dev-$OHM_TARGET.tar.gz\"\
+          \nif [[ ! -f \"$combined_archive\" ]]; then\n  echo \"combined Ohm archive not found: $combined_archive\"\
+          \ >&2\n  exit 1\nfi\n\nrelease_directory=\"$(mktemp -d \"${RUNNER_TEMP:?}/ohm-release.XXXXXX\")\"\narchive_name=\"\
+          $OHM_TOOLCHAIN-$OHM_TARGET.tar.gz\"\nprovenance_name=\"$OHM_TOOLCHAIN-$OHM_TARGET-provenance.json\"\ncp\
+          \ \"$combined_archive\" \"$release_directory/$archive_name\"\ncp source/rust/build/dist/ohm-provenance.json\
+          \ \\\n  \"$release_directory/$provenance_name\"\n\n(\n  cd \"$release_directory\"\n  shasum -a 256 \"$archive_name\"\
+          \ > \"$archive_name.sha256\"\n  shasum -a 256 \"$provenance_name\" > \"$provenance_name.sha256\"\n)\n\n\
+          echo \"directory=$release_directory\" >> \"$GITHUB_OUTPUT\"\n"
+      - name: Retain distribution artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: linux-release-qualification-${{ github.run_id }}
+          path:
+            "${{ steps.assets.outputs.directory }}/${{ steps.manifest.outputs.toolchain }}-x86_64-unknown-linux-gnu.tar.gz
+
+            ${{ steps.assets.outputs.directory }}/${{ steps.manifest.outputs.toolchain }}-x86_64-unknown-linux-gnu.tar.gz.sha256
+
+            ${{ steps.assets.outputs.directory }}/${{ steps.manifest.outputs.toolchain }}-x86_64-unknown-linux-gnu-provenance.json
+
+            ${{ steps.assets.outputs.directory }}/${{ steps.manifest.outputs.toolchain }}-x86_64-unknown-linux-gnu-provenance.json.sha256
+
+            "
+          if-no-files-found: error
+          retention-days: 14
+    name: Build the Linux qualification compiler

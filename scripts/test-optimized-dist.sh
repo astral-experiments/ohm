@@ -69,11 +69,16 @@ arguments = sys.argv[1:]
 if "--rustc-perf-checkout-dir" in arguments:
     perf = pathlib.Path(arguments[arguments.index("--rustc-perf-checkout-dir") + 1])
     collector = (perf / "collector/src/compile/benchmark/mod.rs").read_text()
-    if ".run_rustc(false)" not in collector or "local edit" in collector:
+    if ".run_rustc(false)" not in collector or "local edit" in collector or "local commit" in collector:
         raise SystemExit("expected the prepared copy of the pinned collector")
 
 artifact_directory = checkout / arguments[arguments.index("--artifact-dir") + 1]
 artifact_directory.mkdir(parents=True, exist_ok=True)
+bolt_tools = {}
+if "--use-bolt" in arguments:
+    llvm_dir = pathlib.Path(arguments[arguments.index("--llvm-dir") + 1])
+    for name in ("bin/llvm-profdata", "bin/llvm-bolt", "bin/merge-fdata", "lib"):
+        bolt_tools[name] = str((llvm_dir / name).resolve(strict=True))
 
 
 def fixture_component(name: str) -> str:
@@ -139,6 +144,7 @@ with (checkout / "commands.jsonl").open("a", encoding="utf-8") as output:
     json.dump(
         {
             "kind": "opt-dist",
+            "bolt_tools": bolt_tools,
             "arguments": arguments,
             "environment": dict(os.environ),
             "profiles": profiles,
@@ -356,7 +362,15 @@ if option(pipeline_arguments, "--std-target") != "wasm32-unknown-unknown":
     raise SystemExit("opt-dist must build Wasm std before preserving stage1 for packaging")
 if option(pipeline_arguments, "--checkout-dir") != str(checkout):
     raise SystemExit("opt-dist used the wrong pinned Rust checkout")
-if option(pipeline_arguments, "--llvm-dir") != str(pathlib.Path(expected_llvm).resolve()):
+llvm_dir = pathlib.Path(option(pipeline_arguments, "--llvm-dir"))
+if expect_bolt == "true":
+    if llvm_dir.exists():
+        raise SystemExit("the temporary BOLT directory was not removed")
+    for name, actual in optimized["bolt_tools"].items():
+        root = checkout / "build" / target / "ci-llvm" if name == "bin/llvm-profdata" else pathlib.Path(expected_llvm)
+        if not pathlib.Path(actual).samefile(root / name):
+            raise SystemExit(f"opt-dist received the wrong {name}: {actual}")
+elif llvm_dir != pathlib.Path(expected_llvm).resolve():
     raise SystemExit("opt-dist used the wrong matching LLVM installation")
 if option(pipeline_arguments, "--artifact-dir") != "build/opt-artifacts":
     raise SystemExit("optimization artifacts escaped the isolated Rust build directory")
@@ -459,9 +473,8 @@ legacy_linux_output="$test_directory/legacy-linux-output.log"
 run_optimized_build "$linux_target" "$legacy_linux_output"
 assert_optimized_build "$linux_target" "$bolt_directory" true false "$legacy_linux_output"
 
-if [[ ! "$bolt_directory/bin/llvm-profdata" -ef \
-  "$rust_checkout/build/$linux_target/ci-llvm/bin/llvm-profdata" ]]; then
-  echo 'Linux BOLT did not use the exact matching Rust LLVM profile tool' >&2
+if [[ -e "$bolt_directory/bin/llvm-profdata" || -L "$bolt_directory/bin/llvm-profdata" ]]; then
+  echo 'Linux release build modified the shared BOLT installation' >&2
   exit 1
 fi
 
@@ -533,10 +546,12 @@ printf '%s\n' '// local edit' >> "$original_collector"
 toolchain=ohm-1.99.0-23
 : > "$trace"
 relocated_output="$test_directory/relocated-output.log"
-mkdir -p "$test_directory/profile tmp"
+mkdir -p "$test_directory/profile tmp" "$test_directory/invocation/scripts"
+ln -s "$script_directory" "$test_directory/invocation/commands"
 (
   cd -- "$test_directory"
-  rust_checkout="${rust_checkout##*/}" run_optimized_build "$linux_target" "$relocated_output" TMPDIR="profile tmp" CDPATH=.
+  script_directory="$test_directory/invocation/commands/../scripts" rust_checkout="${rust_checkout##*/}" \
+    run_optimized_build "$linux_target" "$relocated_output" TMPDIR="profile tmp" CDPATH=.
 )
 assert_optimized_build "$linux_target" "$bolt_directory" true true "$relocated_output" relocated
 [[ "$(git -C "$perf_source" rev-parse HEAD)" == "$original_head" ]]
@@ -545,6 +560,36 @@ if grep -Fq '.run_rustc(false)' "$original_collector"; then
   echo 'profile training modified the original collector' >&2
   exit 1
 fi
+pinned_perf_blob="$(git -C "$perf_remote" rev-parse "HEAD:$collector_path")"
+edited_perf_blob="$(git -C "$perf_source" hash-object -w -- "$original_collector")"
+git -C "$perf_source" replace "$pinned_perf_blob" "$edited_perf_blob"
+: > "$trace"
+replacement_output="$test_directory/replaced-collector-blob.log"
+if ! run_optimized_build "$linux_target" "$replacement_output"; then
+  cat "$replacement_output" >&2
+  exit 1
+fi
+assert_optimized_build "$linux_target" "$bolt_directory" true true "$replacement_output" relocated
+git -C "$perf_source" replace -d "$pinned_perf_blob"
+
+pinned_rust_head="$(git -C "$rust_checkout" rev-parse HEAD)"
+(
+  export GIT_INDEX_FILE="$test_directory/replacement-index"
+  git -C "$rust_checkout" read-tree HEAD
+  git -C "$rust_checkout" update-index --cacheinfo 160000 "$original_head" src/tools/rustc-perf
+  replacement_tree="$(git -C "$rust_checkout" write-tree)"
+  replacement_head="$(printf 'Replace collector selection\n' | git -C "$rust_checkout" -c user.name=fixture -c user.email=fixture@example.com commit-tree "$replacement_tree" -p "$pinned_rust_head")"
+  git -C "$rust_checkout" replace "$pinned_rust_head" "$replacement_head"
+)
+: > "$trace"
+replacement_output="$test_directory/replaced-rust-commit.log"
+if ! run_optimized_build "$macos_target" "$replacement_output"; then
+  cat "$replacement_output" >&2
+  exit 1
+fi
+assert_optimized_build "$macos_target" "$rust_checkout/build/$macos_target/ci-llvm" false true "$replacement_output" relocated
+git -C "$rust_checkout" replace -d "$pinned_rust_head"
+
 staged_checkout="$test_directory/staged-checkout"
 cp -R "$rust_checkout" "$staged_checkout"
 git -C "$staged_checkout" submodule deinit --quiet -f -- src/tools/rustc-perf
