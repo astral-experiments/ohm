@@ -1,10 +1,10 @@
 {
   "rust_version": "1.99.0",
-  "ohm_release": "ohm-1.99.0-23",
+  "ohm_release": "ohm-1.99.0-26",
   "jobs": 8,
   "host": {
     "platform": "linux-x86_64",
-    "id": "charlie-ohm-full-23-uv",
+    "id": "charlie-ohm-full-26-uv",
     "logical_cpus": 32,
     "cpu_model": "AMD EPYC-Genoa Processor"
   },
@@ -21,14 +21,14 @@
         "--upstream",
         "1.99.0",
         "--ohm",
-        "ohm-1.99.0-23",
+        "ohm-1.99.0-26",
         "--jobs",
         "8",
         "--minimum-free-gb",
         "60",
         "--require-idle",
         "--output-dir",
-        "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation",
+        "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation",
         "--project",
         "uv",
         "--repetitions",
@@ -36,42 +36,42 @@
         "--offline",
         "--feature-matrix",
         "--scenario",
-        "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-23/scripts/session_replays/uv-feature-ablation.json",
+        "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-26/scripts/session_replays/uv-feature-ablation.json",
         "--source-path",
-        "uv=/home/dev-user/ohm-benchmarks-1.99.0-23/data/sources/uv"
+        "uv=/home/dev-user/ohm-benchmarks-1.99.0-26/data/sources/uv"
       ],
-      "started_at": 1793679807.495399,
-      "wrapper_sha256": "e58d0129d93501a49076faef53ccdd548bda2b210fd7ad05cb3ff24f3fd032fa",
+      "started_at": 1793936067.932322,
+      "wrapper_sha256": "2eecc8007604a43fe278ec5f83f8c5e63841ae259cc333b498330428141af7f8",
       "runner_sha256": {
         "benchmark.py": "b8b137e10eccea11c2bdd3ee8600a337b1efd857576291d630bb39761f813a7e",
         "replay_sessions.py": "015d02607858da8acf93768e714f28603a920a4ad61b5976b862548328f168a8",
         "benchmark_workflows.py": "a31ecbb300c3f83fbb38c41fea8678d097c2e45c93887d7b03de20e8c0a22a84",
         "workflow_results.py": "fabc3ce1ea82ee0dc517c2381e4c82490a3529b4ea9a75814c5f988492fe6e58"
       },
-      "path": "/home/dev-user/ohm-benchmarks-1.99.0-23/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/home/dev-user/ohm-benchmarks-1.99.0-23/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/home/dev-user/ohm-benchmarks-1.99.0-23/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
-      "tmpdir": "/home/dev-user/ohm-benchmarks-1.99.0-23/tmp",
+      "path": "/home/dev-user/ohm-benchmarks-1.99.0-26/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/home/dev-user/ohm-benchmarks-1.99.0-26/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/home/dev-user/ohm-benchmarks-1.99.0-26/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
+      "tmpdir": "/home/dev-user/ohm-benchmarks-1.99.0-26/tmp",
       "toolchains": [
-        ["ohm-all", "ohm-1.99.0-23"],
-        ["ohm-no-public-api-hash", "ohm-1.99.0-23"],
-        ["ohm-no-proc-macro-cache", "ohm-1.99.0-23"],
-        ["ohm-neither", "ohm-1.99.0-23"]
+        ["ohm-all", "ohm-1.99.0-26"],
+        ["ohm-no-public-api-hash", "ohm-1.99.0-26"],
+        ["ohm-no-proc-macro-cache", "ohm-1.99.0-26"],
+        ["ohm-neither", "ohm-1.99.0-26"]
       ],
       "sanitized_environment": {
-        "CARGO_HOME": "/home/dev-user/ohm-benchmarks-1.99.0-23/cargo-home",
+        "CARGO_HOME": "/home/dev-user/ohm-benchmarks-1.99.0-26/cargo-home",
         "CARGO_NET_OFFLINE": "true",
         "GIT_CONFIG_COUNT": "2",
         "GIT_CONFIG_KEY_0": "maintenance.auto",
         "GIT_CONFIG_KEY_1": "gc.auto",
         "GIT_CONFIG_VALUE_0": "false",
         "GIT_CONFIG_VALUE_1": "0",
-        "PATH": "/home/dev-user/ohm-benchmarks-1.99.0-23/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/home/dev-user/ohm-benchmarks-1.99.0-23/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/home/dev-user/ohm-benchmarks-1.99.0-23/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
-        "RUSTUP_HOME": "/home/dev-user/ohm-benchmarks-1.99.0-23/rustup",
-        "TMPDIR": "/home/dev-user/ohm-benchmarks-1.99.0-23/tmp",
-        "UV_CACHE_DIR": "/home/dev-user/ohm-benchmarks-1.99.0-23/uv-cache",
-        "UV_PYTHON": "/home/dev-user/ohm-benchmarks-1.99.0-23/tools/bin/python3.12",
+        "PATH": "/home/dev-user/ohm-benchmarks-1.99.0-26/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/home/dev-user/ohm-benchmarks-1.99.0-26/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/home/dev-user/ohm-benchmarks-1.99.0-26/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/usr/local/bin:/usr/bin:/bin",
+        "RUSTUP_HOME": "/home/dev-user/ohm-benchmarks-1.99.0-26/rustup",
+        "TMPDIR": "/home/dev-user/ohm-benchmarks-1.99.0-26/tmp",
+        "UV_CACHE_DIR": "/home/dev-user/ohm-benchmarks-1.99.0-26/uv-cache",
+        "UV_PYTHON": "/home/dev-user/ohm-benchmarks-1.99.0-26/tools/bin/python3.12",
         "UV_PYTHON_DOWNLOADS": "never",
-        "UV_TOOL_BIN_DIR": "/home/dev-user/ohm-benchmarks-1.99.0-23/tools/uv-bin",
-        "UV_TOOL_DIR": "/home/dev-user/ohm-benchmarks-1.99.0-23/tools/uv-tools"
+        "UV_TOOL_BIN_DIR": "/home/dev-user/ohm-benchmarks-1.99.0-26/tools/uv-bin",
+        "UV_TOOL_DIR": "/home/dev-user/ohm-benchmarks-1.99.0-26/tools/uv-tools"
       },
       "terminal": {
         "controlling_tty": false,
@@ -85,14 +85,14 @@
         "scope": "benchmark process environment only"
       },
       "coordinator_commit": "04c83d53483607aec4f93fd2bb55b412f101d677",
-      "manifest_sha256": "44fc4cb1789ae8f1639d05a1b45b549ae6b400c8abf8d05e8f598a88151df490",
+      "manifest_sha256": "35612a2e4d1186ac0d0a29a6083e178f3e9eb1b75ff886b5c615093033d2ccf0",
       "fixtures": {
-        "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-23/scripts/session_replays/uv-feature-ablation.json": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b"
+        "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-26/scripts/session_replays/uv-feature-ablation.json": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b"
       },
       "post_cell_audit": {
         "helper_sha256": "8e1ba94744f09a491f39c981bbbf59f38417afccf801f01c7fe77e9ddf4d5934",
         "endpoint_helper_sha256": "fecc0d4facabbbe048dc6d9fb0ea80e447ab01d9135dd34a6f47d0ad434f81c1",
-        "process_inspector_sha256": "15ad9a51f2b6777e9a72dc786abbbd69cf92e59b782d7d772095c545ed0af0d1",
+        "process_inspector_sha256": "ca7717dccd437d60687937673ad2d9529ae023ed93547f6ce44b72f961a0cb0f",
         "timing_boundary": "after persisted run_session, before next cell",
         "retirement": "exclusive per-cell target and shared-build leaves only",
         "quiet_seconds_after_retirement": 30
@@ -102,45 +102,45 @@
       "1.99.0": {
         "cargo": {
           "version": "cargo 1.99.0 (5f94df478 2026-08-27)",
-          "path": "/home/dev-user/ohm-benchmarks-1.99.0-23/rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
+          "path": "/home/dev-user/ohm-benchmarks-1.99.0-26/rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo",
           "sha256": "e951141cc55a6cd7b9876d187bd30a3720e6086b99413af95e3b8de1cdd72f14"
         },
         "rustc": {
           "version": "rustc 1.99.0 (b940084d7 2026-09-28)",
-          "path": "/home/dev-user/ohm-benchmarks-1.99.0-23/rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
+          "path": "/home/dev-user/ohm-benchmarks-1.99.0-26/rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc",
           "sha256": "f3834d26669b03f6855fa54bd2381443123e860167bc0c7a8dd137e5cf6e5e4f"
         },
         "clippy-driver": {
           "version": "clippy 0.1.99 (b940084d7e 2026-09-28)",
-          "path": "/home/dev-user/ohm-benchmarks-1.99.0-23/rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/clippy-driver",
+          "path": "/home/dev-user/ohm-benchmarks-1.99.0-26/rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/clippy-driver",
           "sha256": "ecf6d74d4e13728405acd3749bff486db899e793b5e3cd179ab663f7fe9d6fe6"
         },
         "rustfmt": {
           "version": "rustfmt 1.10.0-stable (b940084d7e 2026-09-28)",
-          "path": "/home/dev-user/ohm-benchmarks-1.99.0-23/rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustfmt",
+          "path": "/home/dev-user/ohm-benchmarks-1.99.0-26/rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustfmt",
           "sha256": "a3ab6c445b26eda8d7bcfd5cc3f4b068dd7136af96822fd21378fc6fe8c2f2a3"
         }
       },
-      "ohm-1.99.0-23": {
+      "ohm-1.99.0-26": {
         "cargo": {
-          "version": "cargo 1.99.0-dev (7024b0d2d 2026-11-02) (ohm-1.99.0-23)",
-          "path": "/home/dev-user/ohm-benchmarks-1.99.0-23/rustup/toolchains/ohm-1.99.0-23/bin/cargo",
-          "sha256": "f7cfe387ec3bd7e2e367d80596f379349faa23530194bf7cd7ba80a33adc6dee"
+          "version": "cargo 1.99.0-dev (1312b3b86 2026-11-04) (ohm-1.99.0-26)",
+          "path": "/home/dev-user/ohm-benchmarks-1.99.0-26/rustup/toolchains/ohm-1.99.0-26/bin/cargo",
+          "sha256": "3bd0b81b4cf35c8b142c466f69535310adab3837fdd80299f3adc4967acc99ea"
         },
         "rustc": {
-          "version": "rustc 1.99.0-dev (d57fd1515 2026-11-02) (ohm-1.99.0-23)",
-          "path": "/home/dev-user/ohm-benchmarks-1.99.0-23/rustup/toolchains/ohm-1.99.0-23/bin/rustc",
-          "sha256": "6842898bafad7cf932fea14bd8915a0adff0eecdc03bee91f589ac95a89743dd"
+          "version": "rustc 1.99.0-dev (9d17d6127 2026-11-05) (ohm-1.99.0-26)",
+          "path": "/home/dev-user/ohm-benchmarks-1.99.0-26/rustup/toolchains/ohm-1.99.0-26/bin/rustc",
+          "sha256": "5271516cc86f547b015dbebb4c5a69eec6b2457fc181c91d984e5eb035360f02"
         },
         "clippy-driver": {
           "version": "clippy 0.1.99 (6ca9ddc53c 2026-10-29)",
-          "path": "/home/dev-user/ohm-benchmarks-1.99.0-23/rustup/toolchains/ohm-1.99.0-23/bin/clippy-driver",
-          "sha256": "1db26f65e738d3e759fe6412f18de3b6a33e0c150d59032854a8db3020824e51"
+          "path": "/home/dev-user/ohm-benchmarks-1.99.0-26/rustup/toolchains/ohm-1.99.0-26/bin/clippy-driver",
+          "sha256": "74fcd74f029b73a43f643794d6ba50f8c33cbd814000ea85755b9360c54bab36"
         },
         "rustfmt": {
-          "version": "rustfmt 1.10.0-dev (e5feafbfd6 2026-11-01)",
-          "path": "/home/dev-user/ohm-benchmarks-1.99.0-23/rustup/toolchains/ohm-1.99.0-23/bin/rustfmt",
-          "sha256": "2ec1dd4c2f651b26f5a8594a9f600e9e46aa6bbcfd96d9753b817fafba6286ba"
+          "version": "rustfmt 1.10.0-dev (b7c58d8bec 2026-11-05)",
+          "path": "/home/dev-user/ohm-benchmarks-1.99.0-26/rustup/toolchains/ohm-1.99.0-26/bin/rustfmt",
+          "sha256": "6e5d92e20374c7305fcd5d48eaefb95b88dff919ff781d5ce40d4a1fe6d1f292"
         }
       }
     },
@@ -150,32 +150,32 @@
         "archive_sha256": "4a5cc2f53e6f0f8c59092a6cc38291eb729d46a7dd95d3ae582008881b84931d",
         "binary_sha256": "3ad66571feae522db2cad31b9613bf21035b8a06d2738d6fc8fe6089856f2042",
         "version": "just 1.58.0",
-        "path": "/home/dev-user/ohm-benchmarks-1.99.0-23/tools/bin/just"
+        "path": "/home/dev-user/ohm-benchmarks-1.99.0-26/tools/bin/just"
       },
       "cargo-nextest": {
         "url": "https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.140/cargo-nextest-0.9.140-x86_64-unknown-linux-gnu.tar.gz",
         "archive_sha256": "4ee9aaa0d0171a985a5d0eb735b87355894c1c455972e9674fb9fdbd1387c9a3",
         "binary_sha256": "c1630f9a8c447391325a6732a114f9b1c537fbc3e10156ddedbf6e3b8ff11f1a",
         "version": "cargo-nextest 0.9.140 (a9fef2964 2026-07-05)\nrelease: 0.9.140\ncommit-hash: a9fef2964e34f64ed4fceeee7c0c3559ce560920\ncommit-date: 2026-07-05\nhost: x86_64-unknown-linux-gnu",
-        "path": "/home/dev-user/ohm-benchmarks-1.99.0-23/tools/bin/cargo-nextest"
+        "path": "/home/dev-user/ohm-benchmarks-1.99.0-26/tools/bin/cargo-nextest"
       },
       "uv": {
         "url": "https://github.com/astral-sh/uv/releases/download/0.12.8/uv-x86_64-unknown-linux-gnu.tar.gz",
         "archive_sha256": "2e2b37e9811e17675a9e70bed5e1a58fc8c0388be63d751d72cc735188c149ff",
         "binary_sha256": "fe60af3d6b1771ecea15fdfd3821959912009e1612b3767a4988f135bc3cdd9d",
         "version": "uv 0.12.8 (x86_64-unknown-linux-gnu)",
-        "path": "/home/dev-user/ohm-benchmarks-1.99.0-23/tools/bin/uv"
+        "path": "/home/dev-user/ohm-benchmarks-1.99.0-26/tools/bin/uv"
       },
       "python3.12": {
-        "path": "/home/dev-user/ohm-benchmarks-1.99.0-23/tools/bin/python3.12",
-        "resolved_path": "/home/dev-user/ohm-benchmarks-1.99.0-23/tools/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
+        "path": "/home/dev-user/ohm-benchmarks-1.99.0-26/tools/bin/python3.12",
+        "resolved_path": "/home/dev-user/ohm-benchmarks-1.99.0-26/tools/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
         "sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
         "version": "Python 3.12.13"
       }
     },
     "python": {
-      "path": "/home/dev-user/ohm-benchmarks-1.99.0-23/tools/bin/python3.12",
-      "resolved_path": "/home/dev-user/ohm-benchmarks-1.99.0-23/tools/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
+      "path": "/home/dev-user/ohm-benchmarks-1.99.0-26/tools/bin/python3.12",
+      "resolved_path": "/home/dev-user/ohm-benchmarks-1.99.0-26/tools/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
       "sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
       "version": "Python 3.12.13"
     },
@@ -183,29 +183,29 @@
       "proof": {
         "passed": true,
         "violations": [],
-        "samples": 444,
+        "samples": 488,
         "returncode": 0,
-        "monitor_sha256": "28b3e060a091e3268e561367094a4074ef020fd1008a74bf6a28768bf3a5fd57",
-        "trace_sha256": "8a0825934295789c322368694331bbb1539a709cd8b62a506a9f44a655bd8314"
+        "monitor_sha256": "aae69d2e8e0a46e065ed38bd03698d1a8c21f0a5fb74e12c260781dce7516f18",
+        "trace_sha256": "6e531825ba2de7417ba7db6ec4a81dbfbf4a48fb25bd69e33c556d609ab848bb"
       },
-      "preflight_sha256": "ced4bd06e2279ecd81f4515eaa1760d353d42acfdfa668a15be972d52b9524ab",
+      "preflight_sha256": "943a6f4a114c32cb96a9a4d0c85af859dc2566df22c2055ecef619fc529e08a6",
       "accepted_prefix_only": false,
-      "accepted_samples": 444,
-      "interval_start": 1793679807.2196934,
-      "interval_end": 1793680725.7296627,
-      "maximum_gap_seconds": 2.1687349410003662,
-      "minimum_free_bytes": 511646633984,
-      "weighted_steal_fraction": 2.766344313557273e-5,
-      "peak_steal_fraction": 0.0004572473708276177,
-      "peak_external_user_cpu_fraction": 0.001459623538464854
+      "accepted_samples": 488,
+      "interval_start": 1793936067.6626303,
+      "interval_end": 1793937071.7310758,
+      "maximum_gap_seconds": 2.1156439300002603,
+      "minimum_free_bytes": 598819323904,
+      "weighted_steal_fraction": 3.435307844181931e-5,
+      "peak_steal_fraction": 0.0015349194167306216,
+      "peak_external_user_cpu_fraction": 0.0010617399401765522
     },
-    "raw_results_sha256": "90a8ce0462c4308dd6016c26bd03b248c1ba737713e61b5fb16f90a2698f33b3",
-    "exporter_sha256": "d26cf17ee96575c0d1ae99182948a7a1dde449c9862e65c2037f69969e98d3ba",
+    "raw_results_sha256": "992822fe6b0f543ed3d583e5b2c81f775269fbe8811541cfc35fa1de93dca069",
+    "exporter_sha256": "907d7348be66110ff87a9cb8162696fcb313c2992c05e36672c9e2d69c5ae4aa",
     "fixtures": {
-      "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-23/scripts/session_replays/uv-feature-ablation.json": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b"
+      "/home/dev-user/code/oss/ohm-benchmarks-1.99.0-26/scripts/session_replays/uv-feature-ablation.json": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b"
     }
   },
-  "completed_at": "2026-11-03T07:20:54.134670+00:00",
+  "completed_at": "2026-11-06T06:40:32.874522+00:00",
   "repetitions": 2,
   "sessions": [
     {
@@ -228,10 +228,10 @@
         "category": "check",
         "command": ["cargo", "check", "-p", "uv-client", "--locked"],
         "wall_seconds": {
-          "ohm-all": [0.8985617100001946, 0.8905573310003092],
-          "ohm-no-public-api-hash": [2.2182809810001345, 2.201790162999714],
-          "ohm-no-proc-macro-cache": [0.8305343419997371, 0.9347022679994552],
-          "ohm-neither": [2.4942308449999473, 2.5196723230001226]
+          "ohm-all": [0.8253092360000664, 0.9291898780002157],
+          "ohm-no-public-api-hash": [2.4272742880002625, 2.3977608179993695],
+          "ohm-no-proc-macro-cache": [0.8187662139998793, 0.8244137870005943],
+          "ohm-neither": [2.370469544000116, 2.3458545630001026]
         },
         "tests_started": {
           "ohm-all": [0, 0],
@@ -260,10 +260,10 @@
           "--locked"
         ],
         "wall_seconds": {
-          "ohm-all": [1.1842993330001264, 1.343081388000428],
-          "ohm-no-public-api-hash": [1.254801045000022, 1.3855750509997051],
-          "ohm-no-proc-macro-cache": [1.156536167000013, 1.1755102430006446],
-          "ohm-neither": [1.4478520800003025, 1.1762155439992057]
+          "ohm-all": [1.1672560950000843, 1.2035624860000098],
+          "ohm-no-public-api-hash": [1.3185039119998692, 1.2541781790005189],
+          "ohm-no-proc-macro-cache": [1.153054983000402, 1.1834966779997558],
+          "ohm-neither": [1.2707142010003736, 1.150158776000353]
         },
         "tests_started": {
           "ohm-all": [9, 9],
@@ -288,10 +288,10 @@
         "category": "check",
         "command": ["cargo", "check", "-p", "uv-client", "--locked"],
         "wall_seconds": {
-          "ohm-all": [34.763149758000054, 34.62736630299969],
-          "ohm-no-public-api-hash": [33.93278534299998, 34.80263137799966],
-          "ohm-no-proc-macro-cache": [33.5322459529998, 34.193972269999904],
-          "ohm-neither": [33.88740912000003, 34.64295190300072]
+          "ohm-all": [34.13634401000036, 33.84925730099985],
+          "ohm-no-public-api-hash": [33.80366211399996, 34.2719626449998],
+          "ohm-no-proc-macro-cache": [33.54941187300028, 33.452640299999985],
+          "ohm-neither": [34.0469898500005, 34.00249954300034]
         },
         "tests_started": {
           "ohm-all": [0, 0],
@@ -320,10 +320,10 @@
           "--locked"
         ],
         "wall_seconds": {
-          "ohm-all": [13.83157075600002, 14.678939712000101],
-          "ohm-no-public-api-hash": [13.293180925999877, 13.59139205800011],
-          "ohm-no-proc-macro-cache": [13.446379065000201, 13.933533178000289],
-          "ohm-neither": [13.265204000000267, 13.704096305000348]
+          "ohm-all": [13.839633056000821, 13.723276459999397],
+          "ohm-no-public-api-hash": [13.69187758299995, 13.55030083299971],
+          "ohm-no-proc-macro-cache": [13.188874573000248, 13.677556212999662],
+          "ohm-neither": [13.792746265999995, 13.999151140000322]
         },
         "tests_started": {
           "ohm-all": [9, 9],
@@ -342,40 +342,40 @@
   },
   "timed_session_seconds": {
     "uv": {
-      "ohm-all": [2.1657329009999557, 2.3126518450008007],
-      "ohm-no-public-api-hash": [3.5493343500002084, 3.665533428999879],
-      "ohm-no-proc-macro-cache": [2.0610834799999793, 2.1862996540003223],
-      "ohm-neither": [4.01804261999996, 3.773416921999342]
+      "ohm-all": [2.0638039140003457, 2.2089532279997],
+      "ohm-no-public-api-hash": [3.8177926280004613, 3.722442571999636],
+      "ohm-no-proc-macro-cache": [2.04198623100001, 2.0786076849999517],
+      "ohm-neither": [3.7137177880003946, 3.5678868189997957]
     }
   },
   "timed_command_seconds": {
     "uv": {
-      "ohm-all": [2.082861043000321, 2.233638719000737],
-      "ohm-no-public-api-hash": [3.4730820260001565, 3.587365213999419],
-      "ohm-no-proc-macro-cache": [1.98707050899975, 2.1102125110000998],
-      "ohm-neither": [3.94208292500025, 3.6958878669993283]
+      "ohm-all": [1.9925653310001508, 2.1327523640002255],
+      "ohm-no-public-api-hash": [3.7457782000001316, 3.6519389969998883],
+      "ohm-no-proc-macro-cache": [1.9718211970002812, 2.00791046500035],
+      "ohm-neither": [3.6411837450004896, 3.4960133390004557]
     }
   },
   "timed_edit_seconds": {
     "uv": {
-      "ohm-all": [0.004711973999746988, 0.00396323599943571],
-      "ohm-no-public-api-hash": [0.00453974800029755, 0.004179234999810433],
-      "ohm-no-proc-macro-cache": [0.0034399189999021473, 0.0035768810002991813],
-      "ohm-neither": [0.0031987020001906785, 0.003439110999352124]
+      "ohm-all": [0.004564213999401545, 0.004383075000077952],
+      "ohm-no-public-api-hash": [0.003325360999951954, 0.0037179099999775644],
+      "ohm-no-proc-macro-cache": [0.003100873999756004, 0.00313680699946417],
+      "ohm-neither": [0.0031769010001880815, 0.0032152789999599918]
     }
   },
   "untimed_warmup_seconds": {
     "uv": {
-      "ohm-all": [48.59472051400007, 49.30630601499979],
-      "ohm-no-public-api-hash": [47.225966268999855, 48.39402343599977],
-      "ohm-no-proc-macro-cache": [46.978625018, 48.12750544800019],
-      "ohm-neither": [47.1526131200003, 48.34704820800107]
+      "ohm-all": [47.97597706600118, 47.57253376099925],
+      "ohm-no-public-api-hash": [47.49553969699991, 47.82226347799951],
+      "ohm-no-proc-macro-cache": [46.73828644600053, 47.130196512999646],
+      "ohm-neither": [47.839736116000495, 48.00165068300066]
     }
   },
   "command_audits": [
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-all/0/02.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-all/0/02.log",
       "toolchain": "ohm-all",
       "project": "uv",
       "repetition": 0,
@@ -392,7 +392,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-all/0/03.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-all/0/03.log",
       "toolchain": "ohm-all",
       "project": "uv",
       "repetition": 0,
@@ -401,7 +401,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-all/0/warmup-01.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-all/0/warmup-01.log",
       "toolchain": "ohm-all",
       "project": "uv",
       "repetition": 0,
@@ -418,7 +418,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-all/0/warmup-02.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-all/0/warmup-02.log",
       "toolchain": "ohm-all",
       "project": "uv",
       "repetition": 0,
@@ -427,7 +427,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-no-public-api-hash/0/02.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-no-public-api-hash/0/02.log",
       "toolchain": "ohm-no-public-api-hash",
       "project": "uv",
       "repetition": 0,
@@ -444,7 +444,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-no-public-api-hash/0/03.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-no-public-api-hash/0/03.log",
       "toolchain": "ohm-no-public-api-hash",
       "project": "uv",
       "repetition": 0,
@@ -453,7 +453,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-no-public-api-hash/0/warmup-01.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-no-public-api-hash/0/warmup-01.log",
       "toolchain": "ohm-no-public-api-hash",
       "project": "uv",
       "repetition": 0,
@@ -470,7 +470,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-no-public-api-hash/0/warmup-02.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-no-public-api-hash/0/warmup-02.log",
       "toolchain": "ohm-no-public-api-hash",
       "project": "uv",
       "repetition": 0,
@@ -479,7 +479,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-neither/0/02.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-neither/0/02.log",
       "toolchain": "ohm-neither",
       "project": "uv",
       "repetition": 0,
@@ -496,7 +496,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-neither/0/03.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-neither/0/03.log",
       "toolchain": "ohm-neither",
       "project": "uv",
       "repetition": 0,
@@ -505,7 +505,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-neither/0/warmup-01.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-neither/0/warmup-01.log",
       "toolchain": "ohm-neither",
       "project": "uv",
       "repetition": 0,
@@ -522,7 +522,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-neither/0/warmup-02.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-neither/0/warmup-02.log",
       "toolchain": "ohm-neither",
       "project": "uv",
       "repetition": 0,
@@ -531,7 +531,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-no-proc-macro-cache/0/02.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-no-proc-macro-cache/0/02.log",
       "toolchain": "ohm-no-proc-macro-cache",
       "project": "uv",
       "repetition": 0,
@@ -548,7 +548,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-no-proc-macro-cache/0/03.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-no-proc-macro-cache/0/03.log",
       "toolchain": "ohm-no-proc-macro-cache",
       "project": "uv",
       "repetition": 0,
@@ -557,7 +557,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-no-proc-macro-cache/0/warmup-01.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-no-proc-macro-cache/0/warmup-01.log",
       "toolchain": "ohm-no-proc-macro-cache",
       "project": "uv",
       "repetition": 0,
@@ -574,7 +574,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-no-proc-macro-cache/0/warmup-02.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-no-proc-macro-cache/0/warmup-02.log",
       "toolchain": "ohm-no-proc-macro-cache",
       "project": "uv",
       "repetition": 0,
@@ -583,7 +583,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-no-public-api-hash/1/02.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-no-public-api-hash/1/02.log",
       "toolchain": "ohm-no-public-api-hash",
       "project": "uv",
       "repetition": 1,
@@ -600,7 +600,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-no-public-api-hash/1/03.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-no-public-api-hash/1/03.log",
       "toolchain": "ohm-no-public-api-hash",
       "project": "uv",
       "repetition": 1,
@@ -609,7 +609,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-no-public-api-hash/1/warmup-01.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-no-public-api-hash/1/warmup-01.log",
       "toolchain": "ohm-no-public-api-hash",
       "project": "uv",
       "repetition": 1,
@@ -626,7 +626,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-no-public-api-hash/1/warmup-02.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-no-public-api-hash/1/warmup-02.log",
       "toolchain": "ohm-no-public-api-hash",
       "project": "uv",
       "repetition": 1,
@@ -635,7 +635,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-no-proc-macro-cache/1/02.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-no-proc-macro-cache/1/02.log",
       "toolchain": "ohm-no-proc-macro-cache",
       "project": "uv",
       "repetition": 1,
@@ -652,7 +652,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-no-proc-macro-cache/1/03.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-no-proc-macro-cache/1/03.log",
       "toolchain": "ohm-no-proc-macro-cache",
       "project": "uv",
       "repetition": 1,
@@ -661,7 +661,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-no-proc-macro-cache/1/warmup-01.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-no-proc-macro-cache/1/warmup-01.log",
       "toolchain": "ohm-no-proc-macro-cache",
       "project": "uv",
       "repetition": 1,
@@ -678,7 +678,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-no-proc-macro-cache/1/warmup-02.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-no-proc-macro-cache/1/warmup-02.log",
       "toolchain": "ohm-no-proc-macro-cache",
       "project": "uv",
       "repetition": 1,
@@ -687,7 +687,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-all/1/02.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-all/1/02.log",
       "toolchain": "ohm-all",
       "project": "uv",
       "repetition": 1,
@@ -704,7 +704,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-all/1/03.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-all/1/03.log",
       "toolchain": "ohm-all",
       "project": "uv",
       "repetition": 1,
@@ -713,7 +713,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-all/1/warmup-01.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-all/1/warmup-01.log",
       "toolchain": "ohm-all",
       "project": "uv",
       "repetition": 1,
@@ -730,7 +730,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-all/1/warmup-02.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-all/1/warmup-02.log",
       "toolchain": "ohm-all",
       "project": "uv",
       "repetition": 1,
@@ -739,7 +739,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-neither/1/02.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-neither/1/02.log",
       "toolchain": "ohm-neither",
       "project": "uv",
       "repetition": 1,
@@ -756,7 +756,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-neither/1/03.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-neither/1/03.log",
       "toolchain": "ohm-neither",
       "project": "uv",
       "repetition": 1,
@@ -765,7 +765,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-neither/1/warmup-01.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-neither/1/warmup-01.log",
       "toolchain": "ohm-neither",
       "project": "uv",
       "repetition": 1,
@@ -782,7 +782,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/home/dev-user/ohm-benchmarks-1.99.0-23/output/ablation/logs/uv/ohm-neither/1/warmup-02.log",
+      "log": "/home/dev-user/ohm-benchmarks-1.99.0-26/output/ablation/logs/uv/ohm-neither/1/warmup-02.log",
       "toolchain": "ohm-neither",
       "project": "uv",
       "repetition": 1,

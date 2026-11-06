@@ -29,9 +29,15 @@ git -C "$cargo_checkout" init --quiet
 git -C "$cargo_checkout" -c protocol.file.allow=always submodule add --quiet \
   --name fixture "$dependency" 'vendor/fixture code'
 printf 'fixture cargo\n' > "$cargo_checkout/README.md"
+printf 'expanded.txt ident\n' > "$cargo_checkout/.gitattributes"
+printf '%s\n' "\$Id\$" > "$cargo_checkout/expanded.txt"
 ln -s README.md "$cargo_checkout/readme-link"
-git -C "$cargo_checkout" add README.md readme-link
+git -C "$cargo_checkout" add README.md readme-link .gitattributes expanded.txt
 commit_fixture "$cargo_checkout" -m 'Add Cargo fixture'
+rm -- "$cargo_checkout/expanded.txt"
+git -C "$cargo_checkout" checkout-index -u -- expanded.txt
+expanded_object="$(git -C "$cargo_checkout" rev-parse HEAD:expanded.txt)"
+[[ "$(cat "$cargo_checkout/expanded.txt")" == "\$Id: $expanded_object \$" ]]
 cargo_revision="$(git -C "$cargo_checkout" rev-parse HEAD)"
 
 git -C "$clippy_checkout" init --quiet
@@ -94,6 +100,19 @@ fi
 
 verify_sources=("$script_dir/verify-release-sources.sh" "$release_manifest" "$rust_checkout"
   "$cargo_checkout" "$clippy_checkout" "$rustfmt_checkout")
+# Each spelling invokes the same script and must find its own manifest validator.
+mkdir -p "$test_root/invocation/scripts" "$test_root/invocation/bin"
+ln -s "$script_dir" "$test_root/invocation/link"
+newline_scripts="$test_root/invocation/bin"$'\n'
+ln -s "$script_dir" "$newline_scripts"
+"$test_root/invocation/link/../scripts/verify-release-sources.sh" "${verify_sources[@]:1}" >/dev/null
+"$newline_scripts/verify-release-sources.sh" "${verify_sources[@]:1}" >/dev/null
+
+# A commit hook supplies an index, and a receive hook supplies the calling repository.
+GIT_INDEX_FILE="$clippy_checkout/.git/index" "${verify_sources[@]}" >/dev/null
+GIT_DIR="$clippy_checkout/.git" GIT_WORK_TREE="$clippy_checkout" \
+  GIT_OBJECT_DIRECTORY="$clippy_checkout/.git/objects" GIT_QUARANTINE_PATH="$clippy_checkout/.git/objects" \
+  "${verify_sources[@]}" >/dev/null
 printf '/build.rs\n' >> "$cargo_checkout/.git/info/exclude"
 printf 'fn main() {}\n' > "$cargo_checkout/build.rs"
 if "${verify_sources[@]}" >/dev/null 2>&1; then
@@ -101,6 +120,17 @@ if "${verify_sources[@]}" >/dev/null 2>&1; then
   exit 1
 fi
 rm -- "$cargo_checkout/build.rs"
+
+# A case-sensitive filesystem can contain two paths that Git treats as one.
+if [[ ! -e "$cargo_checkout/readme.md" ]]; then
+  printf 'untracked source\n' > "$cargo_checkout/readme.md"
+  if GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.ignoreCase GIT_CONFIG_VALUE_0=true \
+      "${verify_sources[@]}" >/dev/null 2>&1; then
+    echo 'source verification accepted an untracked file with different case' >&2
+    exit 1
+  fi
+  rm -- "$cargo_checkout/readme.md"
+fi
 
 readme="$cargo_checkout/README.md"
 git -C "$cargo_checkout" config core.trustctime false
@@ -131,6 +161,28 @@ cp -p "$test_root/original-readme" "$readme"
 "${verify_sources[@]}" >/dev/null
 git -C "$cargo_checkout" config --remove-section filter.ohm-test
 rm -- "$cargo_checkout/.git/info/attributes"
+
+printf 'README.md text eol=crlf\n' > "$cargo_checkout/.git/info/attributes"
+printf 'fixture cargo\r\n' > "$readme"
+git -C "$cargo_checkout" add -- README.md
+git -C "$cargo_checkout" diff --cached --quiet HEAD -- README.md
+if "${verify_sources[@]}" >/dev/null 2>&1; then
+  echo 'source verification accepted line endings from unversioned attributes' >&2
+  exit 1
+fi
+rm -- "$cargo_checkout/.git/info/attributes" "$readme"
+git -C "$cargo_checkout" checkout-index -u -- README.md
+
+printf '%s\n' "\$Id: forged expansion \$" > "$cargo_checkout/expanded.txt"
+git -C "$cargo_checkout" add -- expanded.txt
+git -C "$cargo_checkout" diff --cached --quiet HEAD -- expanded.txt
+if "${verify_sources[@]}" >/dev/null 2>&1; then
+  echo 'source verification accepted an incorrect expansion of a committed attribute' >&2
+  exit 1
+fi
+rm -- "$cargo_checkout/expanded.txt"
+git -C "$cargo_checkout" checkout-index -u -- expanded.txt
+"${verify_sources[@]}" >/dev/null
 
 embedded_cargo="$rust_checkout/src/tools/cargo"
 nested_dependency="$embedded_cargo/vendor/fixture code"
@@ -194,14 +246,21 @@ if "${verify_sources[@]}" >/dev/null 2>&1; then
   exit 1
 fi
 git -C "$cargo_checkout" replace -d "$pinned_tree" >/dev/null
-git -C "$cargo_checkout" restore --staged --worktree README.md
+git -C "$cargo_checkout" restore --source=HEAD --staged --worktree README.md
+
+# Git follows symlinks before resolving a parent component in a checkout path.
+mkdir -p "$test_root/logical" "$test_root/physical-child"
+ln -s "$test_root/physical-child" "$test_root/logical/link"
+cp -R "$cargo_checkout" "$test_root/logical/cargo"
+flagged_sources=("${verify_sources[@]}")
+flagged_sources[3]="$test_root/logical/link/../cargo"
 
 for flag in assume-unchanged skip-worktree; do
   git -C "$cargo_checkout" update-index "--$flag" README.md
   flagged_entry="$(git -C "$cargo_checkout" ls-files -v -- README.md)"
-  "${verify_sources[@]}"
+  "${flagged_sources[@]}"
   printf 'uncommitted Cargo source\n' >> "$cargo_checkout/README.md"
-  if "${verify_sources[@]}" >/dev/null 2>&1; then
+  if "${flagged_sources[@]}" >/dev/null 2>&1; then
     echo "source verification accepted an edit hidden by $flag" >&2
     exit 1
   fi
@@ -253,25 +312,21 @@ mv "$rust_checkout/src/tools/clippy" "$test_root/original-clippy"
 git clone --quiet "$clippy_checkout" "$rust_checkout/src/tools/clippy"
 mv "$rust_checkout/src/tools/rustfmt" "$test_root/original-rustfmt"
 git clone --quiet "$rustfmt_checkout" "$rust_checkout/src/tools/rustfmt"
-"$script_dir/verify-release-sources.sh" \
-  "$release_manifest" "$rust_checkout" "$cargo_checkout" \
-  "$rust_checkout/src/tools/clippy" "$rust_checkout/src/tools/rustfmt"
+verify_overlays=("$script_dir/verify-release-sources.sh" "$release_manifest" "$rust_checkout" "$cargo_checkout"
+  "$rust_checkout/src/tools/clippy" "$rust_checkout/src/tools/rustfmt")
+"${verify_overlays[@]}"
+GIT_LITERAL_PATHSPECS=1 "${verify_overlays[@]}"
+GIT_ICASE_PATHSPECS=1 "${verify_overlays[@]}"
 
 printf 'unexpected rustfmt change\n' >> "$rust_checkout/src/tools/rustfmt/README.md"
-if "$script_dir/verify-release-sources.sh" \
-  "$release_manifest" "$rust_checkout" "$cargo_checkout" \
-  "$rust_checkout/src/tools/clippy" "$rust_checkout/src/tools/rustfmt" \
-  >/dev/null 2>&1; then
+if "${verify_overlays[@]}" >/dev/null 2>&1; then
   echo 'source verification accepted a dirty rustfmt checkout' >&2
   exit 1
 fi
 git -C "$rust_checkout/src/tools/rustfmt" restore README.md
 
 printf 'unexpected Rust change\n' >> "$rust_checkout/src/version"
-if "$script_dir/verify-release-sources.sh" \
-  "$release_manifest" "$rust_checkout" "$cargo_checkout" \
-  "$rust_checkout/src/tools/clippy" "$rust_checkout/src/tools/rustfmt" \
-  >/dev/null 2>&1; then
+if "${verify_overlays[@]}" >/dev/null 2>&1; then
   echo 'source verification ignored a dirty Rust checkout outside tool overlays' >&2
   exit 1
 fi

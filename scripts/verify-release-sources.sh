@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# A Git hook can supply its own repository, temporary index and object store.
+unset GIT_DIR GIT_WORK_TREE GIT_COMMON_DIR GIT_INDEX_FILE
+unset GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_QUARANTINE_PATH
+# Use the verifier's own pathspecs, including its exclusions for overlaid tools.
+unset GIT_LITERAL_PATHSPECS GIT_GLOB_PATHSPECS GIT_NOGLOB_PATHSPECS GIT_ICASE_PATHSPECS
 # Release revisions name the original objects, even in checkouts with replacement refs.
 export GIT_NO_REPLACE_OBJECTS=1
 unset CDPATH
@@ -14,7 +19,9 @@ rust_checkout="$2"
 cargo_checkout="$3"
 clippy_checkout="$4"
 rustfmt_checkout="$5"
-script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+script_path="${BASH_SOURCE[0]}"
+[[ "$script_path" == */* ]] || script_path="./$script_path"
+IFS= read -r -d '' script_dir < <(cd -P -- "${script_path%/*}/" && printf '%s\0' "$PWD")
 
 "$script_dir/validate-release-manifest.sh" --require-pinned "$manifest"
 
@@ -27,39 +34,49 @@ expected_cargo_repository="$(jq -er '.sources.cargo.repository' "$manifest")"
 
 verify_clean_checkout() {
   local checkout="$1" checkout_status entry submodule
-  # Release builds depend on the executable bits and symlinks in the pinned tree.
-  local mode_config=(-c core.fileMode=true -c core.symlinks=true)
+  # Check path case, executable bits and symlinks even when the checkout ignores them.
+  local worktree_config=(-c core.ignoreCase=false -c core.fileMode=true -c core.symlinks=true)
   shift
-  checkout_status="$(git -C "$checkout" "${mode_config[@]}" status --porcelain --untracked-files=normal --ignored=matching \
+  checkout_status="$(git -C "$checkout" "${worktree_config[@]}" status --porcelain --untracked-files=normal --ignored=matching \
     --ignore-submodules=none -- "$@")"
   if [[ -n "$checkout_status" ]]; then
     echo "source checkout is not clean: $checkout" >&2
     exit 1
   fi
 
-  # The checkout index can hide edits through file flags or cached timestamps.
-  # A fresh index compares the tracked contents with the pinned tree.
+  # Compare the bytes on disk with the pinned tree, independently of the
+  # checkout's index, config and unversioned attributes.
   if ! (
-    index_directory="$(mktemp -d)" || exit 1
-    trap 'rm -rf -- "$index_directory"' EXIT
-    GIT_INDEX_FILE="$(cd -- "$index_directory" && pwd -P)/index" || exit 1
-    export GIT_INDEX_FILE
+    temporary_repo="$(mktemp -d)" || exit 1
+    temporary_repo="$(cd -P -- "$temporary_repo" && pwd -P)" || exit 1
+    trap 'rm -rf -- "$temporary_repo"' EXIT
+    cd -P -- "$checkout" || exit 1
+    revision="$(git rev-parse HEAD)" || exit 1
+    format="$(git config --local --default sha1 --get extensions.objectFormat)" || exit 1
+    objects="$(git rev-parse --git-path objects)" || exit 1
+    objects="$(cd -P -- "$objects" && printf '%s/' "$PWD")" || exit 1
+    unset GIT_CONFIG_COUNT GIT_CONFIG_PARAMETERS GIT_ATTR_SOURCE
+    export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 GIT_ATTR_NOSYSTEM=1
+    GIT_DEFAULT_HASH="$format" git init --bare --quiet --template= "$temporary_repo" || exit 1
+    export GIT_DIR="$temporary_repo" GIT_WORK_TREE=. GIT_OBJECT_DIRECTORY="$objects"
+    git read-tree "$revision" || exit 1
 
-    # Clean filters can return a pinned blob for different bytes on disk.
-    filter_config="${GIT_INDEX_FILE%/*}/filters"
-    : > "$filter_config" || exit 1
-    git -C "$checkout" config --null --name-only --list > "$index_directory/config-keys" || exit 1
-    while IFS= read -r -d '' key; do
-      case "$key" in
-        filter.*.clean|filter.*.process) value="" ;;
-        filter.*.required) value=false ;;
-        *) continue ;;
-      esac
-      git config --file "$filter_config" --replace-all "$key" "$value" || exit 1
-    done < "$index_directory/config-keys"
-    git -C "$checkout" -c core.sparseCheckout=false read-tree HEAD &&
-      git -C "$checkout" "${mode_config[@]}" -c "include.path=$filter_config" -c core.sparseCheckout=false \
-        diff --no-ext-diff --no-textconv --quiet --ignore-submodules=none HEAD -- "$@"
+    mkdir -p -- "$GIT_DIR/info" || exit 1
+    printf '%s\n' '* -text -crlf !eol -ident !filter !working-tree-encoding' > "$GIT_DIR/info/attributes" || exit 1
+    git "${worktree_config[@]}" diff --raw --no-abbrev -z --no-renames --no-ext-diff --no-textconv \
+      --ignore-submodules=none "$revision" -- "$@" > "$GIT_DIR/changes" || exit 1
+    : > "$GIT_DIR/info/attributes" || exit 1
+
+    # Committed attributes may legitimately expand an object during checkout.
+    # Recreate that output only for regular files whose raw contents differ.
+    while IFS= read -r -d '' change && IFS= read -r -d '' path; do
+      read -r old_mode new_mode object _ status <<< "${change#:}"
+      [[ "$status" == M && "$old_mode" == "$new_mode" && "$old_mode" == 100* ]] || exit 1
+      actual="$(git hash-object --no-filters -- "$path")" || exit 1
+      expected="$(GIT_ATTR_SOURCE="$revision" git -c core.attributesFile=/dev/null \
+        cat-file --filters --path="$path" "$object" | git hash-object --stdin)" || exit 1
+      [[ "$actual" == "$expected" ]] || exit 1
+    done < "$GIT_DIR/changes"
   ); then
     echo "could not verify tracked source files against HEAD: $checkout" >&2
     exit 1

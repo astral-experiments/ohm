@@ -41,7 +41,9 @@ fi
 
 # A NUL delimiter preserves trailing newlines in the physical directory name.
 IFS= read -r -d '' rust_checkout < <(cd -P -- "$rust_checkout" && printf '%s\0' "$PWD")
-script_directory="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+script_path="${BASH_SOURCE[0]}"
+[[ "$script_path" == */* ]] || script_path="./$script_path"
+IFS= read -r -d '' script_directory < <(cd -P -- "${script_path%/*}/" && printf '%s\0' "$PWD")
 if [[ "$bootstrap_config" != /* ]]; then
   bootstrap_config="$PWD/$bootstrap_config"
 fi
@@ -145,6 +147,17 @@ if [[ ! -x "$llvm_profdata" ]]; then
   exit 1
 fi
 
+release_name="${toolchain#ohm-}"
+manifest="$script_directory/../toolchains/${release_name%-*}/${release_name##*-}.json"
+prepare_relocated_dependencies=false
+if [[ -f "$manifest" ]]; then
+  prepare_relocated_dependencies="$(jq -r '.prepare_relocated_pgo_dependencies // false' "$manifest")"
+fi
+if [[ "$use_bolt" == true || "$prepare_relocated_dependencies" == true ]]; then
+  work_directory="$(mktemp -d "${TMPDIR:-/tmp}/ohm-opt-dist.XXXXXX")"
+  trap 'rm -rf -- "$work_directory"' EXIT
+fi
+
 llvm_dir="$ci_llvm_dir"
 if [[ "$use_bolt" == true ]]; then
   llvm_version="$("$llvm_profdata" --version)"
@@ -178,17 +191,11 @@ if [[ "$use_bolt" == true ]]; then
     exit 1
   fi
 
-  bolt_profdata="$bolt_llvm_dir/bin/llvm-profdata"
-  if [[ -e "$bolt_profdata" || -L "$bolt_profdata" ]]; then
-    if [[ ! "$bolt_profdata" -ef "$llvm_profdata" ]]; then
-      echo "LLVM BOLT profile tool does not match downloaded Rust LLVM: $bolt_profdata" >&2
-      exit 1
-    fi
-  else
-    ln -s "$llvm_profdata" "$bolt_profdata"
-  fi
-
-  llvm_dir="$bolt_llvm_dir"
+  # Pair the shared BOLT installation with this checkout's matching profile tool.
+  llvm_dir="$work_directory/llvm"
+  mkdir -p -- "$llvm_dir/bin"
+  ln -s -- "$llvm_profdata" "$bolt_llvm_dir/bin/llvm-bolt" "$bolt_llvm_dir/bin/merge-fdata" "$llvm_dir/bin/"
+  ln -s -- "$bolt_llvm_dir/lib" "$llvm_dir/lib"
 fi
 
 # Upstream opt-dist logs every environment variable before doing any work.
@@ -248,35 +255,29 @@ if [[ "$use_bolt" == true ]]; then
   opt_dist_arguments+=(--use-bolt)
 fi
 
-release_name="${toolchain#ohm-}"
-manifest="$script_directory/../toolchains/${release_name%-*}/${release_name##*-}.json"
-prepare_relocated_dependencies=false
-if [[ -f "$manifest" ]]; then
-  prepare_relocated_dependencies="$(jq -r '.prepare_relocated_pgo_dependencies // false' "$manifest")"
-fi
 if [[ "$prepare_relocated_dependencies" == true ]]; then
   # rustc-perf moves each benchmark after preparing its dependencies. A build
   # script can embed that original path. Prepare the moved dependencies before
   # the profiler starts, keeping the upstream collector and the Rust checkout intact.
   perf_path=src/tools/rustc-perf
-  perf_revision="$(git -C "$rust_checkout" rev-parse "HEAD:$perf_path")"
+  perf_revision="$(git --no-replace-objects -C "$rust_checkout" rev-parse "HEAD:$perf_path")"
   perf_source="$rust_checkout/$perf_path"
-  perf_checkout="$(mktemp -d "${TMPDIR:-/tmp}/ohm-rustc-perf.XXXXXX")"
-  trap 'rm -rf -- "$perf_checkout"' EXIT
+  perf_checkout="$work_directory/rustc-perf"
+  mkdir -- "$perf_checkout"
   if [[ ! -e "$perf_source/.git" ]]; then
     # Read the committed gitlink even if the caller staged a different revision or removal.
     (
       export GIT_INDEX_FILE="$perf_checkout/index"
-      git -C "$rust_checkout" read-tree HEAD
-      git -C "$rust_checkout" submodule update --init --checkout --depth 1 -- "$perf_path"
+      git --no-replace-objects -C "$rust_checkout" read-tree HEAD
+      git --no-replace-objects -C "$rust_checkout" submodule update --init --checkout --depth 1 -- "$perf_path"
     )
     rm -- "$perf_checkout/index"
   fi
-  if ! git -C "$perf_source" cat-file -e "$perf_revision^{commit}" 2>/dev/null; then
+  if ! git --no-replace-objects -C "$perf_source" cat-file -e "$perf_revision^{commit}" 2>/dev/null; then
     # Supply the revision on stdin so Git selects the checkout's usual fetch remote.
-    git -C "$perf_source" fetch --depth 1 --no-tags --no-write-fetch-head --stdin <<< "$perf_revision"
+    git --no-replace-objects -C "$perf_source" fetch --depth 1 --no-tags --no-write-fetch-head --stdin <<< "$perf_revision"
   fi
-  git -C "$perf_source" archive "$perf_revision" | tar -x -C "$perf_checkout"
+  git --no-replace-objects -C "$perf_source" archive "$perf_revision" | tar -x -C "$perf_checkout"
   patch -d "$perf_checkout" -t -N -F 0 -p1 -i "$script_directory/../release/rustc-perf-relocated-dependencies.patch"
   opt_dist_arguments+=(--rustc-perf-checkout-dir "$perf_checkout")
 fi
@@ -286,7 +287,7 @@ fi
 case "$toolchain" in
   ohm-1.99.0-20 | ohm-1.99.0-21)
     pinned_rust="$(jq -er '.sources.rust.revision' "$manifest")"
-    if [[ "$(git -C "$rust_checkout" rev-parse --verify HEAD)" == "$pinned_rust" ]]; then
+    if [[ "$(git --no-replace-objects -C "$rust_checkout" rev-parse --verify HEAD)" == "$pinned_rust" ]]; then
       opt_dist_arguments+=(--benchmark-cargo-config unstable.ohm-defaults=false)
     fi
     ;;
