@@ -149,10 +149,11 @@ the blast radius of bugs is comparatively limited and the benefits of faster ite
 substantial (while continuing to use the official toolchain for production builds).
 
 Ohm is authored entirely by the GPT model series in Codex. Agents lower the cost of implementing,
-testing, and refining the ideas explored in this project; good ideas can then be proven out and
-ultimately proposed upstream.
+testing, and refining ideas. When an optimization proves useful, we can propose it upstream. To
+keep that path open, Ohm avoids _fundamental_ changes to the Rust toolchain, such as introducing a
+stateful development server.
 
-For an explanation of the major optimizations and their measured impact, see
+For details on the optimizations Ohm enables and their measured impact, see
 [Optimizations](docs/optimizations.md).
 
 Ohm's patches are maintained in the following repositories:
