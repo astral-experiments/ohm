@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="430" height="328" viewBox="0 0 430 328" class="compact" role="img" aria-labelledby="title desc">
+<title id="title">Total command time across the four replays</title>
+<desc id="desc">Rust 1.99.0 and Ohm 1.99.0-26. All bars share a linear scale starting at zero.</desc>
+<style>
+.paper { fill: #25172c }
+.grid { stroke: #49364e; stroke-width: 1 }
+.zero { stroke: #66546d; stroke-width: 1 }
+.rust { fill: #beb8c8 }
+.ohm { fill: #d7fa79 }
+text { fill: #faf5fb; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased }
+.head, .tick, .value, .key { font-family: Menlo, Consolas, "Liberation Mono", monospace }
+.head, .tick, .key { fill: #c6b8cb }
+.head, .tick { font-size: 16px }
+.key { font-size: 14px }
+.name { font-weight: 500; font-size: 30px }
+.command { font-size: 24px }
+.value { font-size: 21px; font-variant-numeric: tabular-nums }
+.stat { fill: #d7fa79; font-weight: 500; font-size: 29px }
+.slower { fill: #faf5fb }
+.compact .head, .compact .tick { font-size: 10px }
+.compact .key { font-size: 11px }
+.compact .name { font-size: 17px }
+.compact .command, .compact .value { font-size: 13px }
+.compact .stat { font-size: 16px }
+</style>
+<rect width="100%" height="100%" class="paper"/>
+<rect x="121.00" y="11.00" width="13.00" height="7" class="rust"/>
+<text x="139.00" y="19" class="key" text-anchor="start">Rust</text>
+<rect x="180.00" y="11.00" width="13.00" height="7" class="ohm"/>
+<text x="198.00" y="19" class="key" text-anchor="start">Ohm</text>
+<text x="13.00" y="43" class="head" text-anchor="start">COMMAND</text>
+<text x="121.00" y="43" class="head" text-anchor="start">TIME (MIN:SEC)</text>
+<text x="417.00" y="43" class="head" text-anchor="end">TIME VS. RUST</text>
+<path d="M121.00 63V299" class="zero"/>
+<text x="121.00" y="316" class="tick" text-anchor="middle">0</text>
+<path d="M162.87 63V299" class="grid"/>
+<text x="162.87" y="316" class="tick" text-anchor="middle">3m</text>
+<path d="M204.73 63V299" class="grid"/>
+<text x="204.73" y="316" class="tick" text-anchor="middle">6m</text>
+<path d="M246.60 63V299" class="grid"/>
+<text x="246.60" y="316" class="tick" text-anchor="middle">9m</text>
+<text x="13.00" y="92.5" class="command" text-anchor="start">Tests</text>
+<rect x="121.00" y="76.50" width="150.25" height="8" class="rust"/>
+<text x="275.25" y="84.5" class="value" text-anchor="start">10:46</text>
+<rect x="121.00" y="90.50" width="100.01" height="8" class="ohm"/>
+<text x="225.01" y="98.5" class="value" text-anchor="start">7:10</text>
+<text x="417.00" y="92.5" class="stat" text-anchor="end">33.4% less</text>
+<text x="13.00" y="139.5" class="command" text-anchor="start">cargo clippy</text>
+<rect x="121.00" y="123.50" width="74.10" height="8" class="rust"/>
+<text x="199.10" y="131.5" class="value" text-anchor="start">5:19</text>
+<rect x="121.00" y="137.50" width="27.58" height="8" class="ohm"/>
+<text x="152.58" y="145.5" class="value" text-anchor="start">1:59</text>
+<text x="417.00" y="139.5" class="stat" text-anchor="end">62.8% less</text>
+<text x="13.00" y="186.5" class="command" text-anchor="start">cargo check</text>
+<rect x="121.00" y="170.50" width="23.31" height="8" class="rust"/>
+<text x="148.31" y="178.5" class="value" text-anchor="start">1:40</text>
+<rect x="121.00" y="184.50" width="8.45" height="8" class="ohm"/>
+<text x="133.45" y="192.5" class="value" text-anchor="start">0:36.3</text>
+<text x="417.00" y="186.5" class="stat" text-anchor="end">63.7% less</text>
+<text x="13.00" y="233.5" class="command" text-anchor="start">Other commands</text>
+<rect x="121.00" y="217.50" width="4.49" height="8" class="rust"/>
+<text x="129.49" y="225.5" class="value" text-anchor="start">0:19.3</text>
+<rect x="121.00" y="231.50" width="4.69" height="8" class="ohm"/>
+<text x="129.69" y="239.5" class="value" text-anchor="start">0:20.2</text>
+<text x="417.00" y="233.5" class="stat slower" text-anchor="end">4.4% more</text>
+<text x="13.00" y="280.5" class="command" text-anchor="start">cargo fmt</text>
+<rect x="121.00" y="264.50" width="3.22" height="8" class="rust"/>
+<text x="128.22" y="272.5" class="value" text-anchor="start">0:13.8</text>
+<rect x="121.00" y="278.50" width="1.98" height="8" class="ohm"/>
+<text x="126.98" y="286.5" class="value" text-anchor="start">0:08.5</text>
+<text x="417.00" y="280.5" class="stat" text-anchor="end">38.6% less</text>
+</svg>

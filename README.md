@@ -14,7 +14,10 @@ With Ohm, incremental builds can be up to 45× faster, replayed development sess
 We replayed four development sessions with Rust 1.99.0 and Ohm 1.99.0-26 on x86_64 Linux.
 [Session timings](BENCHMARKS.md#replayed-sessions)
 
-![Mean replay time for Ruff, Codex, ty, and uv, with the speedup for each project.](docs/benchmarks/sessions.svg)
+<picture>
+  <source media="(max-width: 600px)" srcset="docs/benchmarks/sessions-mobile.svg">
+  <img src="docs/benchmarks/sessions.svg" alt="Mean replay time for Ruff, Codex, ty, and uv, with the speedup for each project." width="100%">
+</picture>
 
 Compared to the stock Rust toolchain, Ohm:
 
@@ -118,18 +121,27 @@ Each pair of bars shows how much time stock Rust and Ohm spent on a command acro
 replays. Tests include `cargo test`, `cargo nextest`, and `just test`.
 [Command timings](BENCHMARKS.md#command-timings)
 
-![Rust and Ohm wall times for tests, Clippy, checks, formatting, and other commands.](docs/benchmarks/commands.svg)
+<picture>
+  <source media="(max-width: 600px)" srcset="docs/benchmarks/commands-mobile.svg">
+  <img src="docs/benchmarks/commands.svg" alt="Rust and Ohm wall times for tests, Clippy, checks, formatting, and other commands." width="100%">
+</picture>
 
 For individual commands, we measured how much faster Ohm was after two kinds of edits. A direct
 edit changes the target crate. A dependency edit changes a dependency's implementation while
 preserving its public API. [Individual command timings](BENCHMARKS.md#individual-edits)
 
-![Ohm speedups over stock Rust for direct edits and dependency edits in uv and Codex.](docs/benchmarks/edits.svg)
+<picture>
+  <source media="(max-width: 600px)" srcset="docs/benchmarks/edits-mobile.svg">
+  <img src="docs/benchmarks/edits.svg" alt="Ohm speedups over stock Rust for direct edits and dependency edits in uv and Codex." width="100%">
+</picture>
 
 The disk study compared Rust 1.99.0 and Ohm 1.99.0-11 on macOS (APFS). We measured how much
 space ten worktrees retained after running the same workloads. [Disk measurements](BENCHMARKS.md#disk-use)
 
-![Disk space retained by ten Ruff/ty or uv worktrees with stock Rust and Ohm.](docs/benchmarks/disk.svg)
+<picture>
+  <source media="(max-width: 600px)" srcset="docs/benchmarks/disk-mobile.svg">
+  <img src="docs/benchmarks/disk.svg" alt="Disk space retained by ten Ruff/ty or uv worktrees with stock Rust and Ohm." width="100%">
+</picture>
 
 To preview which build outputs have been idle for at least two days, run
 `cargo +ohm gc --max-age 2d --dry-run`.

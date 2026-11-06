@@ -1,35 +1,56 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="73" viewBox="0 0 640 73" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="264" viewBox="0 0 1000 264" class="wide" role="img" aria-labelledby="title desc">
 <title id="title">Disk space retained by ten worktrees on APFS</title>
 <desc id="desc">Rust 1.99.0 and Ohm 1.99.0-11. All bars share a linear scale starting at zero.</desc>
 <style>
-text { font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #26232b }
-.heading { font-size: 16px; font-weight: 550 }
-.label { fill: #625f67 }
-.value, .change { font-size: 13px; font-variant-numeric: tabular-nums }
-.change { fill: #625f67 }
-.rust { fill: #b8b8bd }
-.ohm { fill: #7546a8 }
-@media (prefers-color-scheme: dark) {
-  text { fill: #ece9ef }
-  .label, .change { fill: #c2bec6 }
-  .rust { fill: #88888e }
-  .ohm { fill: #c49aeb }
-}
+.paper { fill: #25172c }
+.grid { stroke: #49364e; stroke-width: 1 }
+.zero { stroke: #66546d; stroke-width: 1 }
+.rust { fill: #beb8c8 }
+.ohm { fill: #d7fa79 }
+text { fill: #faf5fb; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased }
+.head, .tick, .value, .key { font-family: Menlo, Consolas, "Liberation Mono", monospace }
+.head, .tick, .key { fill: #c6b8cb }
+.head, .tick { font-size: 16px }
+.key { font-size: 14px }
+.name { font-weight: 500; font-size: 30px }
+.command { font-size: 24px }
+.value { font-size: 21px; font-variant-numeric: tabular-nums }
+.stat { fill: #d7fa79; font-weight: 500; font-size: 29px }
+.slower { fill: #faf5fb }
+.compact .head, .compact .tick { font-size: 10px }
+.compact .key { font-size: 11px }
+.compact .name { font-size: 17px }
+.compact .command, .compact .value { font-size: 13px }
+.compact .stat { font-size: 16px }
 </style>
-<text x="2.0" y="18" class="heading" text-anchor="start">Ruff/ty</text>
-<text x="300.0" y="18" class="change" text-anchor="end">50.1% less space</text>
-<text x="2.0" y="41" class="label" text-anchor="start">Rust</text>
-<rect x="46" y="33" width="122.09" height="8" class="rust"/>
-<text x="174.1" y="41" class="value" text-anchor="start">52.98 GiB</text>
-<text x="2.0" y="61" class="label" text-anchor="start">Ohm</text>
-<rect x="46" y="53" width="60.98" height="8" class="ohm"/>
-<text x="113.0" y="61" class="value ohm" text-anchor="start">26.46 GiB</text>
-<text x="330.0" y="18" class="heading" text-anchor="start">uv</text>
-<text x="628.0" y="18" class="change" text-anchor="end">59.3% less space</text>
-<text x="330.0" y="41" class="label" text-anchor="start">Rust</text>
-<rect x="374" y="33" width="183.00" height="8" class="rust"/>
-<text x="563.0" y="41" class="value" text-anchor="start">79.41 GiB</text>
-<text x="330.0" y="61" class="label" text-anchor="start">Ohm</text>
-<rect x="374" y="53" width="74.46" height="8" class="ohm"/>
-<text x="454.5" y="61" class="value ohm" text-anchor="start">32.31 GiB</text>
+<rect width="100%" height="100%" class="paper"/>
+<rect x="553.00" y="29.00" width="16.00" height="7" class="rust"/>
+<text x="575.00" y="37" class="key" text-anchor="start">Rust</text>
+<rect x="633.00" y="29.00" width="16.00" height="7" class="ohm"/>
+<text x="655.00" y="37" class="key" text-anchor="start">Ohm</text>
+<text x="30.00" y="37" class="head" text-anchor="start">PROJECT</text>
+<text x="188.00" y="37" class="head" text-anchor="start">RETAINED SPACE (GiB)</text>
+<text x="970.00" y="37" class="head" text-anchor="end">SPACE SAVED</text>
+<path d="M188.00 60V215" class="zero"/>
+<text x="188.00" y="243" class="tick" text-anchor="middle">0</text>
+<path d="M332.25 60V215" class="grid"/>
+<text x="332.25" y="243" class="tick" text-anchor="middle">20</text>
+<path d="M476.50 60V215" class="grid"/>
+<text x="476.50" y="243" class="tick" text-anchor="middle">40</text>
+<path d="M620.75 60V215" class="grid"/>
+<text x="620.75" y="243" class="tick" text-anchor="middle">60</text>
+<path d="M765.00 60V215" class="grid"/>
+<text x="765.00" y="243" class="tick" text-anchor="middle">80</text>
+<text x="30.00" y="108.5" class="name" text-anchor="start">Ruff/ty</text>
+<rect x="188.00" y="81.50" width="382.11" height="14" class="rust"/>
+<text x="579.11" y="95.5" class="value" text-anchor="start">52.98</text>
+<rect x="188.00" y="103.50" width="190.85" height="14" class="ohm"/>
+<text x="387.85" y="117.5" class="value" text-anchor="start">26.46</text>
+<text x="970.00" y="108.5" class="stat" text-anchor="end">50.1%</text>
+<text x="30.00" y="185.5" class="name" text-anchor="start">uv</text>
+<rect x="188.00" y="158.50" width="572.76" height="14" class="rust"/>
+<text x="769.76" y="172.5" class="value" text-anchor="start">79.41</text>
+<rect x="188.00" y="180.50" width="233.04" height="14" class="ohm"/>
+<text x="430.04" y="194.5" class="value" text-anchor="start">32.31</text>
+<text x="970.00" y="185.5" class="stat" text-anchor="end">59.3%</text>
 </svg>

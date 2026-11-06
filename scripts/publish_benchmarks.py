@@ -269,7 +269,7 @@ def render_tables(reports, ty_worktree, ty_scenario):
         delta = stock - ohm
         change = "less" if delta >= 0 else "more"
         command = "Tests" if category == "test" else label.strip("`")
-        command_chart.append((command, pair, f"{100 * abs(delta) / stock:.1f}% {change} time"))
+        command_chart.append((command, pair, f"{100 * abs(delta) / stock:.1f}% {change}"))
     command_rows.append(
         [
             "All commands",
@@ -308,8 +308,7 @@ def render_tables(reports, ty_worktree, ty_scenario):
             savings.append(row["percent_less_disk"])
             sizes = [row[f"{lane}_retained_bytes"] / 2**30 for lane in lanes]
             percent = row["percent_less_disk"]
-            change = "less" if percent >= 0 else "more"
-            disk_chart.append((project, sizes, f"{abs(percent):.1f}% {change} space"))
+            disk_chart.append((project, sizes, f"{percent:.1f}%".replace("-", "−")))
 
     comparisons = reports["workflow"]["comparisons"]
     indexed = {(r["project"], r["workflow"], r["phase"]): r for r in comparisons}
@@ -429,26 +428,22 @@ def render_tables(reports, ty_worktree, ty_scenario):
         r"four development sessions with Rust [\d.]+ and Ohm [\d.-]+": f"four development sessions with Rust {rust} and Ohm {version}",
         r"disk study compared Rust [\d.]+ and Ohm [\d.-]+": f"disk study compared Rust {disk_rust} and Ohm {disk_version}",
     }
-    charts = {
-        "sessions": benchmark_charts.toolchains(
-            "Mean replay time by project",
-            [
-                (label.removesuffix(" session"), (stock, ohm), f"{stock / ohm:.2f}× speedup")
-                for label, (stock, ohm) in sorted(session_times.items(), key=lambda r: -r[1][0])
-            ],
-            rust=rust, ohm=version, value_label=benchmark_charts.elapsed,
-        ),
-        "commands": benchmark_charts.toolchains(
-            "Total command time across the four replays",
-            sorted(command_chart, key=lambda row: -row[1][0]),
-            rust=rust, ohm=version, value_label=benchmark_charts.elapsed,
-        ),
-        "edits": benchmark_charts.edit_speedups(edits),
-        "disk": benchmark_charts.toolchains(
-            "Disk space retained by ten worktrees on APFS", disk_chart,
-            rust=disk_rust, ohm=disk_version, value_label=lambda v: f"{v:.2f} GiB",
-        ),
-    }
+    session_chart = [
+        (label.removesuffix(" session"), (stock, ohm), f"{stock / ohm:.2f}×")
+        for label, (stock, ohm) in sorted(session_times.items(), key=lambda r: -r[1][0])
+    ]
+    command_chart.sort(key=lambda row: -row[1][0])
+    charts = {}
+    for compact, suffix in ((False, ""), (True, "-mobile")):
+        for kind, title, rows, base, optimized in (
+            ("sessions", "Mean replay time by project", session_chart, rust, version),
+            ("commands", "Total command time across the four replays", command_chart, rust, version),
+            ("disk", "Disk space retained by ten worktrees on APFS", disk_chart, disk_rust, disk_version),
+        ):
+            charts[kind + suffix] = benchmark_charts.toolchains(
+                title, rows, rust=base, ohm=optimized, kind=kind, compact=compact
+            )
+        charts["edits" + suffix] = benchmark_charts.edit_speedups(edits, compact=compact)
     return rendered, headlines, charts
 
 

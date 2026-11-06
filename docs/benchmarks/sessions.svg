@@ -1,51 +1,66 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="160" viewBox="0 0 640 160" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="418" viewBox="0 0 1000 418" class="wide" role="img" aria-labelledby="title desc">
 <title id="title">Mean replay time by project</title>
 <desc id="desc">Rust 1.99.0 and Ohm 1.99.0-26. All bars share a linear scale starting at zero.</desc>
 <style>
-text { font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #26232b }
-.heading { font-size: 16px; font-weight: 550 }
-.label { fill: #625f67 }
-.value, .change { font-size: 13px; font-variant-numeric: tabular-nums }
-.change { fill: #625f67 }
-.rust { fill: #b8b8bd }
-.ohm { fill: #7546a8 }
-@media (prefers-color-scheme: dark) {
-  text { fill: #ece9ef }
-  .label, .change { fill: #c2bec6 }
-  .rust { fill: #88888e }
-  .ohm { fill: #c49aeb }
-}
+.paper { fill: #25172c }
+.grid { stroke: #49364e; stroke-width: 1 }
+.zero { stroke: #66546d; stroke-width: 1 }
+.rust { fill: #beb8c8 }
+.ohm { fill: #d7fa79 }
+text { fill: #faf5fb; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased }
+.head, .tick, .value, .key { font-family: Menlo, Consolas, "Liberation Mono", monospace }
+.head, .tick, .key { fill: #c6b8cb }
+.head, .tick { font-size: 16px }
+.key { font-size: 14px }
+.name { font-weight: 500; font-size: 30px }
+.command { font-size: 24px }
+.value { font-size: 21px; font-variant-numeric: tabular-nums }
+.stat { fill: #d7fa79; font-weight: 500; font-size: 29px }
+.slower { fill: #faf5fb }
+.compact .head, .compact .tick { font-size: 10px }
+.compact .key { font-size: 11px }
+.compact .name { font-size: 17px }
+.compact .command, .compact .value { font-size: 13px }
+.compact .stat { font-size: 16px }
 </style>
-<text x="2.0" y="18" class="heading" text-anchor="start">Ruff</text>
-<text x="300.0" y="18" class="change" text-anchor="end">1.81× speedup</text>
-<text x="2.0" y="41" class="label" text-anchor="start">Rust</text>
-<rect x="46" y="33" width="183.00" height="8" class="rust"/>
-<text x="235.0" y="41" class="value" text-anchor="start">6m 45s</text>
-<text x="2.0" y="61" class="label" text-anchor="start">Ohm</text>
-<rect x="46" y="53" width="101.12" height="8" class="ohm"/>
-<text x="153.1" y="61" class="value ohm" text-anchor="start">3m 44s</text>
-<text x="330.0" y="18" class="heading" text-anchor="start">Codex</text>
-<text x="628.0" y="18" class="change" text-anchor="end">1.92× speedup</text>
-<text x="330.0" y="41" class="label" text-anchor="start">Rust</text>
-<rect x="374" y="33" width="162.50" height="8" class="rust"/>
-<text x="542.5" y="41" class="value" text-anchor="start">6m 00s</text>
-<text x="330.0" y="61" class="label" text-anchor="start">Ohm</text>
-<rect x="374" y="53" width="84.63" height="8" class="ohm"/>
-<text x="464.6" y="61" class="value ohm" text-anchor="start">3m 07s</text>
-<text x="2.0" y="105" class="heading" text-anchor="start">ty</text>
-<text x="300.0" y="105" class="change" text-anchor="end">1.57× speedup</text>
-<text x="2.0" y="128" class="label" text-anchor="start">Rust</text>
-<rect x="46" y="120" width="90.05" height="8" class="rust"/>
-<text x="142.0" y="128" class="value" text-anchor="start">3m 19s</text>
-<text x="2.0" y="148" class="label" text-anchor="start">Ohm</text>
-<rect x="46" y="140" width="57.50" height="8" class="ohm"/>
-<text x="109.5" y="148" class="value ohm" text-anchor="start">2m 07s</text>
-<text x="330.0" y="105" class="heading" text-anchor="start">uv</text>
-<text x="628.0" y="105" class="change" text-anchor="end">1.76× speedup</text>
-<text x="330.0" y="128" class="label" text-anchor="start">Rust</text>
-<rect x="374" y="120" width="60.99" height="8" class="rust"/>
-<text x="441.0" y="128" class="value" text-anchor="start">2m 15s</text>
-<text x="330.0" y="148" class="label" text-anchor="start">Ohm</text>
-<rect x="374" y="140" width="34.74" height="8" class="ohm"/>
-<text x="414.7" y="148" class="value ohm" text-anchor="start">1m 17s</text>
+<rect width="100%" height="100%" class="paper"/>
+<rect x="553.00" y="29.00" width="16.00" height="7" class="rust"/>
+<text x="575.00" y="37" class="key" text-anchor="start">Rust</text>
+<rect x="633.00" y="29.00" width="16.00" height="7" class="ohm"/>
+<text x="655.00" y="37" class="key" text-anchor="start">Ohm</text>
+<text x="30.00" y="37" class="head" text-anchor="start">SESSION</text>
+<text x="188.00" y="37" class="head" text-anchor="start">MEAN REPLAY TIME (MIN:SEC)</text>
+<text x="970.00" y="37" class="head" text-anchor="end">SPEEDUP</text>
+<path d="M188.00 60V369" class="zero"/>
+<text x="188.00" y="397" class="tick" text-anchor="middle">0</text>
+<path d="M352.86 60V369" class="grid"/>
+<text x="352.86" y="397" class="tick" text-anchor="middle">2m</text>
+<path d="M517.71 60V369" class="grid"/>
+<text x="517.71" y="397" class="tick" text-anchor="middle">4m</text>
+<path d="M682.57 60V369" class="grid"/>
+<text x="682.57" y="397" class="tick" text-anchor="middle">6m</text>
+<text x="30.00" y="108.5" class="name" text-anchor="start">Ruff</text>
+<rect x="188.00" y="81.50" width="556.63" height="14" class="rust"/>
+<text x="753.63" y="95.5" class="value" text-anchor="start">6:45</text>
+<rect x="188.00" y="103.50" width="307.59" height="14" class="ohm"/>
+<text x="504.59" y="117.5" class="value" text-anchor="start">3:44</text>
+<text x="970.00" y="108.5" class="stat" text-anchor="end">1.81×</text>
+<text x="30.00" y="185.5" class="name" text-anchor="start">Codex</text>
+<rect x="188.00" y="158.50" width="494.29" height="14" class="rust"/>
+<text x="691.29" y="172.5" class="value" text-anchor="start">6:00</text>
+<rect x="188.00" y="180.50" width="257.42" height="14" class="ohm"/>
+<text x="454.42" y="194.5" class="value" text-anchor="start">3:07</text>
+<text x="970.00" y="185.5" class="stat" text-anchor="end">1.92×</text>
+<text x="30.00" y="262.5" class="name" text-anchor="start">ty</text>
+<rect x="188.00" y="235.50" width="273.90" height="14" class="rust"/>
+<text x="470.90" y="249.5" class="value" text-anchor="start">3:19</text>
+<rect x="188.00" y="257.50" width="174.90" height="14" class="ohm"/>
+<text x="371.90" y="271.5" class="value" text-anchor="start">2:07</text>
+<text x="970.00" y="262.5" class="stat" text-anchor="end">1.57×</text>
+<text x="30.00" y="339.5" class="name" text-anchor="start">uv</text>
+<rect x="188.00" y="312.50" width="185.51" height="14" class="rust"/>
+<text x="382.51" y="326.5" class="value" text-anchor="start">2:15</text>
+<rect x="188.00" y="334.50" width="105.68" height="14" class="ohm"/>
+<text x="302.68" y="348.5" class="value" text-anchor="start">1:17</text>
+<text x="970.00" y="339.5" class="stat" text-anchor="end">1.76×</text>
 </svg>
