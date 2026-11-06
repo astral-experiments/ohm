@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="430" height="299" viewBox="0 0 430 299" class="compact" role="img" aria-labelledby="title desc">
+<title id="title">Ohm speedup over stock Rust after one edit</title>
+<desc id="desc">Both columns show Ohm speedups over stock Rust on the same linear scale.</desc>
+<style>
+.paper { fill: #25172c }
+.grid { stroke: #49364e; stroke-width: 1 }
+.zero { stroke: #66546d; stroke-width: 1 }
+.rust { fill: #beb8c8 }
+.ohm { fill: #d7fa79 }
+text { fill: #faf5fb; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased }
+.head, .tick, .value, .key { font-family: Menlo, Consolas, "Liberation Mono", monospace }
+.head, .tick, .key { fill: #c6b8cb }
+.head, .tick { font-size: 16px }
+.key { font-size: 14px }
+.name { font-weight: 500; font-size: 30px }
+.command { font-size: 24px }
+.value { font-size: 21px; font-variant-numeric: tabular-nums }
+.stat { fill: #d7fa79; font-weight: 500; font-size: 29px }
+.slower { fill: #faf5fb }
+.compact .head, .compact .tick { font-size: 10px }
+.compact .key { font-size: 11px }
+.compact .name { font-size: 17px }
+.compact .command, .compact .value { font-size: 13px }
+.compact .stat { font-size: 16px }
+</style>
+<rect width="100%" height="100%" class="paper"/>
+<text x="13.00" y="26" class="head" text-anchor="start">COMMAND</text>
+<text x="142.00" y="26" class="head" text-anchor="start">DIRECT EDIT</text>
+<path d="M142.00 42V270" class="zero"/>
+<text x="142.00" y="287" class="tick" text-anchor="middle">0×</text>
+<path d="M176.95 42V270" class="grid"/>
+<text x="176.95" y="287" class="tick" text-anchor="middle">20×</text>
+<path d="M211.89 42V270" class="grid"/>
+<text x="211.89" y="287" class="tick" text-anchor="middle">40×</text>
+<text x="280.00" y="26" class="head" text-anchor="start">DEPENDENCY EDIT</text>
+<path d="M280.00 42V270" class="zero"/>
+<text x="280.00" y="287" class="tick" text-anchor="middle">0×</text>
+<path d="M314.95 42V270" class="grid"/>
+<text x="314.95" y="287" class="tick" text-anchor="middle">20×</text>
+<path d="M349.89 42V270" class="grid"/>
+<text x="349.89" y="287" class="tick" text-anchor="middle">40×</text>
+<text x="13.00" y="63" class="name" text-anchor="start">uv</text>
+<text x="13.00" y="87.5" class="command" text-anchor="start">cargo check</text>
+<rect x="142.00" y="79.50" width="1.97" height="8" class="ohm"/>
+<text x="147.97" y="87.5" class="value" text-anchor="start">1.13×</text>
+<rect x="280.00" y="79.50" width="34.38" height="8" class="ohm"/>
+<text x="318.38" y="87.5" class="value" text-anchor="start">19.68×</text>
+<text x="13.00" y="116.5" class="command" text-anchor="start">cargo clippy</text>
+<rect x="142.00" y="108.50" width="2.26" height="8" class="ohm"/>
+<text x="148.26" y="116.5" class="value" text-anchor="start">1.29×</text>
+<rect x="280.00" y="108.50" width="40.67" height="8" class="ohm"/>
+<text x="324.67" y="116.5" class="value" text-anchor="start">23.27×</text>
+<text x="13.00" y="145.5" class="command" text-anchor="start">cargo test --test it</text>
+<rect x="142.00" y="137.50" width="3.73" height="8" class="ohm"/>
+<text x="149.73" y="145.5" class="value" text-anchor="start">2.14×</text>
+<rect x="280.00" y="137.50" width="15.86" height="8" class="ohm"/>
+<text x="299.86" y="145.5" class="value" text-anchor="start">9.07×</text>
+<text x="13.00" y="177" class="name" text-anchor="start">Codex</text>
+<text x="13.00" y="201.5" class="command" text-anchor="start">cargo check</text>
+<rect x="142.00" y="193.50" width="1.89" height="8" class="ohm"/>
+<text x="147.89" y="201.5" class="value" text-anchor="start">1.08×</text>
+<rect x="280.00" y="193.50" width="45.12" height="8" class="ohm"/>
+<text x="329.12" y="201.5" class="value" text-anchor="start">25.82×</text>
+<text x="13.00" y="230.5" class="command" text-anchor="start">just clippy</text>
+<rect x="142.00" y="222.50" width="2.70" height="8" class="ohm"/>
+<text x="148.70" y="230.5" class="value" text-anchor="start">1.55×</text>
+<rect x="280.00" y="222.50" width="80.34" height="8" class="ohm"/>
+<text x="364.34" y="230.5" class="value" text-anchor="start">45.98×</text>
+<text x="13.00" y="259.5" class="command" text-anchor="start">just test</text>
+<rect x="142.00" y="251.50" width="1.78" height="8" class="ohm"/>
+<text x="147.78" y="259.5" class="value" text-anchor="start">1.02×</text>
+<rect x="280.00" y="251.50" width="35.31" height="8" class="ohm"/>
+<text x="319.31" y="259.5" class="value" text-anchor="start">20.21×</text>
+</svg>

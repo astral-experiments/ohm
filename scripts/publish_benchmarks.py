@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Publish benchmark measurements and refresh the tables from the checked-in reports."""
+"""Publish benchmark measurements and refresh the tables and charts."""
 
 import argparse
 import copy
@@ -10,6 +10,7 @@ import re
 import statistics
 import subprocess
 
+import benchmark_charts
 import workflow_results
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -224,7 +225,7 @@ def render_tables(reports, ty_worktree, ty_scenario):
         ):
             raise ValueError("ty command totals differ from their samples")
 
-    session_rows = []
+    session_times = {}
     totals = [0.0, 0.0]
     for project, label in zip(
         projects, ("Ruff session", "uv session", "Codex session"), strict=True
@@ -234,14 +235,17 @@ def render_tables(reports, ty_worktree, ty_scenario):
             for lane in ("stock", "ohm")
         ]
         totals = [a + b for a, b in zip(totals, pair, strict=True)]
-        session_rows.append([label, *seconds(pair)])
+        session_times[label] = pair
     ty_pair = []
     for lane in lanes:
         ty_total("session", lane)
         ty_pair.append(mean(ty_worktree["session"][lane]["total"]["samples"]))
-    session_rows.append(["ty session", *seconds(ty_pair)])
+    session_times["ty session"] = ty_pair
     totals = [a + b for a, b in zip(totals, ty_pair, strict=True)]
+    session_rows = [[label, *seconds(pair)] for label, pair in session_times.items()]
     session_rows.append(["All sessions", *seconds(totals)])
+    command_rows = []
+    command_chart = []
     for category, label in (
         ("check", "`cargo check`"),
         ("test", "`cargo test`, `cargo nextest`, `just test`"),
@@ -260,8 +264,13 @@ def render_tables(reports, ty_worktree, ty_scenario):
             + ty_categories[category][index]
             for index, lane in enumerate(lanes)
         ]
-        session_rows.append([label, *seconds(pair)])
-    session_rows.append(
+        command_rows.append([label, *seconds(pair)])
+        stock, ohm = pair
+        delta = stock - ohm
+        change = "less" if delta >= 0 else "more"
+        command = "Tests" if category == "test" else label.strip("`")
+        command_chart.append((command, pair, f"{100 * abs(delta) / stock:.1f}% {change}"))
+    command_rows.append(
         [
             "All commands",
             *seconds(
@@ -278,6 +287,7 @@ def render_tables(reports, ty_worktree, ty_scenario):
     )
 
     disk_rows = []
+    disk_chart = []
     savings = []
     disk_rust, disk_version = disk_versions(reports["disk"])
     for item in reports["disk"]["readme_comparisons"]:
@@ -296,6 +306,9 @@ def render_tables(reports, ty_worktree, ty_scenario):
         )
         if row["worktrees"] == 10:
             savings.append(row["percent_less_disk"])
+            sizes = [row[f"{lane}_retained_bytes"] / 2**30 for lane in lanes]
+            percent = row["percent_less_disk"]
+            disk_chart.append((project, sizes, f"{percent:.1f}%".replace("-", "−")))
 
     comparisons = reports["workflow"]["comparisons"]
     indexed = {(r["project"], r["workflow"], r["phase"]): r for r in comparisons}
@@ -309,15 +322,18 @@ def render_tables(reports, ty_worktree, ty_scenario):
             f"{row['speedup']:.2f}×",
         ]
 
+    timing_columns = [f"Rust {rust}", f"Ohm {version}" if ty_worktree["ohm"] == release else "Ohm", "Time saved"]
     rendered = {
         "sessions": table(
-            ["Scope", f"Rust {rust}", "Ohm", "Time saved"], session_rows
+            ["Session", *timing_columns], session_rows
         ),
+        "commands": table(["Command group", *timing_columns], command_rows),
         "disk": table(
             ["Scope", f"Rust {disk_rust}", f"Ohm {disk_version}", "Space saved"],
             disk_rows,
         ),
     }
+    edits = {}
     for phase in ("direct", "dependency"):
         rows = []
         for project, label, package, dependency, commands in (
@@ -339,9 +355,11 @@ def render_tables(reports, ty_worktree, ty_scenario):
             for workflow, command in zip(
                 ("check", "clippy", "test"), commands, strict=True
             ):
+                key = (project, workflow, phase)
+                edits.setdefault((label, command), []).append(indexed[key]["speedup"])
                 rows.append(
                     workflow_row(
-                        (project, workflow, phase),
+                        key,
                         [
                             label,
                             f"`{command}`",
@@ -407,8 +425,26 @@ def render_tables(reports, ty_worktree, ty_scenario):
         r"incremental builds can be up to \d+×": f"incremental builds can be up to {math.floor(max(r['speedup'] for r in comparisons if r['workflow'] in ('check', 'clippy', 'test') and r['phase'] in ('direct', 'dependency', 'noop')))}×",
         r"\d+% (?:less|more) time": f"{abs(session_percent)}% {session_direction} time",
         r"disk usage decreases by around \d+%": f"disk usage decreases by around {5 * round(mean(savings) / 5)}%",
+        r"four development sessions with Rust [\d.]+ and Ohm [\d.-]+": f"four development sessions with Rust {rust} and Ohm {version}",
+        r"disk study compared Rust [\d.]+ and Ohm [\d.-]+": f"disk study compared Rust {disk_rust} and Ohm {disk_version}",
     }
-    return rendered, headlines
+    session_chart = [
+        (label.removesuffix(" session"), (stock, ohm), f"{stock / ohm:.2f}×")
+        for label, (stock, ohm) in sorted(session_times.items(), key=lambda r: -r[1][0])
+    ]
+    command_chart.sort(key=lambda row: -row[1][0])
+    charts = {}
+    for compact, suffix in ((False, ""), (True, "-mobile")):
+        for kind, title, rows, base, optimized in (
+            ("sessions", "Mean replay time by project", session_chart, rust, version),
+            ("commands", "Total command time across the four replays", command_chart, rust, version),
+            ("disk", "Disk space retained by ten worktrees on APFS", disk_chart, disk_rust, disk_version),
+        ):
+            charts[kind + suffix] = benchmark_charts.toolchains(
+                title, rows, rust=base, ohm=optimized, kind=kind, compact=compact
+            )
+        charts["edits" + suffix] = benchmark_charts.edit_speedups(edits, compact=compact)
+    return rendered, headlines, charts
 
 
 def ruff_doctest_table(report):
@@ -434,7 +470,7 @@ def ruff_doctest_table(report):
 
 
 def documents(reports):
-    tables, headlines = render_tables(
+    tables, headlines, charts = render_tables(
         reports, load(RESULTS / TY_WORKTREE_REPORT), load(ROOT / TY_SCENARIO)
     )
     tables["ruff-doctests"] = ruff_doctest_table(load(RESULTS / RUFF_DOCTEST_REPORT))
@@ -466,6 +502,7 @@ def documents(reports):
         result["README.md"], count = re.subn(pattern, value, result["README.md"])
         if count != 1:
             raise ValueError(f"Expected one README headline matching {pattern}")
+    result.update({f"docs/benchmarks/{name}.svg": svg for name, svg in charts.items()})
     return result
 
 
@@ -473,6 +510,13 @@ def normalized_markdown(text):
     # Prettier owns alignment and whitespace; this check owns the table contents.
     text = re.sub(r"(?m)^\|[ |:-]+\|\n", "", text)
     return re.sub(r"\s+", " ", text).strip()
+
+
+def write_documents(updated):
+    for name, text in updated.items():
+        path = ROOT / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text)
 
 
 def publish(directory):
@@ -495,12 +539,12 @@ def publish(directory):
         )
     for kind, path in paths.items():
         write_json(ROOT / path, compact(reports[kind]))
-    for name, text in updated.items():
-        (ROOT / name).write_text(text)
+    write_documents(updated)
     subprocess.run(
         [
             str(prettier),
             "--write",
+            "--ignore-unknown",
             *paths.values(),
             *updated,
         ],
@@ -521,32 +565,32 @@ def main():
     modes.add_argument(
         "--check",
         action="store_true",
-        help="verify the latest checked-in reports and generated tables without publishing",
+        help="verify the generated tables and charts against the checked-in reports",
     )
     modes.add_argument(
         "--render",
         action="store_true",
-        help="regenerate the Markdown tables from the checked-in reports",
+        help="regenerate the Markdown tables and SVG charts from the checked-in reports",
     )
     args = parser.parse_args()
     if (args.check or args.render) == (args.reports is not None):
         parser.error("select a reports directory, --check, or --render")
     if args.check:
         for name, expected in documents(latest_reports()).items():
-            if normalized_markdown((ROOT / name).read_text()) != normalized_markdown(
-                expected
-            ):
-                raise ValueError(f"{name}: benchmark tables are stale")
-        print("Benchmark reports and tables match")
+            actual = (ROOT / name).read_text()
+            if name.endswith(".md"):
+                actual, expected = normalized_markdown(actual), normalized_markdown(expected)
+            if actual != expected:
+                raise ValueError(f"{name}: benchmark output is stale")
+        print("Benchmark reports, tables, and charts match")
     elif args.render:
         prettier = ROOT / "node_modules/.bin/prettier"
         if not prettier.is_file():
             raise ValueError("Run npm ci --ignore-scripts before rendering benchmarks")
         updated = documents(latest_reports())
-        for name, text in updated.items():
-            (ROOT / name).write_text(text)
-        subprocess.run([str(prettier), "--write", *updated], cwd=ROOT, check=True)
-        print("Benchmark tables refreshed")
+        write_documents(updated)
+        subprocess.run([str(prettier), "--write", "--ignore-unknown", *updated], cwd=ROOT, check=True)
+        print("Benchmark tables and charts refreshed")
     else:
         publish(args.reports)
 

@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="491" viewBox="0 0 1000 491" class="wide" role="img" aria-labelledby="title desc">
+<title id="title">Ohm speedup over stock Rust after one edit</title>
+<desc id="desc">Both columns show Ohm speedups over stock Rust on the same linear scale.</desc>
+<style>
+.paper { fill: #25172c }
+.grid { stroke: #49364e; stroke-width: 1 }
+.zero { stroke: #66546d; stroke-width: 1 }
+.rust { fill: #beb8c8 }
+.ohm { fill: #d7fa79 }
+text { fill: #faf5fb; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased }
+.head, .tick, .value, .key { font-family: Menlo, Consolas, "Liberation Mono", monospace }
+.head, .tick, .key { fill: #c6b8cb }
+.head, .tick { font-size: 16px }
+.key { font-size: 14px }
+.name { font-weight: 500; font-size: 30px }
+.command { font-size: 24px }
+.value { font-size: 21px; font-variant-numeric: tabular-nums }
+.stat { fill: #d7fa79; font-weight: 500; font-size: 29px }
+.slower { fill: #faf5fb }
+.compact .head, .compact .tick { font-size: 10px }
+.compact .key { font-size: 11px }
+.compact .name { font-size: 17px }
+.compact .command, .compact .value { font-size: 13px }
+.compact .stat { font-size: 16px }
+</style>
+<rect width="100%" height="100%" class="paper"/>
+<text x="30.00" y="37" class="head" text-anchor="start">COMMAND</text>
+<text x="318.00" y="37" class="head" text-anchor="start">DIRECT EDIT</text>
+<path d="M318.00 62V442" class="zero"/>
+<text x="318.00" y="470" class="tick" text-anchor="middle">0×</text>
+<path d="M360.53 62V442" class="grid"/>
+<text x="360.53" y="470" class="tick" text-anchor="middle">10×</text>
+<path d="M403.05 62V442" class="grid"/>
+<text x="403.05" y="470" class="tick" text-anchor="middle">20×</text>
+<path d="M445.58 62V442" class="grid"/>
+<text x="445.58" y="470" class="tick" text-anchor="middle">30×</text>
+<path d="M488.11 62V442" class="grid"/>
+<text x="488.11" y="470" class="tick" text-anchor="middle">40×</text>
+<text x="655.00" y="37" class="head" text-anchor="start">DEPENDENCY EDIT</text>
+<path d="M655.00 62V442" class="zero"/>
+<text x="655.00" y="470" class="tick" text-anchor="middle">0×</text>
+<path d="M697.53 62V442" class="grid"/>
+<text x="697.53" y="470" class="tick" text-anchor="middle">10×</text>
+<path d="M740.05 62V442" class="grid"/>
+<text x="740.05" y="470" class="tick" text-anchor="middle">20×</text>
+<path d="M782.58 62V442" class="grid"/>
+<text x="782.58" y="470" class="tick" text-anchor="middle">30×</text>
+<path d="M825.11 62V442" class="grid"/>
+<text x="825.11" y="470" class="tick" text-anchor="middle">40×</text>
+<text x="30.00" y="96" class="name" text-anchor="start">uv</text>
+<text x="30.00" y="137.5" class="command" text-anchor="start">cargo check</text>
+<rect x="318.00" y="122.50" width="4.79" height="14" class="ohm"/>
+<text x="331.79" y="136.5" class="value" text-anchor="start">1.13×</text>
+<rect x="655.00" y="122.50" width="83.67" height="14" class="ohm"/>
+<text x="747.67" y="136.5" class="value" text-anchor="start">19.68×</text>
+<text x="30.00" y="186.5" class="command" text-anchor="start">cargo clippy</text>
+<rect x="318.00" y="171.50" width="5.49" height="14" class="ohm"/>
+<text x="332.49" y="185.5" class="value" text-anchor="start">1.29×</text>
+<rect x="655.00" y="171.50" width="98.97" height="14" class="ohm"/>
+<text x="762.97" y="185.5" class="value" text-anchor="start">23.27×</text>
+<text x="30.00" y="235.5" class="command" text-anchor="start">cargo test --test it</text>
+<rect x="318.00" y="220.50" width="9.09" height="14" class="ohm"/>
+<text x="336.09" y="234.5" class="value" text-anchor="start">2.14×</text>
+<rect x="655.00" y="220.50" width="38.59" height="14" class="ohm"/>
+<text x="702.59" y="234.5" class="value" text-anchor="start">9.07×</text>
+<text x="30.00" y="286" class="name" text-anchor="start">Codex</text>
+<text x="30.00" y="327.5" class="command" text-anchor="start">cargo check</text>
+<rect x="318.00" y="312.50" width="4.60" height="14" class="ohm"/>
+<text x="331.60" y="326.5" class="value" text-anchor="start">1.08×</text>
+<rect x="655.00" y="312.50" width="109.82" height="14" class="ohm"/>
+<text x="773.82" y="326.5" class="value" text-anchor="start">25.82×</text>
+<text x="30.00" y="376.5" class="command" text-anchor="start">just clippy</text>
+<rect x="318.00" y="361.50" width="6.58" height="14" class="ohm"/>
+<text x="333.58" y="375.5" class="value" text-anchor="start">1.55×</text>
+<rect x="655.00" y="361.50" width="195.53" height="14" class="ohm"/>
+<text x="859.53" y="375.5" class="value" text-anchor="start">45.98×</text>
+<text x="30.00" y="425.5" class="command" text-anchor="start">just test</text>
+<rect x="318.00" y="410.50" width="4.34" height="14" class="ohm"/>
+<text x="331.34" y="424.5" class="value" text-anchor="start">1.02×</text>
+<rect x="655.00" y="410.50" width="85.94" height="14" class="ohm"/>
+<text x="749.94" y="424.5" class="value" text-anchor="start">20.21×</text>
+</svg>

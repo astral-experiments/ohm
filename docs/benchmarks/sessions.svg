@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="418" viewBox="0 0 1000 418" class="wide" role="img" aria-labelledby="title desc">
+<title id="title">Mean replay time by project</title>
+<desc id="desc">Rust 1.99.0 and Ohm 1.99.0-26. All bars share a linear scale starting at zero.</desc>
+<style>
+.paper { fill: #25172c }
+.grid { stroke: #49364e; stroke-width: 1 }
+.zero { stroke: #66546d; stroke-width: 1 }
+.rust { fill: #beb8c8 }
+.ohm { fill: #d7fa79 }
+text { fill: #faf5fb; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased }
+.head, .tick, .value, .key { font-family: Menlo, Consolas, "Liberation Mono", monospace }
+.head, .tick, .key { fill: #c6b8cb }
+.head, .tick { font-size: 16px }
+.key { font-size: 14px }
+.name { font-weight: 500; font-size: 30px }
+.command { font-size: 24px }
+.value { font-size: 21px; font-variant-numeric: tabular-nums }
+.stat { fill: #d7fa79; font-weight: 500; font-size: 29px }
+.slower { fill: #faf5fb }
+.compact .head, .compact .tick { font-size: 10px }
+.compact .key { font-size: 11px }
+.compact .name { font-size: 17px }
+.compact .command, .compact .value { font-size: 13px }
+.compact .stat { font-size: 16px }
+</style>
+<rect width="100%" height="100%" class="paper"/>
+<rect x="553.00" y="29.00" width="16.00" height="7" class="rust"/>
+<text x="575.00" y="37" class="key" text-anchor="start">Rust</text>
+<rect x="633.00" y="29.00" width="16.00" height="7" class="ohm"/>
+<text x="655.00" y="37" class="key" text-anchor="start">Ohm</text>
+<text x="30.00" y="37" class="head" text-anchor="start">SESSION</text>
+<text x="188.00" y="37" class="head" text-anchor="start">MEAN REPLAY TIME (MIN:SEC)</text>
+<text x="970.00" y="37" class="head" text-anchor="end">SPEEDUP</text>
+<path d="M188.00 60V369" class="zero"/>
+<text x="188.00" y="397" class="tick" text-anchor="middle">0</text>
+<path d="M352.86 60V369" class="grid"/>
+<text x="352.86" y="397" class="tick" text-anchor="middle">2m</text>
+<path d="M517.71 60V369" class="grid"/>
+<text x="517.71" y="397" class="tick" text-anchor="middle">4m</text>
+<path d="M682.57 60V369" class="grid"/>
+<text x="682.57" y="397" class="tick" text-anchor="middle">6m</text>
+<text x="30.00" y="108.5" class="name" text-anchor="start">Ruff</text>
+<rect x="188.00" y="81.50" width="556.63" height="14" class="rust"/>
+<text x="753.63" y="95.5" class="value" text-anchor="start">6:45</text>
+<rect x="188.00" y="103.50" width="307.59" height="14" class="ohm"/>
+<text x="504.59" y="117.5" class="value" text-anchor="start">3:44</text>
+<text x="970.00" y="108.5" class="stat" text-anchor="end">1.81×</text>
+<text x="30.00" y="185.5" class="name" text-anchor="start">Codex</text>
+<rect x="188.00" y="158.50" width="494.29" height="14" class="rust"/>
+<text x="691.29" y="172.5" class="value" text-anchor="start">6:00</text>
+<rect x="188.00" y="180.50" width="257.42" height="14" class="ohm"/>
+<text x="454.42" y="194.5" class="value" text-anchor="start">3:07</text>
+<text x="970.00" y="185.5" class="stat" text-anchor="end">1.92×</text>
+<text x="30.00" y="262.5" class="name" text-anchor="start">ty</text>
+<rect x="188.00" y="235.50" width="273.90" height="14" class="rust"/>
+<text x="470.90" y="249.5" class="value" text-anchor="start">3:19</text>
+<rect x="188.00" y="257.50" width="174.90" height="14" class="ohm"/>
+<text x="371.90" y="271.5" class="value" text-anchor="start">2:07</text>
+<text x="970.00" y="262.5" class="stat" text-anchor="end">1.57×</text>
+<text x="30.00" y="339.5" class="name" text-anchor="start">uv</text>
+<rect x="188.00" y="312.50" width="185.51" height="14" class="rust"/>
+<text x="382.51" y="326.5" class="value" text-anchor="start">2:15</text>
+<rect x="188.00" y="334.50" width="105.68" height="14" class="ohm"/>
+<text x="302.68" y="348.5" class="value" text-anchor="start">1:17</text>
+<text x="970.00" y="339.5" class="stat" text-anchor="end">1.76×</text>
+</svg>
