@@ -705,10 +705,11 @@ message in one test may leave both generated versions of `parse` and their depen
 Ohm can reuse its previous decisions about which compilation group contains each version, while
 still compiling the edited test.
 
-From 1.99.0-27, successful checks of trait bounds no longer read declaration locations merely to
-decide whether the bounds hold. Rustc retains the semantic predicates and their declaration
-indices, then looks up the current source location when a diagnostic needs it. Moving a declaration
-can therefore preserve cached type and borrow checks while errors still point to the current source.
+From 1.99.0-27, successful method confirmation and well-formedness checks can read trait bounds
+without also reading their declaration locations. Rustc retains the semantic predicates and their
+original declaration indices, then looks up the current source location when a diagnostic needs it.
+Moving a declaration can therefore preserve cached type and borrow checks while errors still point
+to the current source.
 
 When rustc loads an unchanged query result from disk, it can keep the encoded bytes for the next
 build. If it recomputes the result, it saves the new value even when its fingerprint matches the
@@ -728,11 +729,13 @@ In an edit-and-rebuild experiment at optimization level 1, splitting reduced tim
 and 45.8% for uv. Splitting also made ty's tests about 3–4% slower and increased uv's cold-build
 time by 5.7% in separate comparisons.
 
-Across eight independent x86_64 Linux pairs, the release-trained -27 candidate used 21.89% fewer
-instructions at the median after the uv #19612 edit (21.72–21.96%). The measurement sums every rustc
-started by the first `cargo check -p uv --lib --locked --offline -j8`, using signed -26 Cargo in both
-arms and enabling Ohm's procedural-macro and native-tool trust. It includes the declaration-location
-change, expansion anchors, and foreign-impl directory change together.
+After the uv #19612 edit on x86_64 Linux, the release-trained -27 candidate used 21.89% fewer
+instructions for the library check and 21.70% fewer for the workspace check than signed -26, at the
+median of eight independent pairs per command. All 16 pairs saved more than 20%. The measurements
+sum every rustc started by the first `cargo check -p uv --lib` or `cargo check`, with
+`--locked --offline -j8`, signed -26 Cargo in both arms, and Ohm's procedural-macro and native-tool
+trust. They include the declaration-location change, expansion anchors, and foreign-impl directory
+change together.
 
 See:
 
