@@ -4,15 +4,9 @@ We compared published Ohm 1.99.0-26 with stock Rust 1.99.0 on x86_64 Linux. Each
 
 The individual-command study covers 216 samples across uv and Codex. The developer study covers five workflows per project for Ruff, uv, and Codex, with four repetitions per toolchain. [Individual commands](workflow.json) · [Developer workflows](developer-workflows.json) · [Historical Ruff replay](historical.json) · [uv feature ablation](ablation.json)
 
-[1.99.0-25 results](1.99.0-25.md) · [1.99.0-23 Codex replay and endpoint tests](1.99.0-23-codex.md) · [Ruff doctests](../../BENCHMARKS.md#ruff-doctests)
+The [Ruff doctest study](../../BENCHMARKS.md#ruff-doctests) measures repeated test runs. The [APFS disk study](disk.json) compares Ohm 1.99.0-11 with stock Rust 1.99.0.
 
-The APFS disk study compares Ohm 1.99.0-11 with stock Rust 1.99.0. All eight cohorts completed in that release. The formatter comparison below measures -10 against -11. [Disk measurements](disk.json) · [Formatter measurements](formatting-comparison.json)
-
-The build record identifies each suite’s host, release archive, installed binaries and workload revisions. The ty report includes individual ext4 and Btrfs measurements. [Build provenance](workflow-build.json) · [ty data](ty-worktree.json) · [Trust settings](../../BENCHMARKS.md#recorded-measurements) · [Earlier developer workflows](1.99.0-9/developer-workflows.md)
-
-The [historical reports and fixtures](https://github.com/astral-sh/ohm/tree/9cbebcf02df6036feaea17cf16173c01185c856e/scripts) and [study-specific reproduction inputs](https://github.com/astral-sh/ohm/tree/444cf954135e74a52b4c9f3f6990d0bc6aff1a5a/benchmark-inputs) preserve the earlier workloads and methods. Host assignments and workloads can differ between releases.
-
-The separate [Ruff edited-check study](ruff-edited-check.json) retains 64 matched pairs for an earlier experimental version of the [public-API metadata optimization](https://github.com/astral-sh/ohm-rust/pull/194), which is included in Ohm 1.99.0-7. Its [build record](ruff-edited-check-build.json) identifies that experimental compiler. The release tables exclude this earlier study.
+The [build record](workflow-build.json) identifies each suite’s host, release archive, installed binaries, and workload revisions. See the [ty measurements](ty-worktree.json) for ext4 and Btrfs results and the [benchmark guide](../../BENCHMARKS.md#recorded-measurements) for the trust settings used in each study.
 
 ## Linux session replays with 1.99.0-26
 
@@ -26,33 +20,9 @@ Each entry gives the wall time in seconds for a complete session replay. The las
 | uv              |                 136.65, 133.42 |                   76.76, 77.09 |     43.03% |
 | ty              | 204.53, 198.70, 195.87, 198.40 | 125.41, 126.82, 128.73, 128.30 |     36.14% |
 
-## Ruff compiler and Cargo changes in 1.99.0-15
+## Earlier studies
 
-We changed a diagnostic in Ruff’s parser and timed a rebuild of the workspace on x86_64 Linux. Both compilers used the same Ohm Cargo and linker. The new compiler could reuse downstream crates after the edit. It finished first in all 12 pairs for each command. [Compiler change](https://github.com/astral-sh/ohm-rust/pull/233) · [Paired timings and compiler traces](https://github.com/astral-sh/ohm-cargo/tree/837a3a07a7368c1a3706ab2779b8ab3450814f7d/benchmarks/ruff-dev-loop-20261027/corrected-workspace-parser)
-
-| Command after the edit | Parent Ohm compiler, median | New Ohm compiler, median |
-| ---------------------- | --------------------------: | -----------------------: |
-| `cargo build`          |                     19.21 s |                   5.60 s |
-| `cargo test --no-run`  |                     25.58 s |                   8.24 s |
-
-The second command builds the workspace tests without running them. A separate `cargo check` after a native build failed with both compilers because Cargo selected two incompatible copies of `pep440_rs`. Both compilers passed the check from an empty target directory. [Build-to-check reproducer](https://github.com/astral-sh/ohm-cargo/tree/4ee02e1ceb06050f40fbb43a205612b732b42bbf/benchmarks/ruff-dev-loop-20261027/mixed-native-check)
-
-We also measured Cargo’s own work on a Ruff workspace check with all 520 artifacts up to date. Compared with the prior Ohm Cargo, the Cargo changes in 1.99.0-15 reduced the instruction count in all 12 pairs, with a median reduction of 10.51%. [Cargo measurements and reproduction instructions](https://github.com/astral-sh/ohm-cargo/tree/60f815537745e8dd8867c3062aea061c6865be34/benchmarks/ruff-dev-loop-20261026/ten-cargo-fresh)
-
-## Formatter comparison
-
-We timed `cargo fmt -p <package>` with Ohm 1.99.0-10 and 1.99.0-11 on `charlie-ohm-11-ty`. Each row covers 40 pairs with identical inputs and outputs and a warm cache for each release. We shuffled the order so each release ran first in 20 pairs.
-
-| Project | Formatting case                | -10 median | -11 median | -11 / -10 time (99% CI) |
-| ------- | ------------------------------ | ---------: | ---------: | ----------------------: |
-| Ruff    | Unchanged file                 |  115.06 ms |  114.07 ms |  1.0009 (0.8914–1.1232) |
-| Ruff    | Already formatted comment      |  178.10 ms |  181.84 ms |  1.1382 (0.9760–1.3434) |
-| Ruff    | Whitespace requiring a rewrite |  228.99 ms |  239.34 ms |  1.1170 (0.9726–1.3065) |
-| uv      | Unchanged file                 |   87.03 ms |  151.70 ms |  1.3260 (1.1025–1.5923) |
-| uv      | Already formatted comment      |  831.63 ms |  898.97 ms |  1.0525 (0.9948–1.1167) |
-| uv      | Whitespace requiring a rewrite | 1486.13 ms | 1578.68 ms |  1.0680 (1.0370–1.1011) |
-
-The last column gives the geometric mean of the within-pair time ratios. Values above 1 mean -11 took longer. The 99% intervals use 20,000 bootstrap resamples of the pairs. [Paired timings, fixtures, and reproduction instructions](formatting-comparison.json)
+Earlier release reports and one-off experiments are in the [benchmark archive](https://github.com/astral-experiments/ohm/tree/a2deb1cf5ce3a40bd6673b92b90a58d425514b3d/scripts/benchmark_results), including the [Ruff compiler and Cargo study](https://github.com/astral-experiments/ohm/blob/a2deb1cf5ce3a40bd6673b92b90a58d425514b3d/scripts/benchmark_results/README.md#ruff-compiler-and-cargo-changes-in-1990-15) and the [formatter comparison](https://github.com/astral-experiments/ohm/blob/a2deb1cf5ce3a40bd6673b92b90a58d425514b3d/scripts/benchmark_results/README.md#formatter-comparison). The [earlier reports and fixtures](https://github.com/astral-sh/ohm/tree/9cbebcf02df6036feaea17cf16173c01185c856e/scripts) and [study-specific reproduction inputs](https://github.com/astral-sh/ohm/tree/444cf954135e74a52b4c9f3f6990d0bc6aff1a5a/benchmark-inputs) preserve the original workloads.
 
 ## Publish results
 
