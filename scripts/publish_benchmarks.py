@@ -448,7 +448,7 @@ def documents(reports):
             "Project",
             "Workflow",
             f"Rust {workflows['rust_version']}",
-            f"Ohm {workflow_results.toolchain_label(workflows)}",
+            f"Ohm {workflows['ohm_release'].removeprefix('ohm-')}",
             "Time saved",
         ],
         workflow_results.table_rows(workflows),

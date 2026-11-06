@@ -190,17 +190,11 @@ class WorkflowReportTests(unittest.TestCase):
                 workflow_results.build_report(runs, omitted_projects=omissions)
 
     def test_unreleased_build_must_match_its_source_revision(self):
-        for build, label, cargo_revision in (
-            ("workflow-cache-fix", "fix", None),
-            ("workflow-overhead", "fixes", None),
-            ("workflow-overhead", "fixes", "3" * 40),
-            ("edited-check-compact2", "fixes", "3" * 40),
-            ("edited-check-sso", "fixes", "3" * 40),
-        ):
-            with self.subTest(build=build, cargo_revision=cargo_revision):
+        for cargo_revision in (None, "3" * 40):
+            with self.subTest(cargo_revision=cargo_revision):
                 runs = synthetic_runs()
                 revision = "a" * 40
-                compiler_release = f"ohm-1.99.0-5-{build}-{revision[:12]}"
+                compiler_release = f"ohm-1.99.0-5-candidate-build2-{revision[:12]}"
                 selector = compiler_release
                 if cargo_revision:
                     selector += f"-cargo-{cargo_revision[:12]}"
@@ -221,9 +215,6 @@ class WorkflowReportTests(unittest.TestCase):
                                 command["command"][1] = f"+{selector}"
                 report = workflow_results.build_report(runs)
                 self.assertEqual(report["ohm_source_revision"], revision)
-                self.assertEqual(
-                    workflow_results.toolchain_label(report), f"1.99.0-5 + {label}"
-                )
                 if cargo_revision:
                     self.assertEqual(report["ohm_cargo_source_revision"], cargo_revision)
                     changed = copy.deepcopy(report)
