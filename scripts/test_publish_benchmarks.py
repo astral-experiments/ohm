@@ -16,6 +16,7 @@ class PublicationTests(unittest.TestCase):
         self.reports = publish.latest_reports()
         self.ty_worktree = publish.load(publish.RESULTS / publish.TY_WORKTREE_REPORT)
         self.ty_scenario = publish.load(publish.ROOT / publish.TY_SCENARIO)
+        self.ruff_doctests = publish.load(publish.RESULTS / publish.RUFF_DOCTEST_REPORT)
 
     def copy_supplemental_reports(self, root):
         destination = root / "scripts/benchmark_results" / publish.TY_WORKTREE_REPORT
@@ -33,10 +34,13 @@ class PublicationTests(unittest.TestCase):
             for pair in range(6) for lane, base in (("stock", 10), ("ohm", 0))
         ]
         report = {"upstream": "1.99.0", "ohm": "ohm-1.99.0-23", "samples": samples}
-        self.assertIn("| 13.000 s | 3.000 s | 4.33× |", publish.ruff_doctest_table(report))
+        self.assertEqual(
+            publish.ruff_doctest_row(report),
+            ["Ruff", "Doctests", "Selected crates", "13.000 s", "3.000 s", "4.33×"],
+        )
         samples.pop()
         with self.assertRaisesRegex(ValueError, "five warm"):
-            publish.ruff_doctest_table(report)
+            publish.ruff_doctest_row(report)
 
     def test_tables_match_current_reports(self):
         for name, expected in publish.documents(self.reports).items():
@@ -47,7 +51,7 @@ class PublicationTests(unittest.TestCase):
 
     def test_ty_is_included_in_session_and_command_totals(self):
         tables, _ = publish.render_tables(
-            self.reports, self.ty_worktree, self.ty_scenario
+            self.reports, self.ty_worktree, self.ty_scenario, self.ruff_doctests
         )
         self.assertIn(
             "| ty | Worktree startup (Btrfs) | `ty_python_semantic` |",
@@ -125,7 +129,9 @@ class PublicationTests(unittest.TestCase):
                 study = copy.deepcopy(self.ty_worktree)
                 change(study)
                 with self.assertRaises(ValueError):
-                    publish.render_tables(self.reports, study, self.ty_scenario)
+                    publish.render_tables(
+                        self.reports, study, self.ty_scenario, self.ruff_doctests
+                    )
 
     def test_rejects_mismatched_or_incomplete_measurements(self):
         changes = [
@@ -311,9 +317,8 @@ class PublicationTests(unittest.TestCase):
             self.assertIn(
                 f"| Scope | Rust {disk_rust} | Ohm {disk_version} | Space saved |", readme
             )
-            self.assertRegex(
-                readme, r"and `target/` disk usage decreases by around \d+%\."
-            )
+            self.assertRegex(readme, r"And disk usage \(on APFS\) decreases by around \d+%")
+            self.assertIn(f"Comparing Ohm {version} to upstream Rust", readme)
             self.assertIn(f"| Rust {rust} | Ohm {version} | Speedup |", readme)
 
 
