@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="286" viewBox="0 0 680 286" role="img" aria-labelledby="title">
+<title id="title">Speedup over stock Rust after a direct or dependency edit</title>
+<style>
+text { font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #24292f }
+.number, .key { font-size: 13px; font-variant-numeric: tabular-nums }
+.key { fill: #59636e }
+.stock { fill: #9aa4af }
+.ohm { fill: #298365 }
+.axis { stroke: #d1d9e0 }
+@media (prefers-color-scheme: dark) {
+  text { fill: #e6edf3 }
+  .key { fill: #a4adb7 }
+  .stock { fill: #788390 }
+  .ohm { fill: #6dc2a1 }
+  .axis { stroke: #3d444d }
+}
+</style>
+<rect x="182.00" y="8.0" width="14.00" height="7" class="stock"/>
+<text x="202.0" y="16.0" class="key" text-anchor="start">Direct edit</text>
+<rect x="328.00" y="8.0" width="14.00" height="7" class="ohm"/>
+<text x="348.0" y="16.0" class="key" text-anchor="start">Dependency edit</text>
+<path d="M182.00 31V282" class="axis"/>
+<text x="2.0" y="59.0" class="" text-anchor="start">uv · cargo check</text>
+<rect x="182.00" y="44.0" width="10.14" height="8" class="stock"/>
+<text x="198.1" y="52.0" class="number" text-anchor="start">1.13×</text>
+<rect x="182.00" y="58.0" width="177.16" height="8" class="ohm"/>
+<text x="365.2" y="66.0" class="number" text-anchor="start">19.68×</text>
+<text x="2.0" y="101.0" class="" text-anchor="start">uv · cargo clippy</text>
+<rect x="182.00" y="86.0" width="11.63" height="8" class="stock"/>
+<text x="199.6" y="94.0" class="number" text-anchor="start">1.29×</text>
+<rect x="182.00" y="100.0" width="209.55" height="8" class="ohm"/>
+<text x="397.6" y="108.0" class="number" text-anchor="start">23.27×</text>
+<text x="2.0" y="143.0" class="" text-anchor="start">uv · cargo test --test it</text>
+<rect x="182.00" y="128.0" width="19.24" height="8" class="stock"/>
+<text x="207.2" y="136.0" class="number" text-anchor="start">2.14×</text>
+<rect x="182.00" y="142.0" width="81.71" height="8" class="ohm"/>
+<text x="269.7" y="150.0" class="number" text-anchor="start">9.07×</text>
+<text x="2.0" y="185.0" class="" text-anchor="start">Codex · cargo check</text>
+<rect x="182.00" y="170.0" width="9.74" height="8" class="stock"/>
+<text x="197.7" y="178.0" class="number" text-anchor="start">1.08×</text>
+<rect x="182.00" y="184.0" width="232.52" height="8" class="ohm"/>
+<text x="420.5" y="192.0" class="number" text-anchor="start">25.82×</text>
+<text x="2.0" y="227.0" class="" text-anchor="start">Codex · just clippy</text>
+<rect x="182.00" y="212.0" width="13.93" height="8" class="stock"/>
+<text x="201.9" y="220.0" class="number" text-anchor="start">1.55×</text>
+<rect x="182.00" y="226.0" width="414.00" height="8" class="ohm"/>
+<text x="602.0" y="234.0" class="number" text-anchor="start">45.98×</text>
+<text x="2.0" y="269.0" class="" text-anchor="start">Codex · just test</text>
+<rect x="182.00" y="254.0" width="9.19" height="8" class="stock"/>
+<text x="197.2" y="262.0" class="number" text-anchor="start">1.02×</text>
+<rect x="182.00" y="268.0" width="181.96" height="8" class="ohm"/>
+<text x="370.0" y="276.0" class="number" text-anchor="start">20.21×</text>
+</svg>

@@ -8,40 +8,9 @@ An experimental fork of the Rust toolchain, designed for fast, highly parallel l
 With Ohm, incremental builds can be up to 45× faster, replayed development sessions take around
 44% less time, and `target/` disk usage decreases by around 55%.
 
-Comparing stock Rust and Ohm 1.99.0-26 on replayed development sessions:
+We replayed four development sessions with stock Rust and Ohm on x86_64 Linux.
 
-<!-- benchmark:sessions -->
-
-| Scope                                      | Rust 1.99.0 | Ohm      | Time saved |
-| ------------------------------------------ | ----------- | -------- | ---------- |
-| Ruff session                               | 405.17 s    | 223.90 s | 44.74%     |
-| uv session                                 | 135.03 s    | 76.92 s  | 43.03%     |
-| Codex session                              | 359.80 s    | 187.38 s | 47.92%     |
-| ty session                                 | 199.38 s    | 127.31 s | 36.14%     |
-| All sessions                               | 1,099.38 s  | 615.51 s | 44.01%     |
-| `cargo check`                              | 100.21 s    | 36.35 s  | 63.73%     |
-| `cargo test`, `cargo nextest`, `just test` | 645.98 s    | 429.97 s | 33.44%     |
-| `cargo clippy`                             | 318.57 s    | 118.59 s | 62.78%     |
-| `cargo fmt`                                | 13.82 s     | 8.49 s   | 38.57%     |
-| Other commands                             | 19.31 s     | 20.15 s  | −4.39%     |
-| All commands                               | 1,097.89 s  | 613.55 s | 44.12%     |
-
-<!-- /benchmark:sessions -->
-
-And comparing disk usage (on APFS):
-
-<!-- benchmark:disk -->
-
-| Scope                 | Rust 1.99.0 | Ohm 1.99.0-11 | Space saved |
-| --------------------- | ----------- | ------------- | ----------- |
-| Ruff/ty session       | 5.82 GiB    | 3.49 GiB      | 40.06%      |
-| Ruff/ty, 2 worktrees  | 10.07 GiB   | 5.91 GiB      | 41.25%      |
-| Ruff/ty, 10 worktrees | 52.98 GiB   | 26.46 GiB     | 50.05%      |
-| uv session            | 12.09 GiB   | 7.76 GiB      | 35.83%      |
-| uv, 2 worktrees       | 16.25 GiB   | 8.55 GiB      | 47.37%      |
-| uv, 10 worktrees      | 79.41 GiB   | 32.31 GiB     | 59.31%      |
-
-<!-- /benchmark:disk -->
+![Mean replay time for Ruff, Codex, ty, and uv, with the speedup for each project.](docs/benchmarks/sessions.svg)
 
 Compared to the stock Rust toolchain, Ohm:
 
@@ -141,6 +110,101 @@ To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS
 
 ## Benchmarks
 
+Time saved by command across the four replays. Tests include `cargo test`, `cargo nextest`, and
+`just test`.
+
+![Time saved on tests, Clippy, checks, formatting, and other commands.](docs/benchmarks/commands.svg)
+
+<details>
+<summary>Session and command timings</summary>
+
+<!-- benchmark:sessions -->
+
+| Scope                                      | Rust 1.99.0 | Ohm      | Time saved |
+| ------------------------------------------ | ----------- | -------- | ---------- |
+| Ruff session                               | 405.17 s    | 223.90 s | 44.74%     |
+| uv session                                 | 135.03 s    | 76.92 s  | 43.03%     |
+| Codex session                              | 359.80 s    | 187.38 s | 47.92%     |
+| ty session                                 | 199.38 s    | 127.31 s | 36.14%     |
+| All sessions                               | 1,099.38 s  | 615.51 s | 44.01%     |
+| `cargo check`                              | 100.21 s    | 36.35 s  | 63.73%     |
+| `cargo test`, `cargo nextest`, `just test` | 645.98 s    | 429.97 s | 33.44%     |
+| `cargo clippy`                             | 318.57 s    | 118.59 s | 62.78%     |
+| `cargo fmt`                                | 13.82 s     | 8.49 s   | 38.57%     |
+| Other commands                             | 19.31 s     | 20.15 s  | −4.39%     |
+| All commands                               | 1,097.89 s  | 613.55 s | 44.12%     |
+
+<!-- /benchmark:sessions -->
+
+</details>
+
+For individual commands, we measured the speedup over stock Rust after two kinds of edits.
+A direct edit changes the target crate. A dependency edit changes a dependency’s implementation
+while preserving its public API.
+
+![Speedups for checks, Clippy, and tests after direct and dependency edits in uv and Codex.](docs/benchmarks/edits.svg)
+
+<details>
+<summary>Individual command timings</summary>
+
+**Direct edits**
+
+<!-- benchmark:direct -->
+
+| Project | Workflow               | Edited crate | Rust 1.99.0 | Ohm 1.99.0-26 | Speedup |
+| ------- | ---------------------- | ------------ | ----------- | ------------- | ------- |
+| uv      | `cargo check`          | `uv`         | 1.92 s      | 1.70 s        | 1.13×   |
+| uv      | `cargo clippy`         | `uv`         | 3.15 s      | 2.43 s        | 1.29×   |
+| uv      | `cargo test --test it` | `uv`         | 16.93 s     | 7.93 s        | 2.14×   |
+| Codex   | `cargo check`          | `codex-core` | 2.77 s      | 2.56 s        | 1.08×   |
+| Codex   | `just clippy`          | `codex-core` | 13.71 s     | 8.87 s        | 1.55×   |
+| Codex   | `just test`            | `codex-core` | 18.35 s     | 17.97 s       | 1.02×   |
+
+<!-- /benchmark:direct -->
+
+**Dependency edits**
+
+<!-- benchmark:dependency -->
+
+| Project | Workflow               | Edited dependency    | Rust 1.99.0 | Ohm 1.99.0-26 | Speedup |
+| ------- | ---------------------- | -------------------- | ----------- | ------------- | ------- |
+| uv      | `cargo check`          | `uv-normalize`       | 8.81 s      | 0.45 s        | 19.68×  |
+| uv      | `cargo clippy`         | `uv-normalize`       | 12.43 s     | 0.53 s        | 23.27×  |
+| uv      | `cargo test --test it` | `uv-normalize`       | 19.64 s     | 2.16 s        | 9.07×   |
+| Codex   | `cargo check`          | `codex-utils-string` | 11.64 s     | 0.45 s        | 25.82×  |
+| Codex   | `just clippy`          | `codex-utils-string` | 27.77 s     | 0.60 s        | 45.98×  |
+| Codex   | `just test`            | `codex-utils-string` | 36.03 s     | 1.78 s        | 20.21×  |
+
+<!-- /benchmark:dependency -->
+
+</details>
+
+We measured the disk space retained by ten worktrees after running the same workloads on macOS
+(APFS).
+
+![Disk space retained by ten Ruff/ty or uv worktrees with stock Rust and Ohm.](docs/benchmarks/disk.svg)
+
+<details>
+<summary>Disk usage for one, two, and ten worktrees</summary>
+
+<!-- benchmark:disk -->
+
+| Scope                 | Rust 1.99.0 | Ohm 1.99.0-11 | Space saved |
+| --------------------- | ----------- | ------------- | ----------- |
+| Ruff/ty session       | 5.82 GiB    | 3.49 GiB      | 40.06%      |
+| Ruff/ty, 2 worktrees  | 10.07 GiB   | 5.91 GiB      | 41.25%      |
+| Ruff/ty, 10 worktrees | 52.98 GiB   | 26.46 GiB     | 50.05%      |
+| uv session            | 12.09 GiB   | 7.76 GiB      | 35.83%      |
+| uv, 2 worktrees       | 16.25 GiB   | 8.55 GiB      | 47.37%      |
+| uv, 10 worktrees      | 79.41 GiB   | 32.31 GiB     | 59.31%      |
+
+<!-- /benchmark:disk -->
+
+</details>
+
+To preview which build outputs have been idle for at least two days, run
+`cargo +ohm gc --max-age 2d --dry-run`.
+
 **Developer workflows** measure complete command sequences after an untimed baseline warmup. Each
 sequence preserves its build artifacts between commands; each repetition starts from fresh artifacts.
 Times are medians of four runs, with each toolchain pair measured on the same host. See the
@@ -167,37 +231,6 @@ Times are medians of four runs, with each toolchain pair measured on the same ho
 | Codex   | Edit → fmt → clippy → test        | 26.34 s     | 21.56 s       | 18.13%     |
 
 <!-- /benchmark:developer-workflows -->
-
-**Direct edits** modify the crate being checked, linted, or tested:
-
-<!-- benchmark:direct -->
-
-| Project | Workflow               | Edited crate | Rust 1.99.0 | Ohm 1.99.0-26 | Speedup |
-| ------- | ---------------------- | ------------ | ----------- | ------------- | ------- |
-| uv      | `cargo check`          | `uv`         | 1.92 s      | 1.70 s        | 1.13×   |
-| uv      | `cargo clippy`         | `uv`         | 3.15 s      | 2.43 s        | 1.29×   |
-| uv      | `cargo test --test it` | `uv`         | 16.93 s     | 7.93 s        | 2.14×   |
-| Codex   | `cargo check`          | `codex-core` | 2.77 s      | 2.56 s        | 1.08×   |
-| Codex   | `just clippy`          | `codex-core` | 13.71 s     | 8.87 s        | 1.55×   |
-| Codex   | `just test`            | `codex-core` | 18.35 s     | 17.97 s       | 1.02×   |
-
-<!-- /benchmark:direct -->
-
-**Indirect edits** modify a dependency's implementation without changing its public API, so Ohm can
-avoid rebuilding unchanged dependents:
-
-<!-- benchmark:dependency -->
-
-| Project | Workflow               | Edited dependency    | Rust 1.99.0 | Ohm 1.99.0-26 | Speedup |
-| ------- | ---------------------- | -------------------- | ----------- | ------------- | ------- |
-| uv      | `cargo check`          | `uv-normalize`       | 8.81 s      | 0.45 s        | 19.68×  |
-| uv      | `cargo clippy`         | `uv-normalize`       | 12.43 s     | 0.53 s        | 23.27×  |
-| uv      | `cargo test --test it` | `uv-normalize`       | 19.64 s     | 2.16 s        | 9.07×   |
-| Codex   | `cargo check`          | `codex-utils-string` | 11.64 s     | 0.45 s        | 25.82×  |
-| Codex   | `just clippy`          | `codex-utils-string` | 27.77 s     | 0.60 s        | 45.98×  |
-| Codex   | `just test`            | `codex-utils-string` | 36.03 s     | 1.78 s        | 20.21×  |
-
-<!-- /benchmark:dependency -->
 
 **Other common cases** include build-to-check reuse, formatting, and worktree startup:
 

@@ -46,7 +46,7 @@ class PublicationTests(unittest.TestCase):
             )
 
     def test_ty_is_included_in_session_and_command_totals(self):
-        tables, _ = publish.render_tables(
+        tables, _, _ = publish.render_tables(
             self.reports, self.ty_worktree, self.ty_scenario
         )
         self.assertIn(
@@ -315,6 +315,9 @@ class PublicationTests(unittest.TestCase):
                 readme, r"and `target/` disk usage decreases by around \d+%\."
             )
             self.assertIn(f"| Rust {rust} | Ohm {version} | Speedup |", readme)
+            charts = root / "docs/benchmarks"
+            self.assertIn(f"Ohm {version}</text>", (charts / "sessions.svg").read_text())
+            self.assertIn(f"Ohm {disk_version}</text>", (charts / "disk.svg").read_text())
 
 
 if __name__ == "__main__":

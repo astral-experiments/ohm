@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="186" viewBox="0 0 680 186" role="img" aria-labelledby="title">
+<title id="title">Wall time saved by command across the four replays</title>
+<style>
+text { font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #24292f }
+.number, .key { font-size: 13px; font-variant-numeric: tabular-nums }
+.key { fill: #59636e }
+.stock { fill: #9aa4af }
+.ohm { fill: #298365 }
+.axis { stroke: #d1d9e0 }
+@media (prefers-color-scheme: dark) {
+  text { fill: #e6edf3 }
+  .key { fill: #a4adb7 }
+  .stock { fill: #788390 }
+  .ohm { fill: #6dc2a1 }
+  .axis { stroke: #3d444d }
+}
+</style>
+<text x="677.0" y="16.0" class="key" text-anchor="end">Time vs. Rust</text>
+<path d="M141.32 23V182" class="axis"/>
+<text x="2.0" y="46.0" class="" text-anchor="start">Tests</text>
+<rect x="141.32" y="38.0" width="336.68" height="8" class="ohm"/>
+<text x="484.0" y="46.0" class="number" text-anchor="start">3m 36s</text>
+<text x="677.0" y="46.0" class="number" text-anchor="end">33.4% less</text>
+<text x="2.0" y="78.0" class="" text-anchor="start">cargo clippy</text>
+<rect x="141.32" y="70.0" width="311.70" height="8" class="ohm"/>
+<text x="459.0" y="78.0" class="number" text-anchor="start">3m 20s</text>
+<text x="677.0" y="78.0" class="number" text-anchor="end">62.8% less</text>
+<text x="2.0" y="110.0" class="" text-anchor="start">cargo check</text>
+<rect x="141.32" y="102.0" width="99.54" height="8" class="ohm"/>
+<text x="246.9" y="110.0" class="number" text-anchor="start">1m 04s</text>
+<text x="677.0" y="110.0" class="number" text-anchor="end">63.7% less</text>
+<text x="2.0" y="142.0" class="" text-anchor="start">cargo fmt</text>
+<rect x="141.32" y="134.0" width="8.31" height="8" class="ohm"/>
+<text x="155.6" y="142.0" class="number" text-anchor="start">5.3 s</text>
+<text x="677.0" y="142.0" class="number" text-anchor="end">38.6% less</text>
+<text x="2.0" y="174.0" class="" text-anchor="start">Other commands</text>
+<rect x="140.00" y="166.0" width="1.32" height="8" class="stock"/>
+<text x="147.3" y="174.0" class="number" text-anchor="start">0.8 s longer</text>
+<text x="677.0" y="174.0" class="number" text-anchor="end">4.4% more</text>
+</svg>
