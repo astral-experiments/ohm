@@ -1,4 +1,4 @@
-# How Ohm speeds up development
+# Optimizations
 
 Ohm includes the following changes to Rust, Cargo, Clippy, and rustfmt.
 

@@ -5,10 +5,7 @@
 
 An experimental fork of the Rust toolchain, designed for fast, highly parallel local development.
 
-With Ohm, incremental builds can be up to 45× faster, replayed development sessions take around
-44% less time, and `target/` disk usage decreases by around 55%.
-
-Comparing stock Rust and Ohm 1.99.0-26 on replayed development sessions:
+Comparing Ohm 1.99.0-26 to upstream Rust, end-to-end development is around 1.79× faster:
 
 <!-- benchmark:sessions -->
 
@@ -28,7 +25,7 @@ Comparing stock Rust and Ohm 1.99.0-26 on replayed development sessions:
 
 <!-- /benchmark:sessions -->
 
-And comparing disk usage (on APFS):
+And disk usage (on APFS) decreases by around 55%:
 
 <!-- benchmark:disk -->
 
@@ -43,7 +40,7 @@ And comparing disk usage (on APFS):
 
 <!-- /benchmark:disk -->
 
-Compared to the stock Rust toolchain, Ohm:
+Compared to upstream, Ohm:
 
 - Enables (by default) existing experimental features (e.g., parallel compiler frontends).
 - Implements experimental, performance-oriented features proposed upstream (e.g.,
@@ -53,15 +50,13 @@ Compared to the stock Rust toolchain, Ohm:
   `cargo build` and `cargo check`, avoiding rustfmt on unchanged files).
 
 **Warning:** Ohm includes backported and experimental Rust, Cargo, and Clippy optimizations that may
-be unsound, including an implementation of
-[Relink, don't rebuild](https://github.com/rust-lang/compiler-team/issues/790). This README is
-human-edited, but all code changes, PR summaries, and additional documentation were authored
-entirely by GPT-6 Astra in Codex. Use Ohm only for local development, and at your own risk.
+be unsound. This README is human-edited, but all code changes, PR summaries, and additional
+documentation were authored entirely by GPT in Codex.
 
 ## Installation
 
-Ohm supports Apple Silicon macOS and x86_64 Linux (glibc). Install [rustup](https://rustup.rs/),
-then install the latest Ohm release with our standalone installer:
+Ohm supports Apple Silicon macOS and x86_64 Linux. Install [rustup](https://rustup.rs/), then
+install the latest Ohm release with our standalone installer:
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
@@ -79,13 +74,10 @@ curl --proto '=https' --tlsv1.2 -LsSf \
   https://labs.astral.sh/ohm/releases/ohm-1.99.0-9/install.sh | sh
 ```
 
-To change the installation directory, set `OHM_INSTALL_DIR`:
-
-```console
-curl --proto '=https' --tlsv1.2 -LsSf \
-  https://labs.astral.sh/ohm/install.sh \
-  | env OHM_INSTALL_DIR=/path/to/toolchain sh
-```
+Each Ohm release targets a specific upstream Rust release. When a Rust version becomes available,
+we replay the optimizations that remain relevant and drop those that have already landed upstream.
+Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-20` and
+`ohm-1.97.1-21`.
 
 ## Usage
 
@@ -107,6 +99,13 @@ Opt out with `-Zohm-defaults=no`:
 
 ```console
 cargo +ohm -Zohm-defaults=no test
+```
+
+Run Ohm's garbage collector from any directory to clean up unused build artifacts in idle worktrees
+and shared caches.
+
+```console
+cargo +ohm gc
 ```
 
 ### `AGENTS.md`
@@ -139,12 +138,33 @@ To teach Codex about Ohm, consider adding the following to your `~/.codex/AGENTS
   plain `cargo <command>` and the repository's normal toolchain for CI and production builds.
 ```
 
+## Philosophy
+
+Rust's compile times and disk usage are emerging as bottlenecks in day-to-day development,
+especially as agents enable us to parallelize across (dozens of) worktrees.
+
+Ohm enables experimental optimizations to improve Rust's iteration speed and throughput. This is a
+deliberate tradeoff: we accept the risks of experimental implementations in local development, where
+the blast radius of bugs is comparatively limited and the benefits of faster iteration are
+substantial (while continuing to use the official toolchain for production builds).
+
+Ohm is authored entirely by the GPT model series in Codex. Agents lower the cost of implementing,
+testing, and refining the ideas explored in this project; good ideas can then be proven out and
+ultimately proposed upstream.
+
+For an explanation of the major optimizations and their measured impact, see
+[Optimizations](docs/optimizations.md).
+
+Ohm's patches are maintained in the following repositories:
+
+- [`ohm-rust`](https://github.com/astral-sh/ohm-rust): Rust compiler and standard library.
+- [`ohm-cargo`](https://github.com/astral-sh/ohm-cargo): Cargo.
+- [`ohm-rust-clippy`](https://github.com/astral-sh/ohm-rust-clippy): Clippy.
+- [`ohm-rustfmt`](https://github.com/astral-sh/ohm-rustfmt): rustfmt.
+
 ## Benchmarks
 
-**Developer workflows** measure complete command sequences after an untimed baseline warmup. Each
-sequence preserves its build artifacts between commands; each repetition starts from fresh artifacts.
-Times are medians of four runs, with each toolchain pair measured on the same host. See the
-[benchmark guide](BENCHMARKS.md) for details.
+See the [benchmark guide](BENCHMARKS.md) for details.
 
 <!-- benchmark:developer-workflows -->
 
@@ -213,92 +233,9 @@ avoid rebuilding unchanged dependents:
 | Codex   | Shared-worktree build    | `codex-utils-string` | 1.66 s      | 0.54 s  | 3.10×   |
 | ty      | Worktree startup (ext4)  | `ty_python_semantic` | 65.29 s     | 38.27 s | 1.71×   |
 | ty      | Worktree startup (Btrfs) | `ty_python_semantic` | 65.22 s     | 37.85 s | 1.72×   |
+| Ruff    | Doctests                 | Selected crates      | 13.600 s    | 1.628 s | 8.35×   |
 
 <!-- /benchmark:features -->
-
-**Doctests** show how long it takes to rerun Ruff's documentation examples with unchanged source:
-
-<!-- benchmark:ruff-doctests -->
-
-| Workload                           | Rust 1.99.0 | Ohm 1.99.0-26 | Speedup |
-| ---------------------------------- | ----------- | ------------- | ------- |
-| Ruff doctests (`cargo test --doc`) | 13.600 s    | 1.628 s       | 8.35×   |
-
-<!-- /benchmark:ruff-doctests -->
-
-## Philosophy
-
-Rust's compile times and disk usage are increasingly viewed as bottlenecks in day-to-day
-development, especially as agents enable us to parallelize across (dozens of) worktrees.
-
-Ohm enables experimental optimizations to improve Rust's iteration speed and throughput. This is a
-deliberate tradeoff: we accept the risks of experimental implementations in local development, where
-the blast radius of bugs is comparatively limited and the benefits of faster iteration are
-substantial (while continuing to use the official toolchain for production builds).
-
-Ohm is authored entirely by GPT-6 Astra in Codex. Agents lower the cost of implementing, testing,
-and refining the ideas explored in this project; good ideas can then be proven out and ultimately
-proposed upstream. And by forking the toolchain itself, we can change _anything_; we aren't bounded
-by the limitations we'd experience as, e.g., a Cargo wrapper.
-
-At present, Ohm includes the following optimizations, all enabled by default:
-
-- Build release compilers with profile-guided optimization (PGO), plus BOLT on Linux. Apply PGO to
-  rustdoc, Cargo, Clippy, rustfmt, and cargo-fmt when supported by the Rust revision.
-- Run compiler frontends in parallel.
-- [Relink, don't rebuild](https://github.com/rust-lang/compiler-team/issues/790): avoid rebuilding
-  dependent crates when a dependency's public interface is unchanged (`rustc -Zpublic-api-hash`).
-- Cache relinking: reuse compiled code when only the final binary needs to change
-  (`cargo -Zrelink-only`).
-- Store relink objects per executable, outside dependency search paths, and discard unrelated
-  temporary files.
-- Find crates by indexing their names and public API hashes, skipping generated object files.
-- Index locked dependencies by package name.
-- Reuse incremental query dependency edges when promoting cached compiler results.
-- Deduplicate metadata for registry and Git dependency libraries.
-- Backport faster specialization, privacy checks, and string escaping.
-- Skip public API hashing for terminal `cargo check`, `cargo clippy`, and test-harness targets.
-- Skip public API hashing for verified immutable registry libraries during cold shared builds.
-- Exclude unreachable items from public API hashing.
-- Share compiled generic functions across crates.
-- Reuse generic-function partitions after edits to private functions or library closures.
-- Keep upstream generic instances that capture local closures in the caller's partition.
-- Keep codegen-unit merging stable across edits so incremental builds can reuse prior output.
-- Reuse encoded metadata prefixes when private edits leave metadata dependencies unchanged.
-- Pipeline metadata when a dependency's public API changes.
-- Start dependent checks from early interface metadata while upstream function bodies are still
-  being checked (`cargo -Zheadstart=no` disables this).
-- Reuse integration-test binaries when the edited libraries aren't used by the tests.
-- Apply early cutoff to `cargo check` and `cargo clippy`, including with shared registry caches.
-- Reuse compiled registry dependencies across builds, checks, tests, and Clippy.
-- Reuse compiled workspace dependencies during checks after validating their fingerprints.
-- Preserve check graphs across test builds and workspace edits.
-- Reuse dependency resolution when only stack, job, or display settings change.
-- Use fine-grained build locks that respect file-descriptor limits.
-- Avoid repeated compiler-driver validation when reusing registry dependencies.
-- Share compiled registry dependencies across worktrees through a separate build directory.
-- Avoid duplicate builds when concurrent Cargo invocations need the same registry library with no
-  dependencies.
-- Format individual changed modules when rustfmt can verify the module graph.
-- Combine Clippy lint passes and backport faster redundant-clone checks.
-
-Ohm is exclusively intended for local development: never use it for production builds or releases,
-and always verify your work with the official Rust toolchain.
-
-Each Ohm release targets a specific upstream Rust release. When a new Rust version becomes
-available, we replay the optimizations that remain relevant and drop those that have already landed
-upstream. Multiple Ohm revisions may target the same Rust release; for example, `ohm-1.97.1-20` and
-`ohm-1.97.1-21`.
-
-For an explanation of the major optimizations and their measured impact, see
-[_How Ohm speeds up development_](docs/optimizations.md).
-
-Ohm's patches are maintained in the following repositories:
-
-- [`ohm-rust`](https://github.com/astral-sh/ohm-rust): Rust compiler and standard library.
-- [`ohm-cargo`](https://github.com/astral-sh/ohm-cargo): Cargo.
-- [`ohm-rust-clippy`](https://github.com/astral-sh/ohm-rust-clippy): Clippy.
-- [`ohm-rustfmt`](https://github.com/astral-sh/ohm-rustfmt): rustfmt.
 
 ## License
 

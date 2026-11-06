@@ -155,7 +155,7 @@ def table(headers, rows):
     )
 
 
-def render_tables(reports, ty_worktree, ty_scenario):
+def render_tables(reports, ty_worktree, ty_scenario, ruff_doctests):
     release, rust = validate(reports)
     version = release.removeprefix("ohm-")
     if ty_worktree["rust"] != rust or not re.fullmatch(
@@ -397,21 +397,24 @@ def render_tables(reports, ty_worktree, ty_scenario):
                 f"{stock / ohm:.2f}×",
             ]
         )
+    if ruff_doctests["upstream"] != rust:
+        raise ValueError("Ruff doctest and table Rust versions differ")
+    feature_rows.append(ruff_doctest_row(ruff_doctests))
     rendered["features"] = table(
         ["Project", "Workflow", "Package", f"Rust {rust}", "Ohm", "Speedup"],
         feature_rows,
     )
-    session_percent = round(100 * (totals[0] - totals[1]) / totals[0])
-    session_direction = "less" if session_percent >= 0 else "more"
     headlines = {
-        r"incremental builds can be up to \d+×": f"incremental builds can be up to {math.floor(max(r['speedup'] for r in comparisons if r['workflow'] in ('check', 'clippy', 'test') and r['phase'] in ('direct', 'dependency', 'noop')))}×",
-        r"\d+% (?:less|more) time": f"{abs(session_percent)}% {session_direction} time",
-        r"disk usage decreases by around \d+%": f"disk usage decreases by around {5 * round(mean(savings) / 5)}%",
+        r"Comparing Ohm [\d.]+-\d+ to upstream Rust": f"Comparing Ohm {version} to upstream Rust",
+        r"around [\d.]+× faster": f"around {totals[0] / totals[1]:.2f}× faster",
+        r"disk usage \(on APFS\) decreases by around \d+%": (
+            f"disk usage (on APFS) decreases by around {5 * round(mean(savings) / 5)}%"
+        ),
     }
     return rendered, headlines
 
 
-def ruff_doctest_table(report):
+def ruff_doctest_row(report):
     medians = {}
     for lane in ("stock", "ohm"):
         samples = [s for s in report["samples"] if s["toolchain"] == lane]
@@ -422,22 +425,23 @@ def ruff_doctest_table(report):
             raise ValueError(f"Invalid Ruff doctest time for {lane}")
         medians[lane] = statistics.median(times)
     stock, ohm = medians["stock"], medians["ohm"]
-    version = report["ohm"].removeprefix("ohm-")
-    headers = ["Workload", f"Rust {report['upstream']}", f"Ohm {version}", "Speedup"]
-    row = [
-        "Ruff doctests (`cargo test --doc`)",
+    return [
+        "Ruff",
+        "Doctests",
+        "Selected crates",
         f"{stock:.3f} s",
         f"{ohm:.3f} s",
         f"{stock / ohm:.2f}×",
     ]
-    return table(headers, [row])
 
 
 def documents(reports):
     tables, headlines = render_tables(
-        reports, load(RESULTS / TY_WORKTREE_REPORT), load(ROOT / TY_SCENARIO)
+        reports,
+        load(RESULTS / TY_WORKTREE_REPORT),
+        load(ROOT / TY_SCENARIO),
+        load(RESULTS / RUFF_DOCTEST_REPORT),
     )
-    tables["ruff-doctests"] = ruff_doctest_table(load(RESULTS / RUFF_DOCTEST_REPORT))
     workflows = load(RESULTS / DEVELOPER_WORKFLOW_REPORT)
     tables["developer-workflows"] = table(
         [
