@@ -231,11 +231,16 @@ In a macOS experiment, creating a worktree and completing its first build took 2
 copied build state and 3.59 seconds with it. When we made a small edit before building, the times
 were 25.08 and 8.33 seconds.
 
+From 1.99.0-26, `cargo worktree add` also uses Git to discover the source repository. This lets
+it work with SHA-256 object IDs and reftables, including when the command starts from a selected
+manifest or a Git hook.
+
 See:
 
 - [Cargo #101](https://github.com/astral-sh/ohm-cargo/pull/101)
 - [Cargo #126](https://github.com/astral-sh/ohm-cargo/pull/126)
 - [Rust #91](https://github.com/astral-sh/ohm-rust/pull/91)
+- [Cargo #450](https://github.com/astral-experiments/ohm-cargo/pull/450)
 
 ### 7. Start checking dependent crates earlier
 
@@ -582,6 +587,10 @@ when the replacement has the same size and modification time. If a changed-modul
 for the operating system to pass to rustfmt, Cargo formats the whole target with the original
 options.
 
+The 1.99.0-26 format cache also accounts for rustfmt's runtime libraries. If loader settings
+could override a library, Ohm runs rustfmt so that formatting and loader errors reach the caller.
+On Ohm's `dev` channel, `cfg_select!` uses the stable formatting layout.
+
 Ohm also reduces filesystem and parsing work during formatting. For example, on Linux it can resolve
 eligible paths with a single filesystem lookup, and it can skip scanning for comments when the text
 contains no `/` character.
@@ -611,6 +620,8 @@ See:
 - [rustfmt #61](https://github.com/astral-experiments/ohm-rustfmt/pull/61)
 - [rustfmt #63](https://github.com/astral-experiments/ohm-rustfmt/pull/63)
 - [rustfmt #65](https://github.com/astral-experiments/ohm-rustfmt/pull/65)
+- [rustfmt #67](https://github.com/astral-experiments/ohm-rustfmt/pull/67)
+- [rustfmt #70](https://github.com/astral-experiments/ohm-rustfmt/pull/70)
 
 ## Rust compiler
 
@@ -812,6 +823,20 @@ with release-optimized compilers. In a separate stage-1 comparison against the i
 change alone, support for character and tuple tables saved 2.75% of instructions on a Ruff parser
 check.
 
+From 1.99.0-26, rustc records which upstream crates can provide a trait implementation for a
+concrete receiver. If a crate's implementations cover only types defined in that crate, it cannot
+provide an implementation for a type owned by another crate. Rustc can skip that crate while still
+checking blanket implementations and the remaining candidates in their original order.
+
+After a uv edit, this saved about 3% of instructions across all 15 compiler processes in two matched
+ThinLTO build histories. The measurement enabled Ohm's procedural-macro and native-tool trust options.
+
+On Linux, 1.99.0-26 also binds references to strong functions from rustc's own libraries within
+the compiler driver after BOLT training. Internal calls no longer pass through dynamic-linker stubs.
+For a uv hint-ordering edit, the -26 candidate used 4.23% fewer retired user-space
+instructions for the full Cargo command than the release-trained trait-cache baseline.
+All eight pairs improved across two Linux runners, using the same Cargo binary.
+
 See:
 
 - [Rust #72](https://github.com/astral-sh/ohm-rust/pull/72)
@@ -834,6 +859,8 @@ See:
 - [Rust #348](https://github.com/astral-experiments/ohm-rust/pull/348)
 - [Rust #353](https://github.com/astral-experiments/ohm-rust/pull/353)
 - [Rust #355](https://github.com/astral-experiments/ohm-rust/pull/355)
+- [Rust #357](https://github.com/astral-experiments/ohm-rust/pull/357)
+- [Rust #351](https://github.com/astral-experiments/ohm-rust/pull/351)
 
 ### 23. Reduce allocator page-clearing work
 
@@ -972,7 +999,11 @@ With the bundled rustdoc, Cargo compiles cached examples using rustdoc's own com
 workspace wrapper change the library's configuration while examples still see the same configuration
 they would receive from rustdoc.
 
-In a Ruff benchmark, the median warm `cargo test --doc` took 13.56 seconds with stock Rust and
+In 1.99.0-26, cached examples also preserve rustdoc's name lookup, test filters, crate name, and
+runtime-library order. Filters containing spaces select the same examples, and failed examples
+return the usual failure status and output.
+
+In a Ruff benchmark with Ohm 1.99.0-23, the median warm `cargo test --doc` took 13.56 seconds with stock Rust and
 1.64 seconds with Ohm.
 
 See:
@@ -982,3 +1013,9 @@ See:
 - [Cargo #443](https://github.com/astral-experiments/ohm-cargo/pull/443)
 - [Cargo #446](https://github.com/astral-experiments/ohm-cargo/pull/446)
 - [Cargo #448](https://github.com/astral-experiments/ohm-cargo/pull/448)
+- [Cargo #452](https://github.com/astral-experiments/ohm-cargo/pull/452)
+- [Cargo #454](https://github.com/astral-experiments/ohm-cargo/pull/454)
+- [Cargo #456](https://github.com/astral-experiments/ohm-cargo/pull/456)
+- [Cargo #458](https://github.com/astral-experiments/ohm-cargo/pull/458)
+- [Cargo #460](https://github.com/astral-experiments/ohm-cargo/pull/460)
+- [Cargo #462](https://github.com/astral-experiments/ohm-cargo/pull/462)
