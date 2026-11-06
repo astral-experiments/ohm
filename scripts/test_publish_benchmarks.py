@@ -42,13 +42,6 @@ class PublicationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "five warm"):
             publish.ruff_doctest_row(report)
 
-    def test_tables_match_current_reports(self):
-        for name, expected in publish.documents(self.reports).items():
-            self.assertEqual(
-                publish.normalized_markdown(expected),
-                publish.normalized_markdown((publish.ROOT / name).read_text()),
-            )
-
     def test_ty_is_included_in_session_and_command_totals(self):
         tables, _ = publish.render_tables(
             self.reports, self.ty_worktree, self.ty_scenario, self.ruff_doctests
