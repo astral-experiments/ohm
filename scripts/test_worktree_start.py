@@ -55,6 +55,8 @@ class WorktreeStartTests(unittest.TestCase):
                         str(fixture),
                         "--source-path",
                         str(source),
+                        "--ohm",
+                        "test-ohm",
                         "--output-dir",
                         str(root / "results"),
                         "--minimum-free-gb",

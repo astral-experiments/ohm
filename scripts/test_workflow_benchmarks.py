@@ -37,6 +37,8 @@ class WorkflowTests(unittest.TestCase):
                 [
                     "--project",
                     "uv",
+                    "--ohm",
+                    "test-ohm",
                     "--output-dir",
                     str(self.root / "results"),
                     "--minimum-free-gb",

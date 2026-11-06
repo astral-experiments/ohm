@@ -8,11 +8,11 @@ if [[ "${1:-}" == "--require-pinned" ]]; then
   shift
 fi
 
-manifest="${1:-toolchains/1.99.0/21.json}"
-if [[ $# -gt 1 ]]; then
-  echo "usage: validate-release-manifest.sh [--require-pinned] [MANIFEST]" >&2
+if [[ $# -ne 1 ]]; then
+  echo "usage: validate-release-manifest.sh [--require-pinned] MANIFEST" >&2
   exit 2
 fi
+manifest="$1"
 
 if ! command -v jq >/dev/null 2>&1; then
   echo "jq is required to validate $manifest" >&2
