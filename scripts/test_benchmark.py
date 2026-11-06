@@ -24,7 +24,7 @@ SPEC.loader.exec_module(benchmark)
 
 class CommandOutputTests(unittest.TestCase):
     def test_reports_captured_error_without_exposing_url_credentials(self) -> None:
-        command = ["git", "clone", "https://github.com/astral-sh/uv.git"]
+        command = ["git", "clone", "https://secret-token@github.com/astral-sh/uv.git"]
         failure = subprocess.CalledProcessError(
             128,
             command,

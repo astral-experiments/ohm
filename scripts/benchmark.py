@@ -15,6 +15,7 @@ import datetime
 import json
 import os
 import re
+import shlex
 import shutil
 import statistics
 import subprocess
@@ -153,6 +154,7 @@ COMPILER_PROCESSES = {
 
 
 def command_output(arguments: list[str], *, cwd: Path | None = None) -> str:
+    rendered = re.sub(r"(https?://)[^/\s@]+@", r"\1<redacted>@", shlex.join(arguments))
     try:
         result = subprocess.run(
             arguments,
@@ -165,13 +167,9 @@ def command_output(arguments: list[str], *, cwd: Path | None = None) -> str:
     except subprocess.CalledProcessError as error:
         detail = error.stderr.strip() if error.stderr else str(error)
         detail = re.sub(r"(https?://)[^/\s@]+@", r"\1<redacted>@", detail)
-        raise BenchmarkError(
-            f"command failed: {' '.join(arguments)}: {detail}"
-        ) from error
+        raise BenchmarkError(f"command failed: {rendered}: {detail}") from error
     except OSError as error:
-        raise BenchmarkError(
-            f"command failed: {' '.join(arguments)}: {error}"
-        ) from error
+        raise BenchmarkError(f"command failed: {rendered}: {error}") from error
     return result.stdout.strip()
 
 

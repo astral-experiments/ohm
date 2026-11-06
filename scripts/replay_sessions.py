@@ -27,7 +27,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from benchmark import COMPILER_PROCESSES, DEFAULT_UPSTREAM, BenchmarkError
+from benchmark import COMPILER_PROCESSES, DEFAULT_UPSTREAM, BenchmarkError, command_output
 
 SCENARIO_DIRECTORY = Path(__file__).with_name("session_replays")
 PROJECTS = ("ruff", "uv", "codex")
@@ -164,26 +164,6 @@ class Scenario:
     warmup: tuple[dict[str, Any], ...]
     steps: tuple[dict[str, Any], ...]
     setup_patches: tuple[dict[str, Any], ...] = ()
-
-
-def command_output(arguments: list[str], *, cwd: Path | None = None) -> str:
-    rendered = re.sub(r"(https?://)[^/\s@]+@", r"\1<redacted>@", shlex.join(arguments))
-    try:
-        result = subprocess.run(
-            arguments,
-            cwd=cwd,
-            text=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            check=True,
-        )
-    except subprocess.CalledProcessError as error:
-        detail = error.stderr.strip() if error.stderr else str(error)
-        detail = re.sub(r"(https?://)[^/\s@]+@", r"\1<redacted>@", detail)
-        raise BenchmarkError(f"command failed: {rendered}: {detail}") from error
-    except OSError as error:
-        raise BenchmarkError(f"command failed: {rendered}: {error}") from error
-    return result.stdout.strip()
 
 
 def safe_revision(value: object, *, field: str) -> str:
