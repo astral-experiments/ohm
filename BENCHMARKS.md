@@ -9,10 +9,11 @@ Install [uv](https://docs.astral.sh/uv/), Git, and both Rust toolchains. Ruff/ty
 workflows need `cargo-nextest`. Codex session replays also need `just`. Run the commands from
 the Ohm repository with enough space for separate builds. Cache dependencies before an offline run.
 
-On x86_64 Linux, compare stock Rust 1.99.0 with Ohm 1.99.0-27, which bundles Wild 0.11.0.
-The versioned installer checks the archive's SHA-256 against
-`54d070c0893077a0442919d51325efaf3d9615c0e6ce5a2cf12d6d45fccd5aea`.
-[Ohm installer](https://labs.astral.sh/ohm/releases/ohm-1.99.0-27/install.sh) · [Release manifest](toolchains/1.99.0/27.json)
+On x86_64 Linux, compare stock Rust 1.99.0 with Ohm 1.99.0-28, which bundles Wild 0.11.0.
+The versioned installer checks the downloaded archive against its embedded SHA-256. The
+[Linux checksum](https://labs.astral.sh/ohm/releases/ohm-1.99.0-28/ohm-1.99.0-28-x86_64-unknown-linux-gnu.tar.gz.sha256)
+is available alongside the archive.
+[Ohm installer](https://labs.astral.sh/ohm/releases/ohm-1.99.0-28/install.sh) · [Release manifest](toolchains/1.99.0/28.json)
 
 Run the developer-workflow and individual-command examples below from Ohm commit
 `04c83d53483607aec4f93fd2bb55b412f101d677` to use the same drivers, workload revisions and replay
@@ -39,13 +40,13 @@ Prepare the sources and dependencies, then measure with the same Cargo home in b
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/uv \
   --upstream 1.99.0 \
-  --ohm ohm-1.99.0-27 \
+  --ohm ohm-1.99.0-28 \
   --output-dir /path/to/preparation --prepare-only
 
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/preparation/sources/uv \
   --upstream 1.99.0 \
-  --ohm ohm-1.99.0-27 \
+  --ohm ohm-1.99.0-28 \
   --jobs 8 --repetitions 4 --contention-retries 8 \
   --require-idle --discard-targets --output-dir /path/to/new-empty-results
 ```
@@ -93,7 +94,7 @@ temporary worktrees and use separate target directories.
 
 ```console
 uv run scripts/benchmark.py \
-  --project uv --upstream 1.99.0 --ohm ohm-1.99.0-27 --jobs 8 \
+  --project uv --upstream 1.99.0 --ohm ohm-1.99.0-28 --jobs 8 \
   --cold-runs 1 --noop-runs 3 --dependency-runs 7 --direct-runs 5 \
   --minimum-free-gb 60 --quiet-seconds 30 --require-idle \
   --discard-targets --output-dir /path/to/new-empty-results
@@ -129,7 +130,7 @@ On a quiet x86-64 Linux host, install both toolchains and run the following from
 ```console
 cargo +1.99.0 fetch --locked --manifest-path /path/to/ruff/Cargo.toml
 python3 scripts/benchmark_ruff_doctests.py --source /path/to/ruff \
-  --upstream 1.99.0 --ohm ohm-1.99.0-27 --jobs 32 --output /path/to/new-results
+  --upstream 1.99.0 --ohm ohm-1.99.0-28 --jobs 32 --output /path/to/new-results
 ```
 
 The results record all five warm pairs, the Cargo, rustc and rustdoc binaries used, and the
