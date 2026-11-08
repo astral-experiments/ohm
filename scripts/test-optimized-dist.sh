@@ -546,6 +546,7 @@ perf_git_dir="$(git -C "$perf_source" rev-parse --absolute-git-dir)"
 mkdir -p -- "$perf_git_dir/info"
 printf '%s export-ignore\n' "$collector_path" > "$perf_git_dir/info/attributes"
 git -C "$perf_source" config tar.umask 0222
+git -C "$perf_source" config core.autocrlf true
 printf '%s\n' '// local edit' >> "$original_collector"
 toolchain=ohm-1.99.0-23
 : > "$trace"
