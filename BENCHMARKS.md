@@ -149,6 +149,8 @@ follow the [session replay guide](scripts/session_replays/README.md) or the
 
 ## Recorded measurements
 
+The −28 Linux suites used the qualification SDK. Its runtime matches the published SDK in 3,820 of 3,827 files. [Qualification build](https://github.com/astral-experiments/ohm/actions/runs/42406214909)
+
 The individual-command benchmarks use the default trust settings. Session replays enable procedural-macro
 trust. The ty session, developer workflows, and APFS disk measurements enable both procedural-macro
 and native-tool trust. The ty worktree study measures Ohm with and without those opt-ins.
