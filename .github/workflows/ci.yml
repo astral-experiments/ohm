@@ -5,6 +5,19 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      coordinator:
+        description: Full coordinator commit containing the release manifest
+        required: true
+        type: string
+      llvm:
+        description: Expected LLVM commit on the 23.1.1 release branch
+        required: true
+        type: string
+      host:
+        type: choice
+        default: all
+        options: [all, linux, macos]
 
 permissions: {}
 
@@ -209,3 +222,304 @@ jobs:
             echo "$failing" >&2
             exit 1
           fi
+
+  packaged-llvm:
+    name: Qualify the packaged Ohm LLVM compiler (${{ matrix.target }})
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/charlie/qualify-custom-llvm'
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(inputs.host == 'linux' && '[{"target":"x86_64-unknown-linux-gnu","runner":"namespace-profile-ubuntu-24-04-16"}]' || inputs.host == 'macos' && '[{"target":"aarch64-apple-darwin","runner":"macos-15"}]' || '[{"target":"x86_64-unknown-linux-gnu","runner":"namespace-profile-ubuntu-24-04-16"},{"target":"aarch64-apple-darwin","runner":"macos-15"}]') }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 720
+    permissions:
+      contents: read
+    env:
+      COORDINATOR_REVISION: ${{ inputs.coordinator }}
+      MANIFEST_PATH: toolchains/1.99.0/29.json
+      OHM_TARGET: ${{ matrix.target }}
+      LLVM_REVISION: ${{ inputs.llvm }}
+      LLVM_TREE: c5a2ae9f0b8a4f6b4ae11b5329dc01a73d2b6424
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ env.COORDINATOR_REVISION }}
+          persist-credentials: false
+      - name: Select the Rust release Xcode and SDK
+        if: runner.os == 'macOS'
+        run: |
+          export DEVELOPER_DIR
+          DEVELOPER_DIR="$(./scripts/release-xcode.sh)"
+          sudo xcode-select --switch "$DEVELOPER_DIR"
+          echo "DEVELOPER_DIR=$DEVELOPER_DIR" >> "$GITHUB_ENV"
+          xcodebuild -version
+          xcrun --sdk macosx --show-sdk-version
+
+      - name: Make room for macOS profile training
+        if: matrix.runner == 'macos-15' && runner.environment == 'github-hosted'
+        run: ./scripts/prepare-hosted-macos-release.sh
+
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          enable-cache: false
+      - name: Read the committed release manifest
+        run: |
+          test "$(git rev-parse HEAD)" = "$COORDINATOR_REVISION"
+          ./scripts/validate-release-manifest.sh --require-pinned "$MANIFEST_PATH"
+          jq -er '
+            "OHM_TOOLCHAIN=\(.release.toolchain_name)",
+            "RUST_REVISION=\(.sources.rust.revision)",
+            "CARGO_REVISION=\(.sources.cargo.revision)",
+            "CLIPPY_REVISION=\(.sources.clippy.revision)",
+            "RUSTFMT_REVISION=\(.sources.rustfmt.revision)"
+          ' "$MANIFEST_PATH" >> "$GITHUB_ENV"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: astral-experiments/ohm-rust
+          ref: ${{ env.RUST_REVISION }}
+          path: source/rust
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: astral-experiments/ohm-cargo
+          ref: ${{ env.CARGO_REVISION }}
+          path: source/rust/src/tools/cargo
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: astral-experiments/ohm-rust-clippy
+          ref: ${{ env.CLIPPY_REVISION }}
+          path: source/rust/src/tools/clippy
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: astral-experiments/ohm-rustfmt
+          ref: ${{ env.RUSTFMT_REVISION }}
+          path: source/rust/src/tools/rustfmt
+          persist-credentials: false
+      - name: Verify the release sources and fork gitlink
+        run: |
+          test "$OHM_TOOLCHAIN" = ohm-1.99.0-29
+          ./scripts/verify-release-sources.sh "$MANIFEST_PATH" source/rust source/rust/src/tools/cargo source/rust/src/tools/clippy source/rust/src/tools/rustfmt
+          test "$(./scripts/ohm-llvm-revision.sh source/rust)" = "$LLVM_REVISION"
+      - name: Install the upstream Rust LLVM builder
+        if: runner.os == 'Linux'
+        run: ./scripts/install-release-bolt.sh
+      - name: Check the native CMake compiler and library discovery
+        if: runner.os == 'Linux'
+        run: |
+          probe="$GITHUB_WORKSPACE/native-llvm-probe"
+          mkdir "$probe"
+          cat > "$probe/CMakeLists.txt" <<'CMAKE'
+          cmake_minimum_required(VERSION 3.20)
+          project(native LANGUAGES C CXX ASM)
+          find_package(ZLIB REQUIRED)
+          add_executable(probe probe.cpp)
+          target_link_libraries(probe ZLIB::ZLIB)
+          target_compile_options(probe PRIVATE -flto=thin)
+          target_link_options(probe PRIVATE -flto=thin -fuse-ld=lld)
+          CMAKE
+          cat > "$probe/probe.cpp" <<'CPP'
+          #include <features.h>
+          #include <iosfwd>
+          #include <zlib.h>
+          static_assert(__GLIBC__ == 2 && __GLIBC_MINOR__ == 17, "expected CentOS 7 C headers");
+          static_assert(_GLIBCXX_RELEASE == 9, "expected GCC 9 headers");
+          int main() { return zlibVersion() == nullptr; }
+          CPP
+          docker run --rm --platform linux/amd64 --user "$(id -u):$(id -g)" --env HOME=/tmp \
+            --volume "$probe:$probe" --workdir "$probe" "$OHM_LLVM_BUILD_IMAGE" /bin/bash -ec '
+              /rustroot/bin/clang --version; /usr/local/bin/cmake --version; make --version | head -1
+              /rustroot/bin/clang -E -v -x c /dev/null >/dev/null
+              /rustroot/bin/clang++ -E -v -x c++ /dev/null >/dev/null
+              cmake -S . -B build -DCMAKE_C_COMPILER=/rustroot/bin/clang -DCMAKE_CXX_COMPILER=/rustroot/bin/clang++
+              cmake --build build --parallel 2
+              ./build/probe
+            '
+          "$probe/build/probe"
+      - name: Install matching LLVM tools for native PGO
+        if: matrix.target == 'aarch64-apple-darwin'
+        run: |
+          case "$(jq -er '.release.upstream_rust_version' "$MANIFEST_PATH")" in
+            1.97.* | 1.98.*) exit 0 ;;
+            1.99.*)
+              clang_version=23.1.2
+              clang_sha256=d7c26fc6177e42842e2d1ffaad31aec057c56a924392b1a23d830abe2c5d53b1
+              ;;
+            *)
+              echo 'Pin matching Clang for this Rust version' >&2
+              exit 1
+              ;;
+          esac
+
+          # Native PGO and ThinLTO require matching LLVM formats.
+          clang_root="$(mktemp -d "${RUNNER_TEMP:?}/ohm-clang.XXXXXX")"
+          clang_archive="$clang_root/clang.tar.xz"
+          curl --proto '=https' --proto-redir '=https' --tlsv1.2 \
+            --fail --location --retry 3 --show-error --silent \
+            --output "$clang_archive" \
+            "https://github.com/llvm/llvm-project/releases/download/llvmorg-$clang_version/LLVM-$clang_version-macOS-ARM64.tar.xz"
+          printf '%s  %s\n' "$clang_sha256" "$clang_archive" | shasum -a 256 --check
+          tar -xf "$clang_archive" -C "$clang_root" --strip-components=1
+          rm "$clang_archive"
+          "$clang_root/bin/clang" --version
+          "$clang_root/bin/clang++" --version
+          ln -s clang "$clang_root/bin/cc"
+          ln -s llvm-ar "$clang_root/bin/ar"
+          ln -s llvm-ranlib "$clang_root/bin/ranlib"
+          ln -s llvm-nm "$clang_root/bin/nm"
+          printf '%s\n' "$clang_root/bin" >> "$GITHUB_PATH"
+          {
+            printf 'OHM_HOST_LLVM_DIR=%s\n' "$clang_root"
+            printf 'CC=%s\n' "$clang_root/bin/clang"
+            printf 'CXX=%s\n' "$clang_root/bin/clang++"
+            printf 'AR=%s\n' "$clang_root/bin/llvm-ar"
+            printf 'RANLIB=%s\n' "$clang_root/bin/llvm-ranlib"
+            printf 'SDKROOT=%s\n' "$(xcrun --sdk macosx --show-sdk-path)"
+          } >> "$GITHUB_ENV"
+
+      - name: Prepare pinned Wild linker
+        run: |
+          wild_directory="$(python3 scripts/prepare-wild.py "$MANIFEST_PATH" "$OHM_TARGET" "$RUNNER_TEMP/ohm-wild")"
+          printf 'OHM_WILD_LINKER_DIR=%s\n' "$wild_directory" >> "$GITHUB_ENV"
+      - name: Build the optimized distribution
+        run: ./scripts/build-optimized-dist.sh "$OHM_TARGET" "$OHM_TOOLCHAIN" "$GITHUB_WORKSPACE/source/rust" "$GITHUB_WORKSPACE/release/bootstrap.toml"
+      - name: Show native compiler diagnostics on failure
+        if: failure()
+        run: |
+          find "source/rust/build/$OHM_TARGET/llvm" -name CMakeError.log -exec tail -n 80 {} \; || true
+          find "source/rust/build/$OHM_TARGET/llvm" -name CMakeConfigureLog.yaml -exec tail -n 100 {} \; || true
+      - name: Stage the SDK and its source provenance
+        id: assets
+        run: GITHUB_SHA="$(git rev-parse HEAD)" ./scripts/stage-release-dist.sh
+      - name: Run the packaged compiler and check its LLVM library
+        id: smoke
+        env:
+          ASSETS: ${{ steps.assets.outputs.directory }}
+        run: |
+          test "$(git --no-replace-objects -C source/rust/src/llvm-project rev-parse HEAD)" = "$LLVM_REVISION"
+          test "$(git --no-replace-objects -C source/rust/src/llvm-project rev-parse "HEAD^{tree}")" = "$LLVM_TREE"
+          jq -e --arg coordinator "$COORDINATOR_REVISION" --arg llvm "$LLVM_REVISION" \
+            --arg manifest "$(shasum -a 256 "$MANIFEST_PATH" | cut -d' ' -f1)" \
+            '.coordinator.revision == $coordinator and .manifest.sha256 == $manifest and .sources.llvm.revision == $llvm' \
+            "$ASSETS/$OHM_TOOLCHAIN-$OHM_TARGET-provenance.json"
+          sdk="$RUNNER_TEMP/ohm-llvm-sdk"
+          mkdir -p "$sdk"
+          archive="$ASSETS/$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz"
+          unpacked="$RUNNER_TEMP/ohm-llvm-install"
+          mkdir -p "$unpacked"
+          tar -xzf "$archive" -C "$unpacked"
+          installer=("$unpacked"/rust-*/install.sh)
+          "${installer[0]}" --prefix="$sdk" --components="rustc,rust-std-$OHM_TARGET" --disable-ldconfig
+          cache="source/rust/build/$OHM_TARGET/llvm/build/CMakeCache.txt"
+          lld_cache="source/rust/build/$OHM_TARGET/lld/build/CMakeCache.txt"
+          lld="$sdk/lib/rustlib/$OHM_TARGET/bin/rust-lld"
+          test -x "$lld"
+          grep -E '^(CMAKE_(BUILD_TYPE|CXX_COMPILER|CXX_FLAGS_RELEASE|SYSROOT|OSX_DEPLOYMENT_TARGET)|LLVM_(ENABLE_ASSERTIONS|ENABLE_LTO|ENABLE_ZSTD|USE_STATIC_ZSTD|LINK_LLVM_DYLIB|PROFDATA_FILE)):' "$cache"
+          grep -E '^CMAKE_BUILD_TYPE:[^=]+=Release$' "$cache"
+          grep -E '^LLVM_ENABLE_ASSERTIONS:[^=]+=(OFF|FALSE)$' "$cache"
+          grep -E '^LLVM_LINK_LLVM_DYLIB:[^=]+=(ON|TRUE)$' "$cache"
+          if [[ "$RUNNER_OS" == Linux ]]; then
+            grep -E '^CMAKE_CXX_COMPILER:[^=]+=/rustroot/bin/clang[+][+]$' "$lld_cache"
+            grep -E '^LLVM_ENABLE_LTO:[^=]+=Thin$' "$cache"
+            grep -E '^LLVM_PROFDATA_FILE:[^=]+=.*/llvm-pgo.profdata$' "$cache"
+            grep -E '^LLVM_USE_STATIC_ZSTD:[^=]+=(ON|TRUE)$' "$cache"
+            grep -E '^ZLIB_LIBRARY(_RELEASE)?:[^=]+=/usr/lib64/libz\.so(\.[0-9]+)*$' "$cache"
+          else
+            for apple_cache in "$cache" "$lld_cache"; do
+              grep -E '^CMAKE_CXX_COMPILER:[^=]+=/usr/bin/clang[+][+]$' "$apple_cache"
+              grep -E '^CMAKE_OSX_DEPLOYMENT_TARGET:[^=]+=11[.]0$' "$apple_cache"
+            done
+            if grep -E '^LLVM_ENABLE_LTO:[^=]+=(Thin|Full|ON|TRUE)$|^LLVM_PROFDATA_FILE:[^=]+=.+$' "$cache"; then
+              exit 1
+            fi
+          fi
+          "$sdk/bin/rustc" -vV | tee "$RUNNER_TEMP/rustc-version"
+          grep -F "commit-hash: $RUST_REVISION" "$RUNNER_TEMP/rustc-version"
+          cat > "$RUNNER_TEMP/inliner.rs" <<'RS'
+          #[inline(never)]
+          fn bump(value: u32) -> u32 { value.wrapping_mul(3).wrapping_add(1) }
+          fn main() {
+              assert_eq!(bump(13), 40);
+              assert!(std::panic::catch_unwind(|| panic!("expected unwind")).is_err());
+          }
+          RS
+          "$sdk/bin/rustc" -C opt-level=1 -C passes=o1-local-inliner "$RUNNER_TEMP/inliner.rs" -o "$RUNNER_TEMP/inliner"
+          "$RUNNER_TEMP/inliner"
+          "$sdk/bin/rustc" -C opt-level=0 -C panic=unwind "$RUNNER_TEMP/inliner.rs" -o "$RUNNER_TEMP/unwind"
+          "$RUNNER_TEMP/unwind"
+          if [[ "$RUNNER_OS" == Linux ]]; then
+            python3 - <<'PYDEBUG' > "$RUNNER_TEMP/debug.c"
+          print("struct sample {")
+          for index in range(1024):
+              print(f"long member_{index};")
+          print("}; struct sample instance;")
+          PYDEBUG
+            cc -g -gdwarf-4 -c "$RUNNER_TEMP/debug.c" -o "$RUNNER_TEMP/debug.o"
+            "$lld" -flavor gnu -r --compress-debug-sections=zlib -o "$RUNNER_TEMP/linked.o" "$RUNNER_TEMP/debug.o"
+            readelf -SW "$RUNNER_TEMP/linked.o" > "$RUNNER_TEMP/debug-sections"
+            grep -E '\.debug_info[[:space:]]+PROGBITS.*[[:space:]]C[[:space:]]' "$RUNNER_TEMP/debug-sections"
+            readelf --debug-dump=info "$RUNNER_TEMP/linked.o" > "$RUNNER_TEMP/debug-info"
+            grep -F 'member_1023' "$RUNNER_TEMP/debug-info"
+          else
+            printf 'int answer(void) { return 42; }\n' | /usr/bin/clang -target arm64-apple-macos11 -g -x c -c - -o "$RUNNER_TEMP/debug.o"
+            DYLD_LIBRARY_PATH="$sdk/lib" "$lld" -flavor darwin -arch arm64 -dylib -platform_version macos 11.0 26.2 \
+              -o "$RUNNER_TEMP/debug.dylib" "$RUNNER_TEMP/debug.o"
+            nm -gU "$RUNNER_TEMP/debug.dylib" | grep -E '_answer$'
+            otool -l "$lld" > "$RUNNER_TEMP/lld-load-commands"
+            grep -E 'minos 11[.]0$' "$RUNNER_TEMP/lld-load-commands"
+            grep -E 'sdk 26[.]2$' "$RUNNER_TEMP/lld-load-commands"
+          fi
+          python3 - "$sdk" "$OHM_TARGET" <<'PYPROOF'
+          import hashlib, mmap, pathlib, re, subprocess, sys
+          libdir = pathlib.Path(sys.argv[1]) / "lib"
+          target = sys.argv[2]
+          magic = bytes.fromhex("7f454c46" if "linux" in target else "cffaedfe")
+          def shared_libraries(directory):
+              result = set()
+              for path in directory.glob("libLLVM*"):
+                  if path.is_file():
+                      with path.open("rb") as stream:
+                          if stream.read(4) == magic:
+                              result.add(path.resolve())
+              return sorted(result)
+          paths = shared_libraries(libdir)
+          assert len(paths) == 1, paths
+          packaged = paths[0]
+          with packaged.open("rb") as stream, mmap.mmap(stream.fileno(), 0, access=mmap.ACCESS_READ) as contents:
+              assert contents.find(b"o1-local-inliner") >= 0
+              digest = hashlib.sha256(contents).hexdigest()
+          staged = pathlib.Path("source/rust/build") / target / "stage2/lib"
+          candidates = shared_libraries(staged)
+          assert any(hashlib.sha256(p.read_bytes()).hexdigest() == digest for p in candidates), (packaged, candidates)
+          print(f"Packaged and source-built {packaged.name} match at SHA-256 {digest}")
+          if "linux" in target:
+              elf = subprocess.check_output(["readelf", "-W", "--version-info", "--dynamic", packaged], text=True)
+              needed = re.findall(r'\(NEEDED\).*?\[([^]]+)\]', elf)
+              assert not any(n.startswith(("libstdc++.", "libzstd.")) for n in needed), needed
+              versions = [tuple(map(int, v.split("."))) for v in re.findall(r'\bGLIBC_(\d+(?:\.\d+)+)', elf)]
+              assert max(versions) <= (2, 17), max(versions)
+              print("Maximum GLIBC", max(versions), "DT_NEEDED", needed)
+          else:
+              macho = subprocess.check_output(["otool", "-l", packaged], text=True)
+              cmd = re.search(r"cmd LC_BUILD_VERSION.*?minos ([0-9.]+).*?sdk ([0-9.]+)", macho, re.S)
+              assert cmd and cmd.group(1) in {"11.0", "11.0.0"} and cmd.group(2) in {"26.2", "26.2.0"}, cmd
+              print("Minimum macOS", cmd.group(1), "SDK", cmd.group(2))
+          PYPROOF
+      - name: Capture the source-built libraries if a package check fails
+        if: failure() && steps.assets.outcome == 'success'
+        run: |
+          for project in llvm lld; do
+            cache="source/rust/build/$OHM_TARGET/$project/build/CMakeCache.txt"
+            grep -E '^(CMAKE_(BUILD_TYPE|CXX_COMPILER|OSX_DEPLOYMENT_TARGET)|LLVM_(ENABLE_ASSERTIONS|ENABLE_LTO|ENABLE_ZSTD|USE_STATIC_ZSTD|LINK_LLVM_DYLIB|PROFDATA_FILE)|ZLIB_LIBRARY)' "$cache"
+          done
+          shasum -a 256 source/rust/build/"$OHM_TARGET"/stage2/lib/libLLVM*
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: ${{ !cancelled() && steps.assets.outcome == 'success' }}
+        with:
+          name: ohm-1.99.0-29-${{ steps.smoke.outcome == 'success' && 'qualified' || 'candidate-for-inspection' }}-${{ matrix.target }}
+          compression-level: 0
+          path: ${{ steps.assets.outputs.directory }}
+          if-no-files-found: error
+          retention-days: 14
