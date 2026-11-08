@@ -542,6 +542,9 @@ RS
 )
 original_head="$(git -C "$perf_source" rev-parse HEAD)"
 original_collector="$perf_source/$collector_path"
+perf_git_dir="$(git -C "$perf_source" rev-parse --absolute-git-dir)"
+mkdir -p -- "$perf_git_dir/info"
+printf '%s export-ignore\n' "$collector_path" > "$perf_git_dir/info/attributes"
 printf '%s\n' '// local edit' >> "$original_collector"
 toolchain=ohm-1.99.0-23
 : > "$trace"
@@ -589,6 +592,22 @@ if ! run_optimized_build "$macos_target" "$replacement_output"; then
 fi
 assert_optimized_build "$macos_target" "$rust_checkout/build/$macos_target/ci-llvm" false true "$replacement_output" relocated
 git -C "$rust_checkout" replace -d "$pinned_rust_head"
+
+partial_checkout="$test_directory/partial-checkout"
+cp -R -- "$rust_checkout" "$partial_checkout"
+partial_perf="$partial_checkout/src/tools/rustc-perf"
+mv -- "$partial_perf" "$test_directory/full-collector"
+git -C "$perf_remote" config uploadpack.allowFilter true
+GIT_DEFAULT_REF_FORMAT=reftable git clone --quiet --no-local --no-checkout --filter=blob:none "$perf_remote" "$partial_perf"
+# The archive must hydrate the blob using this checkout's conditional remote.
+remote_config="$test_directory/collector-remote.gitconfig"
+git config --file "$remote_config" remote.origin.url "$perf_remote"
+git -C "$partial_perf" config --unset remote.origin.url
+git -C "$partial_perf" config extensions.worktreeConfig true
+partial_branch="$(git -C "$partial_perf" symbolic-ref --short HEAD)"
+git -C "$partial_perf" config --worktree "includeIf.onbranch:$partial_branch.path" "$remote_config"
+git -C "$partial_perf" rev-list --objects --all --missing=print | grep -Fxq -- "?$pinned_perf_blob"
+rust_checkout="$partial_checkout" run_optimized_build "$linux_target" "$test_directory/partial-checkout.log"
 
 staged_checkout="$test_directory/staged-checkout"
 cp -R "$rust_checkout" "$staged_checkout"

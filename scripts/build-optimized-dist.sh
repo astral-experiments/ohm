@@ -277,7 +277,33 @@ if [[ "$prepare_relocated_dependencies" == true ]]; then
     # Supply the revision on stdin so Git selects the checkout's usual fetch remote.
     git --no-replace-objects -C "$perf_source" fetch --depth 1 --no-tags --no-write-fetch-head --stdin <<< "$perf_revision"
   fi
-  git --no-replace-objects -C "$perf_source" archive "$perf_revision" | tar -x -C "$perf_checkout"
+  # Isolate info/attributes while retaining the Git directory that selects
+  # worktree-specific settings and conditional remotes for partial clones.
+  (
+    cd -P -- "$perf_source"
+    git_dir="$(git rev-parse --absolute-git-dir)"
+    common_dir="$(git rev-parse --git-common-dir)"
+    common_dir="$(cd -P -- "$common_dir" && printf '%s/' "$PWD")"
+    archive_common="$work_directory/collector.git"
+    mkdir -- "$archive_common"
+    ln -s -- "${common_dir}objects" "${common_dir}refs" "${common_dir}packed-refs" \
+      "${common_dir}shallow" "${common_dir}reftable" "$archive_common/"
+    git config --file "$archive_common/config" include.path "${common_dir}config"
+    # Git selects the repository format before it follows config includes.
+    while IFS= read -r -d '' setting; do
+      key="${setting%%$'\n'*}"
+      if [[ "$setting" == "$key" ]]; then
+        value=true # A Git configuration key without a value is true.
+      else
+        value="${setting#*$'\n'}"
+      fi
+      git config --file "$archive_common/config" "$key" "$value"
+    done < <(git config --local --no-includes --null --get-regexp '^(core\.repositoryformatversion$|extensions\.)')
+    unset GIT_INDEX_FILE
+    GIT_DIR="$git_dir" GIT_COMMON_DIR="$archive_common" GIT_WORK_TREE="$perf_source" \
+      GIT_ATTR_NOSYSTEM=1 GIT_ATTR_SOURCE="$perf_revision" \
+      git --no-replace-objects -c core.attributesFile=/dev/null archive "$perf_revision" | tar -x -C "$perf_checkout"
+  )
   patch -d "$perf_checkout" -t -N -F 0 -p1 -i "$script_directory/../release/rustc-perf-relocated-dependencies.patch"
   opt_dist_arguments+=(--rustc-perf-checkout-dir "$perf_checkout")
 fi
