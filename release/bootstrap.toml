@@ -37,9 +37,7 @@ codegen-units-std = 1
 jemalloc = true
 lto = "thin"
 
-# Ohm does not modify LLVM. Reuse Rust's matching CI LLVM when the source
-# history proves that it is compatible; the compiler, sysroot, and extended
-# Cargo archive are still built from the pinned Ohm sources.
+# The release builder turns this off when the Rust gitlink pins the Ohm LLVM fork.
 [llvm]
 download-ci-llvm = true
 

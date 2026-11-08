@@ -2,6 +2,7 @@
 set -euo pipefail
 
 manifest_sha256="$(shasum -a 256 "$MANIFEST_PATH" | awk '{print $1}')"
+llvm_revision="$(scripts/ohm-llvm-revision.sh source/rust)"
 jq -n \
   --arg toolchain "$OHM_TOOLCHAIN" \
   --arg target "$OHM_TARGET" \
@@ -10,6 +11,7 @@ jq -n \
   --arg manifest_path "$MANIFEST_PATH" \
   --arg manifest_sha256 "$manifest_sha256" \
   --arg rust_revision "$RUST_REVISION" \
+  --arg llvm_revision "$llvm_revision" \
   --arg cargo_revision "$CARGO_REVISION" \
   --arg clippy_revision "$CLIPPY_REVISION" \
   --arg rustfmt_revision "$RUSTFMT_REVISION" \
@@ -34,13 +36,17 @@ jq -n \
       clippy: { revision: $clippy_revision },
       rustfmt: { revision: $rustfmt_revision }
     }
-  }' > source/rust/build/dist/ohm-provenance.json
+  } | if $llvm_revision != "" then .sources.llvm = { revision: $llvm_revision } else . end' > source/rust/build/dist/ohm-provenance.json
 
 rust_version="$(tr -d '\r\n' < source/rust/src/version)"
 combined_archive="source/rust/build/dist/rust-$rust_version-dev-$OHM_TARGET.tar.gz"
 if [[ ! -f "$combined_archive" ]]; then
   echo "combined Ohm archive not found: $combined_archive" >&2
   exit 1
+fi
+
+if [[ -n "$llvm_revision" && "$OHM_TARGET" == x86_64-unknown-linux-gnu ]]; then
+  python3 scripts/verify-linux-llvm.py "$combined_archive" "$OHM_HOST_LLVM_DIR/bin/llvm-readelf"
 fi
 
 release_directory="$(mktemp -d "${RUNNER_TEMP:?}/ohm-release.XXXXXX")"

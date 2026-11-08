@@ -26,6 +26,7 @@ jobs:
     permissions:
       contents: read
     outputs:
+      llvm-revision: ${{ steps.llvm.outputs.revision }}
       rust-revision: ${{ steps.manifest.outputs.rust-revision }}
       cargo-revision: ${{ steps.manifest.outputs.cargo-revision }}
       clippy-revision: ${{ steps.manifest.outputs.clippy-revision }}
@@ -131,6 +132,12 @@ jobs:
             source/clippy \
             source/rustfmt
 
+      - name: Read the compiler's LLVM gitlink
+        id: llvm
+        run: |
+          llvm_revision="$(./scripts/ohm-llvm-revision.sh source/rust)"
+          echo "revision=$llvm_revision" >> "$GITHUB_OUTPUT"
+
   build:
     if: inputs.build
     needs: plan
@@ -154,6 +161,16 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+
+      - name: Select the Rust release Xcode and SDK
+        if: runner.os == 'macOS' && needs.plan.outputs.llvm-revision != ''
+        run: |
+          export DEVELOPER_DIR
+          DEVELOPER_DIR="$(./scripts/release-xcode.sh)"
+          sudo xcode-select --switch "$DEVELOPER_DIR"
+          echo "DEVELOPER_DIR=$DEVELOPER_DIR" >> "$GITHUB_ENV"
+          xcodebuild -version
+          xcrun --sdk macosx --show-sdk-version
 
       - name: Make room for macOS profile training
         if: matrix.runner == 'macos-15' && runner.environment == 'github-hosted'
@@ -267,6 +284,7 @@ jobs:
           ln -s llvm-nm "$clang_root/bin/nm"
           printf '%s\n' "$clang_root/bin" >> "$GITHUB_PATH"
           {
+            printf 'OHM_HOST_LLVM_DIR=%s\n' "$clang_root"
             printf 'CC=%s\n' "$clang_root/bin/clang"
             printf 'CXX=%s\n' "$clang_root/bin/clang++"
             printf 'AR=%s\n' "$clang_root/bin/llvm-ar"

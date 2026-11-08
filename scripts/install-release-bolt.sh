@@ -24,7 +24,29 @@ case "$(jq -er '.release.upstream_rust_version' "$MANIFEST_PATH")" in
     ;;
 esac
 bolt_root="$(mktemp -d "${RUNNER_TEMP:?}/ohm-bolt.XXXXXX")"
-if [[ "$bolt_major" == 23 ]]; then
+llvm_revision="$(scripts/ohm-llvm-revision.sh "$GITHUB_WORKSPACE/source/rust")"
+if [[ -n "$llvm_revision" ]]; then
+  # Rust 1.99.0's dist-x86_64-linux image provides Clang, GCC 9.5, static
+  # zstd and the CentOS 7 sysroot used to link its distributed LLVM library.
+  if [[ "$bolt_major" != 23 ]]; then
+    echo 'Pin the matching Rust dist image for this LLVM version' >&2
+    exit 1
+  fi
+  image=ghcr.io/rust-lang/rust-ci@sha256:6ddfb4305cd3f14c08e1e4ac628fe63c297765e2311308fe747355dc5e4b66d5
+  container="$(docker create --platform linux/amd64 "$image" /bin/true)"
+  trap 'docker rm "$container" >/dev/null' EXIT
+  # opt-dist runs the profile merger and BOLT beside the training compiler.
+  # All LLVM compilation and installation happens inside the image itself.
+  mkdir -p "$bolt_root/bin" "$bolt_root/lib"
+  for tool in llvm-profdata llvm-bolt merge-fdata llvm-readelf; do
+    docker cp -L "$container:/rustroot/bin/$tool" "$bolt_root/bin/$tool"
+  done
+  for runtime in libbolt_rt_instr.a libbolt_rt_hugify.a; do
+    docker cp -L "$container:/rustroot/lib/$runtime" "$bolt_root/lib/$runtime"
+  done
+  bolt_llvm_dir="$bolt_root"
+  printf 'OHM_HOST_LLVM_DIR=%s\nOHM_LLVM_BUILD_IMAGE=%s\n' "$bolt_root" "$image" >> "$GITHUB_ENV"
+elif [[ "$bolt_major" == 23 ]]; then
   bolt_archive="$bolt_root/llvm.tar.xz"
   bolt_directory="LLVM-$bolt_version-Linux-X64"
   curl --proto '=https' --proto-redir '=https' --tlsv1.2 \
@@ -32,7 +54,6 @@ if [[ "$bolt_major" == 23 ]]; then
     --output "$bolt_archive" \
     "https://github.com/llvm/llvm-project/releases/download/llvmorg-$bolt_version/$bolt_directory.tar.xz"
   printf '%s  %s\n' "$bolt_sha256" "$bolt_archive" | sha256sum --check --strict
-  # Leave llvm-profdata for the build to link from Rust's matching LLVM.
   tar -xJf "$bolt_archive" -C "$bolt_root" --strip-components=1 --occurrence=1 \
     "$bolt_directory/bin/llvm-bolt" \
     "$bolt_directory/bin/merge-fdata" \
