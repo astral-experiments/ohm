@@ -1,0 +1,35 @@
+{
+  "$schema": "../manifest.schema.json",
+  "schema_version": 1,
+  "status": "pinned",
+  "release": {
+    "upstream_rust_version": "1.99.0",
+    "ohm_revision": 29,
+    "toolchain_name": "ohm-1.99.0-29"
+  },
+  "prepare_relocated_pgo_dependencies": true,
+  "sources": {
+    "rust": {
+      "repository": "https://github.com/astral-sh/ohm-rust",
+      "revision": "43870b60bbb0f568413b9c683d0845835ba798a4"
+    },
+    "cargo": {
+      "repository": "https://github.com/astral-sh/ohm-cargo",
+      "revision": "82436530296447f7c1788ad4b799b418da823157"
+    },
+    "clippy": {
+      "repository": "https://github.com/astral-sh/ohm-rust-clippy",
+      "revision": "864602427f35440c68ea2b0060d6d7fd9bc4fafa"
+    },
+    "rustfmt": {
+      "repository": "https://github.com/astral-sh/ohm-rustfmt",
+      "revision": "b7c58d8bec901c33381c6ffea6ea5ac480244004"
+    }
+  },
+  "bundled_tools": {
+    "wild": {
+      "version": "0.11.0",
+      "sha256": "25012a78de164686f552b7703b5d0223adab4829c79cd1fb351108221d61c7d8"
+    }
+  }
+}
