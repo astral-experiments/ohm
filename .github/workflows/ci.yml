@@ -209,3 +209,70 @@ jobs:
             echo "$failing" >&2
             exit 1
           fi
+
+  load-packaged-llvm:
+    name: Load the packaged LLVM under glibc 2.17
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          github-token: ${{ github.token }}
+          run-id: 42510956432
+          name: ohm-1.99.0-29-qualified-x86_64-unknown-linux-gnu
+          path: assets
+      - name: Verify and load the archived shared library
+        env:
+          IMAGE: ghcr.io/rust-lang/rust-ci@sha256:6ddfb4305cd3f14c08e1e4ac628fe63c297765e2311308fe747355dc5e4b66d5
+        run: |
+          set -euo pipefail
+          cd assets
+          sha256sum --check ./*.sha256
+          jq -e '
+            .coordinator.revision == "80f23502684c3d15506167ddad78fd168495963b" and
+            .manifest.sha256 == "5d0a3aa88c31ce03aa1d7d2eaf780821874c29d24935fdc53608262d99ce454b" and
+            .sources.llvm.revision == "df8532c300c33e37820c5b4aaa7d03b1f424cdaf"
+          ' ./*-provenance.json
+          work="$RUNNER_TEMP/load-llvm"
+          mkdir "$work"
+          python3 - "$work/libLLVM.so" <<'PY'
+          import pathlib, shutil, sys, tarfile
+          with tarfile.open(next(pathlib.Path().glob("*.tar.gz")), "r|gz") as tar:
+              for item in tar:
+                  path = pathlib.PurePosixPath(item.name)
+                  if item.isfile() and path.parts[1:-1] == ("rustc", "lib") and path.name.startswith("libLLVM.so."):
+                      with open(sys.argv[1], "wb") as output:
+                          shutil.copyfileobj(tar.extractfile(item), output)
+                      print(item.name)
+                      break
+              else:
+                  raise SystemExit("packaged LLVM shared object missing")
+          PY
+          sha256sum "$work/libLLVM.so"
+          cat > "$work/load.c" <<'C'
+          #include <dlfcn.h>
+          #include <gnu/libc-version.h>
+          #include <stdio.h>
+          #include <string.h>
+
+          int main(void) {
+              const char *glibc = gnu_get_libc_version();
+              printf("glibc %s\n", glibc);
+              if (strcmp(glibc, "2.17") != 0) return 1;
+              void *library = dlopen("/probe/libLLVM.so", RTLD_NOW | RTLD_LOCAL);
+              if (!library) { fprintf(stderr, "dlopen: %s\n", dlerror()); return 1; }
+              void (*version)(unsigned *, unsigned *, unsigned *) = dlsym(library, "LLVMGetVersion");
+              if (!version) { fprintf(stderr, "dlsym: %s\n", dlerror()); return 1; }
+              unsigned major, minor, patch;
+              version(&major, &minor, &patch);
+              printf("LLVM %u.%u.%u loaded with RTLD_NOW\n", major, minor, patch);
+              return major != 23 || minor != 1 || patch != 1;
+          }
+          C
+          docker run --rm --platform linux/amd64 --volume "$work:/probe:ro" "$IMAGE" bash -ec '
+            /rustroot/bin/clang -O2 /probe/load.c -o /tmp/load-llvm -ldl
+            env -u LD_PRELOAD -u LD_LIBRARY_PATH /tmp/load-llvm
+          '
