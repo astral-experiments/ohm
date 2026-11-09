@@ -4,6 +4,33 @@ set -euo pipefail
 script_directory="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 temporary_directory="$(mktemp -d "${TMPDIR:-/tmp}/ohm-packaging-test.XXXXXXXX")"
 trap 'rm -rf "$temporary_directory"' EXIT
+
+# Store readelf output as fixture data to test dependency selection on either host.
+llvm_fixture="$temporary_directory/llvm"
+mkdir -p "$llvm_fixture/sdk/rustc/bin" "$llvm_fixture/sdk/rustc/lib"
+cat > "$llvm_fixture/readelf" <<'EOF'
+#!/usr/bin/env bash
+cat -- "${!#}"
+EOF
+chmod +x "$llvm_fixture/readelf"
+printf '(NEEDED) Shared library: [librustc_driver-test.so]\n' > "$llvm_fixture/sdk/rustc/bin/rustc"
+printf '(NEEDED) Shared library: [libLLVM.so.active]\n' > "$llvm_fixture/sdk/rustc/lib/librustc_driver-test.so"
+for active in 2.34 2.17; do
+  stale=2.17
+  if [[ "$active" == 2.17 ]]; then stale=2.34; fi
+  printf 'Name: GLIBC_%s\n' "$active" > "$llvm_fixture/sdk/rustc/lib/libLLVM.so.active"
+  printf 'Name: GLIBC_%s\n' "$stale" > "$llvm_fixture/sdk/rustc/lib/libLLVM.so.stale"
+  tar -czf "$llvm_fixture/sdk.tar.gz" -C "$llvm_fixture" sdk/rustc/lib/libLLVM.so.stale \
+    sdk/rustc/bin/rustc sdk/rustc/lib/librustc_driver-test.so sdk/rustc/lib/libLLVM.so.active
+  if python3 "$script_directory/verify-linux-llvm.py" "$llvm_fixture/sdk.tar.gz" "$llvm_fixture/readelf" \
+    > "$llvm_fixture/result" 2>&1; then
+    [[ "$active" == 2.17 ]]
+  else
+    [[ "$active" == 2.34 ]]
+    grep -Fq 'above the glibc 2.17 baseline' "$llvm_fixture/result"
+  fi
+done
+
 toolchain=ohm-9.9.9-1
 manifest="$temporary_directory/manifest.json"$'\n'
 cat > "$manifest" <<EOF
