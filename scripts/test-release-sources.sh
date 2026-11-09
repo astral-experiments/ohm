@@ -58,7 +58,7 @@ printf '1.97.1\n' > "$rust_checkout/src/version"
 printf 'original embedded clippy\n' > "$rust_checkout/src/tools/clippy/README.md"
 printf 'original embedded rustfmt\n' > "$rust_checkout/src/tools/rustfmt/README.md"
 cat > "$rust_checkout/.gitmodules" <<'EOF'
-[submodule "src/tools/cargo"]
+[submodule "Cargo build"]
 	path = src/tools/cargo
 	url = https://github.com/astral-sh/ohm-cargo.git
 EOF
@@ -115,14 +115,23 @@ GIT_DIR="$clippy_checkout/.git" GIT_WORK_TREE="$clippy_checkout" \
   "${verify_sources[@]}" >/dev/null
 llvm_checkout="$test_root/llvm-rust"
 git init --quiet "$llvm_checkout"
-git -C "$llvm_checkout" config --file .gitmodules submodule.src/llvm-project.path src/llvm-project
-git -C "$llvm_checkout" config --file .gitmodules submodule.src/llvm-project.url https://github.com/astral-experiments/ohm-llvm.git
+git -C "$llvm_checkout" config --file .gitmodules submodule.compiler.LLVM.path src/llvm-project
+git -C "$llvm_checkout" config --file .gitmodules submodule.compiler.LLVM.url https://github.com/astral-experiments/ohm-llvm.git
 git -C "$llvm_checkout" add .gitmodules
 git -C "$llvm_checkout" update-index --add --cacheinfo "160000,$clippy_revision,src/llvm-project"
 commit_fixture "$llvm_checkout" -m 'Pin the LLVM fork'
 [[ "$(GIT_DIR="$clippy_checkout/.git" GIT_OBJECT_DIRECTORY="$clippy_checkout/.git/objects" \
   "$script_dir/ohm-llvm-revision.sh" "$llvm_checkout")" == "$clippy_revision" ]]
 [[ -z "$(GIT_DIR="$llvm_checkout/.git" "$script_dir/ohm-llvm-revision.sh" "$rust_checkout")" ]]
+
+# A different submodule can have the same name as the LLVM checkout path.
+git -C "$llvm_checkout" config --file .gitmodules submodule.compiler.LLVM.url https://github.com/rust-lang/llvm-project.git
+git -C "$llvm_checkout" config --file .gitmodules submodule.src/llvm-project.path vendor/llvm
+git -C "$llvm_checkout" config --file .gitmodules submodule.src/llvm-project.url https://github.com/astral-experiments/ohm-llvm.git
+git -C "$llvm_checkout" add .gitmodules
+git -C "$llvm_checkout" update-index --add --cacheinfo "160000,$rustfmt_revision,vendor/llvm"
+commit_fixture "$llvm_checkout" -m 'Pin the LLVM fork at a different path'
+[[ -z "$("$script_dir/ohm-llvm-revision.sh" "$llvm_checkout")" ]]
 
 printf '/build.rs\n' >> "$cargo_checkout/.git/info/exclude"
 printf 'fn main() {}\n' > "$cargo_checkout/build.rs"
@@ -208,7 +217,7 @@ fi
 mv "$nested_dependency/.source.rs" "$nested_dependency/lib.rs"
 mv "$test_root/dependency-gitfile" "$nested_dependency/.git"
 
-git -C "$rust_checkout" config submodule.src/tools/cargo.ignore all
+git -C "$rust_checkout" config 'submodule.Cargo build.ignore' all
 git -C "$embedded_cargo" config submodule.fixture.ignore all
 for source in "$embedded_cargo/README.md" "$nested_dependency/lib.rs"; do
   printf '// uncommitted edit\n' >> "$source"

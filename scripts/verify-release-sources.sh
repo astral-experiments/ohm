@@ -165,7 +165,9 @@ if [[ "$gitlink_revision" != "$cargo_revision" ]]; then
   exit 1
 fi
 
-cargo_repository="$(git -C "$rust_checkout" config -f .gitmodules --get submodule.src/tools/cargo.url)"
+modules=(git -C "$rust_checkout" config --blob HEAD:.gitmodules)
+path_key="$("${modules[@]}" --name-only --get-regexp '^submodule\..*\.path$' '^src/tools/cargo$')"
+cargo_repository="$("${modules[@]}" --get "${path_key%.path}.url")"
 case "$cargo_repository" in
   git@github.com:*) cargo_repository="https://github.com/${cargo_repository#git@github.com:}" ;;
 esac

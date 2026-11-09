@@ -6,7 +6,11 @@ unset GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_QUARANTINE_PATH
 
 # A Rust release opts into source-built LLVM by pinning the Ohm submodule.
 checkout="${1:?expected a Rust checkout}"
-repository="$(git --no-replace-objects -C "$checkout" config --blob HEAD:.gitmodules --get submodule.src/llvm-project.url 2>/dev/null || true)"
+modules=(git --no-replace-objects -C "$checkout" config --blob HEAD:.gitmodules)
+if ! path_key="$("${modules[@]}" --name-only --get-regexp '^submodule\..*\.path$' '^src/llvm-project$' 2>/dev/null)"; then
+  exit 0
+fi
+repository="$("${modules[@]}" --get "${path_key%.path}.url")"
 case "${repository%.git}" in
   https://github.com/astral-experiments/ohm-llvm) ;;
   *) exit 0 ;;
