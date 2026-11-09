@@ -9,11 +9,19 @@ import tarfile
 import tempfile
 
 
-def check_library(readelf, library):
-    info = subprocess.check_output(
-        [readelf, "--wide", "--dynamic", "--version-info", library], text=True
-    )
-    needed = re.findall(r"\(NEEDED\).*?\[([^]]+)\]", info)
+def dependencies(info):
+    return re.findall(r"\(NEEDED\).*?\[([^]]+)\]", info)
+
+
+def required_library(needed, prefix):
+    names = [name for name in needed if name.startswith(prefix) and "/" not in name]
+    if len(names) != 1:
+        raise SystemExit(f"expected one {prefix} dependency, found {names}")
+    return names[0]
+
+
+def check_library(info):
+    needed = dependencies(info)
     if any(name.startswith(("libstdc++.", "libzstd.")) for name in needed):
         raise SystemExit(f"LLVM has an unexpected dynamic dependency: {needed}")
 
@@ -27,18 +35,33 @@ def check_library(readelf, library):
 
 
 def main(archive, readelf):
-    with tarfile.open(archive, "r|gz") as tar:
-        for member in tar:
-            path = pathlib.PurePosixPath(member.name)
-            if not member.isfile() or path.parts[1:-1] != ("rustc", "lib"):
-                continue
-            if path.name.startswith("libLLVM.so"):
-                with tempfile.NamedTemporaryFile() as library:
-                    shutil.copyfileobj(tar.extractfile(member), library)
-                    library.flush()
-                    check_library(readelf, library.name)
-                return
-    raise SystemExit("packaged rustc does not contain its LLVM shared library")
+    with tarfile.open(archive, "r:gz") as tar:
+        # Extraction installs the last entry for each path.
+        members = {pathlib.PurePosixPath(member.name): member for member in tar}
+        launchers = [path for path in members if path.parts[1:] == ("rustc", "bin", "rustc")]
+        if len(launchers) != 1:
+            raise SystemExit("expected one packaged rustc executable")
+        rustc = launchers[0]
+        lib = rustc.parent.parent / "lib"
+
+        def headers(path, *sections):
+            try:
+                data = tar.extractfile(members[path])
+            except KeyError:
+                raise SystemExit(f"missing packaged file: {path}") from None
+            if data is None:
+                raise SystemExit(f"expected a packaged file: {path}")
+            with data, tempfile.NamedTemporaryFile() as file:
+                shutil.copyfileobj(data, file)
+                file.flush()
+                return subprocess.check_output([readelf, "--wide", *sections, file.name], text=True)
+
+        needed = dependencies(headers(rustc, "--dynamic"))
+        if not any(name.startswith("libLLVM") for name in needed):
+            driver = required_library(needed, "librustc_driver")
+            needed = dependencies(headers(lib / driver, "--dynamic"))
+        llvm = required_library(needed, "libLLVM")
+        check_library(headers(lib / llvm, "--dynamic", "--version-info"))
 
 
 if __name__ == "__main__":
