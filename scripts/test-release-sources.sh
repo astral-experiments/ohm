@@ -113,6 +113,17 @@ GIT_INDEX_FILE="$clippy_checkout/.git/index" "${verify_sources[@]}" >/dev/null
 GIT_DIR="$clippy_checkout/.git" GIT_WORK_TREE="$clippy_checkout" \
   GIT_OBJECT_DIRECTORY="$clippy_checkout/.git/objects" GIT_QUARANTINE_PATH="$clippy_checkout/.git/objects" \
   "${verify_sources[@]}" >/dev/null
+llvm_checkout="$test_root/llvm-rust"
+git init --quiet "$llvm_checkout"
+git -C "$llvm_checkout" config --file .gitmodules submodule.src/llvm-project.path src/llvm-project
+git -C "$llvm_checkout" config --file .gitmodules submodule.src/llvm-project.url https://github.com/astral-experiments/ohm-llvm.git
+git -C "$llvm_checkout" add .gitmodules
+git -C "$llvm_checkout" update-index --add --cacheinfo "160000,$clippy_revision,src/llvm-project"
+commit_fixture "$llvm_checkout" -m 'Pin the LLVM fork'
+[[ "$(GIT_DIR="$clippy_checkout/.git" GIT_OBJECT_DIRECTORY="$clippy_checkout/.git/objects" \
+  "$script_dir/ohm-llvm-revision.sh" "$llvm_checkout")" == "$clippy_revision" ]]
+[[ -z "$(GIT_DIR="$llvm_checkout/.git" "$script_dir/ohm-llvm-revision.sh" "$rust_checkout")" ]]
+
 printf '/build.rs\n' >> "$cargo_checkout/.git/info/exclude"
 printf 'fn main() {}\n' > "$cargo_checkout/build.rs"
 if "${verify_sources[@]}" >/dev/null 2>&1; then
