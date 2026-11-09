@@ -27,8 +27,8 @@ import sys
 checkout = pathlib.Path(__file__).resolve().parent
 arguments = sys.argv[1:]
 
-if "opt-dist" not in arguments or "src/llvm-project" not in arguments:
-    raise SystemExit("bootstrap must build opt-dist and download the matching LLVM")
+if "opt-dist" not in arguments:
+    raise SystemExit("bootstrap must build opt-dist")
 
 build_directory = pathlib.Path(arguments[arguments.index("--build-dir") + 1])
 target = arguments[arguments.index("--target") + 1]
@@ -62,6 +62,7 @@ cat > "$rust_checkout/fixture-opt-dist" <<'PY'
 import json
 import os
 import pathlib
+import subprocess
 import sys
 
 checkout = pathlib.Path(__file__).resolve().parents[3]
@@ -88,12 +89,30 @@ def fixture_component(name: str) -> str:
 
 component_pgo = (checkout / "src/tools/opt-dist/component-pgo-v1").is_file()
 profiles = {"rustc": "rustc"}
+if "--build-llvm=true" in arguments:
+    profiles["llvm"] = "llvm"
+if "--llvm-shared=true" in arguments:
+    linux = "--build-llvm=true" in arguments
+    target_build = checkout / "build" / arguments[arguments.index("--target-triple") + 1]
+    for project in ("llvm", "lld", "compiler-rt"):
+        build = target_build / f"component-{project}" / "build"
+        build.mkdir(parents=True, exist_ok=True)
+        source = checkout / "src/llvm-project" / project
+        configured = subprocess.check_output(["cmake", str(source)], cwd=build, text=True)
+        assert configured.strip() == ("upstream Clang" if linux else "Xcode Clang"), configured
+        (build / "CMakeCache.txt").write_text(f"CMAKE_HOME_DIRECTORY:INTERNAL={source}\n")
+        built = subprocess.check_output(["cmake", "--build", str(build)], cwd=checkout, text=True)
+        assert built.strip() == ("upstream build" if linux else "host build")
+    other = subprocess.check_output(["cmake", str(checkout / "library")], cwd=checkout, text=True)
+    assert other.strip() == "host CMake"
+    assert "upstream CMake" not in subprocess.check_output(["cmake", "--version"], cwd=checkout, text=True)
 if component_pgo:
     profiles.update({"rustdoc": "rustdoc", "cargo": "rustc"})
     if os.environ.get("DIST_TRY_BUILD", "0") == "0":
         profiles.update({component: component for component in ("clippy", "rustfmt")})
 
 profile_functions = {
+    "llvm": ["_ZN4llvm11PassBuilder23buildO0DefaultPipelineEv"],
     "rustc": ["_RNvCs_17rustc_driver_impl12run_compiler"],
     "rustdoc": ["_RNvCs_7rustdoc4main"],
     "clippy": ["_RNvCs_12clippy_lints4main"],
@@ -108,7 +127,7 @@ symlink_component = fixture_component("symlink")
 corrupt_component = fixture_component("corrupt")
 wrong_component = fixture_component("wrong")
 missing_coverage = fixture_component("missing-coverage")
-for component in ("rustc", "rustdoc", "clippy", "rustfmt"):
+for component in ("rustc", "rustdoc", "clippy", "rustfmt", "llvm"):
     profile = artifact_directory / f"{component}-pgo.profdata"
     profile.unlink(missing_ok=True)
     if component not in profiles or component == missing_component:
@@ -717,5 +736,104 @@ assert "OHM_WILD_LINKER_DIR" not in event["environment"]
 assert event["environment"]["CARGO_UNSTABLE_OHM_LINKER"] == "lld"
 PY
 expect_failure 'a Wild payload on macOS' "$macos_target" OHM_WILD_LINKER_DIR="$wild_directory"
+
+# Give the fixture a real local LLVM gitlink; bootstrap must consume the fork
+# even if a CI LLVM build is already present in the same build directory.
+llvm_source="$test_directory/fork"
+mkdir -p "$llvm_source/cmake/Modules"
+printf 'set(LLVM_VERSION_MAJOR 22)\n' > "$llvm_source/cmake/Modules/LLVMVersion.cmake"
+git init -q "$llvm_source"
+git -C "$llvm_source" add .
+git -C "$llvm_source" -c user.name=fixture -c user.email=fixture@example.org commit -qm llvm
+llvm_revision="$(git -C "$llvm_source" rev-parse HEAD)"
+git -C "$rust_checkout" symbolic-ref HEAD refs/heads/llvm-fixture
+git -C "$rust_checkout" config -f .gitmodules submodule.src/llvm-project.path src/llvm-project
+git -C "$rust_checkout" config -f .gitmodules submodule.src/llvm-project.url https://github.com/astral-experiments/ohm-llvm.git
+git -C "$rust_checkout" config submodule.src/llvm-project.url "$llvm_source"
+git -C "$rust_checkout" add -- .gitmodules
+git -C "$rust_checkout" update-index --add --cacheinfo "160000,$llvm_revision,src/llvm-project"
+git -C "$rust_checkout" -c user.name=fixture -c user.email=fixture@example.org commit -qm gitlink
+# Only the committed source URL selects the release backend.
+git -C "$rust_checkout" config -f .gitmodules submodule.src/llvm-project.url https://github.com/rust-lang/llvm-project.git
+test "$("$script_directory/ohm-llvm-revision.sh" "$rust_checkout")" = "$llvm_revision"
+git -C "$rust_checkout" restore -- .gitmodules
+
+host_llvm="$test_directory/host LLVM"
+mkdir -p "$host_llvm/bin"
+cp "$rust_checkout/fixture-llvm-tool" "$host_llvm/bin/llvm-profdata"
+cat > "$host_llvm/bin/docker" <<'DOCKER'
+#!/usr/bin/env bash
+case "$1" in
+  run) echo fixture-llvm-container ;;
+  exec)
+    if [[ "$*" == *"/usr/local/bin/cmake --version" ]]; then
+      echo "upstream CMake"
+    elif [[ "$*" == *"/usr/local/bin/cmake --build "* ]]; then
+      echo "upstream build"
+    elif [[ "$*" == *"-DCMAKE_CXX_COMPILER=/rustroot/bin/clang++"* ]]; then
+      echo "upstream Clang"
+    fi
+    ;;
+  rm) exit 0 ;;
+  *) exit 1 ;;
+esac
+DOCKER
+cat > "$host_llvm/bin/cmake" <<'CMAKE'
+#!/usr/bin/env bash
+case "$*" in
+  *-DCMAKE_CXX_COMPILER=/usr/bin/clang++*)
+    [[ "$*" == *"-DCMAKE_OSX_SYSROOT=$SDKROOT"* && "$*" == *"-DCMAKE_OSX_DEPLOYMENT_TARGET=11.0"* ]] || exit 1
+    echo "Xcode Clang"
+    ;;
+  --build*) echo "host build" ;;
+  *) echo "host CMake" ;;
+esac
+CMAKE
+chmod +x "$host_llvm/bin/docker" "$host_llvm/bin/cmake"
+fixture_xcode="$test_directory/Other Xcode.app/Contents/Developer"
+mkdir -p "$fixture_xcode"
+cat > "$host_llvm/bin/xcodebuild" <<'XCODE'
+#!/usr/bin/env bash
+printf 'Xcode %s\nBuild version 17C52\n' "${FIXTURE_XCODE_VERSION:-26.2}"
+XCODE
+cat > "$host_llvm/bin/xcrun" <<'XCRUN'
+#!/usr/bin/env bash
+case "$3" in
+  --show-sdk-version) echo "${FIXTURE_SDK_VERSION:-26.2}" ;;
+  --show-sdk-path) echo "$DEVELOPER_DIR/SDKs/MacOSX26.2.sdk" ;;
+  *) exit 1 ;;
+esac
+XCRUN
+chmod +x "$host_llvm/bin/xcodebuild" "$host_llvm/bin/xcrun"
+for target in "$linux_target" "$macos_target"; do
+  : > "$trace"
+  if ! run_optimized_build "$target" "$test_directory/source-llvm.log" GIT_ALLOW_PROTOCOL=file OHM_HOST_LLVM_DIR="$host_llvm" OHM_LLVM_BUILD_IMAGE=fixture/rust-llvm DEVELOPER_DIR="$fixture_xcode" PATH="$host_llvm/bin:$PATH"; then
+    cat "$test_directory/source-llvm.log" >&2
+    exit 1
+  fi
+  python3 - "$trace" "$rust_checkout/build/ohm-release-bootstrap.toml" "$host_llvm" "$target" <<'PYTEST'
+import json, pathlib, sys, tomllib
+bootstrap, pipeline = [json.loads(line) for line in pathlib.Path(sys.argv[1]).read_text().splitlines()]
+assert "src/llvm-project" not in bootstrap["arguments"]
+llvm = tomllib.loads(pathlib.Path(sys.argv[2]).read_text())["llvm"]
+assert not llvm["download-ci-llvm"] and llvm["link-shared"] and llvm["static-libstdcpp"]
+assert "--llvm-shared=true" in pipeline["arguments"]
+cache = llvm["build-config"]
+if sys.argv[4].startswith("x86_64"):
+    assert "--build-llvm=true" in pipeline["arguments"]
+    assert llvm["thin-lto"] and llvm["libzstd"] and not llvm["ninja"]
+    assert cache["LLVM_ENABLE_ZLIB"] == "FORCE_ON"
+else:
+    assert "--build-llvm=false" in pipeline["arguments"]
+    assert not llvm.get("thin-lto") and not llvm.get("libzstd")
+    assert cache["CMAKE_C_COMPILER"] == "/usr/bin/clang"
+    assert cache["CMAKE_OSX_DEPLOYMENT_TARGET"] == "11.0"
+    assert cache["CMAKE_OSX_SYSROOT"].endswith("/MacOSX26.2.sdk")
+PYTEST
+done
+expect_failure 'mismatched release Xcode' "$macos_target" OHM_HOST_LLVM_DIR="$host_llvm" DEVELOPER_DIR="$fixture_xcode" PATH="$host_llvm/bin:$PATH" FIXTURE_XCODE_VERSION=27.0
+expect_failure 'mismatched macOS SDK' "$macos_target" OHM_HOST_LLVM_DIR="$host_llvm" DEVELOPER_DIR="$fixture_xcode" PATH="$host_llvm/bin:$PATH" FIXTURE_SDK_VERSION=27.0
+printf '# local edit\n' >> "$rust_checkout/src/llvm-project/cmake/Modules/LLVMVersion.cmake"
+expect_failure 'modified LLVM sources' "$macos_target" OHM_HOST_LLVM_DIR="$host_llvm" DEVELOPER_DIR="$fixture_xcode" PATH="$host_llvm/bin:$PATH"
 
 echo 'optimized release build tests passed'

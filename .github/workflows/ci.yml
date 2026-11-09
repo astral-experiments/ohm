@@ -98,7 +98,7 @@ jobs:
           if rust.get("jemalloc") is not True:
               raise SystemExit("Ohm releases must use Rust's jemalloc allocator")
           if config.get("llvm", {}).get("download-ci-llvm") is not True:
-              raise SystemExit("Ohm releases must reuse Rust's optimized CI LLVM")
+              raise SystemExit("The bootstrap template must reuse upstream CI LLVM for historical releases")
           if config.get("dist", {}).get("compression-formats") != ["gz"]:
               raise SystemExit(
                   "Ohm releases must use deterministic gzip-compressed archives"

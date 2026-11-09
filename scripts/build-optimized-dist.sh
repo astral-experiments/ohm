@@ -48,6 +48,53 @@ if [[ "$bootstrap_config" != /* ]]; then
   bootstrap_config="$PWD/$bootstrap_config"
 fi
 
+llvm_revision="$("$script_directory/ohm-llvm-revision.sh" "$rust_checkout")"
+build_llvm=false
+train_llvm=false
+host_llvm_dir=
+bootstrap_targets=(opt-dist src/llvm-project)
+if [[ -n "$llvm_revision" ]]; then
+  build_llvm=true
+  bootstrap_targets=(opt-dist)
+  # Keep the profile merger outside the LLVM output that opt-dist rebuilds.
+  host_llvm_dir="${OHM_HOST_LLVM_DIR:?source-built LLVM requires the pinned release tools}"
+  if [[ "$use_bolt" == true ]]; then
+    train_llvm=true
+    llvm_image="${OHM_LLVM_BUILD_IMAGE:?Linux LLVM requires the Rust distribution image}"
+    llvm_cmake=(LLVM_ENABLE_ZLIB=FORCE_ON)
+  else
+    # Rust builds Apple LLVM as a shared Release library with the system
+    # Clang. Its arm64 distribution supports macOS 11.
+    DEVELOPER_DIR="$("$script_directory/release-xcode.sh")"
+    export DEVELOPER_DIR
+    SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
+    export SDKROOT
+    llvm_cmake=(CMAKE_C_COMPILER=/usr/bin/clang CMAKE_CXX_COMPILER=/usr/bin/clang++
+      CMAKE_OSX_DEPLOYMENT_TARGET=11.0 "CMAKE_OSX_SYSROOT=$SDKROOT")
+    if ! command -v ninja >/dev/null; then
+      build_tools="$rust_checkout/build/ohm-llvm-build-tools"
+      uv venv --allow-existing --python python3 "$build_tools"
+      uv pip install --only-binary :all: --python "$build_tools/bin/python" ninja==1.13.0
+      export PATH="$build_tools/bin:$PATH"
+    fi
+  fi
+  git -C "$rust_checkout" submodule update --init --depth 1 -- src/llvm-project
+  llvm_checkout="$rust_checkout/src/llvm-project"
+  if [[ "$(git -C "$llvm_checkout" rev-parse HEAD)" != "$llvm_revision" ||
+    -n "$(git -C "$llvm_checkout" status --porcelain --untracked-files=all)" ]]; then
+    echo "expected clean Ohm LLVM checkout at $llvm_revision" >&2
+    exit 1
+  fi
+
+  source_major="$(sed -nE 's/^[[:space:]]*set\(LLVM_VERSION_MAJOR ([0-9]+)\)$/\1/p' "$llvm_checkout/cmake/Modules/LLVMVersion.cmake")"
+  host_version="$("$host_llvm_dir/bin/llvm-profdata" --version)"
+  if [[ ! "$host_version" =~ LLVM[[:space:]]version[[:space:]]([0-9]+)\. || "${BASH_REMATCH[1]}" != "$source_major" ]]; then
+    echo "host LLVM profile tool must match pinned LLVM major version $source_major" >&2
+    exit 1
+  fi
+  echo "Building Ohm LLVM $llvm_revision"
+fi
+
 # Older immutable Rust source revisions only train rustc. Detect the explicit
 # component-training contract before bootstrapping so those releases remain
 # reproducible without weakening verification for newer source revisions.
@@ -96,10 +143,22 @@ release_config="$build_dir/ohm-release-bootstrap.toml"
 # Keep the complete release configuration visible to both bootstrap.py and the
 # Rust bootstrap executable. bootstrap.py does not resolve TOML includes, so an
 # include-based override would silently drop release-critical configuration.
-if ! awk -v toolchain="$toolchain" -v use_mimalloc="$use_mimalloc" '
+if ! awk -v toolchain="$toolchain" -v use_mimalloc="$use_mimalloc" -v build_llvm="$build_llvm" -v train_llvm="$train_llvm" '
   /^description[[:space:]]*=[[:space:]]*"Ohm"[[:space:]]*$/ {
     print "description = \"" toolchain "\""
     replacements++
+    next
+  }
+  /^download-ci-llvm[[:space:]]*=[[:space:]]*true[[:space:]]*$/ && build_llvm == "true" {
+    print "download-ci-llvm = false"
+    print "link-shared = true"
+    print "static-libstdcpp = true"
+    if (train_llvm == "true") {
+      print "thin-lto = true"
+      print "libzstd = true"
+      print "ninja = false"
+    }
+    llvm_replacements++
     next
   }
   { print }
@@ -108,12 +167,24 @@ if ! awk -v toolchain="$toolchain" -v use_mimalloc="$use_mimalloc" '
     allocator_replacements++
   }
   END {
-    if (replacements != 1) exit 1
+    if (replacements != 1 || (build_llvm == "true" && llvm_replacements != 1)) exit 1
     if (use_mimalloc == "true" && allocator_replacements != 1) exit 1
   }
 ' "$bootstrap_config" >"$release_config"; then
-  echo 'release bootstrap configuration must contain exactly one Ohm build description' >&2
+  echo 'release bootstrap configuration is missing a required release setting' >&2
   exit 1
+fi
+
+if [[ "$build_llvm" == true ]]; then
+  python3 - "${llvm_cmake[@]}" >> "$release_config" <<'PYCONF'
+import json
+import sys
+
+print("\n[llvm.build-config]")
+for entry in sys.argv[1:]:
+    key, value = entry.split("=", 1)
+    print(f"{key} = {json.dumps(value)}")
+PYCONF
 fi
 
 export RUST_BOOTSTRAP_CONFIG="$release_config"
@@ -122,17 +193,15 @@ if [[ -n "${TMPDIR:-}" && "$TMPDIR" != /* ]]; then
 fi
 cd -- "$rust_checkout"
 
-# `opt-dist` is a bootstrap-only tool and does not itself require LLVM. Ask for
-# LLVM explicitly so bootstrap downloads its already-optimized CI artifact
-# before the optimization pipeline needs the matching llvm-profdata executable.
+# Historical toolchains also fetch Rust's matching CI LLVM here. A fork-backed
+# build lets opt-dist compile and train the pinned source in its normal stages.
 python3 "$rust_checkout/x.py" build \
   --ci false \
   --config "$release_config" \
   --build-dir "$build_dir" \
   --host "$target" \
   --target "$target" \
-  opt-dist \
-  src/llvm-project
+  "${bootstrap_targets[@]}"
 
 opt_dist="$build_dir/$target/stage1-tools-bin/opt-dist"
 if [[ ! -x "$opt_dist" ]]; then
@@ -140,10 +209,10 @@ if [[ ! -x "$opt_dist" ]]; then
   exit 1
 fi
 
-ci_llvm_dir="$build_dir/$target/ci-llvm"
-llvm_profdata="$ci_llvm_dir/bin/llvm-profdata"
+llvm_dir="${host_llvm_dir:-$build_dir/$target/ci-llvm}"
+llvm_profdata="$llvm_dir/bin/llvm-profdata"
 if [[ ! -x "$llvm_profdata" ]]; then
-  echo "matching CI LLVM profile tool was not downloaded: $llvm_profdata" >&2
+  echo "matching LLVM profile tool is missing: $llvm_profdata" >&2
   exit 1
 fi
 
@@ -153,16 +222,81 @@ prepare_relocated_dependencies=false
 if [[ -f "$manifest" ]]; then
   prepare_relocated_dependencies="$(jq -r '.prepare_relocated_pgo_dependencies // false' "$manifest")"
 fi
-if [[ "$use_bolt" == true || "$prepare_relocated_dependencies" == true ]]; then
+if [[ "$use_bolt" == true || "$build_llvm" == true || "$prepare_relocated_dependencies" == true ]]; then
   work_directory="$(mktemp -d "${TMPDIR:-/tmp}/ohm-opt-dist.XXXXXX")"
-  trap 'rm -rf -- "$work_directory"' EXIT
+  llvm_container=
+  trap 'if [[ -n "$llvm_container" ]]; then docker rm -f "$llvm_container" >/dev/null || true; fi; rm -rf -- "$work_directory"' EXIT
 fi
 
-llvm_dir="$ci_llvm_dir"
+if [[ "$train_llvm" == true ]]; then
+  # LLVM and standalone LLD share a CMake installation and Clang toolchain.
+  # Mount the Rust tree at the same path so bootstrap and opt-dist can use
+  # their installed outputs and profiles on the host.
+  llvm_container="$(docker run --detach --rm --platform linux/amd64 \
+    --user "$(id -u):$(id -g)" --env HOME=/tmp \
+    --volume "$rust_checkout:$rust_checkout" --workdir "$rust_checkout" \
+    "$llvm_image" /bin/sleep infinity)"
+  docker exec -i "$llvm_container" /rustroot/bin/clang++ -fsyntax-only -x c++ - <<'HEADERS'
+#include <features.h>
+#include <iosfwd>
+static_assert(__GLIBC__ == 2 && __GLIBC_MINOR__ == 17, "expected the CentOS 7 C headers");
+static_assert(_GLIBCXX_RELEASE == 9, "expected the Rust distribution C++ headers");
+HEADERS
+fi
+
+if [[ "$build_llvm" == true ]]; then
+  # Bootstrap's llvm.build-config applies only to core LLVM. Standalone LLD
+  # and other CMake projects from the same gitlink need the same host tools.
+  if [[ "$train_llvm" == true ]]; then
+    native_cmake=(-DCMAKE_C_COMPILER=/rustroot/bin/clang -DCMAKE_CXX_COMPILER=/rustroot/bin/clang++
+      -DCMAKE_ASM_COMPILER=/rustroot/bin/clang -DCMAKE_AR=/rustroot/bin/llvm-ar -DCMAKE_RANLIB=/rustroot/bin/llvm-ranlib)
+  else
+    native_cmake=("${llvm_cmake[@]/#/-D}" -DCMAKE_ASM_COMPILER=/usr/bin/clang
+      -DCMAKE_AR=/usr/bin/ar -DCMAKE_RANLIB=/usr/bin/ranlib)
+  fi
+  cmake_directory="$work_directory/cmake"
+  mkdir -p "$cmake_directory"
+  {
+    printf '#!/usr/bin/env bash\nset -eu\n'
+    printf 'llvm_source=%q\ncontainer=%q\nhost_cmake=%q\n' \
+      "$rust_checkout/src/llvm-project" "$llvm_container" "$(command -v cmake)"
+    printf 'native_cmake=('
+    printf ' %q' "${native_cmake[@]}"
+    printf ' )\n'
+    cat <<'CMAKE'
+source_dir=
+cache=
+configure=false
+case "${1:-}" in
+  --build | --install) cache="${2:-.}/CMakeCache.txt" ;;
+  -S) source_dir="${2:-}"; configure=true ;;
+  /*) source_dir="$1"; configure=true ;;
+  *) cache="$PWD/CMakeCache.txt" ;;
+esac
+if [[ "$configure" == false && -f "$cache" ]]; then
+  source_dir="$(sed -n 's/^CMAKE_HOME_DIRECTORY:INTERNAL=//p' "$cache")"
+fi
+case "$source_dir" in
+  "$llvm_source" | "$llvm_source/"*) ;;
+  *) exec "$host_cmake" "$@" ;;
+esac
+if [[ "$configure" == true ]]; then
+  set -- "$@" "${native_cmake[@]}"
+fi
+if [[ -n "$container" ]]; then
+  exec docker exec --workdir "$PWD" "$container" /usr/local/bin/cmake "$@"
+fi
+exec "$host_cmake" "$@"
+CMAKE
+  } > "$cmake_directory/cmake"
+  chmod +x "$cmake_directory/cmake"
+  export PATH="$cmake_directory:$PATH"
+fi
+
 if [[ "$use_bolt" == true ]]; then
   llvm_version="$("$llvm_profdata" --version)"
   if [[ ! "$llvm_version" =~ LLVM[[:space:]]version[[:space:]]([0-9]+)\. ]]; then
-    echo "could not determine downloaded LLVM major version: $llvm_profdata" >&2
+    echo "could not determine LLVM major version: $llvm_profdata" >&2
     exit 1
   fi
   llvm_major="${BASH_REMATCH[1]}"
@@ -175,7 +309,7 @@ if [[ "$use_bolt" == true ]]; then
   bolt_major="${BASH_REMATCH[1]}"
 
   if [[ "$llvm_major" != "$bolt_major" ]]; then
-    echo "LLVM BOLT major version $bolt_major does not match downloaded LLVM $llvm_major" >&2
+    echo "LLVM BOLT major version $bolt_major does not match LLVM $llvm_major" >&2
     exit 1
   fi
 
@@ -187,7 +321,7 @@ if [[ "$use_bolt" == true ]]; then
   merge_major="${BASH_REMATCH[1]}"
 
   if [[ "$llvm_major" != "$merge_major" ]]; then
-    echo "LLVM merge-fdata major version $merge_major does not match downloaded LLVM $llvm_major" >&2
+    echo "LLVM merge-fdata major version $merge_major does not match LLVM $llvm_major" >&2
     exit 1
   fi
 
@@ -237,9 +371,6 @@ for variable in \
   fi
 done
 
-# LLVM has already been optimized by Rust's CI. Reuse it instead of rebuilding
-# or reprofiling it. Mark it non-shared for opt-dist's purposes so its first
-# rustc stage does not override settings that are incompatible with CI LLVM.
 opt_dist_arguments=(
   local
   --target-triple "$target"
@@ -248,8 +379,8 @@ opt_dist_arguments=(
   --llvm-dir "$llvm_dir"
   --artifact-dir build/opt-artifacts
   --build-dir build
-  --build-llvm=false
-  --llvm-shared=false
+  --build-llvm="$train_llvm"
+  --llvm-shared="$build_llvm"
 )
 if [[ "$use_bolt" == true ]]; then
   opt_dist_arguments+=(--use-bolt)
@@ -328,6 +459,9 @@ env -i "${safe_environment[@]}" \
 # crate symbols instead of merely accepting any nonempty LLVM profile: another
 # instrumented process can otherwise create a valid but unrelated profile.
 components=(rustc)
+if [[ "$train_llvm" == true ]]; then
+  components+=(llvm)
+fi
 if [[ "$component_pgo" == true ]]; then
   components+=(rustdoc clippy rustfmt)
 fi
@@ -344,6 +478,7 @@ for component in "${components[@]}"; do
   if ! "$llvm_profdata" show --covered "$profile" | awk \
     -v component="$component" \
     -v component_pgo="$component_pgo" '
+      component == "llvm" && index($0, "_ZN4llvm") { primary = 1 }
       component == "rustc" && index($0, "rustc_driver") { primary = 1 }
       component == "rustc" && index($0, "_5cargo") { cargo = 1 }
       component == "rustdoc" && index($0, "_7rustdoc") { primary = 1 }
