@@ -123,6 +123,9 @@ commit_fixture "$llvm_checkout" -m 'Pin the LLVM fork'
 [[ "$(GIT_DIR="$clippy_checkout/.git" GIT_OBJECT_DIRECTORY="$clippy_checkout/.git/objects" \
   "$script_dir/ohm-llvm-revision.sh" "$llvm_checkout")" == "$clippy_revision" ]]
 [[ -z "$(GIT_DIR="$llvm_checkout/.git" "$script_dir/ohm-llvm-revision.sh" "$rust_checkout")" ]]
+for mode in GIT_GLOB_PATHSPECS GIT_ICASE_PATHSPECS; do
+  [[ "$(env "$mode=1" "$script_dir/ohm-llvm-revision.sh" "$llvm_checkout")" == "$clippy_revision" ]]
+done
 
 # A different submodule can have the same name as the LLVM checkout path.
 git -C "$llvm_checkout" config --file .gitmodules submodule.compiler.LLVM.url https://github.com/rust-lang/llvm-project.git
