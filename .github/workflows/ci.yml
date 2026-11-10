@@ -143,8 +143,8 @@ jobs:
     permissions:
       contents: read
     env:
-      # renovate: datasource=pypi depName=actionlint-py
-      ACTIONLINT_VERSION: 1.7.12.24
+      # renovate: datasource=go depName=github.com/rhysd/actionlint
+      ACTIONLINT_VERSION: v1.7.12
       # renovate: datasource=pypi depName=shellcheck-py
       SHELLCHECK_VERSION: 0.11.0.1
     steps:
@@ -156,8 +156,8 @@ jobs:
           enable-cache: true
       - name: Check GitHub Actions workflows
         run: |
-          uvx --from "actionlint-py==$ACTIONLINT_VERSION" \
-            actionlint -config-file .github/actionlint.yaml
+          go run "github.com/rhysd/actionlint/cmd/actionlint@$ACTIONLINT_VERSION" \
+            -config-file .github/actionlint.yaml
       - name: Check shell scripts
         run: |
           uvx --from "shellcheck-py==$SHELLCHECK_VERSION" \
