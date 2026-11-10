@@ -112,12 +112,16 @@ cat > "$smoke_crate/src/main.rs" <<'EOF'
 ohm_smoke_macros::make_answer!();
 
 fn main() {
-    assert!(invert(false));
+    assert!(invert(Some(false)));
     assert_eq!(answer(), 42);
 }
 
-fn invert(value: bool) -> bool {
-    !value
+#[expect(clippy::unneeded_struct_pattern)]
+fn invert(value: Option<bool>) -> bool {
+    match value {
+        Some(value) => !value,
+        None {} => false,
+    }
 }
 EOF
 
