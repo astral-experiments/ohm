@@ -9,11 +9,11 @@ Install [uv](https://docs.astral.sh/uv/), Git, and both Rust toolchains. Ruff/ty
 workflows need `cargo-nextest`. Codex session replays also need `just`. Run the commands from
 the Ohm repository with enough space for separate builds. Cache dependencies before an offline run.
 
-On x86_64 Linux, compare stock Rust 1.99.0 with Ohm 1.99.0-30, which bundles Wild 0.11.0.
+On x86_64 Linux, compare stock Rust 1.99.0 with Ohm 1.99.0-31, which bundles Wild 0.11.0.
 The versioned installer checks the downloaded archive against its embedded SHA-256. The
-[Linux checksum](https://labs.astral.sh/ohm/releases/ohm-1.99.0-30/ohm-1.99.0-30-x86_64-unknown-linux-gnu.tar.gz.sha256)
+[Linux checksum](https://labs.astral.sh/ohm/releases/ohm-1.99.0-31/ohm-1.99.0-31-x86_64-unknown-linux-gnu.tar.gz.sha256)
 is available alongside the archive.
-[Ohm installer](https://labs.astral.sh/ohm/releases/ohm-1.99.0-30/install.sh) · [Release manifest](https://github.com/astral-experiments/ohm/blob/ohm-1.99.0-30/toolchains/1.99.0/30.json)
+[Ohm installer](https://labs.astral.sh/ohm/releases/ohm-1.99.0-31/install.sh) · [Release manifest](https://github.com/astral-experiments/ohm/blob/ohm-1.99.0-31/toolchains/1.99.0/31.json)
 
 Run the developer-workflow and individual-command examples below from Ohm commit
 `04c83d53483607aec4f93fd2bb55b412f101d677` to use the same drivers, workload revisions and replay
@@ -40,13 +40,13 @@ Prepare the sources and dependencies, then measure with the same Cargo home in b
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/uv \
   --upstream 1.99.0 \
-  --ohm ohm-1.99.0-30 \
+  --ohm ohm-1.99.0-31 \
   --output-dir /path/to/preparation --prepare-only
 
 python3 scripts/benchmark_workflows.py \
   --project uv --source-path uv=/path/to/preparation/sources/uv \
   --upstream 1.99.0 \
-  --ohm ohm-1.99.0-30 \
+  --ohm ohm-1.99.0-31 \
   --jobs 8 --repetitions 4 --contention-retries 8 \
   --require-idle --discard-targets --output-dir /path/to/new-empty-results
 ```
@@ -94,7 +94,7 @@ temporary worktrees and use separate target directories.
 
 ```console
 uv run scripts/benchmark.py \
-  --project uv --upstream 1.99.0 --ohm ohm-1.99.0-30 --jobs 8 \
+  --project uv --upstream 1.99.0 --ohm ohm-1.99.0-31 --jobs 8 \
   --cold-runs 1 --noop-runs 3 --dependency-runs 7 --direct-runs 5 \
   --minimum-free-gb 60 --quiet-seconds 30 --require-idle \
   --discard-targets --output-dir /path/to/new-empty-results
@@ -130,7 +130,7 @@ On a quiet x86-64 Linux host, install both toolchains and run the following from
 ```console
 cargo +1.99.0 fetch --locked --manifest-path /path/to/ruff/Cargo.toml
 python3 scripts/benchmark_ruff_doctests.py --source /path/to/ruff \
-  --upstream 1.99.0 --ohm ohm-1.99.0-30 --jobs 32 --output /path/to/new-results
+  --upstream 1.99.0 --ohm ohm-1.99.0-31 --jobs 32 --output /path/to/new-results
 ```
 
 The results record all five warm pairs, the Cargo, rustc and rustdoc binaries used, and the
@@ -149,7 +149,7 @@ follow the [session replay guide](scripts/session_replays/README.md) or the
 
 ## Recorded measurements
 
-All 14 Linux benchmark suites used the published Ohm 1.99.0-30 archive. [Release build](https://github.com/astral-experiments/ohm/actions/runs/42686455943) · [Build record](scripts/benchmark_results/workflow-build.json)
+All 14 Linux benchmark suites used the published Ohm 1.99.0-31 archive. [Release build](https://github.com/astral-experiments/ohm/actions/runs/42880146657) · [Build record](scripts/benchmark_results/workflow-build.json)
 
 The individual-command benchmarks use the default trust settings. Session replays enable procedural-macro
 trust. The ty session, developer workflows, and APFS disk measurements enable both procedural-macro
