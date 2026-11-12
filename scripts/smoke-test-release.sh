@@ -108,6 +108,7 @@ pub fn make_answer(_: TokenStream) -> TokenStream {
     "fn answer() -> u32 { 42 }".parse().unwrap()
 }
 EOF
+printf '%s\n' 'Invert the option_value.' > "$smoke_crate/src/invert.md"
 cat > "$smoke_crate/src/main.rs" <<'EOF'
 ohm_smoke_macros::make_answer!();
 
@@ -116,6 +117,7 @@ fn main() {
     assert_eq!(answer(), 42);
 }
 
+#[doc = include_str!("invert.md")]
 #[expect(clippy::unneeded_struct_pattern)]
 fn invert(value: Option<bool>) -> bool {
     match value {
@@ -225,7 +227,18 @@ if [[ "$OHM_TARGET" == x86_64-unknown-linux-gnu ]] && \
   done
 fi
 
-cargo +"$OHM_TOOLCHAIN" clippy --manifest-path "$smoke_crate/Cargo.toml" -- -D warnings
+check_doc_lint() {
+  cargo +"$OHM_TOOLCHAIN" clippy --manifest-path "$smoke_crate/Cargo.toml" --message-format=json \
+    -- -D warnings --force-warn clippy::doc_markdown \
+    | jq --slurp --exit-status --argjson count "$1" \
+      '[.[] | select(.message.code.code? == "clippy::doc_markdown")] | length == $count' >/dev/null
+}
+
+check_doc_lint 1
+cat > "$smoke_crate/src/invert.md" <<'EOF'
+Invert the `option_value`.
+EOF
+check_doc_lint 0
 cargo +"$OHM_TOOLCHAIN" doc --no-deps --manifest-path "$smoke_crate/Cargo.toml"
 cargo +"$OHM_TOOLCHAIN" fmt --manifest-path "$smoke_crate/Cargo.toml" -- --check
 
