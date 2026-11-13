@@ -240,6 +240,31 @@ Invert the `option_value`.
 EOF
 check_doc_lint 0
 cargo +"$OHM_TOOLCHAIN" doc --no-deps --manifest-path "$smoke_crate/Cargo.toml"
+if [[ "$OHM_TARGET" == x86_64-unknown-linux-gnu ]] &&
+  jq -e '.release | ((.upstream_rust_version | split(".") | map(tonumber)) + [.ohm_revision]) >= [1, 99, 0, 33]' \
+    "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN.json" >/dev/null; then
+  mkdir "$smoke_root/object-reuse"
+  (
+    cd "$smoke_root/object-reuse"
+    for rotation in 17 23; do
+      printf 'pub fn value(x: u64) -> u64 { x.rotate_left(%s).rotate_right(%s) + 7 }\n' \
+        "$rotation" "$rotation" > lib.rs
+      CARGO_PRIMARY_PACKAGE=1 RUSTC_LOG=rustc_codegen_llvm::back::dwarf_cache=info \
+        rustc +"$OHM_TOOLCHAIN" lib.rs --crate-type=rlib --crate-name=fixture \
+          -Zpublic-api-hash -Zohm-shared-stages -Zohm-check-relink-inputs \
+          -Cincremental=incremental -Copt-level=1 -Ccodegen-units=1 -Cembed-bitcode=no \
+          -Clto=off -Cdebuginfo=line-tables-only -Csplit-debuginfo=off \
+          --emit=dep-info,metadata,link 2>"build-$rotation.log" || { cat "build-$rotation.log" >&2; exit 1; }
+    done
+    grep -F ohm_dwarf_postopt_hit build-23.log
+    cat > main.rs <<'EOF'
+fn main() { assert_eq!(fixture::value(35), 42); }
+EOF
+    rustc +"$OHM_TOOLCHAIN" main.rs --extern fixture=libfixture.rlib
+    ./main
+  )
+fi
+
 cargo +"$OHM_TOOLCHAIN" fmt --manifest-path "$smoke_crate/Cargo.toml" -- --check
 
 env -u RUST_SRC_PATH RUSTUP_TOOLCHAIN="$OHM_TOOLCHAIN" \
