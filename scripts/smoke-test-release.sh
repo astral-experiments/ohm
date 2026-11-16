@@ -41,6 +41,11 @@ OHM_DOWNLOAD_URL="file://$RELEASE_DIRECTORY" \
 
 case "$OHM_TARGET" in
   *-apple-darwin)
+    if jq -e '.release | ((.upstream_rust_version | split(".") | map(tonumber)) + [.ohm_revision]) >= [1, 99, 0, 34]' \
+      "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN.json" >/dev/null; then
+      env -u DYLD_LIBRARY_PATH -u DYLD_FALLBACK_LIBRARY_PATH \
+        "$toolchain_root/lib/rustlib/$OHM_TARGET/bin/rust-lld" -flavor wasm --version >/dev/null
+    fi
     otool -L "$toolchain_root/bin/cargo" | awk '
       NR == 1 { next }
       $1 ~ /^\/usr\/lib\// || $1 ~ /^\/System\/Library\// { next }
