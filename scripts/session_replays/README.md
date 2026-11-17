@@ -75,6 +75,26 @@ Archive superseded fixtures with their evidence before replacing them. Fixtures 
 `setup_patches`; the runner verifies and applies them before warmup, then records file hashes and
 modes. Setup time is excluded from session and warmup totals.
 
+### Rust 1.100 fixtures
+
+To reproduce the 1.100.0-1 session measurements, use `--upstream 1.100.0 --ohm ohm-1.100.0-1` and pass the matching fixture to `--scenario`. Paths below are relative to `scripts/session_replays/`.
+
+| Session                                        | Fixture                                                            |
+| ---------------------------------------------- | ------------------------------------------------------------------ |
+| Ruff                                           | [ruff-rust-1.100.json](ruff-rust-1.100.json)                       |
+| Historical Ruff                                | [ruff-historical-rust-1.100.json](ruff-historical-rust-1.100.json) |
+| uv                                             | [uv-rust-1.100.json](uv-rust-1.100.json)                           |
+| ty diagnostic suppression and worktree startup | [ty-29327-rust-1.100.json](ty-29327-rust-1.100.json)               |
+| Codex                                          | [codex-rust-1.99.json](codex-rust-1.99.json)                       |
+
+The 1.100 fixtures keep the historical source commits, edits and test selections. Ruff and uv each apply one additional setup patch to remove an obsolete lint declaration. Each Clippy command still denies warnings and permits the specific lint names recorded in its fixture. The uv feature ablation uses its original [fixture](uv-feature-ablation.json).
+
+The final Clippy command in the ty session permits Cargo to print the 56 manifest warnings from this frozen workspace. After timing, run the following command on that step's log for each repetition and toolchain. It checks warning text, location and multiplicity against the [recorded warnings](helpers/ty-29327/cargo-1.100-manifest-warnings.txt).
+
+```sh
+python3 scripts/session_replays/helpers/ty-29327/check_manifest_warnings.py /path/to/clippy.log
+```
+
 ### ty diagnostic-suppression session
 
 [`ty-29327.json`](ty-29327.json) replays [Ruff #29327](https://github.com/astral-sh/ruff/pull/29327): failing mdtests, Markdown and Rust edits, package tests, CLI rebuilds, diagnostic checks, and Clippy. It preserves `opt-level = 1` and each command's feature selection. The initial CLI build is untimed.
