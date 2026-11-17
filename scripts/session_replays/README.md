@@ -91,6 +91,8 @@ The 1.100 session fixtures keep the historical source commits, edits and test se
 
 For Codex, prepare the frozen inputs once in a dedicated benchmark directory. Both toolchains use the same patched copy of `allocative 0.3.6`. Its published source defines two implementations of the same type on Rust 1.100 development-channel compilers. The helper verifies the crate archive, applies the two upstream source changes and keeps both Codex lockfiles intact. A separate fixture patch sets the workspace `redundant_clone` lint to `warn`. The recorded TUI command still denies `clippy::redundant_closure_for_method_calls`. [Upstream allocative fix](https://github.com/meta/buck2/commit/9711293c6de502d50583cafb12e4a7b764094d3a)
 
+Cargo warns that the path override may have changed the dependency on `allocative_derive`. Both toolchains resolved the same package versions, dependency edges and enabled features with and without the override at each Codex revision. The patched `allocative` itself is a local path dependency.
+
 Run the helper from the Ohm checkout. The Codex source must contain the two recorded revisions. The helper reads the archive from Cargo's cache or from the optional `--archive /path/to/allocative-0.3.6.crate` argument.
 
 ```sh
