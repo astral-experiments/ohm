@@ -71,7 +71,7 @@ To install an exact version:
 
 ```console
 curl --proto '=https' --tlsv1.2 -LsSf \
-  https://labs.astral.sh/ohm/releases/ohm-1.99.0-9/install.sh | sh
+  https://labs.astral.sh/ohm/releases/ohm-1.100.0-1/install.sh | sh
 ```
 
 Each Ohm release targets a specific upstream Rust release. When a Rust version becomes available,
@@ -91,7 +91,7 @@ cargo +ohm fmt
 ```
 
 Exact toolchain names have the form `ohm-<rust-version>-<ohm-revision>`.
-For example, `cargo +ohm-1.99.0-9 test` selects that installed revision.
+For example, `cargo +ohm-1.100.0-1 test` selects that installed revision.
 
 Ohm enables dependency-aware rebuild reduction, cached relinking, parallel compiler frontends,
 and reuse of previously built registry and workspace dependencies by default.
