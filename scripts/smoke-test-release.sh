@@ -244,6 +244,33 @@ cat > "$smoke_crate/src/invert.md" <<'EOF'
 Invert the `option_value`.
 EOF
 check_doc_lint 0
+
+# A workspace member exercises test-function detection without a crate-root tests/ path.
+clippy_workspace="$smoke_root/clippy-test-context"
+mkdir -p "$clippy_workspace/member/src" "$clippy_workspace/member/tests"
+printf '[workspace]\nmembers = ["member"]\nresolver = "2"\n' > "$clippy_workspace/Cargo.toml"
+printf '[package]\nname = "test-context"\nversion = "0.0.0"\nedition = "2021"\n' > "$clippy_workspace/member/Cargo.toml"
+touch "$clippy_workspace/member/src/lib.rs"
+printf 'allow-expect-in-tests = true\n' > "$clippy_workspace/clippy.toml"
+cat > "$clippy_workspace/member/tests/context.rs" <<'EOF'
+fn working_directory() -> std::path::PathBuf {
+    std::env::current_dir().expect("ordinary helper")
+}
+
+#[test]
+fn test_directory() {
+    assert_eq!(working_directory(), std::env::current_dir().expect("inside test"));
+}
+EOF
+(
+  cd "$clippy_workspace"
+  cargo +"$OHM_TOOLCHAIN" clippy --offline --tests --message-format=json -- -W clippy::expect_used
+) | jq --slurp --exit-status '
+  [.[] | select(.message.code.code? == "clippy::expect_used")
+   | .message.spans[] | select(.is_primary) | .text[].text]
+  | length == 1 and (.[0] | contains("ordinary helper"))
+' >/dev/null
+
 cargo +"$OHM_TOOLCHAIN" doc --no-deps --manifest-path "$smoke_crate/Cargo.toml"
 if [[ "$OHM_TARGET" == x86_64-unknown-linux-gnu ]] &&
   jq -e '.release | ((.upstream_rust_version | split(".") | map(tonumber)) + [.ohm_revision]) >= [1, 99, 0, 33]' \
