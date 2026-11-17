@@ -1,6 +1,6 @@
 # Optimizations
 
-Ohm includes the following changes to Rust, Cargo, Clippy, and rustfmt.
+Ohm 1.100.0-1 builds on Rust 1.100.0 and LLVM 23.1.5. It includes the following changes to Rust, Cargo, Clippy, and rustfmt.
 
 ## Cargo and builds
 
@@ -163,7 +163,9 @@ compiler configurations retain ordinary behavior. The extra checkpoints consume 
 `-Zohm-shared-stages=no` on both commands to opt out.
 
 If a shared checkpoint contains invalid nodes, Ohm discards it and falls back to the ordinary
-incremental graph. If that graph is also damaged, it starts a fresh compilation.
+incremental graph. Rust 1.100 reads the previous incremental session separately from the session
+it is writing. Ohm publishes a shared checkpoint after writing its files. If the fallback graph
+is missing its query cache, Ohm starts a fresh compilation.
 
 In a prototype, a first build after a check fell from 104.44 to 80.66 seconds. A separate uv
 warm-cycle comparison was slightly slower with sharing, at 5.80 versus 5.72 seconds.
