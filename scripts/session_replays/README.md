@@ -85,9 +85,30 @@ To reproduce the 1.100.0-1 session measurements, use `--upstream 1.100.0 --ohm o
 | Historical Ruff                                | [ruff-historical-rust-1.100.json](ruff-historical-rust-1.100.json) |
 | uv                                             | [uv-rust-1.100.json](uv-rust-1.100.json)                           |
 | ty diagnostic suppression and worktree startup | [ty-29327-rust-1.100.json](ty-29327-rust-1.100.json)               |
-| Codex                                          | [codex-rust-1.99.json](codex-rust-1.99.json)                       |
+| Codex                                          | [codex-rust-1.100.json](codex-rust-1.100.json)                     |
 
-The 1.100 fixtures keep the historical source commits, edits and test selections. Ruff and uv each apply one additional setup patch to remove an obsolete lint declaration. Each Clippy command still denies warnings and permits the specific lint names recorded in its fixture. The uv feature ablation uses its original [fixture](uv-feature-ablation.json).
+The 1.100 session fixtures keep the historical source commits, edits and test selections. Ruff and uv each apply one additional setup patch to remove an obsolete lint declaration. Their Clippy commands still deny warnings and permit the specific lint names recorded in each fixture. The uv feature ablation uses its original [fixture](uv-feature-ablation.json).
+
+For Codex, prepare the frozen inputs once in a dedicated benchmark directory. Both toolchains use the same patched copy of `allocative 0.3.6`. Its published source defines two implementations of the same type on Rust 1.100 development-channel compilers. The helper verifies the crate archive, applies the two upstream source changes and keeps both Codex lockfiles intact. A separate fixture patch sets the workspace `redundant_clone` lint to `warn`. The recorded TUI command still denies `clippy::redundant_closure_for_method_calls`. [Upstream allocative fix](https://github.com/meta/buck2/commit/9711293c6de502d50583cafb12e4a7b764094d3a)
+
+Run the helper from the Ohm checkout. The Codex source must contain the two recorded revisions. The helper reads the archive from Cargo's cache or from the optional `--archive /path/to/allocative-0.3.6.crate` argument.
+
+```sh
+bench_root=/absolute/path/to/codex-benchmark
+codex_source=/absolute/path/to/codex
+python3 scripts/session_replays/helpers/codex-1.100/prepare.py \
+  --benchmark-root "$bench_root" --codex-source "$codex_source"
+command_source="$bench_root/compatibility/codex-commands"
+command_revision=$(git -C "$command_source" rev-parse HEAD)
+```
+
+The helper writes a Cargo path override under `$bench_root/.cargo`. Keep each suite's output beneath that directory so Cargo and Clippy find the override throughout the run. Use these arguments alongside the job count, repetitions and idle controls in the [benchmark guide](../../BENCHMARKS.md).
+
+| Suite                | Source arguments                                                                                               | Output argument                         |
+| -------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| Individual commands  | `--project codex-core --codex-path "$command_source" --codex-rev "$command_revision"`                          | `--output-dir "$bench_root/individual"` |
+| Developer workflows  | `--project codex --source-path "codex=$command_source" --codex-rev "$command_revision"`                        | `--output-dir "$bench_root/developer"`  |
+| Recorded TUI session | `--project codex --source-path "codex=$codex_source" --scenario scripts/session_replays/codex-rust-1.100.json` | `--output-dir "$bench_root/session"`    |
 
 The final Clippy command in the ty session permits Cargo to print the 56 manifest warnings from this frozen workspace. After timing, run the following command on that step's log for each repetition and toolchain. It checks warning text, location and multiplicity against the [recorded warnings](helpers/ty-29327/cargo-1.100-manifest-warnings.txt).
 
