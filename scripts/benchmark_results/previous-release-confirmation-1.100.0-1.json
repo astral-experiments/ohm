@@ -2,9 +2,90 @@
   "status": "in_progress",
   "reference_release": "ohm-1.99.0-34",
   "candidate_release": "ohm-1.100.0-1",
-  "case_count": 11,
+  "case_count": 12,
   "flagged_count": 14,
   "cases": [
+    {
+      "case": ["individual", "codex-core", "clippy", "cold"],
+      "previous_seconds": [
+        125.80690166999557, 112.30303494400141, 121.13761057599913,
+        118.02082264699857
+      ],
+      "candidate_seconds": [
+        152.55708305600274, 148.42059575500025, 133.85778944299818,
+        150.85649062000448
+      ],
+      "candidate_over_previous": 1.226592059466535,
+      "ratio_95_ci": [1.0832653034615727, 1.38888236846379],
+      "mean_difference_seconds": 27.105897259252743,
+      "difference_95_ci_seconds": [10.643188861187745, 43.56860565731774],
+      "previous_mean_seconds": 119.31709245924867,
+      "candidate_mean_seconds": 146.4229897185014,
+      "direction_95_percent": "slower",
+      "within_pair_samples": {
+        "old": [
+          {
+            "seconds": [125.80690166999557],
+            "retained_invalid_samples": 0,
+            "logs": [
+              "e526695a6d9c9befc1b7dd0d18cc5a517f042e6ec43710e6c0a15a84d9ef07af"
+            ]
+          },
+          {
+            "seconds": [112.30303494400141],
+            "retained_invalid_samples": 0,
+            "logs": [
+              "0784bb014b1e27f4207ed07b52453e86fa2404d63e54b19610050066b8bff9e7"
+            ]
+          },
+          {
+            "seconds": [121.13761057599913],
+            "retained_invalid_samples": 0,
+            "logs": [
+              "89558b5c24f895f2dde3518ebde68c0f740b50694038d7ee03ed7a42653c0378"
+            ]
+          },
+          {
+            "seconds": [118.02082264699857],
+            "retained_invalid_samples": 0,
+            "logs": [
+              "7c329df1ed6cfb0f7eaac9331a000d1ecbda14d019ecd7d90950fc6a571c9fee"
+            ]
+          }
+        ],
+        "new": [
+          {
+            "seconds": [152.55708305600274],
+            "retained_invalid_samples": 0,
+            "logs": [
+              "f5c86d120dc3d22838a6b0686d97f55d3c48c5d97f338fd694d3d23ce8cd53e4"
+            ]
+          },
+          {
+            "seconds": [148.42059575500025],
+            "retained_invalid_samples": 0,
+            "logs": [
+              "31aa9877f9a67eb3512e428103cad1d6569f070f37bba9069b6691c3e50a3153"
+            ]
+          },
+          {
+            "seconds": [133.85778944299818],
+            "retained_invalid_samples": 0,
+            "logs": [
+              "2a3f470c815271aaf6d2363bd49f51848359ee94a9f4fd0dc0f92adb045e613f"
+            ]
+          },
+          {
+            "seconds": [150.85649062000448],
+            "retained_invalid_samples": 0,
+            "logs": [
+              "2c4ce26458cef2c9a226a167433db4ee21ce04e11cecece31e5b752fcaa35881"
+            ]
+          }
+        ]
+      },
+      "case_label": "Codex cold Clippy"
+    },
     {
       "case": ["developer", "ruff", "edit-check-test-check"],
       "previous_seconds": [
@@ -269,10 +350,6 @@
     }
   ],
   "pending_cases": [
-    {
-      "case": ["individual", "codex-core", "clippy", "cold"],
-      "case_label": "Codex cold Clippy"
-    },
     {
       "case": ["developer", "codex", "edit-test"],
       "case_label": "Codex developer workflow \u00b7 edit-test"
@@ -746,10 +823,182 @@
               "tests_started": [75, 75, 0, 1, 5, 1, 1, 1, 5, 0, 3439]
             }
           }
+        },
+        "individual": {
+          "host": "charlie-ohm-full-27-ruff",
+          "boot": "b6643b95-d70a-445e-9667-f3b6c313fed0",
+          "raw_subset_sha256": "ba0c6d8ad8f0ad027cdba7c0ffbdb0e27fcb839a5c348c1769417ee6294683f3",
+          "cold_clippy": {
+            "command": [
+              "just",
+              "clippy",
+              "-p",
+              "codex-core",
+              "--locked",
+              "--offline"
+            ],
+            "command_revision": "b2159a7308ea2380e3a9d2ca2a7a79218820d21e",
+            "cargo_lock_sha256": "1fbc62ee7ddf28744e336d8d4aaa18fee54bc898d9ee97e3282148100b6cb36c",
+            "jobs": 8,
+            "allocative_fix": "https://github.com/meta/buck2/commit/9711293c6de502d50583cafb12e4a7b764094d3a",
+            "reference_warning_headers": {
+              "ohm-1.99.0-34": [
+                "warning: `codex-config` (lib) generated 1 warning",
+                "warning: `codex-core` (lib test) generated 6 warnings (4 duplicates) (run `cargo clippy --fix --lib -p codex-core --tests -- ` to apply 2 suggestions)",
+                "warning: `codex-core` (lib) generated 4 warnings (run `cargo clippy --fix --lib -p codex-core -- ` to apply 4 suggestions)",
+                "warning: `codex-core` (test \"all\") generated 1 warning (run `cargo clippy --fix --test \"all\" -p codex-core -- ` to apply 1 suggestion)",
+                "warning: `codex-mcp` (lib) generated 1 warning",
+                "warning: `codex-response-debug-context` (lib) generated 1 warning (run `cargo clippy --fix --lib -p codex-response-debug-context -- ` to apply 1 suggestion)",
+                "warning: `codex-shell-command` (lib) generated 1 warning (run `cargo clippy --fix --lib -p codex-shell-command -- ` to apply 1 suggestion)",
+                "warning: `codex-skills-extension` (lib) generated 4 warnings (run `cargo clippy --fix --lib -p codex-skills-extension -- ` to apply 4 suggestions)",
+                "warning: `codex-utils-path-uri` (lib) generated 2 warnings (run `cargo clippy --fix --lib -p codex-utils-path-uri -- ` to apply 2 suggestions)",
+                "warning: `codex-utils-stream-parser` (lib) generated 1 warning (run `cargo clippy --fix --lib -p codex-utils-stream-parser -- ` to apply 1 suggestion)",
+                "warning: `core_test_support` (lib) generated 1 warning (run `cargo clippy --fix --lib -p core_test_support -- ` to apply 1 suggestion)",
+                "warning: can be more succinctly written as a byte str",
+                "warning: can be more succinctly written as a byte str",
+                "warning: draining all elements of a collection into a new collection of the same type",
+                "warning: draining all elements of a collection into a new collection of the same type",
+                "warning: draining all elements of a collection into a new collection of the same type",
+                "warning: expression can be simplified using `Option::unwrap_or()`",
+                "warning: path override for crate `allocative` has altered the original list of",
+                "warning: path override for crate `allocative` has altered the original list of",
+                "warning: path override for crate `allocative` has altered the original list of",
+                "warning: redundant field names in struct initialization",
+                "warning: redundant reference in `format!` argument",
+                "warning: the `Err`-variant returned from this function is very large",
+                "warning: the borrowed expression implements the required traits",
+                "warning: the borrowed expression implements the required traits",
+                "warning: the borrowed expression implements the required traits",
+                "warning: the borrowed expression implements the required traits",
+                "warning: the following packages contain code that will be rejected by a future version of Rust: proc-macro-error2 v2.0.1",
+                "warning: this block may be rewritten with the `?` operator",
+                "warning: this function has a `#[must_use]` attribute with no message, but returns a type already considered as `#[must_use]`",
+                "warning: this pattern is unneeded as the `..` pattern can match that element",
+                "warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency",
+                "warning: using `chunks_exact` with a constant chunk size",
+                "warning: using `chunks_exact` with a constant chunk size"
+              ],
+              "ohm-1.100.0-1": [
+                "warning: `codex-core` (lib test) generated 8 warnings (6 duplicates) (run `cargo clippy --fix --lib -p codex-core --tests -- ` to apply 2 suggestions)",
+                "warning: `codex-core` (lib) generated 6 warnings (run `cargo clippy --fix --lib -p codex-core -- ` to apply 5 suggestions)",
+                "warning: `codex-core` (test \"all\") generated 1 warning (run `cargo clippy --fix --test \"all\" -p codex-core -- ` to apply 1 suggestion)",
+                "warning: `codex-mcp` (lib) generated 1 warning",
+                "warning: `codex-protocol` (lib) generated 1 warning (run `cargo clippy --fix --lib -p codex-protocol -- ` to apply 1 suggestion)",
+                "warning: `codex-response-debug-context` (lib) generated 1 warning (run `cargo clippy --fix --lib -p codex-response-debug-context -- ` to apply 1 suggestion)",
+                "warning: `codex-shell-command` (lib) generated 3 warnings (run `cargo clippy --fix --lib -p codex-shell-command -- ` to apply 3 suggestions)",
+                "warning: `codex-utils-path-uri` (lib) generated 2 warnings (run `cargo clippy --fix --lib -p codex-utils-path-uri -- ` to apply 2 suggestions)",
+                "warning: `codex-utils-stream-parser` (lib) generated 1 warning (run `cargo clippy --fix --lib -p codex-utils-stream-parser -- ` to apply 1 suggestion)",
+                "warning: `core_test_support` (lib) generated 1 warning (run `cargo clippy --fix --lib -p core_test_support -- ` to apply 1 suggestion)",
+                "warning: can be more succinctly written as a byte str",
+                "warning: can be more succinctly written as a byte str",
+                "warning: draining all elements of a collection into a new collection of the same type",
+                "warning: draining all elements of a collection into a new collection of the same type",
+                "warning: draining all elements of a collection into a new collection of the same type",
+                "warning: expression can be simplified using `Option::unwrap_or()`",
+                "warning: overflow evaluating the requirement `impl futures::Future<Output = std::result::Result<std::option::Option<std::string::String>, codex_protocol::error::CodexErr>>: std::marker::Send`",
+                "warning: path override for crate `allocative` has altered the original list of",
+                "warning: path override for crate `allocative` has altered the original list of",
+                "warning: path override for crate `allocative` has altered the original list of",
+                "warning: redundant clone",
+                "warning: redundant clone",
+                "warning: redundant field names in struct initialization",
+                "warning: redundant reference in `format!` argument",
+                "warning: the `Err`-variant returned from this function is very large",
+                "warning: the following packages contain code that will be rejected by a future version of Rust: proc-macro-error2 v2.0.1",
+                "warning: this `if` guard returns a bool literal and is followed by another",
+                "warning: this `if` guard returns a bool literal and is followed by another",
+                "warning: this block may be rewritten with the `?` operator",
+                "warning: this pattern is unneeded as the `..` pattern can match that element",
+                "warning: unused workspace dependency `codex-v8-poc`",
+                "warning: unused workspace dependency `sentry`",
+                "warning: unused workspace dependency `syntect`",
+                "warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency",
+                "warning: using `chunks_exact` with a constant chunk size",
+                "warning: using `chunks_exact` with a constant chunk size",
+                "warning: workspace (manifest) generated 3 warnings"
+              ]
+            },
+            "warning_variation": {
+              "code": "recursion_depth_exceeding_limit",
+              "location": "core/src/session/mod.rs:3113:10",
+              "warning": "warning: overflow evaluating the requirement `<impl futures::Future<Output = std::result::Result<<{async block@core/src/session/mod.rs:3102:47: 3102:52} as codex_async_utils::OrCancelExt>::Output, codex_async_utils::CancelErr>> as futures::Future>::Output == std::result::Result<(std::sync::Arc<codex_mcp::McpBinding>, session::turn::PreparedToolRecommendations), codex_async_utils::CancelErr>`",
+              "previous_runs": 0,
+              "current_runs": 3,
+              "qualified_log_sha256": "e77816ade242154aa6b3e4a06a54367144cbbb244e543fa74823930103a69aa1",
+              "summary_without": "warning: `codex-core` (lib test) generated 8 warnings (6 duplicates) (run `cargo clippy --fix --lib -p codex-core --tests -- ` to apply 2 suggestions)",
+              "summary_with": "warning: `codex-core` (lib test) generated 8 warnings (5 duplicates) (run `cargo clippy --fix --lib -p codex-core --tests -- ` to apply 2 suggestions)"
+            },
+            "trials": [
+              {
+                "pair": 0,
+                "sdk": "ohm-1.99.0-34",
+                "log_sha256": "e526695a6d9c9befc1b7dd0d18cc5a517f042e6ec43710e6c0a15a84d9ef07af",
+                "retained_output_sha256": "98900719ea75facc1a56f7847ed2112062f3f2b7f0e57776c0acbb630862895f",
+                "warning_headers": 34,
+                "session_recursion_warning": false
+              },
+              {
+                "pair": 0,
+                "sdk": "ohm-1.100.0-1",
+                "log_sha256": "f5c86d120dc3d22838a6b0686d97f55d3c48c5d97f338fd694d3d23ce8cd53e4",
+                "retained_output_sha256": "f932058f3f8a21ac87f853cd4f84f62b23a45549212de1b4b16415456a95901a",
+                "warning_headers": 38,
+                "session_recursion_warning": true
+              },
+              {
+                "pair": 1,
+                "sdk": "ohm-1.100.0-1",
+                "log_sha256": "31aa9877f9a67eb3512e428103cad1d6569f070f37bba9069b6691c3e50a3153",
+                "retained_output_sha256": "10d322e24acd4a31ac456fe8545abfe6b4bfcd4fdfb265fb18471c02639751c8",
+                "warning_headers": 37,
+                "session_recursion_warning": false
+              },
+              {
+                "pair": 1,
+                "sdk": "ohm-1.99.0-34",
+                "log_sha256": "0784bb014b1e27f4207ed07b52453e86fa2404d63e54b19610050066b8bff9e7",
+                "retained_output_sha256": "0383805dce9eeee23e877de97f6004010bf894986c4b6899a16c0cc7d6565206",
+                "warning_headers": 34,
+                "session_recursion_warning": false
+              },
+              {
+                "pair": 2,
+                "sdk": "ohm-1.100.0-1",
+                "log_sha256": "2a3f470c815271aaf6d2363bd49f51848359ee94a9f4fd0dc0f92adb045e613f",
+                "retained_output_sha256": "da7803ab52048fe04ddd35df78cc70db695c9d7e4ba86d3229c72b213283c421",
+                "warning_headers": 38,
+                "session_recursion_warning": true
+              },
+              {
+                "pair": 2,
+                "sdk": "ohm-1.99.0-34",
+                "log_sha256": "89558b5c24f895f2dde3518ebde68c0f740b50694038d7ee03ed7a42653c0378",
+                "retained_output_sha256": "0383805dce9eeee23e877de97f6004010bf894986c4b6899a16c0cc7d6565206",
+                "warning_headers": 34,
+                "session_recursion_warning": false
+              },
+              {
+                "pair": 3,
+                "sdk": "ohm-1.99.0-34",
+                "log_sha256": "7c329df1ed6cfb0f7eaac9331a000d1ecbda14d019ecd7d90950fc6a571c9fee",
+                "retained_output_sha256": "0383805dce9eeee23e877de97f6004010bf894986c4b6899a16c0cc7d6565206",
+                "warning_headers": 34,
+                "session_recursion_warning": false
+              },
+              {
+                "pair": 3,
+                "sdk": "ohm-1.100.0-1",
+                "log_sha256": "2c4ce26458cef2c9a226a167433db4ee21ce04e11cecece31e5b752fcaa35881",
+                "retained_output_sha256": "da7803ab52048fe04ddd35df78cc70db695c9d7e4ba86d3229c72b213283c421",
+                "warning_headers": 38,
+                "session_recursion_warning": true
+              }
+            ]
+          }
         }
       }
     }
   },
-  "publication_text": "We have repeated 11 of the 14 flagged cases with both released Ohm SDKs. Each comparison has four pairs, with both SDKs running on the same machine. The paired 95% intervals showed that 5 cases were slower and 1 case was faster. The 95% intervals for 5 cases span zero.\n\n| Case | Ohm 1.99.0-34 | Ohm 1.100.0-1 | Mean change | 95% interval for change |\n| --- | ---: | ---: | ---: | ---: |\n| Ruff developer workflow \u00b7 edit-check-test-check | 21.59 s | 25.69 s | +4.10 s | -0.39 to +8.59 s |\n| Ruff editing replay \u00b7 Run final strict Clippy for both affected packages | 15.29 s | 17.22 s | +1.93 s | -0.26 to +4.11 s |\n| uv editing replay \u00b7 Run local-mock-index installation integration test | 38.04 s | 41.13 s | +3.09 s | +1.71 to +4.47 s |\n| Codex editing replay \u00b7 Total wall time | 258.13 s | 308.02 s | +49.89 s | +33.97 to +65.80 s |\n| Codex editing replay \u00b7 Check the edited TUI library | 46.86 s | 71.86 s | +25.00 s | +20.37 to +29.64 s |\n| Codex editing replay \u00b7 Recheck the exact custom-height regression after integrating the widget | 28.85 s | 26.93 s | -1.92 s | -3.83 to -0.02 s |\n| Codex editing replay \u00b7 Run the exact strict Clippy lint used during the original CI fix | 60.62 s | 88.09 s | +27.48 s | +20.52 to +34.43 s |\n| Codex editing replay \u00b7 Validate the entire TUI package once | 33.94 s | 33.21 s | -0.72 s | -12.31 to +10.86 s |\n| Ruff historical replay \u00b7 Run strict Clippy for the changed core and semantic crates | 19.67 s | 20.25 s | +0.58 s | -1.05 to +2.20 s |\n| ty editing replay \u00b7 Run all semantic package tests | 48.41 s | 51.99 s | +3.58 s | -0.39 to +7.55 s |\n| ty editing replay \u00b7 Run Clippy for all semantic targets and features | 26.13 s | 30.45 s | +4.33 s | +2.13 to +6.52 s |\n\nPositive changes mean the new release took longer. The comparisons include the upstream Rust version change and Ohm changes. Both uv SDKs used the same import-level Clippy allowance. Both Ruff SDKs ran Clippy with `-D warnings`. The 1.99 command omits one allowance for the newer `clippy::needless_nonzero_get` lint. The Codex editing comparisons used a second 32-core AMD Genoa host. Two stock/current control pairs there averaged 493.43 seconds with Rust 1.100 and 311.12 with Ohm. The source, lockfile and all 3,439 final TUI tests matched the original host. The complete Codex editing replay took 49.89 seconds longer on average in four direct Ohm pairs. The largest command-level increase was \u201cRun the exact strict Clippy lint used during the original CI fix\u201d at +27.48 seconds. Cold Clippy and two developer workflows are being verified on the original host.",
+  "publication_text": "We have repeated 12 of the 14 flagged cases with both released Ohm SDKs. Each comparison has four pairs, with both SDKs running on the same machine. The paired 95% intervals showed that 6 cases were slower and 1 case was faster. The 95% intervals for 5 cases span zero.\n\n| Case | Ohm 1.99.0-34 | Ohm 1.100.0-1 | Mean change | 95% interval for change |\n| --- | ---: | ---: | ---: | ---: |\n| Codex cold Clippy | 119.32 s | 146.42 s | +27.11 s | +10.64 to +43.57 s |\n| Ruff developer workflow \u00b7 edit-check-test-check | 21.59 s | 25.69 s | +4.10 s | -0.39 to +8.59 s |\n| Ruff editing replay \u00b7 Run final strict Clippy for both affected packages | 15.29 s | 17.22 s | +1.93 s | -0.26 to +4.11 s |\n| uv editing replay \u00b7 Run local-mock-index installation integration test | 38.04 s | 41.13 s | +3.09 s | +1.71 to +4.47 s |\n| Codex editing replay \u00b7 Total wall time | 258.13 s | 308.02 s | +49.89 s | +33.97 to +65.80 s |\n| Codex editing replay \u00b7 Check the edited TUI library | 46.86 s | 71.86 s | +25.00 s | +20.37 to +29.64 s |\n| Codex editing replay \u00b7 Recheck the exact custom-height regression after integrating the widget | 28.85 s | 26.93 s | -1.92 s | -3.83 to -0.02 s |\n| Codex editing replay \u00b7 Run the exact strict Clippy lint used during the original CI fix | 60.62 s | 88.09 s | +27.48 s | +20.52 to +34.43 s |\n| Codex editing replay \u00b7 Validate the entire TUI package once | 33.94 s | 33.21 s | -0.72 s | -12.31 to +10.86 s |\n| Ruff historical replay \u00b7 Run strict Clippy for the changed core and semantic crates | 19.67 s | 20.25 s | +0.58 s | -1.05 to +2.20 s |\n| ty editing replay \u00b7 Run all semantic package tests | 48.41 s | 51.99 s | +3.58 s | -0.39 to +7.55 s |\n| ty editing replay \u00b7 Run Clippy for all semantic targets and features | 26.13 s | 30.45 s | +4.33 s | +2.13 to +6.52 s |\n\nPositive changes mean the new release took longer. The comparisons include the upstream Rust version change and Ohm changes. Both uv SDKs used the same import-level Clippy allowance. Both Ruff SDKs ran Clippy with `-D warnings`. The 1.99 command omits one allowance for the newer `clippy::needless_nonzero_get` lint. The Codex editing comparisons used a second 32-core AMD Genoa host. Two stock/current control pairs there averaged 493.43 seconds with Rust 1.100 and 311.12 with Ohm. The source, lockfile and all 3,439 final TUI tests matched the original host. The complete Codex editing replay took 49.89 seconds longer on average in four direct Ohm pairs. The largest command-level increase was \u201cRun the exact strict Clippy lint used during the original CI fix\u201d at +27.48 seconds. All eight cold Codex Clippy runs exited successfully. Three of the four 1.100 runs also printed a recursion-depth warning at `core/src/session/mod.rs:3113`, previously recorded during release qualification. Cargo counted five duplicate warnings in those runs and six in the other 1.100 run. The two developer workflows are being compared on the original host.",
   "method": "Four order-balanced pairs per completed case. Two-sided 95% intervals use paired differences and Student t with three degrees of freedom."
 }
