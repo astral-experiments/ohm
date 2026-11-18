@@ -120,15 +120,15 @@ python3 scripts/session_replays/helpers/ty-29327/check_manifest_warnings.py /pat
 
 ### ty diagnostic-suppression session
 
-[`ty-29327.json`](ty-29327.json) replays [Ruff #29327](https://github.com/astral-sh/ruff/pull/29327): failing mdtests, Markdown and Rust edits, package tests, CLI rebuilds, diagnostic checks, and Clippy. It preserves `opt-level = 1` and each command's feature selection. The initial CLI build is untimed.
+The Rust 1.100 fixture replays the failing mdtests, Markdown and Rust edits, package tests, CLI rebuilds, diagnostic checks, and Clippy from Ruff #29327. It preserves `opt-level = 1` and each command's feature selection. The initial CLI build is untimed. The measured host used cargo-nextest 0.9.140. [Ruff #29327](https://github.com/astral-sh/ruff/pull/29327) · [Rust 1.100 fixture](ty-29327-rust-1.100.json) · [Earlier fixture](ty-29327.json)
 
 ```sh
 python3 scripts/replay_sessions.py \
-  --project ruff --scenario scripts/session_replays/ty-29327.json \
-  --upstream "$stock" --ohm "$ohm" \
+  --project ruff --scenario scripts/session_replays/ty-29327-rust-1.100.json \
+  --upstream 1.100.0 --ohm ohm-1.100.0-1 \
   --source-path ruff=/path/to/ruff --output-dir /path/to/new-ty-results \
   --jobs 8 --repetitions 4 --native-tool-trust all \
-  --compiler-accounting verbose --offline --require-idle
+  --minimum-free-gb 60 --compiler-accounting verbose --offline --require-idle
 ```
 
 This enables both Ohm trust opt-ins. Expected failures must match the fixture's exit status and diagnostics.
@@ -139,14 +139,15 @@ This enables both Ohm trust opt-ins. Expected failures must match the fixture's 
 
 ```sh
 python3 scripts/benchmark_worktree_start.py \
-  --upstream "$stock" --ohm "$ohm" \
+  --scenario scripts/session_replays/ty-29327-rust-1.100.json \
+  --upstream 1.100.0 --ohm ohm-1.100.0-1 \
   --source-path /path/to/ruff --output-dir /path/to/new-worktree-results \
-  --jobs 8 --repetitions 3 --compiler-accounting verbose --offline --require-idle
+  --jobs 8 --repetitions 3 --minimum-free-gb 60 --compiler-accounting verbose --offline --require-idle
 ```
 
 The runner compares stock Rust with two Ohm configurations: a shared build directory, and that directory with both trust opt-ins. Each repetition starts with fresh artifacts. Stock Rust uses `git worktree add`; Ohm uses `cargo worktree add`. Snapshot cloning requires a filesystem such as Btrfs; ext4 can still reuse shared registry builds.
 
-Use a new output directory after an interrupted startup run. See the [results](../benchmark_results/ty-worktree.md) for both benchmarks.
+For the filesystem comparison, run the worktree command once with an output directory on ext4 and once on Btrfs. Use a fresh output directory after an interrupted startup run. [Session and worktree results](../benchmark_results/ty-worktree.md)
 
 ### Warmups and toolchain settings
 
