@@ -1,0 +1,255 @@
+{
+  "status": "in_progress",
+  "reference_release": "ohm-1.99.0-34",
+  "candidate_release": "ohm-1.100.0-1",
+  "case_count": 6,
+  "flagged_count": 14,
+  "cases": [
+    {
+      "case": ["developer", "ruff", "edit-check-test-check"],
+      "previous_seconds": [
+        23.462952588999542, 19.877755179000815, 23.012241260999872,
+        20.01206250299947
+      ],
+      "candidate_seconds": [
+        23.951871372000824, 24.579929683000955, 30.343543548000525,
+        23.88000100499994
+      ],
+      "candidate_over_previous": 1.1871483375959404,
+      "ratio_95_ci": [0.9984728653919551, 1.411476690359101],
+      "mean_difference_seconds": 4.097583519000636,
+      "difference_95_ci_seconds": [-0.39346967802732014, 8.588636716028592],
+      "previous_mean_seconds": 21.591252882999925,
+      "candidate_mean_seconds": 25.68883640200056,
+      "direction_95_percent": "unresolved",
+      "case_label": "Ruff developer workflow \u00b7 edit-check-test-check"
+    },
+    {
+      "case": [
+        "sessions",
+        "ruff",
+        "command",
+        "14",
+        "Run final strict Clippy for both affected packages"
+      ],
+      "previous_seconds": [
+        15.946032900999853, 15.933267453001463, 14.579538423000486,
+        14.703702489001444
+      ],
+      "candidate_seconds": [
+        16.141586633999395, 17.716746034002426, 18.102227614002913,
+        16.90780263400302
+      ],
+      "candidate_over_previous": 1.1259143313164566,
+      "ratio_95_ci": [0.9840432801124583, 1.2882391527727424],
+      "mean_difference_seconds": 1.9264554125011273,
+      "difference_95_ci_seconds": [-0.25561225892905126, 4.108523083931306],
+      "previous_mean_seconds": 15.290635316500811,
+      "candidate_mean_seconds": 17.21709072900194,
+      "direction_95_percent": "unresolved",
+      "case_label": "Ruff editing replay \u00b7 Run final strict Clippy for both affected packages"
+    },
+    {
+      "case": [
+        "sessions",
+        "uv",
+        "command",
+        "15",
+        "Run local-mock-index installation integration test"
+      ],
+      "previous_seconds": [
+        40.367658922914416, 36.93575316295028, 37.27794006885961,
+        37.55995245371014
+      ],
+      "candidate_seconds": [
+        42.61073999013752, 41.05554384505376, 40.765183751937, 40.0747607992962
+      ],
+      "candidate_over_previous": 1.0816791078103456,
+      "ratio_95_ci": [1.0421086966107946, 1.1227520661507024],
+      "mean_difference_seconds": 3.091230944497511,
+      "difference_95_ci_seconds": [1.7081835556014313, 4.47427833339359],
+      "previous_mean_seconds": 38.03532615210861,
+      "candidate_mean_seconds": 41.12655709660612,
+      "direction_95_percent": "slower",
+      "case_label": "uv editing replay \u00b7 Run local-mock-index installation integration test"
+    },
+    {
+      "case": [
+        "historical",
+        "ruff",
+        "command",
+        "13",
+        "Run strict Clippy for the changed core and semantic crates"
+      ],
+      "previous_seconds": [
+        21.493677441001637, 19.152898005999305, 19.127038882001216,
+        18.910518165001122
+      ],
+      "candidate_seconds": [
+        20.61342827699991, 19.919971069000894, 20.04126088599878,
+        20.410919422000006
+      ],
+      "candidate_over_previous": 1.0305819616132477,
+      "ratio_95_ci": [0.9509093973042474, 1.116929943708177],
+      "mean_difference_seconds": 0.5753617899990786,
+      "difference_95_ci_seconds": [-1.048954335958969, 2.1996779159571265],
+      "previous_mean_seconds": 19.67103312350082,
+      "candidate_mean_seconds": 20.2463949134999,
+      "direction_95_percent": "unresolved",
+      "case_label": "Ruff historical replay \u00b7 Run strict Clippy for the changed core and semantic crates"
+    },
+    {
+      "case": [
+        "sessions",
+        "ty",
+        "command",
+        "5",
+        "Run all semantic package tests"
+      ],
+      "previous_seconds": [
+        47.84927426899958, 49.91413040500083, 49.477651975999834,
+        46.411638653999034
+      ],
+      "candidate_seconds": [
+        48.33721399100068, 53.467446290000225, 53.15875446300015,
+        53.01134554000055
+      ],
+      "candidate_over_previous": 1.0734824737756357,
+      "ratio_95_ci": [0.9911360549437285, 1.1626704686561762],
+      "mean_difference_seconds": 3.580516245000581,
+      "difference_95_ci_seconds": [-0.39121405146104893, 7.55224654146221],
+      "previous_mean_seconds": 48.41317382599982,
+      "candidate_mean_seconds": 51.9936900710004,
+      "direction_95_percent": "unresolved",
+      "case_label": "ty editing replay \u00b7 Run all semantic package tests"
+    },
+    {
+      "case": [
+        "sessions",
+        "ty",
+        "command",
+        "8",
+        "Run Clippy for all semantic targets and features"
+      ],
+      "previous_seconds": [
+        26.358158291999644, 24.73340396200001, 26.939291704000425,
+        26.479708148999634
+      ],
+      "candidate_seconds": [
+        32.2399529309987, 29.83120489400062, 30.12266229799934,
+        29.62197812100021
+      ],
+      "candidate_over_previous": 1.1655168890405452,
+      "ratio_95_ci": [1.0798546565359004, 1.2579744972314137],
+      "mean_difference_seconds": 4.326309034249789,
+      "difference_95_ci_seconds": [2.1285400962362555, 6.524077972263322],
+      "previous_mean_seconds": 26.12764052674993,
+      "candidate_mean_seconds": 30.453949560999718,
+      "direction_95_percent": "slower",
+      "case_label": "ty editing replay \u00b7 Run Clippy for all semantic targets and features"
+    }
+  ],
+  "pending_cases": [
+    {
+      "case": ["individual", "codex-core", "clippy", "cold"],
+      "case_label": "Codex cold Clippy"
+    },
+    {
+      "case": ["developer", "codex", "edit-test"],
+      "case_label": "Codex developer workflow \u00b7 edit-test"
+    },
+    {
+      "case": ["developer", "codex", "edit-fmt-clippy-test"],
+      "case_label": "Codex developer workflow \u00b7 edit-fmt-clippy-test"
+    },
+    {
+      "case": ["sessions", "codex", "total"],
+      "case_label": "Codex editing replay \u00b7 Total wall time"
+    },
+    {
+      "case": [
+        "sessions",
+        "codex",
+        "command",
+        "4",
+        "Check the edited TUI library"
+      ],
+      "case_label": "Codex editing replay \u00b7 Check the edited TUI library"
+    },
+    {
+      "case": [
+        "sessions",
+        "codex",
+        "command",
+        "10",
+        "Recheck the exact custom-height regression after integrating the widget"
+      ],
+      "case_label": "Codex editing replay \u00b7 Recheck the exact custom-height regression after integrating the widget"
+    },
+    {
+      "case": [
+        "sessions",
+        "codex",
+        "command",
+        "13",
+        "Run the exact strict Clippy lint used during the original CI fix"
+      ],
+      "case_label": "Codex editing replay \u00b7 Run the exact strict Clippy lint used during the original CI fix"
+    },
+    {
+      "case": [
+        "sessions",
+        "codex",
+        "command",
+        "14",
+        "Validate the entire TUI package once"
+      ],
+      "case_label": "Codex editing replay \u00b7 Validate the entire TUI package once"
+    }
+  ],
+  "projects": {
+    "uv": {
+      "host": "charlie-ohm-session-bench",
+      "boot": "345e4491-0972-4318-a3d5-e8cc695ac1fc",
+      "raw_archive_sha256": "95c3cf09f804eefc4e089b94fd3366ed2daba9594ef3cd4b5aecb6cece05b9ce",
+      "studies": {
+        "sessions": {
+          "receipt_sha256": "7aa13f548013702784dbdf7c9ebd4cceb2b3ee14d3c2183b33abd649d44f34bd",
+          "case_count": 1
+        }
+      }
+    },
+    "ruff": {
+      "host": "charlie-ohm-32-llvm",
+      "boot": "7f4fedae-b7b6-4ac2-a058-8dbc65bbcff4",
+      "raw_archive_sha256": "b78335e66ef345cf9cc4182790b4191f4bf5ac8a4476a7a0a4afa0e75e29b077",
+      "studies": {
+        "developer": {
+          "receipt_sha256": "73926cab7295f9801526e90ecb923d598738b14afbc48b767a8c5ae14aeb2654",
+          "case_count": 1
+        },
+        "historical": {
+          "receipt_sha256": "51d083c4ef4592a23154dd57e57e3ac09462cd4d5ca0c69d2dd611089da79bc7",
+          "case_count": 1
+        },
+        "sessions": {
+          "receipt_sha256": "f5d67299c005cc98c8813a589c225afb369a3b0b1b5bd74f4e9ea3dd9c20fe06",
+          "case_count": 1
+        }
+      }
+    },
+    "ty": {
+      "host": "charlie-ohm-full-27-uv",
+      "boot": "ef4bf1e4-5050-4fc5-8188-d7328ebbfb07",
+      "raw_archive_sha256": "7dc543d66326d6c28dfc65eb1937c1791db4cc5f73f38597ebb67e05be586cb3",
+      "studies": {
+        "sessions": {
+          "receipt_sha256": "da2478678f72acb3bf8b14f3ee94a026a3ffb6a35e996fc2d3d9cf2950e9cab4",
+          "case_count": 2
+        }
+      }
+    }
+  },
+  "publication_text": "We have repeated 6 of the 14 flagged cases with both released Ohm SDKs. Each comparison has four pairs, with both SDKs running on the same machine. The paired 95% intervals showed that 2 cases were slower. The 95% intervals for 4 cases span zero.\n\n| Case | Ohm 1.99.0-34 | Ohm 1.100.0-1 | Mean change | 95% interval for change |\n| --- | ---: | ---: | ---: | ---: |\n| Ruff developer workflow \u00b7 edit-check-test-check | 21.59 s | 25.69 s | +4.10 s | -0.39 to +8.59 s |\n| Ruff editing replay \u00b7 Run final strict Clippy for both affected packages | 15.29 s | 17.22 s | +1.93 s | -0.26 to +4.11 s |\n| uv editing replay \u00b7 Run local-mock-index installation integration test | 38.04 s | 41.13 s | +3.09 s | +1.71 to +4.47 s |\n| Ruff historical replay \u00b7 Run strict Clippy for the changed core and semantic crates | 19.67 s | 20.25 s | +0.58 s | -1.05 to +2.20 s |\n| ty editing replay \u00b7 Run all semantic package tests | 48.41 s | 51.99 s | +3.58 s | -0.39 to +7.55 s |\n| ty editing replay \u00b7 Run Clippy for all semantic targets and features | 26.13 s | 30.45 s | +4.33 s | +2.13 to +6.52 s |\n\nPositive changes mean the new release took longer. The comparisons include the upstream Rust version change and Ohm changes. Both uv SDKs used the same import-level Clippy allowance. Both Ruff SDKs ran Clippy with `-D warnings`. The 1.99 command omits one allowance for the newer `clippy::needless_nonzero_get` lint. Eight Codex cases are still being compared. On the second host, two stock/current control pairs averaged 493.43 seconds with Rust 1.100 and 311.12 with Ohm. The source, lockfile and all 3,439 final TUI tests matched the original host.",
+  "method": "Four order-balanced pairs per completed case. Two-sided 95% intervals use paired differences and Student t with three degrees of freedom."
+}

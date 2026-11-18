@@ -1,16 +1,18 @@
 # Published benchmarks
 
-We compared published Ohm 1.99.0-27 with stock Rust 1.99.0 on x86_64 Linux. Each project ran both toolchains on the same machine. The four recorded session means totaled 732.91 s with Ohm and 1,334.09 s with stock Rust. Ohm took 45.06% less time across the four sessions. [Release results](1.99.0-27.md) · [Slower replay steps](1.99.0-27.md#slower-replay-steps) · [Recorded sessions](sessions.json) · [ty session and worktree startup](ty-worktree.md)
+Fourteen Linux benchmark suites compare published Ohm 1.100.0-1 with stock Rust 1.100.0. [Release results](1.100.0-1.md) · [Paired uncertainty](paired-1.100.0-1.json) · [Recorded sessions](sessions.json) · [ty worktrees](ty-worktree.md) · [Previous 1.99.0-34 results](https://github.com/astral-experiments/ohm/tree/1c818c3ca4e8fd95652222ee6b7540266633c176/scripts/benchmark_results)
 
 The individual-command study covers 216 samples across uv and Codex. The developer study covers five workflows per project for Ruff, uv, and Codex, with four repetitions per toolchain. [Individual commands](workflow.json) · [Developer workflows](developer-workflows.json) · [Historical Ruff replay](historical.json) · [uv feature ablation](ablation.json)
-
-The two Ruff/ty developer workflows with higher Ohm medians were repeated with eight fresh pairs per workflow. [Confirmation measurements](ruff-slower-workflows-1.99.0-27.json)
 
 The [Ruff doctest study](../../BENCHMARKS.md#ruff-doctests) measures repeated test runs. The [APFS disk study](disk.json) compares Ohm 1.99.0-11 with stock Rust 1.99.0.
 
 The [build record](workflow-build.json) identifies each suite’s host, release archive, installed binaries, and workload revisions. See the [ty measurements](ty-worktree.json) for ext4 and Btrfs results and the [benchmark guide](../../BENCHMARKS.md#recorded-measurements) for the trust settings used in each study.
 
 ## Linux session replays with 1.99.0-27
+
+We compared published Ohm 1.99.0-27 with stock Rust 1.99.0 on x86_64 Linux. Each project ran both toolchains on the same machine. The four recorded session means totaled 732.91 s with Ohm and 1,334.09 s with stock Rust. Ohm took 45.06% less time across the four sessions. [Release results](1.99.0-27.md) · [Slower replay steps](1.99.0-27.md#slower-replay-steps) · [Recorded sessions](https://github.com/astral-experiments/ohm/blob/15812416123951cf9fc8ed4603260fbf8cbb58be/scripts/benchmark_results/sessions.json) · [ty session and worktree startup](https://github.com/astral-experiments/ohm/blob/15812416123951cf9fc8ed4603260fbf8cbb58be/scripts/benchmark_results/ty-worktree.md)
+
+The two Ruff/ty developer workflows with higher Ohm medians were repeated with eight fresh pairs per workflow. [Confirmation measurements](ruff-slower-workflows-1.99.0-27.json)
 
 Each entry gives the wall time in seconds for a complete session replay. The last column compares the mean time for each toolchain on the same host.
 

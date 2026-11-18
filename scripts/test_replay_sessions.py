@@ -228,10 +228,11 @@ class FixtureValidationTests(ReplayTestCase):
             descriptor["paths"],
         )
 
-    def test_historical_ruff_results_match_the_rust_1_99_fixture(self) -> None:
-        fixture = SCRIPTS / "session_replays" / "ruff-historical-rust-1.99.json"
-        scenario = replay.load_scenario(fixture)
+    def test_historical_ruff_results_match_the_fixture(self) -> None:
         baseline = latest_reports()["historical"]
+        series = baseline["rust_version"].rsplit(".", 1)[0]
+        fixture = SCRIPTS / "session_replays" / f"ruff-historical-rust-{series}.json"
+        scenario = replay.load_scenario(fixture)
 
         self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
         self.assertTrue(baseline["methodology"]["matching_test_counts_within_pairs"])
@@ -254,9 +255,10 @@ class FixtureValidationTests(ReplayTestCase):
             self.assertEqual(command["command"], [step["program"], *step["args"]])
 
     def test_current_ruff_results_match_the_fixture(self) -> None:
-        fixture = SCRIPTS / "session_replays" / "ruff-rust-1.99.json"
-        scenario = replay.load_scenario(fixture)
         baseline = latest_reports()["sessions"]
+        series = baseline["rust_version"].rsplit(".", 1)[0]
+        fixture = SCRIPTS / "session_replays" / f"ruff-rust-{series}.json"
+        scenario = replay.load_scenario(fixture)
         self.assertEqual(
             baseline["order_by_project"]["ruff"],
             [["stock", "ohm"], ["ohm", "stock"]],

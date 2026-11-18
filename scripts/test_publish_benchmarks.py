@@ -15,14 +15,15 @@ class PublicationTests(unittest.TestCase):
     def setUp(self):
         self.reports = publish.latest_reports()
         self.ty_worktree = publish.load(publish.RESULTS / publish.TY_WORKTREE_REPORT)
-        self.ty_scenario = publish.load(publish.ROOT / publish.TY_SCENARIO)
+        self.ty_fixture = publish.ty_fixture(self.ty_worktree)
+        self.ty_scenario = publish.load(publish.ROOT / self.ty_fixture)
         self.ruff_doctests = publish.load(publish.RESULTS / publish.RUFF_DOCTEST_REPORT)
 
     def copy_supplemental_reports(self, root):
         destination = root / "scripts/benchmark_results" / publish.TY_WORKTREE_REPORT
         destination.parent.mkdir(parents=True, exist_ok=True)
         publish.write_json(destination, self.ty_worktree)
-        fixture = root / publish.TY_SCENARIO
+        fixture = root / self.ty_fixture
         fixture.parent.mkdir(parents=True, exist_ok=True)
         publish.write_json(fixture, self.ty_scenario)
         for name in (publish.DEVELOPER_WORKFLOW_REPORT, publish.RUFF_DOCTEST_REPORT):
@@ -224,10 +225,18 @@ class PublicationTests(unittest.TestCase):
             root = Path(directory)
             self.prepare_publication(root)
             disk_rust, disk_version = publish.disk_versions(self.reports["disk"])
+            # The combined timing table needs ty and Ruff inputs for this Rust version.
+            release = f"ohm-{disk_version}"
+            for name, versions in (
+                (publish.TY_WORKTREE_REPORT, {"rust": disk_rust, "ohm": release}),
+                (publish.RUFF_DOCTEST_REPORT, {"upstream": disk_rust, "ohm": release}),
+            ):
+                path = root / "scripts/benchmark_results" / name
+                publish.write_json(path, {**publish.load(path), **versions})
             for kind, report in self.reports.items():
                 if kind in publish.TIMING_KINDS:
                     report = dict(
-                        report, ohm_release=f"ohm-{disk_version}", rust_version=disk_rust
+                        report, ohm_release=release, rust_version=disk_rust
                     )
                 publish.write_json(root / "inputs" / f"{kind}.json", report)
                 publish.write_json(
