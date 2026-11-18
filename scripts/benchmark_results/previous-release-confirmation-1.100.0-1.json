@@ -2,7 +2,7 @@
   "status": "in_progress",
   "reference_release": "ohm-1.99.0-34",
   "candidate_release": "ohm-1.100.0-1",
-  "case_count": 6,
+  "case_count": 11,
   "flagged_count": 14,
   "cases": [
     {
@@ -72,6 +72,125 @@
       "candidate_mean_seconds": 41.12655709660612,
       "direction_95_percent": "slower",
       "case_label": "uv editing replay \u00b7 Run local-mock-index installation integration test"
+    },
+    {
+      "case": ["sessions", "codex", "total"],
+      "previous_seconds": [
+        260.0053838356398, 264.3524394328706, 252.70462116366252,
+        255.46403978671879
+      ],
+      "candidate_seconds": [
+        299.1138663501479, 312.67322222329676, 316.0182663737796,
+        304.2639341619797
+      ],
+      "candidate_over_previous": 1.1931507510355621,
+      "ratio_95_ci": [1.1290157885890622, 1.2609289693599577],
+      "mean_difference_seconds": 49.885701222578064,
+      "difference_95_ci_seconds": [33.97118727756842, 65.80021516758771],
+      "previous_mean_seconds": 258.1316210547229,
+      "candidate_mean_seconds": 308.017322277301,
+      "direction_95_percent": "slower",
+      "case_label": "Codex editing replay \u00b7 Total wall time"
+    },
+    {
+      "case": [
+        "sessions",
+        "codex",
+        "command",
+        "4",
+        "Check the edited TUI library"
+      ],
+      "previous_seconds": [
+        48.09226957708597, 46.82614674791694, 44.71930840192363,
+        47.79835319984704
+      ],
+      "candidate_seconds": [
+        69.88345430698246, 75.5711477198638, 70.15426956210285,
+        71.83759459899738
+      ],
+      "candidate_over_previous": 1.5334377164520299,
+      "ratio_95_ci": [1.4245257595854746, 1.650676524741724],
+      "mean_difference_seconds": 25.00259706529323,
+      "difference_95_ci_seconds": [20.369454620523676, 29.635739510062784],
+      "previous_mean_seconds": 46.859019481693394,
+      "candidate_mean_seconds": 71.86161654698662,
+      "direction_95_percent": "slower",
+      "case_label": "Codex editing replay \u00b7 Check the edited TUI library"
+    },
+    {
+      "case": [
+        "sessions",
+        "codex",
+        "command",
+        "10",
+        "Recheck the exact custom-height regression after integrating the widget"
+      ],
+      "previous_seconds": [
+        28.509396468289196, 28.621279918123037, 28.271626031026244,
+        29.99910724768415
+      ],
+      "candidate_seconds": [
+        27.03235970484093, 26.95495602907613, 27.369609822053462,
+        26.349050716031343
+      ],
+      "candidate_over_previous": 0.9334799473904306,
+      "ratio_95_ci": [0.8727740890033189, 0.9984082056963168],
+      "mean_difference_seconds": -1.9238583482801914,
+      "difference_95_ci_seconds": [-3.826661209209983, -0.021055487350399416],
+      "previous_mean_seconds": 28.850352416280657,
+      "candidate_mean_seconds": 26.926494068000466,
+      "direction_95_percent": "faster",
+      "case_label": "Codex editing replay \u00b7 Recheck the exact custom-height regression after integrating the widget"
+    },
+    {
+      "case": [
+        "sessions",
+        "codex",
+        "command",
+        "13",
+        "Run the exact strict Clippy lint used during the original CI fix"
+      ],
+      "previous_seconds": [
+        62.50412926496938, 60.08147212816402, 59.910189917776734,
+        59.97539239330217
+      ],
+      "candidate_seconds": [
+        84.72999903326854, 88.32695161737502, 86.53296508314088,
+        92.78253916278481
+      ],
+      "candidate_over_previous": 1.452659415378023,
+      "ratio_95_ci": [1.3319411406681647, 1.5843187905644494],
+      "mean_difference_seconds": 27.475317798089236,
+      "difference_95_ci_seconds": [20.520799823860596, 34.42983577231787],
+      "previous_mean_seconds": 60.61779592605308,
+      "candidate_mean_seconds": 88.09311372414231,
+      "direction_95_percent": "slower",
+      "case_label": "Codex editing replay \u00b7 Run the exact strict Clippy lint used during the original CI fix"
+    },
+    {
+      "case": [
+        "sessions",
+        "codex",
+        "command",
+        "14",
+        "Validate the entire TUI package once"
+      ],
+      "previous_seconds": [
+        36.00392425386235, 37.735417085234076, 35.90137438522652,
+        26.113239536993206
+      ],
+      "candidate_seconds": [
+        28.478454040829092, 35.06202649092302, 45.50148643320426,
+        23.81345115462318
+      ],
+      "candidate_over_previous": 0.9600251966917516,
+      "ratio_95_ci": [0.6998558519510482, 1.3169117264843584],
+      "mean_difference_seconds": -0.7246342854341492,
+      "difference_95_ci_seconds": [-12.313667291053232, 10.864398720184933],
+      "previous_mean_seconds": 33.93848881532904,
+      "candidate_mean_seconds": 33.21385452989489,
+      "direction_95_percent": "unresolved",
+      "case_label": "Codex editing replay \u00b7 Validate the entire TUI package once"
     },
     {
       "case": [
@@ -161,50 +280,6 @@
     {
       "case": ["developer", "codex", "edit-fmt-clippy-test"],
       "case_label": "Codex developer workflow \u00b7 edit-fmt-clippy-test"
-    },
-    {
-      "case": ["sessions", "codex", "total"],
-      "case_label": "Codex editing replay \u00b7 Total wall time"
-    },
-    {
-      "case": [
-        "sessions",
-        "codex",
-        "command",
-        "4",
-        "Check the edited TUI library"
-      ],
-      "case_label": "Codex editing replay \u00b7 Check the edited TUI library"
-    },
-    {
-      "case": [
-        "sessions",
-        "codex",
-        "command",
-        "10",
-        "Recheck the exact custom-height regression after integrating the widget"
-      ],
-      "case_label": "Codex editing replay \u00b7 Recheck the exact custom-height regression after integrating the widget"
-    },
-    {
-      "case": [
-        "sessions",
-        "codex",
-        "command",
-        "13",
-        "Run the exact strict Clippy lint used during the original CI fix"
-      ],
-      "case_label": "Codex editing replay \u00b7 Run the exact strict Clippy lint used during the original CI fix"
-    },
-    {
-      "case": [
-        "sessions",
-        "codex",
-        "command",
-        "14",
-        "Validate the entire TUI package once"
-      ],
-      "case_label": "Codex editing replay \u00b7 Validate the entire TUI package once"
     }
   ],
   "projects": {
@@ -248,8 +323,433 @@
           "case_count": 2
         }
       }
+    },
+    "codex": {
+      "editing_host": "charlie-ohm-session-bench",
+      "boot": "345e4491-0972-4318-a3d5-e8cc695ac1fc",
+      "raw_archive_sha256": "780118561b07fda18a3744fa671bc2d9c1545bbb02c0e3de24ff6950fa86305b",
+      "studies": {
+        "sessions": {
+          "host_control": {
+            "primary_host": {
+              "name": "charlie-ohm-full-27-ruff",
+              "boot": "b6643b95-d70a-445e-9667-f3b6c313fed0",
+              "machine_id": "fa3ec12000544abd9643858a80c3e53c",
+              "logical_cpus": 32,
+              "cpu_models": ["AMD EPYC-Genoa Processor"]
+            },
+            "comparison_host": {
+              "name": "charlie-ohm-session-bench",
+              "boot": "345e4491-0972-4318-a3d5-e8cc695ac1fc",
+              "machine_id": "eb7592fbfea54b57834b84a3c3f73ade",
+              "logical_cpus": 32,
+              "cpu_models": ["AMD EPYC-Genoa Processor"]
+            },
+            "primary_mean_seconds": {
+              "stock": 485.10216613700027,
+              "ohm": 322.8132245564998
+            },
+            "comparison_mean_seconds": {
+              "stock": 493.425090868026,
+              "ohm": 311.1203271378763
+            },
+            "comparison_trials": [
+              {
+                "lane": "stock",
+                "repetition": 0,
+                "wall_seconds": 493.060593822971,
+                "commands": [
+                  6.912344090174884, 82.0788555778563, 136.53747230116278,
+                  49.668272177223116, 2.322167028207332, 2.925914255902171,
+                  31.377507699187845, 2.198548164218664, 2.157725899014622,
+                  135.20312137017027, 41.24085436202586
+                ],
+                "tests_started": [75, 75, 0, 1, 5, 1, 1, 1, 5, 0, 3439],
+                "receipt_sha256": "467588e7d0ee7d46bf1cf976c71db1432a5f3c83f19568e9f91ae4f3675aa083"
+              },
+              {
+                "lane": "ohm",
+                "repetition": 0,
+                "wall_seconds": 306.29153417469934,
+                "commands": [
+                  6.233333645854145, 41.71355269988999, 73.33733132435009,
+                  32.72470044763759, 1.6854013111442327, 1.7231775978580117,
+                  26.87420559907332, 1.7078674719668925, 1.814794457051903,
+                  88.48552801506594, 29.4613612559624
+                ],
+                "tests_started": [75, 75, 0, 1, 5, 1, 1, 1, 5, 0, 3439],
+                "receipt_sha256": "95a8a0ee20637696b70ffcd31ab987aa6d58a18dbd62aae05edb5f1326098367"
+              },
+              {
+                "lane": "ohm",
+                "repetition": 1,
+                "wall_seconds": 315.94912010105327,
+                "commands": [
+                  6.915292279794812, 41.080687461886555, 73.97511997073889,
+                  32.33417358295992, 1.795737481676042, 1.7331023081205785,
+                  26.0840580672957, 2.239798054099083, 2.1751096043735743,
+                  90.96030062111095, 35.74867694498971
+                ],
+                "tests_started": [75, 75, 0, 1, 5, 1, 1, 1, 5, 0, 3439],
+                "receipt_sha256": "b6461c9358fd2be4102992f1deac188295c40faefa24e7e6d43afd51c7d6982e"
+              },
+              {
+                "lane": "stock",
+                "repetition": 1,
+                "wall_seconds": 493.78958791308105,
+                "commands": [
+                  8.519766209181398, 82.9050532062538, 139.13747366471216,
+                  56.19801648426801, 3.1450849580578506, 2.2753535942174494,
+                  34.30291006760672, 3.3483980149030685, 2.937614374794066,
+                  134.28276450000703, 26.27241950435564
+                ],
+                "tests_started": [75, 75, 0, 1, 5, 1, 1, 1, 5, 0, 3439],
+                "receipt_sha256": "5296ba9353c3128b17c5189b8e4809b7d56019bed96b89f3486062412a3e51b9"
+              }
+            ],
+            "endpoint_count": 3439,
+            "endpoint_sha256": "0cc837caecde3fedded4a30ec0a21440ce36d24124fdcd9b48251e182a525677",
+            "source": {
+              "head": "74004b5397b24662a87a5264a6ae80664168c7f3",
+              "tree": "110e0e8c2bcbab10e2429262c697d071d50fdfe5",
+              "expected_tree": "110e0e8c2bcbab10e2429262c697d071d50fdfe5",
+              "diff_sha256": "1d4b4993da6b9a0b8a5d62fc9482ecc901e78110b89adfa8850152a5609ebdf8",
+              "lockfile_sha256": "1fe5151bfcba81b0becadd1a98b40fdff11c1f3795ee87f43520ee827a7db29d",
+              "fixture_sha256": "f2d9c9b29ca5e81f39a3683aefe8e541c50e1100a0b43c32c9f8ac157e276084"
+            },
+            "stock_components": {
+              "cargo": {
+                "version": "cargo 1.100.0 (3acc79c0c 2026-11-05)\nrelease: 1.100.0\ncommit-hash: 3acc79c0c841844675bc53a605922dbfc441e750\ncommit-date: 2026-11-05\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]",
+                "sha256": "84d55d77232a921da96bcf2e1f78532ef5c5221803aae4448d9e220d48ebd808"
+              },
+              "clippy-driver": {
+                "version": "clippy 0.1.100 (0ef1bc3860 2026-11-09)",
+                "sha256": "b20543523b921c8c57b14fb80e04209a6d9e7290c935e0bb5d50f622c45b9160"
+              },
+              "rustc": {
+                "version": "rustc 1.100.0 (0ef1bc386 2026-11-09)\nbinary: rustc\ncommit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a\ncommit-date: 2026-11-09\nhost: x86_64-unknown-linux-gnu\nrelease: 1.100.0\nLLVM version: 23.1.5",
+                "sha256": "5073422953727c9427a76b7fce03aa9404da46315e5a1e4965389512a41e8db0"
+              },
+              "rustfmt": {
+                "version": "rustfmt 1.11.0-stable (0ef1bc3860 2026-11-09)",
+                "sha256": "6e2d5b048877b33b14d5da5670381516b7ec3ee22572b8aff933d090fe6cb664"
+              }
+            },
+            "raw_sha256": "e77a6e0f9446d667d0e0c0690639e9e9aba049be0d99188854eb0b85cf950ddd",
+            "cpu_coverage": {
+              "commands": 48,
+              "traces": [
+                "2d4bf9b526a47dbb821da7922ae789feb6916af62175047cdfbc2ace84041fda"
+              ]
+            },
+            "preflight_idle_fractions": [
+              {
+                "idle": 0.9988743668313427,
+                "iowait": 0.00037521105621912324,
+                "steal": 0.0
+              },
+              {
+                "idle": 0.9993120700437773,
+                "iowait": 6.253908692933083e-5,
+                "steal": 0.0
+              },
+              {
+                "idle": 0.9991245622811405,
+                "iowait": 0.0001250625312656328,
+                "steal": 0.0
+              },
+              {
+                "idle": 0.9951829840475446,
+                "iowait": 0.00012511729746637472,
+                "steal": 0.0
+              },
+              {
+                "idle": 0.9990620310155077,
+                "iowait": 0.00031265632816408203,
+                "steal": 0.0
+              },
+              {
+                "idle": 0.9993121130635982,
+                "iowait": 6.253517603652055e-5,
+                "steal": 0.0
+              }
+            ],
+            "output_verification": {
+              "command_logs_rehashed": 48,
+              "timing_driver_sha256": "f6bf1df6f1ae559fea9038ee4c9294bb00e851a6464b0d2b90352805d072086b",
+              "initial_reader_sha256": "9118d9a1e04872b5087d4662192b6a6a676ed48475cebd4104f3d063623afd30",
+              "verified_reader_sha256": "af8e4243672d8f4ba349d551e4ca69e5bfeed6de45ea51f28260905ee3a0c841",
+              "method": "The initial post-run reader expected a checksum on each timing row. The frozen runner records checksums in the cell audit. The corrected reader verified the same four completed runs from those receipts."
+            },
+            "preflight_free_bytes": 238881009664
+          },
+          "editing_command_times": {
+            "commands": [
+              {
+                "index": 1,
+                "label": "Run the existing focused startup tests before editing",
+                "previous_seconds": [
+                  6.167273726314306, 10.345949091948569, 6.1785919200629,
+                  6.415866719093174
+                ],
+                "candidate_seconds": [
+                  6.740339032839984, 8.73849163018167, 6.6203891397453845,
+                  6.571384375914931
+                ],
+                "mean_difference_seconds": -0.10926931968424469,
+                "difference_95_ci_seconds": [
+                  -1.722598728231407, 1.5040600888629176
+                ]
+              },
+              {
+                "index": 3,
+                "label": "Recheck focused startup behavior after the transcript edit",
+                "previous_seconds": [
+                  39.90304686781019, 41.13681055791676, 40.48313446622342,
+                  46.33076253533363
+                ],
+                "candidate_seconds": [
+                  41.293018688913435, 41.65786023903638, 41.50780080119148,
+                  42.04898399673402
+                ],
+                "mean_difference_seconds": -0.33652267535217106,
+                "difference_95_ci_seconds": [
+                  -4.559923188309988, 3.8868778376056463
+                ]
+              },
+              {
+                "index": 4,
+                "label": "Check the edited TUI library",
+                "previous_seconds": [
+                  48.09226957708597, 46.82614674791694, 44.71930840192363,
+                  47.79835319984704
+                ],
+                "candidate_seconds": [
+                  69.88345430698246, 75.5711477198638, 70.15426956210285,
+                  71.83759459899738
+                ],
+                "mean_difference_seconds": 25.00259706529323,
+                "difference_95_ci_seconds": [
+                  20.369454620523676, 29.635739510062784
+                ]
+              },
+              {
+                "index": 6,
+                "label": "Run the exact custom-height regression from the recorded session",
+                "previous_seconds": [
+                  28.963800507131964, 29.973396824207157, 27.915519603993744,
+                  29.043429971206933
+                ],
+                "candidate_seconds": [
+                  33.152078595012426, 29.05526579171419, 31.12748980289325,
+                  33.22580716200173
+                ],
+                "mean_difference_seconds": 2.66612361127045,
+                "difference_95_ci_seconds": [
+                  -1.2055775967628377, 6.537824819303738
+                ]
+              },
+              {
+                "index": 7,
+                "label": "Run the focused active-cell rendering tests",
+                "previous_seconds": [
+                  2.5432085297070444, 2.5142064532265067, 2.468899441882968,
+                  2.5913626616820693
+                ],
+                "candidate_seconds": [
+                  2.005815557669848, 1.719162629917264, 1.6879374091513455,
+                  1.7374729700386524
+                ],
+                "mean_difference_seconds": -0.7418221299303696,
+                "difference_95_ci_seconds": [
+                  -0.9644321061353536, -0.5192121537253855
+                ]
+              },
+              {
+                "index": 8,
+                "label": "Confirm animated active cells continue rendering",
+                "previous_seconds": [
+                  3.0441906610503793, 1.9423330812714994, 1.9029699387028813,
+                  2.168974499218166
+                ],
+                "candidate_seconds": [
+                  1.722242685034871, 1.6636575488373637, 1.6660575112327933,
+                  1.6565212421119213
+                ],
+                "mean_difference_seconds": -0.5874972982564941,
+                "difference_95_ci_seconds": [
+                  -1.3901480911185478, 0.21515349460555944
+                ]
+              },
+              {
+                "index": 10,
+                "label": "Recheck the exact custom-height regression after integrating the widget",
+                "previous_seconds": [
+                  28.509396468289196, 28.621279918123037, 28.271626031026244,
+                  29.99910724768415
+                ],
+                "candidate_seconds": [
+                  27.03235970484093, 26.95495602907613, 27.369609822053462,
+                  26.349050716031343
+                ],
+                "mean_difference_seconds": -1.9238583482801914,
+                "difference_95_ci_seconds": [
+                  -3.826661209209983, -0.021055487350399416
+                ]
+              },
+              {
+                "index": 11,
+                "label": "Validate active-cell removal cache invalidation",
+                "previous_seconds": [
+                  1.9008795330300927, 2.9604164022020996, 2.4945994312874973,
+                  2.4743694928474724
+                ],
+                "candidate_seconds": [
+                  1.8938967762514949, 1.7224729182198644, 1.7049087998457253,
+                  1.6673960098996758
+                ],
+                "mean_difference_seconds": -0.7103975887876004,
+                "difference_95_ci_seconds": [
+                  -1.5262836572026854, 0.10548847962748475
+                ]
+              },
+              {
+                "index": 12,
+                "label": "Rerun the complete focused rendering regression module",
+                "previous_seconds": [
+                  1.6363299689255655, 1.760123509913683, 2.0092073502019048,
+                  2.029066347051412
+                ],
+                "candidate_seconds": [
+                  1.732994447927922, 1.7395297698676586, 1.7033806079998612,
+                  1.6596714002080262
+                ],
+                "mean_difference_seconds": -0.14978773752227426,
+                "difference_95_ci_seconds": [
+                  -0.5056023149675812, 0.20602683992303278
+                ]
+              },
+              {
+                "index": 13,
+                "label": "Run the exact strict Clippy lint used during the original CI fix",
+                "previous_seconds": [
+                  62.50412926496938, 60.08147212816402, 59.910189917776734,
+                  59.97539239330217
+                ],
+                "candidate_seconds": [
+                  84.72999903326854, 88.32695161737502, 86.53296508314088,
+                  92.78253916278481
+                ],
+                "mean_difference_seconds": 27.475317798089236,
+                "difference_95_ci_seconds": [
+                  20.520799823860596, 34.42983577231787
+                ]
+              },
+              {
+                "index": 14,
+                "label": "Validate the entire TUI package once",
+                "previous_seconds": [
+                  36.00392425386235, 37.735417085234076, 35.90137438522652,
+                  26.113239536993206
+                ],
+                "candidate_seconds": [
+                  28.478454040829092, 35.06202649092302, 45.50148643320426,
+                  23.81345115462318
+                ],
+                "mean_difference_seconds": -0.7246342854341492,
+                "difference_95_ci_seconds": [
+                  -12.313667291053232, 10.864398720184933
+                ]
+              }
+            ],
+            "command_logs_rehashed": 96,
+            "time_outside_commands": {
+              "previous_seconds": [
+                0.7369344774633646, 0.45488763274624944, 0.44920027535408735,
+                0.5241151824593544
+              ],
+              "candidate_seconds": [
+                0.4492134805768728, 0.4616998382844031, 0.4419714012183249,
+                0.9140613726340234
+              ],
+              "mean_difference_seconds": 0.025452131172642112
+            },
+            "total_mean_difference_seconds": 49.885701222578064
+          },
+          "source_and_test_checks": {
+            "0": {
+              "source": {
+                "diff_sha256": "1d4b4993da6b9a0b8a5d62fc9482ecc901e78110b89adfa8850152a5609ebdf8",
+                "expected_tree": "110e0e8c2bcbab10e2429262c697d071d50fdfe5",
+                "fixture_sha256": "f2d9c9b29ca5e81f39a3683aefe8e541c50e1100a0b43c32c9f8ac157e276084",
+                "head": "74004b5397b24662a87a5264a6ae80664168c7f3",
+                "lockfile_sha256": "1fe5151bfcba81b0becadd1a98b40fdff11c1f3795ee87f43520ee827a7db29d",
+                "tree": "110e0e8c2bcbab10e2429262c697d071d50fdfe5"
+              },
+              "endpoint": [
+                [
+                  3439,
+                  "0cc837caecde3fedded4a30ec0a21440ce36d24124fdcd9b48251e182a525677"
+                ]
+              ],
+              "tests_started": [75, 75, 0, 1, 5, 1, 1, 1, 5, 0, 3439]
+            },
+            "1": {
+              "source": {
+                "diff_sha256": "1d4b4993da6b9a0b8a5d62fc9482ecc901e78110b89adfa8850152a5609ebdf8",
+                "expected_tree": "110e0e8c2bcbab10e2429262c697d071d50fdfe5",
+                "fixture_sha256": "f2d9c9b29ca5e81f39a3683aefe8e541c50e1100a0b43c32c9f8ac157e276084",
+                "head": "74004b5397b24662a87a5264a6ae80664168c7f3",
+                "lockfile_sha256": "1fe5151bfcba81b0becadd1a98b40fdff11c1f3795ee87f43520ee827a7db29d",
+                "tree": "110e0e8c2bcbab10e2429262c697d071d50fdfe5"
+              },
+              "endpoint": [
+                [
+                  3439,
+                  "0cc837caecde3fedded4a30ec0a21440ce36d24124fdcd9b48251e182a525677"
+                ]
+              ],
+              "tests_started": [75, 75, 0, 1, 5, 1, 1, 1, 5, 0, 3439]
+            },
+            "2": {
+              "source": {
+                "diff_sha256": "1d4b4993da6b9a0b8a5d62fc9482ecc901e78110b89adfa8850152a5609ebdf8",
+                "expected_tree": "110e0e8c2bcbab10e2429262c697d071d50fdfe5",
+                "fixture_sha256": "f2d9c9b29ca5e81f39a3683aefe8e541c50e1100a0b43c32c9f8ac157e276084",
+                "head": "74004b5397b24662a87a5264a6ae80664168c7f3",
+                "lockfile_sha256": "1fe5151bfcba81b0becadd1a98b40fdff11c1f3795ee87f43520ee827a7db29d",
+                "tree": "110e0e8c2bcbab10e2429262c697d071d50fdfe5"
+              },
+              "endpoint": [
+                [
+                  3439,
+                  "0cc837caecde3fedded4a30ec0a21440ce36d24124fdcd9b48251e182a525677"
+                ]
+              ],
+              "tests_started": [75, 75, 0, 1, 5, 1, 1, 1, 5, 0, 3439]
+            },
+            "3": {
+              "source": {
+                "diff_sha256": "1d4b4993da6b9a0b8a5d62fc9482ecc901e78110b89adfa8850152a5609ebdf8",
+                "expected_tree": "110e0e8c2bcbab10e2429262c697d071d50fdfe5",
+                "fixture_sha256": "f2d9c9b29ca5e81f39a3683aefe8e541c50e1100a0b43c32c9f8ac157e276084",
+                "head": "74004b5397b24662a87a5264a6ae80664168c7f3",
+                "lockfile_sha256": "1fe5151bfcba81b0becadd1a98b40fdff11c1f3795ee87f43520ee827a7db29d",
+                "tree": "110e0e8c2bcbab10e2429262c697d071d50fdfe5"
+              },
+              "endpoint": [
+                [
+                  3439,
+                  "0cc837caecde3fedded4a30ec0a21440ce36d24124fdcd9b48251e182a525677"
+                ]
+              ],
+              "tests_started": [75, 75, 0, 1, 5, 1, 1, 1, 5, 0, 3439]
+            }
+          }
+        }
+      }
     }
   },
-  "publication_text": "We have repeated 6 of the 14 flagged cases with both released Ohm SDKs. Each comparison has four pairs, with both SDKs running on the same machine. The paired 95% intervals showed that 2 cases were slower. The 95% intervals for 4 cases span zero.\n\n| Case | Ohm 1.99.0-34 | Ohm 1.100.0-1 | Mean change | 95% interval for change |\n| --- | ---: | ---: | ---: | ---: |\n| Ruff developer workflow \u00b7 edit-check-test-check | 21.59 s | 25.69 s | +4.10 s | -0.39 to +8.59 s |\n| Ruff editing replay \u00b7 Run final strict Clippy for both affected packages | 15.29 s | 17.22 s | +1.93 s | -0.26 to +4.11 s |\n| uv editing replay \u00b7 Run local-mock-index installation integration test | 38.04 s | 41.13 s | +3.09 s | +1.71 to +4.47 s |\n| Ruff historical replay \u00b7 Run strict Clippy for the changed core and semantic crates | 19.67 s | 20.25 s | +0.58 s | -1.05 to +2.20 s |\n| ty editing replay \u00b7 Run all semantic package tests | 48.41 s | 51.99 s | +3.58 s | -0.39 to +7.55 s |\n| ty editing replay \u00b7 Run Clippy for all semantic targets and features | 26.13 s | 30.45 s | +4.33 s | +2.13 to +6.52 s |\n\nPositive changes mean the new release took longer. The comparisons include the upstream Rust version change and Ohm changes. Both uv SDKs used the same import-level Clippy allowance. Both Ruff SDKs ran Clippy with `-D warnings`. The 1.99 command omits one allowance for the newer `clippy::needless_nonzero_get` lint. Eight Codex cases are still being compared. On the second host, two stock/current control pairs averaged 493.43 seconds with Rust 1.100 and 311.12 with Ohm. The source, lockfile and all 3,439 final TUI tests matched the original host.",
+  "publication_text": "We have repeated 11 of the 14 flagged cases with both released Ohm SDKs. Each comparison has four pairs, with both SDKs running on the same machine. The paired 95% intervals showed that 5 cases were slower and 1 case was faster. The 95% intervals for 5 cases span zero.\n\n| Case | Ohm 1.99.0-34 | Ohm 1.100.0-1 | Mean change | 95% interval for change |\n| --- | ---: | ---: | ---: | ---: |\n| Ruff developer workflow \u00b7 edit-check-test-check | 21.59 s | 25.69 s | +4.10 s | -0.39 to +8.59 s |\n| Ruff editing replay \u00b7 Run final strict Clippy for both affected packages | 15.29 s | 17.22 s | +1.93 s | -0.26 to +4.11 s |\n| uv editing replay \u00b7 Run local-mock-index installation integration test | 38.04 s | 41.13 s | +3.09 s | +1.71 to +4.47 s |\n| Codex editing replay \u00b7 Total wall time | 258.13 s | 308.02 s | +49.89 s | +33.97 to +65.80 s |\n| Codex editing replay \u00b7 Check the edited TUI library | 46.86 s | 71.86 s | +25.00 s | +20.37 to +29.64 s |\n| Codex editing replay \u00b7 Recheck the exact custom-height regression after integrating the widget | 28.85 s | 26.93 s | -1.92 s | -3.83 to -0.02 s |\n| Codex editing replay \u00b7 Run the exact strict Clippy lint used during the original CI fix | 60.62 s | 88.09 s | +27.48 s | +20.52 to +34.43 s |\n| Codex editing replay \u00b7 Validate the entire TUI package once | 33.94 s | 33.21 s | -0.72 s | -12.31 to +10.86 s |\n| Ruff historical replay \u00b7 Run strict Clippy for the changed core and semantic crates | 19.67 s | 20.25 s | +0.58 s | -1.05 to +2.20 s |\n| ty editing replay \u00b7 Run all semantic package tests | 48.41 s | 51.99 s | +3.58 s | -0.39 to +7.55 s |\n| ty editing replay \u00b7 Run Clippy for all semantic targets and features | 26.13 s | 30.45 s | +4.33 s | +2.13 to +6.52 s |\n\nPositive changes mean the new release took longer. The comparisons include the upstream Rust version change and Ohm changes. Both uv SDKs used the same import-level Clippy allowance. Both Ruff SDKs ran Clippy with `-D warnings`. The 1.99 command omits one allowance for the newer `clippy::needless_nonzero_get` lint. The Codex editing comparisons used a second 32-core AMD Genoa host. Two stock/current control pairs there averaged 493.43 seconds with Rust 1.100 and 311.12 with Ohm. The source, lockfile and all 3,439 final TUI tests matched the original host. The complete Codex editing replay took 49.89 seconds longer on average in four direct Ohm pairs. The largest command-level increase was \u201cRun the exact strict Clippy lint used during the original CI fix\u201d at +27.48 seconds. Cold Clippy and two developer workflows are being verified on the original host.",
   "method": "Four order-balanced pairs per completed case. Two-sided 95% intervals use paired differences and Student t with three degrees of freedom."
 }
