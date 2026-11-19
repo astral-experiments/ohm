@@ -574,6 +574,13 @@ For example, fixing a bug in `parse_number` leaves the workspace's dependency ve
 The next check can reuse the saved resolution. Adding a dependency to `Cargo.toml` invalidates it,
 so Cargo resolves the dependencies again.
 
+A path dependency can inherit its version from a different workspace. Ohm checks the resolved
+package summary, so editing the other workspace’s version invalidates the saved graph. It also
+tracks local patches that Cargo listed under `[[patch.unused]]`. If a patch becomes eligible after a
+version bump, a warm `--locked` check reports the stale lockfile before compiling it. [Inherited
+versions](https://github.com/astral-experiments/ohm-cargo/pull/547) · [Unused
+patches](https://github.com/astral-experiments/ohm-cargo/pull/549)
+
 Cargo shares inherited dependency declarations across workspace members. On Unix, it also caches
 parsed registry manifests in Cargo home. If two projects use the same published crate, the second
 can reuse the manifest parsed by the first. Cargo checks that the contents and parser version
@@ -708,6 +715,12 @@ When a module changes, Ohm can format or verify just that module if it can deter
 owns it and how the modules connect. Otherwise, it formats the whole crate. Set `OHM_INCREMENTAL_FMT=0`
 to disable the cache.
 
+Requests to list changed files or print a verbose trace need fresh output on each run. Ohm invokes
+the full formatter for these options, including their `--l` and `--v` spellings. A formatting pass
+that spans multiple editions keeps its temporary module manifests together and removes them when
+an edition fails its check. [Output](https://github.com/astral-experiments/ohm-rustfmt/pull/87) ·
+[Cleanup](https://github.com/astral-experiments/ohm-rustfmt/pull/88)
+
 Ohm 1.99.0-25 runs rustfmt each time the command names a file, so replacing a symlink formats its
 new target and deleting it produces the usual error. Cargo also accounts for options that take
 values when it recognizes `--check`. Replacing the formatter invalidates its cached results, even
@@ -759,6 +772,13 @@ See:
 - [rustfmt #70](https://github.com/astral-experiments/ohm-rustfmt/pull/70)
 
 ## Rust compiler
+
+Ohm builds rustc on the dev channel so Cargo can enable experimental optimizations. Starting
+with 1.100.0-2, that build uses stable Rust’s type checking defaults. The next trait solver checks
+whether trait implementations overlap, and the stable borrow checker checks lifetimes in function
+bodies. Four programs in the release smoke test cover a valid constant pattern and three invalid
+borrows. [Compiler defaults](https://github.com/astral-experiments/ohm-rust/pull/431) ·
+[Packaged checks](https://github.com/astral-experiments/ohm/pull/392)
 
 ### 18. Run the compiler frontend in parallel
 
