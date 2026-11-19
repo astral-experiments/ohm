@@ -15,15 +15,14 @@ class PublicationTests(unittest.TestCase):
     def setUp(self):
         self.reports = publish.latest_reports()
         self.ty_worktree = publish.load(publish.RESULTS / publish.TY_WORKTREE_REPORT)
-        self.ty_fixture = publish.ty_fixture(self.ty_worktree)
-        self.ty_scenario = publish.load(publish.ROOT / self.ty_fixture)
+        self.ty_scenario = publish.load(publish.ROOT / publish.TY_SCENARIO)
         self.ruff_doctests = publish.load(publish.RESULTS / publish.RUFF_DOCTEST_REPORT)
 
     def copy_supplemental_reports(self, root):
         destination = root / "scripts/benchmark_results" / publish.TY_WORKTREE_REPORT
         destination.parent.mkdir(parents=True, exist_ok=True)
         publish.write_json(destination, self.ty_worktree)
-        fixture = root / self.ty_fixture
+        fixture = root / publish.TY_SCENARIO
         fixture.parent.mkdir(parents=True, exist_ok=True)
         publish.write_json(fixture, self.ty_scenario)
         for name in (publish.DEVELOPER_WORKFLOW_REPORT, publish.RUFF_DOCTEST_REPORT):

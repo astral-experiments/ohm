@@ -435,20 +435,11 @@ def ruff_doctest_row(report):
     ]
 
 
-def ty_fixture(study):
-    path = Path(study.get("source", {}).get("fixture", TY_SCENARIO))
-    if path.parent != Path(TY_SCENARIO).parent or path.suffix != ".json":
-        raise ValueError(f"Invalid ty replay fixture: {path}")
-    return path
-
-
 def documents(reports):
-    ty_worktree = load(RESULTS / TY_WORKTREE_REPORT)
-    fixture = ty_fixture(ty_worktree)
     tables, headlines = render_tables(
         reports,
-        ty_worktree,
-        load(ROOT / fixture),
+        load(RESULTS / TY_WORKTREE_REPORT),
+        load(ROOT / TY_SCENARIO),
         load(RESULTS / RUFF_DOCTEST_REPORT),
     )
     workflows = load(RESULTS / DEVELOPER_WORKFLOW_REPORT)

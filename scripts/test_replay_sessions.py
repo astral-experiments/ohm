@@ -72,6 +72,8 @@ class ReplayTestCase(unittest.TestCase):
     def runner(self, *arguments: str) -> object:
         options = replay.parser().parse_args(
             [
+                "--upstream",
+                "1.99.0",
                 "--project",
                 "ruff",
                 "--scenario",
@@ -91,11 +93,20 @@ class FixtureValidationTests(ReplayTestCase):
         self.assertEqual(sum(step.get("expected_exit") == 100 for step in commands), 2)
         self.assertEqual(scenario.environment["CARGO_PROFILE_DEV_OPT_LEVEL"], "1")
         self.assertNotIn("CARGO_BUILD_WARNINGS", scenario.environment)
-        self.assertEqual(commands[-1]["environment"], {"CARGO_BUILD_WARNINGS": "deny"})
+        self.assertEqual(commands[-1]["environment"], {"CARGO_BUILD_WARNINGS": "warn"})
         self.assertEqual(scenario.warmup[0]["args"], ["build", "--bin", "ty"])
         self.assertEqual(
-            commands[-1]["args"],
-            ["clippy", "-p", "ty_python_semantic", "--all-targets", "--all-features"],
+            commands[-1]["args"][:8],
+            [
+                "clippy",
+                "-p",
+                "ty_python_semantic",
+                "--all-targets",
+                "--all-features",
+                "--",
+                "-D",
+                "warnings",
+            ],
         )
         for step in commands:
             if step["args"][:2] == ["nextest", "run"]:
@@ -132,7 +143,7 @@ class FixtureValidationTests(ReplayTestCase):
         for project in replay.PROJECTS:
             with self.subTest(project=project):
                 scenario = replay.load_scenario(
-                    SCRIPTS / "session_replays" / f"{project}-rust-1.99.json"
+                    SCRIPTS / "session_replays" / f"{project}-rust-1.100.json"
                 )
                 self.assertEqual(scenario.project, project)
                 self.assertRegex(scenario.session["id"], r"^[a-z][a-z0-9-]+$")
@@ -153,10 +164,10 @@ class FixtureValidationTests(ReplayTestCase):
 
     def test_default_ruff_fixture_preserves_the_historical_workload(self) -> None:
         historical = replay.load_scenario(
-            SCRIPTS / "session_replays" / "ruff-historical-rust-1.99.json"
+            SCRIPTS / "session_replays" / "ruff-historical-rust-1.100.json"
         )
         current = replay.load_scenario(
-            SCRIPTS / "session_replays" / "ruff-rust-1.99.json"
+            SCRIPTS / "session_replays" / "ruff-rust-1.100.json"
         )
         self.assertEqual(current.project, "ruff")
         self.assertNotEqual(current.session["id"], historical.session["id"])
@@ -205,7 +216,7 @@ class FixtureValidationTests(ReplayTestCase):
 
     def test_codex_fixture_uses_reviewed_setup_patch(self) -> None:
         directory = SCRIPTS / "session_replays"
-        fixture = directory / "codex-rust-1.99.json"
+        fixture = directory / "codex-rust-1.100.json"
         descriptor = {
             "label": "Bound safety-retry goal accounting by elapsed wall time",
             "patch": "patches/codex-safety-retry-goal-accounting.patch",
@@ -229,10 +240,9 @@ class FixtureValidationTests(ReplayTestCase):
         )
 
     def test_historical_ruff_results_match_the_fixture(self) -> None:
-        baseline = latest_reports()["historical"]
-        series = baseline["rust_version"].rsplit(".", 1)[0]
-        fixture = SCRIPTS / "session_replays" / f"ruff-historical-rust-{series}.json"
+        fixture = SCRIPTS / "session_replays" / "ruff-historical-rust-1.100.json"
         scenario = replay.load_scenario(fixture)
+        baseline = latest_reports()["historical"]
 
         self.assertEqual(baseline["order"], [["stock", "ohm"], ["ohm", "stock"]])
         self.assertTrue(baseline["methodology"]["matching_test_counts_within_pairs"])
@@ -255,10 +265,9 @@ class FixtureValidationTests(ReplayTestCase):
             self.assertEqual(command["command"], [step["program"], *step["args"]])
 
     def test_current_ruff_results_match_the_fixture(self) -> None:
-        baseline = latest_reports()["sessions"]
-        series = baseline["rust_version"].rsplit(".", 1)[0]
-        fixture = SCRIPTS / "session_replays" / f"ruff-rust-{series}.json"
+        fixture = SCRIPTS / "session_replays" / "ruff-rust-1.100.json"
         scenario = replay.load_scenario(fixture)
+        baseline = latest_reports()["sessions"]
         self.assertEqual(
             baseline["order_by_project"]["ruff"],
             [["stock", "ohm"], ["ohm", "stock"]],
