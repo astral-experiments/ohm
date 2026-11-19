@@ -103,6 +103,20 @@ class WorkflowTests(unittest.TestCase):
             "log": str(log),
         }
 
+    def test_codex_revision_selects_and_records_the_requested_commit(self):
+        revision = self.git("rev-parse", "HEAD")
+        options = workflows.parser().parse_args(
+            ["--project", "codex", "--ohm", "test-ohm", "--output-dir", str(self.root)]
+        )
+        options.codex_rev = revision
+        study = workflows.WorkflowStudy(options)
+        self.assertEqual(study.scenarios[0].base_revision, revision)
+        self.assertEqual(study.configuration()["projects"]["codex"]["revision"], revision)
+        self.assertNotEqual(workflows.project_definitions()["codex"]["revision"], revision)
+        options.codex_rev = "HEAD"
+        with self.assertRaises(workflows.BenchmarkError):
+            workflows.WorkflowStudy(options)
+
     def test_edit_sequence_keeps_one_target_and_excludes_warmup(self):
         def after_warmup():
             self.assertEqual(

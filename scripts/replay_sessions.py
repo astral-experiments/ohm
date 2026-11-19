@@ -576,7 +576,7 @@ class Replay:
         projects = self.options.project or list(PROJECTS)
         for project in projects:
             if project not in selected:
-                candidate = SCENARIO_DIRECTORY / f"{project}-rust-1.99.json"
+                candidate = SCENARIO_DIRECTORY / f"{project}-rust-1.100.json"
                 if not candidate.is_file():
                     raise BenchmarkError(
                         f"no {project} session fixture; provide --scenario PATH"

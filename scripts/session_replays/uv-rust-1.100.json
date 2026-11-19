@@ -52,7 +52,9 @@
         "-A",
         "clippy::doc_markdown",
         "-A",
-        "clippy::double_must_use"
+        "clippy::double_must_use",
+        "-A",
+        "clippy::needless_bool"
       ]
     },
     {
@@ -127,7 +129,9 @@
         "-A",
         "clippy::doc_markdown",
         "-A",
-        "clippy::double_must_use"
+        "clippy::double_must_use",
+        "-A",
+        "clippy::needless_bool"
       ]
     },
     {
@@ -165,7 +169,9 @@
         "-A",
         "clippy::doc_markdown",
         "-A",
-        "clippy::double_must_use"
+        "clippy::double_must_use",
+        "-A",
+        "clippy::needless_bool"
       ]
     },
     {
@@ -215,7 +221,9 @@
         "-A",
         "clippy::doc_markdown",
         "-A",
-        "clippy::double_must_use"
+        "clippy::double_must_use",
+        "-A",
+        "clippy::needless_bool"
       ]
     },
     {
@@ -275,6 +283,12 @@
         "crates/uv/tests/sync/centralized_project_envs.rs",
         "crates/uv/tests/tool/tool_install.rs"
       ]
+    },
+    {
+      "label": "Remove a lint expectation that Clippy 1.100 no longer fulfills on the import",
+      "patch": "patches/rust-1.100-uv-unfulfilled-expectation.patch",
+      "sha256": "20b3b1c8894b25e5bce5404042f60d5f99212f783740e0a49221badbced0753c",
+      "paths": ["crates/uv-fs/src/locked_file.rs"]
     }
   ]
 }

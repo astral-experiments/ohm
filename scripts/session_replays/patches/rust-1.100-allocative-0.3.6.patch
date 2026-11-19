@@ -1,0 +1,28 @@
+diff --git a/src/impls/std/unsorted.rs b/src/impls/std/unsorted.rs
+--- a/src/impls/std/unsorted.rs
++++ b/src/impls/std/unsorted.rs
+@@ -225,13 +225,6 @@ impl Allocative for Infallible {
+     }
+ }
+ 
+-#[cfg(rust_nightly)]
+-impl Allocative for ! {
+-    fn visit<'a, 'b: 'a>(&self, _visitor: &'a mut Visitor<'b>) {
+-        match *self {}
+-    }
+-}
+-
+ impl<T: Allocative> Allocative for [T] {
+     fn visit<'a, 'b: 'a>(&self, visitor: &'a mut Visitor<'b>) {
+         let mut visitor = visitor.enter(Key::for_type_name::<T>(), mem::size_of_val::<[T]>(self));
+diff --git a/src/lib.rs b/src/lib.rs
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -43,7 +43,6 @@
+ //! [bumpalo]: https://github.com/fitzgen/bumpalo
+ 
+ #![cfg_attr(rust_nightly, feature(const_type_name))]
+-#![cfg_attr(rust_nightly, feature(never_type))]
+ // Used so that we can have `rustc_trivial_field_reads`. If it in any way becomes a problem for a
+ // rustc upgrade, just delete it
+ #![cfg_attr(rust_nightly, allow(internal_features))]

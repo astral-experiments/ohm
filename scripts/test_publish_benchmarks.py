@@ -224,10 +224,18 @@ class PublicationTests(unittest.TestCase):
             root = Path(directory)
             self.prepare_publication(root)
             disk_rust, disk_version = publish.disk_versions(self.reports["disk"])
+            # The combined timing table needs ty and Ruff inputs for this Rust version.
+            release = f"ohm-{disk_version}"
+            for name, versions in (
+                (publish.TY_WORKTREE_REPORT, {"rust": disk_rust, "ohm": release}),
+                (publish.RUFF_DOCTEST_REPORT, {"upstream": disk_rust, "ohm": release}),
+            ):
+                path = root / "scripts/benchmark_results" / name
+                publish.write_json(path, {**publish.load(path), **versions})
             for kind, report in self.reports.items():
                 if kind in publish.TIMING_KINDS:
                     report = dict(
-                        report, ohm_release=f"ohm-{disk_version}", rust_version=disk_rust
+                        report, ohm_release=release, rust_version=disk_rust
                     )
                 publish.write_json(root / "inputs" / f"{kind}.json", report)
                 publish.write_json(

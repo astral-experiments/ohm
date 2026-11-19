@@ -1,0 +1,9 @@
+diff --git a/crates/uv-fs/src/locked_file.rs b/crates/uv-fs/src/locked_file.rs
+--- a/crates/uv-fs/src/locked_file.rs
++++ b/crates/uv-fs/src/locked_file.rs
+@@ -294,5 +294,4 @@
+     fn create(path: impl AsRef<Path>) -> Result<fs_err::File, LockedFileError> {
+         use rustix::io::Errno;
+-        #[expect(clippy::disallowed_types)]
+         use std::{fs::File, os::unix::fs::PermissionsExt};
+         use tempfile::NamedTempFile;
