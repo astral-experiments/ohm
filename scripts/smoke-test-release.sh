@@ -75,6 +75,10 @@ if jq -e '.release | ((.upstream_rust_version | split(".") | map(tonumber)) + [.
     "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN.json" >/dev/null; then
   bash "$(dirname -- "${BASH_SOURCE[0]}")/smoke-test-relink.sh" "$OHM_TOOLCHAIN" "$smoke_root/relink"
 fi
+if jq -e '.release | ((.upstream_rust_version | split(".") | map(tonumber)) + [.ohm_revision]) >= [1, 100, 0, 2]' \
+    "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN.json" >/dev/null; then
+  bash "$(dirname -- "${BASH_SOURCE[0]}")/smoke-test-stable-analysis.sh" "$OHM_TOOLCHAIN" "$smoke_root"
+fi
 clippy_revision="${CLIPPY_REVISION:0:10}"
 "$toolchain_root/bin/cargo-clippy" --version \
   | grep -F "$clippy_revision" >/dev/null
