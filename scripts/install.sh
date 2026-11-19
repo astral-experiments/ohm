@@ -225,6 +225,8 @@ upstream_version=${upstream_version%-*}
 archive_root=rust-$upstream_version-dev-$host_target
 
 info 'inspecting archive contents'
+# Inspect and extract the complete archive covered by the checksum.
+unset TAR_OPTIONS
 tar -tf "$archive_path" > "$temporary_directory/members" || fail 'could not inspect the archive'
 awk -v expected_root="$archive_root" '
     {
