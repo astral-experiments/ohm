@@ -308,6 +308,10 @@ class HostMonitor:
 class WorkflowStudy(replay.Replay):
     def __init__(self, options):
         self.definitions = project_definitions()
+        if options.codex_rev is not None:
+            self.definitions["codex"]["revision"] = replay.safe_revision(
+                options.codex_rev, field="Codex source revision"
+            )
         self.workflows = options.workflow or list(WORKFLOWS)
         self.discarded = []
         self.failures = []
@@ -917,6 +921,7 @@ def parser():
     result.add_argument("--project", action="append", choices=project_definitions())
     result.add_argument("--workflow", action="append", choices=WORKFLOWS)
     result.add_argument("--source-path", action="append", default=[])
+    result.add_argument("--codex-rev", help="Full Codex commit to measure")
     result.add_argument("--output-dir", type=Path, required=True)
     result.add_argument("--upstream", default=DEFAULT_UPSTREAM)
     result.add_argument("--ohm", required=True, help="Ohm toolchain to benchmark")

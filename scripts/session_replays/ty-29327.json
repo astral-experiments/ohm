@@ -147,10 +147,21 @@
         "-p",
         "ty_python_semantic",
         "--all-targets",
-        "--all-features"
+        "--all-features",
+        "--",
+        "-D",
+        "warnings",
+        "-A",
+        "clippy::needless_bool",
+        "-A",
+        "clippy::needless_nonzero_get",
+        "-A",
+        "clippy::redundant_clone",
+        "-A",
+        "clippy::used_underscore_items"
       ],
       "environment": {
-        "CARGO_BUILD_WARNINGS": "deny"
+        "CARGO_BUILD_WARNINGS": "warn"
       }
     }
   ]

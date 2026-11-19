@@ -112,7 +112,15 @@
         "-A",
         "clippy::needless_borrows_for_generic_args",
         "-A",
-        "clippy::mut_mut"
+        "clippy::mut_mut",
+        "-A",
+        "clippy::needless_bool",
+        "-A",
+        "clippy::needless_nonzero_get",
+        "-A",
+        "clippy::redundant_clone",
+        "-A",
+        "clippy::used_underscore_items"
       ]
     },
     {
@@ -176,7 +184,15 @@
         "-A",
         "clippy::needless_borrows_for_generic_args",
         "-A",
-        "clippy::mut_mut"
+        "clippy::mut_mut",
+        "-A",
+        "clippy::needless_bool",
+        "-A",
+        "clippy::needless_nonzero_get",
+        "-A",
+        "clippy::redundant_clone",
+        "-A",
+        "clippy::used_underscore_items"
       ]
     },
     {
@@ -261,7 +277,15 @@
         "-A",
         "clippy::needless_borrows_for_generic_args",
         "-A",
-        "clippy::mut_mut"
+        "clippy::mut_mut",
+        "-A",
+        "clippy::needless_bool",
+        "-A",
+        "clippy::needless_nonzero_get",
+        "-A",
+        "clippy::redundant_clone",
+        "-A",
+        "clippy::used_underscore_items"
       ]
     },
     {
@@ -277,6 +301,12 @@
       "patch": "patches/rust-1.99-ruff-cfg-select.patch",
       "sha256": "8182a10c8b8a9c49bf93b043bed93ade4a57522e5f16f9391c6356c34ff083a8",
       "paths": ["crates/ty_python_core/src/ast_node_ref.rs"]
+    },
+    {
+      "label": "Remove the Clippy rule retired in Rust 1.100",
+      "patch": "patches/rust-1.100-ruff-removed-clippy-lint.patch",
+      "sha256": "c7e205a638a4bf85de8aafdf3f3a566505febf26f3db1e4790b504d62c5d0cd3",
+      "paths": ["crates/ruff_annotate_snippets/Cargo.toml"]
     }
   ]
 }
