@@ -575,7 +575,7 @@ ln -s "$script_directory" "$test_directory/invocation/commands"
 (
   cd -- "$test_directory"
   script_directory="$test_directory/invocation/commands/../scripts" rust_checkout="${rust_checkout##*/}" \
-    run_optimized_build "$linux_target" "$relocated_output" TMPDIR="profile tmp" CDPATH=.
+    run_optimized_build "$linux_target" "$relocated_output" TMPDIR="profile tmp" CDPATH=. TAR_OPTIONS=--exclude=mod.rs
 )
 assert_optimized_build "$linux_target" "$bolt_directory" true true "$relocated_output" relocated
 [[ "$(git -C "$perf_source" rev-parse HEAD)" == "$original_head" ]]
