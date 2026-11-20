@@ -1,5 +1,5 @@
 name: Ruff edit replay
-run-name: Replay the Ruff edit sequence with cache-eligible files
+run-name: Verify LLVM enum reuse with the Ruff replay environment
 on:
   workflow_dispatch:
     inputs:
@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: astral-sh/ruff
-          ref: 4b00c689c3d91bb17866ec08de549479d6d8dcca
+          ref: ff1770df69dfd6ff554a5623a11f790f8867e14f
           fetch-depth: 4
           path: source
           persist-credentials: false

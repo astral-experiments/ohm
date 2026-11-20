@@ -9,6 +9,20 @@ out.mkdir()
 inputs = wd / "scripts/session_replays"
 fixture = json.loads((inputs / "ruff-rust-1.100.json").read_text())
 sdk = root / "sdk"
+parent = "ce0077c3e55ed6bd30e301729c8447af7cc6075a"
+child = "ff1770df69dfd6ff554a5623a11f790f8867e14f"
+cmd = dict(
+    kind="command",
+    label="Compile Ruff",
+    program="cargo",
+    args=["nextest", "run", "--locked", "--no-run", "-p", "ruff_linter"],
+)
+fixture.update(
+    base_revision=parent,
+    setup_patches=[],
+    warmup=[cmd],
+    steps=[dict(kind="edit", parent=parent, commit=child), cmd],
+)
 kit = wd / "kits"
 source = wd / "source"
 target = root / "target"
@@ -226,19 +240,10 @@ def arm(tag):
         )
     git("add", "-A")
     tree = git("write-tree").decode().strip()
-    assert tree == "f8f06a00db94b2a3b23bdfcb31e84849ae709ebf", tree
-    assert len(rows) == 13
-    inventory = cache()
-    llvm = digest(sdk / "lib/libLLVM.so.23.1-rust-dev")
-    for path in (sdk, target, shared):
-        shutil.rmtree(path)
-    return dict(tree=tree, archive=archive, cache=inventory, llvm=llvm, rows=rows)
+    assert tree == git("rev-parse", child + "^{tree}").decode().strip()
+    assert rows[-1]["events"].get("leaf-hit", 0), rows[-1]
+    return dict(rows=rows, cache=cache())
 
 
-order = sys.argv[1][:2]
-result = {t: arm(t) for t in order}
-data = json.dumps(result, indent=2)
-(out / "counts.json").write_text(data)
-a, b = order
-for x, y in zip(result[a]["rows"], result[b]["rows"]):
-    assert x["label"] == y["label"] and x["tests"] == y["tests"]
+result = arm("f")
+(out / "counts.json").write_text(json.dumps(result, indent=2))
