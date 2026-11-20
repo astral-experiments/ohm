@@ -56,6 +56,7 @@ def count(argv, cwd, env, out, metadata=True):
         result = subprocess.run(runnable, cwd=cwd, env=env, stdout=subprocess.PIPE,stderr=log)
     seconds = time.monotonic() - begin
     if result.returncode:
+        (out/'stdout').write_bytes(result.stdout)
         print((out/'stderr').read_text()[-4000:])
         print(result.stdout.decode()[-1200:])
         result.check_returncode()
@@ -154,6 +155,7 @@ def replay(role):
         if fresh:
             if CLIENT:
                 shutil.rmtree(TRIAL/'target')
+                (TRIAL/'before-edit').rename(TRIAL/'target')
             else:
                 command([cargo,'clean','--offline','-p',PACKAGE],cwd,env,folder/'clean.log')
         elif CLIENT or i == 0:
@@ -163,6 +165,9 @@ def replay(role):
             args = [cargo,op,'--locked','--offline','-p',PACKAGE,'--message-format=json']
             if CLIENT:
                 args.append('--lib')
+            if CASE == 'codex-clippy':
+                # The archived Codex has deny lints introduced before Clippy 1.100.
+                args += ['--','--cap-lints=warn']
             if op == 'test':
                 args.append('--no-run')
             rec = count(args,cwd,env,folder/op)
@@ -176,6 +181,11 @@ def replay(role):
         if i:
             edit(i)
         runs[i]=sequence(i)
+        if i == 0 and PAIR == 1 and CLIENT:
+            # Reproduce Cargo's unit selection from the mixed prime while
+            # discarding every query cache in the fresh arm.
+            shutil.copytree(TRIAL/'target', TRIAL/'before-edit', symlinks=True,
+                            ignore=shutil.ignore_patterns('incremental'))
     # Rebuild at identical paths with target state cleared. Codex retains the
     # unchanged dependency artifacts and removes the selected package's state.
     if PAIR==1:
@@ -218,4 +228,3 @@ else:
         roles.reverse()
     for role in roles:
         replay(role)
-
