@@ -154,7 +154,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        pair: ${{ fromJSON(inputs.mode == 'confirm' && '[1,2,3,4,5,6]' || inputs.mode == 'marginal' && '[1,2]' || '[1]') }}
+        pair: ${{ fromJSON(inputs.mode == 'confirm' && '[1,2,3,4,5,6]' || (inputs.mode == 'marginal' || inputs.mode == 'profile') && '[1,2]' || '[1]') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:

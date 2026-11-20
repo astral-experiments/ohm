@@ -1,4 +1,4 @@
-"""Sample a dependency update and a source edit in the uv history on the candidate."""
+"""Sample the six warm checks where the query reuse stack increased instructions."""
 
 import argparse
 import gzip
@@ -32,7 +32,9 @@ def main():
     src = args.scratch / "uv"
     src.mkdir(parents=True)
     args.output.mkdir(parents=True, exist_ok=True)
-    sdk = args.candidate
+    role = args.first
+    sdk = getattr(args, role)
+    (args.output / "profile-role").write_text(role + "\n")
     cargo = sdk / "bin/cargo"
     shutil.copy2(args.candidate_cargo or args.cargo, cargo)
     tc = args.scratch / "rustup/toolchains/ohm"
@@ -44,7 +46,7 @@ def main():
                CARGO_BUILD_JOBS=str(args.jobs), CARGO_TARGET_DIR=str(args.scratch / "target"),
                RUSTUP_HOME=str(args.scratch / "rustup"), RUSTUP_TOOLCHAIN="ohm")
     old_lock = None
-    for i, commit in enumerate(commits[:11]):
+    for i, commit in enumerate(commits):
         if i == 0:
             subprocess.run(["tar", "-x"], input=git(args.uv, "archive", commit), cwd=src, check=True)
         else:
@@ -57,17 +59,17 @@ def main():
         old_lock = lock
         argv = [cargo, *CHECK]
         binary = args.scratch / "perf.data"
-        if i in (4, 10):
-            argv = [perf, "record", "-e", "instructions:u", "-c", "3000017",
-                    "--call-graph", "dwarf,4096", "-o", binary, "--", *argv]
+        if i in (1, 6, 10, 11, 17, 20):
+            period = 49999 if i in (1, 17) else 120011
+            argv = [perf, "record", "-e", "instructions:u", "-c", str(period),
+                    "-m", "256", "-o", binary, "--", *argv]
         command(argv, src, env, args.output / f"{i}-build.log")
         if binary.is_file():
-            for key in ("children", "no-children"):
-                data = subprocess.check_output([perf, "report", "--stdio", "-i", binary,
-                    "--sort=dso,symbol", "--percent-limit=0.002", "--field-separator=|",
-                    "--call-graph=none", "--" + key], env=env)
-                with gzip.open(args.output / f"{i}-{key}.txt.gz", "wb") as f:
-                    f.write(data)
+            data = subprocess.check_output([perf, "report", "--stdio", "-i", binary,
+                "--sort=comm,dso,symbol", "--fields=period,sample,comm,dso,symbol",
+                "--percent-limit=0", "--field-separator=|", "--no-children"], env=env)
+            with gzip.open(args.output / f"{i}-symbols.txt.gz", "wb") as f:
+                f.write(data)
             binary.unlink()
         print(i, commit, flush=True)
 
