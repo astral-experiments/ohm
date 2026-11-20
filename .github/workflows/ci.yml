@@ -7,7 +7,11 @@ on:
         description: Experiment
         required: true
         type: choice
-        options: [build, build-pair, build-prototype, build-cargo, calibrate, pilot, confirm, profile, audit]
+        options: [build, build-pair, build-prototype, build-public, build-cargo, calibrate, pilot, marginal, confirm, profile, audit]
+      patch:
+        description: Optional gzipped, base64-encoded compiler diff for an ephemeral benchmark
+        type: string
+        required: false
       kits:
         description: Workflow run with compiler kits, or empty for shipped -2 on both sides
         type: string
@@ -61,14 +65,14 @@ jobs:
           compression-level: 0
 
   build:
-    if: inputs.mode == 'build' || inputs.mode == 'build-pair' || inputs.mode == 'build-prototype'
+    if: inputs.mode == 'build' || inputs.mode == 'build-pair' || inputs.mode == 'build-prototype' || inputs.mode == 'build-public'
     name: Build ${{ matrix.role }} compiler
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
-        role: ${{ fromJSON(inputs.mode == 'build-prototype' && '["candidate"]' || '["control","candidate"]') }}
+        role: ${{ fromJSON(inputs.mode == 'build-public' && '["control"]' || inputs.mode == 'build-prototype' && '["candidate"]' || '["control","candidate"]') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -84,7 +88,9 @@ jobs:
       - name: Build and smoke-test the compiler SDK
         working-directory: rust
         env:
-          PROTOTYPE: ${{ inputs.mode != 'build' && '1' || '' }}
+          PROTOTYPE: ${{ (inputs.mode == 'build-pair' || inputs.mode == 'build-prototype') && '1' || '' }}
+          EXACT_PUBLIC: ${{ inputs.mode == 'build-public' && '1' || '' }}
+          EXPERIMENT_PATCH: ${{ inputs.patch }}
           OPTIMIZED: ${{ inputs.optimized && '1' || '' }}
           PUBLIC_STACK: ${{ inputs.public_stack && '1' || '' }}
         run: bash ../coordinator/scripts/uv-check-instructions/build-kit.sh ${{ matrix.role }}
@@ -124,7 +130,7 @@ jobs:
           PY
 
   measure:
-    if: inputs.mode == 'pilot' || inputs.mode == 'confirm' || inputs.mode == 'profile' || inputs.mode == 'audit'
+    if: inputs.mode == 'pilot' || inputs.mode == 'marginal' || inputs.mode == 'confirm' || inputs.mode == 'profile' || inputs.mode == 'audit'
     name: Measure pair ${{ matrix.pair }}
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 60
@@ -134,7 +140,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        pair: ${{ fromJSON(inputs.mode == 'confirm' && '[1,2,3,4,5,6]' || '[1]') }}
+        pair: ${{ fromJSON(inputs.mode == 'confirm' && '[1,2,3,4,5,6]' || inputs.mode == 'marginal' && '[1,2]' || '[1]') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:

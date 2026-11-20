@@ -5,7 +5,12 @@ role=$1
 base=cad56cdf53143b0a539218169451ca12f7064ff3
 host=x86_64-unknown-linux-gnu
 test "$(git rev-parse HEAD)" = "$base"
-case "$role" in
+source=$role
+if [[ "${EXACT_PUBLIC:-}" == 1 ]]; then
+  source=candidate
+  PUBLIC_STACK=1
+fi
+case "$source" in
   control) ;;
   candidate)
     tips=(
@@ -26,11 +31,18 @@ case "$role" in
     done
     test "$(git diff --name-only | wc -l)" -eq "$paths"
     if [[ "${PROTOTYPE:-}" == 1 ]]; then
-      git apply ../coordinator/scripts/uv-check-instructions/prototype.patch
+      if [[ -n "${EXPERIMENT_PATCH:-}" ]]; then
+        printf '%s' "$EXPERIMENT_PATCH" | base64 -d | gzip -dc > "$RUNNER_TEMP/experiment.patch"
+        sha256sum "$RUNNER_TEMP/experiment.patch"
+        git apply --include='compiler/*' "$RUNNER_TEMP/experiment.patch"
+      else
+        git apply ../coordinator/scripts/uv-check-instructions/prototype.patch
+      fi
     fi
     ;;
   *) exit 2 ;;
 esac
+unset EXPERIMENT_PATCH
 git submodule update --init --depth 1 library/backtrace
 kit="$RUNNER_TEMP/kits/$role"
 mkdir -p "$kit/bin" "$kit/lib/rustlib/$host" "$RUNNER_TEMP/packages"
