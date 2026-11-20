@@ -1,4 +1,4 @@
-"""Sample the six warm checks where the query reuse stack increased instructions."""
+"""Sample two units at the first held-out uv check after the twenty-edit replay."""
 
 import argparse
 import collections
@@ -10,7 +10,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from run import CHECK, TIP, command, git, sha
+from run import CHECK, TIP, HOLDOUT, command, git, sha
 
 
 def find_perf():
@@ -28,8 +28,8 @@ def main():
     parser.add_argument("--jobs", type=int)
     args = parser.parse_args()
     perf = find_perf()
-    commits = git(args.uv, "rev-list", "--first-parent", "--max-count=21", TIP).decode().splitlines()[::-1]
-    assert len(commits) == 21
+    commits = git(args.uv, "rev-list", "--first-parent", "--max-count=23", HOLDOUT).decode().splitlines()[::-1]
+    assert len(commits) == 23 and commits[20] == TIP
     src = args.scratch / "uv"
     src.mkdir(parents=True)
     args.output.mkdir(parents=True, exist_ok=True)
@@ -62,57 +62,29 @@ def main():
                     src, env, args.output / f"{i}-fetch.log")
         old_lock = lock
         argv = [cargo, *CHECK]
-        binary = args.scratch / "perf.data"
-        subject = {1: "uv_python_interpreter", 17: "uv_pep508"}.get(i)
-        receipt = args.output / f"{i}-repeats"
+        subjects = ["uv_lock", "uv_project_commands"] if i == 21 else []
         step = env
-        if subject:
-            step = dict(env, RUSTC_WRAPPER=str(wrapper), REPEAT_UNIT=subject,
-                        REPEAT_RECEIPT=str(receipt))
-        if annotate and subject:
-            step["REPEAT_COUNT"] = "96"
-            argv = [perf, "record", "-e", "instructions:u", "-c", "700001",
-                    "-m", "256", "-o", binary, "--", *argv]
-        if not annotate and i in (1, 6, 10, 11, 17, 20):
-            argv = [perf, "record", "-e", "instructions:u", "-c", "1200007",
-                    "--call-graph", "dwarf,4096", "-m", "256", "-o", binary, "--", *argv]
+        if subjects:
+            step = dict(env, RUSTC_WRAPPER=str(wrapper), REPEAT_UNITS=",".join(subjects),
+                        REPEAT_COUNT="16", REPEAT_DIR=str(args.output),
+                        PERF_DIR=str(args.scratch), PROFILER=str(perf))
         command(argv, src, step, args.output / f"{i}-build.log")
-        if subject:
-            assert receipt.exists()
-        if annotate and binary.is_file():
-            samples = subprocess.check_output([perf, "script", "-i", binary,
-                "-F", "ip,sym,symoff", "--no-demangle"], env=env)
-            counts = collections.Counter()
-            symbols = set()
-            for sample in samples.decode().splitlines():
-                if "def_path_hash" in sample:
-                    full = sample.split()[-1]
-                    counts[full] += 1
-                    symbols.add(full.partition("+")[0])
-            with (args.output / f"{i}-offsets.txt").open("w") as f:
-                for name, count in sorted(counts.items()):
-                    print(name, count, file=f)
-            driver, = (sdk / "lib").glob("librustc_driver-*.so")
-            with (args.output/f"{i}-asm.txt").open("w") as f:
-                for symbol in sorted(symbols):
-                    if "StableHashState" in symbol:
-                        subprocess.run(["objdump", "--disassemble=" + symbol, driver],
-                                       stdout=f, check=True)
-            binary.unlink()
-            if i == 17:
-                break
-        if binary.is_file():
+        for unit in subjects:
+            assert (args.output / (unit+"-repeats")).is_file()
+            binary = args.scratch / (unit+".data")
             data = subprocess.check_output([perf, "report", "--stdio", "-i", binary,
                 "--sort=comm,dso,symbol", "--fields=period,sample,comm,dso,symbol",
                 "--percent-limit=0", "--field-separator=|", "--call-graph=none", "--no-children"], env=env)
-            with gzip.open(args.output / f"{i}-symbols.txt.gz", "wb") as f:
+            with gzip.open(args.output / f"{unit}-symbols.txt.gz", "wb") as f:
                 f.write(data)
             data = subprocess.check_output([perf, "report", "--stdio", "-i", binary,
                 "--sort=dso,symbol", "--comms=rustc", "--field-separator=|",
                 "--call-graph=none", "--percent-limit=0", "--children"], env=env)
-            with gzip.open(args.output / f"{i}-children.txt.gz", "wb") as f:
+            with gzip.open(args.output / f"{unit}-children.txt.gz", "wb") as f:
                 f.write(data)
             binary.unlink()
+        if subjects:
+            break
         print(i, commit, flush=True)
 
 
