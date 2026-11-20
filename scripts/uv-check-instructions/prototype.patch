@@ -1,3 +1,35 @@
+--- a/compiler/rustc_abi/src/lib.rs
++++ b/compiler/rustc_abi/src/lib.rs
+@@ -151,7 +151,7 @@
+ /// Represents the repr options provided by the user.
+ #[derive(Copy, Clone, Debug, Eq, PartialEq, Default)]
+ #[cfg_attr(feature = "nightly", derive(Encodable_NoContext, Decodable_NoContext, StableHash))]
+-pub struct ReprOptions {
++pub struct ReprOptions<Seed = Hash64> {
+     pub int: Option<IntegerType>,
+     pub align: Option<Align>,
+     pub pack: Option<Align>,
+@@ -165,10 +165,16 @@
+     /// hash without loss, but it does pay the price of being larger.
+     /// Everything's a tradeoff, a 64-bit seed should be sufficient for our
+     /// purposes (primarily `-Z randomize-layout`)
+-    pub field_shuffle_seed: Hash64,
+-}
+-
+-impl ReprOptions {
++    pub field_shuffle_seed: Seed,
++}
++
++impl<Seed> ReprOptions<Seed> {
++    /// Projects the declaration attributes used independently of layout randomization.
++    pub fn without_seed(&self) -> ReprOptions<()> {
++        let Self { int, align, pack, flags, scalable, field_shuffle_seed: _ } = *self;
++        ReprOptions { int, align, pack, flags, scalable, field_shuffle_seed: () }
++    }
++
+     #[inline]
+     pub fn simd(&self) -> bool {
+         self.flags.contains(ReprFlags::IS_SIMD)
 --- a/compiler/rustc_ast_lowering/src/lib.rs
 +++ b/compiler/rustc_ast_lowering/src/lib.rs
 @@ -266,7 +266,7 @@
@@ -121,13 +153,16 @@
          self.def_path_hashes.push(local_hash);
          debug_assert!(self.def_path_hashes.len() == self.def_id_to_key.len());
  
-@@ -413,9 +468,12 @@
-     /// if the `DefPathHash` is from a previous compilation session and
-     /// the def-path does not exist anymore.
-     pub fn local_def_path_hash_to_def_id(&self, hash: DefPathHash) -> Option<LocalDefId> {
--        debug_assert!(hash.stable_crate_id() == self.stable_crate_id);
--        self.def_path_hash_to_index
--            .get(&hash.local_hash())
+@@ -416,6 +471,18 @@
+         debug_assert!(hash.stable_crate_id() == self.stable_crate_id);
+         self.def_path_hash_to_index
+             .get(&hash.local_hash())
++            .map(|local_def_index| LocalDefId { local_def_index })
++    }
++
++    /// Resolve a definition key from the incremental dependency graph or query cache.
++    #[inline]
++    pub fn incremental_def_path_hash_to_def_id(&self, hash: DefPathHash) -> Option<LocalDefId> {
 +        debug_assert!(hash.stable_crate_id() == self.incremental_crate_id());
 +        let indices = match &self.incremental_paths {
 +            Some(paths) => &paths.indices,
@@ -505,19 +540,6 @@
  
      let stable_crate_ids = FreezeLock::new(StableCrateIdMap::default());
      let untracked = Untracked {
---- a/compiler/rustc_metadata/src/rmeta/decoder.rs
-+++ b/compiler/rustc_metadata/src/rmeta/decoder.rs
-@@ -1412,7 +1412,9 @@
-             DefKind::Union => ty::AdtKind::Union,
-             _ => bug!("get_adt_def called on a non-ADT {:?}", did),
-         };
--        let repr = self.root.tables.repr_options.get(self, item_id).unwrap().decode((self, tcx));
-+        let mut repr = self.root.tables.repr_options.get(self, item_id).unwrap().decode((self, tcx));
-+        // Metadata carries the effective layout seed. Keep only the user seed in AdtDef.
-+        repr.field_shuffle_seed ^= tcx.def_path_hash(did).0.to_smaller_hash().as_u64();
- 
-         let mut variants: Vec<_> = if let ty::AdtKind::Enum = adt_kind {
-             self.root
 --- a/compiler/rustc_metadata/src/rmeta/decoder/cstore_impl.rs
 +++ b/compiler/rustc_metadata/src/rmeta/decoder/cstore_impl.rs
 @@ -941,9 +941,10 @@
@@ -545,6 +567,26 @@
  
          let params_in_repr = self.tcx.params_in_repr(def_id);
          record!(self.tables.params_in_repr[def_id] <- params_in_repr, hcx);
+--- a/compiler/rustc_middle/src/dep_graph/dep_node.rs
++++ b/compiler/rustc_middle/src/dep_graph/dep_node.rs
+@@ -211,7 +211,7 @@
+     /// validated MIR for. Now, when we call `force_from_dep_node()` on a `DepNode`
+     /// with kind `mir_promoted`, we know that the key fingerprint of the `DepNode`
+     /// is actually a `DefPathHash`, and can therefore just look up the corresponding
+-    /// `DefId` in `tcx.def_path_hash_to_def_id`.
++    /// `DefId` in `tcx.incremental_def_path_hash_to_def_id`.
+     pub force_from_dep_node_fn: Option<
+         fn(
+             tcx: TyCtxt<'tcx>,
+@@ -341,7 +341,7 @@
+     /// has been removed.
+     pub fn extract_def_id(&self, tcx: TyCtxt<'_>) -> Option<DefId> {
+         if tcx.key_fingerprint_style(self.kind) == KeyFingerprintStyle::DefPathHash {
+-            tcx.def_path_hash_to_def_id(DefPathHash(self.key_fingerprint.into()))
++            tcx.incremental_def_path_hash_to_def_id(DefPathHash(self.key_fingerprint.into()))
+         } else {
+             None
+         }
 --- a/compiler/rustc_middle/src/dep_graph/dep_node_key.rs
 +++ b/compiler/rustc_middle/src/dep_graph/dep_node_key.rs
 @@ -40,7 +40,7 @@
@@ -585,15 +627,17 @@
          Fingerprint::new(
              // `owner` is local, so is completely defined by the local hash
              def_path_hash.local_hash(),
-@@ -220,7 +220,7 @@
+@@ -220,8 +220,8 @@
      fn try_recover_key(tcx: TyCtxt<'tcx>, dep_node: &DepNode) -> Option<Self> {
          if tcx.key_fingerprint_style(dep_node.kind) == KeyFingerprintStyle::HirId {
              let (local_hash, local_id) = Fingerprint::from(dep_node.key_fingerprint).split();
 -            let def_path_hash = DefPathHash::new(tcx.stable_crate_id(LOCAL_CRATE), local_hash);
+-            let def_id = tcx.def_path_hash_to_def_id(def_path_hash)?.expect_local();
 +            let def_path_hash = DefPathHash::new(tcx.incremental_crate_id(LOCAL_CRATE), local_hash);
-             let def_id = tcx.def_path_hash_to_def_id(def_path_hash)?.expect_local();
++            let def_id = tcx.incremental_def_path_hash_to_def_id(def_path_hash)?.expect_local();
              let local_id = local_id
                  .as_u64()
+                 .try_into()
 --- a/compiler/rustc_middle/src/dep_graph/graph.rs
 +++ b/compiler/rustc_middle/src/dep_graph/graph.rs
 @@ -519,7 +519,7 @@
@@ -793,6 +837,15 @@
          cnum
      }
  
+@@ -887,7 +881,7 @@
+         // If we get to this point, then all of the query inputs were green,
+         // which means that the definition with this hash is guaranteed to
+         // still exist in the current compilation session.
+-        match self.tcx.def_path_hash_to_def_id(def_path_hash) {
++        match self.tcx.incremental_def_path_hash_to_def_id(def_path_hash) {
+             Some(r) => r,
+             None => panic!("Failed to convert DefPathHash {def_path_hash:?}"),
+         }
 @@ -1078,7 +1072,7 @@
  
      fn encode_expn_id(&mut self, expn_id: ExpnId) {
@@ -818,71 +871,75 @@
      fn encode_def_index(&mut self, _def_index: DefIndex) {
 --- a/compiler/rustc_middle/src/ty/adt.rs
 +++ b/compiler/rustc_middle/src/ty/adt.rs
-@@ -10,12 +10,12 @@
- use rustc_data_structures::fx::FxHashMap;
- use rustc_data_structures::intern::Interned;
- use rustc_data_structures::stable_hash::{
--    StableHash, StableHashControls, StableHashCtxt, StableHasher,
-+    StableHash, StableHashControls, StableHashCtxt, StableHasher, ToStableHashKey,
- };
- use rustc_errors::ErrorGuaranteed;
- use rustc_hir as hir;
- use rustc_hir::def::{CtorKind, DefKind, Res};
--use rustc_hir::def_id::DefId;
-+use rustc_hir::def_id::{DefId, DefPathHash};
- use rustc_index::{IndexSlice, IndexVec};
- use rustc_macros::{StableHash, TyDecodable, TyEncodable};
- use rustc_session::DataTypeKind;
-@@ -118,6 +118,14 @@
+@@ -118,6 +118,17 @@
      repr: ReprOptions,
  }
  
 +impl AdtDefData {
-+    fn repr_with_path(&self, path: DefPathHash) -> ReprOptions {
-+        let mut repr = self.repr;
-+        repr.field_shuffle_seed ^= path.0.to_smaller_hash().as_u64();
-+        repr
++    /// A cached local ADT may originate in a check using another linkage salt.
++    /// Refresh the seed with the canonical path of its already-remapped definition.
++    pub(super) fn remap_local_layout_seed(&mut self, tcx: TyCtxt<'_>) {
++        if let Some(local) = self.did.as_local() {
++            let path = tcx.definitions_untracked().def_path_hash(local);
++            self.repr.field_shuffle_seed = tcx.path_layout_seed(path);
++        }
 +    }
 +}
 +
  impl PartialEq for AdtDefData {
      #[inline]
      fn eq(&self, other: &Self) -> bool {
-@@ -166,13 +174,14 @@
-             let addr = self as *const AdtDefData as usize;
-             let stable_hash_controls = hcx.stable_hash_controls();
-             *cache.borrow_mut().entry((addr, stable_hash_controls)).or_insert_with(|| {
--                let ty::AdtDefData { did, ref variants, ref flags, ref repr } = *self;
-+                let ty::AdtDefData { did, ref variants, ref flags, repr: _ } = *self;
- 
-                 let mut hasher = StableHasher::new();
--                did.stable_hash(hcx, &mut hasher);
-+                let path = did.to_stable_hash_key(hcx);
-+                path.stable_hash(hcx, &mut hasher);
+@@ -172,7 +183,13 @@
+                 did.stable_hash(hcx, &mut hasher);
                  variants.stable_hash(hcx, &mut hasher);
                  flags.stable_hash(hcx, &mut hasher);
 -                repr.stable_hash(hcx, &mut hasher);
-+                self.repr_with_path(path).stable_hash(hcx, &mut hasher);
++                if stable_hash_controls.incremental_keys && did.is_local() {
++                    // The effective seed has a separate dependency (repr_for_layout).
++                    // The user seed is a tracked compiler option.
++                    repr.without_seed().stable_hash(hcx, &mut hasher);
++                } else {
++                    repr.stable_hash(hcx, &mut hasher);
++                }
  
                  hasher.finish()
              })
-@@ -207,9 +216,16 @@
+@@ -207,8 +224,17 @@
          self.0.0.flags
      }
  
-+    /// The declaration's representation attributes and user-supplied layout seed.
-     #[inline]
-     pub fn repr(self) -> ReprOptions {
-         self.0.0.repr
+-    #[inline]
+-    pub fn repr(self) -> ReprOptions {
++    /// The declaration's representation attributes.
++    #[inline]
++    pub fn repr(self) -> ReprOptions<()> {
++        self.0.0.repr.without_seed()
 +    }
 +
-+    /// Incorporates the canonical definition path into the field shuffle seed.
-+    /// Reading it here lets layout depend on linkage independently of type checking.
++    /// The full representation, including its canonical layout seed.
 +    pub fn repr_for_layout(self, tcx: TyCtxt<'tcx>) -> ReprOptions {
-+        self.0.0.repr_with_path(tcx.def_path_hash(self.did()))
++        if self.did().is_local() {
++            tcx.track_local_linkage_identity();
++        }
+         self.0.0.repr
      }
  
-     pub fn field_representing_type_info(
+--- a/compiler/rustc_middle/src/ty/codec.rs
++++ b/compiler/rustc_middle/src/ty/codec.rs
+@@ -343,7 +343,12 @@
+ 
+ impl<'tcx, D: TyDecoder<'tcx>> Decodable<D> for AdtDef<'tcx> {
+     fn decode(decoder: &mut D) -> Self {
+-        decoder.interner().mk_adt_def_from_data(Decodable::decode(decoder))
++        let tcx = decoder.interner();
++        let mut data: ty::AdtDefData = Decodable::decode(decoder);
++        if !D::CLEAR_CROSS_CRATE && tcx.sess.opts.unstable_opts.ohm_shared_stages {
++            data.remap_local_layout_seed(tcx);
++        }
++        tcx.mk_adt_def_from_data(data)
+     }
+ }
+ 
 --- a/compiler/rustc_middle/src/ty/context.rs
 +++ b/compiler/rustc_middle/src/ty/context.rs
 @@ -860,6 +860,7 @@
@@ -971,16 +1028,29 @@
              self.stable_crate_id
          } else {
              self.cstore_untracked().stable_crate_id(crate_num)
-@@ -1324,7 +1371,7 @@
+@@ -1331,13 +1378,29 @@
+         }
+     }
  
-         // If this is a DefPathHash from the local crate, we can look up the
-         // DefId in the tcx's `Definitions`.
--        if stable_crate_id == self.stable_crate_id(LOCAL_CRATE) {
++    /// Resolve a definition key from the incremental dependency graph or query cache.
++    #[inline]
++    pub fn incremental_def_path_hash_to_def_id(self, hash: DefPathHash) -> Option<DefId> {
++        debug!("incremental_def_path_hash_to_def_id({:?})", hash);
++
++        let stable_crate_id = hash.stable_crate_id();
++
++        // If this is a DefPathHash from the local crate, we can look up the
++        // DefId in the tcx's `Definitions`.
 +        if stable_crate_id == self.incremental_crate_id {
-             Some(self.untracked.definitions.read().local_def_path_hash_to_def_id(hash)?.to_def_id())
-         } else {
-             self.def_path_hash_to_def_id_extern(hash, stable_crate_id)
-@@ -1337,7 +1384,7 @@
++            Some(self.untracked.definitions.read().incremental_def_path_hash_to_def_id(hash)?.to_def_id())
++        } else {
++            self.def_path_hash_to_def_id_extern(hash, stable_crate_id)
++        }
++    }
++
+     pub fn def_path_debug_str(self, def_id: DefId) -> String {
+         // We are explicitly not going through queries here in order to get
+         // crate name and stable crate id since this code is called from debug!()
          // statements within the query system and we'd run into endless
          // recursion otherwise.
          let (crate_name, stable_crate_id) = if def_id.is_local() {
@@ -989,7 +1059,7 @@
          } else {
              let cstore = &*self.cstore_untracked();
              (cstore.crate_name(def_id.krate), cstore.stable_crate_id(def_id.krate))
-@@ -1472,6 +1519,9 @@
+@@ -1472,6 +1535,9 @@
          stable_crate_id: StableCrateId,
      ) -> Result<TyCtxtFeed<'tcx, CrateNum>, CrateNum> {
          let mut lock = self.untracked().stable_crate_ids.write();
@@ -999,7 +1069,7 @@
          if let Some(&existing) = lock.get(&stable_crate_id) {
              return Err(existing);
          }
-@@ -1561,6 +1611,22 @@
+@@ -1561,6 +1627,22 @@
  
      #[inline(always)]
      pub fn with_stable_hashing_context<R>(self, f: impl FnOnce(StableHashState<'_>) -> R) -> R {
@@ -1008,7 +1078,7 @@
 +    }
 +
 +    #[inline]
-+    fn track_local_linkage_identity(self) {
++    pub(super) fn track_local_linkage_identity(self) {
 +        if self.incremental_crate_id != self.stable_crate_id {
 +            let _ = self.local_linkage_identity(());
 +        }
@@ -1022,7 +1092,7 @@
          f(StableHashState::new(self.sess, &self.untracked))
      }
  
-@@ -3269,6 +3335,7 @@
+@@ -3269,6 +3351,7 @@
  }
  
  pub fn provide(providers: &mut Providers) {
@@ -1050,7 +1120,22 @@
                  return hash;
 --- a/compiler/rustc_middle/src/ty/mod.rs
 +++ b/compiler/rustc_middle/src/ty/mod.rs
-@@ -1608,16 +1608,8 @@
+@@ -1602,22 +1602,22 @@
+             .filter(move |item| item.is_fn() && item.defaultness(self).has_value())
+     }
+ 
++    fn path_layout_seed(
++        self,
++        path: rustc_hir::def_id::DefPathHash,
++    ) -> rustc_hashes::Hash64 {
++        let mut seed = path.0.to_smaller_hash();
++        seed ^= self.sess.opts.unstable_opts.layout_seed.unwrap_or_default();
++        seed
++    }
++
+     pub fn repr_options_of_def(self, did: LocalDefId) -> ReprOptions {
+         let mut flags = ReprFlags::empty();
+         let mut size = None;
          let mut max_align: Option<Align> = None;
          let mut min_pack: Option<Align> = None;
  
@@ -1064,8 +1149,7 @@
 -        if let Some(user_seed) = self.sess.opts.unstable_opts.layout_seed {
 -            field_shuffle_seed ^= user_seed;
 -        }
-+        let field_shuffle_seed =
-+            rustc_hashes::Hash64::new(self.sess.opts.unstable_opts.layout_seed.unwrap_or_default());
++        let field_shuffle_seed = self.path_layout_seed(self.def_path_hash(did.to_def_id()));
  
          let elt = find_attr!(self, did, RustcScalableVector { element_count } => element_count
          )
@@ -1080,6 +1164,56 @@
      });
  
      let old_hash = dep_graph_data.prev_value_fingerprint_of(prev_index);
+--- a/compiler/rustc_mir_build/src/thir/print.rs
++++ b/compiler/rustc_mir_build/src/thir/print.rs
+@@ -10,7 +10,7 @@
+     match super::cx::thir_body(tcx, owner_def) {
+         Ok((thir, expr)) => {
+             let thir = thir.steal();
+-            let mut printer = ThirPrinter::new(&thir);
++            let mut printer = ThirPrinter::new(tcx, &thir);
+             printer.print(expr);
+             printer.into_buffer()
+         }
+@@ -27,6 +27,7 @@
+ }
+ 
+ struct ThirPrinter<'a, 'tcx> {
++    tcx: TyCtxt<'tcx>,
+     thir: &'a Thir<'tcx>,
+     fmt: String,
+ }
+@@ -48,8 +49,8 @@
+ }
+ 
+ impl<'a, 'tcx> ThirPrinter<'a, 'tcx> {
+-    fn new(thir: &'a Thir<'tcx>) -> Self {
+-        Self { thir, fmt: String::new() }
++    fn new(tcx: TyCtxt<'tcx>, thir: &'a Thir<'tcx>) -> Self {
++        Self { tcx, thir, fmt: String::new() }
+     }
+ 
+     fn indent(&mut self, level: usize) {
+@@ -649,7 +650,7 @@
+         print_indented!(self, format!("did: {:?}", adt_def.did()), depth_lvl + 1);
+         print_indented!(self, format!("variants: {:?}", adt_def.variants()), depth_lvl + 1);
+         print_indented!(self, format!("flags: {:?}", adt_def.flags()), depth_lvl + 1);
+-        print_indented!(self, format!("repr: {:?}", adt_def.repr()), depth_lvl + 1);
++        print_indented!(self, format!("repr: {:?}", adt_def.repr_for_layout(self.tcx)), depth_lvl + 1);
+         print_indented!(self, "}", depth_lvl);
+     }
+ 
+--- a/compiler/rustc_public_bridge/src/context/impls.rs
++++ b/compiler/rustc_public_bridge/src/context/impls.rs
+@@ -388,7 +388,7 @@
+ 
+     /// Returns the representation options for this ADT.
+     pub fn adt_repr(&self, def: AdtDef<'tcx>) -> ReprOptions {
+-        def.repr()
++        def.repr_for_layout(self.tcx)
+     }
+ 
+     /// Retrieve the function signature for the given generic arguments.
 --- a/compiler/rustc_query_impl/src/execution.rs
 +++ b/compiler/rustc_query_impl/src/execution.rs
 @@ -383,7 +383,7 @@
@@ -1288,7 +1422,7 @@
  
 --- a/compiler/rustc_ty_utils/src/layout.rs
 +++ b/compiler/rustc_ty_utils/src/layout.rs
-@@ -733,7 +733,7 @@
+@@ -733,14 +733,14 @@
                      return Err(error(cx, LayoutError::ReferencesError(guar)));
                  }
  
@@ -1297,6 +1431,14 @@
              }
  
              // UnsafeCell and UnsafePinned both disable niche optimizations
+             let is_special_no_niche = def.is_unsafe_cell() || def.is_unsafe_pinned();
+ 
+             let discr_range_of_repr = |min: RangeFrom<i128>, max: RangeToInclusive<u128>| {
+-                abi::Integer::discr_range_of_repr(tcx, ty, &def.repr(), min.start, max.last)
++                abi::Integer::discr_range_of_repr(tcx, ty, &def.repr_for_layout(tcx), min.start, max.last)
+             };
+ 
+             // We shouldn't be computing the layout of discrs that fail typeck
 @@ -776,7 +776,7 @@
              let mut layout = cx
                  .calc
