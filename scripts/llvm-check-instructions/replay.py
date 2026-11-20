@@ -10,7 +10,7 @@ root = Path.cwd()
 src = root / "source"
 reports = root / "receipts"
 reports.mkdir()
-sdk = root / "compiler"
+sdk = Path("/tmp/ohm-llvm-pmu/compiler")
 target = root / "target"
 shared = root / "shared"
 trace = root / "llvm.log"
