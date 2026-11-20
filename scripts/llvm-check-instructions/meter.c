@@ -12,10 +12,13 @@
 #include <sys/syscall.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <time.h>
+#include <sys/resource.h>
 
 // Open a counter on each rustc image before the dynamic loader runs.
 // The kernel sums the threads of that image, excluding forked processes.
 struct image {
+    double start,elapsed,cpu;
     struct image *next;
     char *crate;
     char *kind;
@@ -50,6 +53,12 @@ static void read_args(struct image *image) {
     fclose(f);
 }
 
+static double seconds(void) {
+    struct timespec stamp;
+    if (clock_gettime(CLOCK_MONOTONIC,&stamp)) err(1,"clock");
+    return stamp.tv_sec + stamp.tv_nsec*1e-9;
+}
+
 static void observe_exec(pid_t pid) {
     char path[64];
     snprintf(path, sizeof(path), "/proc/%d/exe", pid);
@@ -74,7 +83,17 @@ static void observe_exec(pid_t pid) {
         tree_fd = syscall(SYS_perf_event_open, &tree, pid, -1, -1, PERF_FLAG_FD_CLOEXEC);
         if (tree_fd < 0) err(1, "tree counter");
     }
-    if ((exe.st_dev != selected.st_dev || exe.st_ino != selected.st_ino) &&
+    char full[4096];
+    ssize_t len = readlink(path, full, sizeof full-1);
+    if (len < 0) err(1,"readlink");
+    full[len] = 0;
+    char *name = strrchr(full,'/');
+    name = name ? name + 1 : full;
+    int test = !strncmp(name,"pip_install-",12)
+        || !strncmp(name,"uv_client-",10)
+        || !strncmp(name,"uv_pypi_types-",14);
+    if (test) attr.inherit_thread = attr.remove_on_exec = 0;
+    if (!test && (exe.st_dev != selected.st_dev || exe.st_ino != selected.st_ino) &&
         (exe.st_dev != clippy.st_dev || exe.st_ino != clippy.st_ino)) return;
     int fd = syscall(SYS_perf_event_open, &attr, pid, -1, -1, PERF_FLAG_FD_CLOEXEC);
     if (fd < 0) err(1, "perf_event_open for pid %d", pid);
@@ -84,7 +103,11 @@ static void observe_exec(pid_t pid) {
     image->pid = pid;
     image->next = images;
     images = image;
-    read_args(image);
+    image->start = seconds();
+    if (test) {
+        image->kind = strdup("test-tree");
+        image->crate = strdup(name);
+    } else read_args(image);
 }
 
 static void resume(pid_t pid, int sig) {
@@ -111,7 +134,17 @@ static int trace(char **argv) {
     resume(root, 0);
     int code = 1;
     for (;;) {
-        pid_t pid = waitpid(-1, &status, __WALL);
+        struct rusage usage;
+        pid_t pid = wait4(-1, &status, __WALL, &usage);
+        if (pid > 0 && WIFEXITED(status)) {
+            for (struct image *i=images;i;i=i->next) {
+                if (i->pid!=pid) continue;
+                i->elapsed=seconds()-i->start;
+                i->cpu=usage.ru_utime.tv_sec+usage.ru_stime.tv_sec
+                    + (usage.ru_utime.tv_usec+usage.ru_stime.tv_usec)*1e-6;
+                break;
+            }
+        }
         if (pid == -1) {
             if (errno == ECHILD) break;
             if (errno == EINTR) continue;
@@ -156,9 +189,9 @@ int main(int argc, char **argv) {
             || value.running < value.enabled * .995)
             errx(1, "unusable PMU for pid %d: %" PRIu64 " instructions, %" PRIu64 "/%" PRIu64 " ns",
                  i->pid, value.instructions, value.running, value.enabled);
-        fprintf(out, "%d\t%s\t%s\t%" PRIu64 "\t%" PRIu64 "\t%" PRIu64 "\n",
+        fprintf(out, "%d\t%s\t%s\t%" PRIu64 "\t%" PRIu64 "\t%" PRIu64 "\t%.9f\t%.9f\n",
                 i->pid, i->crate ? i->crate : "-", i->kind ? i->kind : "-",
-                value.instructions, value.running, value.enabled);
+                value.instructions, value.enabled, value.running, i->elapsed, i->cpu);
     }
     if (ferror(out) || fclose(out)) err(1, "receipt");
     return code;

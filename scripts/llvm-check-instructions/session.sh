@@ -4,7 +4,7 @@ set -eu
 # Give the runner's loader and the compiler regular files in a private mount.
 scratch=/tmp/ohm-llvm-pmu
 mkdir -p "$scratch"
-mount -t tmpfs -o size=28G tmpfs "$scratch"
+mount -t tmpfs -o size=37G tmpfs "$scratch"
 mkdir "$scratch/compiler"
 mkdir "$scratch/work"
 chown "$1" "$scratch/work"
@@ -28,4 +28,4 @@ for name in ld-linux-x86-64.so.2 libc.so.6 libm.so.6 libpthread.so.0 libdl.so.2 
     mount --bind "$scratch/$name" "$path"
   fi
 done
-exec runuser -u "$1" -- env -u LD_PRELOAD -u LD_AUDIT -u LD_LIBRARY_PATH -u CI -u GITHUB_ACTIONS RUNNER_TEMP="$scratch/work" PATH="$3" GITHUB_STEP_SUMMARY="$4" python3 -I pmruff.py "$2"
+exec runuser -u "$1" -- env -u LD_PRELOAD -u LD_AUDIT -u LD_LIBRARY_PATH -u CI -u GITHUB_ACTIONS RUNNER_TEMP="$scratch/work" PATH="$3" GITHUB_STEP_SUMMARY="$4" python3 -I pmuv.py "$2"

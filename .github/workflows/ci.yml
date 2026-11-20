@@ -1,5 +1,5 @@
-name: Ruff edit replay
-run-name: Replay the Ruff edit sequence with cache-eligible files
+name: uv edit replay
+run-name: Replay the uv edit sequence with cache-eligible files
 on:
   workflow_dispatch:
     inputs:
@@ -23,8 +23,8 @@ jobs:
           persist-credentials: false
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          repository: astral-sh/ruff
-          ref: 4b00c689c3d91bb17866ec08de549479d6d8dcca
+          repository: astral-sh/uv
+          ref: 63251e5ce54f03363a10c088d7f9f6d6ba268302
           fetch-depth: 4
           path: source
           persist-credentials: false
@@ -35,39 +35,22 @@ jobs:
           name=ohm-1.100.0-2
           curl -fsSL --retry 4 "https://github.com/astral-experiments/ohm/releases/download/$name/$name-x86_64-unknown-linux-gnu.tar.gz" -o kits/2/kit.tar.gz
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        if: contains(matrix.order, 'b')
+        if: contains(matrix.order, '3')
         with:
           github-token: ${{ github.token }}
-          run-id: '44666699041'
-          name: linux-release-qualification-44666699041
-          path: kits/b
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        if: contains(matrix.order, 'n')
-        with:
-          github-token: ${{ github.token }}
-          run-id: '44733436429'
-          name: linux-release-qualification-44733436429
-          path: kits/n
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        if: contains(matrix.order, 'f')
-        with:
-          github-token: ${{ github.token }}
-          run-id: '44735982792'
-          name: linux-release-qualification-44735982792
-          path: kits/f
-      - name: Install nextest and measure the recorded commands
+          run-id: '44754589323'
+          name: ohm-1.100.0-3-x86_64-unknown-linux-gnu
+          path: kits/3
+      - name: Measure the recorded commands
         env:
           ORDER: ${{ matrix.order }}
         run: |
-          curl --retry 3 -fsSL https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.140/cargo-nextest-0.9.140-x86_64-unknown-linux-gnu.tar.gz -o nextest.tgz
-          echo '4ee9aaa0d0171a985a5d0eb735b87355894c1c455972e9674fb9fdbd1387c9a3  nextest.tgz' | sha256sum -c -
-          tar xf nextest.tgz
           if [[ $(cat /proc/sys/kernel/perf_event_paranoid) -gt 2 ]]; then sudo sysctl kernel.perf_event_paranoid=2; fi
           cc -O2 scripts/llvm-check-instructions/meter.c -o meter
           sudo unshare --mount --propagation private bash scripts/llvm-check-instructions/session.sh "$USER" "$ORDER" "$PWD:$PATH" "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: ruff-${{ matrix.order }}
+          name: uv-${{ matrix.order }}
           path: counts/
 
