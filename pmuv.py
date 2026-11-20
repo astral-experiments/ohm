@@ -52,7 +52,7 @@ def digest(path):
 
 def install(arm, selector):
     variant = arm
-    if arm in ("l", "s"):
+    if arm in ("l", "s", "x", "y", "z"):
         arm = "3"
     (tarball,) = list((kit / arm).rglob("*.tar.gz"))
     rustdir = "rust-1.100.0-dev-x86_64-unknown-linux-gnu"
@@ -82,6 +82,29 @@ def install(arm, selector):
                 rustdir + "/" + package + "/" + relative,
                 stdout=dest,
             )
+    if variant in ("x", "y", "z"):
+        (driver,) = (sdk / "lib").glob("librustc_driver-*.so")
+        assert (
+            digest(driver)
+            == "51518fa9b15aa72a2e1ad890cb1980690d17f2baa18471bbad0d375029e14c33"
+        )
+        with driver.open("r+b") as stream:
+
+            def change(offset, old, new):
+                old, new = bytes.fromhex(old), bytes.fromhex(new)
+                stream.seek(offset)
+                assert len(new) == len(old) and stream.read(len(old)) == old
+                stream.seek(offset)
+                stream.write(new)
+
+            if variant in ("x", "z"):
+                # Fall through to the full-table lookup in the inlined
+                # upstream_monomorphizations_in provider, as before #439.
+                change(107751413, "0f850c010000", "660f1f440000")
+            if variant in ("y", "z"):
+                # After comparing opt-level with zero in place_mono_items,
+                # use unsigned < 0, which always disables sole-user placement.
+                change(133381903, "80b868140000000f94c0", "80b868140000000f92c0")
     run("rustup", "toolchain", "link", selector, sdk)
     return archives[arm]
 
@@ -249,6 +272,8 @@ def arm(tag):
         name: digest(sdk / name)
         for name in ["bin/cargo", "lib/libLLVM.so.23.1-rust-dev", "bin/rustc"]
     }
+    (driver,) = (sdk / "lib").glob("librustc_driver-*.so")
+    tools["rustc_driver"] = digest(driver)
     inventory = cache()
     for p in (sdk, target, shared, uvcache):
         if p.is_dir():
