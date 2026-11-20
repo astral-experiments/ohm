@@ -1,5 +1,5 @@
 name: Measure uv check instructions
-run-name: uv history ${{ inputs.mode }} (rustc ${{ inputs.kits || 'shipped' }}, Cargo ${{ inputs.cargo || 'shipped' }})
+run-name: uv history ${{ inputs.mode }} (rustc ${{ inputs.prototype || inputs.kits || 'shipped' }}, Cargo ${{ inputs.cargo || 'shipped' }})
 on:
   workflow_dispatch:
     inputs:
@@ -7,13 +7,17 @@ on:
         description: Experiment
         required: true
         type: choice
-        options: [build, build-cargo, calibrate, pilot, confirm, profile]
+        options: [build, build-prototype, build-cargo, calibrate, pilot, confirm, profile, audit]
       kits:
         description: Workflow run with compiler kits, or empty for shipped -2 on both sides
         type: string
         required: false
       cargo:
         description: Workflow run with the patched Cargo to use on the candidate side
+        type: string
+        required: false
+      prototype:
+        description: Workflow run with a replacement candidate compiler SDK, requires kits
         type: string
         required: false
 
@@ -49,14 +53,14 @@ jobs:
           compression-level: 0
 
   build:
-    if: inputs.mode == 'build'
+    if: inputs.mode == 'build' || inputs.mode == 'build-prototype'
     name: Build ${{ matrix.role }} compiler
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
-        role: [control, candidate]
+        role: ${{ fromJSON(inputs.mode == 'build' && '["control","candidate"]' || '["candidate"]') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -71,6 +75,8 @@ jobs:
           path: rust
       - name: Build and smoke-test the compiler SDK
         working-directory: rust
+        env:
+          PROTOTYPE: ${{ inputs.mode == 'build-prototype' && '1' || '' }}
         run: bash ../coordinator/scripts/uv-check-instructions/build-kit.sh ${{ matrix.role }}
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
@@ -108,7 +114,7 @@ jobs:
           PY
 
   measure:
-    if: inputs.mode == 'pilot' || inputs.mode == 'confirm' || inputs.mode == 'profile'
+    if: inputs.mode == 'pilot' || inputs.mode == 'confirm' || inputs.mode == 'profile' || inputs.mode == 'audit'
     name: Measure pair ${{ matrix.pair }}
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 60
@@ -135,8 +141,15 @@ jobs:
         with:
           github-token: ${{ github.token }}
           run-id: ${{ inputs.kits }}
-          pattern: sdk-*
+          pattern: ${{ inputs.prototype != '' && 'sdk-control' || 'sdk-*' }}
           merge-multiple: true
+          path: ${{ runner.temp }}/kits
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        if: inputs.prototype != ''
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.prototype }}
+          name: sdk-candidate
           path: ${{ runner.temp }}/kits
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         if: inputs.cargo != ''
@@ -148,6 +161,7 @@ jobs:
       - name: Measure the first root check after each of the twenty edits
         env:
           PROFILE_UV: ${{ inputs.mode == 'profile' && '1' || '' }}
+          AUDIT_UV: ${{ inputs.mode == 'audit' && '1' || '' }}
           RUSTC_KITS: ${{ inputs.kits }}
           CARGO_KITS: ${{ inputs.cargo }}
         run: bash scripts/uv-check-instructions/measure.sh ${{ matrix.pair }}

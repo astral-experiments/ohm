@@ -73,6 +73,62 @@ def link_or_copy(src, dest):
         shutil.copy2(src, dest)
 
 
+def messages(cargo, src, env, log):
+    with log.open("w") as err:
+        text = subprocess.check_output([cargo, *CHECK, "--message-format=json"],
+                                       cwd=src, env=env, stderr=err, text=True)
+    rows = []
+    for line in text.splitlines():
+        event = json.loads(line)
+        if event["reason"] == "compiler-message":
+            rows.append(json.dumps(event, sort_keys=True))
+    return sorted(rows)
+
+
+def local_outputs(target, local):
+    records = {}
+    for pkgdir in (target / "debug/build").iterdir():
+        if pkgdir.name not in local:
+            continue
+        for pattern in ("*/out/*.rmeta", "*/fingerprint/*.public-api-hash"):
+            for path in pkgdir.glob(pattern):
+                with path.open("rb") as f:
+                    header = f.read(56)
+                public = header[40:56].hex() if header.startswith(b"rust") else None
+                records[path.relative_to(target).as_posix()] = dict(public=public, sha=sha(path))
+    return records
+
+
+def compare_fresh(cargo, src, env, out):
+    target = Path(env["CARGO_TARGET_DIR"])
+    saved = target.with_name("preserved-target")
+    local = {p.name for p in (src / "crates").iterdir()}
+    warm = local_outputs(target, local)
+    warm_diagnostics = messages(cargo, src, env, out / "warm-diagnostics.log")
+    target.rename(saved)
+    try:
+        # Registry artifacts carry no uv workspace state. Use the same paths
+        # for both checks so file hashes include identical source locations.
+        build = target / "debug/build"
+        build.mkdir(parents=True)
+        for package in (saved / "debug/build").iterdir():
+            if package.name not in local and package.is_dir():
+                shutil.copytree(package, build / package.name, symlinks=True)
+        command([cargo, *CHECK], src, env, out / "fresh.log")
+        fresh = local_outputs(target, local)
+        diagnostics = messages(cargo, src, env, out / "fresh-diagnostics.log")
+        assert sum(x["public"] is not None for x in fresh.values()) > 50
+        assert fresh.keys() <= warm.keys(), fresh.keys() - warm.keys()
+        # Look up the active units using the fresh output paths. The history
+        # retains other files from builds using earlier dependency versions.
+        records = {p: dict(warm=warm[p], fresh=v) for p, v in fresh.items()}
+        save(out / "audit.json", dict(outputs=records, warm_diagnostics=warm_diagnostics,
+                                      fresh_diagnostics=diagnostics))
+    finally:
+        shutil.rmtree(target)
+        saved.rename(target)
+
+
 def run(args, commits, role):
     fixed = args.scratch / "trial"
     fixed.mkdir()
@@ -126,6 +182,8 @@ def run(args, commits, role):
         command([args.scratch / "meter", rustc, noop, cargo, *CHECK],
                 src, env, folder / "noop.log")
         assert not read_counts(noop), (i, "unexpected recompilation")
+        if args.audit and i in (4, 5, 9, 18, 20):
+            compare_fresh(cargo, src, env, folder)
         total = sum(x["instructions"] for x in units)
         title = git(args.uv, "log", "-1", "--format=%s", commit).decode().strip()
         rows.append(dict(commit=commit, title=title, diff=hashlib.sha256(data).hexdigest(),
@@ -144,6 +202,7 @@ def main():
     parser.add_argument("--first", choices=["control", "candidate"], required=True)
     parser.add_argument("--jobs", type=int, default=4)
     parser.add_argument("--offline", action="store_true")
+    parser.add_argument("--audit", action="store_true")
     args = parser.parse_args()
     args.output.mkdir(exist_ok=True, parents=True)
     args.scratch.mkdir(exist_ok=True, parents=True)
@@ -155,9 +214,15 @@ def main():
     summary = dict(cpu=cpu, kernel=platform.release(), jobs=args.jobs, commits=commits,
                    command=["cargo", *CHECK], first=args.first,
                    boot=sha(Path("/proc/sys/kernel/random/boot_id")))
-    for role in [args.first, "candidate" if args.first == "control" else "control"]:
+    roles = [args.first, "candidate" if args.first == "control" else "control"]
+    if args.audit:
+        roles = ["candidate"]
+    for role in roles:
         summary[role] = run(args, commits, role)
         assert summary[role]["total"] > 0
+    if args.audit:
+        save(args.output / "audit-summary.json", summary)
+        return
     summary["reduction_pct"] = 100 * (1 - summary["candidate"]["total"] / summary["control"]["total"])
     print(summary["reduction_pct"], flush=True)
     save(args.output / "summary.json", summary)

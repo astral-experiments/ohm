@@ -56,6 +56,10 @@ if (( pair % 2 == 0 )); then
   first=candidate
 fi
 entry=run.py
+extra=()
+if [[ "${AUDIT_UV:-}" == 1 ]]; then
+  extra+=(--audit)
+fi
 if [[ "${PROFILE_UV:-}" == 1 ]]; then
   if ! perf --version; then
     sudo apt-get update -qq
@@ -71,4 +75,4 @@ python3 -IS "scripts/uv-check-instructions/$entry" \
   --candidate-cargo "$candidate_cargo" \
   --scratch "$RUNNER_TEMP/experiment" \
   --output "$out" \
-  --first "$first" --jobs 4
+  --first "$first" --jobs 4 "${extra[@]}"

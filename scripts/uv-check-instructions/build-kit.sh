@@ -20,6 +20,9 @@ case "$role" in
       git diff "$base" "$tip" -- compiler | git apply -
     done
     test "$(git diff --name-only | wc -l)" -eq 38
+    if [[ "${PROTOTYPE:-}" == 1 ]]; then
+      git apply ../coordinator/scripts/uv-check-instructions/prototype.patch
+    fi
     ;;
   *) exit 2 ;;
 esac
