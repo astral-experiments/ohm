@@ -194,6 +194,7 @@ def run(args, commits, role):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--window", choices=["recent", "preceding"], default="recent")
     parser.add_argument("--project", choices=PROJECTS.keys(), required=True)
     for arg in ("source", "control", "candidate", "cargo", "candidate-cargo", "scratch", "output"):
         parser.add_argument("--" + arg, type=lambda p: Path(p).resolve(), required=arg != "candidate-cargo")
@@ -214,10 +215,11 @@ def main():
     assert not any(args.scratch.iterdir()), "expected an empty scratch directory"
     calibrate(args.scratch, args.output)
     spec = PROJECTS[args.project]
-    commits = git(args.source, "rev-list", "--first-parent", "--max-count=21", spec["tip"]).decode().splitlines()[::-1]
-    assert len(commits) == 21 and commits[0] == spec["seed"] and commits[-1] == spec["tip"]
+    seed, tip = (spec["earlier_seed"], spec["seed"]) if args.window == "preceding" else (spec["seed"], spec["tip"])
+    commits = git(args.source, "rev-list", "--first-parent", "--max-count=21", tip).decode().splitlines()[::-1]
+    assert len(commits) == 21 and commits[0] == seed and commits[-1] == tip
     cpu = re.search(r"^model name\s*:\s*(.+)$", Path("/proc/cpuinfo").read_text(), re.M)[1]
-    summary = dict(project=args.project, repo=spec["repo"], cpu=cpu, kernel=platform.release(), jobs=args.jobs, commits=commits,
+    summary = dict(project=args.project, window=args.window, repo=spec["repo"], cpu=cpu, kernel=platform.release(), jobs=args.jobs, commits=commits,
                    command=["cargo", *CHECK], first=args.first,
                    boot=sha(Path("/proc/sys/kernel/random/boot_id")))
     roles = [args.first, "candidate" if args.first == "control" else "control"]

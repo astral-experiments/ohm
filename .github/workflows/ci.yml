@@ -1,5 +1,5 @@
 name: Measure project check instructions
-run-name: ${{ inputs.project }} history ${{ inputs.mode }} (rustc ${{ inputs.prototype || inputs.kits || 'shipped' }}, Cargo ${{ inputs.cargo || 'shipped' }})
+run-name: ${{ inputs.project }} history ${{ inputs.mode }} (rustc ${{ inputs.prototype || inputs.kits || 'shipped' }}, window ${{ inputs.window }})
 on:
   workflow_dispatch:
     inputs:
@@ -24,10 +24,15 @@ on:
         description: Exact public compiler commit to apply before the experimental patch
         required: false
         type: string
-      reference_pair:
-        description: Optional kit pair with the release and the previous PR stack
-        required: false
-        type: string
+      shipped:
+        description: Add the actual release as a separate arm
+        type: boolean
+        default: false
+      window:
+        description: Select the 20 edits before the scoring window for a holdout
+        type: choice
+        default: recent
+        options: [recent, preceding]
       intermediate:
         description: Optional kit for the first PR of a stack
         required: false
@@ -40,10 +45,6 @@ on:
         description: Use the candidate from kits as the control when comparing two candidate builds
         default: false
         type: boolean
-        required: false
-      cargo:
-        description: Workflow run with the patched Cargo to use on the candidate side
-        type: string
         required: false
       prototype:
         description: Workflow run with a replacement candidate compiler SDK, requires kits
@@ -121,7 +122,7 @@ jobs:
         with:
           repository: ${{ matrix.project == 'ripgrep' && 'BurntSushi/ripgrep' || 'astral-experiments/serc' }}
           ref: ${{ matrix.project == 'ripgrep' && '43fc97d43a4c61d65e7d74d4110c8480fe42ea5b' || '1b15ce1cba1d5a0045ac7303b8797102f807e57c' }}
-          fetch-depth: 21
+          fetch-depth: ${{ inputs.window == 'preceding' && 41 || 21 }}
           persist-credentials: false
           path: workload
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
@@ -136,11 +137,7 @@ jobs:
         if: inputs.candidate_as_control
         shell: bash
         run: |
-          mkdir "$RUNNER_TEMP/repack"
-          tar -C "$RUNNER_TEMP/repack" --zstd -xf "$RUNNER_TEMP/kits/candidate.tar.zst"
-          mv "$RUNNER_TEMP/repack/candidate" "$RUNNER_TEMP/repack/control"
-          tar -C "$RUNNER_TEMP/repack" -cf - control | zstd -T4 -1 > "$RUNNER_TEMP/kits/control.tar.zst"
-          mv "$RUNNER_TEMP/kits/candidate.tar.zst" "$RUNNER_TEMP/repack/"
+          mv "$RUNNER_TEMP/kits/candidate.tar.zst" "$RUNNER_TEMP/kits/control.tar.zst"
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         if: inputs.prototype != ''
         with:
@@ -148,21 +145,6 @@ jobs:
           run-id: ${{ inputs.prototype }}
           name: sdk-candidate
           path: ${{ runner.temp }}/kits
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        if: inputs.cargo != ''
-        with:
-          github-token: ${{ github.token }}
-          run-id: ${{ inputs.cargo }}
-          name: cargo-kits
-          path: ${{ runner.temp }}/kits
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        if: inputs.reference_pair != ''
-        with:
-          github-token: ${{ github.token }}
-          run-id: ${{ inputs.reference_pair }}
-          pattern: sdk-*
-          merge-multiple: true
-          path: ${{ runner.temp }}/kits/references
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         if: inputs.intermediate != ''
         with:
@@ -184,10 +166,10 @@ jobs:
           ANNOTATE_UV: ${{ inputs.mode == 'annotate' && '1' || '' }}
           AUDIT_UV: ${{ inputs.mode == 'audit-control' && 'control' || inputs.mode == 'audit' && '1' || '' }}
           RUSTC_KITS: ${{ inputs.kits }}
-          REFERENCE_PAIR: ${{ inputs.reference_pair }}
+          HISTORY_WINDOW: ${{ inputs.window }}
+          SHIPPED: ${{ inputs.shipped }}
           INTERMEDIATE_KIT: ${{ inputs.intermediate }}
           SECOND_KIT: ${{ inputs.second }}
-          CARGO_KITS: ${{ inputs.cargo }}
         run: bash scripts/project-check-instructions/measure.sh ${{ matrix.pair }}
       - if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
