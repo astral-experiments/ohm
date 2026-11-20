@@ -7,13 +7,17 @@ on:
         description: Experiment
         required: true
         type: choice
-        options: [build, build-pair, build-prototype, build-public, build-cargo, calibrate, pilot, marginal, confirm, profile, audit, audit-control]
+        options: [build, build-pair, build-prototype, build-public, build-cargo, calibrate, pilot, marginal, confirm, profile, audit, audit-control, probe]
       patch:
         description: Optional gzipped, base64-encoded compiler diff for an ephemeral benchmark
         type: string
         required: false
       kits:
         description: Workflow run with compiler kits, or empty for shipped -2 on both sides
+        type: string
+      compiler_ref:
+        description: Exact public compiler commit to apply before the experimental patch
+        required: false
         type: string
       candidate_as_control:
         description: Use the candidate from kits as the control when comparing two candidate builds
@@ -77,14 +81,14 @@ jobs:
           compression-level: 0
 
   build:
-    if: inputs.mode == 'build' || inputs.mode == 'build-pair' || inputs.mode == 'build-prototype' || inputs.mode == 'build-public'
+    if: inputs.mode == 'build' || inputs.mode == 'build-pair' || inputs.mode == 'build-prototype' || inputs.mode == 'build-public' || inputs.mode == 'probe'
     name: Build ${{ matrix.role }} compiler
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
-        role: ${{ fromJSON(inputs.mode == 'build-public' && '["control"]' || inputs.mode == 'build-prototype' && '["candidate"]' || '["control","candidate"]') }}
+        role: ${{ fromJSON(inputs.mode == 'build-public' && '["control"]' || (inputs.mode == 'build-prototype' || inputs.mode == 'probe') && '["candidate"]' || '["control","candidate"]') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -100,7 +104,8 @@ jobs:
       - name: Build and smoke-test the compiler SDK
         working-directory: rust
         env:
-          PROTOTYPE: ${{ (inputs.mode == 'build-pair' || inputs.mode == 'build-prototype') && '1' || '' }}
+          PROTOTYPE: ${{ (inputs.mode == 'build-pair' || inputs.mode == 'build-prototype' || inputs.mode == 'probe') && '1' || '' }}
+          COMPILER_REF: ${{ inputs.compiler_ref }}
           EXACT_PUBLIC: ${{ inputs.mode == 'build-public' && '1' || '' }}
           EXPERIMENT_PATCH: ${{ inputs.patch }}
           OPTIMIZED: ${{ inputs.optimized && '1' || '' }}
@@ -115,6 +120,28 @@ jobs:
           if-no-files-found: error
           retention-days: 10
           compression-level: 0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        if: inputs.mode == 'probe'
+        with:
+          persist-credentials: false
+          repository: astral-sh/uv
+          ref: c99faeeeeb8318d874007b4c48635d009838c1a0
+          fetch-depth: 21
+          path: coordinator/uv
+      - name: Record one history with the newly built compiler
+        if: inputs.mode == 'probe'
+        working-directory: coordinator
+        env:
+          PROBE_UV: '1'
+          RUSTC_KITS: '1'
+        run: bash scripts/uv-check-instructions/measure.sh 2
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always() && inputs.mode == 'probe'
+        with:
+          name: probe
+          path: ${{ runner.temp }}/out
+          if-no-files-found: error
+          retention-days: 30
 
   calibrate:
     if: inputs.mode == 'calibrate'

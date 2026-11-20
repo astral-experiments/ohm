@@ -25,11 +25,17 @@ case "$source" in
       tips=(138b9b74a947f60ba231d42608866d70b55843eb)
       paths=36
     fi
+    if [[ -n "${COMPILER_REF:-}" ]]; then
+      [[ "$COMPILER_REF" =~ ^[a-f0-9]{40}$ ]]
+      tips=("$COMPILER_REF")
+    fi
     for tip in "${tips[@]}"; do
       git cat-file -e "$tip^{commit}" || git fetch --no-tags origin "$tip"
       git diff "$base" "$tip" -- compiler | git apply -
     done
-    test "$(git diff --name-only | wc -l)" -eq "$paths"
+    if [[ -z "${COMPILER_REF:-}" ]]; then
+      test "$(git diff --name-only | wc -l)" -eq "$paths"
+    fi
     if [[ "${CTFE:-}" == 1 ]]; then
       test "$PUBLIC_STACK" = 1
       ctfe=2b0876f27b147ff94f271a7a93795b8bb326731c
@@ -49,7 +55,7 @@ case "$source" in
         printf '%s' "$EXPERIMENT_PATCH" | base64 -d | gzip -dc > "$RUNNER_TEMP/experiment.patch"
         sha256sum "$RUNNER_TEMP/experiment.patch"
         git apply --include='compiler/*' "$RUNNER_TEMP/experiment.patch"
-      else
+      elif [[ -z "${COMPILER_REF:-}" ]]; then
         git apply ../coordinator/scripts/uv-check-instructions/prototype.patch
       fi
     fi

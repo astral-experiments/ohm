@@ -208,6 +208,7 @@ def main():
     parser.add_argument("--jobs", type=int, default=4)
     parser.add_argument("--offline", action="store_true")
     parser.add_argument("--audit", action="store_true")
+    parser.add_argument("--probe", action="store_true")
     parser.add_argument("--audit-role", choices=["control", "candidate"], default="candidate")
     args = parser.parse_args()
     args.output.mkdir(exist_ok=True, parents=True)
@@ -223,11 +224,16 @@ def main():
     roles = [args.first, "candidate" if args.first == "control" else "control"]
     if args.audit:
         roles = [args.audit_role]
+    if args.probe:
+        roles = ["candidate"]
     for role in roles:
         summary[role] = run(args, commits, role)
         assert summary[role]["total"] > 0
     if args.audit:
         save(args.output / "audit-summary.json", summary)
+        return
+    if args.probe:
+        save(args.output / "probe-summary.json", summary)
         return
     summary["reduction_pct"] = 100 * (1 - summary["candidate"]["total"] / summary["control"]["total"])
     print(summary["reduction_pct"], flush=True)

@@ -19,9 +19,18 @@ sha256sum "$packed" > "$out/archives.sha256"
 if [[ -n "${RUSTC_KITS:-}" ]]; then
   control="$kits/control"
   candidate="$kits/candidate"
-  for role in control candidate; do
-    sha256sum "$kits/$role.tar.zst" >> "$out/archives.sha256"
-    tar --zstd -C "$kits" -xf "$kits/$role.tar.zst"
+  roles=(control candidate)
+  if [[ "${PROBE_UV:-}" == 1 ]]; then
+    roles=(candidate)
+    control="$candidate"
+  fi
+  for role in "${roles[@]}"; do
+    if [[ "${PROBE_UV:-}" == 1 ]]; then
+      sha256sum "$RUNNER_TEMP/packages/$role.tar.zst" >> "$out/archives.sha256"
+    else
+      sha256sum "$kits/$role.tar.zst" >> "$out/archives.sha256"
+      tar --zstd -C "$kits" -xf "$kits/$role.tar.zst"
+    fi
     (cd "$kits/$role" && sha256sum --quiet -c manifest.sha256)
     mkdir "$out/sdk-$role"
     cp "$kits/$role"/{bootstrap.toml,compiler.patch,manifest.sha256,revision,version.txt} "$out/sdk-$role/"
@@ -33,7 +42,7 @@ if [[ -n "${RUSTC_KITS:-}" ]]; then
   control_epoch="$(cat "$control/epoch" 2>/dev/null || echo 5)"
   candidate_epoch="$(cat "$candidate/epoch" 2>/dev/null || echo 5)"
   echo "metadata epochs $control_epoch $candidate_epoch" > "$out/stdlib"
-  if [[ "$candidate_epoch" == "$control_epoch" ]]; then
+  if [[ "$candidate_epoch" == "$control_epoch" && "$control" != "$candidate" ]]; then
     mv "$candidate/lib/rustlib/$host/lib" "$kits/unused-std"
     cp -al "$control/lib/rustlib/$host/lib" "$candidate/lib/rustlib/$host/lib"
     echo 'Both compilers consume the control std' >> "$out/stdlib"
@@ -68,6 +77,9 @@ if (( pair % 2 == 0 )); then
 fi
 entry=run.py
 extra=()
+if [[ "${PROBE_UV:-}" == 1 ]]; then
+  extra+=(--probe)
+fi
 if [[ "${AUDIT_UV:-}" == 1 ]]; then
   extra+=(--audit)
 elif [[ "${AUDIT_UV:-}" == control ]]; then
