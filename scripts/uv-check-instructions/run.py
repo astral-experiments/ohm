@@ -129,12 +129,17 @@ def compare_fresh(cargo, src, env, out):
         # Look up the active units using the fresh output paths. The history
         # retains other files from builds using earlier dependency versions.
         records = {p: dict(warm=warm[p], fresh=v) for p, v in fresh.items()}
-        if out.name == '4':
-            for p in records:
-                path = Path(p)
-                if path.name.startswith('libuv_auth-') and path.suffix == '.rmeta':
-                    shutil.copyfile(target / path, out / 'fresh-uv-auth.rmeta')
-                    shutil.copyfile(saved / path, out / 'warm-uv-auth.rmeta')
+        mismatch = {p for p,o in records.items() if o['warm']['public'] != o['fresh']['public']}
+        # A changed public hash propagates to dependents. Preserve the first
+        # differing compiler output in invocation order for diagnosis.
+        if mismatch:
+            print('::warning::'+str(len(mismatch))+' header differences at '+str(out),flush=True)
+            for unit in reversed(read_counts(out/'units.tsv')):
+                diff = [p for p in mismatch if ('/lib'+unit['name']+'-') in p]
+                if diff:
+                    shutil.copyfile(target/diff[0],out/('fresh-'+unit['name']+'.rmeta'))
+                    shutil.copyfile(saved/diff[0],out/('warm-'+unit['name']+'.rmeta'))
+                    break
         save(out / "audit.json", dict(outputs=records, warm_diagnostics=warm_diagnostics,
                                       fresh_diagnostics=diagnostics))
     finally:
@@ -245,4 +250,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

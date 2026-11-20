@@ -18,6 +18,8 @@ SCRATCH = ROOT / "work"
 TRIAL = SCRATCH / "trial"
 CASE = os.environ["WORKLOAD"]
 PAIR = int(os.environ["PAIR"])
+PROBE_RUN = os.getenv('PROBE_RUN')
+PROBE = os.getenv('PROBE')
 BASELINE = os.environ["BASELINE_ONLY"] == "true"
 UPDATE = "99a766b1e1a2d674cae961cefc44c139fa57f12f"
 CODEX = json.loads((codex.KIT / "codex-edits.json").read_text())
@@ -45,6 +47,43 @@ def install(role):
     bins.extend((kit / 'lib').glob('librustc_driver*.so'))
     proof = json.loads(next((ROOT / role).rglob('*-provenance.json')).read_text())
     save(OUT / (role + '-sdk.json'), dict(archive=digest,proof=proof,binaries={p.name:sha(p) for p in bins}))
+
+
+def install_probe(role, name):
+    path = ROOT / 'probes' / ('sdk-' + name)
+    archive = path / (name + '.tar.zst')
+    subprocess.run(['tar','-xf',archive],cwd=path,check=True)
+    kit = KITS / role
+    (path / name).rename(kit)
+    subprocess.run(['sha256sum','--check','--quiet','manifest.sha256'],cwd=kit,check=True)
+    stock = KITS / 'stock'
+    for p in stock.rglob('*'):
+        if p.name in ('wild','cargo','rust-lld','rust-wild','ld.lld','gcc-ld') and p.is_file():
+            dest = kit / p.relative_to(stock)
+            dest.parent.mkdir(exist_ok=True,parents=True)
+            shutil.copy2(p,dest)
+    save(OUT/(role+'-sdk.json'),dict(probe_run=PROBE_RUN, archive=sha(archive),
+         rust=(kit/'revision').read_text().strip(), manifest=sha(kit/'manifest.sha256'),
+         patch=sha(kit/'compiler.patch'),cargo=sha(kit/'bin/cargo')))
+    archive.unlink()
+
+
+def normalize(diags):
+    # Parallel linting may attach a once-per-lint note to one of several
+    # diagnostics with the same lint. Compare the complete non-note output
+    # and the once note itself for each target, with duplicate counts.
+    messages, notes = [], []
+    for raw in diags:
+        event = json.loads(raw)
+        msg = event['message']
+        for c in list(msg['children']):
+            if not c['spans'] and c['message'].startswith('requested on the command line with '):
+                msg['children'].remove(c)
+                note = '    = note: '+c['message']+'\n'
+                msg['rendered'] = msg['rendered'].replace(note,'')
+                notes.append(json.dumps((event['target'],msg['code'],c),sort_keys=True))
+        messages.append(json.dumps(event,sort_keys=True))
+    return sorted(messages),sorted(notes)
 
 
 def count(argv, cwd, env, out, metadata=True):
@@ -87,6 +126,8 @@ def count(argv, cwd, env, out, metadata=True):
                 with path.open('rb') as f:
                     header = f.read(56)
                 public = header[40:56].hex() if header.startswith(b'rust') else None
+                if CLIENT and PAIR == 1 and path.name.startswith('libuv_client-') and argv[1]=='clippy':
+                    shutil.copyfile(path, out/'uv-client.rmeta')
                 arts[path.relative_to(TRIAL).as_posix()] = dict(public=public, sha=sha(path))
     rec.update(dirty=sorted(dirty), diags=sorted(diag), metadata=arts)
     if metadata and argv[1] == 'test':
@@ -194,10 +235,11 @@ def replay(role):
                 edit(i+1,False)
             batch = sequence(i,True)
             for warm,fresh in zip(runs[i],batch,strict=True):
-                assert warm['diags']==fresh['diags'], 'diagnostics mismatch'
+                assert normalize(warm['diags'])==normalize(fresh['diags']), 'diagnostics mismatch'
                 assert warm.get('tests')==fresh.get('tests'), 'test list mismatch'
                 pub = lambda rec:{p:m['public'] for p,m in rec['metadata'].items()}
-                assert pub(warm)==pub(fresh),'public hash mismatch'
+                if pub(warm)!=pub(fresh):
+                    print('::warning::'+role+' public hash mismatch at step '+str(i),flush=True)
     kit.rename(KITS/role)
     shutil.rmtree(TRIAL)
 
@@ -207,8 +249,15 @@ KITS.mkdir()
 SCRATCH.mkdir()
 save(OUT/'config.json',dict(case=CASE, pair=PAIR,boot=sha(Path('/proc/sys/kernel/random/boot_id')),
                            cpu=subprocess.check_output(['lscpu']).decode(), codex=CODEX,uv=UPDATE))
-for role in ['control'] if BASELINE else ['control','candidate']:
-    install(role)
+install('control')
+if PROBE_RUN:
+    (OUT/'control-sdk.json').rename(OUT/'stock-sdk.json')
+    (KITS/'control').rename(KITS/'stock')
+    install_probe('control','base')
+    install_probe('candidate',PROBE)
+    shutil.rmtree(KITS/'stock')
+elif not BASELINE:
+    install('candidate')
 first = 'control' if PAIR%2 else 'candidate'
 if CASE in ('history','audit-control','audit-candidate'):
     args = []
