@@ -30,6 +30,14 @@ case "$source" in
       git diff "$base" "$tip" -- compiler | git apply -
     done
     test "$(git diff --name-only | wc -l)" -eq "$paths"
+    if [[ -n "${PARSER_REF:-}" ]]; then
+      test "$PUBLIC_STACK" = 1
+      [[ "$PARSER_REF" =~ ^[a-f0-9]{40}$ ]]
+      git cat-file -e "$PARSER_REF^{commit}" || git fetch --no-tags origin "$PARSER_REF"
+      parent=dad52b05487dcaf6acaa818f382b1c107efad2d9
+      git merge-base --is-ancestor "$parent" "$PARSER_REF"
+      git diff "$parent" "$PARSER_REF" -- compiler | git apply -
+    fi
     if [[ "${PROTOTYPE:-}" == 1 ]]; then
       if [[ -n "${EXPERIMENT_PATCH:-}" ]]; then
         printf '%s' "$EXPERIMENT_PATCH" | base64 -d | gzip -dc > "$RUNNER_TEMP/experiment.patch"
@@ -46,6 +54,7 @@ unset EXPERIMENT_PATCH
 git submodule update --init --depth 1 library/backtrace
 kit="$RUNNER_TEMP/kits/$role"
 mkdir -p "$kit/bin" "$kit/lib/rustlib/$host" "$RUNNER_TEMP/packages"
+git add -N compiler
 git diff --full-index --binary -- compiler > "$kit/compiler.patch"
 git rev-parse HEAD > "$kit/revision"
 cat > bootstrap.toml <<'TOML'

@@ -32,6 +32,10 @@ on:
         description: Use the restacked public compiler source through 138b9b74a947
         type: boolean
         default: false
+      parser_ref:
+        description: 'Optional exact public #450 commit on top of #448'
+        type: string
+        required: false
 
 permissions:
   contents: read
@@ -93,6 +97,7 @@ jobs:
           EXPERIMENT_PATCH: ${{ inputs.patch }}
           OPTIMIZED: ${{ inputs.optimized && '1' || '' }}
           PUBLIC_STACK: ${{ inputs.public_stack && '1' || '' }}
+          PARSER_REF: ${{ inputs.parser_ref }}
         run: bash ../coordinator/scripts/uv-check-instructions/build-kit.sh ${{ matrix.role }}
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
