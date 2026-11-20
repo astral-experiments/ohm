@@ -1,4 +1,5 @@
 """Exercise metadata-only check histories using sources from Rust's own tests."""
+from contextlib import contextmanager
 import argparse
 import concurrent.futures
 import hashlib
@@ -52,6 +53,21 @@ def fixtures(tests, compatibility):
 def sha(data):
     return hashlib.sha256(data).hexdigest()
 
+@contextmanager
+def fixture_dir(origin, changed):
+    if args.scratch is None:
+        with tempfile.TemporaryDirectory() as path:
+            yield Path(path)
+        return
+    name = sha((str(origin) + str(changed)).encode())
+    path = args.scratch / name
+    path.mkdir(parents=True)
+    try:
+        yield path
+    finally:
+        shutil.rmtree(path)
+
+
 def check(item):
     path, changed = item
     origin = path.relative_to(args.tests)
@@ -67,8 +83,7 @@ def check(item):
     cfg = first[1] if first else "testcfg"
     if changed:
         cfg = "cmp_revision"
-    with tempfile.TemporaryDirectory(dir=args.scratch) as cwd:
-        cwd = Path(cwd)
+    with fixture_dir(origin, changed) as cwd:
         file = cwd / "subject.rs" if changed else path
         def compile(rustc, salt, state):
             command = [

@@ -50,22 +50,28 @@ def corpus():
             run([sys.executable, here / "suppliers.py", rustc, "--rotate"], stdout=f)
         path = out / role / "salt.jsonl"
         with path.open("w") as f:
-            run([sys.executable, here / "corpus.py", rustc, tests, "salt", "--jobs", "6"], stdout=f)
+            run([sys.executable, here / "corpus.py", rustc, tests, "salt", "--jobs", "6", "--scratch", scratch / "cases"], stdout=f)
         cases = [json.loads(line) for line in path.open()]
         suites[role] = {(r["fixture"], r["edit"]): r for r in cases}
         assert len(cases) == len(suites[role])
     control, candidate = map(suites.get, roles)
     assert control.keys() == candidate.keys()
+    differences_by_compiler = []
     for key, row in control.items():
         other = candidate[key]
         for field in ("source_sha256", "status", "exit"):
             assert row.get(field) == other.get(field), (field, key)
         if "warm" in row:
             assert row["warm"]["exit"] == other["warm"]["exit"], key
+            left, right = row.get("fresh", row["warm"]), other.get("fresh", other["warm"])
+            diff = [k for k in left if left[k] != right.get(k)]
+            if diff:
+                differences_by_compiler.append(dict(case=key, fields=diff))
         if row["status"] == "different":
             def differences(r):
                 return [k for k, v in r["warm"].items() if v != r["fresh"].get(k)]
             assert differences(row) == differences(other), key
+    (out/"compiler-differences.json").write_text(json.dumps(differences_by_compiler))
     from collections import Counter
     print(Counter(x["status"] for x in candidate.values()), flush=True)
 
