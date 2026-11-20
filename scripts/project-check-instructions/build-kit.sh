@@ -68,7 +68,8 @@ if [[ -n "${PROFILED:-}" ]]; then
   sed -i '/^\[rust\]$/a mimalloc = true' bootstrap.toml
   sed -i 's/^lld = false$/lld = true/' bootstrap.toml
   pgo_bootstrap=src/bootstrap/src/core/builder/cargo.rs
-  sed -i '/pub fn apply_pgo(/,/let has_profile/ s/build_compiler.stage != 1/build_compiler.stage > 1/' "$pgo_bootstrap"
+  sed -i '/fn apply_pgo(/,/let has_profile/ s/build_compiler.stage != 1/build_compiler.stage > 1/' "$pgo_bootstrap"
+  ! git diff --quiet -- "$pgo_bootstrap" || exit 1
   git diff -- "$pgo_bootstrap" >> "$kit/bootstrap.patch"
   mkdir -p "$RUNNER_TEMP/profiles"
   if [[ "$PROFILED" == train ]]; then
@@ -93,6 +94,10 @@ if [[ "${PROFILED:-}" == train ]]; then
   git submodule update --init --depth 1 src/tools/rustc-perf
   patch -d src/tools/rustc-perf -t -N -F 0 -p1 -i "$GITHUB_WORKSPACE/coordinator/release/rustc-perf-relocated-dependencies.patch"
   exe="$PWD/$stage/bin/rustc"
+  LLVM_PROFILE_FILE="$RUNNER_TEMP/pgo-smoke.profraw" "$exe" -vV
+  test -s "$RUNNER_TEMP/pgo-smoke.profraw"
+  mv "$RUNNER_TEMP/profiles" "$RUNNER_TEMP/bootstrap-profiles"
+  mkdir "$RUNNER_TEMP/profiles"
   stage0="$PWD/build/$host/stage0"
   cargo3="$RUNNER_TEMP/cargo"
   name="ohm-1.100.0-3-$host.tar.gz"
