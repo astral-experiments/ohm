@@ -23,7 +23,7 @@ permissions:
 jobs:
   cargo-build:
     if: inputs.mode == 'build-cargo'
-    name: Build Cargo from the release pin with and without the metadata patch
+    name: Build Cargo from the release pin with the metadata patch
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 30
     steps:
@@ -37,7 +37,7 @@ jobs:
           ref: 1ba8a0a1fa3404a92da16b1886fb70df8ce03970
           persist-credentials: false
           path: cargo
-      - name: Build both Cargo binaries
+      - name: Build the patched Cargo
         working-directory: cargo
         run: bash ../coordinator/scripts/uv-check-instructions/build-cargo.sh
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a

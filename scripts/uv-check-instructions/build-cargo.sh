@@ -9,14 +9,10 @@ export CARGO_HOME="$RUNNER_TEMP/registry"
 out="$RUNNER_TEMP/cargo-kits"
 mkdir -p "$out" "$RUNNER_TEMP/package"
 cp "$patch" "$out/source.patch"
-for role in control candidate; do
-  if [[ "$role" == candidate ]]; then
-    git apply "$patch"
-  fi
-  cargo +1.100.0 build --release --locked -p cargo --bin cargo --features ohm-defaults,all-static
-  cp target/release/cargo "$out/$role"
-  "$out/$role" -vV | tee "$out/version-$role.txt"
-done
+git apply "$patch"
+cargo +1.100.0 build --release --locked -p cargo --bin cargo --features ohm-defaults,all-static
+cp target/release/cargo "$out/candidate"
+"$out/candidate" -vV | tee "$out/version-candidate.txt"
 git rev-parse HEAD > "$out/revision"
-(cd "$out" && sha256sum control candidate source.patch | tee manifest.sha256)
+(cd "$out" && sha256sum candidate source.patch | tee manifest.sha256)
 tar -C "$RUNNER_TEMP" -cf - cargo-kits | zstd -T4 -3 > "$RUNNER_TEMP/package/cargo.tar.zst"
