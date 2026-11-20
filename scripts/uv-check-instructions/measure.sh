@@ -77,6 +77,34 @@ if (( pair % 2 == 0 )); then
 fi
 entry=run.py
 extra=()
+load_reference() {
+  local role=$1 packed_role=$2
+  sha256sum "$kits/$packed_role.tar.zst" >> "$out/archives.sha256"
+  mkdir "$kits/$role"
+  tar --zstd -C "$kits/$role" --strip-components=1 -xf "$kits/$packed_role.tar.zst"
+  (cd "$kits/$role" && sha256sum --quiet -c manifest.sha256)
+  mkdir "$out/sdk-$role"
+  cp "$kits/$role"/{bootstrap.toml,bootstrap.patch,compiler.patch,manifest.sha256,revision,version.txt} "$out/sdk-$role/"
+  if [[ "$(cat "$kits/$role/epoch")" == "$control_epoch" ]]; then
+    mv "$kits/$role/lib/rustlib/$host/lib" "$kits/unused-$role-std"
+    cp -al "$control/lib/rustlib/$host/lib" "$kits/$role/lib/rustlib/$host/lib"
+    echo "$role consumes the control std" >> "$out/stdlib"
+  else
+    echo "$role consumes the std it built" >> "$out/stdlib"
+  fi
+  extra+=(--"$role" "$kits/$role")
+}
+if [[ -n "${REFERENCE_PAIR:-}" || -n "${INTERMEDIATE_KIT:-}" ]]; then
+  test -n "${RUSTC_KITS:-}"
+  extra+=(--pair "$pair")
+  if [[ -n "${REFERENCE_PAIR:-}" ]]; then
+    load_reference release references/control
+    load_reference current references/candidate
+  fi
+  if [[ -n "${INTERMEDIATE_KIT:-}" ]]; then
+    load_reference intermediate pr/candidate
+  fi
+fi
 if [[ "${PROBE_UV:-}" == 1 ]]; then
   extra+=(--probe)
 fi

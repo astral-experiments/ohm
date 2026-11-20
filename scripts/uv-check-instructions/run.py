@@ -209,6 +209,10 @@ def main():
     parser.add_argument("--offline", action="store_true")
     parser.add_argument("--audit", action="store_true")
     parser.add_argument("--probe", action="store_true")
+    parser.add_argument("--release", type=Path)
+    parser.add_argument("--current", type=Path)
+    parser.add_argument("--intermediate", type=Path)
+    parser.add_argument("--pair", type=int)
     parser.add_argument("--audit-role", choices=["control", "candidate"], default="candidate")
     args = parser.parse_args()
     args.output.mkdir(exist_ok=True, parents=True)
@@ -222,6 +226,17 @@ def main():
                    command=["cargo", *CHECK], first=args.first,
                    boot=sha(Path("/proc/sys/kernel/random/boot_id")))
     roles = [args.first, "candidate" if args.first == "control" else "control"]
+    if args.pair is not None:
+        # Rotating the initial positions and reversing each adjacent pair
+        # means each two-way comparison runs each arm first three times.
+        roles = [r for r in ("release","control","current","intermediate","candidate")
+                 if getattr(args,r)]
+        offset = (args.pair-1)//2
+        roles = roles[offset:] + roles[:offset]
+        if args.pair % 2 == 0:
+            roles.reverse()
+        summary["first"] = next(r for r in roles if r in ("control","candidate"))
+        summary["order"] = roles
     if args.audit:
         roles = [args.audit_role]
     if args.probe:

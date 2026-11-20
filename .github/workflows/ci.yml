@@ -19,6 +19,14 @@ on:
         description: Exact public compiler commit to apply before the experimental patch
         required: false
         type: string
+      reference_pair:
+        description: Optional kit pair with the release and the previous PR stack
+        required: false
+        type: string
+      intermediate:
+        description: Optional kit for the first PR of a two-patch stack
+        required: false
+        type: string
       candidate_as_control:
         description: Use the candidate from kits as the control when comparing two candidate builds
         default: false
@@ -224,12 +232,29 @@ jobs:
           run-id: ${{ inputs.cargo }}
           name: cargo-kits
           path: ${{ runner.temp }}/kits
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        if: inputs.reference_pair != ''
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.reference_pair }}
+          pattern: sdk-*
+          merge-multiple: true
+          path: ${{ runner.temp }}/kits/references
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        if: inputs.intermediate != ''
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.intermediate }}
+          name: sdk-candidate
+          path: ${{ runner.temp }}/kits/pr
       - name: Measure the first root check after each of the twenty edits
         env:
           PROFILE_UV: ${{ (inputs.mode == 'profile' || inputs.mode == 'annotate') && '1' || '' }}
           ANNOTATE_UV: ${{ inputs.mode == 'annotate' && '1' || '' }}
           AUDIT_UV: ${{ inputs.mode == 'audit-control' && 'control' || inputs.mode == 'audit' && '1' || '' }}
           RUSTC_KITS: ${{ inputs.kits }}
+          REFERENCE_PAIR: ${{ inputs.reference_pair }}
+          INTERMEDIATE_KIT: ${{ inputs.intermediate }}
           CARGO_KITS: ${{ inputs.cargo }}
         run: bash scripts/uv-check-instructions/measure.sh ${{ matrix.pair }}
       - if: always()
