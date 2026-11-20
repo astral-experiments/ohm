@@ -1,13 +1,24 @@
 name: Measure uv check instructions
-run-name: Build Ohm 1.100.0-2 compiler pair for uv
+run-name: uv history ${{ inputs.mode }} on Ohm 1.100.0-2
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Experiment
+        required: true
+        type: choice
+        options: [build, calibrate, pilot, confirm]
+      kits:
+        description: Workflow run with the two compiler SDK artifacts
+        type: string
+        required: false
 
 permissions:
   contents: read
 
 jobs:
   build:
+    if: inputs.mode == 'build'
     name: Build ${{ matrix.role }} compiler
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 90
@@ -37,3 +48,70 @@ jobs:
           if-no-files-found: error
           retention-days: 10
           compression-level: 0
+
+  calibrate:
+    if: inputs.mode == 'calibrate'
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Check the hardware instruction counter with known loops
+        working-directory: scripts/uv-check-instructions
+        run: |
+          lscpu
+          if [[ "$(cat /proc/sys/kernel/perf_event_paranoid)" -gt 2 ]]; then
+            sudo sysctl kernel.perf_event_paranoid=2
+          fi
+          python3 -IS - <<'PY'
+          import sys, tempfile
+          from pathlib import Path
+          sys.path.insert(0, str(Path.cwd()))
+          import run
+          with tempfile.TemporaryDirectory() as folder:
+              path = Path(folder)
+              run.calibrate(path, path)
+              for file in sorted(path.glob("*.tsv")):
+                  print(file.name, file.read_text())
+          PY
+
+  measure:
+    if: inputs.mode == 'pilot' || inputs.mode == 'confirm'
+    name: Measure pair ${{ matrix.pair }}
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        pair: ${{ fromJSON(inputs.mode == 'pilot' && '[1]' || '[1,2,3,4,5,6]') }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: astral-sh/uv
+          ref: c99faeeeeb8318d874007b4c48635d009838c1a0
+          fetch-depth: 21
+          persist-credentials: false
+          path: uv
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.kits }}
+          pattern: sdk-*
+          merge-multiple: true
+          path: ${{ runner.temp }}/kits
+      - name: Measure the first root check after each of the twenty edits
+        run: bash scripts/uv-check-instructions/measure.sh ${{ matrix.pair }}
+      - if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: pair-${{ matrix.pair }}
+          path: ${{ runner.temp }}/out
+          if-no-files-found: error
+          retention-days: 30
