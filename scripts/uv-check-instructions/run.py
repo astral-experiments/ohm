@@ -39,10 +39,10 @@ def git(repo, *args):
 def read_counts(output):
     units = []
     for line in output.read_text().splitlines():
-        pid, name, kind, n, enabled, running = line.split("\t")
+        pid, name, kind, n, enabled, running, rss = line.split("\t")
         assert int(n) > 0 and 0 < int(enabled) * .995 <= int(running) <= int(enabled)
         units.append(dict(pid=int(pid), name=name, kind=kind, instructions=int(n),
-                          enabled=int(enabled), running=int(running)))
+                          enabled=int(enabled), running=int(running), rss_kib=int(rss)))
     return sorted(units, key=lambda v: (v["name"], v["kind"]))
 
 
@@ -135,6 +135,33 @@ def compare_fresh(cargo, src, env, out):
         saved.rename(target)
 
 
+def footprint(target):
+    # Count shared inode contents once for the full target and separately
+    # for each file class. Include all stages and retained generations.
+    stats = {}
+    seen = set()
+    for base, _, files in os.walk(target):
+        for name in files:
+            categories = ["target"]
+            if name.endswith("query-cache.bin"):
+                categories.append("queries")
+            if name.endswith("dep-graph.bin"):
+                categories.append("graphs")
+            if "incremental" in Path(base).parts:
+                categories.append("incremental")
+            st = os.lstat(os.path.join(base, name))
+            for category in categories:
+                k = (category, st.st_dev, st.st_ino)
+                if k in seen:
+                    continue
+                seen.add(k)
+                record = stats.setdefault(category, dict(allocated=0, logical=0, files=0))
+                record["allocated"] += 512 * st.st_blocks
+                record["logical"] += st.st_size
+                record["files"] += 1
+    return stats
+
+
 def run(args, commits, role):
     fixed = args.scratch / "trial"
     fixed.mkdir()
@@ -180,6 +207,10 @@ def run(args, commits, role):
         log = folder / ("check.log" if i else "prime.log")
         command([args.scratch / "meter", rustc, receipt, cargo, *CHECK], src, env, log)
         units = read_counts(receipt)
+        save(folder / "resources.json", dict(
+            max_rustc_rss_kib=max((u["rss_kib"] for u in units), default=0),
+            disk=footprint(env["CARGO_TARGET_DIR"]),
+        ))
         if i == 0:
             assert units
             units = []

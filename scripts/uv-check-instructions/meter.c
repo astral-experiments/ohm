@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ptrace.h>
+#include <sys/resource.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
 #include <sys/wait.h>
@@ -21,6 +22,7 @@ struct image {
     char *kind;
     int fd;
     pid_t pid;
+    long maxrss_kib;
 };
 
 static struct image *images;
@@ -102,7 +104,8 @@ static int trace(char **argv) {
     resume(root, 0);
     int code = 1;
     for (;;) {
-        pid_t pid = waitpid(-1, &status, __WALL);
+        struct rusage usage;
+        pid_t pid = wait4(-1, &status, __WALL, &usage);
         if (pid == -1) {
             if (errno == ECHILD) break;
             if (errno == EINTR) continue;
@@ -113,8 +116,15 @@ static int trace(char **argv) {
             if (event == PTRACE_EVENT_EXEC) observe_exec(pid);
             int sig = WSTOPSIG(status);
             resume(pid, event || sig == SIGSTOP ? 0 : sig);
-        } else if (pid == root && WIFEXITED(status)) {
-            code = WEXITSTATUS(status);
+        } else if (WIFEXITED(status) || WIFSIGNALED(status)) {
+            for (struct image *i = images; i; i = i->next) {
+                if (i->pid == pid) {
+                    i->maxrss_kib = usage.ru_maxrss;
+                    break;
+                }
+            }
+            if (pid == root && WIFEXITED(status))
+                code = WEXITSTATUS(status);
         }
     }
     return code;
@@ -135,9 +145,9 @@ int main(int argc, char **argv) {
             || value.running < value.enabled * .995)
             errx(1, "unusable PMU for pid %d: %" PRIu64 " instructions, %" PRIu64 "/%" PRIu64 " ns",
                  i->pid, value.instructions, value.running, value.enabled);
-        fprintf(out, "%d\t%s\t%s\t%" PRIu64 "\t%" PRIu64 "\t%" PRIu64 "\n",
+        fprintf(out, "%d\t%s\t%s\t%" PRIu64 "\t%" PRIu64 "\t%" PRIu64 "\t%ld\n",
                 i->pid, i->crate ? i->crate : "-", i->kind ? i->kind : "-",
-                value.instructions, value.running, value.enabled);
+                value.instructions, value.enabled, value.running, i->maxrss_kib);
     }
     if (ferror(out) || fclose(out)) err(1, "receipt");
     return code;

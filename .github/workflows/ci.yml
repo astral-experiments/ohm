@@ -1,177 +1,30 @@
-name: Measure uv check instructions
-run-name: uv history ${{ inputs.mode }} (rustc ${{ inputs.prototype || inputs.kits || 'shipped' }}, Cargo ${{ inputs.cargo || 'shipped' }})
+name: Validate uv check queries
+run-name: Query validation (${{ inputs.kits }} vs ${{ inputs.prototype }})
 on:
   workflow_dispatch:
     inputs:
-      mode:
-        description: Experiment
-        required: true
-        type: choice
-        options: [build, build-pair, build-prototype, build-public, build-cargo, calibrate, pilot, marginal, confirm, profile, audit, audit-control, probe]
-      patch:
-        description: Optional gzipped, base64-encoded compiler diff for an ephemeral benchmark
-        type: string
-        required: false
       kits:
-        description: Workflow run with compiler kits, or empty for shipped -2 on both sides
-        type: string
-      compiler_ref:
-        description: Exact public compiler commit to apply before the experimental patch
-        required: false
-        type: string
-      candidate_as_control:
-        description: Use the candidate from kits as the control when comparing two candidate builds
-        default: false
-        type: boolean
-        required: false
-      cargo:
-        description: Workflow run with the patched Cargo to use on the candidate side
-        type: string
-        required: false
+        description: Build run with a control compiler in sdk-candidate
+        required: true
       prototype:
-        description: Workflow run with a replacement candidate compiler SDK, requires kits
-        type: string
-        required: false
-      optimized:
-        description: Build matched stage-1 kits with thin LTO and one codegen unit
+        description: Build run with a candidate compiler in sdk-candidate
+        required: true
+      pairs:
+        description: JSON list of pair numbers
+        default: '[1,2]'
+      rust_source:
+        description: Rust source for correctness checks
+        default: 'cd98e8497afea884845b172374fd47957ef39666'
+      checks:
+        description: Include correctness tests on pair 1
         type: boolean
-        default: false
-      public_stack:
-        description: Use the restacked public compiler source through 138b9b74a947
-        type: boolean
-        default: false
-      parser_ref:
-        description: 'Optional exact public #450 commit on top of #448'
-        type: string
-        required: false
-      ctfe:
-        description: 'Apply #318 at 2b0876f27b14 to the public stack'
-        type: boolean
-        default: false
-
+        default: true
 permissions:
   contents: read
+  actions: read
 
 jobs:
-  cargo-build:
-    if: inputs.mode == 'build-cargo'
-    name: Build Cargo from the release pin with the metadata patch
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-          path: coordinator
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          repository: astral-experiments/ohm-cargo
-          ref: 1ba8a0a1fa3404a92da16b1886fb70df8ce03970
-          persist-credentials: false
-          path: cargo
-      - name: Build the patched Cargo
-        working-directory: cargo
-        run: bash ../coordinator/scripts/uv-check-instructions/build-cargo.sh
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: cargo-kits
-          path: ${{ runner.temp }}/package/cargo.tar.zst
-          if-no-files-found: error
-          retention-days: 10
-          compression-level: 0
-
-  build:
-    if: inputs.mode == 'build' || inputs.mode == 'build-pair' || inputs.mode == 'build-prototype' || inputs.mode == 'build-public' || inputs.mode == 'probe'
-    name: Build ${{ matrix.role }} compiler
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        role: ${{ fromJSON(inputs.mode == 'build-public' && '["control"]' || (inputs.mode == 'build-prototype' || inputs.mode == 'probe') && '["candidate"]' || '["control","candidate"]') }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-          path: coordinator
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          repository: astral-experiments/ohm-rust
-          ref: cad56cdf53143b0a539218169451ca12f7064ff3
-          fetch-depth: 0
-          persist-credentials: false
-          path: rust
-      - name: Build and smoke-test the compiler SDK
-        working-directory: rust
-        env:
-          PROTOTYPE: ${{ (inputs.mode == 'build-pair' || inputs.mode == 'build-prototype' || inputs.mode == 'probe') && '1' || '' }}
-          COMPILER_REF: ${{ inputs.compiler_ref }}
-          EXACT_PUBLIC: ${{ inputs.mode == 'build-public' && '1' || '' }}
-          EXPERIMENT_PATCH: ${{ inputs.patch }}
-          OPTIMIZED: ${{ inputs.optimized && '1' || '' }}
-          PUBLIC_STACK: ${{ inputs.public_stack && '1' || '' }}
-          PARSER_REF: ${{ inputs.parser_ref }}
-          CTFE: ${{ inputs.ctfe && '1' || '' }}
-        run: bash ../coordinator/scripts/uv-check-instructions/build-kit.sh ${{ matrix.role }}
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: sdk-${{ matrix.role }}
-          path: ${{ runner.temp }}/packages/*.tar.zst
-          if-no-files-found: error
-          retention-days: 10
-          compression-level: 0
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        if: inputs.mode == 'probe'
-        with:
-          persist-credentials: false
-          repository: astral-sh/uv
-          ref: c99faeeeeb8318d874007b4c48635d009838c1a0
-          fetch-depth: 21
-          path: coordinator/uv
-      - name: Record one history with the newly built compiler
-        if: inputs.mode == 'probe'
-        working-directory: coordinator
-        env:
-          PROBE_UV: '1'
-          RUSTC_KITS: '1'
-        run: bash scripts/uv-check-instructions/measure.sh 2
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        if: always() && inputs.mode == 'probe'
-        with:
-          name: probe
-          path: ${{ runner.temp }}/out
-          if-no-files-found: error
-          retention-days: 30
-
-  calibrate:
-    if: inputs.mode == 'calibrate'
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-      - name: Check the hardware instruction counter with known loops
-        working-directory: scripts/uv-check-instructions
-        run: |
-          lscpu
-          if [[ "$(cat /proc/sys/kernel/perf_event_paranoid)" -gt 2 ]]; then
-            sudo sysctl kernel.perf_event_paranoid=2
-          fi
-          python3 -IS - <<'PY'
-          import sys, tempfile
-          from pathlib import Path
-          sys.path.insert(0, str(Path.cwd()))
-          import run
-          with tempfile.TemporaryDirectory() as folder:
-              path = Path(folder)
-              run.calibrate(path, path)
-              for file in sorted(path.glob("*.tsv")):
-                  print(file.name, file.read_text())
-          PY
-
   measure:
-    if: inputs.mode == 'pilot' || inputs.mode == 'marginal' || inputs.mode == 'confirm' || inputs.mode == 'profile' || inputs.mode == 'audit' || inputs.mode == 'audit-control'
     name: Measure pair ${{ matrix.pair }}
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 60
@@ -181,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        pair: ${{ fromJSON(inputs.mode == 'confirm' && '[1,2,3,4,5,6]' || (inputs.mode == 'marginal' || inputs.mode == 'profile') && '[1,2]' || '[1]') }}
+        pair: ${{ fromJSON(inputs.pairs) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -198,11 +51,9 @@ jobs:
         with:
           github-token: ${{ github.token }}
           run-id: ${{ inputs.kits }}
-          pattern: ${{ inputs.candidate_as_control && 'sdk-candidate' || inputs.prototype != '' && 'sdk-control' || 'sdk-*' }}
-          merge-multiple: true
+          name: sdk-candidate
           path: ${{ runner.temp }}/kits
       - name: Stage the first candidate kit as the control
-        if: inputs.candidate_as_control
         shell: bash
         run: |
           mkdir "$RUNNER_TEMP/repack"
@@ -217,20 +68,20 @@ jobs:
           run-id: ${{ inputs.prototype }}
           name: sdk-candidate
           path: ${{ runner.temp }}/kits
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        if: inputs.cargo != ''
-        with:
-          github-token: ${{ github.token }}
-          run-id: ${{ inputs.cargo }}
-          name: cargo-kits
-          path: ${{ runner.temp }}/kits
-      - name: Measure the first root check after each of the twenty edits
+      - name: Measure the first root check after each edit
         env:
-          PROFILE_UV: ${{ inputs.mode == 'profile' && '1' || '' }}
-          AUDIT_UV: ${{ inputs.mode == 'audit-control' && 'control' || inputs.mode == 'audit' && '1' || '' }}
           RUSTC_KITS: ${{ inputs.kits }}
-          CARGO_KITS: ${{ inputs.cargo }}
         run: bash scripts/uv-check-instructions/measure.sh ${{ matrix.pair }}
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        if: matrix.pair == 1 && inputs.checks
+        with:
+          repository: astral-experiments/ohm-rust
+          ref: ${{ inputs.rust_source }}
+          path: source
+          persist-credentials: false
+      - name: Compare fresh and incremental compilers across fixtures and run focused regressions
+        if: matrix.pair == 1 && inputs.checks
+        run: python3 scripts/uv-check-instructions/validate.py
       - if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
