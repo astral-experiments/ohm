@@ -3,9 +3,12 @@ run-name: SDK workload qualification (${{ inputs.candidate }} ${{ inputs.cases }
 on:
   workflow_dispatch:
     inputs:
+      build:
+        type: boolean
+        default: false
       candidate:
         type: string
-        default: '44733436429'
+        default: '44735982792'
       cases:
         type: string
         default: '["history","mixed","codex-check","codex-clippy"]'
@@ -19,7 +22,46 @@ permissions:
   contents: read
   actions: read
 jobs:
+  build:
+    if: inputs.build
+    name: Build ${{ matrix.role }} compiler
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        role: [base, parser, queries]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          path: coordinator
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: astral-experiments/ohm-rust
+          ref: cad56cdf53143b0a539218169451ca12f7064ff3
+          fetch-depth: 0
+          persist-credentials: false
+          path: rust
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: astral-experiments/ohm-rust-clippy
+          ref: 8b452cfcbe11a705b7202554c7655dd9209d2e04
+          persist-credentials: false
+          path: clippy
+      - name: Build and smoke-test the compiler SDK
+        working-directory: rust
+        run: bash ../coordinator/scripts/uv-check-instructions/build-kit.sh ${{ matrix.role }}
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: sdk-${{ matrix.role }}
+          path: ${{ runner.temp }}/packages/*.tar.zst
+          if-no-files-found: error
+          retention-days: 10
+          compression-level: 0
+
   measure:
+    if: "!inputs.build"
     name: ${{ matrix.workload }} pair ${{ matrix.pair }}
     runs-on: namespace-profile-ubuntu-24-04-16
     strategy:

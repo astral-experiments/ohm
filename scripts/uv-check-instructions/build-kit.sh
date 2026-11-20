@@ -5,64 +5,22 @@ role=$1
 base=cad56cdf53143b0a539218169451ca12f7064ff3
 host=x86_64-unknown-linux-gnu
 test "$(git rev-parse HEAD)" = "$base"
-source=$role
-if [[ "${EXACT_PUBLIC:-}" == 1 ]]; then
-  source=candidate
-  PUBLIC_STACK=1
-fi
-case "$source" in
-  control) ;;
-  candidate)
-    tips=(
-      19b163d170f777a8fcf08e6e1a308e9223364113
-      348b2bebc9cbabe0f7091e4f8e74a2fa06913653
-      2b0876f27b147ff94f271a7a93795b8bb326731c
-      7f5e45ead8f2c8553c1dcaa83a155e8613df1025
-      8b48b7cf2dbc0ca895d48268a94c4fbd3e6681e2
-    )
-    paths=38
-    if [[ "${PUBLIC_STACK:-}" == 1 ]]; then
-      tips=(138b9b74a947f60ba231d42608866d70b55843eb)
-      paths=36
-    fi
-    for tip in "${tips[@]}"; do
-      git cat-file -e "$tip^{commit}" || git fetch --no-tags origin "$tip"
-      git diff "$base" "$tip" -- compiler | git apply -
-    done
-    test "$(git diff --name-only | wc -l)" -eq "$paths"
-    if [[ "${CTFE:-}" == 1 ]]; then
-      test "$PUBLIC_STACK" = 1
-      ctfe=2b0876f27b147ff94f271a7a93795b8bb326731c
-      git cat-file -e "$ctfe^{commit}" || git fetch --no-tags origin "$ctfe"
-      git diff "$base" "$ctfe" -- compiler | git apply -
-    fi
-    if [[ -n "${PARSER_REF:-}" ]]; then
-      test "$PUBLIC_STACK" = 1
-      [[ "$PARSER_REF" =~ ^[a-f0-9]{40}$ ]]
-      git cat-file -e "$PARSER_REF^{commit}" || git fetch --no-tags origin "$PARSER_REF"
-      parent=dad52b05487dcaf6acaa818f382b1c107efad2d9
-      git merge-base --is-ancestor "$parent" "$PARSER_REF"
-      git diff "$parent" "$PARSER_REF" -- compiler | git apply -
-    fi
-    if [[ "${PROTOTYPE:-}" == 1 ]]; then
-      if [[ -n "${EXPERIMENT_PATCH:-}" ]]; then
-        printf '%s' "$EXPERIMENT_PATCH" | base64 -d | gzip -dc > "$RUNNER_TEMP/experiment.patch"
-        sha256sum "$RUNNER_TEMP/experiment.patch"
-        git apply --include='compiler/*' "$RUNNER_TEMP/experiment.patch"
-      else
-        git apply ../coordinator/scripts/uv-check-instructions/prototype.patch
-      fi
-    fi
-    ;;
-  *) exit 2 ;;
+case "$role" in
+  base) tip=138b9b74a947f60ba231d42608866d70b55843eb ;;
+  parser) tip=13a07e28cd4ad2553cd70f26df61dddfed55da1c ;;
+  queries) tip=5f6e2050215d0863b39669e8b01b982c10c3bfe2 ;;
 esac
-unset EXPERIMENT_PATCH
+git diff "$base" "$tip" -- compiler | git apply -
+git add -N compiler
+git diff --quiet "$tip" -- compiler
+rsync --delete --exclude .git -a ../clippy/ src/tools/clippy/
+OPTIMIZED=1
 git submodule update --init --depth 1 library/backtrace
 kit="$RUNNER_TEMP/kits/$role"
 mkdir -p "$kit/bin" "$kit/lib/rustlib/$host" "$RUNNER_TEMP/packages"
 git add -N compiler
 git diff --full-index --binary -- compiler > "$kit/compiler.patch"
-git rev-parse HEAD > "$kit/revision"
+git rev-parse "$tip" > "$kit/revision"
 cat > bootstrap.toml <<'TOML'
 profile = "compiler"
 change-id = "ignore"
@@ -104,7 +62,7 @@ fi
 cp bootstrap.toml "$kit/"
 sed -n 's/^const OHM_METADATA_EPOCH: u32 = \([0-9]*\);/\1/p' compiler/rustc_metadata/src/rmeta/mod.rs > "$kit/epoch"
 test -s "$kit/epoch"
-env -u GITHUB_ACTIONS python3 x.py --ci false build --stage 1 library
+env -u GITHUB_ACTIONS python3 x.py --ci false build --stage 1 library src/tools/clippy
 stage="build/$host/stage1"
 cp -L "$stage/bin/rustc" "$kit/bin/"
 cp -L "$stage/lib"/librustc_driver-*.so "$kit/lib/"
@@ -112,10 +70,18 @@ cp -aL "$stage/lib/rustlib/$host/lib" "$kit/lib/rustlib/$host/"
 if [[ -d "$stage/lib/rustlib/$host/codegen-backends" ]]; then
   cp -aL "$stage/lib/rustlib/$host/codegen-backends" "$kit/lib/rustlib/$host/"
 fi
+for tool in clippy-driver cargo-clippy; do
+  lib=$(find build/"$host" -path "*/stage*-tools-bin/$tool" -print -quit)
+  if [[ -z "$lib" ]]; then
+    lib=$(find build/"$host" -name "$tool" -type f -executable -print -quit)
+  fi
+  cp -L "$lib" "$kit/bin/"
+done
 shopt -s nullglob
 for lib in "$stage/lib"/libLLVM*.so* build/"$host"/ci-llvm/lib/libLLVM*.so*; do
   cp -L "$lib" "$kit/lib/"
 done
+"$kit/bin/clippy-driver" --version
 "$kit/bin/rustc" -vV | tee "$kit/version.txt"
 printf 'fn main() { println!("uv"); }\n' > "$RUNNER_TEMP/sample.rs"
 "$kit/bin/rustc" "$RUNNER_TEMP/sample.rs" -o "$RUNNER_TEMP/sample"
