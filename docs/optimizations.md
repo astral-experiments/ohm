@@ -869,6 +869,35 @@ groups stable across edits and reuses compatible decisions about where generic c
 retains cached query results from those decisions so they can be reused after a later edit. This can
 increase the size of the query cache; set `OHM_RETAIN_MONO_QUERY_VALUES=0` to disable the retention.
 
+After a dependency update, Cargo may ask rustc to check an unchanged crate with a new metadata
+identifier. If the new incremental directory is empty, rustc can read a completed check for the same
+package and source path with compatible options. It rechecks each query’s dependencies and writes
+the result in the new directory. Queries sensitive to the current crate identity, such as type
+layout, track that identity. When part of a constant comes from disk and part is evaluated again,
+rustc restores shared literals through the same interner. This keeps duplicate strings from shifting
+the allocation indices in the exported metadata. [Query
+reuse](https://github.com/astral-experiments/ohm-rust/pull/451) · [Cached
+literals](https://github.com/astral-experiments/ohm-rust/pull/318)
+
+Adding an implementation of one trait to a dependency can invalidate cached lookups for other
+traits. For a lookup of `Display`, rustc records a fingerprint of the crates that supply
+implementations of `Display`. Adding a supplier changes the fingerprint. Changing a crate that only
+implements other traits can leave this lookup reusable. [Trait
+lookup](https://github.com/astral-experiments/ohm-rust/pull/452)
+
+When a module lives in its own file, editing its caller often leaves the file unchanged. Ohm can
+restore the parsed syntax of such a file if it is at least 1 KiB and its contents, edition and
+parsing context match. Rustc adjusts source locations and attribute IDs, then expands macros and
+resolves names in the current crate. It reparses files that produced diagnostics and skips snapshots
+that grow too large. [Parsed modules](https://github.com/astral-experiments/ohm-rust/pull/450)
+
+Inserting a Ruff rule can renumber variants of the rule enum. A function that returns one variant
+may compile to the same instructions with a new constant. On x86-64 Linux at optimization level 1
+with line tables and LTO disabled, LLVM can copy a previous object and patch that constant. It
+compares the optimized IR just before instruction selection and checks the encoding, section and
+references for each changed function. If any check fails, it regenerates the object. [Enum
+returns](https://github.com/astral-experiments/ohm-llvm/pull/37)
+
 Adding a method to an impl can invalidate hundreds of callers of its existing methods. Ohm records
 the item each name selected and can repeat the lookup directly. If it still finds the same method,
 callers can reuse their type checks. Removing a neighboring import also preserves the identities of
@@ -896,9 +925,12 @@ instances](https://github.com/astral-experiments/ohm-rust/pull/439) · [Relink
 inputs](https://github.com/astral-experiments/ohm-rust/pull/438)
 
 If only one function calls `decode::<Snapshot>`, moving that call can rebuild a large codegen unit
-that holds generic functions from many modules. Ohm places the instance with the generics of the
-caller’s module. It checks the usage map again when the set of callers changes. [Single-user
-instances](https://github.com/astral-experiments/ohm-rust/pull/448)
+that holds generic functions from many modules. For unoptimized incremental builds, Ohm places the
+instance with the generics of the caller’s module. It checks the usage map again when the set of
+callers changes. In optimized builds, placing instances in their defining module can avoid extra
+copies of helper functions across codegen units. [Single-user
+instances](https://github.com/astral-experiments/ohm-rust/pull/448) · [Optimized
+builds](https://github.com/astral-experiments/ohm-rust/pull/455)
 
 Starting in 1.99.0-24, rustc tracks which crate provides each group of generic instantiations.
 For example, moving the provider of `width::<u16>` can rebuild its callers while reusing compiled
