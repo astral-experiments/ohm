@@ -78,13 +78,12 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
           path: rust
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+      - name: Download the baseline compiler profile
         if: inputs.profdata != ''
-        with:
-          github-token: ${{ github.token }}
-          run-id: ${{ inputs.profdata }}
-          name: rustc-profile
-          path: ${{ runner.temp }}/profile
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PROFILE: ${{ inputs.profdata }}
+        run: bash coordinator/scripts/project-check-instructions/download.sh "$PROFILE" rustc-profile rustc.profdata "$RUNNER_TEMP/profile/rustc.profdata"
       - name: Build and smoke-test the compiler SDK
         working-directory: rust
         env:
@@ -125,40 +124,23 @@ jobs:
           fetch-depth: ${{ inputs.window == 'preceding' && 41 || 21 }}
           persist-credentials: false
           path: workload
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+      - name: Download compiler kits and verify their digests
         if: inputs.kits != ''
-        with:
-          github-token: ${{ github.token }}
-          run-id: ${{ inputs.kits }}
-          pattern: ${{ inputs.candidate_as_control && 'sdk-candidate' || inputs.prototype != '' && 'sdk-control' || 'sdk-*' }}
-          merge-multiple: true
-          path: ${{ runner.temp }}/kits
-      - name: Stage the first candidate kit as the control
-        if: inputs.candidate_as_control
-        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          CONTROL: ${{ inputs.kits }}
+          CANDIDATE: ${{ inputs.prototype }}
+          INTERMEDIATE: ${{ inputs.intermediate }}
+          SECOND: ${{ inputs.second }}
         run: |
-          mv "$RUNNER_TEMP/kits/candidate.tar.zst" "$RUNNER_TEMP/kits/control.tar.zst"
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        if: inputs.prototype != ''
-        with:
-          github-token: ${{ github.token }}
-          run-id: ${{ inputs.prototype }}
-          name: sdk-candidate
-          path: ${{ runner.temp }}/kits
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        if: inputs.intermediate != ''
-        with:
-          github-token: ${{ github.token }}
-          run-id: ${{ inputs.intermediate }}
-          name: sdk-candidate
-          path: ${{ runner.temp }}/kits/pr
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        if: inputs.second != ''
-        with:
-          github-token: ${{ github.token }}
-          run-id: ${{ inputs.second }}
-          name: sdk-candidate
-          path: ${{ runner.temp }}/kits/pr2
+          set -euo pipefail
+          fetch() {
+            bash scripts/project-check-instructions/download.sh "$1" sdk-candidate candidate.tar.zst "$RUNNER_TEMP/kits/$2.tar.zst"
+          }
+          fetch "$CONTROL" control
+          fetch "$CANDIDATE" candidate
+          if [[ -n "$INTERMEDIATE" ]]; then fetch "$INTERMEDIATE" pr/candidate; fi
+          if [[ -n "$SECOND" ]]; then fetch "$SECOND" pr2/candidate; fi
       - name: Measure the first root check after each of the twenty edits
         env:
           PROJECT: ${{ matrix.project }}
