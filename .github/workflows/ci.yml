@@ -12,7 +12,7 @@ on:
         description: Experiment
         required: true
         type: choice
-        options: [build-kit, pilot, marginal, confirm, audit, audit-control]
+        options: [build-kit, pilot, marginal, confirm, profile, audit, audit-control]
       patch:
         description: Optional gzipped, base64-encoded compiler diff for an ephemeral benchmark
         type: string
@@ -114,7 +114,7 @@ jobs:
       fail-fast: false
       matrix:
         project: ${{ fromJSON(inputs.project == 'both' && '["ripgrep","serc"]' || format('["{0}"]', inputs.project)) }}
-        pair: ${{ fromJSON(inputs.mode == 'confirm' && '[1,2,3,4,5,6]' || (inputs.mode == 'marginal' || inputs.mode == 'profile') && '[1,2]' || '[1]') }}
+        pair: ${{ fromJSON(inputs.mode == 'confirm' && '[1,2,3,4,5,6]' || inputs.mode == 'marginal' && '[1,2]' || '[1]') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:

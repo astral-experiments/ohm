@@ -95,6 +95,9 @@ load_reference() {
   else
     echo "$role consumes the std it built" >> "$out/stdlib"
   fi
+  if [[ -z "${REFERENCE_PAIR:-}" ]]; then
+    cp "$control/bin/rustc" "$kits/$role/bin/rustc"
+  fi
   extra+=(--"$role" "$kits/$role")
 }
 if [[ -n "${REFERENCE_PAIR:-}" || -n "${INTERMEDIATE_KIT:-}" ]]; then
