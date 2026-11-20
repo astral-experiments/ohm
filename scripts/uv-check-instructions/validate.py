@@ -108,5 +108,20 @@ run_make_support = {{ path = "{support}" }}
             shutil.rmtree(work)
 
 
+def mixed_metadata():
+    suites = []
+    for role in roles:
+        path = out / role / "mixed-metadata.jsonl"
+        with path.open("w") as f:
+            run([sys.executable, here / "mixed_metadata.py", kits / role / "bin/rustc",
+                 scratch / "mixed-metadata"], stdout=f)
+        cases = [json.loads(line) for line in path.open()]
+        suites.append(cases)
+    for control, candidate in zip(*suites, strict=True):
+        assert control == candidate, (control, candidate)
+        assert candidate["warm"] == candidate["fresh"], candidate
+
+
 corpus()
 run_make()
+mixed_metadata()
