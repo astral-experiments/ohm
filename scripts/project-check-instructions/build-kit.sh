@@ -103,6 +103,7 @@ if [[ "${PROFILED:-}" == train ]]; then
     cd src/tools/rustc-perf
     export LLVM_PROFILE_FILE="$RUNNER_TEMP/profiles/default_%m_%p.profraw"
     export RUSTC="$stage0/bin/rustc" RUSTC_BOOTSTRAP=1 CARGO_UNSTABLE_OHM_LINKER=lld
+    "$stage0/bin/cargo" build -p collector --bins
     "$stage0/bin/cargo" run -p collector --bin collector -- profile_local eprintln "$exe" --id Test --cargo "$cargo3" --profiles Check,Debug,Opt --scenarios All --exact-match externs,ctfe-stress-5,cargo-0.87.1,token-stream-stress,match-stress,tuple-stress,diesel-2.2.10,bitmaps-3.2.1,serde-1.0.219-new-solver --frontend-threads 1 --jobs 4
   )
   profdata="$(find build -name llvm-profdata -type f | head -1)"
