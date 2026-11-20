@@ -12,7 +12,7 @@ on:
         description: Experiment
         required: true
         type: choice
-        options: [train, build-kit, pilot, marginal, confirm, profile, audit, audit-control]
+        options: [train, build-kit, build-cargo, pilot, marginal, confirm, profile, audit, audit-control]
       patch:
         description: Optional gzipped, base64-encoded compiler diff for an ephemeral benchmark
         type: string
@@ -52,6 +52,12 @@ on:
         required: false
       profdata:
         description: Optional baseline rustc profile training run ID
+        type: string
+      cargo_parent:
+        description: Run supplying Cargo for the intermediate arm
+        type: string
+      cargo_head:
+        description: Run supplying Cargo for second and candidate arms
         type: string
       stage2:
         description: Build stage two with the release driver's relocation policy
@@ -105,6 +111,35 @@ jobs:
           retention-days: 10
           compression-level: 0
 
+  build-cargo:
+    if: inputs.mode == 'build-cargo'
+    name: Build Cargo with the supplied changes
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          path: coordinator
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: astral-experiments/ohm-cargo
+          ref: 4193b7226ed980a4947848e979cd72444cc3bc22
+          persist-credentials: false
+          path: cargo
+      - name: Compile the alternative Cargo
+        working-directory: cargo
+        env:
+          EXPERIMENT_PATCH: ${{ inputs.patch }}
+        run: bash ../coordinator/scripts/project-check-instructions/build-cargo.sh
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: alt-cargo
+          path: ${{ runner.temp }}/cargo.tar.zst
+          if-no-files-found: error
+          retention-days: 10
+          compression-level: 0
+
   measure:
     if: inputs.mode == 'pilot' || inputs.mode == 'marginal' || inputs.mode == 'confirm' || inputs.mode == 'profile' || inputs.mode == 'audit' || inputs.mode == 'audit-control' || inputs.mode == 'annotate'
     name: Measure ${{ matrix.project }} pair ${{ matrix.pair }}
@@ -146,6 +181,19 @@ jobs:
           fetch "$CANDIDATE" candidate
           if [[ -n "$INTERMEDIATE" ]]; then fetch "$INTERMEDIATE" pr/candidate; fi
           if [[ -n "$SECOND" ]]; then fetch "$SECOND" pr2/candidate; fi
+      - name: Download alternative Cargo binaries
+        if: inputs.cargo_head != ''
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PARENT: ${{ inputs.cargo_parent }}
+          CANDIDATE: ${{ inputs.cargo_head }}
+        run: |
+          dest=$RUNNER_TEMP/kits
+          for variant in PARENT CANDIDATE; do
+            [[ -n "${!variant}" ]] || continue
+            file="$dest/cargo-$variant.tar.zst"
+            bash scripts/project-check-instructions/download.sh "${!variant}" alt-cargo cargo.tar.zst "$file"
+          done
       - name: Measure the first root check after each of the twenty edits
         env:
           PROJECT: ${{ matrix.project }}

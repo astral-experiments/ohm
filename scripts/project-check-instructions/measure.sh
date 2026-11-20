@@ -69,6 +69,20 @@ if [[ -n "${RUSTC_KITS:-}" ]]; then
     extra+=(--pair "$pair")
   fi
 fi
+for variant in PARENT CANDIDATE; do
+  dir="$kits/cargo-$variant"
+  if [[ -f "$dir.tar.zst" ]]; then
+    mkdir -p "$dir" "$out/cargo-$variant"
+    tar -C "$dir" --zstd -xf "$dir.tar.zst"
+    (cd "$dir" && sha256sum -c manifest.sha256)
+    cp "$dir"/{manifest.sha256,revision,source.patch,source.tree,version.txt} "$out/cargo-$variant/"
+    if [[ "$variant" == PARENT ]]; then
+      extra+=(--intermediate-cargo "$dir/cargo")
+    else
+      extra+=(--second-cargo "$dir/cargo" --candidate-cargo "$dir/cargo")
+    fi
+  fi
+done
 sha256sum "$control/bin/rustc" | cut -d' ' -f1 > "$out/common-launcher"
 if [[ "$(cat /proc/sys/kernel/perf_event_paranoid)" -gt 2 ]]; then
   sudo sysctl kernel.perf_event_paranoid=2

@@ -138,7 +138,7 @@ def run(args, commits, role):
     shutil.copytree(getattr(args, role), kit, symlinks=True, copy_function=link_or_copy)
     cargo = kit / "bin/cargo"
     cargo.unlink(missing_ok=True)
-    cargo_src = args.candidate_cargo if role == "candidate" and args.candidate_cargo else args.cargo
+    cargo_src = getattr(args, role+"_cargo", None) or args.cargo
     shutil.copy2(cargo_src, cargo)
     rustc = kit / "bin/rustc"
     tool = fixed / "rustup/toolchains/ohm"
@@ -196,8 +196,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--window", choices=["recent", "preceding"], default="recent")
     parser.add_argument("--project", choices=PROJECTS.keys(), required=True)
-    for arg in ("source", "control", "candidate", "cargo", "candidate-cargo", "scratch", "output"):
-        parser.add_argument("--" + arg, type=lambda p: Path(p).resolve(), required=arg != "candidate-cargo")
+    for arg in ("source", "control", "candidate", "cargo", "candidate-cargo", "intermediate-cargo", "second-cargo", "scratch", "output"):
+        parser.add_argument("--" + arg, type=lambda p: Path(p).resolve(), required=not arg.endswith("-cargo"))
     parser.add_argument("--first", choices=["control", "candidate"], required=True)
     parser.add_argument("--jobs", type=int, default=4)
     parser.add_argument("--offline", action="store_true")
