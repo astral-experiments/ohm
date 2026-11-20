@@ -187,7 +187,7 @@ def run(args, commits, role):
         command([args.scratch / "meter", rustc, noop, cargo, *CHECK],
                 src, env, folder / "noop.log")
         assert not read_counts(noop), (i, "unexpected recompilation")
-        if args.audit and i in (4, 5, 9, 18, 20):
+        if args.audit and units:
             compare_fresh(cargo, src, env, folder)
         total = sum(x["instructions"] for x in units)
         title = git(args.uv, "log", "-1", "--format=%s", commit).decode().strip()
