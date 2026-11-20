@@ -70,25 +70,22 @@ def main():
             step = dict(env, RUSTC_WRAPPER=str(wrapper), REPEAT_UNITS=",".join(subjects),
                         REPEAT_COUNT="16", REPEAT_DIR=str(args.output),
                         PERF_DIR=str(args.scratch), PROFILER=str(perf))
-            binary = args.scratch / "samples.data"
-            argv = [perf, "record", "-q", "-e", "instructions:u", "-c", "900001",
-                    "--call-graph","dwarf,4096","-m","256","-o",binary,"--",*argv]
         command(argv, src, step, args.output / f"{i}-build.log")
         for unit in subjects:
             assert (args.output / (unit+"-repeats")).is_file()
-            pids = (args.output / (unit+"-pids")).read_text().strip()
-            data = subprocess.check_output([perf, "report", "--stdio", "-i", binary, "--pid", pids,
+            binary = args.scratch / (unit+".data")
+            data = subprocess.check_output([perf, "report", "--stdio", "-i", binary,
                 "--sort=comm,dso,symbol", "--fields=period,sample,comm,dso,symbol",
                 "--percent-limit=0", "--field-separator=|", "--call-graph=none", "--no-children"], env=env)
             with gzip.open(args.output / f"{unit}-symbols.txt.gz", "wb") as f:
                 f.write(data)
-            data = subprocess.check_output([perf, "report", "--stdio", "-i", binary, "--pid", pids,
+            data = subprocess.check_output([perf, "report", "--stdio", "-i", binary,
                 "--sort=dso,symbol", "--comms=rustc", "--field-separator=|",
                 "--call-graph=none", "--percent-limit=0", "--children"], env=env)
             with gzip.open(args.output / f"{unit}-children.txt.gz", "wb") as f:
                 f.write(data)
-        if subjects:
             binary.unlink()
+        if subjects:
             break
         print(i, commit, flush=True)
 
