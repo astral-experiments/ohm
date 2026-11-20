@@ -139,36 +139,33 @@
  
 --- a/compiler/rustc_hir_typeck/src/writeback.rs
 +++ b/compiler/rustc_hir_typeck/src/writeback.rs
-@@ -392,6 +392,9 @@
+@@ -392,7 +392,7 @@
  
  impl<'cx, 'tcx> WritebackCx<'cx, 'tcx> {
      fn eval_closure_size(&mut self) {
-+        if self.fcx.typeck_results.borrow().closure_size_eval.is_empty() {
-+            return;
-+        }
-         self.tcx().with_stable_hashing_context(|mut hcx| {
+-        self.tcx().with_stable_hashing_context(|mut hcx| {
++        self.tcx().with_incremental_hashing_context(|mut hcx| {
              let fcx_typeck_results = self.fcx.typeck_results.borrow();
  
-@@ -409,6 +412,9 @@
+             self.typeck_results.closure_size_eval = fcx_typeck_results
+@@ -409,7 +409,7 @@
      }
  
      fn visit_min_capture_map(&mut self) {
-+        if self.fcx.typeck_results.borrow().closure_min_captures.is_empty() {
-+            return;
-+        }
-         self.tcx().with_stable_hashing_context(|mut hcx| {
+-        self.tcx().with_stable_hashing_context(|mut hcx| {
++        self.tcx().with_incremental_hashing_context(|mut hcx| {
              let fcx_typeck_results = self.fcx.typeck_results.borrow();
  
-@@ -440,6 +446,9 @@
+             self.typeck_results.closure_min_captures = fcx_typeck_results
+@@ -440,7 +440,7 @@
      }
  
      fn visit_fake_reads_map(&mut self) {
-+        if self.fcx.typeck_results.borrow().closure_fake_reads.is_empty() {
-+            return;
-+        }
-         self.tcx().with_stable_hashing_context(move |mut hcx| {
+-        self.tcx().with_stable_hashing_context(move |mut hcx| {
++        self.tcx().with_incremental_hashing_context(move |mut hcx| {
              let fcx_typeck_results = self.fcx.typeck_results.borrow();
  
+             self.typeck_results.closure_fake_reads = fcx_typeck_results
 --- a/compiler/rustc_incremental/src/assert_dep_graph.rs
 +++ b/compiler/rustc_incremental/src/assert_dep_graph.rs
 @@ -111,7 +111,7 @@
@@ -870,6 +867,21 @@
              let key = ptr::from_ref(*self).cast::<()>();
              if let Some(&hash) = cache.borrow().get(&key) {
                  return hash;
+--- a/compiler/rustc_middle/src/ty/mod.rs
++++ b/compiler/rustc_middle/src/ty/mod.rs
+@@ -1610,7 +1610,11 @@
+ 
+         // Generate a deterministically-derived seed from the item's path hash
+         // to allow for cross-crate compilation to actually work
+-        let mut field_shuffle_seed = self.def_path_hash(did.to_def_id()).0.to_smaller_hash();
++        let mut field_shuffle_seed = if self.sess.opts.unstable_opts.randomize_layout {
++            self.def_path_hash(did.to_def_id()).0.to_smaller_hash()
++        } else {
++            rustc_data_structures::stable_hash::Hash64::ZERO
++        };
+ 
+         // If the user defined a custom seed for layout randomization, xor the item's
+         // path hash with the user defined seed, this will allowing determinism while
 --- a/compiler/rustc_middle/src/verify_ich.rs
 +++ b/compiler/rustc_middle/src/verify_ich.rs
 @@ -24,7 +24,7 @@
