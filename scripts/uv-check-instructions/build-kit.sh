@@ -30,6 +30,12 @@ case "$source" in
       git diff "$base" "$tip" -- compiler | git apply -
     done
     test "$(git diff --name-only | wc -l)" -eq "$paths"
+    if [[ "${CTFE:-}" == 1 ]]; then
+      test "$PUBLIC_STACK" = 1
+      ctfe=2b0876f27b147ff94f271a7a93795b8bb326731c
+      git cat-file -e "$ctfe^{commit}" || git fetch --no-tags origin "$ctfe"
+      git diff "$base" "$ctfe" -- compiler | git apply -
+    fi
     if [[ -n "${PARSER_REF:-}" ]]; then
       test "$PUBLIC_STACK" = 1
       [[ "$PARSER_REF" =~ ^[a-f0-9]{40}$ ]]
