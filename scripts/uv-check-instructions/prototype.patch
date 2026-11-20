@@ -190,12 +190,11 @@
              return;
 --- a/compiler/rustc_incremental/src/persist/file_format.rs
 +++ b/compiler/rustc_incremental/src/persist/file_format.rs
-@@ -30,7 +30,9 @@
+@@ -30,7 +30,8 @@
  // Local built MIR now fingerprints the type-checking root's region annotation.
  // OwnerNodes records loop-control attributes and params_in_repr fingerprints the full bitset.
  // Source maps retain physical caller paths from the defining checkout.
 -const HEADER_FORMAT_VERSION: u16 = 61342;
-+// Local query caches now distinguish deduplicated CTFE literals.
 +// Check graphs carry a sibling compatibility key and use logical local IDs.
 +const HEADER_FORMAT_VERSION: u16 = 61344;
  
@@ -506,6 +505,19 @@
  
      let stable_crate_ids = FreezeLock::new(StableCrateIdMap::default());
      let untracked = Untracked {
+--- a/compiler/rustc_metadata/src/rmeta/decoder.rs
++++ b/compiler/rustc_metadata/src/rmeta/decoder.rs
+@@ -1412,7 +1412,9 @@
+             DefKind::Union => ty::AdtKind::Union,
+             _ => bug!("get_adt_def called on a non-ADT {:?}", did),
+         };
+-        let repr = self.root.tables.repr_options.get(self, item_id).unwrap().decode((self, tcx));
++        let mut repr = self.root.tables.repr_options.get(self, item_id).unwrap().decode((self, tcx));
++        // Metadata carries the effective layout seed. Keep only the user seed in AdtDef.
++        repr.field_shuffle_seed ^= tcx.def_path_hash(did).0.to_smaller_hash().as_u64();
+ 
+         let mut variants: Vec<_> = if let ty::AdtKind::Enum = adt_kind {
+             self.root
 --- a/compiler/rustc_metadata/src/rmeta/decoder/cstore_impl.rs
 +++ b/compiler/rustc_metadata/src/rmeta/decoder/cstore_impl.rs
 @@ -941,9 +941,10 @@
@@ -522,6 +534,17 @@
          let def_index = cstore.get_crate_data(cnum).def_path_hash_to_def_index(hash)?;
          Some(DefId { krate: cnum, index: def_index })
      };
+--- a/compiler/rustc_metadata/src/rmeta/encoder.rs
++++ b/compiler/rustc_metadata/src/rmeta/encoder.rs
+@@ -2678,7 +2678,7 @@
+         let def_id = local_def_id.to_def_id();
+         let tcx = self.tcx;
+         let adt_def = tcx.adt_def(def_id);
+-        record!(self.tables.repr_options[def_id] <- adt_def.repr(), hcx);
++        record!(self.tables.repr_options[def_id] <- adt_def.repr_for_layout(tcx), hcx);
+ 
+         let params_in_repr = self.tcx.params_in_repr(def_id);
+         record!(self.tables.params_in_repr[def_id] <- params_in_repr, hcx);
 --- a/compiler/rustc_middle/src/dep_graph/dep_node_key.rs
 +++ b/compiler/rustc_middle/src/dep_graph/dep_node_key.rs
 @@ -40,7 +40,7 @@
@@ -672,136 +695,6 @@
  
          // Note that we require that `hash_spans` be the inverse of the global `-Z
          // incremental-ignore-spans` option. Normally, this option is disabled, in which case
---- a/compiler/rustc_middle/src/mir/interpret/mod.rs
-+++ b/compiler/rustc_middle/src/mir/interpret/mod.rs
-@@ -103,6 +103,8 @@
-     VTable,
-     Static,
-     Type,
-+    // Used only in the local query cache. Foreign memory keeps its own identity.
-+    DeduplicatedMemory,
- }
- 
- pub fn specialized_encode_alloc_id<'tcx, E: TyEncoder<'tcx>>(
-@@ -113,7 +115,13 @@
-     match tcx.global_alloc(alloc_id) {
-         GlobalAlloc::Memory(alloc) => {
-             trace!("encoding {:?} with {:#?}", alloc_id, alloc);
--            AllocDiscriminant::Alloc.encode(encoder);
-+            let kind =
-+                if !E::CLEAR_CROSS_CRATE && tcx.alloc_map.is_deduplicated_memory(alloc_id, alloc) {
-+                    AllocDiscriminant::DeduplicatedMemory
-+                } else {
-+                    AllocDiscriminant::Alloc
-+                };
-+            kind.encode(encoder);
-             alloc.encode(encoder);
-         }
-         GlobalAlloc::Function { instance } => {
-@@ -224,6 +232,9 @@
-             let alloc_kind = AllocDiscriminant::decode(decoder);
-             (alloc_kind, decoder.position())
-         });
-+        assert!(
-+            !D::CLEAR_CROSS_CRATE || !matches!(alloc_kind, AllocDiscriminant::DeduplicatedMemory)
-+        );
- 
-         // We are going to hold this lock during the entire decoding of this allocation, which may
-         // require that we decode other allocations. This cannot deadlock for two reasons:
-@@ -246,11 +257,16 @@
- 
-         // Now decode the actual data.
-         let alloc_id = decoder.with_position(pos, |decoder| match alloc_kind {
--            AllocDiscriminant::Alloc => {
-+            AllocDiscriminant::Alloc | AllocDiscriminant::DeduplicatedMemory => {
-                 trace!("creating memory alloc ID");
-                 let alloc = <ConstAllocation<'tcx> as Decodable<_>>::decode(decoder);
-                 trace!("decoded alloc {:?}", alloc);
--                decoder.interner().reserve_and_set_memory_alloc(alloc)
-+                if let AllocDiscriminant::DeduplicatedMemory = alloc_kind {
-+                    assert!(is_immutable_leaf(alloc));
-+                    decoder.interner().reserve_and_set_memory_dedup(alloc, CTFE_ALLOC_SALT)
-+                } else {
-+                    decoder.interner().reserve_and_set_memory_alloc(alloc)
-+                }
-             }
-             AllocDiscriminant::Fn => {
-                 trace!("creating fn alloc ID");
-@@ -487,6 +503,11 @@
- 
- pub const CTFE_ALLOC_SALT: usize = 0;
- 
-+/// Pointer-bearing memory must retain the identity of its referenced allocations.
-+fn is_immutable_leaf(alloc: ConstAllocation<'_>) -> bool {
-+    !alloc.inner().mutability.is_mut() && alloc.inner().provenance().ptrs().is_empty()
-+}
-+
- pub(crate) struct AllocMap<'tcx> {
-     /// Maps `AllocId`s to their corresponding allocations.
-     // Note that this map on rustc workloads seems to be rather dense, but in miri workloads should
-@@ -509,6 +530,13 @@
- }
- 
- impl<'tcx> AllocMap<'tcx> {
-+    /// Only the original salt-zero ID can rejoin freshly evaluated literals. A distinct ID
-+    /// may point at exactly the same interned allocation.
-+    fn is_deduplicated_memory(&self, id: AllocId, alloc: ConstAllocation<'tcx>) -> bool {
-+        is_immutable_leaf(alloc)
-+            && self.dedup.lock().get(&(GlobalAlloc::Memory(alloc), CTFE_ALLOC_SALT)) == Some(&id)
-+    }
-+
-     pub(crate) fn new() -> Self {
-         AllocMap {
-             to_alloc: Default::default(),
---- a/compiler/rustc_middle/src/mir/interpret/tests.rs
-+++ b/compiler/rustc_middle/src/mir/interpret/tests.rs
-@@ -1,4 +1,10 @@
--use super::{AllocDecodingState, Arc};
-+use rustc_abi::TargetDataLayout;
-+use rustc_data_structures::intern::Interned;
-+
-+use super::{
-+    Align, AllocDecodingState, AllocMap, Allocation, Arc, CTFE_ALLOC_SALT, ConstAllocation,
-+    GlobalAlloc, Mutability, Scalar, Size, alloc_range, is_immutable_leaf,
-+};
- 
- #[test]
- fn aliases_preserve_allocation_identity() {
-@@ -14,3 +20,34 @@
-     assert!(std::ptr::eq(original.state_at(0), rewritten_again.state_at(0)));
-     assert!(!std::ptr::eq(original.state_at(0), rewritten.state_at(1)));
- }
-+
-+#[test]
-+fn only_the_original_ctfe_literal_id_is_restored() {
-+    rustc_data_structures::sync::set_dyn_thread_safe_mode(true);
-+    let map = AllocMap::new();
-+    let bytes = Allocation::from_bytes_byte_aligned_immutable(&b"same"[..], ());
-+    let literal = ConstAllocation(Interned::new_unchecked(&bytes));
-+    let canonical = map.reserve();
-+    let salted = map.reserve();
-+    let distinct = map.reserve();
-+    map.dedup.lock().insert((GlobalAlloc::Memory(literal), CTFE_ALLOC_SALT), canonical);
-+    map.dedup.lock().insert((GlobalAlloc::Memory(literal), 1), salted);
-+    assert!(map.is_deduplicated_memory(canonical, literal));
-+    assert!(!map.is_deduplicated_memory(salted, literal));
-+    assert!(!map.is_deduplicated_memory(distinct, literal));
-+
-+    let layout = TargetDataLayout::default();
-+    let size = layout.pointer_size();
-+    let mut pointer =
-+        Allocation::from_bytes(vec![0; size.bytes_usize()], Align::ONE, Mutability::Mut, ());
-+    assert!(!is_immutable_leaf(ConstAllocation(Interned::new_unchecked(&pointer))));
-+    pointer
-+        .write_scalar(
-+            &layout,
-+            alloc_range(Size::ZERO, size),
-+            Scalar::from_pointer(canonical.into(), &layout),
-+        )
-+        .unwrap();
-+    pointer.mutability = Mutability::Not;
-+    assert!(!is_immutable_leaf(ConstAllocation(Interned::new_unchecked(&pointer))));
-+}
 --- a/compiler/rustc_middle/src/queries.rs
 +++ b/compiler/rustc_middle/src/queries.rs
 @@ -255,6 +255,11 @@
@@ -923,6 +816,73 @@
      }
  
      fn encode_def_index(&mut self, _def_index: DefIndex) {
+--- a/compiler/rustc_middle/src/ty/adt.rs
++++ b/compiler/rustc_middle/src/ty/adt.rs
+@@ -10,12 +10,12 @@
+ use rustc_data_structures::fx::FxHashMap;
+ use rustc_data_structures::intern::Interned;
+ use rustc_data_structures::stable_hash::{
+-    StableHash, StableHashControls, StableHashCtxt, StableHasher,
++    StableHash, StableHashControls, StableHashCtxt, StableHasher, ToStableHashKey,
+ };
+ use rustc_errors::ErrorGuaranteed;
+ use rustc_hir as hir;
+ use rustc_hir::def::{CtorKind, DefKind, Res};
+-use rustc_hir::def_id::DefId;
++use rustc_hir::def_id::{DefId, DefPathHash};
+ use rustc_index::{IndexSlice, IndexVec};
+ use rustc_macros::{StableHash, TyDecodable, TyEncodable};
+ use rustc_session::DataTypeKind;
+@@ -118,6 +118,14 @@
+     repr: ReprOptions,
+ }
+ 
++impl AdtDefData {
++    fn repr_with_path(&self, path: DefPathHash) -> ReprOptions {
++        let mut repr = self.repr;
++        repr.field_shuffle_seed ^= path.0.to_smaller_hash().as_u64();
++        repr
++    }
++}
++
+ impl PartialEq for AdtDefData {
+     #[inline]
+     fn eq(&self, other: &Self) -> bool {
+@@ -166,13 +174,14 @@
+             let addr = self as *const AdtDefData as usize;
+             let stable_hash_controls = hcx.stable_hash_controls();
+             *cache.borrow_mut().entry((addr, stable_hash_controls)).or_insert_with(|| {
+-                let ty::AdtDefData { did, ref variants, ref flags, ref repr } = *self;
++                let ty::AdtDefData { did, ref variants, ref flags, repr: _ } = *self;
+ 
+                 let mut hasher = StableHasher::new();
+-                did.stable_hash(hcx, &mut hasher);
++                let path = did.to_stable_hash_key(hcx);
++                path.stable_hash(hcx, &mut hasher);
+                 variants.stable_hash(hcx, &mut hasher);
+                 flags.stable_hash(hcx, &mut hasher);
+-                repr.stable_hash(hcx, &mut hasher);
++                self.repr_with_path(path).stable_hash(hcx, &mut hasher);
+ 
+                 hasher.finish()
+             })
+@@ -207,9 +216,16 @@
+         self.0.0.flags
+     }
+ 
++    /// The declaration's representation attributes and user-supplied layout seed.
+     #[inline]
+     pub fn repr(self) -> ReprOptions {
+         self.0.0.repr
++    }
++
++    /// Incorporates the canonical definition path into the field shuffle seed.
++    /// Reading it here lets layout depend on linkage independently of type checking.
++    pub fn repr_for_layout(self, tcx: TyCtxt<'tcx>) -> ReprOptions {
++        self.0.0.repr_with_path(tcx.def_path_hash(self.did()))
+     }
+ 
+     pub fn field_representing_type_info(
 --- a/compiler/rustc_middle/src/ty/context.rs
 +++ b/compiler/rustc_middle/src/ty/context.rs
 @@ -860,6 +860,7 @@
@@ -1090,19 +1050,25 @@
                  return hash;
 --- a/compiler/rustc_middle/src/ty/mod.rs
 +++ b/compiler/rustc_middle/src/ty/mod.rs
-@@ -1610,7 +1610,11 @@
+@@ -1608,16 +1608,8 @@
+         let mut max_align: Option<Align> = None;
+         let mut min_pack: Option<Align> = None;
  
-         // Generate a deterministically-derived seed from the item's path hash
-         // to allow for cross-crate compilation to actually work
+-        // Generate a deterministically-derived seed from the item's path hash
+-        // to allow for cross-crate compilation to actually work
 -        let mut field_shuffle_seed = self.def_path_hash(did.to_def_id()).0.to_smaller_hash();
-+        let mut field_shuffle_seed = if self.sess.opts.unstable_opts.randomize_layout {
-+            self.def_path_hash(did.to_def_id()).0.to_smaller_hash()
-+        } else {
-+            rustc_hashes::Hash64::ZERO
-+        };
+-
+-        // If the user defined a custom seed for layout randomization, xor the item's
+-        // path hash with the user defined seed, this will allowing determinism while
+-        // still allowing users to further randomize layout generation for e.g. fuzzing
+-        if let Some(user_seed) = self.sess.opts.unstable_opts.layout_seed {
+-            field_shuffle_seed ^= user_seed;
+-        }
++        let field_shuffle_seed =
++            rustc_hashes::Hash64::new(self.sess.opts.unstable_opts.layout_seed.unwrap_or_default());
  
-         // If the user defined a custom seed for layout randomization, xor the item's
-         // path hash with the user defined seed, this will allowing determinism while
+         let elt = find_attr!(self, did, RustcScalableVector { element_count } => element_count
+         )
 --- a/compiler/rustc_middle/src/verify_ich.rs
 +++ b/compiler/rustc_middle/src/verify_ich.rs
 @@ -24,7 +24,7 @@
@@ -1320,3 +1286,32 @@
              hash_expansion(input, hcx)
          };
  
+--- a/compiler/rustc_ty_utils/src/layout.rs
++++ b/compiler/rustc_ty_utils/src/layout.rs
+@@ -733,7 +733,7 @@
+                     return Err(error(cx, LayoutError::ReferencesError(guar)));
+                 }
+ 
+-                return map_layout(cx.calc.layout_of_union(&def.repr(), &variants));
++                return map_layout(cx.calc.layout_of_union(&def.repr_for_layout(tcx), &variants));
+             }
+ 
+             // UnsafeCell and UnsafePinned both disable niche optimizations
+@@ -776,7 +776,7 @@
+             let mut layout = cx
+                 .calc
+                 .layout_of_struct_or_enum(
+-                    &def.repr(),
++                    &def.repr_for_layout(tcx),
+                     &variants,
+                     def.is_enum(),
+                     is_special_no_niche,
+@@ -805,7 +805,7 @@
+                 *variants[FIRST_VARIANT].raw.last_mut().unwrap() = tail_replacement;
+ 
+                 let Ok(unsized_layout) = cx.calc.layout_of_struct_or_enum(
+-                    &def.repr(),
++                    &def.repr_for_layout(tcx),
+                     &variants,
+                     def.is_enum(),
+                     is_special_no_niche,
