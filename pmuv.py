@@ -81,6 +81,10 @@ def arm(tag):
     d = out / tag
     d.mkdir()
     git("reset", "--hard", fixture["base_revision"])
+    for setup in fixture["setup_patches"]:
+        patch = inputs / setup["patch"]
+        assert digest(patch) == setup["sha256"]
+        git("apply", str(patch))
     env = {
         k: os.environ[k]
         for k in (
