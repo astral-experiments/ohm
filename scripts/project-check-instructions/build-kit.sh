@@ -119,6 +119,9 @@ fi
 cp -L "$stage/bin/rustc" "$kit/bin/"
 cp -L "$stage/lib"/librustc_driver-*.so "$kit/lib/"
 cp -aL "$stage/lib/rustlib/$host/lib" "$kit/lib/rustlib/$host/"
+if [[ -d "$stage/lib/rustlib/$host/bin" ]]; then
+  cp -aL "$stage/lib/rustlib/$host/bin" "$kit/lib/rustlib/$host/"
+fi
 if [[ -d "$stage/lib/rustlib/$host/codegen-backends" ]]; then
   cp -aL "$stage/lib/rustlib/$host/codegen-backends" "$kit/lib/rustlib/$host/"
 fi
