@@ -15,6 +15,10 @@ on:
       kits:
         description: Workflow run with compiler kits, or empty for shipped -2 on both sides
         type: string
+      candidate_as_control:
+        description: Use the candidate from kits as the control when comparing two candidate builds
+        default: false
+        type: boolean
         required: false
       cargo:
         description: Workflow run with the patched Cargo to use on the candidate side
@@ -167,9 +171,18 @@ jobs:
         with:
           github-token: ${{ github.token }}
           run-id: ${{ inputs.kits }}
-          pattern: ${{ inputs.prototype != '' && 'sdk-control' || 'sdk-*' }}
+          pattern: ${{ inputs.candidate_as_control && 'sdk-candidate' || inputs.prototype != '' && 'sdk-control' || 'sdk-*' }}
           merge-multiple: true
           path: ${{ runner.temp }}/kits
+      - name: Stage the first candidate kit as the control
+        if: inputs.candidate_as_control
+        shell: bash
+        run: |
+          mkdir "$RUNNER_TEMP/repack"
+          tar -C "$RUNNER_TEMP/repack" --zstd -xf "$RUNNER_TEMP/kits/candidate.tar.zst"
+          mv "$RUNNER_TEMP/repack/candidate" "$RUNNER_TEMP/repack/control"
+          tar -C "$RUNNER_TEMP/repack" -cf - control | zstd -T4 -1 > "$RUNNER_TEMP/kits/control.tar.zst"
+          mv "$RUNNER_TEMP/kits/candidate.tar.zst" "$RUNNER_TEMP/repack/"
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         if: inputs.prototype != ''
         with:
