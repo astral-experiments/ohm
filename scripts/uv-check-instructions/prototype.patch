@@ -383,7 +383,7 @@
 +    opts.dep_tracking_hash(false).as_u64().hash(&mut inputs);
 +    sess.source_map()
 +        .path_mapping()
-+        .to_real_filename(&opts.working_dir, input.as_path())
++        .to_real_filename(sess.source_map().working_dir(), input.as_path())
 +        .hash(&mut inputs);
 +    for (key, value) in &sess.config {
 +        (key.as_str(), value.as_ref().map(|v| v.as_str())).hash(&mut inputs);
