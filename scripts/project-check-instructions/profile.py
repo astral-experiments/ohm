@@ -25,7 +25,7 @@ def record(argv, cwd, env, log):
     command([PERF, "record", "-e", "instructions:u", "-c", period, "-m", "128",
              "-o", data, "--", *argv], cwd, env, log)
     if run.read_counts(log.parent / "units.tsv"):
-        samples = subprocess.check_output([PERF, "script", "-i", data, "-F", "pid,comm,sym,dso"], env=env)
+        samples = subprocess.check_output([PERF, "script", "-i", data, "-F", "pid,comm,ip,sym,dso"], env=env)
         with gzip.open(log.parent / "samples.txt.gz", "wb") as output:
             output.write(samples)
         (log.parent/"period").write_text(period)
