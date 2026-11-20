@@ -1,148 +1,54 @@
-name: Qualification workloads
-run-name: SDK workload qualification (${{ inputs.build && 'build probes' || inputs.probe_run && inputs.probe || inputs.candidate }} ${{ inputs.cases }})
+name: Ohm release instruction comparison
+run-name: uv history on Ohm 1.100.0-2 and 1.100.0-3
 on:
   workflow_dispatch:
     inputs:
-      base_run:
-        type: string
-      probe_run:
-        type: string
-      probe:
-        type: string
-        default: parser
-      build:
-        type: boolean
-        default: false
       candidate:
+        required: true
         type: string
-        default: '44735982792'
-      cases:
-        type: string
-        default: '["history","mixed","codex-check","codex-clippy"]'
-      pairs:
-        type: string
-        default: '[1,2]'
-      baseline:
-        type: boolean
-        default: false
 permissions:
   contents: read
   actions: read
 jobs:
-  build:
-    if: inputs.build
-    name: Build ${{ matrix.role }} compiler
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        role: [base, parser, queries]
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-          path: coordinator
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          repository: astral-experiments/ohm-rust
-          ref: cad56cdf53143b0a539218169451ca12f7064ff3
-          fetch-depth: 0
-          persist-credentials: false
-          path: rust
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          repository: astral-experiments/ohm-rust-clippy
-          ref: 8b452cfcbe11a705b7202554c7655dd9209d2e04
-          persist-credentials: false
-          path: clippy
-      - name: Build and smoke-test the compiler SDK
-        working-directory: rust
-        run: bash ../coordinator/scripts/uv-check-instructions/build-kit.sh ${{ matrix.role }}
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: sdk-${{ matrix.role }}
-          path: ${{ runner.temp }}/packages/*.tar.zst
-          if-no-files-found: error
-          retention-days: 10
-          compression-level: 0
-
   measure:
-    if: "!inputs.build"
-    name: ${{ matrix.workload }} pair ${{ matrix.pair }}
+    name: 20 uv merges, pair ${{ matrix.pair }}
     runs-on: namespace-profile-ubuntu-24-04-16
     strategy:
       fail-fast: false
       matrix:
-        workload: ${{ fromJSON(inputs.cases) }}
-        pair: ${{ fromJSON(inputs.pairs) }}
+        workload: [history]
+        pair: [1,2,3,4,5,6]
     timeout-minutes: 45
     env:
-      BASE_RUN: ${{ inputs.base_run }}
-      PROBE_RUN: ${{ inputs.probe_run }}
-      PROBE: ${{ inputs.probe }}
       WORKLOAD: ${{ matrix.workload }}
       PAIR: ${{ matrix.pair }}
-      BASELINE_ONLY: ${{ inputs.baseline }}
+      BASELINE_ONLY: "false"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        if: "!startsWith(matrix.workload, 'codex')"
         with:
           repository: astral-sh/uv
           ref: c99faeeeeb8318d874007b4c48635d009838c1a0
           fetch-depth: 21
           persist-credentials: false
           path: source
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        if: startsWith(matrix.workload, 'codex')
-        with:
-          repository: openai/codex
-          ref: c909d1bc0462d0b8bfd4525264cce938fd2475e8
-          persist-credentials: false
-          path: source
-      - name: Prepare Codex dependencies
-        if: startsWith(matrix.workload, 'codex')
+      - name: Obtain the previous release
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends libcap-dev libasound2-dev protobuf-compiler
-          curl -fsSL --retry 4 https://static.crates.io/crates/allocative/allocative-0.3.6.crate -o scripts/uv-check-instructions/compat/allocative-0.3.6.crate
+          tag=ohm-1.100.0-2
+          prefix=$tag-x86_64-unknown-linux-gnu
+          mkdir -p "$RUNNER_TEMP/control"
+          cd "$RUNNER_TEMP/control"
+          for file in "$prefix.tar.gz" "$prefix.tar.gz.sha256" "$prefix-provenance.json"; do
+            curl --retry 5 -fsSLO "https://github.com/astral-experiments/ohm/releases/download/$tag/$file"
+          done
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        with:
-          github-token: ${{ github.token }}
-          run-id: '44666699041'
-          name: linux-release-qualification-44666699041
-          path: ${{ runner.temp }}/control
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        if: "!inputs.baseline && inputs.probe_run == ''"
         with:
           github-token: ${{ github.token }}
           run-id: ${{ inputs.candidate }}
-          name: linux-release-qualification-${{ inputs.candidate }}
+          name: ohm-1.100.0-3-x86_64-unknown-linux-gnu
           path: ${{ runner.temp }}/candidate
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        if: inputs.probe_run != '' && inputs.base_run == ''
-        with:
-          github-token: ${{ github.token }}
-          run-id: ${{ inputs.probe_run }}
-          pattern: sdk-{base,${{ inputs.probe }}}
-          path: ${{ runner.temp }}/probes
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        if: inputs.base_run != ''
-        with:
-          github-token: ${{ github.token }}
-          run-id: ${{ inputs.base_run }}
-          name: sdk-candidate
-          path: ${{ runner.temp }}/probes/sdk-base
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        if: inputs.base_run != ''
-        with:
-          github-token: ${{ github.token }}
-          run-id: ${{ inputs.probe_run }}
-          name: sdk-candidate
-          path: ${{ runner.temp }}/probes/sdk-queries
       - name: Verify the SDKs, calibrate the meter, replay the edits
         run: |
           if [[ "$(cat /proc/sys/kernel/perf_event_paranoid)" -gt 2 ]]; then
@@ -173,3 +79,4 @@ jobs:
           name: summary
           path: results/summary.json
           retention-days: 30
+

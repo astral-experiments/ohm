@@ -37,7 +37,7 @@ def install(role):
     digest = sha(archive)
     assert digest == sha_file.read_text().split()[0], (digest, sha_file)
     if role == "control":
-        assert digest == "5132d76e6c51d8e2ea8804e129685852e828369a169fc546abd03732161bbc4c"
+        assert digest == "a6a1621e4581940e93ff7f9720b6102f6589185539650633a4235410f0bbd26d"
     unpack = ROOT / "unpack"
     unpack.mkdir()
     subprocess.run(["tar", "-xzf", archive, "-C", unpack], check=True)
