@@ -69,7 +69,7 @@ def main():
                         REPEAT_RECEIPT=str(receipt))
         if i in (1, 6, 10, 11, 17, 20):
             argv = [perf, "record", "-e", "instructions:u", "-c", "1200007",
-                    "--call-graph", "dwarf,4096", "-m", "512", "-o", binary, "--", *argv]
+                    "--call-graph", "dwarf,4096", "-m", "256", "-o", binary, "--", *argv]
         command(argv, src, step, args.output / f"{i}-build.log")
         if subject:
             assert receipt.exists()
