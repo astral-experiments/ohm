@@ -7,7 +7,7 @@ on:
         description: Experiment
         required: true
         type: choice
-        options: [build, build-prototype, build-cargo, calibrate, pilot, confirm, profile, audit]
+        options: [build, build-pair, build-prototype, build-cargo, calibrate, pilot, confirm, profile, audit]
       kits:
         description: Workflow run with compiler kits, or empty for shipped -2 on both sides
         type: string
@@ -61,14 +61,14 @@ jobs:
           compression-level: 0
 
   build:
-    if: inputs.mode == 'build' || inputs.mode == 'build-prototype'
+    if: inputs.mode == 'build' || inputs.mode == 'build-pair' || inputs.mode == 'build-prototype'
     name: Build ${{ matrix.role }} compiler
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
-        role: ${{ fromJSON(inputs.mode == 'build' && '["control","candidate"]' || '["candidate"]') }}
+        role: ${{ fromJSON(inputs.mode == 'build-prototype' && '["candidate"]' || '["control","candidate"]') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -84,7 +84,7 @@ jobs:
       - name: Build and smoke-test the compiler SDK
         working-directory: rust
         env:
-          PROTOTYPE: ${{ inputs.mode == 'build-prototype' && '1' || '' }}
+          PROTOTYPE: ${{ inputs.mode != 'build' && '1' || '' }}
           OPTIMIZED: ${{ inputs.optimized && '1' || '' }}
           PUBLIC_STACK: ${{ inputs.public_stack && '1' || '' }}
         run: bash ../coordinator/scripts/uv-check-instructions/build-kit.sh ${{ matrix.role }}
