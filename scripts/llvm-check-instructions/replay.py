@@ -56,7 +56,7 @@ def install(key, llvm):
         )
         assert (
             proof["coordinator"]["revision"]
-            == "587a1d7554f18db1c8c52fe0cbfec0c1bf8fbd3f"
+            == "a254d50f72d322ddb599963bd4db705433eb5614"
         )
     subprocess.run(
         ["tar", "xzf", archive, "--exclude=*/rust-docs", "--exclude=*/rust-src"],
