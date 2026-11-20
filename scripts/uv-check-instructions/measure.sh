@@ -107,6 +107,19 @@ if [[ -n "${REFERENCE_PAIR:-}" || -n "${INTERMEDIATE_KIT:-}" ]]; then
       load_reference second pr2/candidate
     fi
   fi
+  if [[ -n "${REFERENCE_PAIR:-}" ]]; then
+    # This independent replay uses the release's exact std, as in the original
+    # −2 comparison. The primary matched six-VM run uses the #318 std.
+    std="$kits/unused-release-std"
+    test -d "$std"
+    for role in release control current intermediate second candidate; do
+      [[ -d "$kits/$role" ]] || continue
+      test "$(cat "$kits/$role/epoch")" = "$control_epoch"
+      mv "$kits/$role/lib/rustlib/$host/lib" "$kits/intermediate-std-$role"
+      cp -al "$std" "$kits/$role/lib/rustlib/$host/lib"
+    done
+    echo 'All compilers consume the release std' > "$out/stdlib"
+  fi
 fi
 if [[ "${PROBE_UV:-}" == 1 ]]; then
   extra+=(--probe)
