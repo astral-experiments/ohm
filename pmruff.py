@@ -72,34 +72,31 @@ def arm(tag):
         cmd=['cargo','+ohm-1.100.0-3',*step['args']]
         print(tag,idx,cmd,flush=True)
         stamp=time.time_ns()
+        start=time.perf_counter()
         path=receipt.with_suffix('.log')
         with path.open('w') as f:
-            run(wd/'meter',sdk/'bin/rustc',receipt,*cmd,cwd=source,env=env,stdout=f,stderr=subprocess.STDOUT)
-        n=int(receipt.with_suffix('.tsv.tree').read_text().split()[0])
-        rust={}
-        for line in receipt.read_text().splitlines():
-            pid,crate,kind,count,enabled,running=line.split()
-            rust[crate]=rust.get(crate,0)+int(count)
+            run(*cmd,cwd=source,env=env,stdout=f,stderr=subprocess.STDOUT)
+        n=time.perf_counter()-start
         tests=re.findall(r'(\d+) tests? run',path.read_text())
-        rows.append(dict(step=idx,label=step['label'],instructions=n,compiler=rust,tests=tests,objects=objects(stamp) if idx==11 else {}))
+        rows.append(dict(step=idx,label=step['label'],seconds=n,tests=tests,objects=objects(stamp) if idx==11 else {}))
     git('add','-A')
     tree=git('write-tree').decode().strip()
     assert tree=='f8f06a00db94b2a3b23bdfcb31e84849ae709ebf',tree
     assert len(rows)==13
     for path in (sdk,target,shared):shutil.rmtree(path)
     return dict(tree=tree,archive=archive,rows=rows)
-order=sys.argv[1]
+order=sys.argv[1][:2]
 result={t:arm(t) for t in order}
 data=json.dumps(result,indent=2)
 (out/'counts.json').write_text(data)
 a,b=order
 with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as f:
-    print('## Retired user instructions during the Ruff edit sequence',file=f)
-    print('\n2 is published −2, b is the 30-PR candidate, n adds the new compiler and LLVM changes, and f includes the Ruff fix. Each arm starts with a clean target. Counts are billions of instructions executed by Cargo and its descendants.\n',file=f)
+    print('## Elapsed seconds during the Ruff edit sequence',file=f)
+    print('\n2 is published −2, b is the 30-PR candidate, n adds the new compiler and LLVM changes, and f includes the Ruff fix. Each arm starts with a clean target. Each row measures elapsed seconds for the complete command.\n',file=f)
     print(f'| Command | {a} | {b} |\n|---|---:|---:|',file=f)
     for x,y in zip(result[a]['rows'],result[b]['rows']):
         assert x['label']==y['label'] and x['tests']==y['tests']
-        print(f"| {x['label']} | {x['instructions']/1e9:.2f} | {y['instructions']/1e9:.2f} |",file=f)
-    totals=[sum(row['instructions'] for row in result[t]['rows'][1:])/1e9 for t in order]
+        print(f"| {x['label']} | {x['seconds']:.2f} | {y['seconds']:.2f} |",file=f)
+    totals=[sum(row['seconds'] for row in result[t]['rows'][1:]) for t in order]
     print(f"| Total after warmup | {totals[0]:.2f} | {totals[1]:.2f} |",file=f)
 

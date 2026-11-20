@@ -1,5 +1,5 @@
 name: Ruff edit replay
-run-name: Count instructions across the Ruff edit sequence
+run-name: Time the Ruff edit sequence against published −2
 on:
   workflow_dispatch:
     inputs:
@@ -62,12 +62,11 @@ jobs:
           curl --retry 3 -fsSL https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.140/cargo-nextest-0.9.140-x86_64-unknown-linux-gnu.tar.gz -o nextest.tgz
           echo '4ee9aaa0d0171a985a5d0eb735b87355894c1c455972e9674fb9fdbd1387c9a3  nextest.tgz' | sha256sum -c -
           tar xf nextest.tgz
-          if [[ $(cat /proc/sys/kernel/perf_event_paranoid) -gt 2 ]]; then sudo sysctl kernel.perf_event_paranoid=2; fi
-          cc -O2 meter.c -o meter
           PATH="$PWD:$PATH" python3 pmruff.py "$ORDER"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
           name: ruff-${{ matrix.order }}
           path: counts/
+
 
