@@ -6,7 +6,7 @@ if [[ $# -ne 4 ]]; then
   echo "usage: smoke-test-release.sh RELEASE_DIRECTORY TOOLCHAIN TARGET CLIPPY_REVISION" >&2
   exit 2
 fi
-IFS= read -r -d '' RELEASE_DIRECTORY < <(cd -- "$1" && printf '%s\0' "$PWD")
+IFS= read -r -d '' RELEASE_DIRECTORY < <(cd -P -- "$1" && printf '%s\0' "$PWD")
 OHM_TOOLCHAIN=$2
 OHM_TARGET=$3
 CLIPPY_REVISION=$4
@@ -37,7 +37,7 @@ toolchain_root="$smoke_root/toolchain"
 export CARGO_HOME="$smoke_root/cargo-home"
 export RUSTUP_HOME="$smoke_root/rustup-home"
 mkdir -p "$CARGO_HOME" "$RUSTUP_HOME"
-OHM_DOWNLOAD_URL="file://$RELEASE_DIRECTORY" \
+OHM_DOWNLOAD_URL="file://${RELEASE_DIRECTORY//%/%25}" \
   OHM_INSTALL_DIR="$toolchain_root" \
   sh "$RELEASE_DIRECTORY/ohm-installer.sh"
 
