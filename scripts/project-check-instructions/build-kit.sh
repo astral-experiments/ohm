@@ -56,6 +56,9 @@ download-ci-llvm = true
 TOML
 if [[ "${OPTIMIZED:-}" == 1 ]]; then
   sed -i -e 's/ = 16$/ = 1/' -e 's/lto = "off"/lto = "thin"/' bootstrap.toml
+fi
+touch "$kit/bootstrap.patch"
+if [[ "${OPTIMIZED:-}" == 1 && "${STAGE_TWO:-}" != true ]]; then
   # Bootstrap normally adds cross-crate Rust LTO flags starting at stage 2.
   # Use its existing flags for both single-stage benchmark kits.
   bootstrap=src/bootstrap/src/core/build_steps/compile.rs
@@ -67,10 +70,12 @@ if [[ -n "${PROFILED:-}" ]]; then
   # Match the release allocator and enable bootstrap's PGO flags for stage 1.
   sed -i '/^\[rust\]$/a mimalloc = true' bootstrap.toml
   sed -i 's/^lld = false$/lld = true/' bootstrap.toml
-  pgo_bootstrap=src/bootstrap/src/core/builder/cargo.rs
-  sed -i '/fn apply_pgo(/,/let has_profile/ s/build_compiler.stage != 1/build_compiler.stage > 1/' "$pgo_bootstrap"
-  ! git diff --quiet -- "$pgo_bootstrap" || exit 1
-  git diff -- "$pgo_bootstrap" >> "$kit/bootstrap.patch"
+  if [[ "${STAGE_TWO:-}" != true ]]; then
+    pgo_bootstrap=src/bootstrap/src/core/builder/cargo.rs
+    sed -i '/fn apply_pgo(/,/let has_profile/ s/build_compiler.stage != 1/build_compiler.stage > 1/' "$pgo_bootstrap"
+    ! git diff --quiet -- "$pgo_bootstrap" || exit 1
+    git diff -- "$pgo_bootstrap" >> "$kit/bootstrap.patch"
+  fi
   mkdir -p "$RUNNER_TEMP/profiles"
   if [[ "$PROFILED" == train ]]; then
     cat >>bootstrap.toml <<TOML
@@ -88,8 +93,27 @@ fi
 cp bootstrap.toml "$kit/"
 sed -n 's/^const OHM_METADATA_EPOCH: u32 = \([0-9]*\);/\1/p' compiler/rustc_metadata/src/rmeta/mod.rs > "$kit/epoch"
 test -s "$kit/epoch"
-env -u GITHUB_ACTIONS python3 x.py --ci false build --stage 1 library
 stage="build/$host/stage1"
+if [[ "${STAGE_TWO:-}" == true ]]; then
+  # Build the compiler that builds the candidate from the same base in every job.
+  if [[ -s "$kit/compiler.patch" ]]; then
+    git apply -R "$kit/compiler.patch"
+  fi
+  env -u GITHUB_ACTIONS python3 x.py --ci false build --stage 1 library
+  sha256sum "$stage/bin/rustc" "$stage/lib"/librustc_driver-*.so | tee "$kit/stage1.sha256"
+  if [[ -s "$kit/compiler.patch" ]]; then
+    git apply "$kit/compiler.patch"
+  fi
+  env -u GITHUB_ACTIONS python3 x.py --ci false build --keep-stage 1 --enable-bolt-settings --stage 2 library
+  stage="build/$host/stage2"
+  readelf --relocs --wide "$stage/lib"/librustc_driver-*.so | awk '
+    /^Relocation section/ { count = ($3 ~ /\.rela\.(dyn|plt)/) }
+    count && /R_X86_64/ { n[$3]++ }
+    END { for (k in n) print k,n[k] }
+  ' | sort | tee "$kit/relocations.txt"
+else
+  env -u GITHUB_ACTIONS python3 x.py --ci false build --stage 1 library
+fi
 if [[ "${PROFILED:-}" == train ]]; then
   git submodule update --init --depth 1 src/tools/rustc-perf
   patch -d src/tools/rustc-perf -t -N -F 0 -p1 -i "$GITHUB_WORKSPACE/coordinator/release/rustc-perf-relocated-dependencies.patch"

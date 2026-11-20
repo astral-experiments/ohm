@@ -53,6 +53,10 @@ on:
       profdata:
         description: Optional baseline rustc profile training run ID
         type: string
+      stage2:
+        description: Build stage two with the release driver's relocation policy
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -89,6 +93,7 @@ jobs:
         env:
           EXPERIMENT_PATCH: ${{ inputs.patch }}
           OPTIMIZED: 1
+          STAGE_TWO: ${{ inputs.stage2 }}
           PROFILED: ${{ inputs.mode == 'train' && 'train' || inputs.profdata }}
           COMPILER_REF: ${{ inputs.compiler_ref }}
         run: bash ../coordinator/scripts/project-check-instructions/build-kit.sh candidate
