@@ -22,7 +22,7 @@ def record(argv, cwd, env, log):
         return command(argv, cwd, env, log)
     data = cwd.parent / "check.data"
     period = "170003"
-    command([PERF, "record", "-e", "instructions:u", "-c", period, "-m", "512",
+    command([PERF, "record", "-e", "instructions:u", "-c", period, "-m", "128",
              "-o", data, "--", *argv], cwd, env, log)
     if run.read_counts(log.parent / "units.tsv"):
         samples = subprocess.check_output([PERF, "script", "-i", data, "-F", "pid,comm,sym,dso"], env=env)
