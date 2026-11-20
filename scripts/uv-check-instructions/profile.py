@@ -30,12 +30,14 @@ def main():
     perf = find_perf()
     commits = git(args.uv, "rev-list", "--first-parent", "--max-count=23", HOLDOUT).decode().splitlines()[::-1]
     assert len(commits) == 23 and commits[20] == TIP
+    args.scratch = args.scratch / "trial"
     src = args.scratch / "uv"
     src.mkdir(parents=True)
     args.output.mkdir(parents=True, exist_ok=True)
     annotate = bool(os.getenv("ANNOTATE_UV"))
     role = "candidate" if annotate else args.first
-    sdk = getattr(args, role)
+    sdk = args.scratch / "sdk"
+    shutil.copytree(getattr(args, role), sdk, symlinks=True, copy_function=os.link)
     (args.output / "profile-role").write_text(role + "\n")
     cargo = sdk / "bin/cargo"
     shutil.copy2(args.candidate_cargo or args.cargo, cargo)
@@ -68,22 +70,25 @@ def main():
             step = dict(env, RUSTC_WRAPPER=str(wrapper), REPEAT_UNITS=",".join(subjects),
                         REPEAT_COUNT="16", REPEAT_DIR=str(args.output),
                         PERF_DIR=str(args.scratch), PROFILER=str(perf))
+            binary = args.scratch / "samples.data"
+            argv = [perf, "record", "-q", "-e", "instructions:u", "-c", "900001",
+                    "--call-graph","dwarf,4096","-m","256","-o",binary,"--",*argv]
         command(argv, src, step, args.output / f"{i}-build.log")
         for unit in subjects:
             assert (args.output / (unit+"-repeats")).is_file()
-            binary = args.scratch / (unit+".data")
-            data = subprocess.check_output([perf, "report", "--stdio", "-i", binary,
+            pids = (args.output / (unit+"-pids")).read_text().strip()
+            data = subprocess.check_output([perf, "report", "--stdio", "-i", binary, "--pid", pids,
                 "--sort=comm,dso,symbol", "--fields=period,sample,comm,dso,symbol",
                 "--percent-limit=0", "--field-separator=|", "--call-graph=none", "--no-children"], env=env)
             with gzip.open(args.output / f"{unit}-symbols.txt.gz", "wb") as f:
                 f.write(data)
-            data = subprocess.check_output([perf, "report", "--stdio", "-i", binary,
+            data = subprocess.check_output([perf, "report", "--stdio", "-i", binary, "--pid", pids,
                 "--sort=dso,symbol", "--comms=rustc", "--field-separator=|",
                 "--call-graph=none", "--percent-limit=0", "--children"], env=env)
             with gzip.open(args.output / f"{unit}-children.txt.gz", "wb") as f:
                 f.write(data)
-            binary.unlink()
         if subjects:
+            binary.unlink()
             break
         print(i, commit, flush=True)
 
