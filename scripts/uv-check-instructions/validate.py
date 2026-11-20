@@ -127,3 +127,20 @@ def mixed_metadata():
 corpus()
 run_make()
 mixed_metadata()
+
+
+def sparse_history():
+    suites = []
+    for role in roles:
+        path = out / role / "sparse-history.jsonl"
+        with path.open("w") as f:
+            run([sys.executable, here / "sparse_history.py", kits / role / "bin/rustc",
+                 scratch / "sparse-history"], stdout=f)
+        cases = [json.loads(line) for line in path.open()]
+        suites.append(cases)
+    for control, candidate in zip(*suites, strict=True):
+        for key in ("edit", "threads", "warm", "fresh"):
+            assert control[key] == candidate[key], (key, control, candidate)
+
+
+sparse_history()
