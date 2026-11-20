@@ -7,7 +7,7 @@ on:
         description: Experiment
         required: true
         type: choice
-        options: [build, calibrate, pilot, confirm]
+        options: [build, calibrate, pilot, confirm, profile]
       kits:
         description: Workflow run with the two compiler SDK artifacts
         type: string
@@ -77,7 +77,7 @@ jobs:
           PY
 
   measure:
-    if: inputs.mode == 'pilot' || inputs.mode == 'confirm'
+    if: inputs.mode == 'pilot' || inputs.mode == 'confirm' || inputs.mode == 'profile'
     name: Measure pair ${{ matrix.pair }}
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 60
@@ -87,7 +87,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        pair: ${{ fromJSON(inputs.mode == 'pilot' && '[1]' || '[1,2,3,4,5,6]') }}
+        pair: ${{ fromJSON(inputs.mode == 'confirm' && '[1,2,3,4,5,6]' || '[1]') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -107,6 +107,8 @@ jobs:
           merge-multiple: true
           path: ${{ runner.temp }}/kits
       - name: Measure the first root check after each of the twenty edits
+        env:
+          PROFILE_UV: ${{ inputs.mode == 'profile' && '1' || '' }}
         run: bash scripts/uv-check-instructions/measure.sh ${{ matrix.pair }}
       - if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a

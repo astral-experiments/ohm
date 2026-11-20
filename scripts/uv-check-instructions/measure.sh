@@ -34,7 +34,15 @@ first=control
 if (( pair % 2 == 0 )); then
   first=candidate
 fi
-python3 -IS scripts/uv-check-instructions/run.py \
+entry=run.py
+if [[ "${PROFILE_UV:-}" == 1 ]]; then
+  if ! perf --version; then
+    sudo apt-get update -qq
+    sudo apt-get install -y --no-install-recommends linux-tools-generic
+  fi
+  entry=profile.py
+fi
+python3 -IS "scripts/uv-check-instructions/$entry" \
   --uv "$PWD/uv" \
   --control "$kits/control" \
   --candidate "$kits/candidate" \
