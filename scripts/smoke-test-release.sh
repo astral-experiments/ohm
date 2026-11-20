@@ -23,7 +23,9 @@ esac
 (
   cd "$RELEASE_DIRECTORY"
   shasum -a 256 --check "$OHM_TOOLCHAIN-$OHM_TARGET.tar.gz.sha256"
-  grep '  ohm-installer\.sh$' SHA256SUMS | shasum -a 256 --check
+  for asset in ohm-installer.sh "$OHM_TOOLCHAIN.json"; do
+    awk -v asset="$asset" '$0 == $1 "  " asset' SHA256SUMS | shasum -a 256 --check
+  done
 )
 
 # Install the test toolchain with permissions that allow its native link driver to run.

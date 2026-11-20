@@ -126,13 +126,17 @@ for failure in checksum wrong-archive wrong-provenance symlink identity; do
   test ! -e "$broken/ohm-installer.sh"
 done
 
-# Reject damaged published archives before installing or invoking a compiler.
-printf 'corrupt\n' >> "$valid/$toolchain-aarch64-apple-darwin.tar.gz"
-if bash "$script_directory/smoke-test-release.sh" "$valid" "$toolchain" \
-  aarch64-apple-darwin aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa \
-  > "$temporary_directory/smoke.log" 2>&1; then
-  echo 'smoke test accepted a corrupted archive' >&2
-  exit 1
-fi
-grep -F 'FAILED' "$temporary_directory/smoke.log"
+# Reject damaged release inputs before installing or invoking a compiler.
+for asset in "$toolchain-aarch64-apple-darwin.tar.gz" "$toolchain.json" ohm-installer.sh; do
+  cp "$valid/$asset" "$temporary_directory/original"
+  printf '\n' >> "$valid/$asset"
+  if bash "$script_directory/smoke-test-release.sh" "$valid" "$toolchain" \
+    aarch64-apple-darwin aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa \
+    > "$temporary_directory/smoke.log" 2>&1; then
+    echo "smoke test accepted a corrupted $asset" >&2
+    exit 1
+  fi
+  grep -Fx "$asset: FAILED" "$temporary_directory/smoke.log"
+  mv "$temporary_directory/original" "$valid/$asset"
+done
 echo 'release packaging tests passed'
