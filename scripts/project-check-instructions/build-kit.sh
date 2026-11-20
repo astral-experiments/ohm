@@ -90,6 +90,9 @@ TOML
     sha256sum "$RUNNER_TEMP/profile/rustc.profdata" > "$kit/profile.sha256"
   fi
 fi
+if [[ "${STAGE_TWO:-}" == true ]]; then
+  sed -i "s/^profiler = false$/profiler = true/" bootstrap.toml
+fi
 cp bootstrap.toml "$kit/"
 sed -n 's/^const OHM_METADATA_EPOCH: u32 = \([0-9]*\);/\1/p' compiler/rustc_metadata/src/rmeta/mod.rs > "$kit/epoch"
 test -s "$kit/epoch"
