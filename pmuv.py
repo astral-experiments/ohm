@@ -27,6 +27,16 @@ archives = {
 }
 
 
+archives.update(
+    {
+        "q": "ea527ee721f47048e89652849fda2c56422f2e43e81bd3d9dffcdb10fbec82fa",
+        "e": "5132d76e6c51d8e2ea8804e129685852e828369a169fc546abd03732161bbc4c",
+        "n": "c3e509aa4350d888819a370a2c6783ddd83f4a0f21b746e2590dfcef74401699",
+        "f": "9d3e4a2df0ee55cd154c063dcb02f792b60b94d972c7ecb707a4acf2ea8a6dc2",
+    }
+)
+
+
 def run(*args, **opts):
     subprocess.run(list(map(str, args)), check=True, **opts)
 
@@ -41,6 +51,9 @@ def digest(path):
 
 
 def install(arm, selector):
+    variant = arm
+    if arm in ("l", "s"):
+        arm = "3"
     (tarball,) = list((kit / arm).rglob("*.tar.gz"))
     rustdir = "rust-1.100.0-dev-x86_64-unknown-linux-gnu"
     assert digest(tarball) == archives[arm]
@@ -53,6 +66,22 @@ def install(arm, selector):
         "--without=rust-docs",
     )
     shutil.rmtree(root / rustdir)
+    if variant in ("l", "s"):
+        (prev,) = list((kit / "2").rglob("*.tar.gz"))
+        assert digest(prev) == archives["2"]
+        package, relative = (
+            ("rustc", "lib/libLLVM.so.23.1-rust-dev")
+            if variant == "l"
+            else ("cargo", "bin/cargo")
+        )
+        with (sdk / relative).open("wb") as dest:
+            run(
+                "tar",
+                "xOzf",
+                prev,
+                rustdir + "/" + package + "/" + relative,
+                stdout=dest,
+            )
     run("rustup", "toolchain", "link", selector, sdk)
     return archives[arm]
 
@@ -60,7 +89,7 @@ def install(arm, selector):
 def cache():
     sizes = collections.Counter()
     files = collections.Counter()
-    for p in target.rglob("llvmcache-*"):
+    for p in root.rglob("llvmcache-*"):
         if p.is_file():
             with p.open("rb") as f:
                 name = f.read(8)
@@ -76,7 +105,7 @@ def rusage():
 
 
 def arm(tag):
-    selector = "ohm-1.100.0-" + tag
+    selector = "ohm-1.100.0-" + ("2" if tag == "2" else "3")
     archive = install(tag, selector)
     d = out / tag
     d.mkdir()
@@ -216,11 +245,15 @@ def arm(tag):
         12,
         0,
     ]
+    tools = {
+        name: digest(sdk / name)
+        for name in ["bin/cargo", "lib/libLLVM.so.23.1-rust-dev", "bin/rustc"]
+    }
     inventory = cache()
     for p in (sdk, target, shared, uvcache):
         if p.is_dir():
             shutil.rmtree(p)
-    return dict(tree=tree, archive=archive, cache=inventory, rows=rows)
+    return dict(tree=tree, archive=archive, cache=inventory, tools=tools, rows=rows)
 
 
 result = {t: arm(t) for t in sys.argv[1][:2]}

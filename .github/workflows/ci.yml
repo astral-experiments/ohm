@@ -29,7 +29,7 @@ jobs:
           path: source
           persist-credentials: false
       - name: Download published −2
-        if: contains(matrix.order, '2')
+        if: contains(matrix.order, '2') || contains(matrix.order, 'l') || contains(matrix.order, 's')
         run: |
           mkdir -p kits/2
           name=ohm-1.100.0-2
@@ -41,6 +41,34 @@ jobs:
           run-id: '44754589323'
           name: ohm-1.100.0-3-x86_64-unknown-linux-gnu
           path: kits/3
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        if: contains(matrix.order, 'q')
+        with:
+          github-token: ${{ github.token }}
+          run-id: '44648210123'
+          name: linux-release-qualification-44648210123
+          path: kits/q
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        if: contains(matrix.order, 'e')
+        with:
+          github-token: ${{ github.token }}
+          run-id: '44666699041'
+          name: linux-release-qualification-44666699041
+          path: kits/e
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        if: contains(matrix.order, 'n')
+        with:
+          github-token: ${{ github.token }}
+          run-id: '44733436429'
+          name: linux-release-qualification-44733436429
+          path: kits/n
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        if: contains(matrix.order, 'f')
+        with:
+          github-token: ${{ github.token }}
+          run-id: '44735982792'
+          name: linux-release-qualification-44735982792
+          path: kits/f
       - name: Measure the recorded commands
         env:
           ORDER: ${{ matrix.order }}
