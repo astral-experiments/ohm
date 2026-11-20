@@ -103,6 +103,9 @@ if [[ -n "${REFERENCE_PAIR:-}" || -n "${INTERMEDIATE_KIT:-}" ]]; then
   fi
   if [[ -n "${INTERMEDIATE_KIT:-}" ]]; then
     load_reference intermediate pr/candidate
+    if [[ -n "${SECOND_KIT:-}" ]]; then
+      load_reference second pr2/candidate
+    fi
   fi
 fi
 if [[ "${PROBE_UV:-}" == 1 ]]; then

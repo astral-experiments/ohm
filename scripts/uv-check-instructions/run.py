@@ -212,6 +212,7 @@ def main():
     parser.add_argument("--release", type=Path)
     parser.add_argument("--current", type=Path)
     parser.add_argument("--intermediate", type=Path)
+    parser.add_argument("--second", type=Path)
     parser.add_argument("--pair", type=int)
     parser.add_argument("--audit-role", choices=["control", "candidate"], default="candidate")
     args = parser.parse_args()
@@ -229,7 +230,7 @@ def main():
     if args.pair is not None:
         # Rotating the initial positions and reversing each adjacent pair
         # means each two-way comparison runs each arm first three times.
-        roles = [r for r in ("release","control","current","intermediate","candidate")
+        roles = [r for r in ("release","control","current","intermediate","second","candidate")
                  if getattr(args,r)]
         offset = (args.pair-1)//2
         roles = roles[offset:] + roles[:offset]

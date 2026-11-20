@@ -24,7 +24,11 @@ on:
         required: false
         type: string
       intermediate:
-        description: Optional kit for the first PR of a two-patch stack
+        description: Optional kit for the first PR of a stack
+        required: false
+        type: string
+      second:
+        description: Optional kit for the second PR of a three-patch stack
         required: false
         type: string
       candidate_as_control:
@@ -247,6 +251,13 @@ jobs:
           run-id: ${{ inputs.intermediate }}
           name: sdk-candidate
           path: ${{ runner.temp }}/kits/pr
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        if: inputs.second != ''
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.second }}
+          name: sdk-candidate
+          path: ${{ runner.temp }}/kits/pr2
       - name: Measure the first root check after each of the twenty edits
         env:
           PROFILE_UV: ${{ (inputs.mode == 'profile' || inputs.mode == 'annotate') && '1' || '' }}
@@ -255,6 +266,7 @@ jobs:
           RUSTC_KITS: ${{ inputs.kits }}
           REFERENCE_PAIR: ${{ inputs.reference_pair }}
           INTERMEDIATE_KIT: ${{ inputs.intermediate }}
+          SECOND_KIT: ${{ inputs.second }}
           CARGO_KITS: ${{ inputs.cargo }}
         run: bash scripts/uv-check-instructions/measure.sh ${{ matrix.pair }}
       - if: always()
