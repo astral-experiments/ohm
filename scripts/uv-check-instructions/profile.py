@@ -20,75 +20,36 @@ def find_perf():
     raise RuntimeError("install linux-tools-generic")
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    for arg in ("uv", "control", "candidate", "cargo", "candidate-cargo", "scratch", "output"):
-        parser.add_argument("--" + arg, type=lambda p: Path(p).resolve())
-    parser.add_argument("--first")
-    parser.add_argument("--jobs", type=int)
-    args = parser.parse_args()
-    perf = find_perf()
-    commits = git(args.uv, "rev-list", "--first-parent", "--max-count=23", HOLDOUT).decode().splitlines()[::-1]
-    assert len(commits) == 23 and commits[20] == TIP
-    args.scratch = args.scratch / "trial"
-    src = args.scratch / "uv"
-    src.mkdir(parents=True)
-    args.output.mkdir(parents=True, exist_ok=True)
-    annotate = bool(os.getenv("ANNOTATE_UV"))
-    role = "candidate" if annotate else args.first
-    sdk = args.scratch / "sdk"
-    shutil.copytree(getattr(args, role), sdk, symlinks=True, copy_function=os.link)
-    (args.output / "profile-role").write_text(role + "\n")
-    cargo = sdk / "bin/cargo"
-    shutil.copy2(args.candidate_cargo or args.cargo, cargo)
-    tc = args.scratch / "rustup/toolchains/ohm"
-    tc.parent.mkdir(parents=True)
-    tc.symlink_to(sdk)
-    env = dict(HOME=os.environ["HOME"], LANG="C.UTF-8",
-               PATH=str(sdk / "bin") + ":" + os.environ["PATH"],
-               CARGO_HOME=os.environ["CARGO_HOME"],
-               CARGO_BUILD_JOBS=str(args.jobs), CARGO_TARGET_DIR=str(args.scratch / "target"),
-               RUSTUP_HOME=str(args.scratch / "rustup"), RUSTUP_TOOLCHAIN="ohm")
-    old_lock = None
-    wrapper = Path(__file__).resolve().parent / "repeat-rustc.py"
-    wrapper.chmod(0o755)
-    for i, commit in enumerate(commits):
-        if i == 0:
-            subprocess.run(["tar", "-x"], input=git(args.uv, "archive", commit), cwd=src, check=True)
-        else:
-            diff = git(args.uv, "diff", "--no-renames", "--binary", commits[i-1], commit)
-            subprocess.run(["git", "apply", "--whitespace=nowarn"], cwd=src, input=diff, check=True)
-        lock = sha(src / "Cargo.lock")
-        if lock != old_lock:
-            command([cargo, "fetch", "--locked", "--target", "x86_64-unknown-linux-gnu"],
-                    src, env, args.output / f"{i}-fetch.log")
-        old_lock = lock
-        argv = [cargo, *CHECK]
-        subjects = ["uv_lock", "uv_project_commands"] if i == 21 else []
-        step = env
-        if subjects:
-            step = dict(env, RUSTC_WRAPPER=str(wrapper), REPEAT_UNITS=",".join(subjects),
-                        REPEAT_COUNT="16", REPEAT_DIR=str(args.output),
-                        PERF_DIR=str(args.scratch), PROFILER=str(perf))
-        command(argv, src, step, args.output / f"{i}-build.log")
-        for unit in subjects:
-            assert (args.output / (unit+"-repeats")).is_file()
-            binary = args.scratch / (unit+".data")
-            data = subprocess.check_output([perf, "report", "--stdio", "-i", binary,
-                "--sort=comm,dso,symbol", "--fields=period,sample,comm,dso,symbol",
-                "--percent-limit=0", "--field-separator=|", "--call-graph=none", "--no-children"], env=env)
-            with gzip.open(args.output / f"{unit}-symbols.txt.gz", "wb") as f:
-                f.write(data)
-            data = subprocess.check_output([perf, "report", "--stdio", "-i", binary,
-                "--sort=dso,symbol", "--comms=rustc", "--field-separator=|",
-                "--call-graph=none", "--percent-limit=0", "--children"], env=env)
-            with gzip.open(args.output / f"{unit}-children.txt.gz", "wb") as f:
-                f.write(data)
-            binary.unlink()
-        if subjects:
-            break
-        print(i, commit, flush=True)
+import run
 
+PERF = find_perf()
+real_command = run.command
+def record(argv, cwd, env, log):
+    if log.name != "check.log" or log.parent.name != "21":
+        return real_command(argv, cwd, env, log)
+    data = cwd.parent / "check.data"
+    real_command([PERF, "record", "-e", "instructions:u", "-c", "170003", "-m", "256",
+                  "-o", data, "--", *argv], cwd, env, log)
+    # perf script preserves actual process ids per sample before symbol aggregation.
+    units = run.read_counts(log.parent/"units.tsv")
+    dst = log.parents[2]
+    for u in units:
+        pid = u["pid"]
+        name = u["name"]
+        if name not in ("uv_lock","uv_project_commands"):
+            continue
+        report = subprocess.check_output([PERF,"report","--stdio","--pid",str(pid),"-i",data,
+                  "--sort=pid,comm,dso,symbol","--fields=period,sample,comm,dso,symbol,pid",
+                  "--percent-limit=0","--field-separator=|","--no-children"],env=env)
+        with gzip.open(dst/(name+"-symbols.txt.gz"),"wb") as f:
+            f.write(report)
+        (dst/(name+"-repeats")).write_text(name+" 1\n")
+    exact = subprocess.check_output([PERF,"script","-i",data,"-F","pid,comm,sym,dso"],env=env)
+    with gzip.open(dst/"events.txt.gz","wb") as f:
+        f.write(exact)
+    (dst/"profile-role").write_text(log.parents[1].name)
+    (dst/"period").write_text("170003")
+    data.unlink()
 
-if __name__ == "__main__":
-    main()
+run.command=record
+run.main()

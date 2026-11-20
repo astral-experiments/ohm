@@ -299,6 +299,8 @@ def main():
         roles = [args.audit_role]
     if args.probe:
         roles = ["candidate"]
+    if os.getenv("PROFILE_UV"):
+        roles=[args.first]
     for role in roles:
         summary[role] = run(args, commits, role)
         assert summary[role]["total"] > 0
@@ -307,6 +309,9 @@ def main():
         return
     if args.probe:
         save(args.output / "probe-summary.json", summary)
+        return
+    if os.getenv("PROFILE_UV"):
+        save(args.output / "profile-summary.json", summary)
         return
     summary["reduction_pct"] = 100 * (1 - summary["candidate"]["total"] / summary["control"]["total"])
     print(summary["reduction_pct"], flush=True)
