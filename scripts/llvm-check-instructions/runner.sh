@@ -4,8 +4,10 @@ set -eu
 # Give the runner's loader and the compiler regular files in a private mount.
 scratch=/tmp/ohm-llvm-pmu
 mkdir -p "$scratch"
-mount -t tmpfs -o size=2G tmpfs "$scratch"
+mount -t tmpfs -o size=10G tmpfs "$scratch"
 mkdir "$scratch/compiler"
+mkdir "$scratch/work"
+chown "$1" "$scratch/work"
 chown "$1" "$scratch/compiler"
 python3 - <<'PY'
 import os
@@ -19,7 +21,7 @@ for line in open("/proc/self/maps"):
     mapped=tuple(int(v,16) for v in device.split(":"))+(int(inode),)
     if (os.major(id.st_dev),os.minor(id.st_dev),id.st_ino)!=mapped: print("mapped image differs",path)
 PY
-for name in ld-linux-x86-64.so.2 libc.so.6 libm.so.6 libpthread.so.0 libdl.so.2 librt.so.1 libgcc_s.so.1 libstdc++.so.6 libz.so.1 libzstd.so.1 libffi.so.8 libtinfo.so.6 libxml2.so.2; do
+for name in ld-linux-x86-64.so.2 libc.so.6 libm.so.6 libpthread.so.0 libdl.so.2 librt.so.1 libgcc_s.so.1 libstdc++.so.6 libz.so.1 libzstd.so.1 libffi.so.8 libtinfo.so.6 libxml2.so.2 libatomic.so.1 libutil.so.1 libmvec.so.1 liblzma.so.5 libicuuc.so.74 libicudata.so.74 libresolv.so.2; do
   path=/usr/lib/x86_64-linux-gnu/$name
   if [[ -e "$path" ]]; then
     cp -L "$path" "$scratch/$name"

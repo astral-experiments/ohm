@@ -4,6 +4,8 @@ import sys
 import shutil
 import hashlib
 import subprocess
+import threading
+import time
 from pathlib import Path
 
 root = Path.cwd()
@@ -11,8 +13,8 @@ src = root / "source"
 reports = root / "receipts"
 reports.mkdir()
 sdk = Path("/tmp/ohm-llvm-pmu/compiler")
-target = root / "target"
-shared = root / "shared"
+target = sdk.parent / "work" / "target"
+shared = sdk.parent / "work" / "shared"
 trace = root / "llvm.log"
 platform = "x86_64-unknown-linux-gnu"
 ref = Path("lib/libLLVM.so.23.1-rust-dev")
@@ -97,7 +99,7 @@ def clear_linter():
     assert len(paths) > 1
     paths.extend(inc.glob("*/.ohm-checked-objects-v1"))
     for p in paths:
-        assert p.resolve().is_relative_to(root)
+        assert p.resolve().is_relative_to(sdk.parent / "work")
         shutil.rmtree(p)
     assert not any(inc.rglob("llvmcache-*"))
 
@@ -170,6 +172,37 @@ def exercise(stage, cli):
 
 
 def arm(role, library):
+    def mapped():
+        found = set()
+        for _ in range(120):
+            for file in Path("/proc").glob("[0-9]*/cmdline"):
+                try:
+                    cmd = file.read_bytes().split(b"\x00")
+                    if b"ruff_linter" not in cmd:
+                        continue
+                    for line in file.with_name("maps").read_text().splitlines():
+                        _, mode, _, device, inode, *rest = line.split()
+                        if "x" not in mode or not rest or not rest[0].startswith("/"):
+                            continue
+                        n = rest[0]
+                        if n in found:
+                            continue
+                        s = os.stat(n)
+                        found.add(n)
+                        expected = tuple(int(v, 16) for v in device.split(":")) + (
+                            int(inode),
+                        )
+                        if (
+                            os.major(s.st_dev),
+                            os.minor(s.st_dev),
+                            s.st_ino,
+                        ) != expected:
+                            print("mismatched rustc mapping", n, flush=True)
+                except OSError:
+                    pass
+            time.sleep(1)
+
+    threading.Thread(target=mapped, daemon=True).start()
     for p in (target, shared):
         if p.exists():
             shutil.rmtree(p)
