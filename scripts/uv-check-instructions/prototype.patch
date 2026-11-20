@@ -832,7 +832,7 @@
 +    #[inline]
 +    fn track_local_linkage_identity(self) {
 +        if self.incremental_crate_id != self.stable_crate_id {
-+            self.local_linkage_identity(());
++            let _ = self.local_linkage_identity(());
 +        }
 +    }
 +
