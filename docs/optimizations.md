@@ -15,6 +15,20 @@ interface changes, Cargo starts downstream compilation once the new metadata is 
 waiting for the rest of the dependency's build. Ohm also uses a compact metadata graph to reduce the
 work needed to compute the interface hash.
 
+For a public function returning `impl Trait`, downstream code can depend on properties of its hidden
+type, including whether it implements `Send`. Ohm follows those reachable types when hashing the
+public interface. A change to an unrelated private impl can then leave downstream crates fresh. The
+metadata also lists reachable traits, so rustdoc shows their blanket methods and rustc can suggest
+an import. [Private impls](https://github.com/astral-experiments/ohm-rust/pull/445) · [Trait
+discovery](https://github.com/astral-experiments/ohm-rust/pull/444)
+
+Shortening a line of source can move the byte offset of a later `.await` while preserving its file,
+line, and column. Ohm uses those visible coordinates for the exported expansion and keeps the byte
+offsets for local incremental checks. Within a generated method, Ohm can also anchor a nested macro
+to a preceding source method to keep its location stable across earlier edits. [Await
+locations](https://github.com/astral-experiments/ohm-rust/pull/449) · [Generated
+methods](https://github.com/astral-experiments/ohm-rust/pull/446)
+
 For example, assume that `linter` depends on `parser`. If you fix a bug in a private parser helper
 without changing the exposed interface, Ohm recompiles `parser` but can reuse `linter`. An
 executable using them still needs to be relinked to pick up the change. If `linter` produces a
@@ -570,6 +584,21 @@ Cargo can reuse the selected versions after edits confined to trailing profile t
 Rust and Clippy lint tables, while still applying the new settings. It still resolves the packages
 and features needed by the current command.
 
+When a branch switch changes the lockfile, Cargo remembers the last two workspace resolutions.
+Returning to the previous branch can reuse its resolution after Cargo checks its lockfile and
+manifests. In a resolver-1 workspace, running `cargo check --workspace --no-default-features` from a
+sibling can change which member gets its defaults. Cargo keys the selected packages by the features
+requested for each member. [Branch
+switches](https://github.com/astral-experiments/ohm-cargo/pull/555) · [Member
+features](https://github.com/astral-experiments/ohm-cargo/pull/557)
+
+A locked Git dependency can already have a complete checkout in Cargo home. Ohm checks the commit in
+the local database and the checkout before loading the HTTPS transport. A missing or damaged
+checkout goes through the usual fetch and repair code. Cargo also stops scanning workspace manifests
+once it has found a use for every inherited field. [Git
+checkouts](https://github.com/astral-experiments/ohm-cargo/pull/553) · [Manifest
+lints](https://github.com/astral-experiments/ohm-cargo/pull/554)
+
 For example, fixing a bug in `parse_number` leaves the workspace's dependency versions unchanged.
 The next check can reuse the saved resolution. Adding a dependency to `Cargo.toml` invalidates it,
 so Cargo resolves the dependencies again.
@@ -715,6 +744,14 @@ When a module changes, Ohm can format or verify just that module if it can deter
 owns it and how the modules connect. Otherwise, it formats the whole crate. Set `OHM_INCREMENTAL_FMT=0`
 to disable the cache.
 
+An editor can save `child.rs` while rustfmt is checking another crate. Ohm records the module’s
+modification time and permissions before reading it. If those differ when the check finishes, the
+formatter verifies its inputs again before recording a clean result. Discovering a new
+`rustfmt.toml` also triggers a check of every selected target, since the new settings can affect a
+crate that was clean at the start. [Source
+edits](https://github.com/astral-experiments/ohm-rustfmt/pull/92) · [Configuration
+edits](https://github.com/astral-experiments/ohm-rustfmt/pull/91)
+
 Requests to list changed files or print a verbose trace need fresh output on each run. Ohm invokes
 the full formatter for these options, including their `--l` and `--v` spellings. A formatting pass
 that spans multiple editions keeps its temporary module manifests together and removes them when
@@ -831,6 +868,37 @@ The compiler groups generated code into units that it can compile separately. Oh
 groups stable across edits and reuses compatible decisions about where generic code belongs. It also
 retains cached query results from those decisions so they can be reused after a later edit. This can
 increase the size of the query cache; set `OHM_RETAIN_MONO_QUERY_VALUES=0` to disable the retention.
+
+Adding a method to an impl can invalidate hundreds of callers of its existing methods. Ohm records
+the item each name selected and can repeat the lookup directly. If it still finds the same method,
+callers can reuse their type checks. Removing a neighboring import also preserves the identities of
+imports with other names. When a new trait impl appears, rustc can recover lookups for closures and
+function items from their definitions. [Method
+names](https://github.com/astral-experiments/ohm-rust/pull/436) · [Selected
+items](https://github.com/astral-experiments/ohm-rust/pull/437) · [Import
+identities](https://github.com/astral-experiments/ohm-rust/pull/434) ·
+[Closures](https://github.com/astral-experiments/ohm-rust/pull/433)
+
+Rustc stores the symbols each typed function references, so the dead-code lint can follow them
+without loading the whole type-check result. For queries with unchanged dependencies, rustc keeps
+their indices and copies their encoded dependencies into the next graph. Queries that run again
+record their current dependencies. Rustc compacts the graph once more than one in five slots is
+empty. [Symbol uses](https://github.com/astral-experiments/ohm-rust/pull/435) · [Graph
+reuse](https://github.com/astral-experiments/ohm-rust/pull/441) · [Edge
+encoding](https://github.com/astral-experiments/ohm-rust/pull/440)
+
+A new call to a generic function can force rustc to search every dependency for a compiled instance
+that it can reuse. Ohm stores pages of that table in the incremental cache so nearby lookups can
+share a page. This can increase disk usage. On a Codex TUI build, filling the cache used an extra
+46.52 MiB. Ohm also checks the edited functions before deciding which codegen units to relink, so it
+can reuse the previous partition when their references are unchanged. [Generic
+instances](https://github.com/astral-experiments/ohm-rust/pull/439) · [Relink
+inputs](https://github.com/astral-experiments/ohm-rust/pull/438)
+
+If only one function calls `decode::<Snapshot>`, moving that call can rebuild a large codegen unit
+that holds generic functions from many modules. Ohm places the instance with the generics of the
+caller’s module. It checks the usage map again when the set of callers changes. [Single-user
+instances](https://github.com/astral-experiments/ohm-rust/pull/448)
 
 Starting in 1.99.0-24, rustc tracks which crate provides each group of generic instantiations.
 For example, moving the provider of `width::<u16>` can rebuild its callers while reusing compiled
@@ -1315,6 +1383,17 @@ For host tests of libraries using the Rust 2024 edition, Ohm can cache supported
 and their compiled object files. It still runs every selected example and repeats the final link to
 pick up changes to native archives. An edit to an example or its included Markdown invalidates the
 cache.
+
+A merged example that returns `Err` must fail even if it installs a panic hook that exits
+successfully. The generated entry point now returns the result and lets the test harness handle
+termination. Ohm also lets rustdoc compile examples with macros that use `$crate`, so an alias
+inside the macro resolves in the intended crate. [Returned
+errors](https://github.com/astral-experiments/ohm-cargo/pull/559) · [Macro
+resolution](https://github.com/astral-experiments/ohm-cargo/pull/561)
+
+Rustdoc sorts merged tests before naming their generated modules. Ohm uses the same order and bundle
+identity, which matters for examples that inspect a local type with `std::any::type_name`. [Bundle
+identity](https://github.com/astral-experiments/ohm-cargo/pull/565)
 
 Libraries with `compile_fail` examples, custom rustdoc flags, or unsupported test arguments use
 ordinary rustdoc. Pass `-Zohm-cached-doctests=no` to run eligible examples through rustdoc as well.
