@@ -75,6 +75,8 @@ if [[ "${OPTIMIZED:-}" == 1 ]]; then
   git diff -- "$bootstrap" > "$kit/bootstrap.patch"
 fi
 cp bootstrap.toml "$kit/"
+sed -n 's/^const OHM_METADATA_EPOCH: u32 = \([0-9]*\);/\1/p' compiler/rustc_metadata/src/rmeta/mod.rs > "$kit/epoch"
+test -s "$kit/epoch"
 env -u GITHUB_ACTIONS python3 x.py --ci false build --stage 1 library
 stage="build/$host/stage1"
 cp -L "$stage/bin/rustc" "$kit/bin/"

@@ -9,6 +9,33 @@
                  let mut stable_hasher = StableHasher::new();
                  bodies_hash.unwrap().stable_hash(&mut hcx, &mut stable_hasher);
                  attrs_hash.unwrap().stable_hash(&mut hcx, &mut stable_hasher);
+--- a/compiler/rustc_crate_store/src/cstore.rs
++++ b/compiler/rustc_crate_store/src/cstore.rs
+@@ -205,6 +205,8 @@
+     // comp. uses to identify a DefId.
+     fn def_key(&self, def: DefId) -> DefKey;
+     fn def_path(&self, def: DefId) -> DefPath;
++    fn incremental_def_path_hash(&self, def: DefId) -> DefPathHash;
++    fn incremental_crate_id(&self, cnum: CrateNum) -> StableCrateId;
+     fn def_path_hash(&self, def: DefId) -> DefPathHash;
+ 
+     // This information is safe to access, since it's hashed as part of the StableCrateId, which
+@@ -223,6 +225,7 @@
+     /// The interned [StableCrateId]s.
+     pub stable_crate_ids: FreezeLock<StableCrateIdMap>,
+     /// The hash of the local crate as computed in metadata encoding.
++    pub incremental_crate_nums: FreezeLock<StableCrateIdMap>,
+     pub local_crate_hash: OnceLock<Svh>,
+ }
+ 
+@@ -232,6 +235,7 @@
+     /// (which writes the map) finishes before the map is frozen.
+     pub fn freeze_cstore(&self) {
+         self.cstore.freeze();
++        self.incremental_crate_nums.freeze();
+         self.stable_crate_ids.freeze();
+     }
+ }
 --- a/compiler/rustc_data_structures/src/stable_hash.rs
 +++ b/compiler/rustc_data_structures/src/stable_hash.rs
 @@ -23,6 +23,12 @@
@@ -121,7 +148,7 @@
          self.def_path_hashes.push(local_hash);
          debug_assert!(self.def_path_hashes.len() == self.def_id_to_key.len());
  
-@@ -413,9 +468,12 @@
+@@ -413,14 +468,21 @@
      /// if the `DefPathHash` is from a previous compilation session and
      /// the def-path does not exist anymore.
      pub fn local_def_path_hash_to_def_id(&self, hash: DefPathHash) -> Option<LocalDefId> {
@@ -137,6 +164,15 @@
              .map(|local_def_index| LocalDefId { local_def_index })
      }
  
+     pub fn def_path_hash_to_def_index_map(&self) -> &DefPathHashMap {
+         &self.def_path_hash_to_index
++    }
++
++    pub fn incremental_def_path_hash_map(&self) -> Option<&DefPathHashMap> {
++        self.incremental_paths.as_ref().map(|p| &p.indices)
+     }
+ 
+     pub fn num_definitions(&self) -> usize {
 --- a/compiler/rustc_hir_typeck/src/writeback.rs
 +++ b/compiler/rustc_hir_typeck/src/writeback.rs
 @@ -392,7 +392,7 @@
@@ -188,19 +224,26 @@
  
          let Some(clean_attrs) = find_attr!(self.tcx, item_id, RustcClean(attr) => attr) else {
              return;
+--- a/compiler/rustc_incremental/src/persist/file_format.rs
++++ b/compiler/rustc_incremental/src/persist/file_format.rs
+@@ -31,7 +31,8 @@
+ // OwnerNodes records loop-control attributes and params_in_repr fingerprints the full bitset.
+ // Source maps retain physical caller paths from the defining checkout.
+ // Local query caches now distinguish deduplicated CTFE literals.
+-const HEADER_FORMAT_VERSION: u16 = 61343;
++// Check graphs carry a sibling compatibility key and use logical local IDs.
++const HEADER_FORMAT_VERSION: u16 = 61344;
+ 
+ pub(crate) fn write_file_header(stream: &mut FileEncoder<'_>, sess: &Session) {
+     stream.emit_raw_bytes(FILE_MAGIC);
 --- a/compiler/rustc_incremental/src/persist/fs.rs
 +++ b/compiler/rustc_incremental/src/persist/fs.rs
-@@ -276,7 +276,36 @@
+@@ -276,7 +276,34 @@
          None
      };
  
 -    IncrCompSession { old_session_directory, new_session_directory }
-+    IncrCompSession {
-+        old_session_directory,
-+        new_session_directory,
-+        lookup_id: None,
-+        check_seed: None,
-+    }
++    IncrCompSession { old_session_directory, new_session_directory, check_seed: None }
 +}
 +
 +/// Finalized session candidates for a cold check, newest first.
@@ -224,13 +267,95 @@
 +        }
 +    }
 +    paths.sort_unstable_by(|a, b| b.file_name().cmp(&a.file_name()));
-+    paths.into_iter().filter_map(move |path| lock_directory(sess, &path, false))
++    paths.into_iter().filter_map(|path| {
++        let lock = lock_file_path(&path);
++        flock::LockedDir::try_lock(path, &lock, false, false).ok()
++    })
  }
  
  /// This function finalizes and thus 'publishes' the session directory by
 --- a/compiler/rustc_incremental/src/persist/load.rs
 +++ b/compiler/rustc_incremental/src/persist/load.rs
-@@ -60,7 +60,6 @@
+@@ -1,19 +1,21 @@
+ //! Code to load the dep-graph from files.
+ 
++use std::hash::Hash;
+ use std::io;
+ use std::path::{Path, PathBuf};
+ use std::sync::Arc;
+ 
+ use rustc_data_structures::memmap::Mmap;
++use rustc_data_structures::stable_hash::StableHasher;
+ use rustc_data_structures::unord::UnordMap;
+ use rustc_hashes::Hash64;
+ use rustc_middle::dep_graph::{CheckCacheSource, DepGraph, SerializedDepGraph, WorkProductMap};
+ use rustc_middle::query::on_disk_cache::OnDiskCache;
+ use rustc_serialize::opaque::{FileEncoder, MemDecoder};
+ use rustc_serialize::{Decodable, Decoder, Encodable};
+-use rustc_session::config::IncrementalStateAssertion;
++use rustc_session::config::{IncrementalStateAssertion, Input};
+ use rustc_session::{IncrCompSession, Session, StableCrateId};
+-use rustc_span::Symbol;
++use rustc_span::{RemapPathScopeComponents, Symbol};
+ use tracing::{debug, warn};
+ 
+ use super::data::*;
+@@ -33,6 +35,46 @@
+     IoError { path: PathBuf, err: io::Error },
+ }
+ 
++/// The canonical key validates a complete incremental session. The optional
++/// check key permits borrowing query data after a dependency salt change.
++#[derive(Clone, Copy, rustc_macros::Encodable, rustc_macros::Decodable)]
++struct GraphKey {
++    canonical: Hash64,
++    check: Option<Hash64>,
++}
++
++impl GraphKey {
++    fn new(sess: &Session, lookup_id: Option<StableCrateId>) -> Self {
++        let mut canonical = sess.opts.dep_tracking_hash(false);
++        if let Some(id) = lookup_id {
++            let mut hasher = StableHasher::new();
++            (canonical, id).hash(&mut hasher);
++            canonical = hasher.finish();
++        }
++        let check = lookup_id.and_then(|id| check_compatibility(sess, id));
++        Self { canonical, check }
++    }
++}
++
++fn check_compatibility(sess: &Session, id: StableCrateId) -> Option<Hash64> {
++    if sess.opts.output_types.should_codegen() {
++        return None;
++    }
++    let Input::File(input) = &sess.io.input else { return None };
++    let mut opts = sess.opts.clone();
++    opts.cg.metadata.clear();
++    let mut hash = StableHasher::new();
++    (id, opts.dep_tracking_hash(false)).hash(&mut hash);
++    let map = sess.source_map();
++    let input = map.path_mapping().to_real_filename(map.working_dir(), input.as_path());
++    input.path(RemapPathScopeComponents::DEBUGINFO).hash(&mut hash);
++    let mut cfg: Vec<_> =
++        sess.config.iter().map(|(k, v)| (k.as_str(), v.as_ref().map(Symbol::as_str))).collect();
++    cfg.sort_unstable();
++    cfg.hash(&mut hash);
++    Some(hash.finish())
++}
++
+ fn decode_dep_graph(
+     sess: &Session,
+     path: &Path,
+@@ -50,6 +92,7 @@
+     sess: &Session,
+     incr_comp_session: &IncrCompSession,
+     stage_graph: Option<&Arc<SerializedDepGraph>>,
++    expected_hash: Hash64,
+ ) -> LoadResult {
+     assert!(sess.opts.incremental.is_some());
+ 
+@@ -60,7 +103,6 @@
      let Some(path) = old_dep_graph_path(incr_comp_session) else {
          return LoadResult::DataOutOfDate;
      };
@@ -238,18 +363,18 @@
  
      let mut prev_work_products = UnordMap::default();
  
-@@ -112,9 +111,7 @@
+@@ -112,9 +154,7 @@
                  sess.dcx().emit_warn(diagnostics::CorruptFile { path: &path });
                  return LoadResult::DataOutOfDate;
              };
 -            let prev_commandline_args_hash = Hash64::decode(&mut decoder);
 -
 -            if prev_commandline_args_hash != expected_hash {
-+            if !compatible_header(sess, incr_comp_session, &mut decoder, false) {
++            if GraphKey::decode(&mut decoder).canonical != expected_hash {
                  if sess.opts.unstable_opts.incremental_info {
                      eprintln!(
                          "[incremental] completely ignoring cache because of \
-@@ -207,6 +204,7 @@
+@@ -207,6 +247,7 @@
      sess: &Session,
      crate_name: Symbol,
      stable_crate_id: StableCrateId,
@@ -257,15 +382,15 @@
  ) -> (DepGraph, Option<IncrCompSession>, Option<OnDiskCache>) {
      if sess.opts.incremental.is_none() {
          return (DepGraph::new_disabled(), None, None);
-@@ -214,6 +212,7 @@
+@@ -214,6 +255,7 @@
  
      // `load_dep_graph` can only be called after `prepare_session_directory`.
      let mut incr_comp_session = prepare_session_directory(sess, crate_name, stable_crate_id);
-+    incr_comp_session.lookup_id = lookup_id;
++    let key = GraphKey::new(sess, lookup_id);
      let should_codegen = sess.opts.output_types.should_codegen();
      let checkpoint_files = if sess.opts.unstable_opts.ohm_shared_stages {
          match (
-@@ -228,12 +227,32 @@
+@@ -228,12 +270,38 @@
      } else {
          None
      };
@@ -273,20 +398,28 @@
 -        .and_then(|(graph, cache)| load_stage_checkpoint(sess, &incr_comp_session, graph, cache));
 +    let mut checkpoint = checkpoint_files.and_then(|(graph, cache)| {
 +        let dir = incr_comp_session.old_session_directory.as_ref()?;
-+        load_stage_checkpoint(sess, &incr_comp_session, dir, graph, cache, false)
++        load_stage_checkpoint(sess, dir, graph, cache, |old| old.canonical == key.canonical)
 +    });
      // Try to load the previous session's dep graph and work products.
-     let mut load_result =
-         load_dep_graph(sess, &incr_comp_session, checkpoint.as_ref().map(|(graph, _)| graph));
+-    let mut load_result =
+-        load_dep_graph(sess, &incr_comp_session, checkpoint.as_ref().map(|(graph, _)| graph));
++    let mut load_result = load_dep_graph(
++        sess,
++        &incr_comp_session,
++        checkpoint.as_ref().map(|(graph, _)| graph),
++        key.canonical,
++    );
      let mut query_cache = None;
 +    // Retain canonical stage histories. Only an otherwise cold check may
 +    // borrow a compatible sibling's query results. Work products, including
 +    // encoded metadata, belong to their original canonical crate identity.
-+    if !should_codegen && lookup_id.is_some() && incr_comp_session.old_session_directory.is_none() {
++    if key.check.is_some() && incr_comp_session.old_session_directory.is_none() {
 +        for dir in sibling_sessions(sess, crate_name) {
-+            if let Some((graph, cache)) = load_stage_checkpoint(
-+                sess, &incr_comp_session, &dir, CHECK_DEP_GRAPH, CHECK_QUERY_CACHE, true
-+            ) {
++            if let Some((graph, cache)) =
++                load_stage_checkpoint(sess, &dir, CHECK_DEP_GRAPH, CHECK_QUERY_CACHE, |old| {
++                    old.check == key.check
++                })
++            {
 +                incr_comp_session.check_seed = Some(dir);
 +                load_result = LoadResult::Ok {
 +                    prev_graph: Arc::clone(&graph),
@@ -300,38 +433,58 @@
      if matches!(load_result, LoadResult::Ok { .. }) && checkpoint.is_none() {
          query_cache = load_query_result_cache(sess, Some(&incr_comp_session));
          if query_cache.is_none() {
-@@ -304,6 +323,7 @@
+@@ -283,7 +351,7 @@
+         }
+     }
+     let latest_check = if should_codegen && checkpoint.is_some() {
+-        load_latest_check(sess, &incr_comp_session)
++        load_latest_check(sess, &incr_comp_session, key.canonical)
+     } else {
+         None
+     };
+@@ -303,7 +371,7 @@
+     file_format::write_file_header(&mut encoder, sess);
  
      // First encode the commandline arguments hash
-     sess.opts.dep_tracking_hash(false).encode(&mut encoder);
-+    incr_comp_session.lookup_id.map(StableCrateId::as_u64).encode(&mut encoder);
+-    sess.opts.dep_tracking_hash(false).encode(&mut encoder);
++    key.encode(&mut encoder);
  
      (
          DepGraph::new(sess, prev_graph, prev_work_products, encoder, latest_check),
-@@ -344,7 +364,7 @@
+@@ -340,11 +408,15 @@
+ }
+ 
+ /// Maps the current check snapshot without decoding it until a build query needs it.
+-fn load_latest_check(sess: &Session, session: &IncrCompSession) -> Option<CheckCacheSource> {
++fn load_latest_check(
++    sess: &Session,
++    session: &IncrCompSession,
++    expected_hash: Hash64,
++) -> Option<CheckCacheSource> {
      let OpenFile { mmap: graph, start_pos } =
          file_format::open_incremental_file(sess, &old_dep_graph_path(session)?).ok()?;
      let mut decoder = MemDecoder::new(&graph, start_pos).ok()?;
 -    if Hash64::decode(&mut decoder) != sess.opts.dep_tracking_hash(false) {
-+    if !compatible_header(sess, session, &mut decoder, false) {
++    if GraphKey::decode(&mut decoder).canonical != expected_hash {
          return None;
      }
      let graph_start = decoder.position();
-@@ -356,18 +376,32 @@
+@@ -355,18 +427,19 @@
+ 
  fn load_stage_checkpoint(
      sess: &Session,
-     session: &IncrCompSession,
+-    session: &IncrCompSession,
 +    directory: &Path,
      graph_filename: &str,
      cache_filename: &str,
-+    sibling: bool,
++    compatible: impl FnOnce(GraphKey) -> bool,
  ) -> Option<(Arc<SerializedDepGraph>, OnDiskCache)> {
 -    let path = in_old_incr_comp_dir_sess(session, graph_filename)?;
 +    let path = directory.join(graph_filename);
      let OpenFile { mmap, start_pos } = file_format::open_incremental_file(sess, &path).ok()?;
      let mut decoder = MemDecoder::new(&mmap, start_pos).ok()?;
 -    if Hash64::decode(&mut decoder) != sess.opts.dep_tracking_hash(false) {
-+    if !compatible_header(sess, session, &mut decoder, sibling) {
++    if !compatible(GraphKey::decode(&mut decoder)) {
          return None;
      }
      let graph = decode_dep_graph(sess, &path, decoder.position(), mmap)?;
@@ -340,55 +493,28 @@
      let OpenFile { mmap, start_pos } = file_format::open_incremental_file(sess, &path).ok()?;
      let cache = OnDiskCache::new(sess, mmap, start_pos).ok()?;
      Some((graph, cache))
- }
-+
-+fn compatible_header(
-+    sess: &Session,
-+    session: &IncrCompSession,
-+    decoder: &mut MemDecoder<'_>,
-+    sibling: bool,
-+) -> bool {
-+    let canonical = Hash64::decode(decoder);
-+    let lookup = Option::<u64>::decode(decoder);
-+    lookup == session.lookup_id.map(StableCrateId::as_u64)
-+        && if sibling { lookup.is_some() } else { canonical == sess.opts.dep_tracking_hash(false) }
-+}
 --- a/compiler/rustc_interface/src/passes.rs
 +++ b/compiler/rustc_interface/src/passes.rs
-@@ -1063,6 +1063,40 @@
+@@ -1063,6 +1063,26 @@
      *providers
  });
  
-+/// Identifies a Cargo source target for the local incremental query cache.
-+/// Its public identity still includes Cargo's recursive dependency salt.
++/// Names local query keys independently of Cargo's recursive dependency salt.
 +fn ohm_lookup_id(sess: &Session, crate_name: Symbol, is_exe: bool) -> Option<StableCrateId> {
-+    use std::hash::{DefaultHasher, Hash, Hasher};
-+
 +    if !sess.opts.unstable_opts.ohm_shared_stages
 +        || sess.opts.incremental.is_none()
 +        || sess.opts.cg.metadata.len() != 1
++        || !matches!(sess.io.input, Input::File(_))
 +    {
 +        return None;
 +    }
-+    let Input::File(input) = &sess.io.input else { return None };
 +    let name = env::var("CARGO_PKG_NAME").ok()?;
 +    let version = env::var("CARGO_PKG_VERSION").ok()?;
-+
-+    let mut opts = sess.opts.clone();
-+    opts.cg.metadata.clear();
-+    let mut inputs = DefaultHasher::new();
-+    opts.dep_tracking_hash(false).as_u64().hash(&mut inputs);
-+    sess.source_map()
-+        .path_mapping()
-+        .to_real_filename(sess.source_map().working_dir(), input.as_path())
-+        .hash(&mut inputs);
-+    for (key, value) in &sess.config {
-+        (key.as_str(), value.as_ref().map(|v| v.as_str())).hash(&mut inputs);
-+    }
 +    Some(StableCrateId::new(
 +        crate_name,
 +        is_exe,
-+        vec![format!("ohm-local-queries:{name}:{version}:{:016x}", inputs.finish())],
++        // The NUL keeps this private domain outside possible command-line metadata.
++        vec![format!("\0ohm-local-queries:{name}:{version}")],
 +        sess.cfg_version,
 +    ))
 +}
@@ -396,7 +522,7 @@
  pub fn create_and_enter_global_ctxt<T, F: for<'tcx> FnOnce(TyCtxt<'tcx>) -> T>(
      compiler: &Compiler,
      krate: rustc_ast::Crate,
-@@ -1089,12 +1123,16 @@
+@@ -1089,12 +1109,16 @@
  
      let outputs = util::build_output_filenames(&pre_configured_attrs, sess);
  
@@ -415,22 +541,349 @@
  
      let stable_crate_ids = FreezeLock::new(StableCrateIdMap::default());
      let untracked = Untracked {
+@@ -1102,6 +1126,7 @@
+         source_span: AppendOnlyIndexVec::new(),
+         definitions,
+         stable_crate_ids,
++        incremental_crate_nums: FreezeLock::new(StableCrateIdMap::default()),
+         local_crate_hash: OnceLock::new(),
+     };
+ 
+--- a/compiler/rustc_metadata/src/creader.rs
++++ b/compiler/rustc_metadata/src/creader.rs
+@@ -667,12 +667,16 @@
+             None
+         };
+ 
++        let incremental_id = tcx.register_incremental_crate(
++            cnum, crate_root.stable_crate_id(), crate_root.incremental_crate_id
++        );
+         let crate_metadata = CrateMetadata::new(
+             metadata,
+             crate_root,
+             unhashed,
+             raw_proc_macros,
+             cnum,
++            incremental_id,
+             cnum_map,
+             dep_kind,
+             source,
+--- a/compiler/rustc_metadata/src/rmeta/decoder.rs
++++ b/compiler/rustc_metadata/src/rmeta/decoder.rs
+@@ -255,6 +255,8 @@
+     /// Source maps for code from the crate.
+     source_map_import_info: Lock<Vec<Option<ImportedSourceFile>>>,
+     /// For every definition in this crate, maps its `DefPathHash` to its `DefIndex`.
++    incremental_crate_id: StableCrateId,
++    incremental_def_path_hash_map: Option<DefPathHashMapRef<'static>>,
+     def_path_hash_map: DefPathHashMapRef<'static>,
+     /// Likewise for ExpnHash.
+     expn_hash_map: OnceLock<UnhashMap<ExpnHash, ExpnIndex>>,
+@@ -678,8 +680,8 @@
+                 cstore.get_crate_data(cnum)
+             };
+             let expn_data = cdata.root.expn_data.get(cdata, index).unwrap().decode((cdata, tcx));
+-            let expn_hash = cdata.root.expn_hashes.get(cdata, index).unwrap().decode((cdata, tcx));
+-            (expn_data, expn_hash)
++            let (canonical, logical) = cdata.expansion_hashes(tcx, index).unwrap();
++            (expn_data, canonical, logical)
+         });
+         expn_id
+     }
+@@ -1982,6 +1984,24 @@
+     }
+ 
+     #[inline]
++    fn incremental_def_path_hash(&self, index: DefIndex) -> DefPathHash {
++        if self.incremental_def_path_hash_map.is_some() {
++            DefPathHash(Fingerprint::new(self.incremental_crate_id.as_u64(),
++                self.root.tables.incremental_def_path_hashes.get(&self.blob, index)))
++        } else {
++            self.def_path_hash(index)
++        }
++    }
++
++    fn incremental_def_path_hash_to_index(&self, hash: DefPathHash) -> Option<DefIndex> {
++        if let Some(map) = &self.incremental_def_path_hash_map {
++            map.local_def_path_hash_to_def_index(&hash.local_hash())
++        } else {
++            self.def_path_hash_to_def_index(hash)
++        }
++    }
++
++    #[inline]
+     fn def_path_hash_to_def_index(&self, hash: DefPathHash) -> Option<DefIndex> {
+         self.def_path_hash_map.local_def_path_hash_to_def_index(&hash.local_hash())
+     }
+@@ -1991,12 +2011,22 @@
+         self.def_path_hash_map.local_def_path_hash_to_def_index(&hash)
+     }
+ 
++    fn expansion_hashes(&self, tcx: TyCtxt<'_>, index: ExpnIndex) -> Option<(ExpnHash, ExpnHash)> {
++        let (hash, logical) = self.root.expn_hashes.get(self, index)?.decode((self, tcx));
++        let id = tcx.incremental_crate_id(self.cnum);
++        let incremental = if id == self.root.stable_crate_id {
++            hash
++        } else {
++            ExpnHash::new(id, logical.unwrap_or(hash.local_hash()))
++        };
++        Some((hash, incremental))
++    }
++
+     fn expn_hash_to_expn_id(&self, tcx: TyCtxt<'_>, index_guess: u32, hash: ExpnHash) -> ExpnId {
+         let index_guess = ExpnIndex::from_u32(index_guess);
+-        let old_hash =
+-            self.root.expn_hashes.get(self, index_guess).map(|lazy| lazy.decode((self, tcx)));
+-
+-        let index = if old_hash == Some(hash) {
++        let old_hash = self.expansion_hashes(tcx, index_guess);
++
++        let index = if old_hash.is_some_and(|(canonical, logical)| canonical == hash || logical == hash) {
+             // Fast path: the expn and its index is unchanged from the
+             // previous compilation session. There is no need to decode anything
+             // else.
+@@ -2011,8 +2041,9 @@
+                     UnhashMap::with_capacity_and_hasher(end_id as usize, Default::default());
+                 for i in 0..end_id {
+                     let i = ExpnIndex::from_u32(i);
+-                    if let Some(hash) = self.root.expn_hashes.get(self, i) {
+-                        map.insert(hash.decode((self, tcx)), i);
++                    if let Some((canonical, logical)) = self.expansion_hashes(tcx, i) {
++                        map.insert(canonical, i);
++                        map.insert(logical, i);
+                     }
+                 }
+                 map
+@@ -2021,7 +2052,8 @@
+         };
+ 
+         let data = self.root.expn_data.get(self, index).unwrap().decode((self, tcx));
+-        rustc_span::hygiene::register_expn_id(self.cnum, index, data, hash)
++        let (canonical, logical) = self.expansion_hashes(tcx, index).unwrap();
++        rustc_span::hygiene::register_expn_id(self.cnum, index, data, canonical, logical)
+     }
+ 
+     /// Imports the source_map from an external crate into the source_map of the crate
+@@ -2177,6 +2209,12 @@
+                     stable_id,
+                     ..
+                 } = source_file_to_import;
++                let id = tcx.incremental_crate_id(self.cnum);
++                let incremental_id = if id == self.root.stable_crate_id {
++                    stable_id
++                } else {
++                    rustc_span::StableSourceFileId::from_filename_for_export(&name, id)
++                };
+ 
+                 // If this file is under $sysroot/lib/rustlib/src/
+                 // and the user wish to simulate remapping with -Z simulate-remapped-rust-src-base,
+@@ -2230,6 +2268,7 @@
+                     src_hash,
+                     checksum_hash,
+                     stable_id,
++                    incremental_id,
+                     normalized_source_len.to_u32(),
+                     unnormalized_source_len,
+                     self.cnum,
+@@ -2296,6 +2335,7 @@
+         unhashed: CrateRootUnhashed,
+         raw_proc_macros: Option<&'static [ProcMacroClient]>,
+         cnum: CrateNum,
++        incremental_crate_id: StableCrateId,
+         cnum_map: CrateNumMap,
+         dep_kind: CrateDepKind,
+         source: CrateSource,
+@@ -2336,6 +2376,11 @@
+ 
+         // Pre-decode the DefPathHash->DefIndex table. This is a cheap operation
+         // that does not copy any data. It just does some data verification.
++        let incremental_def_path_hash_map = if incremental_crate_id != root.stable_crate_id {
++            Some(root.incremental_def_path_hash_map.unwrap().decode(&blob))
++        } else {
++            None
++        };
+         let def_path_hash_map = root.def_path_hash_map.decode(&blob);
+ 
+         CrateMetadata {
+@@ -2346,6 +2391,8 @@
+             incoherent_impls: Default::default(),
+             raw_proc_macros,
+             source_map_import_info: Lock::new(Vec::new()),
++            incremental_crate_id,
++            incremental_def_path_hash_map,
+             def_path_hash_map,
+             expn_hash_map: Default::default(),
+             alloc_decoding_state,
 --- a/compiler/rustc_metadata/src/rmeta/decoder/cstore_impl.rs
 +++ b/compiler/rustc_metadata/src/rmeta/decoder/cstore_impl.rs
-@@ -941,9 +941,10 @@
+@@ -895,6 +895,14 @@
+         self.get_crate_data(def.krate).def_path(def.index)
+     }
+ 
++    fn incremental_def_path_hash(&self, def: DefId) -> DefPathHash {
++        self.get_crate_data(def.krate).incremental_def_path_hash(def.index)
++    }
++
++    fn incremental_crate_id(&self, cnum: CrateNum) -> StableCrateId {
++        self.get_crate_data(cnum).incremental_crate_id
++    }
++
+     fn def_path_hash(&self, def: DefId) -> DefPathHash {
+         self.get_crate_data(def.krate).def_path_hash(def.index)
+     }
+@@ -939,12 +947,13 @@
+         let cstore = CStore::from_tcx(tcx);
+         let cnum = *tcx
              .untracked()
-             .stable_crate_ids
+-            .stable_crate_ids
++            .incremental_crate_nums
              .read()
 -            .get(&stable_crate_id)
 -            .unwrap_or_else(|| bug!("uninterned StableCrateId: {stable_crate_id:?}"));
 -        assert_ne!(cnum, LOCAL_CRATE);
+-        let def_index = cstore.get_crate_data(cnum).def_path_hash_to_def_index(hash)?;
 +            .get(&stable_crate_id)?;
 +        if cnum == LOCAL_CRATE {
 +            return None;
 +        }
-         let def_index = cstore.get_crate_data(cnum).def_path_hash_to_def_index(hash)?;
++        let def_index = cstore.get_crate_data(cnum).incremental_def_path_hash_to_index(hash)?;
          Some(DefId { krate: cnum, index: def_index })
      };
+ 
+--- a/compiler/rustc_metadata/src/rmeta/encoder.rs
++++ b/compiler/rustc_metadata/src/rmeta/encoder.rs
+@@ -1140,6 +1140,11 @@
+                     definitions.enumerated_keys_and_path_hashes()
+                 {
+                     let def_key = this.lazy(def_key);
++                    if definitions.has_incremental_paths() {
++                        let id = LocalDefId { local_def_index: def_index };
++                        let hash = definitions.incremental_def_path_hash(id);
++                        this.tables.incremental_def_path_hashes.set_unhashed(def_index, hash.local_hash().as_u64());
++                    }
+                     this.tables.def_keys.set_some_unhashed(def_index, def_key);
+                     this.tables
+                         .def_path_hashes
+@@ -1426,6 +1431,14 @@
+         // Encode source_map. This needs to be done last, because encoding `Span`s tells us which
+         // `SourceFiles` we actually need to encode.
+         let (source_map, source_files) = stat!("source-map", || self.encode_source_map());
++        let incremental_def_path_hash_map = if self.is_proc_macro {
++            None
++        } else {
++            self.tcx.untracked().definitions.freeze().incremental_def_path_hash_map()
++                .map(|map| self.lazy(DefPathHashMapRef::BorrowedFromTcx(map)))
++        };
++        let incremental_crate_id = incremental_def_path_hash_map.as_ref()
++            .map(|_| self.tcx.incremental_crate_id(LOCAL_CRATE));
+         let target_modifiers = stat!("target-modifiers", || self.encode_target_modifiers(hcx));
+         let denied_partial_mitigations = stat!("denied-partial-mitigations", || self
+             .encode_enabled_denied_partial_mitigations(hcx));
+@@ -1490,6 +1503,8 @@
+             syntax_contexts,
+             expn_data,
+             expn_hashes,
++            incremental_crate_id: Unhashed(incremental_crate_id),
++            incremental_def_path_hash_map: Unhashed(incremental_def_path_hash_map),
+             def_path_hash_map,
+             specialization_enabled_in: tcx.specialization_enabled_in(LOCAL_CRATE),
+             public_api_hash_opt_enabled: hcx.enabled(),
+@@ -3068,6 +3083,7 @@
+                 });
+             },
+             |(this, _, expn_data_table, expn_hash_table), index, expn_data, mut hash| {
++                let id = index;
+                 if let Some(index) = index.as_local() {
+                     let expn_data = expn_data.expect("local expn");
+                     if hcx.borrow().enabled() {
+@@ -3082,7 +3098,16 @@
+                         );
+ 
+                         // don't need to hash it since it is already included with `expn_data_table`
+-                        expn_hash_table.set_some_unhashed(index.as_raw(), this.lazy(hash));
++                        use rustc_data_structures::stable_hash::StableHashCtxt;
++                        let incremental = if hcx.borrow().enabled() {
++                            hcx.borrow_mut().hcx_mut().with_incremental_keys(|hcx| {
++                                expn_data.metadata_hash(id.incremental_expn_hash(), hcx).local_hash()
++                            })
++                        } else {
++                            let logical = id.incremental_expn_hash();
++                            (logical != hash).then_some(logical.local_hash())
++                        };
++                        expn_hash_table.set_some_unhashed(index.as_raw(), this.lazy((hash, incremental)));
+                     });
+                 }
+             },
+--- a/compiler/rustc_metadata/src/rmeta/encoder/public_api_hasher.rs
++++ b/compiler/rustc_metadata/src/rmeta/encoder/public_api_hasher.rs
+@@ -578,6 +578,8 @@
+     pub(crate) proc_macro_data: NoneIfHashed<ProcMacroData>,
+     // The introduction of the option to store the DefIndex part of DefId-s as DefPathHash in the
+     // metadata was done to remove this from the public hash.
++    pub(crate) incremental_crate_id: Unhashed<Option<StableCrateId>>,
++    pub(crate) incremental_def_path_hash_map: Unhashed<Option<LazyValue<DefPathHashMapRef<'static>>>>,
+     pub(crate) def_path_hash_map: Unhashed<LazyValue<DefPathHashMapRef<'static>>>,
+     // Only used for diagnostics when the compilation session errors
+     // FIXME: this is currently removed from the metadata when public api hashing is enabled. We
+@@ -701,6 +703,8 @@
+             expn_data: self.expn_data.0,
+             expn_hashes: self.expn_hashes.0,
+ 
++            incremental_crate_id: self.incremental_crate_id.0,
++            incremental_def_path_hash_map: self.incremental_def_path_hash_map.0,
+             def_path_hash_map: self.def_path_hash_map.0,
+ 
+             source_map: self.source_map.0,
+--- a/compiler/rustc_metadata/src/rmeta/mod.rs
++++ b/compiler/rustc_metadata/src/rmeta/mod.rs
+@@ -63,8 +63,8 @@
+ mod table;
+ 
+ /// Older SDK source maps predate physical caller paths and use the same scope byte.
+-const COMPATIBLE_SYSROOT_EPOCHS: [u32; 2] = [3, 4];
+-const OHM_METADATA_EPOCH: u32 = 5;
++const COMPATIBLE_SYSROOT_EPOCHS: [u32; 0] = [];
++const OHM_METADATA_EPOCH: u32 = 6;
+ 
+ pub(crate) fn rustc_version(cfg_version: &'static str) -> String {
+     format!("rustc {cfg_version} (Ohm metadata {OHM_METADATA_EPOCH})")
+@@ -219,7 +219,7 @@
+ 
+ type SyntaxContextTable = LazyTable<u32, Option<LazyValue<SyntaxContextKey>>>;
+ type ExpnDataTable = LazyTable<ExpnIndex, Option<LazyValue<ExpnData>>>;
+-type ExpnHashTable = LazyTable<ExpnIndex, Option<LazyValue<ExpnHash>>>;
++type ExpnHashTable = LazyTable<ExpnIndex, Option<LazyValue<(ExpnHash, Option<Hash64>)>>>;
+ 
+ #[derive(MetadataEncodable, LazyDecodable)]
+ pub(crate) struct ProcMacroData {
+@@ -323,6 +323,9 @@
+     expn_data: ExpnDataTable,
+     expn_hashes: ExpnHashTable,
+ 
++    /// Optional, private lookup hints used when the consumer shares local queries.
++    pub(crate) incremental_crate_id: Option<StableCrateId>,
++    incremental_def_path_hash_map: Option<LazyValue<DefPathHashMapRef<'static>>>,
+     def_path_hash_map: LazyValue<DefPathHashMapRef<'static>>,
+ 
+     source_map: LazyTable<u32, Option<LazyValue<rustc_span::SourceFile>>>,
+@@ -496,6 +499,7 @@
+     // Note also that this table is fully populated (no gaps) as every DefIndex should have a
+     // corresponding DefPathHash.
+     def_path_hashes: Table<RDRHashNone, DefIndex, u64>,
++    incremental_def_path_hashes: Table<RDRHashNone, DefIndex, u64>,
+     explicit_item_bounds: Table<RDRHashAll, DefIndex, LazyArray<(ty::Clause<'static>, Span)>>,
+     explicit_item_self_bounds: Table<RDRHashAll, DefIndex, LazyArray<(ty::Clause<'static>, Span)>>,
+     inferred_outlives_of: Table<RDRHashAll, DefIndex, LazyArray<(ty::Clause<'static>, Span)>>,
+--- a/compiler/rustc_metadata/src/rmeta/parameterized.rs
++++ b/compiler/rustc_metadata/src/rmeta/parameterized.rs
+@@ -141,6 +141,7 @@
+     rustc_session::config::TargetModifier,
+     rustc_session::config::mitigation_coverage::DeniedPartialMitigation,
+     rustc_span::ExpnData,
++    rustc_hashes::Hash64,
+     rustc_span::ExpnHash,
+     rustc_span::ExpnId,
+     rustc_span::Ident,
 --- a/compiler/rustc_middle/src/dep_graph/dep_node_key.rs
 +++ b/compiler/rustc_middle/src/dep_graph/dep_node_key.rs
 @@ -40,7 +40,7 @@
@@ -543,7 +996,29 @@
      }
  
      #[inline]
-@@ -181,11 +186,27 @@
+@@ -145,6 +150,7 @@
+ 
+         // If this is not an empty or invalid span, we want to hash the last position that belongs
+         // to it, as opposed to hashing the first position past it.
++        let incremental_keys = self.stable_hash_controls.incremental_keys;
+         let Some((file, line_lo, col_lo, line_hi, col_hi)) =
+             self.source_map().span_data_to_lines_and_cols(&span)
+         else {
+@@ -165,7 +171,12 @@
+         }
+ 
+         Hash::hash(&TAG_VALID_SPAN, hasher);
+-        Hash::hash(&file.stable_id, hasher);
++        let file_id = if incremental_keys {
++            file.incremental_id
++        } else {
++            file.stable_id
++        };
++        Hash::hash(&file_id, hasher);
+ 
+         // Hash both the length and the end location (line/column) of a span. If we hash only the
+         // length, for example, then two otherwise equal spans with different end locations will
+@@ -181,13 +192,34 @@
          Hash::hash(&(span.hi - span.lo).0, hasher);
      }
  
@@ -570,9 +1045,17 @@
 +                definitions.def_path_hash(def_id)
 +            }
          } else {
-             self.untracked.cstore.read().def_path_hash(def_id)
+-            self.untracked.cstore.read().def_path_hash(def_id)
++            let cstore = self.untracked.cstore.read();
++            if self.stable_hash_controls.incremental_keys {
++                cstore.incremental_def_path_hash(def_id)
++            } else {
++                cstore.def_path_hash(def_id)
++            }
          }
-@@ -199,7 +220,7 @@
+         .0
+     }
+@@ -199,7 +231,7 @@
      #[inline]
      fn assert_default_stable_hash_controls(&self, msg: &str) {
          let stable_hash_controls = self.stable_hash_controls;
@@ -583,11 +1066,17 @@
          // incremental-ignore-spans` option. Normally, this option is disabled, in which case
 --- a/compiler/rustc_middle/src/queries.rs
 +++ b/compiler/rustc_middle/src/queries.rs
-@@ -255,6 +255,11 @@
+@@ -255,6 +255,17 @@
          feedable
      }
  
-+    query local_linkage_identity(_: ()) -> Fingerprint {
++    query linkage_identities(_: ()) -> Fingerprint {
++        eval_always
++        no_force
++        desc { "tracking crate identities during stable hashing" }
++    }
++
++    query linkage_identity(_: CrateNum) -> Fingerprint {
 +        eval_always
 +        desc { "tracking the local crate identity" }
 +    }
@@ -616,24 +1105,34 @@
  use rustc_data_structures::sync::{HashMapExt, Lock, RwLock};
  use rustc_data_structures::unhash::UnhashMap;
  use rustc_data_structures::unord::{UnordMap, UnordSet};
-@@ -175,7 +174,7 @@
+@@ -174,8 +173,8 @@
+     #[inline]
      fn new(tcx: TyCtxt<'_>, file: &SourceFile) -> EncodedSourceFileId {
          EncodedSourceFileId {
-             stable_source_file_id: file.stable_id,
+-            stable_source_file_id: file.stable_id,
 -            stable_crate_id: tcx.stable_crate_id(file.cnum),
++            stable_source_file_id: file.incremental_id,
 +            stable_crate_id: tcx.incremental_crate_id(file.cnum),
          }
      }
  }
-@@ -489,7 +488,7 @@
+@@ -485,13 +484,13 @@
+                     encoder.encode_tagged(TAG_SYNTAX_CONTEXT, ctxt_data);
+                     syntax_contexts.insert(index, pos);
+                 },
+-                |encoder, expn_id, data, hash| {
++                |encoder, expn_id, data, _hash| {
                      if expn_id.krate == LOCAL_CRATE {
                          let pos = AbsoluteBytePos::new(encoder.position());
                          encoder.encode_tagged(TAG_EXPN_DATA, data.expect("local expn"));
 -                        expn_data.insert(hash, pos);
 +                        expn_data.insert(expn_id.incremental_expn_hash(), pos);
                      } else {
-                         foreign_expn_data.insert(hash, expn_id.local_id.as_u32());
+-                        foreign_expn_data.insert(hash, expn_id.local_id.as_u32());
++                        foreign_expn_data.insert(expn_id.incremental_expn_hash(), expn_id.local_id.as_u32());
                      }
+                 },
+             );
 @@ -648,7 +647,7 @@
  
          Arc::clone(file_index_to_file.borrow_mut().entry(index).or_insert_with(|| {
@@ -643,7 +1142,21 @@
  
              // If this `SourceFile` is from a foreign crate, then make sure
              // that we've imported all of the source files from that crate.
-@@ -802,7 +801,7 @@
+@@ -665,7 +664,7 @@
+ 
+             tcx.sess
+                 .source_map()
+-                .source_file_by_stable_id(source_file_id.stable_source_file_id)
++                .source_file_by_incremental_id(source_file_cnum, source_file_id.stable_source_file_id)
+                 .expect("failed to lookup `SourceFile` in new context")
+         }))
+     }
+@@ -798,11 +797,11 @@
+             return ExpnId::root();
+         }
+ 
+-        if let Some(expn_id) = ExpnId::from_hash(hash) {
++        if let Some(expn_id) = ExpnId::from_hash(hash) && expn_id.incremental_expn_hash() == hash {
              return expn_id;
          }
  
@@ -722,16 +1235,15 @@
              sess,
              crate_types,
              stable_crate_id,
-@@ -1226,8 +1229,8 @@
+@@ -1226,7 +1229,7 @@
  
      #[inline]
      pub fn def_path_hash(self, def_id: DefId) -> rustc_hir::definitions::DefPathHash {
 -        // Accessing the DefPathHash is ok, it is incr. comp. stable.
++        self.track_linkage_identity(def_id.krate);
          if let Some(def_id) = def_id.as_local() {
-+            self.track_local_linkage_identity();
              self.definitions_untracked().def_path_hash(def_id)
          } else {
-             self.cstore_untracked().def_path_hash(def_id)
 @@ -1237,6 +1240,42 @@
      #[inline]
      pub fn crate_types(self) -> &'tcx [CrateType] {
@@ -743,7 +1255,7 @@
 +        if crate_num == LOCAL_CRATE {
 +            self.incremental_crate_id
 +        } else {
-+            self.cstore_untracked().stable_crate_id(crate_num)
++            self.cstore_untracked().incremental_crate_id(crate_num)
 +        }
 +    }
 +
@@ -752,7 +1264,7 @@
 +        if let Some(local) = id.as_local() {
 +            self.untracked.definitions.read().incremental_def_path_hash(local)
 +        } else {
-+            self.cstore_untracked().def_path_hash(id)
++            self.cstore_untracked().incremental_def_path_hash(id)
 +        }
 +    }
 +
@@ -768,29 +1280,27 @@
 +        if id == self.incremental_crate_id {
 +            LOCAL_CRATE
 +        } else {
-+            let num = self.untracked.stable_crate_ids.read()[&id];
++            let num = self.untracked.incremental_crate_nums.read()[&id];
 +            assert_ne!(num, LOCAL_CRATE);
 +            num
 +        }
      }
  
      pub fn needs_metadata(self) -> bool {
-@@ -1292,6 +1331,14 @@
+@@ -1291,6 +1330,12 @@
+ 
      #[inline]
      pub fn stable_crate_id(self, crate_num: CrateNum) -> StableCrateId {
-         if crate_num == LOCAL_CRATE {
-+            self.track_local_linkage_identity();
-+        }
++        self.track_linkage_identity(crate_num);
 +        self.untracked_stable_crate_id(crate_num)
 +    }
 +
 +    #[inline]
 +    pub fn untracked_stable_crate_id(self, crate_num: CrateNum) -> StableCrateId {
-+        if crate_num == LOCAL_CRATE {
+         if crate_num == LOCAL_CRATE {
              self.stable_crate_id
          } else {
-             self.cstore_untracked().stable_crate_id(crate_num)
-@@ -1324,7 +1371,7 @@
+@@ -1324,7 +1369,7 @@
  
          // If this is a DefPathHash from the local crate, we can look up the
          // DefId in the tcx's `Definitions`.
@@ -799,7 +1309,7 @@
              Some(self.untracked.definitions.read().local_def_path_hash_to_def_id(hash)?.to_def_id())
          } else {
              self.def_path_hash_to_def_id_extern(hash, stable_crate_id)
-@@ -1337,7 +1384,7 @@
+@@ -1337,7 +1382,7 @@
          // statements within the query system and we'd run into endless
          // recursion otherwise.
          let (crate_name, stable_crate_id) = if def_id.is_local() {
@@ -808,28 +1318,68 @@
          } else {
              let cstore = &*self.cstore_untracked();
              (cstore.crate_name(def_id.krate), cstore.stable_crate_id(def_id.krate))
-@@ -1472,6 +1519,9 @@
+@@ -1467,15 +1512,41 @@
+         feed
+     }
+ 
++    /// Select an imported package's hint at registration time. Compilations
++    /// loading two variants of that package give later variants their ordinary
++    /// canonical identities, so every cached key has one owner in this graph.
++    pub fn register_incremental_crate(
++        self,
++        cnum: CrateNum,
++        canonical: StableCrateId,
++        hint: Option<StableCrateId>,
++    ) -> StableCrateId {
++        let canonical_ids = self.untracked.stable_crate_ids.read();
++        let mut selected = self.untracked.incremental_crate_nums.write();
++        let id = hint.filter(|id|
++            self.incremental_crate_id != self.stable_crate_id
++                && !selected.contains_key(id)
++                && !canonical_ids.contains_key(id)
++        ).unwrap_or(canonical);
++        assert!(selected.insert(id, cnum).is_none());
++        id
++    }
++
+     pub fn create_crate_num(
+         self,
          stable_crate_id: StableCrateId,
      ) -> Result<TyCtxtFeed<'tcx, CrateNum>, CrateNum> {
          let mut lock = self.untracked().stable_crate_ids.write();
-+        if !lock.is_empty() && stable_crate_id == self.incremental_crate_id {
-+            return Err(LOCAL_CRATE);
++        if let Some(&existing) = self.untracked.incremental_crate_nums.read().get(&stable_crate_id) {
++            return Err(existing);
 +        }
          if let Some(&existing) = lock.get(&stable_crate_id) {
              return Err(existing);
          }
-@@ -1561,6 +1611,22 @@
+         let num = CrateNum::new(lock.len());
++        if num == LOCAL_CRATE {
++            self.untracked.incremental_crate_nums.write().insert(self.incremental_crate_id, num);
++        }
+         lock.insert(stable_crate_id, num);
+         Ok(TyCtxtFeed { key: num, tcx: self })
+     }
+@@ -1561,6 +1632,30 @@
  
      #[inline(always)]
      pub fn with_stable_hashing_context<R>(self, f: impl FnOnce(StableHashState<'_>) -> R) -> R {
-+        self.track_local_linkage_identity();
++        if self.incremental_crate_id != self.stable_crate_id {
++            if self.untracked.stable_crate_ids.is_frozen() {
++                let _ = self.linkage_identities(());
++            } else {
++                self.dep_graph.read_index(DepNodeIndex::FOREVER_RED_NODE);
++            }
++        }
 +        self.with_untracked_stable_hashing_context(f)
 +    }
 +
 +    #[inline]
-+    fn track_local_linkage_identity(self) {
-+        if self.incremental_crate_id != self.stable_crate_id {
-+            let _ = self.local_linkage_identity(());
++    fn track_linkage_identity(self, cnum: CrateNum) {
++        if self.incremental_crate_id != self.stable_crate_id
++            && self.incremental_crate_id(cnum) != self.untracked_stable_crate_id(cnum)
++        {
++            let _ = self.linkage_identity(cnum);
 +        }
 +    }
 +
@@ -841,11 +1391,20 @@
          f(StableHashState::new(self.sess, &self.untracked))
      }
  
-@@ -3269,6 +3335,7 @@
+@@ -3269,6 +3364,16 @@
  }
  
  pub fn provide(providers: &mut Providers) {
-+    providers.local_linkage_identity = |tcx, ()| rustc_data_structures::fingerprint::Fingerprint::new(tcx.stable_crate_id.as_u64(), 0);
++    providers.linkage_identity = |tcx, cnum| {
++        rustc_data_structures::fingerprint::Fingerprint::new(tcx.untracked_stable_crate_id(cnum).as_u64(), 0)
++    };
++    providers.linkage_identities = |tcx, ()| {
++        use rustc_data_structures::fingerprint::Fingerprint;
++        assert!(tcx.untracked.stable_crate_ids.is_frozen());
++        tcx.untracked.incremental_crate_nums.read().iter()
++            .map(|(&logical,&num)| Fingerprint::new(logical.as_u64(),tcx.untracked_stable_crate_id(num).as_u64()))
++            .fold(Fingerprint::ZERO, Fingerprint::combine_commutative)
++    };
      providers.codegen_output_mode = |tcx, ()| {
          (tcx.sess.opts.output_types.should_codegen(), tcx.sess.opts.output_types.should_link())
      };
@@ -913,23 +1472,32 @@
                  hash_value_fn(&mut hcx, &value);
              });
          }
-@@ -748,7 +748,7 @@
+@@ -748,8 +748,8 @@
  fn registered_def_id(tcx: TyCtxt<'_>, dep_node: DepNode) -> Option<DefId> {
      let hash = DefPathHash(dep_node.key_fingerprint.into());
      let id = hash.stable_crate_id();
 -    if id != tcx.stable_crate_id(LOCAL_CRATE)
+-        && !tcx.untracked().stable_crate_ids.read().contains_key(&id)
 +    if id != tcx.incremental_crate_id(LOCAL_CRATE)
-         && !tcx.untracked().stable_crate_ids.read().contains_key(&id)
++        && !tcx.untracked().incremental_crate_nums.read().contains_key(&id)
      {
          return None;
+     }
+@@ -847,7 +847,7 @@
+             _ => return None,
+         };
+         let supplier = DefPathHash(supplier_node.key_fingerprint.into()).stable_crate_id();
+-        let cnum = *tcx.untracked().stable_crate_ids.read().get(&supplier)?;
++        let cnum = *tcx.untracked().incremental_crate_nums.read().get(&supplier)?;
+         if trait_id.is_local()
+             || cnum == LOCAL_CRATE
+             || DepNode::construct(tcx, DepKind::external_metadata_input_hash, &cnum)
 --- a/compiler/rustc_session/src/session.rs
 +++ b/compiler/rustc_session/src/session.rs
-@@ -1905,6 +1905,10 @@
+@@ -1905,6 +1905,8 @@
  
  /// Holds data on the current incremental compilation session, if there is one.
  pub struct IncrCompSession {
-+    /// Identifies compatible local query keys across Cargo dependency salts.
-+    pub lookup_id: Option<StableCrateId>,
 +    /// Retains the lease on mapped check data from another canonical crate directory.
 +    pub check_seed: Option<flock::LockedDir>,
      /// The directory from which cached data of a previous session can be read.
@@ -937,6 +1505,15 @@
      /// The directory to which cached data for the current session can be
 --- a/compiler/rustc_span/src/hygiene.rs
 +++ b/compiler/rustc_span/src/hygiene.rs
+@@ -161,7 +161,7 @@
+ 
+     /// Builds a new [ExpnHash] with the given [StableCrateId] and
+     /// `local_hash`, where `local_hash` must be unique within its crate.
+-    fn new(stable_crate_id: StableCrateId, local_hash: Hash64) -> ExpnHash {
++    pub fn new(stable_crate_id: StableCrateId, local_hash: Hash64) -> ExpnHash {
+         ExpnHash(Fingerprint::new(stable_crate_id.0, local_hash))
+     }
+ }
 @@ -217,11 +217,12 @@
  
      pub fn fresh(mut expn_data: ExpnData, hcx: impl StableHashCtxt) -> LocalExpnId {
@@ -978,7 +1555,7 @@
      }
  
      #[inline]
-@@ -364,6 +370,7 @@
+@@ -364,10 +370,11 @@
      /// first and then resolved later), so we use an `Option` here.
      local_expn_data: IndexVec<LocalExpnId, Option<ExpnData>>,
      local_expn_hashes: IndexVec<LocalExpnId, ExpnHash>,
@@ -986,6 +1563,11 @@
      /// Data and hash information from external crates. We may eventually want to remove these
      /// maps, and fetch the information directly from the other crate's metadata like DefIds do.
      foreign_expn_data: FxHashMap<ExpnId, ExpnData>,
+-    foreign_expn_hashes: FxHashMap<ExpnId, ExpnHash>,
++    foreign_expn_hashes: FxHashMap<ExpnId, (ExpnHash, ExpnHash)>,
+     expn_hash_to_expn_id: UnhashMap<ExpnHash, ExpnId>,
+     syntax_context_data: Vec<SyntaxContextData>,
+     syntax_context_map: FxHashMap<SyntaxContextKey, SyntaxContext>,
 @@ -394,6 +401,7 @@
          let root_ctxt_data = SyntaxContextData::root();
          HygieneData {
@@ -994,12 +1576,10 @@
              local_expn_hashes: IndexVec::from_elem_n(ExpnHash(Fingerprint::ZERO), 1),
              foreign_expn_data: FxHashMap::default(),
              foreign_expn_hashes: FxHashMap::default(),
-@@ -408,6 +416,20 @@
-     #[inline]
-     fn with<R>(f: impl FnOnce(&mut HygieneData) -> R) -> R {
+@@ -410,11 +418,28 @@
          with_session_globals(|session_globals| f(&mut session_globals.hygiene_data.borrow_mut()))
-+    }
-+
+     }
+ 
 +    fn set_incremental_hash(&mut self, expn_id: LocalExpnId, hash: Option<ExpnHash>) {
 +        if let Some(hash) = hash {
 +            *self.incremental_hashes.ensure_contains_elem(expn_id, || ExpnHash(Fingerprint::ZERO)) = hash;
@@ -1008,14 +1588,25 @@
 +    }
 +
 +    fn hash_for_mode(&self, id: ExpnId, incremental: bool) -> ExpnHash {
++        if incremental && id.as_local().is_none() {
++            return self.foreign_expn_hashes[&id].1;
++        }
 +        if incremental && let Some(local) = id.as_local() && let Some(hash) = self.incremental_hashes.get(local) {
 +            return *hash;
 +        }
 +        self.expn_hash(id)
++    }
++
+     #[inline]
+     fn expn_hash(&self, expn_id: ExpnId) -> ExpnHash {
+         match expn_id.as_local() {
+             Some(expn_id) => self.local_expn_hashes[expn_id],
+-            None => self.foreign_expn_hashes[&expn_id],
++            None => self.foreign_expn_hashes[&expn_id].0,
+         }
      }
  
-     #[inline]
-@@ -1186,6 +1208,11 @@
+@@ -1186,6 +1211,11 @@
          }
      }
  
@@ -1027,7 +1618,7 @@
      #[inline]
      fn hash_expn(&self, hcx: &mut impl StableHashCtxt) -> Hash64 {
          let mut hasher = StableHasher::new();
-@@ -1502,7 +1529,19 @@
+@@ -1502,7 +1532,19 @@
  ///
  /// The caller must validate the decoded data against `hash` before registration. Concurrent
  /// decoders of the same expansion then reuse the identity registered by the first decoder.
@@ -1047,7 +1638,7 @@
      HygieneData::with(|hygiene_data| {
          if let Some(&expn_id) = hygiene_data.expn_hash_to_expn_id.get(&hash) {
              assert_eq!(
-@@ -1515,6 +1554,7 @@
+@@ -1515,6 +1557,7 @@
  
          let expn_id = hygiene_data.local_expn_data.next_index();
          hygiene_data.local_expn_data.push(Some(data));
@@ -1055,7 +1646,46 @@
          let _eid = hygiene_data.local_expn_hashes.push(hash);
          debug_assert_eq!(expn_id, _eid);
  
-@@ -1629,7 +1669,7 @@
+@@ -1532,13 +1575,14 @@
+     local_id: ExpnIndex,
+     data: ExpnData,
+     hash: ExpnHash,
++    incremental: ExpnHash,
+ ) -> ExpnId {
+     debug_assert!(data.parent == ExpnId::root() || krate == data.parent.krate);
+     let expn_id = ExpnId { krate, local_id };
+     HygieneData::with(|hygiene_data| {
+         let _old_data = hygiene_data.foreign_expn_data.insert(expn_id, data);
+-        let _old_hash = hygiene_data.foreign_expn_hashes.insert(expn_id, hash);
+-        debug_assert!(_old_hash.is_none() || _old_hash == Some(hash));
++        let _old_hash = hygiene_data.foreign_expn_hashes.insert(expn_id, (hash, incremental));
++        debug_assert!(_old_hash.is_none() || _old_hash == Some((hash, incremental)));
+         let _old_id = hygiene_data.expn_hash_to_expn_id.insert(hash, expn_id);
+         debug_assert!(_old_id.is_none() || _old_id == Some(expn_id));
+     });
+@@ -1549,7 +1593,7 @@
+ pub fn decode_expn_id(
+     krate: CrateNum,
+     index: u32,
+-    decode_data: impl FnOnce(ExpnId) -> (ExpnData, ExpnHash),
++    decode_data: impl FnOnce(ExpnId) -> (ExpnData, ExpnHash, ExpnHash),
+ ) -> ExpnId {
+     if index == 0 {
+         trace!("decode_expn_id: deserialized root");
+@@ -1569,9 +1613,9 @@
+ 
+     // Don't decode the data inside `HygieneData::with`, since we need to recursively decode
+     // other ExpnIds
+-    let (expn_data, hash) = decode_data(expn_id);
+-
+-    register_expn_id(krate, index, expn_data, hash)
++    let (expn_data, hash, incremental) = decode_data(expn_id);
++
++    register_expn_id(krate, index, expn_data, hash, incremental)
+ }
+ 
+ // Decodes `SyntaxContext`, using the provided `HygieneDecodeContext`
+@@ -1629,7 +1673,7 @@
  /// `set_expn_data`). It is *not* called for foreign `ExpnId`s deserialized
  /// from another crate's metadata - since `ExpnHash` includes the stable crate id,
  /// collisions are only possible between `ExpnId`s within the same crate.
@@ -1064,7 +1694,7 @@
      // This disambiguator should not have been set yet.
      assert_eq!(expn_data.disambiguator, 0, "Already set disambiguator for ExpnData: {expn_data:?}");
      hcx.assert_default_stable_hash_controls("ExpnData (disambiguator)");
-@@ -1661,13 +1701,15 @@
+@@ -1661,13 +1705,15 @@
          });
      }
  
@@ -1083,7 +1713,7 @@
          if for_metadata
              && let Some(local) = id.as_local()
              && let Some(data) = &self.local_expn_data[local]
-@@ -1706,7 +1748,7 @@
+@@ -1706,7 +1752,7 @@
              hcx.assert_default_stable_hash_controls("ExpnId");
              let (hash, transparency) = HygieneData::with(|data| {
                  let (expn_id, transparency) = data.outer_mark(*self);
@@ -1092,7 +1722,7 @@
              });
              hash_expansion(hash, hcx).stable_hash(hcx, hasher);
              transparency.stable_hash(hcx, hasher);
-@@ -1722,7 +1764,7 @@
+@@ -1722,7 +1768,7 @@
              Fingerprint::ZERO
          } else {
              let input =
@@ -1101,3 +1731,95 @@
              hash_expansion(input, hcx)
          };
  
+--- a/compiler/rustc_span/src/hygiene/tests.rs
++++ b/compiler/rustc_span/src/hygiene/tests.rs
+@@ -39,7 +39,7 @@
+         );
+         let hash = ExpnHash::new(StableCrateId(Hash64::new(1)), Hash64::new(2));
+ 
+-        register_expn_id(CrateNum::from_u32(1), ExpnIndex::from_u32(1), data.clone(), hash);
++        register_expn_id(CrateNum::from_u32(1), ExpnIndex::from_u32(1), data.clone(), hash, hash);
+         register_local_expn_id(data, hash);
+     });
+ }
+--- a/compiler/rustc_span/src/lib.rs
++++ b/compiler/rustc_span/src/lib.rs
+@@ -2034,6 +2034,7 @@
+     /// files within the crate graph and for speeding up hashing in incremental
+     /// compilation.
+     pub stable_id: StableSourceFileId,
++    pub incremental_id: StableSourceFileId,
+     /// Indicates which crate this `SourceFile` was imported from.
+     pub cnum: CrateNum,
+ }
+@@ -2053,6 +2054,7 @@
+             multibyte_chars: self.multibyte_chars.clone(),
+             normalized_pos: self.normalized_pos.clone(),
+             stable_id: self.stable_id,
++            incremental_id: self.incremental_id,
+             cnum: self.cnum,
+         }
+     }
+@@ -2173,6 +2175,7 @@
+             multibyte_chars,
+             normalized_pos,
+             stable_id,
++            incremental_id: stable_id,
+             cnum,
+         }
+     }
+@@ -2289,6 +2292,7 @@
+             multibyte_chars,
+             normalized_pos,
+             stable_id,
++            incremental_id: stable_id,
+             cnum: LOCAL_CRATE,
+         })
+     }
+--- a/compiler/rustc_span/src/source_map.rs
++++ b/compiler/rustc_span/src/source_map.rs
+@@ -327,6 +327,18 @@
+         self.files.borrow().stable_id_to_source_file.get(&stable_id).cloned()
+     }
+ 
++    pub fn source_file_by_incremental_id(
++        &self,
++        krate: CrateNum,
++        id: StableSourceFileId,
++    ) -> Option<Arc<SourceFile>> {
++        let files = self.files.borrow();
++        let matches = |file: &&Arc<SourceFile>| file.cnum == krate && file.incremental_id == id;
++        files.stable_id_to_source_file.get(&id).filter(matches)
++            .or_else(|| files.source_files.iter().rev().find(matches))
++            .cloned()
++    }
++
+     fn register_source_file(
+         &self,
+         file_id: StableSourceFileId,
+@@ -419,6 +431,7 @@
+         src_hash: SourceFileHash,
+         checksum_hash: Option<SourceFileHash>,
+         stable_id: StableSourceFileId,
++        incremental_id: StableSourceFileId,
+         normalized_source_len: u32,
+         unnormalized_source_len: u32,
+         cnum: CrateNum,
+@@ -445,6 +458,7 @@
+             multibyte_chars,
+             normalized_pos,
+             stable_id,
++            incremental_id,
+             cnum,
+         };
+ 
+--- a/compiler/rustc_span/src/source_map/tests.rs
++++ b/compiler/rustc_span/src/source_map/tests.rs
+@@ -242,6 +242,7 @@
+         src_hash,
+         checksum_hash,
+         stable_id,
++        stable_id,
+         normalized_source_len.to_u32(),
+         unnormalized_source_len,
+         CrateNum::ZERO,

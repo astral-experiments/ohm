@@ -29,9 +29,17 @@ if [[ -n "${RUSTC_KITS:-}" ]]; then
       cp "$kits/$role/bootstrap.patch" "$out/sdk-$role/"
     fi
   done
-  # Both arms read the same standard library.
-  mv "$candidate/lib/rustlib/$host/lib" "$kits/unused-std"
-  cp -al "$control/lib/rustlib/$host/lib" "$candidate/lib/rustlib/$host/lib"
+  # Earlier artifacts in this experiment all use the pinned epoch 5.
+  control_epoch="$(cat "$control/epoch" 2>/dev/null || echo 5)"
+  candidate_epoch="$(cat "$candidate/epoch" 2>/dev/null || echo 5)"
+  echo "metadata epochs $control_epoch $candidate_epoch" > "$out/stdlib"
+  if [[ "$candidate_epoch" == "$control_epoch" ]]; then
+    mv "$candidate/lib/rustlib/$host/lib" "$kits/unused-std"
+    cp -al "$control/lib/rustlib/$host/lib" "$candidate/lib/rustlib/$host/lib"
+    echo 'Both compilers consume the control std' >> "$out/stdlib"
+  else
+    echo 'Each compiler consumes the std it built' >> "$out/stdlib"
+  fi
 else
   control="$kits/release"
   candidate="$control"
