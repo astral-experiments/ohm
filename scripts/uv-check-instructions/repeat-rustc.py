@@ -18,11 +18,12 @@ if subject and "--crate-name" in args and args[args.index("--crate-name")+1] == 
         saved = Path(d)
         for s in sessions:
             shutil.copytree(s, saved/s.name)
-        for repeat in range(47):
+        repeats = int(os.environ.get("REPEAT_COUNT", "48"))
+        for repeat in range(repeats - 1):
             subprocess.run(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                            close_fds=False, check=True)
             for s in sessions:
                 shutil.rmtree(s)
                 shutil.copytree(saved/s.name, s)
-    Path(os.environ["REPEAT_RECEIPT"]).write_text(subject+" 48\n")
+    Path(os.environ["REPEAT_RECEIPT"]).write_text(f"{subject} {repeats}\n")
 os.execvp(args[0],args)

@@ -1,6 +1,7 @@
 """Sample the six warm checks where the query reuse stack increased instructions."""
 
 import argparse
+import collections
 import gzip
 import os
 from pathlib import Path
@@ -32,7 +33,8 @@ def main():
     src = args.scratch / "uv"
     src.mkdir(parents=True)
     args.output.mkdir(parents=True, exist_ok=True)
-    role = args.first
+    annotate = bool(os.getenv("ANNOTATE_UV"))
+    role = "candidate" if annotate else args.first
     sdk = getattr(args, role)
     (args.output / "profile-role").write_text(role + "\n")
     cargo = sdk / "bin/cargo"
@@ -67,12 +69,38 @@ def main():
         if subject:
             step = dict(env, RUSTC_WRAPPER=str(wrapper), REPEAT_UNIT=subject,
                         REPEAT_RECEIPT=str(receipt))
-        if i in (1, 6, 10, 11, 17, 20):
+        if annotate and subject:
+            step["REPEAT_COUNT"] = "96"
+            argv = [perf, "record", "-e", "instructions:u", "-c", "700001",
+                    "-m", "256", "-o", binary, "--", *argv]
+        if not annotate and i in (1, 6, 10, 11, 17, 20):
             argv = [perf, "record", "-e", "instructions:u", "-c", "1200007",
                     "--call-graph", "dwarf,4096", "-m", "256", "-o", binary, "--", *argv]
         command(argv, src, step, args.output / f"{i}-build.log")
         if subject:
             assert receipt.exists()
+        if annotate and binary.is_file():
+            samples = subprocess.check_output([perf, "script", "-i", binary,
+                "-F", "ip,sym,symoff", "--no-demangle"], env=env)
+            counts = collections.Counter()
+            symbols = set()
+            for sample in samples.decode().splitlines():
+                if "def_path_hash" in sample:
+                    full = sample.split()[-1]
+                    counts[full] += 1
+                    symbols.add(full.partition("+")[0])
+            with (args.output / f"{i}-offsets.txt").open("w") as f:
+                for name, count in sorted(counts.items()):
+                    print(name, count, file=f)
+            driver, = (sdk / "lib").glob("librustc_driver-*.so")
+            with (args.output/f"{i}-asm.txt").open("w") as f:
+                for symbol in sorted(symbols):
+                    if "StableHashState" in symbol:
+                        subprocess.run(["objdump", "--disassemble=" + symbol, driver],
+                                       stdout=f, check=True)
+            binary.unlink()
+            if i == 17:
+                break
         if binary.is_file():
             data = subprocess.check_output([perf, "report", "--stdio", "-i", binary,
                 "--sort=comm,dso,symbol", "--fields=period,sample,comm,dso,symbol",
