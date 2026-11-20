@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import os
+import time
 from pathlib import Path
 import platform
 import re
@@ -25,8 +26,11 @@ def sha(path):
 
 
 def command(argv, cwd, env, log):
+    start = time.monotonic()
     with log.open("w") as f:
         p = subprocess.run(argv, cwd=cwd, env=env, stdout=f, stderr=subprocess.STDOUT)
+    if Path(argv[0]).name == "meter":
+        save(log.with_suffix(".seconds"), time.monotonic() - start)
     if p.returncode:
         print(log.read_text()[-4000:], flush=True)
         raise RuntimeError(f"{argv} failed ({p.returncode})")
@@ -60,6 +64,9 @@ def calibrate(tmp, out):
         counts = sorted(u["instructions"] for u in read_counts(receipt))
         assert len(counts) == 2, counts
         observations.append(counts)
+    tree = [int((out / f"calibration-{n}.tsv.tree").read_text().split()[0])
+            for n in (1, 10_000_001)]
+    assert abs(tree[1] - tree[0] - 80_000_000) <= 400_000, tree
     # The child runs one two-instruction loop. The parent runs two across
     # its main and worker threads. A third image runs a loop and is excluded.
     for short, long, expected in zip(*observations, [20_000_000, 40_000_000], strict=True):
@@ -221,12 +228,14 @@ def main():
                    command=["cargo", *CHECK], first=args.first,
                    boot=sha(Path("/proc/sys/kernel/random/boot_id")))
     roles = [args.first, "candidate" if args.first == "control" else "control"]
+    if os.getenv("BASELINE_ONLY") == "true":
+        roles = ["control"]
     if args.audit:
         roles = [args.audit_role]
     for role in roles:
         summary[role] = run(args, commits, role)
         assert summary[role]["total"] > 0
-    if args.audit:
+    if len(roles) == 1:
         save(args.output / "audit-summary.json", summary)
         return
     summary["reduction_pct"] = 100 * (1 - summary["candidate"]["total"] / summary["control"]["total"])
@@ -236,3 +245,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

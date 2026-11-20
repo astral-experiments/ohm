@@ -1,0 +1,13 @@
+diff --git a/codex-rs/tui/src/terminal_hyperlinks.rs b/codex-rs/tui/src/terminal_hyperlinks.rs
+index 3e415fa14affceab346bdb5e1a80f099985988bc..e9580dc68cbebe08d5dae61b3dd86540b7d001d8 100644
+--- a/codex-rs/tui/src/terminal_hyperlinks.rs
++++ b/codex-rs/tui/src/terminal_hyperlinks.rs
+@@ -500,7 +500,7 @@ pub(crate) fn mark_buffer_hyperlinks(
+     lines: &[HyperlinkLine],
+     scroll_rows: usize,
+ ) {
+-    if area.width == 0 {
++    if area.width == 0 || lines.iter().all(|line| line.hyperlinks.is_empty()) {
+         return;
+     }
+     let mut logical_row = 0usize;

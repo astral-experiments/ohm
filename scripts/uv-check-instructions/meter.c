@@ -24,7 +24,8 @@ struct image {
 };
 
 static struct image *images;
-static struct stat selected;
+static struct stat selected, clippy;
+static int tree_fd = -1;
 
 static void read_args(struct image *image) {
     char path[64];
@@ -54,8 +55,6 @@ static void observe_exec(pid_t pid) {
     snprintf(path, sizeof(path), "/proc/%d/exe", pid);
     struct stat exe;
     if (stat(path, &exe)) err(1, "%s", path);
-    if (exe.st_dev != selected.st_dev || exe.st_ino != selected.st_ino)
-        return;
     struct perf_event_attr attr = {
         .type = PERF_TYPE_HARDWARE,
         .size = sizeof(attr),
@@ -67,6 +66,16 @@ static void observe_exec(pid_t pid) {
         .remove_on_exec = 1,
         .read_format = PERF_FORMAT_TOTAL_TIME_ENABLED | PERF_FORMAT_TOTAL_TIME_RUNNING,
     };
+    if (tree_fd == -1) {
+        // At the root exec, count Cargo and all descendants independently of
+        // the rustc/clippy-driver image totals, excluding this tracer.
+        struct perf_event_attr tree = attr;
+        tree.inherit_thread = tree.remove_on_exec = 0;
+        tree_fd = syscall(SYS_perf_event_open, &tree, pid, -1, -1, PERF_FLAG_FD_CLOEXEC);
+        if (tree_fd < 0) err(1, "tree counter");
+    }
+    if ((exe.st_dev != selected.st_dev || exe.st_ino != selected.st_ino) &&
+        (exe.st_dev != clippy.st_dev || exe.st_ino != clippy.st_ino)) return;
     int fd = syscall(SYS_perf_event_open, &attr, pid, -1, -1, PERF_FLAG_FD_CLOEXEC);
     if (fd < 0) err(1, "perf_event_open for pid %d", pid);
     struct image *image = calloc(1, sizeof(*image));
@@ -123,7 +132,19 @@ static int trace(char **argv) {
 int main(int argc, char **argv) {
     if (argc < 4) errx(1, "usage: meter executable receipt command [arg...]");
     if (stat(argv[1], &selected)) err(1, "%s", argv[1]);
+    const char *driver = getenv("MEASURE_CLIPPY");
+    if (driver && stat(driver, &clippy)) err(1, "%s", driver);
     int code = trace(argv + 3);
+    struct { uint64_t instructions, enabled, running; } v;
+    if (read(tree_fd, &v, sizeof(v)) != sizeof(v) ||
+        !v.instructions || !v.running || v.running > v.enabled || v.running < v.enabled * .995)
+        errx(1, "unusable tree counter");
+    char *filename;
+    if (asprintf(&filename, "%s.tree", argv[2]) < 0) err(1, "asprintf");
+    FILE *tree = fopen(filename, "wx");
+    if (!tree) err(1, "%s", filename);
+    fprintf(tree, "%" PRIu64 "\t%" PRIu64 "\t%" PRIu64 "\n", v.instructions, v.enabled, v.running);
+    if (ferror(tree) || fclose(tree)) err(1, "tree receipt");
     FILE *out = fopen(argv[2], "wx");
     if (!out) err(1, "%s", argv[2]);
     for (struct image *i = images; i; i = i->next) {
@@ -142,3 +163,4 @@ int main(int argc, char **argv) {
     if (ferror(out) || fclose(out)) err(1, "receipt");
     return code;
 }
+
