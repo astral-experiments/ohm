@@ -20,6 +20,14 @@ on:
         description: Workflow run with a replacement candidate compiler SDK, requires kits
         type: string
         required: false
+      optimized:
+        description: Build matched stage-1 kits with thin LTO and one codegen unit
+        type: boolean
+        default: false
+      public_stack:
+        description: Use the restacked public compiler source through 138b9b74a947
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -77,6 +85,8 @@ jobs:
         working-directory: rust
         env:
           PROTOTYPE: ${{ inputs.mode == 'build-prototype' && '1' || '' }}
+          OPTIMIZED: ${{ inputs.optimized && '1' || '' }}
+          PUBLIC_STACK: ${{ inputs.public_stack && '1' || '' }}
         run: bash ../coordinator/scripts/uv-check-instructions/build-kit.sh ${{ matrix.role }}
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:

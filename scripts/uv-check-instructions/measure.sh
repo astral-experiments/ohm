@@ -25,6 +25,9 @@ if [[ -n "${RUSTC_KITS:-}" ]]; then
     (cd "$kits/$role" && sha256sum --quiet -c manifest.sha256)
     mkdir "$out/sdk-$role"
     cp "$kits/$role"/{bootstrap.toml,compiler.patch,manifest.sha256,revision,version.txt} "$out/sdk-$role/"
+    if [[ -f "$kits/$role/bootstrap.patch" ]]; then
+      cp "$kits/$role/bootstrap.patch" "$out/sdk-$role/"
+    fi
   done
   # Both arms read the same standard library.
   mv "$candidate/lib/rustlib/$host/lib" "$kits/unused-std"

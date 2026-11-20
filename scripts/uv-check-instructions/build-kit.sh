@@ -15,11 +15,16 @@ case "$role" in
       7f5e45ead8f2c8553c1dcaa83a155e8613df1025
       8b48b7cf2dbc0ca895d48268a94c4fbd3e6681e2
     )
+    paths=38
+    if [[ "${PUBLIC_STACK:-}" == 1 ]]; then
+      tips=(138b9b74a947f60ba231d42608866d70b55843eb)
+      paths=36
+    fi
     for tip in "${tips[@]}"; do
       git cat-file -e "$tip^{commit}" || git fetch --no-tags origin "$tip"
       git diff "$base" "$tip" -- compiler | git apply -
     done
-    test "$(git diff --name-only | wc -l)" -eq 38
+    test "$(git diff --name-only | wc -l)" -eq "$paths"
     if [[ "${PROTOTYPE:-}" == 1 ]]; then
       git apply ../coordinator/scripts/uv-check-instructions/prototype.patch
     fi
@@ -60,6 +65,15 @@ llvm-tools = false
 [llvm]
 download-ci-llvm = true
 TOML
+if [[ "${OPTIMIZED:-}" == 1 ]]; then
+  sed -i -e 's/ = 16$/ = 1/' -e 's/lto = "off"/lto = "thin"/' bootstrap.toml
+  # Bootstrap normally adds cross-crate Rust LTO flags starting at stage 2.
+  # Use its existing flags for both single-stage benchmark kits.
+  bootstrap=src/bootstrap/src/core/build_steps/compile.rs
+  test "$(grep -Fc 'if is_lto_stage(build_compiler) {' "$bootstrap")" = 1
+  sed -i 's/if is_lto_stage(build_compiler) {/if is_lto_stage(build_compiler) || matches!(builder.config.rust_lto, RustcLto::Thin) {/' "$bootstrap"
+  git diff -- "$bootstrap" > "$kit/bootstrap.patch"
+fi
 cp bootstrap.toml "$kit/"
 env -u GITHUB_ACTIONS python3 x.py --ci false build --stage 1 library
 stage="build/$host/stage1"

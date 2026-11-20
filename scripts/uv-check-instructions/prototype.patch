@@ -877,7 +877,7 @@
 +        let mut field_shuffle_seed = if self.sess.opts.unstable_opts.randomize_layout {
 +            self.def_path_hash(did.to_def_id()).0.to_smaller_hash()
 +        } else {
-+            rustc_data_structures::stable_hash::Hash64::ZERO
++            rustc_hashes::Hash64::ZERO
 +        };
  
          // If the user defined a custom seed for layout randomization, xor the item's
