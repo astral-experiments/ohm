@@ -5,7 +5,7 @@ import hashlib
 import json
 import os
 import subprocess
-import tempfile
+import shutil
 
 CONTRACTS = """
 pub trait Pick<Tag> { fn pick(&self) -> u32; }
@@ -87,10 +87,12 @@ def exercise(rustc, path, public, rotate):
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("rustc", type=Path)
 parser.add_argument("--rotate", action="store_true", help="also check a new consumer salt on each edit")
+parser.add_argument("scratch", type=Path)
 args = parser.parse_args()
 result = []
 for public in (True, False):
     for rotate in ([False, True] if args.rotate else [False]):
-        with tempfile.TemporaryDirectory() as tmp:
-            result.extend(exercise(args.rustc.resolve(), Path(tmp), public, rotate))
+        args.scratch.mkdir()
+        result.extend(exercise(args.rustc.resolve(), args.scratch.resolve(), public, rotate))
+        shutil.rmtree(args.scratch)
 print(json.dumps(result, indent=2))

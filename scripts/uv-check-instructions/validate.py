@@ -47,13 +47,15 @@ def corpus():
     for role in roles:
         rustc = kits / role / "bin/rustc"
         with (out / role / "suppliers.json").open("w") as f:
-            run([sys.executable, here / "suppliers.py", rustc, "--rotate"], stdout=f)
+            run([sys.executable, here / "suppliers.py", rustc, scratch / "suppliers", "--rotate"], stdout=f)
         path = out / role / "salt.jsonl"
         with path.open("w") as f:
             run([sys.executable, here / "corpus.py", rustc, tests, "salt", "--jobs", "6", "--scratch", scratch / "cases"], stdout=f)
         cases = [json.loads(line) for line in path.open()]
         suites[role] = {(r["fixture"], r["edit"]): r for r in cases}
         assert len(cases) == len(suites[role])
+    left, right = [(out / role / "suppliers.json").read_bytes() for role in roles]
+    assert left == right
     control, candidate = map(suites.get, roles)
     assert control.keys() == candidate.keys()
     differences_by_compiler = []
