@@ -1,0 +1,102 @@
+--- a/src/compiler/build_runner/compilation_files.rs
++++ b/src/compiler/build_runner/compilation_files.rs
+@@ -105,6 +105,7 @@
+ pub struct Metadata {
+     unit_id: UnitHash,
+     c_metadata: UnitHash,
++    recursive_metadata: UnitHash,
+     c_extra_filename: bool,
+     pkg_dir: bool,
+ }
+@@ -216,13 +217,22 @@
+         target: HashMap<CompileTarget, Layout>,
+     ) -> CompilationFiles<'a, 'gctx> {
+         let mut metas = HashMap::default();
+-        for unit in build_runner
+-            .bcx
+-            .roots
+-            .iter()
+-            .chain(build_runner.bcx.test_check_candidates.values())
+-        {
+-            metadata_of(unit, build_runner, &mut metas);
++        let roots = || {
++            build_runner.bcx.roots.iter().chain(build_runner.bcx.test_check_candidates.values())
++        };
++        for unit in roots() {
++            metadata_of(unit, build_runner, &mut metas, true);
++        }
++        let mut local = HashMap::default();
++        if metas.values().any(|meta| {
++            meta.c_metadata != meta.recursive_metadata
++                && local.insert(meta.c_metadata, meta.recursive_metadata)
++                    .is_some_and(|id| id != meta.recursive_metadata)
++        }) {
++            metas.clear();
++            for unit in roots() {
++                metadata_of(unit, build_runner, &mut metas, false);
++            }
+         }
+         let outputs = metas
+             .keys()
+@@ -2605,12 +2615,13 @@
+     unit: &Unit,
+     build_runner: &BuildRunner<'_, '_>,
+     metas: &'a mut HashMap<Unit, Metadata>,
++    local: bool,
+ ) -> &'a Metadata {
+     if !metas.contains_key(unit) {
+-        let meta = compute_metadata(unit, build_runner, metas);
++        let meta = compute_metadata(unit, build_runner, metas, local);
+         metas.insert(unit.clone(), meta);
+         for dep in build_runner.unit_deps(unit) {
+-            metadata_of(&dep.unit, build_runner, metas);
++            metadata_of(&dep.unit, build_runner, metas, local);
+         }
+     }
+     &metas[unit]
+@@ -2621,12 +2632,13 @@
+     unit: &Unit,
+     build_runner: &BuildRunner<'_, '_>,
+     metas: &mut HashMap<Unit, Metadata>,
++    local: bool,
+ ) -> Metadata {
+     let bcx = &build_runner.bcx;
+     let deps_metadata = build_runner
+         .unit_deps(unit)
+         .iter()
+-        .map(|dep| *metadata_of(&dep.unit, build_runner, metas))
++        .map(|dep| *metadata_of(&dep.unit, build_runner, metas, local))
+         .collect::<Vec<_>>();
+     let c_extra_filename = use_extra_filename(bcx, unit);
+     let pkg_dir = use_pkg_dir(bcx, unit);
+@@ -2752,7 +2764,7 @@
+     // Mix in the target-metadata of all the dependencies of this target.
+     let mut dep_c_metadata_hashes = deps_metadata
+         .iter()
+-        .map(|m| m.c_metadata)
++        .map(|m| m.recursive_metadata)
+         .collect::<Vec<_>>();
+     dep_c_metadata_hashes.sort();
+     dep_c_metadata_hashes.hash(&mut c_metadata_hasher);
+@@ -2804,12 +2816,20 @@
+         "ohm-incremental-mono-partition-defaults".hash(&mut unit_id_hasher);
+     }
+ 
+-    let c_metadata = UnitHash(Hasher::finish(&c_metadata_hasher));
++    let recursive_metadata = UnitHash(Hasher::finish(&c_metadata_hasher));
++    let c_metadata = if local && shared_stages && unit.profile.incremental && bcx.ws.is_member(&unit.pkg) {
++        "ohm-local-metadata-v1".hash(&mut shared_hasher);
++        "ohm-local-metadata-v1".hash(&mut unit_id_hasher);
++        UnitHash(Hasher::finish(&shared_hasher))
++    } else {
++        recursive_metadata
++    };
+     let unit_id = UnitHash(Hasher::finish(&unit_id_hasher));
+ 
+     Metadata {
+         unit_id,
+         c_metadata,
++        recursive_metadata,
+         c_extra_filename,
+         pkg_dir,
+     }

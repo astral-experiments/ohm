@@ -1,5 +1,5 @@
 name: Measure uv check instructions
-run-name: uv history ${{ inputs.mode }} on Ohm 1.100.0-2
+run-name: uv history ${{ inputs.mode }} (rustc ${{ inputs.kits || 'shipped' }}, Cargo ${{ inputs.cargo || 'shipped' }})
 on:
   workflow_dispatch:
     inputs:
@@ -7,9 +7,13 @@ on:
         description: Experiment
         required: true
         type: choice
-        options: [build, calibrate, pilot, confirm, profile]
+        options: [build, build-cargo, calibrate, pilot, confirm, profile]
       kits:
-        description: Workflow run with the two compiler SDK artifacts
+        description: Workflow run with compiler kits, or empty for shipped -2 on both sides
+        type: string
+        required: false
+      cargo:
+        description: Workflow run with the patched Cargo to use on the candidate side
         type: string
         required: false
 
@@ -17,6 +21,33 @@ permissions:
   contents: read
 
 jobs:
+  cargo-build:
+    if: inputs.mode == 'build-cargo'
+    name: Build Cargo from the release pin with and without the metadata patch
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          path: coordinator
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: astral-experiments/ohm-cargo
+          ref: 1ba8a0a1fa3404a92da16b1886fb70df8ce03970
+          persist-credentials: false
+          path: cargo
+      - name: Build both Cargo binaries
+        working-directory: cargo
+        run: bash ../coordinator/scripts/uv-check-instructions/build-cargo.sh
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: cargo-kits
+          path: ${{ runner.temp }}/package/cargo.tar.zst
+          if-no-files-found: error
+          retention-days: 10
+          compression-level: 0
+
   build:
     if: inputs.mode == 'build'
     name: Build ${{ matrix.role }} compiler
@@ -100,15 +131,25 @@ jobs:
           persist-credentials: false
           path: uv
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        if: inputs.kits != ''
         with:
           github-token: ${{ github.token }}
           run-id: ${{ inputs.kits }}
           pattern: sdk-*
           merge-multiple: true
           path: ${{ runner.temp }}/kits
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        if: inputs.cargo != ''
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.cargo }}
+          name: cargo-kits
+          path: ${{ runner.temp }}/kits
       - name: Measure the first root check after each of the twenty edits
         env:
           PROFILE_UV: ${{ inputs.mode == 'profile' && '1' || '' }}
+          RUSTC_KITS: ${{ inputs.kits }}
+          CARGO_KITS: ${{ inputs.cargo }}
         run: bash scripts/uv-check-instructions/measure.sh ${{ matrix.pair }}
       - if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
