@@ -136,6 +136,59 @@ def compare_fresh(cargo, src, env, out):
         saved.rename(target)
 
 
+import struct
+
+END = b"rust-end-file"
+TAG = 0xC0FFEE_C0FFEE_C0FFEE_C0FFEE_C0FFEE
+
+def leb(stream):
+    n = shift = 0
+    while True:
+        c = stream.read(1)[0]
+        n |= (c & 127) << shift
+        if c < 128:
+            return n
+        shift += 7
+
+def generations(path):
+    lengths = []
+    with path.open('rb') as stream:
+        end = path.stat().st_size
+        while True:
+            lengths.append(end)
+            stream.seek(end - len(END) - 8)
+            footer, = struct.unpack('<Q', stream.read(8))
+            assert stream.read(len(END)) == END
+            stream.seek(footer)
+            assert leb(stream) == TAG, (path, footer)
+            present = stream.read(1)[0]
+            if not present:
+                break
+            assert present == 1
+            end = leb(stream)
+            assert end <= footer
+    return lengths
+
+def shape(path):
+    with path.open('rb') as stream:
+        stream.seek(-len(END) - 24, 2)
+        slots,live,edges = struct.unpack('<QQQ',stream.read(24))
+        assert stream.read(len(END)) == END
+        return dict(slots=slots,live=live,edges=edges)
+
+
+def cache_state(target):
+    rows = {}
+    for graph in target.rglob('dep-graph.bin'):
+        try:
+            row = dict(shape(graph), modified=graph.stat().st_mtime_ns,
+                       generations=generations(graph.with_name('query-cache.bin')))
+        except (OSError, IndexError, AssertionError, ValueError, struct.error) as e:
+            row = dict(error=repr(e))
+        rows[str(graph.relative_to(target))] = row
+    return rows
+
+
 def run(args, commits, role):
     fixed = args.scratch / "trial"
     fixed.mkdir()
@@ -188,6 +241,8 @@ def run(args, commits, role):
         command([args.scratch / "meter", rustc, noop, cargo, *CHECK],
                 src, env, folder / "noop.log")
         assert not read_counts(noop), (i, "unexpected recompilation")
+        if i >= 18:
+            save(folder / "state.json", cache_state(fixed / "target"))
         if args.audit and units:
             compare_fresh(cargo, src, env, folder)
         total = sum(x["instructions"] for x in units)
