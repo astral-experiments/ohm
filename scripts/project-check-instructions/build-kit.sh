@@ -104,7 +104,7 @@ if [[ "${STAGE_TWO:-}" == true ]]; then
   if [[ -s "$kit/compiler.patch" ]]; then
     git apply "$kit/compiler.patch"
   fi
-  env -u GITHUB_ACTIONS python3 x.py --ci false build --keep-stage 1 --enable-bolt-settings --stage 2 library
+  env -u GITHUB_ACTIONS python3 x.py --ci false build --keep-stage 0 --enable-bolt-settings --stage 2 library
   stage="build/$host/stage2"
   readelf --relocs --wide "$stage/lib"/librustc_driver-*.so | awk '
     /^Relocation section/ { count = ($3 ~ /\.rela\.(dyn|plt)/) }
