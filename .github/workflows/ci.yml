@@ -12,7 +12,7 @@ on:
         description: Experiment
         required: true
         type: choice
-        options: [pilot, marginal, confirm, audit, audit-control]
+        options: [build-kit, pilot, marginal, confirm, audit, audit-control]
       patch:
         description: Optional gzipped, base64-encoded compiler diff for an ephemeral benchmark
         type: string
@@ -70,6 +70,38 @@ permissions:
   contents: read
 
 jobs:
+  build:
+    if: inputs.mode == 'build-kit'
+    name: Build matched compiler
+    runs-on: namespace-profile-ubuntu-24-04-16
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          path: coordinator
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: astral-experiments/ohm-rust
+          ref: af392995e5ca93b70fc487b45dfdf6604dbbbc84
+          fetch-depth: 0
+          persist-credentials: false
+          path: rust
+      - name: Build and smoke-test the compiler SDK
+        working-directory: rust
+        env:
+          EXPERIMENT_PATCH: ${{ inputs.patch }}
+          OPTIMIZED: 1
+          COMPILER_REF: ${{ inputs.compiler_ref }}
+        run: bash ../coordinator/scripts/project-check-instructions/build-kit.sh candidate
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: sdk-candidate
+          path: ${{ runner.temp }}/packages/*.tar.zst
+          if-no-files-found: error
+          retention-days: 10
+          compression-level: 0
+
   measure:
     if: inputs.mode == 'pilot' || inputs.mode == 'marginal' || inputs.mode == 'confirm' || inputs.mode == 'profile' || inputs.mode == 'audit' || inputs.mode == 'audit-control' || inputs.mode == 'annotate'
     name: Measure ${{ matrix.project }} pair ${{ matrix.pair }}
