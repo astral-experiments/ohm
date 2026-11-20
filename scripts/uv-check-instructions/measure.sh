@@ -119,6 +119,15 @@ if [[ -n "${REFERENCE_PAIR:-}" || -n "${INTERMEDIATE_KIT:-}" ]]; then
       cp -al "$std" "$kits/$role/lib/rustlib/$host/lib"
     done
     echo 'All compilers consume the release std' > "$out/stdlib"
+    # Keep the allocator and launcher identical. The SDK manifests captured
+    # above describe the original builds, before substituting the launcher.
+    launcher="$kits/release/bin/rustc"
+    sha256sum "$launcher" | cut -d' ' -f1 > "$out/common-launcher"
+    for role in control current intermediate second candidate; do
+      [[ -d "$kits/$role" ]] || continue
+      cp "$launcher" "$kits/$role/bin/rustc"
+      cmp "$launcher" "$kits/$role/bin/rustc"
+    done
   fi
 fi
 if [[ "${PROBE_UV:-}" == 1 ]]; then
