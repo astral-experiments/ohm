@@ -137,8 +137,8 @@ jobs:
         with:
           persist-credentials: false
           repository: astral-sh/uv
-          ref: c99faeeeeb8318d874007b4c48635d009838c1a0
-          fetch-depth: 21
+          ref: 7bf2d9a3ae44f53a19eed9dcc2348492c8f9f2be
+          fetch-depth: 23
           path: coordinator/uv
       - name: Record one history with the newly built compiler
         if: inputs.mode == 'probe'
@@ -201,8 +201,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: astral-sh/uv
-          ref: c99faeeeeb8318d874007b4c48635d009838c1a0
-          fetch-depth: 21
+          ref: 7bf2d9a3ae44f53a19eed9dcc2348492c8f9f2be
+          fetch-depth: 23
           persist-credentials: false
           path: uv
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
@@ -258,7 +258,7 @@ jobs:
           run-id: ${{ inputs.second }}
           name: sdk-candidate
           path: ${{ runner.temp }}/kits/pr2
-      - name: Measure the first root check after each of the twenty edits
+      - name: Measure the first root check after each of the twenty edits and two holdouts
         env:
           PROFILE_UV: ${{ (inputs.mode == 'profile' || inputs.mode == 'annotate') && '1' || '' }}
           ANNOTATE_UV: ${{ inputs.mode == 'annotate' && '1' || '' }}

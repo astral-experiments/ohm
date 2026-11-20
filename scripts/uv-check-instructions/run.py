@@ -1,4 +1,4 @@
-"""Count rustc user instructions across the 20 first-parent uv edits ending at c99faeee."""
+"""Count rustc user instructions across the 20 first-parent uv edits and the two following holdouts."""
 
 import argparse
 import hashlib
@@ -12,6 +12,7 @@ import subprocess
 
 HERE = Path(__file__).resolve().parent
 TIP = "c99faeeeeb8318d874007b4c48635d009838c1a0"
+HOLDOUT = "7bf2d9a3ae44f53a19eed9dcc2348492c8f9f2be"
 CHECK = ["check", "--locked", "--offline"]
 
 
@@ -220,8 +221,9 @@ def main():
     args.scratch.mkdir(exist_ok=True, parents=True)
     assert not any(args.scratch.iterdir()), "expected an empty scratch directory"
     calibrate(args.scratch, args.output)
-    commits = git(args.uv, "rev-list", "--first-parent", "--max-count=21", TIP).decode().splitlines()[::-1]
-    assert len(commits) == 21 and commits[0].startswith("fdc9403a") and commits[-1] == TIP
+    commits = git(args.uv, "rev-list", "--first-parent", "--max-count=23", HOLDOUT).decode().splitlines()[::-1]
+    assert len(commits) == 23 and commits[0].startswith("fdc9403a")
+    assert commits[20] == TIP and commits[-1] == HOLDOUT
     cpu = re.search(r"^model name\s*:\s*(.+)$", Path("/proc/cpuinfo").read_text(), re.M)[1]
     summary = dict(cpu=cpu, kernel=platform.release(), jobs=args.jobs, commits=commits,
                    command=["cargo", *CHECK], first=args.first,
