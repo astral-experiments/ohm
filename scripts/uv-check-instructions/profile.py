@@ -46,6 +46,8 @@ def main():
                CARGO_BUILD_JOBS=str(args.jobs), CARGO_TARGET_DIR=str(args.scratch / "target"),
                RUSTUP_HOME=str(args.scratch / "rustup"), RUSTUP_TOOLCHAIN="ohm")
     old_lock = None
+    wrapper = Path(__file__).resolve().parent / "repeat-rustc.py"
+    wrapper.chmod(0o755)
     for i, commit in enumerate(commits):
         if i == 0:
             subprocess.run(["tar", "-x"], input=git(args.uv, "archive", commit), cwd=src, check=True)
@@ -59,16 +61,28 @@ def main():
         old_lock = lock
         argv = [cargo, *CHECK]
         binary = args.scratch / "perf.data"
+        subject = {1: "uv_python_interpreter", 17: "uv_pep508"}.get(i)
+        receipt = args.output / f"{i}-repeats"
+        step = env
+        if subject:
+            step = dict(env, RUSTC_WRAPPER=str(wrapper), REPEAT_UNIT=subject,
+                        REPEAT_RECEIPT=str(receipt))
         if i in (1, 6, 10, 11, 17, 20):
-            period = 49999 if i in (1, 17) else 120011
-            argv = [perf, "record", "-e", "instructions:u", "-c", str(period),
-                    "-m", "256", "-o", binary, "--", *argv]
-        command(argv, src, env, args.output / f"{i}-build.log")
+            argv = [perf, "record", "-e", "instructions:u", "-c", "1200007",
+                    "--call-graph", "dwarf,4096", "-m", "512", "-o", binary, "--", *argv]
+        command(argv, src, step, args.output / f"{i}-build.log")
+        if subject:
+            assert receipt.exists()
         if binary.is_file():
             data = subprocess.check_output([perf, "report", "--stdio", "-i", binary,
                 "--sort=comm,dso,symbol", "--fields=period,sample,comm,dso,symbol",
-                "--percent-limit=0", "--field-separator=|", "--no-children"], env=env)
+                "--percent-limit=0", "--field-separator=|", "--call-graph=none", "--no-children"], env=env)
             with gzip.open(args.output / f"{i}-symbols.txt.gz", "wb") as f:
+                f.write(data)
+            data = subprocess.check_output([perf, "report", "--stdio", "-i", binary,
+                "--sort=dso,symbol", "--comms=rustc", "--field-separator=|",
+                "--call-graph=none", "--percent-limit=0", "--children"], env=env)
+            with gzip.open(args.output / f"{i}-children.txt.gz", "wb") as f:
                 f.write(data)
             binary.unlink()
         print(i, commit, flush=True)
