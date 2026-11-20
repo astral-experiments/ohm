@@ -12,7 +12,7 @@ on:
         description: Experiment
         required: true
         type: choice
-        options: [build-kit, pilot, marginal, confirm, profile, audit, audit-control]
+        options: [train, build-kit, pilot, marginal, confirm, profile, audit, audit-control]
       patch:
         description: Optional gzipped, base64-encoded compiler diff for an ephemeral benchmark
         type: string
@@ -49,29 +49,19 @@ on:
         description: Workflow run with a replacement candidate compiler SDK, requires kits
         type: string
         required: false
-      optimized:
-        description: Build matched stage-1 kits with thin LTO and one codegen unit
-        type: boolean
-        default: false
-      public_stack:
-        description: Use the restacked public compiler source through 138b9b74a947
-        type: boolean
-        default: false
-      parser_ref:
-        description: 'Optional exact public #450 commit on top of #448'
+      profdata:
+        description: Optional baseline rustc profile training run ID
         type: string
-        required: false
-      ctfe:
-        description: 'Apply #318 at 2b0876f27b14 to the public stack'
-        type: boolean
-        default: false
 
 permissions:
   contents: read
 
 jobs:
   build:
-    if: inputs.mode == 'build-kit'
+    if: inputs.mode == 'build-kit' || inputs.mode == 'train'
+    permissions:
+      contents: read
+      actions: read
     name: Build matched compiler
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 90
@@ -87,17 +77,25 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
           path: rust
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        if: inputs.profdata != ''
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.profdata }}
+          name: rustc-profile
+          path: ${{ runner.temp }}/profile
       - name: Build and smoke-test the compiler SDK
         working-directory: rust
         env:
           EXPERIMENT_PATCH: ${{ inputs.patch }}
           OPTIMIZED: 1
+          PROFILED: ${{ inputs.mode == 'train' && 'train' || inputs.profdata }}
           COMPILER_REF: ${{ inputs.compiler_ref }}
         run: bash ../coordinator/scripts/project-check-instructions/build-kit.sh candidate
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: sdk-candidate
-          path: ${{ runner.temp }}/packages/*.tar.zst
+          name: ${{ inputs.mode == 'train' && 'rustc-profile' || 'sdk-candidate' }}
+          path: ${{ runner.temp }}/packages/*
           if-no-files-found: error
           retention-days: 10
           compression-level: 0

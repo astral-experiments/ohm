@@ -63,11 +63,53 @@ if [[ "${OPTIMIZED:-}" == 1 ]]; then
   sed -i 's/if is_lto_stage(build_compiler) {/if is_lto_stage(build_compiler) || matches!(builder.config.rust_lto, RustcLto::Thin) {/' "$bootstrap"
   git diff -- "$bootstrap" > "$kit/bootstrap.patch"
 fi
+if [[ -n "${PROFILED:-}" ]]; then
+  # Match the release allocator and enable bootstrap's PGO flags for stage 1.
+  sed -i '/^\[rust\]$/a mimalloc = true' bootstrap.toml
+  sed -i 's/^lld = false$/lld = true/' bootstrap.toml
+  pgo_bootstrap=src/bootstrap/src/core/builder/cargo.rs
+  sed -i '/pub fn apply_pgo(/,/let has_profile/ s/build_compiler.stage != 1/build_compiler.stage > 1/' "$pgo_bootstrap"
+  git diff -- "$pgo_bootstrap" >> "$kit/bootstrap.patch"
+  mkdir -p "$RUNNER_TEMP/profiles"
+  if [[ "$PROFILED" == train ]]; then
+    cat >>bootstrap.toml <<TOML
+[pgo.rustc]
+generate = "$RUNNER_TEMP/profiles"
+TOML
+  else
+    cat >>bootstrap.toml <<TOML
+[pgo.rustc]
+use = "$RUNNER_TEMP/profile/rustc.profdata"
+TOML
+    sha256sum "$RUNNER_TEMP/profile/rustc.profdata" > "$kit/profile.sha256"
+  fi
+fi
 cp bootstrap.toml "$kit/"
 sed -n 's/^const OHM_METADATA_EPOCH: u32 = \([0-9]*\);/\1/p' compiler/rustc_metadata/src/rmeta/mod.rs > "$kit/epoch"
 test -s "$kit/epoch"
 env -u GITHUB_ACTIONS python3 x.py --ci false build --stage 1 library
 stage="build/$host/stage1"
+if [[ "${PROFILED:-}" == train ]]; then
+  git submodule update --init --depth 1 src/tools/rustc-perf
+  patch -d src/tools/rustc-perf -t -N -F 0 -p1 -i "$GITHUB_WORKSPACE/coordinator/release/rustc-perf-relocated-dependencies.patch"
+  exe="$PWD/$stage/bin/rustc"
+  stage0="$PWD/build/$host/stage0"
+  cargo3="$RUNNER_TEMP/cargo"
+  name="ohm-1.100.0-3-$host.tar.gz"
+  curl -fsSL --retry 4 "https://github.com/astral-experiments/ohm/releases/download/ohm-1.100.0-3/$name" -o "$RUNNER_TEMP/$name"
+  echo "7fc3d21a5efad6bff7be654b14e0e60aa2fbbfd11db198582788f3cc4bcf7591  $RUNNER_TEMP/$name" | sha256sum -c -
+  tar -C "$RUNNER_TEMP" -xzf "$RUNNER_TEMP/$name" --strip-components=3 "rust-1.100.0-dev-$host/cargo/bin/cargo"
+  (
+    cd src/tools/rustc-perf
+    export LLVM_PROFILE_FILE="$RUNNER_TEMP/profiles/default_%m_%p.profraw"
+    export RUSTC="$stage0/bin/rustc" RUSTC_BOOTSTRAP=1 CARGO_UNSTABLE_OHM_LINKER=lld
+    "$stage0/bin/cargo" run -p collector --bin collector -- profile_local eprintln "$exe" --id Test --cargo "$cargo3" --profiles Check,Debug,Opt --scenarios All --exact-match externs,ctfe-stress-5,cargo-0.87.1,token-stream-stress,match-stress,tuple-stress,diesel-2.2.10,bitmaps-3.2.1,serde-1.0.219-new-solver --frontend-threads 1 --jobs 4
+  )
+  profdata="$(find build -name llvm-profdata -type f | head -1)"
+  "$profdata" merge -o "$RUNNER_TEMP/packages/rustc.profdata" "$RUNNER_TEMP/profiles"
+  sha256sum "$RUNNER_TEMP/packages/rustc.profdata"
+  exit
+fi
 cp -L "$stage/bin/rustc" "$kit/bin/"
 cp -L "$stage/lib"/librustc_driver-*.so "$kit/lib/"
 cp -aL "$stage/lib/rustlib/$host/lib" "$kit/lib/rustlib/$host/"
