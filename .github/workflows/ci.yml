@@ -1,19 +1,24 @@
-name: Measure uv check instructions
-run-name: uv history ${{ inputs.mode }} (rustc ${{ inputs.prototype || inputs.kits || 'shipped' }}, Cargo ${{ inputs.cargo || 'shipped' }})
+name: Measure project check instructions
+run-name: ${{ inputs.project }} history ${{ inputs.mode }} (rustc ${{ inputs.prototype || inputs.kits || 'shipped' }}, Cargo ${{ inputs.cargo || 'shipped' }})
 on:
   workflow_dispatch:
     inputs:
+      project:
+        description: Workload
+        default: both
+        type: choice
+        options: [both, ripgrep, serc]
       mode:
         description: Experiment
         required: true
         type: choice
-        options: [build, build-pair, build-prototype, build-public, build-cargo, calibrate, pilot, marginal, confirm, profile, audit, audit-control, probe, annotate]
+        options: [pilot, marginal, confirm, audit, audit-control]
       patch:
         description: Optional gzipped, base64-encoded compiler diff for an ephemeral benchmark
         type: string
         required: false
       kits:
-        description: Workflow run with compiler kits, or empty for shipped -2 on both sides
+        description: Workflow run with compiler kits, or empty for shipped -3 on both sides
         type: string
       compiler_ref:
         description: Exact public compiler commit to apply before the experimental patch
@@ -65,126 +70,9 @@ permissions:
   contents: read
 
 jobs:
-  cargo-build:
-    if: inputs.mode == 'build-cargo'
-    name: Build Cargo from the release pin with the metadata patch
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-          path: coordinator
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          repository: astral-experiments/ohm-cargo
-          ref: 1ba8a0a1fa3404a92da16b1886fb70df8ce03970
-          persist-credentials: false
-          path: cargo
-      - name: Build the patched Cargo
-        working-directory: cargo
-        run: bash ../coordinator/scripts/uv-check-instructions/build-cargo.sh
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: cargo-kits
-          path: ${{ runner.temp }}/package/cargo.tar.zst
-          if-no-files-found: error
-          retention-days: 10
-          compression-level: 0
-
-  build:
-    if: inputs.mode == 'build' || inputs.mode == 'build-pair' || inputs.mode == 'build-prototype' || inputs.mode == 'build-public' || inputs.mode == 'probe'
-    name: Build ${{ matrix.role }} compiler
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        role: ${{ fromJSON(inputs.mode == 'build-public' && '["control"]' || (inputs.mode == 'build-prototype' || inputs.mode == 'probe') && '["candidate"]' || '["control","candidate"]') }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-          path: coordinator
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          repository: astral-experiments/ohm-rust
-          ref: cad56cdf53143b0a539218169451ca12f7064ff3
-          fetch-depth: 0
-          persist-credentials: false
-          path: rust
-      - name: Build and smoke-test the compiler SDK
-        working-directory: rust
-        env:
-          PROTOTYPE: ${{ (inputs.mode == 'build-pair' || inputs.mode == 'build-prototype' || inputs.mode == 'probe') && '1' || '' }}
-          COMPILER_REF: ${{ inputs.compiler_ref }}
-          EXACT_PUBLIC: ${{ inputs.mode == 'build-public' && '1' || '' }}
-          EXPERIMENT_PATCH: ${{ inputs.patch }}
-          OPTIMIZED: ${{ inputs.optimized && '1' || '' }}
-          PUBLIC_STACK: ${{ inputs.public_stack && '1' || '' }}
-          PARSER_REF: ${{ inputs.parser_ref }}
-          CTFE: ${{ inputs.ctfe && '1' || '' }}
-        run: bash ../coordinator/scripts/uv-check-instructions/build-kit.sh ${{ matrix.role }}
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: sdk-${{ matrix.role }}
-          path: ${{ runner.temp }}/packages/*.tar.zst
-          if-no-files-found: error
-          retention-days: 10
-          compression-level: 0
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        if: inputs.mode == 'probe'
-        with:
-          persist-credentials: false
-          repository: astral-sh/uv
-          ref: 7bf2d9a3ae44f53a19eed9dcc2348492c8f9f2be
-          fetch-depth: 23
-          path: coordinator/uv
-      - name: Record one history with the newly built compiler
-        if: inputs.mode == 'probe'
-        working-directory: coordinator
-        env:
-          PROBE_UV: '1'
-          RUSTC_KITS: '1'
-        run: bash scripts/uv-check-instructions/measure.sh 2
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        if: always() && inputs.mode == 'probe'
-        with:
-          name: probe
-          path: ${{ runner.temp }}/out
-          if-no-files-found: error
-          retention-days: 30
-
-  calibrate:
-    if: inputs.mode == 'calibrate'
-    runs-on: namespace-profile-ubuntu-24-04-16
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-      - name: Check the hardware instruction counter with known loops
-        working-directory: scripts/uv-check-instructions
-        run: |
-          lscpu
-          if [[ "$(cat /proc/sys/kernel/perf_event_paranoid)" -gt 2 ]]; then
-            sudo sysctl kernel.perf_event_paranoid=2
-          fi
-          python3 -IS - <<'PY'
-          import sys, tempfile
-          from pathlib import Path
-          sys.path.insert(0, str(Path.cwd()))
-          import run
-          with tempfile.TemporaryDirectory() as folder:
-              path = Path(folder)
-              run.calibrate(path, path)
-              for file in sorted(path.glob("*.tsv")):
-                  print(file.name, file.read_text())
-          PY
-
   measure:
     if: inputs.mode == 'pilot' || inputs.mode == 'marginal' || inputs.mode == 'confirm' || inputs.mode == 'profile' || inputs.mode == 'audit' || inputs.mode == 'audit-control' || inputs.mode == 'annotate'
-    name: Measure pair ${{ matrix.pair }}
+    name: Measure ${{ matrix.project }} pair ${{ matrix.pair }}
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 60
     permissions:
@@ -193,6 +81,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        project: ${{ fromJSON(inputs.project == 'both' && '["ripgrep","serc"]' || format('["{0}"]', inputs.project)) }}
         pair: ${{ fromJSON(inputs.mode == 'confirm' && '[1,2,3,4,5,6]' || (inputs.mode == 'marginal' || inputs.mode == 'profile') && '[1,2]' || '[1]') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -200,11 +89,11 @@ jobs:
           persist-credentials: false
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          repository: astral-sh/uv
-          ref: 7bf2d9a3ae44f53a19eed9dcc2348492c8f9f2be
-          fetch-depth: 23
+          repository: ${{ matrix.project == 'ripgrep' && 'BurntSushi/ripgrep' || 'astral-experiments/serc' }}
+          ref: ${{ matrix.project == 'ripgrep' && '43fc97d43a4c61d65e7d74d4110c8480fe42ea5b' || '1b15ce1cba1d5a0045ac7303b8797102f807e57c' }}
+          fetch-depth: 21
           persist-credentials: false
-          path: uv
+          path: workload
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         if: inputs.kits != ''
         with:
@@ -258,8 +147,9 @@ jobs:
           run-id: ${{ inputs.second }}
           name: sdk-candidate
           path: ${{ runner.temp }}/kits/pr2
-      - name: Measure the first root check after each of the twenty edits and two holdouts
+      - name: Measure the first root check after each of the twenty edits
         env:
+          PROJECT: ${{ matrix.project }}
           PROFILE_UV: ${{ (inputs.mode == 'profile' || inputs.mode == 'annotate') && '1' || '' }}
           ANNOTATE_UV: ${{ inputs.mode == 'annotate' && '1' || '' }}
           AUDIT_UV: ${{ inputs.mode == 'audit-control' && 'control' || inputs.mode == 'audit' && '1' || '' }}
@@ -268,11 +158,11 @@ jobs:
           INTERMEDIATE_KIT: ${{ inputs.intermediate }}
           SECOND_KIT: ${{ inputs.second }}
           CARGO_KITS: ${{ inputs.cargo }}
-        run: bash scripts/uv-check-instructions/measure.sh ${{ matrix.pair }}
+        run: bash scripts/project-check-instructions/measure.sh ${{ matrix.pair }}
       - if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: pair-${{ matrix.pair }}
+          name: ${{ matrix.project }}-pair-${{ matrix.pair }}
           path: ${{ runner.temp }}/out
           if-no-files-found: error
           retention-days: 30
