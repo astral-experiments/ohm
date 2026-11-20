@@ -19,6 +19,7 @@ SCRATCH = ROOT / "work"
 TRIAL = SCRATCH / "trial"
 CASE = os.environ["WORKLOAD"]
 PAIR = int(os.environ["PAIR"])
+BASE_RUN = os.getenv('BASE_RUN')
 PROBE_RUN = os.getenv('PROBE_RUN')
 PROBE = os.getenv('PROBE')
 BASELINE = os.environ["BASELINE_ONLY"] == "true"
@@ -52,10 +53,11 @@ def install(role):
 
 def install_probe(role, name):
     path = ROOT / 'probes' / ('sdk-' + name)
-    archive = path / (name + '.tar.zst')
+    packed = 'candidate' if BASE_RUN else name
+    archive = path / (packed + '.tar.zst')
     subprocess.run(['tar','-xf',archive],cwd=path,check=True)
     kit = KITS / role
-    (path / name).rename(kit)
+    (path / packed).rename(kit)
     subprocess.run(['sha256sum','--check','--quiet','manifest.sha256'],cwd=kit,check=True)
     stock = KITS / 'stock'
     for p in stock.rglob('*'):
@@ -63,8 +65,15 @@ def install_probe(role, name):
             dest = kit / p.relative_to(stock)
             dest.parent.mkdir(exist_ok=True,parents=True)
             shutil.copy2(p,dest)
-    save(OUT/(role+'-sdk.json'),dict(probe_run=PROBE_RUN, archive=sha(archive),
-         rust=(kit/'revision').read_text().strip(), manifest=sha(kit/'manifest.sha256'),
+    rev=(kit/'revision').read_text().strip()
+    if BASE_RUN:
+        rev={
+          'b2b6232d27b9075cfbce01dab3913f6b69fece21b2fbe85f87c3efe41b0a4a38':'940ecb5927a5eaa4c0d557294d6cfd3df4210971',
+          'd7f4acb064302903f09ae6bf5fbefda47081411e4e6289f50b09901fffcb0d7a':'5f6e2050215d0863b39669e8b01b982c10c3bfe2',
+        }[sha(kit/'compiler.patch')]
+    runid=BASE_RUN if BASE_RUN and role=='control' else PROBE_RUN
+    save(OUT/(role+'-sdk.json'),dict(probe_run=runid, archive=sha(archive),
+         rust=rev, manifest=sha(kit/'manifest.sha256'),
          patch=sha(kit/'compiler.patch'),cargo=sha(kit/'bin/cargo')))
     archive.unlink()
 
@@ -108,7 +117,8 @@ def count(argv, cwd, env, out, metadata=True):
             if path.suffix == '.rmeta':
                 with path.open('rb') as f:
                     header = f.read(56)
-                public = header[40:56].hex() if header.startswith(b'rust') else None
+                has_public = header.startswith(b'rust') and header[24:40]!=header[40:56]
+                public = header[40:56].hex() if has_public else None
                 if CLIENT and PAIR == 1 and path.name.startswith('libuv_client-') and argv[1]=='clippy':
                     shutil.copyfile(path, out/'uv-client.rmeta')
                 arts[path.relative_to(TRIAL).as_posix()] = dict(public=public, sha=sha(path))
@@ -238,6 +248,14 @@ if PROBE_RUN:
     (KITS/'control').rename(KITS/'stock')
     install_probe('control','base')
     install_probe('candidate',PROBE)
+    if BASE_RUN:
+        x,y=KITS/'control',KITS/'candidate'
+        for field in ('epoch','bootstrap.toml','bootstrap.patch'):
+            assert (x/field).read_bytes()==(y/field).read_bytes()
+        std='lib/rustlib/x86_64-unknown-linux-gnu/lib'
+        shutil.rmtree(y/std)
+        shutil.copytree(x/std,y/std,copy_function=os.link)
+        save(OUT/'std.json',{'both':'control'})
     shutil.rmtree(KITS/'stock')
 elif not BASELINE:
     install('candidate')

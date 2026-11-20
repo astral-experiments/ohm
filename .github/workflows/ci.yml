@@ -3,6 +3,8 @@ run-name: SDK workload qualification (${{ inputs.build && 'build probes' || inpu
 on:
   workflow_dispatch:
     inputs:
+      base_run:
+        type: string
       probe_run:
         type: string
       probe:
@@ -76,6 +78,7 @@ jobs:
         pair: ${{ fromJSON(inputs.pairs) }}
     timeout-minutes: 45
     env:
+      BASE_RUN: ${{ inputs.base_run }}
       PROBE_RUN: ${{ inputs.probe_run }}
       PROBE: ${{ inputs.probe }}
       WORKLOAD: ${{ matrix.workload }}
@@ -120,12 +123,26 @@ jobs:
           name: linux-release-qualification-${{ inputs.candidate }}
           path: ${{ runner.temp }}/candidate
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        if: inputs.probe_run != ''
+        if: inputs.probe_run != '' && inputs.base_run == ''
         with:
           github-token: ${{ github.token }}
           run-id: ${{ inputs.probe_run }}
           pattern: sdk-{base,${{ inputs.probe }}}
           path: ${{ runner.temp }}/probes
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        if: inputs.base_run != ''
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.base_run }}
+          name: sdk-candidate
+          path: ${{ runner.temp }}/probes/sdk-base
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        if: inputs.base_run != ''
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.probe_run }}
+          name: sdk-candidate
+          path: ${{ runner.temp }}/probes/sdk-queries
       - name: Verify the SDKs, calibrate the meter, replay the edits
         run: |
           if [[ "$(cat /proc/sys/kernel/perf_event_paranoid)" -gt 2 ]]; then

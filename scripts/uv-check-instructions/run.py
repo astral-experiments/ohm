@@ -134,7 +134,7 @@ def compare_fresh(cargo, src, env, out):
         # differing compiler output in invocation order for diagnosis.
         if mismatch:
             print('::warning::'+str(len(mismatch))+' header differences at '+str(out),flush=True)
-            for unit in reversed(read_counts(out/'units.tsv')):
+            for unit in sorted(read_counts(out/'units.tsv'), key=lambda row:row['pid']):
                 diff = [p for p in mismatch if ('/lib'+unit['name']+'-') in p]
                 if diff:
                     shutil.copyfile(target/diff[0],out/('fresh-'+unit['name']+'.rmeta'))

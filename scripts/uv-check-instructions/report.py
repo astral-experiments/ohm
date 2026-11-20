@@ -214,7 +214,7 @@ def summary(result):
         print()
     if result['audits']:
         print('## Fresh comparisons\n')
-        print('The uv history rebuilds all workspace packages at each source revision that launched rustc and checks both metadata headers and Cargo fingerprints. The mixed replay restores the original mixed target with all query caches cleared before applying the dependency update. The TUI replay cleans the selected package before rebuilding each edit. Diagnostic comparisons preserve all source locations, count one-time command-line notes per lint and allow such a note to follow a different warning for the same lint.\n')
+        print('The uv history rebuilds all workspace packages at each source revision that launched rustc and checks both metadata headers and Cargo fingerprints. The mixed replay restores the original mixed target with all query caches cleared before applying the dependency update. The TUI replay cleans the selected package before rebuilding each edit. Diagnostic comparisons preserve all source locations, count one-time command-line notes per lint and allow such a note to follow a different warning for the same lint. For package checks, public hashes count metadata with a public hash distinct from the whole-crate hash. The file count includes both kinds.\n')
         print('| Case | Steps | Public hashes | Differing hashes | Differing files | Steps with differing diagnostics |')
         print('|---|---:|---:|---:|---:|---:|')
         for key,rec in result['audits'].items():
