@@ -46,6 +46,12 @@ if [[ -n "${RUSTC_KITS:-}" ]]; then
     mv "$candidate/lib/rustlib/$host/lib" "$kits/unused-std"
     cp -al "$control/lib/rustlib/$host/lib" "$candidate/lib/rustlib/$host/lib"
     echo 'Both compilers consume the control std' >> "$out/stdlib"
+    # In a two-way pilot the control SDK supplies both launcher and std.
+    if [[ -z "${REFERENCE_PAIR:-}" && -z "${INTERMEDIATE_KIT:-}" ]]; then
+      sha256sum "$control/bin/rustc" | cut -d' ' -f1 > "$out/common-launcher"
+      cp "$control/bin/rustc" "$candidate/bin/rustc"
+      cmp "$control/bin/rustc" "$candidate/bin/rustc"
+    fi
   else
     echo 'Each compiler consumes the std it built' >> "$out/stdlib"
   fi
