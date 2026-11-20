@@ -590,7 +590,7 @@
          feedable
      }
  
-+    query local_linkage_identity(_: ()) -> u64 {
++    query local_linkage_identity(_: ()) -> Fingerprint {
 +        eval_always
 +        desc { "tracking the local crate identity" }
 +    }
@@ -848,7 +848,7 @@
  }
  
  pub fn provide(providers: &mut Providers) {
-+    providers.local_linkage_identity = |tcx, ()| tcx.stable_crate_id.as_u64();
++    providers.local_linkage_identity = |tcx, ()| rustc_data_structures::fingerprint::Fingerprint::new(tcx.stable_crate_id.as_u64(), 0);
      providers.codegen_output_mode = |tcx, ()| {
          (tcx.sess.opts.output_types.should_codegen(), tcx.sess.opts.output_types.should_link())
      };
