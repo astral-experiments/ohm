@@ -196,7 +196,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--window", choices=["recent", "preceding"], default="recent")
     parser.add_argument("--project", choices=PROJECTS.keys(), required=True)
-    for arg in ("source", "control", "candidate", "cargo", "candidate-cargo", "intermediate-cargo", "second-cargo", "scratch", "output"):
+    for arg in ("source", "control", "candidate", "cargo", "candidate-cargo", "current-cargo", "intermediate-cargo", "second-cargo", "scratch", "output"):
         parser.add_argument("--" + arg, type=lambda p: Path(p).resolve(), required=not arg.endswith("-cargo"))
     parser.add_argument("--first", choices=["control", "candidate"], required=True)
     parser.add_argument("--jobs", type=int, default=4)

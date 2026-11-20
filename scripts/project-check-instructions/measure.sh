@@ -77,6 +77,10 @@ for variant in PARENT CANDIDATE; do
     (cd "$dir" && sha256sum -c manifest.sha256)
     cp "$dir"/{manifest.sha256,revision,source.patch,source.tree,version.txt} "$out/cargo-$variant/"
     if [[ "$variant" == PARENT ]]; then
+      if [[ -n "${INTERMEDIATE_KIT:-}" ]]; then
+        cp -a "$out/sdk-control" "$out/sdk-current"
+        extra+=(--current "$control" --current-cargo "$dir/cargo")
+      fi
       extra+=(--intermediate-cargo "$dir/cargo")
     else
       extra+=(--second-cargo "$dir/cargo" --candidate-cargo "$dir/cargo")
