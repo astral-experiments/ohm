@@ -32,18 +32,19 @@ def install(arm):
     run('tar','xzf',tarball,'-C',root)
     run('sh',root/rustdir/'install.sh','--prefix='+str(sdk),'--disable-ldconfig','--without=rust-docs')
     shutil.rmtree(root/rustdir)
-    run('rustup','toolchain','link','ohm-perf',sdk)
+    run('rustup','toolchain','link','ohm-1.100.0-3',sdk)
     return h
 def objects(stamp):
     result={}
     for name in ('ty_python_semantic','ty_test'):
         units=[]
-        for directory in target.glob('debug/incremental/*/'+name+'-*/s-*'):
+        for directory in root.glob('**/incremental/**/'+name+'-*/s-*'):
             if not directory.is_dir():continue
             files=[path.stat() for path in directory.glob('*.o')]
             fresh=[stat for stat in files if stat.st_mtime_ns>=stamp]
             if fresh:units.append(dict(total=len(files),written=len(fresh),bytes=sum(stat.st_size for stat in fresh)))
         result[name]=units
+    print('objects',result,flush=True)
     return result
 def arm(tag):
     archive=install(tag)
@@ -54,11 +55,12 @@ def arm(tag):
         path=inputs/patch['patch']
         assert digest(path)==patch['sha256']
         git('apply',str(path))
-    env=dict(os.environ,**fixture['environment'])
-    env.update(CARGO_BUILD_JOBS='8',RUSTUP_TOOLCHAIN='ohm-perf',MEASURE_CLIPPY=str(sdk/'bin/clippy-driver'),
+    env={k:os.environ[k] for k in ('PATH','HOME','USER','LANG','TMPDIR','LOGNAME','SSL_CERT_FILE','SSL_CERT_DIR') if k in os.environ}
+    env.update(fixture['environment'])
+    env.update(CARGO_BUILD_JOBS='8',RUSTUP_TOOLCHAIN='ohm-1.100.0-3',MEASURE_CLIPPY=str(sdk/'bin/clippy-driver'),
         CARGO_TARGET_DIR=str(target),CARGO_BUILD_BUILD_DIR=str(shared),
         CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST='all',CARGO_TERM_COLOR='never')
-    run('cargo','+ohm-perf','fetch','--locked','--target','x86_64-unknown-linux-gnu',env=env,cwd=source)
+    run('cargo','+ohm-1.100.0-3','fetch','--locked','--target','x86_64-unknown-linux-gnu',env=env,cwd=source)
     env['CARGO_NET_OFFLINE']='true'
     rows=[]
     for idx,step in enumerate(fixture['warmup']+fixture['steps']):
@@ -67,7 +69,7 @@ def arm(tag):
             continue
         assert step['program']=='cargo'
         receipt=d/f'{idx}.tsv'
-        cmd=['cargo','+ohm-perf',*step['args']]
+        cmd=['cargo','+ohm-1.100.0-3',*step['args']]
         print(tag,idx,cmd,flush=True)
         stamp=time.time_ns()
         path=receipt.with_suffix('.log')
