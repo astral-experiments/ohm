@@ -170,14 +170,13 @@ def run(args, commits, role):
             command([cargo, "fetch", "--locked", "--target", "x86_64-unknown-linux-gnu"],
                     src, env, folder / "fetch.log")
         previous_lock = lock
-        units = []
+        receipt = folder / ("units.tsv" if i else "prime.tsv")
+        log = folder / ("check.log" if i else "prime.log")
+        command([args.scratch / "meter", rustc, receipt, cargo, *CHECK], src, env, log)
+        units = read_counts(receipt)
         if i == 0:
-            command([cargo, *CHECK], src, env, folder / "prime.log")
-        else:
-            receipt = folder / "units.tsv"
-            command([args.scratch / "meter", rustc, receipt, cargo, *CHECK],
-                    src, env, folder / "check.log")
-            units = read_counts(receipt)
+            assert units
+            units = []
         noop = folder / "noop.tsv"
         command([args.scratch / "meter", rustc, noop, cargo, *CHECK],
                 src, env, folder / "noop.log")
