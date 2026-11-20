@@ -70,6 +70,8 @@ entry=run.py
 extra=()
 if [[ "${AUDIT_UV:-}" == 1 ]]; then
   extra+=(--audit)
+elif [[ "${AUDIT_UV:-}" == control ]]; then
+  extra+=(--audit --audit-role control)
 fi
 if [[ "${PROFILE_UV:-}" == 1 ]]; then
   if ! perf --version; then

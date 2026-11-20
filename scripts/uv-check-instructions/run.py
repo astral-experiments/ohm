@@ -122,6 +122,12 @@ def compare_fresh(cargo, src, env, out):
         # Look up the active units using the fresh output paths. The history
         # retains other files from builds using earlier dependency versions.
         records = {p: dict(warm=warm[p], fresh=v) for p, v in fresh.items()}
+        if out.name == '4':
+            for p in records:
+                path = Path(p)
+                if path.name.startswith('libuv_auth-') and path.suffix == '.rmeta':
+                    shutil.copyfile(target / path, out / 'fresh-uv-auth.rmeta')
+                    shutil.copyfile(saved / path, out / 'warm-uv-auth.rmeta')
         save(out / "audit.json", dict(outputs=records, warm_diagnostics=warm_diagnostics,
                                       fresh_diagnostics=diagnostics))
     finally:
@@ -202,6 +208,7 @@ def main():
     parser.add_argument("--jobs", type=int, default=4)
     parser.add_argument("--offline", action="store_true")
     parser.add_argument("--audit", action="store_true")
+    parser.add_argument("--audit-role", choices=["control", "candidate"], default="candidate")
     args = parser.parse_args()
     args.output.mkdir(exist_ok=True, parents=True)
     args.scratch.mkdir(exist_ok=True, parents=True)
@@ -215,7 +222,7 @@ def main():
                    boot=sha(Path("/proc/sys/kernel/random/boot_id")))
     roles = [args.first, "candidate" if args.first == "control" else "control"]
     if args.audit:
-        roles = ["candidate"]
+        roles = [args.audit_role]
     for role in roles:
         summary[role] = run(args, commits, role)
         assert summary[role]["total"] > 0
