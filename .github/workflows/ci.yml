@@ -40,7 +40,7 @@ on:
         description: Select a history and any commits to check before the replay
         type: choice
         default: recent
-        options: [recent, preceding, shared, revisit, from-tip, moves]
+        options: [recent, preceding, shared, revisit, from-tip, moves, preceding-tip, detour]
       intermediate:
         description: Optional kit for the first PR of a stack
         required: false

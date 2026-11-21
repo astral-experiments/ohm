@@ -160,7 +160,7 @@ def run(args, commits, role):
         used["llvm"] = sha(llvm)
         assert used["llvm"] == (args.output / "release-llvm.sha256").read_text().split()[0]
     save(out / "sdk.json", used)
-    if args.window == "from-tip":
+    if args.window in ("from-tip", "preceding-tip"):
         # Check the tip, then go back 20 commits and replay the same history.
         # Leave all artifacts in this checkout as Cargo wrote them.
         git(src, "checkout", "--quiet", "--detach", commits[-1])
@@ -225,7 +225,9 @@ def run(args, commits, role):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--window", choices=["recent", "preceding", "shared", "revisit", "from-tip", "moves"], default="recent")
+    parser.add_argument("--window", choices=["recent", "preceding", "shared", "revisit",
+                                            "from-tip", "moves", "preceding-tip", "detour"],
+                        default="recent")
     parser.add_argument("--project", choices=PROJECTS.keys(), required=True)
     for arg in ("source", "control", "candidate", "cargo", "candidate-cargo", "current-cargo", "intermediate-cargo", "second-cargo", "scratch", "output"):
         parser.add_argument("--" + arg, type=lambda p: Path(p).resolve(), required=not arg.endswith("-cargo"))
@@ -246,12 +248,18 @@ def main():
     assert not any(args.scratch.iterdir()), "expected an empty scratch directory"
     calibrate(args.scratch, args.output)
     spec = PROJECTS[args.project]
-    seed, tip = (spec["earlier_seed"], spec["seed"]) if args.window == "preceding" else (spec["seed"], spec["tip"])
+    seed, tip = spec["seed"], spec["tip"]
+    if args.window in ("preceding", "preceding-tip"):
+        seed, tip = spec["earlier_seed"], seed
     if args.window == "moves":
         assert args.project == "serc"
         seed, tip = spec["moves_seed"], spec["moves_tip"]
     commits = git(args.source, "rev-list", "--first-parent", "--max-count=21", tip).decode().splitlines()[::-1]
     assert len(commits) == 21 and commits[0] == seed and commits[-1] == tip
+    if args.window == "detour":
+        # Visit a distant revision, then resume editing the original branch.
+        # At the second check the older canonical session is likely closer.
+        commits = [seed, tip, *commits[1:-1]]
     if args.window == "revisit":
         # Start with the same seed and three real edits. Return twice across
         # the dependency and source change with the whole target dir intact.
