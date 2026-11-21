@@ -20,6 +20,11 @@ cat > "$fixture_directory/$archive_root/install.sh" <<'EOF'
 #!/bin/sh
 set -eu
 
+if [ "${OHM_STAGED_INSTALL:-}" != 1 ]; then
+  echo 'expected component paths relative to the installed toolchain' >&2
+  exit 1
+fi
+
 prefix=
 for argument in "$@"; do
   case "$argument" in
