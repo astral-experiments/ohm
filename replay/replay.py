@@ -224,7 +224,7 @@ def codex_clippy():
     workload = benchmark.WORKLOADS["codex-core"]
     cmd = ["just","clippy","-p","codex-core","--locked","--offline"]
     driver=sdk/"bin/clippy-driver"
-    if case=="codex-test":
+    if case in ("codex-test","codex-transition"):
         driver=rustc
         cmd=["just","test","-p","codex-core","--lib","--locked","--offline","--no-tests","fail",workload.selected_test]
         env.update(CARGO_TARGET_DIR=str(root/"disk/target"),CARGO_HOME=str(root/"disk/registry"))
@@ -253,6 +253,18 @@ def codex_clippy():
             stats=dict(phase=phase,i=iteration,total=count,driver=sum(u['instructions'] for u in units),codex_core=sum(u['instructions']for u in units if u['name']=='codex_core'),units=units)
             print(role,label,len(units),stats["total"],flush=True)
             entries.append(stats)
+        if case=="codex-transition":
+            orig = source
+            source=source/"codex-rs"
+            cmd=["cargo","+ohm","build","-p","codex-core","--lib","--locked","--offline"]
+            capture("build",0)
+            cmd[2]="check"
+            capture("check",0)
+            result[role]=entries
+            result["command"]=cmd
+            source=orig
+            sdk.rename(root/role)
+            continue
         capture("cold",0)
         for i in range(3):capture("noop",i)
         for phase,n in [('dependency',7),('direct',5)]:
@@ -264,7 +276,7 @@ def codex_clippy():
         result[role]=entries
         sdk.rename(root/role)
     history.save(out/"result.json",result)
-if case in ("codex-clippy","codex-test"):
+if case in ("codex-clippy","codex-test","codex-transition"):
     sys.path.insert(0,str(wd/"scripts"))
     codex_clippy()
     raise SystemExit(0)
