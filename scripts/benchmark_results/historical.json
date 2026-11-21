@@ -1,6 +1,6 @@
 {
   "rust_version": "1.100.0",
-  "ohm_release": "ohm-1.100.0-4",
+  "ohm_release": "ohm-1.100.0-5",
   "jobs": 8,
   "host": {
     "platform": "linux-x86_64",
@@ -21,54 +21,54 @@
         "--upstream",
         "1.100.0",
         "--ohm",
-        "ohm-1.100.0-4",
+        "ohm-1.100.0-5",
         "--jobs",
         "8",
         "--minimum-free-gb",
         "60",
         "--require-idle",
         "--output-dir",
-        "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical",
+        "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical",
         "--project",
         "ruff",
         "--repetitions",
         "2",
         "--offline",
         "--scenario",
-        "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/release-fixtures/ruff-historical-rust-1.100.json",
+        "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/release-fixtures/ruff-historical-rust-1.100.json",
         "--source-path",
-        "ruff=/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/data/sources/ruff"
+        "ruff=/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/data/sources/ruff"
       ],
-      "started_at": 1795251758.1154234,
-      "wrapper_sha256": "d4b0b2c04fd7c1de776d6d63d38ad46f6d0f634cde1b2d60618067f373be7b65",
+      "started_at": 1795277952.3594763,
+      "wrapper_sha256": "7b30a9fafb74e18b032aba4be920bca6aaea61ba5b8b6d80240b2ff792952a3b",
       "runner_sha256": {
         "benchmark.py": "b8b137e10eccea11c2bdd3ee8600a337b1efd857576291d630bb39761f813a7e",
         "replay_sessions.py": "015d02607858da8acf93768e714f28603a920a4ad61b5976b862548328f168a8",
         "benchmark_workflows.py": "a31ecbb300c3f83fbb38c41fea8678d097c2e45c93887d7b03de20e8c0a22a84",
         "workflow_results.py": "fabc3ce1ea82ee0dc517c2381e4c82490a3529b4ea9a75814c5f988492fe6e58"
       },
-      "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/usr/local/libexec/applied-devbox-oaiproxy:/usr/local/bin:/home/dev-user/.local/bin:/home/dev-user/.openai/bin:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin",
-      "tmpdir": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/tmp",
+      "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/usr/local/libexec/applied-devbox-oaiproxy:/usr/local/bin:/home/dev-user/.local/bin:/home/dev-user/.openai/bin:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin",
+      "tmpdir": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/tmp",
       "toolchains": [
         ["stock", "1.100.0"],
-        ["ohm", "ohm-1.100.0-4"]
+        ["ohm", "ohm-1.100.0-5"]
       ],
       "sanitized_environment": {
-        "CARGO_HOME": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/cargo-home",
+        "CARGO_HOME": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/cargo-home",
         "CARGO_NET_OFFLINE": "true",
         "GIT_CONFIG_COUNT": "2",
         "GIT_CONFIG_KEY_0": "maintenance.auto",
         "GIT_CONFIG_KEY_1": "gc.auto",
         "GIT_CONFIG_VALUE_0": "false",
         "GIT_CONFIG_VALUE_1": "0",
-        "PATH": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/usr/local/libexec/applied-devbox-oaiproxy:/usr/local/bin:/home/dev-user/.local/bin:/home/dev-user/.openai/bin:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin",
-        "RUSTUP_HOME": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/rustup",
-        "TMPDIR": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/tmp",
-        "UV_CACHE_DIR": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/uv-cache",
-        "UV_PYTHON": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/tools/bin/python3.12",
+        "PATH": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/usr/local/libexec/applied-devbox-oaiproxy:/usr/local/bin:/home/dev-user/.local/bin:/home/dev-user/.openai/bin:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "RUSTUP_HOME": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/rustup",
+        "TMPDIR": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/tmp",
+        "UV_CACHE_DIR": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/uv-cache",
+        "UV_PYTHON": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/tools/bin/python3.12",
         "UV_PYTHON_DOWNLOADS": "never",
-        "UV_TOOL_BIN_DIR": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/tools/uv-bin",
-        "UV_TOOL_DIR": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/tools/uv-tools"
+        "UV_TOOL_BIN_DIR": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/tools/uv-bin",
+        "UV_TOOL_DIR": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/tools/uv-tools"
       },
       "terminal": {
         "controlling_tty": false,
@@ -82,14 +82,14 @@
         "scope": "benchmark process environment only"
       },
       "coordinator_commit": "04c83d53483607aec4f93fd2bb55b412f101d677",
-      "manifest_sha256": "ae2e3bd75d910f2aaccc1f2f8ad199cc98d0728bd4a7237f2c3a7c0f6244e808",
+      "manifest_sha256": "996ec6486b1e6e366a037a9499640bed5cb0876149774d9c46194712748b8785",
       "fixtures": {
-        "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/release-fixtures/ruff-historical-rust-1.100.json": "86ab0e113839ec4490d944ddf13874b3dc1fdae30a44f42ff20019dc0a93a7d3"
+        "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/release-fixtures/ruff-historical-rust-1.100.json": "86ab0e113839ec4490d944ddf13874b3dc1fdae30a44f42ff20019dc0a93a7d3"
       },
       "post_cell_audit": {
         "helper_sha256": "8e1ba94744f09a491f39c981bbbf59f38417afccf801f01c7fe77e9ddf4d5934",
         "endpoint_helper_sha256": "fecc0d4facabbbe048dc6d9fb0ea80e447ab01d9135dd34a6f47d0ad434f81c1",
-        "process_inspector_sha256": "5da46484e2700b4f886dd358fd471380a7ac8f8492c8be706709578e71611fe7",
+        "process_inspector_sha256": "58640737f5b4e2e3fc9a1cced2a32bab0277a8c23d72e5f01cf38eedbdf39664",
         "timing_boundary": "after persisted run_session, before next cell",
         "retirement": "exclusive per-cell target and shared-build leaves only",
         "quiet_seconds_after_retirement": 30
@@ -99,45 +99,45 @@
       "1.100.0": {
         "cargo": {
           "version": "cargo 1.100.0 (3acc79c0c 2026-11-05)",
-          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
           "sha256": "84d55d77232a921da96bcf2e1f78532ef5c5221803aae4448d9e220d48ebd808"
         },
         "rustc": {
           "version": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
-          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/rustc",
+          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/rustc",
           "sha256": "5073422953727c9427a76b7fce03aa9404da46315e5a1e4965389512a41e8db0"
         },
         "clippy-driver": {
           "version": "clippy 0.1.100 (0ef1bc3860 2026-11-09)",
-          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/clippy-driver",
+          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/clippy-driver",
           "sha256": "b20543523b921c8c57b14fb80e04209a6d9e7290c935e0bb5d50f622c45b9160"
         },
         "rustfmt": {
           "version": "rustfmt 1.11.0-stable (0ef1bc3860 2026-11-09)",
-          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/rustfmt",
+          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/rustfmt",
           "sha256": "6e2d5b048877b33b14d5da5670381516b7ec3ee22572b8aff933d090fe6cb664"
         }
       },
-      "ohm-1.100.0-4": {
+      "ohm-1.100.0-5": {
         "cargo": {
-          "version": "cargo 1.100.0-dev (01450c1e5 2026-11-20) (ohm-1.100.0-4)",
-          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/rustup/toolchains/ohm-1.100.0-4/bin/cargo",
-          "sha256": "a2cb9829c58a757e16c7155d4b9d08da698bdedae1100213ee521630e133e535"
+          "version": "cargo 1.100.0-dev (f82cf2a02 2026-11-21) (ohm-1.100.0-5)",
+          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/rustup/toolchains/ohm-1.100.0-5/bin/cargo",
+          "sha256": "dd51207722c8996ae13da3bfd8447036db17448bc10fab36826600e29686c71f"
         },
         "rustc": {
-          "version": "rustc 1.100.0-dev (47d83992e 2026-11-21) (ohm-1.100.0-4)",
-          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/rustup/toolchains/ohm-1.100.0-4/bin/rustc",
-          "sha256": "88dff9856d5e1a90fae4b95a48c60a1ce7eb42b50ab5f5806c30129c241358e1"
+          "version": "rustc 1.100.0-dev (a49bb506f 2026-11-21) (ohm-1.100.0-5)",
+          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/rustup/toolchains/ohm-1.100.0-5/bin/rustc",
+          "sha256": "fb1bc38ff91a9f7a00888f6e0c1bdd3c03a739f56a544e4d131168a4868e1d73"
         },
         "clippy-driver": {
-          "version": "clippy 0.1.100 (8b452cfcbe 2026-11-17)",
-          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/rustup/toolchains/ohm-1.100.0-4/bin/clippy-driver",
-          "sha256": "a8e8bac96c2a079698ef4054c4f8cdf4f01a3bda59d7005fae933da8f3d22c01"
+          "version": "clippy 0.1.100 (c62b64916f 2026-11-20)",
+          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/rustup/toolchains/ohm-1.100.0-5/bin/clippy-driver",
+          "sha256": "ceda9d17442a78c887eef324a7ea05202b63fbe90d1f2327950b7a8d57fb3672"
         },
         "rustfmt": {
-          "version": "rustfmt 1.11.0-dev (cd3f7fc323 2026-11-20)",
-          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/rustup/toolchains/ohm-1.100.0-4/bin/rustfmt",
-          "sha256": "b3e56b3dff6f4e3da4f2f903b87540427504b53667e5514ea201da6f02f433b5"
+          "version": "rustfmt 1.11.0-dev (f63d4c44ba 2026-11-20)",
+          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/rustup/toolchains/ohm-1.100.0-5/bin/rustfmt",
+          "sha256": "57edb0fcbc10dc024d657fc41b8035203b562ef59af13667a31916ac5c04a7fe"
         }
       }
     },
@@ -147,32 +147,32 @@
         "binary_sha256": "c1630f9a8c447391325a6732a114f9b1c537fbc3e10156ddedbf6e3b8ff11f1a",
         "url": "https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.140/cargo-nextest-0.9.140-x86_64-unknown-linux-gnu.tar.gz",
         "version": "cargo-nextest 0.9.140 (a9fef2964 2026-07-05)\nrelease: 0.9.140\ncommit-hash: a9fef2964e34f64ed4fceeee7c0c3559ce560920\ncommit-date: 2026-07-05\nhost: x86_64-unknown-linux-gnu",
-        "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/tools/bin/cargo-nextest"
+        "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/tools/bin/cargo-nextest"
       },
       "just": {
         "archive_sha256": "4a5cc2f53e6f0f8c59092a6cc38291eb729d46a7dd95d3ae582008881b84931d",
         "binary_sha256": "3ad66571feae522db2cad31b9613bf21035b8a06d2738d6fc8fe6089856f2042",
         "url": "https://github.com/casey/just/releases/download/1.58.0/just-1.58.0-x86_64-unknown-linux-musl.tar.gz",
         "version": "just 1.58.0",
-        "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/tools/bin/just"
+        "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/tools/bin/just"
       },
       "uv": {
         "archive_sha256": "2e2b37e9811e17675a9e70bed5e1a58fc8c0388be63d751d72cc735188c149ff",
         "binary_sha256": "fe60af3d6b1771ecea15fdfd3821959912009e1612b3767a4988f135bc3cdd9d",
         "url": "https://github.com/astral-sh/uv/releases/download/0.12.8/uv-x86_64-unknown-linux-gnu.tar.gz",
         "version": "uv 0.12.8 (x86_64-unknown-linux-gnu)",
-        "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/tools/bin/uv"
+        "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/tools/bin/uv"
       },
       "python3.12": {
-        "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/tools/bin/python3.12",
+        "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/tools/bin/python3.12",
         "resolved_path": "/home/dev-user/ohm-benchmarks-1.99.0-27/tools/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
         "sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
         "version": "Python 3.12.13"
       }
     },
     "python": {
-      "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/tools/bin/python3.12",
-      "resolved_path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/python/bin/python3.12",
+      "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/tools/bin/python3.12",
+      "resolved_path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/python/bin/python3.12",
       "sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
       "version": "Python 3.12.13"
     },
@@ -180,29 +180,29 @@
       "proof": {
         "passed": true,
         "violations": [],
-        "samples": 1069,
+        "samples": 1045,
         "returncode": 0,
-        "monitor_sha256": "70ffcf1659a98f34cfa7656fdd1e89f3c29de26b06cd590ae3cb5b96494850fc",
-        "trace_sha256": "0e6eebb15630998979fd24b05e60cffe69384a3998c4e531530fcfc268f0c891"
+        "monitor_sha256": "82d2c6a04f8b89810a1c2fcf1e7fe8eaf33dadadf19a4375ec9a263f9d093abc",
+        "trace_sha256": "d584352451643f900b66fddb49558cd4eaf3212716bafb67fcb33fe968c10f63"
       },
-      "preflight_sha256": "d87ce1053fbe2cd159bbed3e91d94d1f833f50a8e14873778c03d2076acb203c",
+      "preflight_sha256": "5ba11f5cdbd4537a34b8393265f736aead6c4d575421de59233fcbea73664392",
       "accepted_prefix_only": false,
-      "accepted_samples": 1069,
-      "interval_start": 1795251757.8145726,
-      "interval_end": 1795253968.9309464,
-      "maximum_gap_seconds": 2.205460453998967,
-      "minimum_free_bytes": 296091541504,
-      "weighted_steal_fraction": 2.7972953419920747e-5,
-      "peak_steal_fraction": 0.0006113403637475164,
-      "peak_external_user_cpu_fraction": 0.003303145169742845
+      "accepted_samples": 1045,
+      "interval_start": 1795277952.0375881,
+      "interval_end": 1795280109.834835,
+      "maximum_gap_seconds": 2.351565228000254,
+      "minimum_free_bytes": 306771390464,
+      "weighted_steal_fraction": 3.173534238431121e-5,
+      "peak_steal_fraction": 0.001068702290076336,
+      "peak_external_user_cpu_fraction": 0.0015185125706284586
     },
-    "raw_results_sha256": "2fd9961abfa6c7cbe6e350624bad1927a399c25df5670c5bd3a673623a17756c",
-    "exporter_sha256": "64833214a472e6ad8daadcf05e20c8503badf13a023c8082a664ccb0a496c472",
+    "raw_results_sha256": "96a2dfd6f83633c36bf8c4ce8543e092d15250aa8ef676f836fd478a08df5da5",
+    "exporter_sha256": "91ff4d7398f9fca44178e63c6c1664bbb13e5a7f93882d5b7de0697693c90091",
     "fixtures": {
-      "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/release-fixtures/ruff-historical-rust-1.100.json": "86ab0e113839ec4490d944ddf13874b3dc1fdae30a44f42ff20019dc0a93a7d3"
+      "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/release-fixtures/ruff-historical-rust-1.100.json": "86ab0e113839ec4490d944ddf13874b3dc1fdae30a44f42ff20019dc0a93a7d3"
     }
   },
-  "completed_at": "2026-11-21T09:58:58.417480+00:00",
+  "completed_at": "2026-11-21T17:14:27.690759+00:00",
   "repetitions": 2,
   "sessions": [
     {
@@ -240,8 +240,8 @@
         "category": "check",
         "command": ["cargo", "check", "-p", "ty_python_semantic"],
         "wall_seconds": {
-          "stock": [0.3880791910014523, 0.3840910770013579],
-          "ohm": [0.328984498999489, 0.4496667920029722]
+          "stock": [0.258038451000175, 0.2769344970001839],
+          "ohm": [0.3892853749994174, 0.27353092199973617]
         },
         "tests_started": {
           "stock": [0, 0],
@@ -266,8 +266,8 @@
           "mdtest::cycle.md"
         ],
         "wall_seconds": {
-          "stock": [1.003871312001138, 1.1135445199979586],
-          "ohm": [0.9055712160006806, 0.9310882409990882]
+          "stock": [0.9154428650008413, 0.9497623409997686],
+          "ohm": [0.9127187399999457, 0.7835849409993898]
         },
         "tests_started": {
           "stock": [1, 1],
@@ -292,8 +292,8 @@
           "mdtest::attributes.md"
         ],
         "wall_seconds": {
-          "stock": [131.44487605000177, 137.62195864200112],
-          "ohm": [76.44071882999924, 85.01047755000036]
+          "stock": [122.92045176299962, 127.88268323800003],
+          "ohm": [71.39630078400023, 68.35994741200011]
         },
         "tests_started": {
           "stock": [1, 1],
@@ -318,8 +318,8 @@
           "mdtest::cycle.md"
         ],
         "wall_seconds": {
-          "stock": [1.0952689459991234, 1.277940840998781],
-          "ohm": [0.9478401019987359, 1.1173995019998983]
+          "stock": [1.2014430089993766, 1.430130253000243],
+          "ohm": [0.8672983590004151, 0.9822157860007792]
         },
         "tests_started": {
           "stock": [1, 1],
@@ -343,8 +343,8 @@
           "ty_python_semantic"
         ],
         "wall_seconds": {
-          "stock": [18.725364896999963, 23.495271462001256],
-          "ohm": [6.820142328997463, 7.994585259002633]
+          "stock": [18.790775427999506, 22.002131756999916],
+          "ohm": [7.357155179000074, 6.460195108999869]
         },
         "tests_started": {
           "stock": [0, 0],
@@ -378,8 +378,8 @@
           "mdtest::type_properties/is_subtype_of.md"
         ],
         "wall_seconds": {
-          "stock": [59.10153037599957, 61.84528634399976],
-          "ohm": [38.99621023800137, 43.6189401499978]
+          "stock": [59.64111639300063, 62.83119166399956],
+          "ohm": [35.90567329899932, 38.4229803420003]
         },
         "tests_started": {
           "stock": [3, 3],
@@ -396,8 +396,8 @@
         "category": "check",
         "command": ["cargo", "check", "-p", "ty_python_semantic"],
         "wall_seconds": {
-          "stock": [19.830518734997895, 16.71263706299942],
-          "ohm": [6.383487507002428, 6.535704980000446]
+          "stock": [18.136048638999455, 19.95701580900004],
+          "ohm": [6.491219110000202, 6.176409713999419]
         },
         "tests_started": {
           "stock": [0, 0],
@@ -422,8 +422,8 @@
           "mdtest::cycle.md"
         ],
         "wall_seconds": {
-          "stock": [126.57645694600069, 121.80394825700205],
-          "ohm": [76.20438187200125, 74.32934615200065]
+          "stock": [116.88425355799973, 125.03574432900041],
+          "ohm": [66.24350813000001, 63.60746358800043]
         },
         "tests_started": {
           "stock": [1, 1],
@@ -448,8 +448,8 @@
           "mdtest::attributes.md"
         ],
         "wall_seconds": {
-          "stock": [1.720019765998586, 1.446690998996928],
-          "ohm": [1.3335951549997844, 1.4013819329993566]
+          "stock": [1.656576206999489, 1.5141685770004187],
+          "ohm": [1.410470832000101, 1.3726710800001456]
         },
         "tests_started": {
           "stock": [1, 1],
@@ -495,8 +495,8 @@
           "clippy::used_underscore_items"
         ],
         "wall_seconds": {
-          "stock": [59.483713188001275, 57.605791014000715],
-          "ohm": [20.296961405998445, 18.78597059800086]
+          "stock": [58.175498430000516, 55.17768511500071],
+          "ohm": [19.51601028799996, 18.87647957900026]
         },
         "tests_started": {
           "stock": [0, 0],
@@ -513,8 +513,8 @@
         "category": "formatting",
         "command": ["cargo", "fmt", "--all", "--", "--check"],
         "wall_seconds": {
-          "stock": [6.005567516000156, 5.722231986001134],
-          "ohm": [6.332401509000192, 6.074402812999324]
+          "stock": [5.773753027000566, 5.637268636000044],
+          "ohm": [5.566767235000043, 5.828973829999995]
         },
         "tests_started": {
           "stock": [0, 0],
@@ -544,8 +544,8 @@
           "immediate-final"
         ],
         "wall_seconds": {
-          "stock": [14.458429752001393, 14.679391994999605],
-          "ohm": [10.277349019001122, 11.397978278000664]
+          "stock": [13.645714405000035, 12.916483379000056],
+          "ohm": [10.155709472000126, 10.295126388999961]
         },
         "tests_started": {
           "stock": [867, 867],
@@ -566,8 +566,8 @@
         "category": "check",
         "command": ["cargo", "check", "-p", "ty_python_semantic"],
         "wall_seconds": {
-          "stock": [38.12062553999931, 35.68447616300182],
-          "ohm": [21.376229039000464, 19.53779714600023]
+          "stock": [34.45522159600023, 31.3073204859993],
+          "ohm": [20.724089858000298, 19.911812897000345]
         },
         "tests_started": {
           "stock": [0, 0],
@@ -592,8 +592,8 @@
           "mdtest::cycle.md"
         ],
         "wall_seconds": {
-          "stock": [163.26867094699992, 157.47901901099976],
-          "ohm": [116.20647497800019, 115.9380772700024]
+          "stock": [144.58494380400043, 148.93145090400049],
+          "ohm": [111.49647059500057, 104.85442938899996]
         },
         "tests_started": {
           "stock": [1, 1],
@@ -608,32 +608,32 @@
   },
   "timed_session_seconds": {
     "ruff": {
-      "stock": [440.4444685259987, 444.31796118700004],
-      "ohm": [245.89458473299965, 258.261828273]
+      "stock": [418.5915679439995, 436.2508358750001],
+      "ohm": [226.9001456549995, 222.05414943300002]
     }
   },
   "timed_command_seconds": {
     "ruff": {
-      "stock": [439.833696675003, 443.7087842000001],
-      "ohm": [245.2676436820002, 257.64694224800405]
+      "stock": [417.99911217499994, 435.6111995950014],
+      "ohm": [226.21211680299984, 221.4395786920004]
     }
   },
   "timed_edit_seconds": {
     "ruff": {
-      "stock": [0.0539105669959099, 0.07115638299728744],
-      "ohm": [0.05627836799976649, 0.05116907000046922]
+      "stock": [0.05226008399949933, 0.060680338000565825],
+      "ohm": [0.05334272300115117, 0.05432175000078132]
     }
   },
   "untimed_warmup_seconds": {
     "ruff": {
-      "stock": [201.38929648699923, 193.16349517400158],
-      "ohm": [137.58270401700065, 135.47587441600263]
+      "stock": [179.04016540000066, 180.23877138999978],
+      "ohm": [132.22056045300087, 124.7662422860003]
     }
   },
   "command_audits": [
     {
       "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/0/01.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/0/01.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -650,7 +650,7 @@
         "--",
         "mdtest::cycle.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/0/02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/0/02.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -667,7 +667,7 @@
         "--",
         "mdtest::attributes.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/0/04.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/0/04.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -684,7 +684,7 @@
         "--",
         "mdtest::cycle.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/0/05.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/0/05.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -700,7 +700,7 @@
         "-p",
         "ty_python_semantic"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/0/06.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/0/06.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -726,7 +726,7 @@
         "mdtest::narrow/hasattr.md",
         "mdtest::type_properties/is_subtype_of.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/0/08.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/0/08.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -735,7 +735,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/0/09.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/0/09.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -752,7 +752,7 @@
         "--",
         "mdtest::cycle.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/0/11.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/0/11.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -769,7 +769,7 @@
         "--",
         "mdtest::attributes.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/0/12.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/0/12.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -807,7 +807,7 @@
         "-A",
         "clippy::used_underscore_items"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/0/13.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/0/13.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -816,7 +816,7 @@
     },
     {
       "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/0/14.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/0/14.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -838,7 +838,7 @@
         "--failure-output",
         "immediate-final"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/0/15.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/0/15.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -847,7 +847,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/0/warmup-01.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/0/warmup-01.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -864,7 +864,7 @@
         "--",
         "mdtest::cycle.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/0/warmup-02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/0/warmup-02.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 0,
@@ -873,7 +873,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/0/01.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/0/01.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -890,7 +890,7 @@
         "--",
         "mdtest::cycle.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/0/02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/0/02.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -907,7 +907,7 @@
         "--",
         "mdtest::attributes.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/0/04.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/0/04.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -924,7 +924,7 @@
         "--",
         "mdtest::cycle.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/0/05.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/0/05.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -940,7 +940,7 @@
         "-p",
         "ty_python_semantic"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/0/06.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/0/06.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -966,7 +966,7 @@
         "mdtest::narrow/hasattr.md",
         "mdtest::type_properties/is_subtype_of.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/0/08.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/0/08.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -975,7 +975,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/0/09.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/0/09.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -992,7 +992,7 @@
         "--",
         "mdtest::cycle.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/0/11.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/0/11.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -1009,7 +1009,7 @@
         "--",
         "mdtest::attributes.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/0/12.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/0/12.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -1047,7 +1047,7 @@
         "-A",
         "clippy::used_underscore_items"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/0/13.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/0/13.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -1056,7 +1056,7 @@
     },
     {
       "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/0/14.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/0/14.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -1078,7 +1078,7 @@
         "--failure-output",
         "immediate-final"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/0/15.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/0/15.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -1087,7 +1087,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/0/warmup-01.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/0/warmup-01.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -1104,7 +1104,7 @@
         "--",
         "mdtest::cycle.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/0/warmup-02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/0/warmup-02.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 0,
@@ -1113,7 +1113,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/1/01.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/1/01.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -1130,7 +1130,7 @@
         "--",
         "mdtest::cycle.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/1/02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/1/02.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -1147,7 +1147,7 @@
         "--",
         "mdtest::attributes.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/1/04.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/1/04.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -1164,7 +1164,7 @@
         "--",
         "mdtest::cycle.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/1/05.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/1/05.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -1180,7 +1180,7 @@
         "-p",
         "ty_python_semantic"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/1/06.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/1/06.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -1206,7 +1206,7 @@
         "mdtest::narrow/hasattr.md",
         "mdtest::type_properties/is_subtype_of.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/1/08.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/1/08.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -1215,7 +1215,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/1/09.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/1/09.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -1232,7 +1232,7 @@
         "--",
         "mdtest::cycle.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/1/11.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/1/11.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -1249,7 +1249,7 @@
         "--",
         "mdtest::attributes.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/1/12.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/1/12.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -1287,7 +1287,7 @@
         "-A",
         "clippy::used_underscore_items"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/1/13.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/1/13.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -1296,7 +1296,7 @@
     },
     {
       "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/1/14.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/1/14.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -1318,7 +1318,7 @@
         "--failure-output",
         "immediate-final"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/1/15.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/1/15.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -1327,7 +1327,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/1/warmup-01.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/1/warmup-01.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -1344,7 +1344,7 @@
         "--",
         "mdtest::cycle.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/ohm/1/warmup-02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/ohm/1/warmup-02.log",
       "toolchain": "ohm",
       "project": "ruff",
       "repetition": 1,
@@ -1353,7 +1353,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/1/01.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/1/01.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -1370,7 +1370,7 @@
         "--",
         "mdtest::cycle.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/1/02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/1/02.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -1387,7 +1387,7 @@
         "--",
         "mdtest::attributes.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/1/04.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/1/04.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -1404,7 +1404,7 @@
         "--",
         "mdtest::cycle.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/1/05.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/1/05.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -1420,7 +1420,7 @@
         "-p",
         "ty_python_semantic"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/1/06.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/1/06.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -1446,7 +1446,7 @@
         "mdtest::narrow/hasattr.md",
         "mdtest::type_properties/is_subtype_of.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/1/08.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/1/08.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -1455,7 +1455,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/1/09.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/1/09.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -1472,7 +1472,7 @@
         "--",
         "mdtest::cycle.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/1/11.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/1/11.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -1489,7 +1489,7 @@
         "--",
         "mdtest::attributes.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/1/12.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/1/12.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -1527,7 +1527,7 @@
         "-A",
         "clippy::used_underscore_items"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/1/13.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/1/13.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -1536,7 +1536,7 @@
     },
     {
       "command": ["cargo", "fmt", "--all", "--", "--check"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/1/14.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/1/14.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -1558,7 +1558,7 @@
         "--failure-output",
         "immediate-final"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/1/15.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/1/15.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -1567,7 +1567,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "ty_python_semantic"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/1/warmup-01.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/1/warmup-01.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -1584,7 +1584,7 @@
         "--",
         "mdtest::cycle.md"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-4/published/campaign-ruff/output/historical/logs/ruff/stock/1/warmup-02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-5/published/campaign-ruff/output/historical/logs/ruff/stock/1/warmup-02.log",
       "toolchain": "stock",
       "project": "ruff",
       "repetition": 1,
@@ -1611,17 +1611,17 @@
   ],
   "measured_sdk": {
     "source_kind": "published release",
-    "release": "https://github.com/astral-experiments/ohm/releases/tag/ohm-1.100.0-4",
-    "release_run": "https://github.com/astral-experiments/ohm/actions/runs/44877876902",
-    "coordinator_revision": "0e9062bb4559f3caaa65067ed0382ddeb0ccc0de",
-    "manifest_sha256": "ae2e3bd75d910f2aaccc1f2f8ad199cc98d0728bd4a7237f2c3a7c0f6244e808",
+    "release": "https://github.com/astral-experiments/ohm/releases/tag/ohm-1.100.0-5",
+    "release_run": "https://github.com/astral-experiments/ohm/actions/runs/44913157240",
+    "coordinator_revision": "88080fb93fc9bb27f2341059835262bdc7997de9",
+    "manifest_sha256": "996ec6486b1e6e366a037a9499640bed5cb0876149774d9c46194712748b8785",
     "source_revisions": {
-      "rust": "47d83992e42cba3797d917abea34f5a527603480",
-      "cargo": "01450c1e58ff11a116b40ea835aeb70fd60c473d",
-      "clippy": "8b452cfcbe11a705b7202554c7655dd9209d2e04",
-      "rustfmt": "cd3f7fc323dcce7ec70284c3cc3f673a48ecd26f",
-      "llvm": "71b1be2373b29792c2544b7e5a6d2ceb6dd7ce27"
+      "rust": "a49bb506fec6caff6cd3af19751598d87c2a9999",
+      "cargo": "f82cf2a0203950ffd01aa83c67d2e2faa2e97f63",
+      "clippy": "c62b64916f4fa9b918bf4f3c8cb141eff7152040",
+      "rustfmt": "f63d4c44ba9dec69a4e97fd718f4152eae1f515a",
+      "llvm": "2f69322070d903946a94c06e0103676ee77dad8b"
     },
-    "linux_archive_sha256": "6948ffc7d33b245bf48fdf770b5913cd536e71aec40a0ea280bd0eb33d4524b8"
+    "linux_archive_sha256": "6ab0b3956440eec269a7db65c885d34edf1c279c31d5a19598439cada8f4b42e"
   }
 }
