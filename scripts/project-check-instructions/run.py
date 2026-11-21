@@ -13,6 +13,7 @@ import subprocess
 HERE = Path(__file__).resolve().parent
 PROJECTS = json.loads((HERE / "projects.json").read_text())
 CHECK = ["check", "--locked", "--offline"]
+BUILD = ["build", "--locked", "--offline"]
 
 
 def save(path, value):
@@ -201,8 +202,10 @@ def run(args, commits, role):
         previous_lock = lock
         receipt = folder / ("units.tsv" if i else "prime.tsv")
         log = folder / ("check.log" if i else "prime.log")
-        build_seed = not i and args.window == "post-build"
-        invocation = ("build", "--locked", "--offline") if build_seed else CHECK
+        build = (not i and args.window in ("post-build", "to-check")) or (
+            i == 1 and args.window == "to-build"
+        )
+        invocation = BUILD if build else CHECK
         command([args.scratch / "meter", rustc, receipt, cargo, *invocation], src, env, log)
         units = read_counts(receipt)
         if i == 0:
@@ -212,7 +215,7 @@ def run(args, commits, role):
         command([args.scratch / "meter", rustc, noop, cargo, *invocation],
                 src, env, folder / "noop.log")
         assert not read_counts(noop), (i, "unexpected recompilation")
-        if args.audit and not build_seed:
+        if args.audit and not build:
             compare_fresh(cargo, src, env, folder)
         total = sum(x["instructions"] for x in units)
         title = git(src, "log", "-1", "--format=%s", commit).decode().strip()
@@ -228,7 +231,8 @@ def run(args, commits, role):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--window", choices=["recent", "preceding", "shared", "revisit",
-                                            "from-tip", "moves", "preceding-tip", "detour", "next", "post-build"],
+                                            "from-tip", "moves", "preceding-tip", "detour", "next",
+                                            "post-build", "to-build", "to-check"],
                         default="recent")
     parser.add_argument("--project", choices=PROJECTS.keys(), required=True)
     for arg in ("source", "control", "candidate", "cargo", "candidate-cargo", "current-cargo", "intermediate-cargo", "second-cargo", "scratch", "output"):
@@ -259,8 +263,13 @@ def main():
     if args.window == "next":
         assert args.project == "ripgrep"
         seed, tip = spec["next_seed"], spec["next_tip"]
-    commits = git(args.source, "rev-list", "--first-parent", "--max-count=21", tip).decode().splitlines()[::-1]
-    assert len(commits) == 21 and commits[0] == seed and commits[-1] == tip
+    if args.window in ("to-build", "to-check"):
+        assert not args.audit
+        commits = [tip, tip]
+    else:
+        assert args.project != "uv"
+        commits = git(args.source, "rev-list", "--first-parent", "--max-count=21", tip).decode().splitlines()[::-1]
+        assert len(commits) == 21 and commits[0] == seed and commits[-1] == tip
     if args.window == "detour":
         # Visit a distant revision, then resume editing the original branch.
         # At the second check the older canonical session is likely closer.
@@ -272,7 +281,7 @@ def main():
         commits = commits[:4] + commits[2:4] * 2
     cpu = re.search(r"^model name\s*:\s*(.+)$", Path("/proc/cpuinfo").read_text(), re.M)[1]
     summary = dict(project=args.project, window=args.window, repo=spec["repo"], cpu=cpu, kernel=platform.release(), jobs=args.jobs, commits=commits,
-                   command=["cargo", *CHECK], first=args.first,
+                   command=["cargo", *(BUILD if args.window == "to-build" else CHECK)], first=args.first,
                    boot=sha(Path("/proc/sys/kernel/random/boot_id")))
     roles = [args.first, "candidate" if args.first == "control" else "control"]
     if args.pair is not None:
