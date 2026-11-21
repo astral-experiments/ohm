@@ -155,6 +155,17 @@ def run(args, commits, role):
     out.mkdir()
     driver, = (kit / "lib").glob("librustc_driver-*.so")
     save(out / "sdk.json", dict(rustc=sha(rustc), driver=sha(driver), cargo=sha(cargo)))
+    if args.window == "from-tip":
+        # Check the tip, then go back 20 commits and replay the same history.
+        # Leave all artifacts in this checkout as Cargo wrote them.
+        git(src, "checkout", "--quiet", "--detach", commits[-1])
+        if not args.offline:
+            command([cargo, "fetch", "--locked", "--target", "x86_64-unknown-linux-gnu"],
+                    src, env, out / "tip-fetch.log")
+        command([args.scratch / "meter", rustc, out / "tip.tsv", cargo, *CHECK],
+                src, env, out / "tip.log")
+        assert read_counts(out / "tip.tsv")
+        save(out / "tip.json", {"commit": commits[-1], "lock": sha(src / "Cargo.lock")})
     if args.window == "shared":
         # A second checkout has already built the registry dependencies.
         # Give the measured checkout a fresh private target and keep both
@@ -209,7 +220,7 @@ def run(args, commits, role):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--window", choices=["recent", "preceding", "shared", "revisit"], default="recent")
+    parser.add_argument("--window", choices=["recent", "preceding", "shared", "revisit", "from-tip"], default="recent")
     parser.add_argument("--project", choices=PROJECTS.keys(), required=True)
     for arg in ("source", "control", "candidate", "cargo", "candidate-cargo", "current-cargo", "intermediate-cargo", "second-cargo", "scratch", "output"):
         parser.add_argument("--" + arg, type=lambda p: Path(p).resolve(), required=not arg.endswith("-cargo"))

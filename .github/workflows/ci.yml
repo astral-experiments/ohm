@@ -33,10 +33,10 @@ on:
         type: boolean
         default: false
       window:
-        description: Use a 20-edit history, a warm shared build directory, or two returns to serc PR 2299
+        description: Select a history and any commits to check before the replay
         type: choice
         default: recent
-        options: [recent, preceding, shared, revisit]
+        options: [recent, preceding, shared, revisit, from-tip]
       intermediate:
         description: Optional kit for the first PR of a stack
         required: false
