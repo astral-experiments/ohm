@@ -56,7 +56,7 @@ class Workload:
 
 
 # Stock Rust version used with the default benchmark workloads.
-DEFAULT_UPSTREAM = "1.99.0"
+DEFAULT_UPSTREAM = "1.100.0"
 
 REPOSITORIES = {
     "uv": {

@@ -3,8 +3,8 @@
   "revision": "23a16fa018cf3b219c2edc7a2b739881e023a874",
   "platform": "Linux",
   "arch": "x86_64",
-  "upstream": "1.99.0",
-  "ohm": "ohm-1.99.0-33",
+  "upstream": "1.100.0",
+  "ohm": "ohm-1.100.0-3",
   "cargo_args": [
     "test",
     "--doc",
@@ -49,30 +49,30 @@
   "toolchains": {
     "stock": {
       "cargo": {
-        "version": "cargo 1.99.0 (5f94df478 2026-08-27)",
-        "sha256": "e951141cc55a6cd7b9876d187bd30a3720e6086b99413af95e3b8de1cdd72f14"
+        "version": "cargo 1.100.0 (3acc79c0c 2026-11-05)",
+        "sha256": "84d55d77232a921da96bcf2e1f78532ef5c5221803aae4448d9e220d48ebd808"
       },
       "rustc": {
-        "version": "rustc 1.99.0 (b940084d7 2026-09-28)",
-        "sha256": "f3834d26669b03f6855fa54bd2381443123e860167bc0c7a8dd137e5cf6e5e4f"
+        "version": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+        "sha256": "5073422953727c9427a76b7fce03aa9404da46315e5a1e4965389512a41e8db0"
       },
       "rustdoc": {
-        "version": "rustdoc 1.99.0 (b940084d7 2026-09-28)",
-        "sha256": "a1321a60578a6b2e3e0ff428201b8618bbd9a9fbcd475c0d0f151bbf17cb0a9e"
+        "version": "rustdoc 1.100.0 (0ef1bc386 2026-11-09)",
+        "sha256": "e4caf2a2cb59463219d5f0db3d6bfd1dc48416d1278764d48f291b4d43cca410"
       }
     },
     "ohm": {
       "cargo": {
-        "version": "cargo 1.99.0-dev (056994fd4 2026-11-12) (ohm-1.99.0-33)",
-        "sha256": "b0173c06827a68b473dea1bcbf354d7e7aec045582491c3562fb43ef353320bb"
+        "version": "cargo 1.100.0-dev (4193b7226 2026-11-19) (ohm-1.100.0-3)",
+        "sha256": "5ea04c3f771c033bc071cd3e5ca9de7dfbe5888733bf15986f334f80ff9aadf8"
       },
       "rustc": {
-        "version": "rustc 1.99.0-dev (483768fa7 2026-11-12) (ohm-1.99.0-33)",
-        "sha256": "da600e9f3690a34f0d2987163aa976eef4f3a68db030f9268bd1e26636a773af"
+        "version": "rustc 1.100.0-dev (af392995e 2026-11-20) (ohm-1.100.0-3)",
+        "sha256": "d2683ab1c4ef571e052dc7e73bdf5ab81b1c0f6570532b7a70170bd47f61511f"
       },
       "rustdoc": {
-        "version": "rustdoc 1.99.0-dev (483768fa7 2026-11-12) (ohm-1.99.0-33)",
-        "sha256": "2f0197e8f2681544b6ad002c3693686e6cb0c9182bd5bc19c2e6e54eb2b023f1"
+        "version": "rustdoc 1.100.0-dev (af392995e 2026-11-20) (ohm-1.100.0-3)",
+        "sha256": "aed6c0875930d32f67fe07b57b1a48fd55bff937e2e36365294846624b9ed52d"
       }
     }
   },
@@ -83,108 +83,106 @@
     {
       "pair": 0,
       "toolchain": "stock",
-      "seconds": 96.62682028100244,
-      "log_sha256": "13cde65b13aacadd1a3dc54da38863dc8374fe7f4c831427520337f3f06a3bb9"
+      "seconds": 91.02791066700047,
+      "log_sha256": "0c7246b5bdabaf10114e1882330aa15b6734994920f39dcabd622e59eaf582ad"
     },
     {
       "pair": 0,
       "toolchain": "ohm",
-      "seconds": 65.92077540599712,
-      "log_sha256": "acc76cacb465ec5292a62ae6fc7718acfbf8af727ee919a63a604383c93f8452"
+      "seconds": 68.07035649000136,
+      "log_sha256": "eaad601e91fa0603f416ef378cf0d3d83587ce99721f5c49c1e4cbf3e24674ad"
     },
     {
       "pair": 1,
       "toolchain": "stock",
-      "seconds": 14.40756956399855,
-      "log_sha256": "67c066e05ea5a032c3f5fa019c82debb93be93597c0c8bb6ff95df9a816ea1ef"
+      "seconds": 16.783650942999884,
+      "log_sha256": "cc01d8220f6de3f87ac74626c4873dad2fab66e73e51d1369f4c59851e47e95b"
     },
     {
       "pair": 1,
       "toolchain": "ohm",
-      "seconds": 2.7916104449977865,
-      "log_sha256": "a73c7356ebff5b7edcf06cdf5800a52c9330d5f5870b1e8b6f3495821cad1b08"
+      "seconds": 3.477257278000252,
+      "log_sha256": "716c38d346533836bfe0638badc432f24ca2a781b0b6dc34a2216e5e056b279b"
     },
     {
       "pair": 2,
       "toolchain": "ohm",
-      "seconds": 1.5962196590044186,
-      "log_sha256": "6ec700cb4b9529893eabd83e2d1749eb1a0e6e9636be5465595bb224eee548fa"
+      "seconds": 2.4189807160000782,
+      "log_sha256": "ef5b2c52c23d1c3d9f92c02ca7ca3edf18049ceeb860ff8fee13abcd9e09af29"
     },
     {
       "pair": 2,
       "toolchain": "stock",
-      "seconds": 13.928055128999404,
-      "log_sha256": "eb8f7d1f2581c88de700551d21bc2787ad3dad9bc10fad1b991cfb854742ac60"
+      "seconds": 15.618401513998833,
+      "log_sha256": "16e3b14a561da2781e5e822b7c00394b4fcf3ac95786fa8ec6d01fd307bcae6b"
     },
     {
       "pair": 3,
       "toolchain": "stock",
-      "seconds": 13.701723240003048,
-      "log_sha256": "8bc41202da1b365030117ba4f9e890dfd40ecb291e9388f65c7dd86396b755db"
+      "seconds": 14.668724807001126,
+      "log_sha256": "11b3ce3bd2f3fccae5e6067d5322a90c663422e32f303df43a5bdc2252a880df"
     },
     {
       "pair": 3,
       "toolchain": "ohm",
-      "seconds": 1.5640948989967,
-      "log_sha256": "035ba1524aa5132c8d0d06142b5edc76df497be1195e6a531a9bf6a65b9ad4f3"
+      "seconds": 2.1797070169996005,
+      "log_sha256": "e9829c8424215da2ce93dc358728f07fabe00020463032bddd0e309ef40fcaa3"
     },
     {
       "pair": 4,
       "toolchain": "ohm",
-      "seconds": 1.5587329780028085,
-      "log_sha256": "846728db1bddcf4d77480f3ee06ab39a052d83246bc79e96ac974a009238eaad"
+      "seconds": 2.1457198659991263,
+      "log_sha256": "7dccf866eeec5e10d9e577f2007b7af5924077090b195af8f8a0bf681194899c"
     },
     {
       "pair": 4,
       "toolchain": "stock",
-      "seconds": 13.711050500001875,
-      "log_sha256": "ef0fcff163412c0bfa640d4d83a9d18c18d859c68f0b556f299370b77fab8fc9"
+      "seconds": 16.318893993999154,
+      "log_sha256": "fdd070dab9fa1700db68aa08ef9f3f6bc4ece8952f964070c0d601889bd9d5c4"
     },
     {
       "pair": 5,
       "toolchain": "stock",
-      "seconds": 14.217726253002184,
-      "log_sha256": "bb05fbe7feb1773c4021415a1d529e78a78132e6c25c67724015bff5e731becc"
+      "seconds": 16.472345874000894,
+      "log_sha256": "5a595e7e1153f10e1b38e6eb034d5a2a0d4ef0027232be307eefb94f13b367f7"
     },
     {
       "pair": 5,
       "toolchain": "ohm",
-      "seconds": 1.5749525389983319,
-      "log_sha256": "98bd3aa714bccf687816a07172f09c68bcf9254dbe010b4364bb436b17940d1a"
+      "seconds": 2.4509637980008847,
+      "log_sha256": "b80ab35833fceb895f85a2a1e76490249af589d5e33eb4857a28003285aeca61"
     }
   ],
   "warm_median_seconds": {
-    "stock": 13.928055128999404,
-    "ohm": 1.5749525389983319
+    "stock": 16.318893993999154,
+    "ohm": 2.4189807160000782
   },
   "measured_sdk": {
     "source_kind": "published release",
-    "release": "https://github.com/astral-experiments/ohm/releases/tag/ohm-1.99.0-33",
-    "release_run": "https://github.com/astral-experiments/ohm/actions/runs/43388154564",
-    "coordinator_revision": "a5522029ee993659131d4e368888547c5e055b38",
-    "manifest_sha256": "312fa14c7e58d9766edcee425ce58b157a2da84dee93e9d535431d6db5091b27",
+    "release": "https://github.com/astral-experiments/ohm/releases/tag/ohm-1.100.0-3",
+    "release_run": "https://github.com/astral-experiments/ohm/actions/runs/44754589323",
+    "coordinator_revision": "3b39a0eea279a0ac249928719cae2f34618f8650",
+    "manifest_sha256": "7fb0cc34bfbb8a2200b8391c12cfa9151d671a7d4d2f1f8be879cf6c6f3bb7b9",
     "source_revisions": {
-      "rust": "483768fa78e90530f5d9c06983f46549e1d9d276",
-      "cargo": "056994fd40811b95057989434483f02b81db069a",
-      "clippy": "fa3fb5bffdf63a827d77f2841e3682d806ba797a",
-      "rustfmt": "a1e3d882f9b49c03795b2d724d7efa7c86e738c8",
-      "llvm": "34cbf528ee5548079b5395e9a1bf3ae2b0dbd7b5"
+      "rust": "af392995e5ca93b70fc487b45dfdf6604dbbbc84",
+      "cargo": "4193b7226ed980a4947848e979cd72444cc3bc22",
+      "clippy": "8b452cfcbe11a705b7202554c7655dd9209d2e04",
+      "rustfmt": "92cc15aac56ea2cc72f72d7c3cdc08ba737af030",
+      "llvm": "bb335fde37c28311ce5db7203a2bfbb10db1853c"
     },
-    "linux_archive_sha256": "2632a68200d2c71ddba305f2a36804763f9665868148ff04dfdcc347c6860e07"
+    "linux_archive_sha256": "7fc3d21a5efad6bff7be654b14e0e60aa2fbbfd11db198582788f3cc4bcf7591"
   },
   "provenance": {
-    "build_run": "https://github.com/astral-experiments/ohm/actions/runs/43388154564",
-    "manifest_sha256": "312fa14c7e58d9766edcee425ce58b157a2da84dee93e9d535431d6db5091b27",
-    "linux_archive_sha256": "2632a68200d2c71ddba305f2a36804763f9665868148ff04dfdcc347c6860e07",
+    "build_run": "https://github.com/astral-experiments/ohm/actions/runs/44754589323",
+    "manifest_sha256": "7fb0cc34bfbb8a2200b8391c12cfa9151d671a7d4d2f1f8be879cf6c6f3bb7b9",
+    "linux_archive_sha256": "7fc3d21a5efad6bff7be654b14e0e60aa2fbbfd11db198582788f3cc4bcf7591",
     "ruff_lock_sha256": "422c71899e747052bd420702ac7d969a333f2cb36cf117ee5c0ff845c9775251",
     "linux_cpus": 32,
-    "runner_sha256": "3792677ac637ade96666cea8c6a0db827943bae3a18d09ed296f8db17edce9de",
     "reproduction_runner_sha256": "3792677ac637ade96666cea8c6a0db827943bae3a18d09ed296f8db17edce9de",
-    "cpu_intervals": 118,
-    "cpu_trace_sha256": "d97bf83fd5875edbf1bb3fe89b342857d553bb101923678bf9dd7ba63670df62",
-    "raw_evidence_sha256": "c7f8b12a8991b6a2c4f9ef430723786aa5e3b56bc264a5b190fba856f87b6c52",
+    "cpu_intervals": 123,
+    "cpu_trace_sha256": "2ff026ff9059ee4357afa992fff8cc736bccf465d0f4c3097417e77b08cb03ab",
+    "raw_evidence_sha256": "bb2f015c06acca22562bba97c9c782a154d32daf0dd2b9a844a605b3b63e7ad0",
     "raw_evidence_files": 21,
-    "host": "charlie-ohm-32-llvm",
-    "excluded_attempts": []
+    "host": "charlie-ohm-32-llvm"
   }
 }

@@ -435,7 +435,7 @@ if [[ "$prepare_relocated_dependencies" == true ]]; then
     GIT_DIR="$git_dir" GIT_COMMON_DIR="$archive_common" GIT_WORK_TREE="$perf_source" \
       GIT_ATTR_NOSYSTEM=1 GIT_ATTR_SOURCE="$perf_revision" \
       git --no-replace-objects -c core.attributesFile=/dev/null -c core.autocrlf=input \
-        -c tar.umask=0002 archive "$perf_revision" | tar -x -C "$perf_checkout"
+        -c tar.umask=0002 archive "$perf_revision" | TAR_OPTIONS='' tar -x -C "$perf_checkout"
   )
   patch -d "$perf_checkout" -t -N -F 0 -p1 -i "$script_directory/../release/rustc-perf-relocated-dependencies.patch"
   opt_dist_arguments+=(--rustc-perf-checkout-dir "$perf_checkout")

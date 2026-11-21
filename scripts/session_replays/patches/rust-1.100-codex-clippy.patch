@@ -1,0 +1,13 @@
+diff --git a/codex-rs/Cargo.toml b/codex-rs/Cargo.toml
+index c5bbcb5920bf7879343e18336a9a7efe19ebda72..2613ae9596671906656aaa577a98712eee9c5f61 100644
+--- a/codex-rs/Cargo.toml
++++ b/codex-rs/Cargo.toml
+@@ -524,7 +524,7 @@ needless_late_init = "deny"
+ needless_option_as_deref = "deny"
+ needless_question_mark = "deny"
+ needless_update = "deny"
+-redundant_clone = "deny"
++redundant_clone = "warn"
+ redundant_closure = "deny"
+ redundant_closure_for_method_calls = "deny"
+ redundant_static_lifetimes = "deny"

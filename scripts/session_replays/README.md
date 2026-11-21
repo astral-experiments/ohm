@@ -15,13 +15,38 @@ can exceed the default file-descriptor limit. It also needs a short, private tem
 two tests depend on path length or its encoded representation. A symlink to a longer path does not
 work.
 
+### Prepare the Codex inputs
+
+For Codex, prepare the frozen inputs once in a dedicated benchmark directory. Both toolchains use the same patched copy of `allocative 0.3.6`. Its published source defines two implementations of the same type on Rust 1.100 development-channel compilers. The helper verifies the crate archive, applies the two upstream source changes and keeps both Codex lockfiles intact. A separate fixture patch sets the workspace `redundant_clone` lint to `warn`. The recorded TUI command still denies `clippy::redundant_closure_for_method_calls`. [Upstream allocative fix](https://github.com/meta/buck2/commit/9711293c6de502d50583cafb12e4a7b764094d3a)
+
+Cargo warns that the path override may have changed the dependency on `allocative_derive`. Both toolchains resolved the same package versions, dependency edges and enabled features with and without the override at each Codex revision. The patched `allocative` itself is a local path dependency.
+
+Run the helper from the Ohm checkout. The Codex source must contain the two recorded revisions. The helper reads the archive from Cargo's cache or from the optional `--archive /path/to/allocative-0.3.6.crate` argument.
+
+```sh
+bench_root=/absolute/path/to/codex-benchmark
+codex_source=/absolute/path/to/codex
+python3 scripts/session_replays/helpers/codex-1.100/prepare.py \
+  --benchmark-root "$bench_root" --codex-source "$codex_source"
+command_source="$bench_root/compatibility/codex-commands"
+command_revision=$(git -C "$command_source" rev-parse HEAD)
+```
+
+The helper writes a Cargo path override under `$bench_root/.cargo`. Keep each suite's output beneath that directory so Cargo and Clippy find the override throughout the run. Use these arguments alongside the job count, repetitions and idle controls in the [benchmark guide](../../BENCHMARKS.md).
+
+| Suite                | Source arguments                                                                        | Output argument                         |
+| -------------------- | --------------------------------------------------------------------------------------- | --------------------------------------- |
+| Individual commands  | `--project codex-core --codex-path "$command_source" --codex-rev "$command_revision"`   | `--output-dir "$bench_root/individual"` |
+| Developer workflows  | `--project codex --source-path "codex=$command_source" --codex-rev "$command_revision"` | `--output-dir "$bench_root/developer"`  |
+| Recorded TUI session | `--project codex --source-path "codex=$codex_source"`                                   | `--output-dir "$bench_root/session"`    |
+
 ## Run the sessions
 
 Choose an installed Ohm release and its corresponding stock Rust version before running the examples.
 
 ```sh
-stock=1.99.0
-ohm=ohm-1.99.0-26
+stock=1.100.0
+ohm=ohm-1.100.0-3
 ```
 
 ```sh
@@ -32,8 +57,8 @@ python3 scripts/replay_sessions.py \
   --upstream "$stock" --ohm "$ohm" \
   --source-path ruff=/path/to/ruff \
   --source-path uv=/path/to/uv \
-  --source-path codex=/path/to/codex \
-  --output-dir /path/to/new-empty-results \
+  --source-path "codex=$codex_source" \
+  --output-dir "$bench_root/session" \
   --jobs 8 \
   --repetitions 2 \
   --require-idle
@@ -57,13 +82,13 @@ If your shell sets `PYTHONSAFEPATH=1`, invoke the trusted script with
 Use `--project ruff`, `--project uv`, or `--project codex` to run one project. Override its fixture
 with `--scenario PATH`.
 
-| Project | Fixture                                      | Workload                                                                                               |
-| ------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Ruff/ty | [ruff-rust-1.99.json](ruff-rust-1.99.json)   | Recursive attribute inference, focused mdtests, package tests, Clippy, and formatting.                 |
-| uv      | [uv-rust-1.99.json](uv-rust-1.99.json)       | PyPI Simple API JSON parsing, parser and registry-client tests, Clippy, and a local installation test. |
-| Codex   | [codex-rust-1.99.json](codex-rust-1.99.json) | Public TUI rendering changes, focused nextest runs, package tests, and Clippy.                         |
+| Project | Fixture                                        | Workload                                                                                               |
+| ------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Ruff/ty | [ruff-rust-1.100.json](ruff-rust-1.100.json)   | Recursive attribute inference, focused mdtests, package tests, Clippy, and formatting.                 |
+| uv      | [uv-rust-1.100.json](uv-rust-1.100.json)       | PyPI Simple API JSON parsing, parser and registry-client tests, Clippy, and a local installation test. |
+| Codex   | [codex-rust-1.100.json](codex-rust-1.100.json) | Public TUI rendering changes, focused nextest runs, package tests, and Clippy.                         |
 
-The default Rust 1.99 fixtures apply the same formatting compatibility patches and Clippy allowances to both toolchains. Profiles and test selections also match. The [historical Ruff fixture](ruff-historical-rust-1.99.json) covers a different session, including check-to-test-to-check transitions.
+The default Rust 1.100 fixtures apply the same compatibility patches and Clippy allowances to both toolchains. Profiles and test selections also match. The [historical Ruff fixture](ruff-historical-rust-1.100.json) covers a different session, including check-to-test-to-check transitions. [Archived Rust 1.99 fixtures](https://github.com/astral-experiments/ohm/tree/5ca20614e8ebabc7b3f79a04a9dcc9476e33d882/scripts/session_replays)
 
 The Codex fixture includes a
 [test-only setup patch](patches/codex-safety-retry-goal-accounting.patch) that bounds a timing
@@ -77,15 +102,17 @@ modes. Setup time is excluded from session and warmup totals.
 
 ### ty diagnostic-suppression session
 
-[`ty-29327.json`](ty-29327.json) replays [Ruff #29327](https://github.com/astral-sh/ruff/pull/29327): failing mdtests, Markdown and Rust edits, package tests, CLI rebuilds, diagnostic checks, and Clippy. It preserves `opt-level = 1` and each command's feature selection. The initial CLI build is untimed.
+The Rust 1.100 fixture replays the failing mdtests, Markdown and Rust edits, package tests, CLI rebuilds, diagnostic checks, and Clippy from Ruff #29327. It preserves `opt-level = 1` and each command's feature selection. The initial CLI build is untimed. The measured host used cargo-nextest 0.9.140. [Ruff #29327](https://github.com/astral-sh/ruff/pull/29327) · [Rust 1.100 fixture](ty-29327.json)
+
+The build record calls this fixture `ty-29327-rust-1.100.json`. The final Clippy step permits Cargo manifest warnings. We verified its logs against the 56 expected warnings after timing. [Archived warning checker and expected output](https://github.com/astral-experiments/ohm/tree/94f277c4d022c35dde70e10677e75bdec896ac15/scripts/session_replays/helpers/ty-29327)
 
 ```sh
 python3 scripts/replay_sessions.py \
   --project ruff --scenario scripts/session_replays/ty-29327.json \
-  --upstream "$stock" --ohm "$ohm" \
+  --upstream 1.100.0 --ohm ohm-1.100.0-3 \
   --source-path ruff=/path/to/ruff --output-dir /path/to/new-ty-results \
   --jobs 8 --repetitions 4 --native-tool-trust all \
-  --compiler-accounting verbose --offline --require-idle
+  --minimum-free-gb 60 --compiler-accounting verbose --offline --require-idle
 ```
 
 This enables both Ohm trust opt-ins. Expected failures must match the fixture's exit status and diagnostics.
@@ -96,14 +123,15 @@ This enables both Ohm trust opt-ins. Expected failures must match the fixture's 
 
 ```sh
 python3 scripts/benchmark_worktree_start.py \
-  --upstream "$stock" --ohm "$ohm" \
+  --scenario scripts/session_replays/ty-29327.json \
+  --upstream 1.100.0 --ohm ohm-1.100.0-3 \
   --source-path /path/to/ruff --output-dir /path/to/new-worktree-results \
-  --jobs 8 --repetitions 3 --compiler-accounting verbose --offline --require-idle
+  --jobs 8 --repetitions 3 --minimum-free-gb 60 --compiler-accounting verbose --offline --require-idle
 ```
 
 The runner compares stock Rust with two Ohm configurations: a shared build directory, and that directory with both trust opt-ins. Each repetition starts with fresh artifacts. Stock Rust uses `git worktree add`; Ohm uses `cargo worktree add`. Snapshot cloning requires a filesystem such as Btrfs; ext4 can still reuse shared registry builds.
 
-Use a new output directory after an interrupted startup run. See the [results](../benchmark_results/ty-worktree.md) for both benchmarks.
+For the filesystem comparison, run the worktree command once with an output directory on ext4 and once on Btrfs. Use a fresh output directory after an interrupted startup run. [Session and worktree results](../benchmark_results/ty-worktree.md)
 
 ### Warmups and toolchain settings
 

@@ -294,6 +294,7 @@ assert_no_links() {
 
 mkdir -p "$temporary_directory/back\\slash"
 TMPDIR="$temporary_directory/back\\slash" run_case escaped-tempdir success
+TAR_OPTIONS=--exclude=install.sh run_case tar-exclusion success
 
 run_case help success --help
 assert_contains "$temporary_directory/cases/help/output.log" 'Usage: install.sh'

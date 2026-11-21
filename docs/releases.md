@@ -114,6 +114,13 @@ gh workflow run release.yml --repo astral-experiments/ohm --ref main \
   -f manifest="$manifest" -F build=true
 ```
 
+To run targeted replays while the macOS distribution builds, pass `-f require_replay=true`.
+Download the Linux artifact from that run and replay its SDK against the previous release.
+Once the replays pass, post a successful commit status on the workflow’s coordinator commit
+with context `ohm/replay/<sha256>` and a link to the results. Use the SHA-256 of the Linux
+`.tar.gz` inside the artifact. Before tagging, the publish job checks the latest status for
+that archive on that commit. If the replays finish later, rerun the failed publish job.
+
 The workflow verifies source revisions, builds both complete stage-2 Rust distributions, and
 generates one universal installer with both archive checksums embedded. It smoke-tests that exact
 installer on macOS and Linux before checking existing source tags across all four repositories and

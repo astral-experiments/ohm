@@ -17,6 +17,13 @@ case "$(jq -er '.release.upstream_rust_version' "$MANIFEST_PATH")" in
     bolt_major=23
     bolt_version='23.1.2'
     bolt_sha256='b5ed9675149cc837c282e9b6962c276c9fa62863d5b2f91537b60848552995b7'
+    image=ghcr.io/rust-lang/rust-ci@sha256:6ddfb4305cd3f14c08e1e4ac628fe63c297765e2311308fe747355dc5e4b66d5
+    ;;
+  1.100.*)
+    bolt_major=23
+    bolt_version='23.1.5'
+    bolt_sha256='f72edb0b36580ece7f52e23858f00c18fad4e87395ea7ad05d7e55c39f8fc78a'
+    image=ghcr.io/rust-lang/rust-ci@sha256:b25a83e67b0dcc0e6964732eb4352f4e4d956cec36bca930853a1ce53e47737f
     ;;
   *)
     echo 'Pin matching LLVM BOLT tools for this Rust version' >&2
@@ -26,13 +33,12 @@ esac
 bolt_root="$(mktemp -d "${RUNNER_TEMP:?}/ohm-bolt.XXXXXX")"
 llvm_revision="$(scripts/ohm-llvm-revision.sh "$GITHUB_WORKSPACE/source/rust")"
 if [[ -n "$llvm_revision" ]]; then
-  # Rust 1.99.0's dist-x86_64-linux image provides Clang, GCC 9.5, static
+  # Rust's dist-x86_64-linux image provides Clang, GCC 9.5, static
   # zstd and the CentOS 7 sysroot used to link its distributed LLVM library.
   if [[ "$bolt_major" != 23 ]]; then
     echo 'Pin the matching Rust dist image for this LLVM version' >&2
     exit 1
   fi
-  image=ghcr.io/rust-lang/rust-ci@sha256:6ddfb4305cd3f14c08e1e4ac628fe63c297765e2311308fe747355dc5e4b66d5
   container="$(docker create --platform linux/amd64 "$image" /bin/true)"
   trap 'docker rm "$container" >/dev/null' EXIT
   # opt-dist runs the profile merger and BOLT beside the training compiler.

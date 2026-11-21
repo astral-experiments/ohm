@@ -72,29 +72,28 @@ jobs:
           echo "directory=$public_directory" >> "$GITHUB_OUTPUT"
 
       - name: Publish immutable release assets
+        uses: astral-sh/github-actions/upload-r2@46d9685eed35b39a3d83a8dde3a3b4e1bff97a8a # 2026.11.19.0
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.MIRROR_R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.MIRROR_R2_SECRET_ACCESS_KEY }}
-          AWS_ENDPOINT_URL: https://${{ vars.MIRROR_R2_CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
-          AWS_DEFAULT_REGION: auto
-          PUBLIC_DIRECTORY: ${{ steps.assets.outputs.directory }}
-          R2_BUCKET: ${{ vars.MIRROR_R2_BUCKET_NAME }}
-        run: |
-          aws s3 cp --recursive --output table --color on \
-            --cache-control "public, max-age=31536000, immutable" \
-            "$PUBLIC_DIRECTORY/" \
-            "s3://$R2_BUCKET/ohm/releases/$OHM_TOOLCHAIN/"
+        with:
+          account-id: ${{ vars.MIRROR_R2_CLOUDFLARE_ACCOUNT_ID }}
+          bucket: ${{ vars.MIRROR_R2_BUCKET_NAME }}
+          source-directory: ${{ steps.assets.outputs.directory }}
+          prefix: ohm/releases/${{ inputs.version }}
+          if-exists: skip
+          cache-control: public, max-age=31536000, immutable
 
       - name: Publish latest release installer
+        uses: astral-sh/github-actions/upload-r2@46d9685eed35b39a3d83a8dde3a3b4e1bff97a8a # 2026.11.19.0
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.MIRROR_R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.MIRROR_R2_SECRET_ACCESS_KEY }}
-          AWS_ENDPOINT_URL: https://${{ vars.MIRROR_R2_CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
-          AWS_DEFAULT_REGION: auto
-          PUBLIC_DIRECTORY: ${{ steps.assets.outputs.directory }}
-          R2_BUCKET: ${{ vars.MIRROR_R2_BUCKET_NAME }}
-        run: |
-          aws s3 cp --output table --color on \
-            --cache-control "public, max-age=300" \
-            "$PUBLIC_DIRECTORY/install.sh" \
-            "s3://$R2_BUCKET/ohm/install.sh"
+        with:
+          account-id: ${{ vars.MIRROR_R2_CLOUDFLARE_ACCOUNT_ID }}
+          bucket: ${{ vars.MIRROR_R2_BUCKET_NAME }}
+          source-directory: ${{ steps.assets.outputs.directory }}
+          include: install.sh
+          prefix: ohm
+          if-exists: overwrite
+          cache-control: public, max-age=300

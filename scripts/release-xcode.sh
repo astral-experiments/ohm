@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Rust 1.99.0 builds its Apple Silicon distribution with this Xcode and SDK.
+# Match the Xcode and SDK used for Rust's Apple Silicon distribution.
 expected=$'Xcode 26.2\nBuild version 17C52'
 for developer in /Applications/Xcode_26.2.app/Contents/Developer \
   "${DEVELOPER_DIR:-$(xcode-select -p)}" /Applications/Xcode*.app/Contents/Developer; do
@@ -15,5 +15,5 @@ for developer in /Applications/Xcode_26.2.app/Contents/Developer \
   fi
 done
 
-echo 'Ohm LLVM for Rust 1.99.0 requires Xcode 26.2 (17C52) with macOS SDK 26.2' >&2
+echo 'Ohm LLVM requires Xcode 26.2 (17C52) with macOS SDK 26.2' >&2
 exit 1
