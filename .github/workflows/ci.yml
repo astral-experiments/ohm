@@ -74,7 +74,7 @@ jobs:
           tar xzf just.tar.gz just
       - name: Install the automatic fix tool
         if: matrix.scenario == 'regression'
-        run: cargo install --locked cargo-fixit --version 0.1.12
+        run: rustup toolchain install 1.100.0 --profile minimal && cargo +1.100.0 install --locked cargo-fixit --version 0.1.12
       - name: Replay both SDKs
         env:
           REPLAY_MODE: ${{ inputs.label }}
