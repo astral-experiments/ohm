@@ -208,6 +208,62 @@ if os.environ.get("REPLAY_MODE") == "llvm-only":
                                candidate=history.sha(produced/so),identical_files=unchanged)
 
 history.save(out / "inputs.json", result)
+# Additional matched PMU run of the exact Codex Clippy edit sequence.
+def codex_clippy():
+    import benchmark
+    fetch()
+    archive = root/"allocative-0.3.6.crate"
+    run("curl","-fsSL","--retry","4","https://static.crates.io/crates/allocative/allocative-0.3.6.crate","-o", archive)
+    helper = wd/"scripts/session_replays/helpers/codex-1.100/prepare.py"
+    prep=json.loads(subprocess.check_output(["python3",helper,"--benchmark-root",root,"--codex-source",src,"--archive",archive]))
+    assert prep["codex_command_commit"]=="b2159a7308ea2380e3a9d2ca2a7a79218820d21e"
+    source=Path(prep["codex_command_source"])
+    history.save(out/"prepare.json",prep)
+    run("just","--version",env=env)
+    history.calibrate(root,out)
+    workload = benchmark.WORKLOADS["codex-core"]
+    cmd = ["just","clippy","-p","codex-core","--locked","--offline"]
+    result["command"]=cmd
+    for role in order:
+        (root / role).rename(sdk)
+        env.pop('CARGO_NET_OFFLINE',None)
+        if target.exists():shutil.rmtree(target)
+        folder=out/role
+        folder.mkdir()
+        history.command([cargo,"fetch","--locked"],source/"codex-rs",env,folder/"fetch.log")
+        env['CARGO_NET_OFFLINE']='true'
+        entries=[]
+        def capture(phase,iteration):
+            label=f"{phase}-{iteration}"
+            receipt=folder/(label+".tsv")
+            proc=subprocess.run([meter,sdk/"bin/clippy-driver",receipt,*cmd],cwd=source,capture_output=True,env=env)
+            log=proc.stdout+proc.stderr
+            (folder/(label+".log")).write_bytes(log)
+            if proc.returncode:print(log[-2900:].decode(errors="replace"),flush=True)
+            assert proc.returncode==0
+            units=history.read_counts(receipt)
+            count,enabled,running=map(int,Path(str(receipt)+".tree").read_text().split())
+            assert count and 0<.995*enabled<=running<=enabled
+            stats=dict(phase=phase,i=iteration,total=count,driver=sum(u['instructions'] for u in units),codex_core=sum(u['instructions']for u in units if u['name']=='codex_core'),units=units)
+            print(role,label,len(units),stats["total"],flush=True)
+            entries.append(stats)
+        capture("cold",0)
+        for i in range(3):capture("noop",i)
+        for phase,n in [('dependency',7),('direct',5)]:
+            if phase=="direct":capture("warmup",0)
+            with benchmark.reversible_edit(source,getattr(workload,phase)) as edit:
+                for i in range(n):
+                    edit(i%2==0)
+                    capture(phase,i)
+        result[role]=entries
+        sdk.rename(root/role)
+    history.save(out/"result.json",result)
+if case=="codex-clippy":
+    sys.path.insert(0,str(wd/"scripts"))
+    codex_clippy()
+    raise SystemExit(0)
+
+
 if case == "correctness":
     from correctness import verify
     for role in order:
