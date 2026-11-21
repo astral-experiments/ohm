@@ -264,6 +264,78 @@ if case=="codex-clippy":
     raise SystemExit(0)
 
 
+# PMU counts for the two Codex TUI compiler commands.
+def tui_session():
+    import replay_sessions as r
+    import dataclasses,resource
+    fetch()
+    base="74004b5397b24662a87a5264a6ae80664168c7f3"
+    tip="3d7bb2dd2e834b4d26cf29a7c0163dd4fb5afb70"
+    git("checkout","-q","--detach",base)
+    git("update-ref","refs/heads/edits",tip)
+    crate=root/"allocative.crate"
+    run("curl","-fsSL","--retry","4","https://static.crates.io/crates/allocative/allocative-0.3.6.crate","-o",crate)
+    fixture=wd/"scripts/session_replays/codex-rust-1.100.json"
+    helper=fixture.parent/"helpers/codex-1.100/prepare.py"
+    p=subprocess.check_output(["python3",helper,"--benchmark-root",root,"--codex-source",src,"--archive",crate])
+    (out/"prepare.json").write_bytes(p)
+    assert history.sha(fixture)=="f2d9c9b29ca5e81f39a3683aefe8e541c50e1100a0b43c32c9f8ac157e276084"
+    history.calibrate(root,out)
+    run("cc","-O2","replay/pmuv.c","-o",wd/"meter")
+    (_,hard)=resource.getrlimit(resource.RLIMIT_NOFILE)
+    resource.setrlimit(resource.RLIMIT_NOFILE,(min(hard,65536),hard))
+    tmp=Path('/tmp/o100p4')
+    tmp.mkdir(mode=0o700)
+    os.environ.update(env)
+    os.environ.update(TMPDIR=str(tmp),CARGO_HOME=str(root/'disk/registry'),MEASURE_CLIPPY=str(sdk/"bin/clippy-driver"))
+    where=root/"disk/sessions"
+    class Study(r.Replay):
+        def command(self,step,selector,directory):
+            cmd=super().command(step,selector,directory)
+            if step['program']=='cargo':
+                receipt=folder/(step['args'][0]+".tsv")
+                return [str(wd/'meter'),str(rustc),str(receipt),*cmd]
+            return cmd
+    for role in order:
+        (root/role).rename(sdk)
+        number='3' if role=='control' else '4'
+        selector="ohm-1.100.0-"+number
+        (toolchain.parent/selector).symlink_to(sdk)
+        folder=out/role
+        folder.mkdir()
+        os.environ['RUSTUP_TOOLCHAIN']=selector
+        history.command([cargo,"fetch","--locked"],src/"codex-rs",os.environ,folder/"fetch.log")
+        args=['--upstream','1.100.0','--ohm',selector,'--jobs','8','--minimum-free-gb','1',
+                '--output-dir',str(where),'--project','codex','--repetitions','1','--offline',
+                '--scenario',str(fixture),'--source-path','codex='+str(src)]
+        study=Study(r.parser().parse_args(args))
+        scenario=study.scenarios[0]
+        assert scenario.steps[-2]['args'][0]=='clippy'
+        scenario=dataclasses.replace(scenario,steps=scenario.steps[:-1])
+        study.toolchains=(('ohm',selector),)
+        dest=study.prepare_source(scenario)
+        run('git','-C',dest,'config','--local','user.email','benchmark@users.noreply.github.com')
+        run('git','-C',dest,'config','--local','user.name','Ohm benchmark fixture')
+        study.sources['codex']=dest
+        study.persist()
+        try:
+            sample=study.run_session(scenario,'ohm',selector,0)
+        finally:
+            if (where/'logs').exists():shutil.copytree(where/'logs',folder/'logs')
+        co=Path(sample['worktree'])
+        run('git','-C',co,'add','-A')
+        tree=subprocess.check_output(['git','-C',co,'write-tree'],text=True).strip()
+        assert tree=='110e0e8c2bcbab10e2429262c697d071d50fdfe5',tree
+        result[role]=dict(sample=sample,tree=tree)
+        history.save(out/'result.json',result)
+        shutil.rmtree(where)
+        sdk.rename(root/role)
+if case=="codex-tui":
+    sys.path.insert(0,str(wd/"scripts"))
+    tui_session()
+    raise SystemExit(0)
+
+
 if case == "correctness":
     from correctness import verify
     for role in order:
