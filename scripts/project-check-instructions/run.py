@@ -194,7 +194,7 @@ def run(args, commits, role):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--window", choices=["recent", "preceding"], default="recent")
+    parser.add_argument("--window", choices=["recent", "preceding", "revisit"], default="recent")
     parser.add_argument("--project", choices=PROJECTS.keys(), required=True)
     for arg in ("source", "control", "candidate", "cargo", "candidate-cargo", "current-cargo", "intermediate-cargo", "second-cargo", "scratch", "output"):
         parser.add_argument("--" + arg, type=lambda p: Path(p).resolve(), required=not arg.endswith("-cargo"))
@@ -218,6 +218,11 @@ def main():
     seed, tip = (spec["earlier_seed"], spec["seed"]) if args.window == "preceding" else (spec["seed"], spec["tip"])
     commits = git(args.source, "rev-list", "--first-parent", "--max-count=21", tip).decode().splitlines()[::-1]
     assert len(commits) == 21 and commits[0] == seed and commits[-1] == tip
+    if args.window == "revisit":
+        # Start with the same seed and three real edits. Return twice across
+        # the dependency and source change with the whole target dir intact.
+        assert args.project == "serc" and commits[3] == "62aa5649bb530ae479c3c3c6e82a8c943247ecd0"
+        commits = commits[:4] + commits[2:4] * 2
     cpu = re.search(r"^model name\s*:\s*(.+)$", Path("/proc/cpuinfo").read_text(), re.M)[1]
     summary = dict(project=args.project, window=args.window, repo=spec["repo"], cpu=cpu, kernel=platform.release(), jobs=args.jobs, commits=commits,
                    command=["cargo", *CHECK], first=args.first,

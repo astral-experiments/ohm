@@ -29,10 +29,10 @@ on:
         type: boolean
         default: false
       window:
-        description: Select the 20 edits before the scoring window for a holdout
+        description: Use either 20-edit history, or return twice to serc PR 2299
         type: choice
         default: recent
-        options: [recent, preceding]
+        options: [recent, preceding, revisit]
       intermediate:
         description: Optional kit for the first PR of a stack
         required: false
