@@ -227,6 +227,7 @@ def tui_session():
                 return [str(wd/'meter'),str(rustc),str(receipt),*cmd]
             return cmd
 
+    os.environ.pop('MEASURE_CLIPPY',None)
     history.calibrate(root,out)
     meter = root / "sessionmeter"
     run("cc","-O2",wd/"replay/sessionmeter.c","-o",meter)
@@ -305,6 +306,7 @@ def session_time():
     os.environ.update(TMPDIR=str(tmp),CARGO_HOME=str(root/'disk/registry'),MEASURE_CLIPPY=str(sdk/"bin/clippy-driver"))
     where=root/"disk/sessions"
 
+    os.environ.pop('MEASURE_CLIPPY',None)
     history.calibrate(root,out)
     meter = root / "sessionmeter"
     run("cc","-O2",wd/"replay/sessionmeter.c","-o",meter)
