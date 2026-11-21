@@ -137,6 +137,7 @@ def probe(binary, directory):
 def replay(role):
     (root / role).rename(sdk)
     if target.exists():shutil.rmtree(target)
+    env["RUSTC"] = str(rustc)
     folder = out / role
     folder.mkdir()
     app = record["app"]
@@ -164,7 +165,7 @@ def replay(role):
         size = int(subprocess.check_output(["du", "-sb", target]).split()[0])
         cache = [f.stat().st_size for f in target.rglob("llvmcache-*") if f.is_file()]
         row = dict(rev=where, lock=lock, command=list(map(str,cmd)), target_bytes=size,
-                   llvmcache_bytes=sum(cache), llvmcache_files=len(cache), **profile)
+                   identities=sum(1 for f in target.rglob(".ohm-checked-objects-v1")), llvmcache_bytes=sum(cache), llvmcache_files=len(cache), **profile)
         if record["kind"] != "check":
             if app == "ty_python_semantic":
                 matches = re.findall(rb"Executable unittests .*? \((.*?)\)", p.stderr)
