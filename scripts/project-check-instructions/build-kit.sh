@@ -22,7 +22,7 @@ unset EXPERIMENT_PATCH
 git submodule update --init --depth 1 library/backtrace
 kit="$RUNNER_TEMP/kits/$role"
 mkdir -p "$kit/bin" "$kit/lib/rustlib/$host" "$RUNNER_TEMP/packages"
-git add -N compiler
+git add -N --ignore-removal compiler
 git diff --full-index --binary -- compiler > "$kit/compiler.patch"
 git rev-parse HEAD > "$kit/revision"
 cat > bootstrap.toml <<'TOML'
