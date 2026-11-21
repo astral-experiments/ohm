@@ -226,7 +226,7 @@ if os.environ.get('REPLAY_MODE')=='subset' or os.environ.get('REPLAY_MODE','').s
         kit=path/'candidate'
         run('sha256sum','-c','manifest.sha256','--quiet',cwd=kit)
         dest=root/role
-        for binary in (dest/'lib').glob('librustc_driver-*.so'):binary.unlink()
+        # The production rustfmt still loads the original compiler library.
         shutil.rmtree(dest/'lib/rustlib/x86_64-unknown-linux-gnu/lib')
         shutil.copytree(kit,dest,dirs_exist_ok=True)
         result['kit-'+role]=history.sha(file)
