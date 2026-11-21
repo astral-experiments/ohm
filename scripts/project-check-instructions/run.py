@@ -154,7 +154,12 @@ def run(args, commits, role):
     out = args.output / role
     out.mkdir()
     driver, = (kit / "lib").glob("librustc_driver-*.so")
-    save(out / "sdk.json", dict(rustc=sha(rustc), driver=sha(driver), cargo=sha(cargo)))
+    used = dict(rustc=sha(rustc), driver=sha(driver), cargo=sha(cargo))
+    if os.environ.get("RELEASE_LLVM") == "true":
+        llvm, = (kit / "lib").glob("libLLVM.so.*")
+        used["llvm"] = sha(llvm)
+        assert used["llvm"] == (args.output / "release-llvm.sha256").read_text().split()[0]
+    save(out / "sdk.json", used)
     if args.window == "from-tip":
         # Check the tip, then go back 20 commits and replay the same history.
         # Leave all artifacts in this checkout as Cargo wrote them.

@@ -32,6 +32,10 @@ on:
         description: Use Ohm 1.100.0-4 for the common Cargo and the release arm
         type: boolean
         default: false
+      release_llvm:
+        description: Load the verified Ohm -4 LLVM 23.1.5 shared library in every compiler
+        type: boolean
+        default: false
       window:
         description: Select a history and any commits to check before the replay
         type: choice
@@ -212,6 +216,7 @@ jobs:
       - name: Measure the first root check after each edit
         env:
           RELEASE4: ${{ inputs.release4 }}
+          RELEASE_LLVM: ${{ inputs.release_llvm }}
           PROJECT: ${{ matrix.project }}
           PROFILE_UV: ${{ (inputs.mode == 'profile' || inputs.mode == 'annotate') && '1' || '' }}
           ANNOTATE_UV: ${{ inputs.mode == 'annotate' && '1' || '' }}

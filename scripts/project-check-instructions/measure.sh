@@ -34,6 +34,14 @@ if [[ -z "${RUSTC_KITS:-}" || "${SHIPPED:-}" == true ]]; then
   fi
 fi
 
+if [[ "${RELEASE_LLVM:-}" == true ]]; then
+  test "$tag" = ohm-1.100.0-4
+  lib=libLLVM.so.23.1-rust-dev
+  tar -C "$kits" -xzf "$packed" --strip-components=3 "rust-1.100.0-dev-$host/rustc/lib/$lib"
+  echo "19327450340ce3aac82e30a57a2e028a86ea77d9974e9dc168bf0fa882225f02  $kits/$lib" | sha256sum -c -
+  sha256sum "$kits/$lib" > "$out/release-llvm.sha256"
+fi
+
 load_role() {
   local role=$1 archive="$kits/$2.tar.zst"
   local sdk="$kits/$role"
@@ -57,6 +65,21 @@ load_role() {
     cp "$control/bin/rustc" "$sdk/bin/rustc"
     cmp "$control/bin/rustc" "$sdk/bin/rustc"
     echo "$role consumes the control std" >> "$out/stdlib"
+  fi
+  if [[ "${RELEASE_LLVM:-}" == true ]]; then
+    # Same LLVM version, different library names in CI and release builds.
+    # Verify the build receipt above and record the library actually used below.
+    grep -qx 'LLVM version: 23.1.5' "$sdk/version.txt"
+    for path in libLLVM.so.23.1-rust-1.100.0-beta libLLVM-23-rust-1.100.0-beta.so; do
+      test -f "$sdk/lib/$path"
+      ln -sf "$kits/$lib" "$sdk/lib/$path"
+    done
+    ldd -r "$sdk"/lib/librustc_driver-*.so > "$out/sdk-$role/dynamic-link.txt" 2>&1
+    if grep -E 'undefined symbol|not found' "$out/sdk-$role/dynamic-link.txt"; then exit 1; fi
+    "$sdk/bin/rustc" -vV | grep -qx 'LLVM version: 23.1.5'
+    echo 'fn main(){println!("{}", std::env::args().count());}' |
+      "$sdk/bin/rustc" --crate-name check_llvm - -o "$kits/check-llvm"
+    test "$("$kits/check-llvm" a)" = 2
   fi
 }
 if [[ -n "${RUSTC_KITS:-}" ]]; then
