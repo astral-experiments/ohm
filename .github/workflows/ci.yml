@@ -1,5 +1,5 @@
 name: Replay Ohm edits
-run-name: Replay Ohm −4 against −3 (${{ inputs.label }})
+run-name: Measure build then check (${{ inputs.label }})
 on:
   workflow_dispatch:
     inputs:
@@ -53,8 +53,15 @@ jobs:
           run-id: ${{ inputs.run }}
           name: ohm-1.100.0-${{ inputs.candidate }}-x86_64-unknown-linux-gnu
           path: kits/4
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        if: endsWith(matrix.scenario, '-keys')
+        with:
+          github-token: ${{ github.token }}
+          run-id: 44875612642
+          name: sdk-candidate
+          path: keys
       - name: Set up the Codex dependencies
-        if: startsWith(matrix.scenario, 'codex-')
+        if: contains(matrix.scenario, 'codex-')
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq libasound2-dev libcap-dev protobuf-compiler
@@ -62,7 +69,7 @@ jobs:
           echo '4a5cc2f53e6f0f8c59092a6cc38291eb729d46a7dd95d3ae582008881b84931d  just.tar.gz' | sha256sum -c
           tar xzf just.tar.gz just
       - name: Install nextest
-        if: startsWith(matrix.scenario, 'codex-')
+        if: contains(matrix.scenario, 'codex-')
         run: |
           curl -fsSL --retry 4 https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.140/cargo-nextest-0.9.140-x86_64-unknown-linux-musl.tar.gz -o next.tar.gz
           echo 'bc2a998567816eef7b087b920036f49fb89aa2a8a603f6a3d84098be160b62c5  next.tar.gz' | sha256sum -c

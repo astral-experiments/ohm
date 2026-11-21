@@ -208,6 +208,68 @@ if os.environ.get("REPLAY_MODE") == "llvm-only":
                                candidate=history.sha(produced/so),identical_files=unchanged)
 
 history.save(out / "inputs.json", result)
+if case.startswith("exp-"):
+    import resource
+    _, project, mode = case.split("-")
+    _, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+    resource.setrlimit(resource.RLIMIT_NOFILE, (min(hard,65536),hard))
+    fetch()
+    source=src
+    if project=="codex":
+        tar=root/"allocative-0.3.6.crate"
+        run("curl","-fsSL","--retry","4","https://static.crates.io/crates/allocative/allocative-0.3.6.crate","-o",tar)
+        helper=wd/"scripts/session_replays/helpers/codex-1.100/prepare.py"
+        prep=json.loads(subprocess.check_output(["python3",helper,"--benchmark-root",root,"--codex-source",src,"--archive",tar]))
+        assert prep["codex_command_commit"]=="b2159a7308ea2380e3a9d2ca2a7a79218820d21e"
+        source=Path(prep["codex_command_source"])/"codex-rs"
+        project="codex-core"
+        result["prepare"]=prep
+    else:
+        git("checkout","-q","--detach",record["revs"][0])
+    history.calibrate(root,out)
+    if mode=="keys":
+        file=wd/"keys"/"candidate.tar.zst"
+        path=root/"keys"
+        path.mkdir()
+        run("tar","xf",file,"-C",path)
+        desktop=path/"candidate"
+        run("sha256sum","-c","manifest.sha256","--quiet",cwd=desktop)
+        dest=root/"candidate"
+        for f in (dest/"lib").glob("librustc_driver-*.so"):f.unlink()
+        shutil.rmtree(dest/"lib/rustlib/x86_64-unknown-linux-gnu/lib")
+        shutil.copytree(desktop,dest,dirs_exist_ok=True)
+        result["kit"]=history.sha(file)
+        result["patch"]=history.sha(dest/"compiler.patch")
+        result["order"]=order=["default","off","both"] if int(pair)%2 else ["both","off","default"]
+    else:assert mode=="shipped"
+    work=root/"disk/target"
+    env.update(CARGO_TARGET_DIR=str(work),CARGO_HOME=str(root/"disk/registry"))
+    for role in order:
+        start=root/("candidate" if mode=="keys" else role)
+        start.rename(sdk)
+        if work.exists():shutil.rmtree(work)
+        folder=out/role
+        folder.mkdir()
+        for key in ("OHM_SKIP_IMPORTED_KEYS","OHM_CODEGEN_KEYS"):
+            env.pop(key,None)
+        if role=="off":env['OHM_SKIP_IMPORTED_KEYS']="1"
+        if role=="both":env['OHM_CODEGEN_KEYS']="1"
+        history.command([cargo,"fetch","--locked"],source,env,folder/"fetch.log")
+        rows={}
+        for phase in ("build","check"):
+            receipt=folder/(phase+".tsv")
+            cmd=["cargo","+ohm",phase,"-p",project,"--lib","--locked","--offline"]
+            history.command([meter,rustc,receipt,*cmd],source,env,folder/(phase+".log"))
+            entries=history.read_counts(receipt)
+            n,en,ru=map(int,Path(str(receipt)+".tree").read_text().split())
+            assert n and en*.995<=ru<=en
+            rows[phase]=dict(total=n,en=en,ru=ru,units=entries)
+            print(role,phase,n,flush=True)
+        result[role]=rows
+        history.save(out/"result.json",result)
+        sdk.rename(start)
+    raise SystemExit(0)
+
 # Additional matched PMU run of the exact Codex Clippy edit sequence.
 def codex_clippy():
     import benchmark
