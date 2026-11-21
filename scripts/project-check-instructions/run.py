@@ -226,7 +226,7 @@ def run(args, commits, role):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--window", choices=["recent", "preceding", "shared", "revisit",
-                                            "from-tip", "moves", "preceding-tip", "detour"],
+                                            "from-tip", "moves", "preceding-tip", "detour", "next"],
                         default="recent")
     parser.add_argument("--project", choices=PROJECTS.keys(), required=True)
     for arg in ("source", "control", "candidate", "cargo", "candidate-cargo", "current-cargo", "intermediate-cargo", "second-cargo", "scratch", "output"):
@@ -254,6 +254,9 @@ def main():
     if args.window == "moves":
         assert args.project == "serc"
         seed, tip = spec["moves_seed"], spec["moves_tip"]
+    if args.window == "next":
+        assert args.project == "ripgrep"
+        seed, tip = spec["next_seed"], spec["next_tip"]
     commits = git(args.source, "rev-list", "--first-parent", "--max-count=21", tip).decode().splitlines()[::-1]
     assert len(commits) == 21 and commits[0] == seed and commits[-1] == tip
     if args.window == "detour":
