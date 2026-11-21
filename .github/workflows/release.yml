@@ -12,6 +12,10 @@ on:
         required: true
         default: false
         type: boolean
+      require_replay:
+        description: Require a successful replay status for the Linux archive before tagging
+        default: false
+        type: boolean
 
 permissions: {}
 
@@ -458,6 +462,7 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: write
+      statuses: read
     env:
       GH_TOKEN: ${{ github.token }}
       OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
@@ -472,6 +477,20 @@ jobs:
       - name: Verify release assets
         working-directory: release
         run: sha256sum --check --strict SHA256SUMS
+
+      - name: Check targeted replays for the Linux archive
+        if: inputs.require_replay
+        shell: bash
+        working-directory: release
+        run: |
+          archive="$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu.tar.gz"
+          checksum="$(sha256sum "$archive")"
+          context="ohm/replay/${checksum%% *}"
+          if ! gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/status" |
+            jq -e --arg context "$context" 'any(.[].statuses[]; .context == $context and .state == "success")'; then
+            echo "::error::Expected a successful $context status on $GITHUB_SHA before publishing"
+            exit 1
+          fi
 
       - name: Create source repository tagging token
         id: source-token
