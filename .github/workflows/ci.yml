@@ -28,6 +28,10 @@ on:
         description: Add the actual release as a separate arm
         type: boolean
         default: false
+      release4:
+        description: Use Ohm 1.100.0-4 for the common Cargo and the release arm
+        type: boolean
+        default: false
       window:
         description: Use either 20-edit history, or return twice to serc PR 2299
         type: choice
@@ -194,8 +198,20 @@ jobs:
             file="$dest/cargo-$variant.tar.zst"
             bash scripts/project-check-instructions/download.sh "${!variant}" alt-cargo cargo.tar.zst "$file"
           done
-      - name: Measure the first root check after each of the twenty edits
+      - name: Retrieve the official Linux distribution for Ohm -4
+        if: inputs.release4
         env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          base=ohm-1.100.0-4-x86_64-unknown-linux-gnu
+          packed="$RUNNER_TEMP/kits/$base.tar.gz"
+          mkdir -p "$RUNNER_TEMP/kits"
+          if ! curl -fsSL --retry 3 "https://github.com/astral-experiments/ohm/releases/download/ohm-1.100.0-4/$base.tar.gz" -o "$packed"; then
+            bash scripts/project-check-instructions/download.sh 44863671852 "$base" "$base.tar.gz" "$packed"
+          fi
+      - name: Measure the first root check after each edit
+        env:
+          RELEASE4: ${{ inputs.release4 }}
           PROJECT: ${{ matrix.project }}
           PROFILE_UV: ${{ (inputs.mode == 'profile' || inputs.mode == 'annotate') && '1' || '' }}
           ANNOTATE_UV: ${{ inputs.mode == 'annotate' && '1' || '' }}

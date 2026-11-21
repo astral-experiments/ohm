@@ -8,11 +8,18 @@ mkdir "$out"
 mkdir -p "$kits"
 host=x86_64-unknown-linux-gnu
 tag=ohm-1.100.0-3
+digest=7fc3d21a5efad6bff7be654b14e0e60aa2fbbfd11db198582788f3cc4bcf7591
+if [[ "${RELEASE4:-}" == true ]]; then
+  tag=ohm-1.100.0-4
+  digest=09c701b4a1f6b196d51164e8392adafc2304f7e2c759d2aa524d5c42d2178943
+fi
 name="$tag-$host.tar.gz"
 packed="$kits/$name"
 release="https://github.com/astral-experiments/ohm/releases/download/$tag/$name"
-curl -fsSL --retry 4 "$release" -o "$packed"
-echo "7fc3d21a5efad6bff7be654b14e0e60aa2fbbfd11db198582788f3cc4bcf7591  $packed" | sha256sum -c -
+if [[ ! -f "$packed" ]]; then
+  curl -fsSL --retry 4 "$release" -o "$packed"
+fi
+echo "$digest  $packed" | sha256sum -c -
 tar -C "$kits" -xzf "$packed" --strip-components=3 "rust-1.100.0-dev-$host/cargo/bin/cargo"
 sha256sum "$packed" > "$out/archives.sha256"
 extra=()
