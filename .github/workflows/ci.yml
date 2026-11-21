@@ -12,7 +12,7 @@ on:
         description: Experiment
         required: true
         type: choice
-        options: [train, build-kit, build-cargo, pilot, marginal, confirm, profile, audit, audit-control]
+        options: [train, pool, build-kit, build-cargo, pilot, marginal, confirm, profile, audit, audit-control]
       patch:
         description: Optional gzipped, base64-encoded compiler diff for an ephemeral benchmark
         type: string
@@ -80,6 +80,45 @@ permissions:
   contents: read
 
 jobs:
+  pool:
+    if: inputs.mode == 'pool'
+    permissions:
+      actions: read
+      contents: read
+    name: Sum the control and candidate counters
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Download the two profiles
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          script=scripts/project-check-instructions/download.sh
+          bash "$script" 44878955698 rustc-profile rustc.profdata old.profdata
+          bash "$script" 44889001612 rustc-profile rustc.profdata new.profdata
+          echo '7d37226ee5d9d0aad77ea3727d1eca5bbd340d94f27234b570540d7034a39c39  old.profdata' | sha256sum -c -
+          echo 'b47b3bc8ca4158cd6e17b9a796a36c45f76b3fce170192e668a4d749e8eef966  new.profdata' | sha256sum -c -
+      - name: Merge one copy of each profile with the same weights
+        run: |
+          set -eu
+          rustup toolchain install 1.100.0 --profile minimal --component llvm-tools-preview --no-self-update
+          tool="$(rustc +1.100.0 --print sysroot)/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata"
+          "$tool" --version
+          "$tool" merge --num-threads=1 -o rustc.profdata old.profdata new.profdata
+          "$tool" show rustc.profdata
+          sha256sum rustc.profdata
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: rustc-profile
+          path: rustc.profdata
+          if-no-files-found: error
+          retention-days: 10
+
+
   build:
     if: inputs.mode == 'build-kit' || inputs.mode == 'train'
     permissions:
