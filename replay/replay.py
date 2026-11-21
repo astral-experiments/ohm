@@ -33,7 +33,7 @@ result = dict(case=case, pair=pair, record=record, order=order, archive={},
               cpu=re.search(r"^model name\s*:\s*(.+)$", Path("/proc/cpuinfo").read_text(), re.M)[1],
               boot=history.sha(Path("/proc/sys/kernel/random/boot_id")), kernel=platform.release())
 env = dict(HOME=str(Path.home()), USER=os.environ["USER"], LANG="C.UTF-8",
-           PATH=str(sdk / "bin") + ":" + os.environ["PATH"],
+           PATH=str(Path.home() / ".cargo/bin") + ":" + os.environ["PATH"],
            CARGO_HOME=str(registry), CARGO_BUILD_JOBS="8", CARGO_TARGET_DIR=str(target),
            RUSTUP_HOME=str(rustup), RUSTUP_TOOLCHAIN="ohm", CARGO_TERM_COLOR="never")
 toolchain = rustup / "toolchains/ohm"
@@ -137,7 +137,7 @@ def probe(binary, directory):
 def replay(role):
     (root / role).rename(sdk)
     if target.exists():shutil.rmtree(target)
-    env["RUSTC"] = str(rustc)
+    # Exercise normal rustup toolchain selection and Cargo’s compiler path.
     folder = out / role
     folder.mkdir()
     app = record["app"]
@@ -160,7 +160,7 @@ def replay(role):
         prev = lock
         directory = folder / str(i)
         directory.mkdir()
-        profile, p = count("compile", cmd, directory)
+        profile, p = count("compile", ["cargo","+ohm",*cmd[1:]], directory)
         (directory / "build.log").write_bytes(p.stderr)
         size = int(subprocess.check_output(["du", "-sb", target]).split()[0])
         cache = [f.stat().st_size for f in target.rglob("llvmcache-*") if f.is_file()]
