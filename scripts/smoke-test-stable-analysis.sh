@@ -2,6 +2,10 @@
 set -euo pipefail
 
 toolchain=$1
+# These probes check the defaults of the selected distribution. Cargo gives
+# the encoded flag list precedence over environment and config rustflags.
+RUSTC="$(rustup which --toolchain "$toolchain" rustc)"
+export RUSTC RUSTC_WRAPPER='' RUSTC_WORKSPACE_WRAPPER='' CARGO_ENCODED_RUSTFLAGS=''
 probe="$2/stable-analysis"
 mkdir -p "$probe/src"
 cat > "$probe/Cargo.toml" <<'EOF'
