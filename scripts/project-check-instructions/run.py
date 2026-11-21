@@ -249,6 +249,10 @@ def main():
     parser.add_argument("--pair", type=int)
     parser.add_argument("--audit-role", choices=["control", "candidate"], default="candidate")
     args = parser.parse_args()
+    if args.project == "uv":
+        # Match the public mixed-stage release check at this revision.
+        args.jobs = 8
+        CHECK[1:1] = BUILD[1:1] = ["-p", "uv", "--lib"]
     args.output.mkdir(exist_ok=True, parents=True)
     args.scratch.mkdir(exist_ok=True, parents=True)
     assert not any(args.scratch.iterdir()), "expected an empty scratch directory"
