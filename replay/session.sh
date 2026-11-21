@@ -28,4 +28,4 @@ for name in ld-linux-x86-64.so.2 libc.so.6 libm.so.6 libpthread.so.0 libdl.so.2 
     mount --bind "$scratch/$name" "$path"
   fi
 done
-exec runuser -u "$1" -- env -u LD_PRELOAD -u LD_AUDIT -u LD_LIBRARY_PATH -u CI -u GITHUB_ACTIONS RUNNER_TEMP="$scratch/work" PATH="$3" GITHUB_STEP_SUMMARY="$4" python3 -I "$5" "$2"
+exec runuser -u "$1" -- env -u LD_PRELOAD -u LD_AUDIT -u LD_LIBRARY_PATH -u CI -u GITHUB_ACTIONS REPLAY_MODE="$6" RUNNER_TEMP="$scratch/work" PATH="$3" GITHUB_STEP_SUMMARY="$4" python3 -I "$5" "$2"

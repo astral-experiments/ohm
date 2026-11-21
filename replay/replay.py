@@ -184,6 +184,29 @@ def replay(role):
 
 for role in order:
     install(role)
+# An additional controlled comparison isolates the complete production LLVM
+# library, keeping every other file in the production -4 SDK byte-identical.
+if os.environ.get("REPLAY_MODE") == "llvm-only":
+    assert record["kind"] == "llvm"
+    stock = root/"control"
+    produced = root/"candidate"
+    so = Path("lib/libLLVM.so.23.1-rust-dev")
+    image = root/"previous-llvm.so"
+    (stock/so).rename(image)
+    shutil.rmtree(stock)
+    shutil.copytree(produced, stock, symlinks=True, copy_function=os.link)
+    image.replace(stock/so)
+    unchanged = 0
+    for file in produced.rglob('*'):
+        rel = file.relative_to(produced)
+        if file.is_symlink():
+            assert os.readlink(file) == os.readlink(stock/rel)
+        elif file.is_file() and rel!=so:
+            assert os.path.samefile(file, stock/rel)
+            unchanged += 1
+    result["llvm_only"] = dict(base=result["archive"]["candidate"],control=history.sha(stock/so),
+                               candidate=history.sha(produced/so),identical_files=unchanged)
+
 history.save(out / "inputs.json", result)
 if case == "correctness":
     from correctness import verify

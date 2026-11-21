@@ -55,6 +55,7 @@ jobs:
           path: kits/4
       - name: Replay both SDKs
         env:
+          REPLAY_MODE: ${{ inputs.label }}
           PAIR: ${{ matrix.pair }}
           SCENARIO: ${{ matrix.scenario }}
         run: |
@@ -66,7 +67,7 @@ jobs:
             main=replay/pmuv.py
             if (( PAIR % 2 )); then args=34p; else args=43p; fi
           fi
-          sudo unshare --mount --propagation private bash replay/session.sh "$USER" "$args" "$PWD:$PATH" "$GITHUB_STEP_SUMMARY" "$main"
+          sudo unshare --mount --propagation private bash replay/session.sh "$USER" "$args" "$PWD:$PATH" "$GITHUB_STEP_SUMMARY" "$main" "$REPLAY_MODE"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
