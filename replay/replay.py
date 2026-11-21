@@ -267,7 +267,7 @@ if case.startswith("exp-dev"):
         folder.mkdir()
         history.command([cargo,'fetch','--locked'],source,env,folder/'fetch.log')
         rows={}
-        for phase in ['warmup','first','build','last']:
+        for phase in (['build','warmup'] if kind=='forward' else ['warmup','first','build','last']):
             if kind=='nocheck' and phase=='first':continue
             command='build' if phase=='build' else 'check'
             receipt=folder/(phase+'.tsv')

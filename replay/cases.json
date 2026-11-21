@@ -2363,5 +2363,147 @@
         ]
       }
     }
+  },
+  "exp-devuv-forward": {
+    "kind": "transition",
+    "repo": "astral-sh/uv",
+    "revs": [
+      "c22e6b71933443e9cd299d4b6ac8de035ed4825b"
+    ],
+    "dev": {
+      "label": "uv",
+      "repository": "https://github.com/astral-sh/uv.git",
+      "revision": "c22e6b71933443e9cd299d4b6ac8de035ed4825b",
+      "workspace": ".",
+      "package": "uv",
+      "environment": {},
+      "edits": {
+        "direct": {
+          "path": "crates/uv/src/install_source.rs",
+          "before": "component == cellar && next == formula",
+          "after": "{\n                component == cellar && (next == formula || next == OsStr::new(\"uv-preview\"))\n            }",
+          "crate": "uv"
+        },
+        "dependency": {
+          "path": "crates/uv-normalize/src/lib.rs",
+          "before": "b'a'..=b'z' | b'0'..=b'9' => {\n                normalized.push",
+          "after": "b'0'..=b'9' | b'a'..=b'z' => {\n                normalized.push",
+          "crate": "uv-normalize"
+        }
+      },
+      "commands": {
+        "check": [
+          "check",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "build": [
+          "build",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "test": [
+          "test",
+          "-p",
+          "uv",
+          "--test",
+          "it",
+          "--locked",
+          "help::help",
+          "--",
+          "--exact"
+        ],
+        "clippy": [
+          "clippy",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "fmt": [
+          "fmt",
+          "-p",
+          "uv",
+          "--"
+        ]
+      }
+    }
+  },
+  "exp-devruff-forward": {
+    "kind": "transition",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "4d6a7db787130c5a4a95bd835369babd78e4a1f6"
+    ],
+    "dev": {
+      "label": "Ruff/ty",
+      "repository": "https://github.com/astral-sh/ruff.git",
+      "revision": "4d6a7db787130c5a4a95bd835369babd78e4a1f6",
+      "workspace": ".",
+      "package": "ty_python_semantic",
+      "environment": {
+        "CARGO_PROFILE_DEV_OPT_LEVEL": "1",
+        "CARGO_PROFILE_DEV_LTO": "off",
+        "CARGO_PROFILE_DEV_DEBUG": "line-tables-only"
+      },
+      "edits": {
+        "direct": {
+          "path": "crates/ty_python_semantic/src/types.rs",
+          "before": "DynamicType::Unknown\n                    | DynamicType::UnknownGeneric(_)",
+          "after": "DynamicType::UnknownGeneric(_)\n                    | DynamicType::Unknown",
+          "crate": "ty_python_semantic"
+        },
+        "dependency": {
+          "path": "crates/ty_python_core/src/platform.rs",
+          "before": "_ => PythonPlatform::Identifier(platform.clone()),",
+          "after": "_ => PythonPlatform::Identifier(platform),",
+          "crate": "ty_python_core"
+        }
+      },
+      "commands": {
+        "check": [
+          "check",
+          "-p",
+          "ty_python_semantic",
+          "--lib",
+          "--locked"
+        ],
+        "build": [
+          "build",
+          "-p",
+          "ty_python_semantic",
+          "--lib",
+          "--locked"
+        ],
+        "clippy": [
+          "clippy",
+          "-p",
+          "ty_python_semantic",
+          "--lib",
+          "--locked"
+        ],
+        "test": [
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "--locked",
+          "-E",
+          "test(=mdtest::liskov.md)"
+        ],
+        "fmt": [
+          "fmt",
+          "-p",
+          "ty_python_semantic",
+          "--"
+        ]
+      }
+    }
   }
 }
