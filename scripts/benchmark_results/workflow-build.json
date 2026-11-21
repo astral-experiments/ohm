@@ -1,33 +1,33 @@
 {
   "schema_version": 1,
-  "coordinator_revision": "3b39a0eea279a0ac249928719cae2f34618f8650",
+  "coordinator_revision": "0e9062bb4559f3caaa65067ed0382ddeb0ccc0de",
   "manifest": {
-    "path": "toolchains/1.100.0/3.json",
-    "sha256": "7fb0cc34bfbb8a2200b8391c12cfa9151d671a7d4d2f1f8be879cf6c6f3bb7b9"
+    "path": "toolchains/1.100.0/4.json",
+    "sha256": "ae2e3bd75d910f2aaccc1f2f8ad199cc98d0728bd4a7237f2c3a7c0f6244e808"
   },
   "sources": {
-    "rust": "af392995e5ca93b70fc487b45dfdf6604dbbbc84",
-    "cargo": "4193b7226ed980a4947848e979cd72444cc3bc22",
+    "rust": "47d83992e42cba3797d917abea34f5a527603480",
+    "cargo": "01450c1e58ff11a116b40ea835aeb70fd60c473d",
     "clippy": "8b452cfcbe11a705b7202554c7655dd9209d2e04",
-    "rustfmt": "92cc15aac56ea2cc72f72d7c3cdc08ba737af030",
-    "llvm": "bb335fde37c28311ce5db7203a2bfbb10db1853c"
+    "rustfmt": "cd3f7fc323dcce7ec70284c3cc3f673a48ecd26f",
+    "llvm": "71b1be2373b29792c2544b7e5a6d2ceb6dd7ce27"
   },
   "released": true,
-  "release": "https://github.com/astral-experiments/ohm/releases/tag/ohm-1.100.0-3",
-  "release_workflow": "https://github.com/astral-experiments/ohm/actions/runs/44754589323",
-  "published_at": "2026-11-20T17:55:29Z",
-  "toolchain": "ohm-1.100.0-3",
+  "release": "https://github.com/astral-experiments/ohm/releases/tag/ohm-1.100.0-4",
+  "release_workflow": "https://github.com/astral-experiments/ohm/actions/runs/44877876902",
+  "published_at": "2026-11-21T12:37:44Z",
+  "toolchain": "ohm-1.100.0-4",
   "targets": {
     "x86_64-unknown-linux-gnu": {
       "archive": {
-        "sha256": "7fc3d21a5efad6bff7be654b14e0e60aa2fbbfd11db198582788f3cc4bcf7591",
-        "size": 365099666,
-        "url": "https://github.com/astral-experiments/ohm/releases/download/ohm-1.100.0-3/ohm-1.100.0-3-x86_64-unknown-linux-gnu.tar.gz"
+        "sha256": "6948ffc7d33b245bf48fdf770b5913cd536e71aec40a0ea280bd0eb33d4524b8",
+        "size": 364922998,
+        "url": "https://github.com/astral-experiments/ohm/releases/download/ohm-1.100.0-4/ohm-1.100.0-4-x86_64-unknown-linux-gnu.tar.gz"
       },
       "published_provenance": {
-        "sha256": "dd6e2ab4524644ab422aa98a90041a3df502b676cb8e9fc23b3dc6213a394274",
+        "sha256": "f466ba8624916808506208fa66104669e2d2d89cd33069778e64cd4c866fadf8",
         "size": 959,
-        "url": "https://github.com/astral-experiments/ohm/releases/download/ohm-1.100.0-3/ohm-1.100.0-3-x86_64-unknown-linux-gnu-provenance.json"
+        "url": "https://github.com/astral-experiments/ohm/releases/download/ohm-1.100.0-4/ohm-1.100.0-4-x86_64-unknown-linux-gnu-provenance.json"
       },
       "bundled_tools": {
         "wild": {
@@ -36,47 +36,55 @@
         }
       },
       "components": {
-        "rustc": {
-          "sha256": "d2683ab1c4ef571e052dc7e73bdf5ab81b1c0f6570532b7a70170bd47f61511f"
-        },
         "cargo": {
-          "sha256": "5ea04c3f771c033bc071cd3e5ca9de7dfbe5888733bf15986f334f80ff9aadf8"
+          "sha256": "a2cb9829c58a757e16c7155d4b9d08da698bdedae1100213ee521630e133e535"
         },
         "clippy-driver": {
-          "sha256": "0b11a8fd85175ef188a2d3b722072d6da35c17036351fa15b4fbaaee3b19adb9"
+          "sha256": "a8e8bac96c2a079698ef4054c4f8cdf4f01a3bda59d7005fae933da8f3d22c01"
+        },
+        "rustc": {
+          "sha256": "88dff9856d5e1a90fae4b95a48c60a1ce7eb42b50ab5f5806c30129c241358e1"
         },
         "rustfmt": {
-          "sha256": "2257fbc1ecda4ca6ad0ac16275904b59ccb46cad32e6fcec137f0eb93aacf316"
+          "sha256": "b3e56b3dff6f4e3da4f2f903b87540427504b53667e5514ea201da6f02f433b5"
         }
       }
     },
     "aarch64-apple-darwin": {
       "archive": {
-        "sha256": "080ce1624728d3fde8afd1c8567793f8d214d930c69fba96905dcdc39a8efa77",
-        "size": 299320305,
-        "url": "https://github.com/astral-experiments/ohm/releases/download/ohm-1.100.0-3/ohm-1.100.0-3-aarch64-apple-darwin.tar.gz"
+        "sha256": "c19ff22c52d755fbde54d7f1625c709e91d6c25e3170a705efd654c82c695ce1",
+        "size": 299299262,
+        "url": "https://github.com/astral-experiments/ohm/releases/download/ohm-1.100.0-4/ohm-1.100.0-4-aarch64-apple-darwin.tar.gz"
       },
       "published_provenance": {
-        "sha256": "3de4174bc755302b48412a0842f2840e67eaff5fa90767ec4cd34e8af8533cdb",
+        "sha256": "20996c45ef73586cb576640b974d5a1fbc1182f212de9f72bb74432466b29c37",
         "size": 822,
-        "url": "https://github.com/astral-experiments/ohm/releases/download/ohm-1.100.0-3/ohm-1.100.0-3-aarch64-apple-darwin-provenance.json"
+        "url": "https://github.com/astral-experiments/ohm/releases/download/ohm-1.100.0-4/ohm-1.100.0-4-aarch64-apple-darwin-provenance.json"
       },
       "bundled_tools": {}
     }
   },
   "measurement": {
     "hosts_by_project": {
-      "uv": {
-        "workflow": "charlie-ohm-full-26-uv",
-        "sessions": "charlie-ohm-full-26-uv",
-        "ablation": "charlie-ohm-full-26-uv",
-        "developer": "charlie-ohm-full-26-ty"
-      },
       "ruff": {
+        "doctests": "charlie-ohm-32-llvm",
         "sessions": "charlie-ohm-32-llvm",
         "historical": "charlie-ohm-32-llvm",
-        "developer": "charlie-ohm-full-26-ruff",
-        "doctests": "charlie-ohm-32-llvm"
+        "developer/edit-test": "charlie-ohm-32-llvm",
+        "developer/dependency-test": "charlie-ohm-full-26-ruff",
+        "developer/edit-check-test-check": "charlie-ohm-full-26-ruff",
+        "developer/check-build-check": "charlie-ohm-full-26-ruff",
+        "developer/edit-fmt-clippy-test": "charlie-ohm-full-26-ruff"
+      },
+      "uv": {
+        "sessions": "charlie-ohm-full-26-uv",
+        "workflow": "charlie-ohm-full-26-uv",
+        "ablation": "charlie-ohm-full-26-uv",
+        "developer/edit-test": "charlie-ohm-full-26-uv",
+        "developer/dependency-test": "charlie-ohm-full-26-uv",
+        "developer/edit-check-test-check": "charlie-ohm-full-26-ty",
+        "developer/check-build-check": "charlie-ohm-full-26-ty",
+        "developer/edit-fmt-clippy-test": "charlie-ohm-full-26-ty"
       },
       "ty": {
         "sessions": "charlie-ohm-full-27-uv",
@@ -84,99 +92,107 @@
         "worktree_btrfs": "charlie-ohm-full-27-uv"
       },
       "codex": {
-        "developer/edit-check-test-check": "charlie-ohm-full-25-codex",
-        "developer/edit-test": "charlie-ohm-full-26-codex",
-        "developer/dependency-test": "charlie-ohm-full-26-codex",
-        "sessions": "charlie-ohm-full-26-uv",
         "workflow": "charlie-ohm-full-27-ruff",
-        "developer/edit-fmt-clippy-test": "charlie-ohm-full-27-ruff",
-        "developer/check-build-check": "charlie-ohm-full-27-uv"
+        "developer/check-build-check": "charlie-ohm-full-27-ruff",
+        "sessions": "charlie-ohm-full-27-codex",
+        "developer/edit-test": "charlie-ohm-full-27-codex",
+        "developer/dependency-test": "charlie-ohm-full-27-ty",
+        "developer/edit-check-test-check": "charlie-ohm-full-27-ty",
+        "developer/edit-fmt-clippy-test": "charlie-ohm-full-26-codex"
       }
     },
     "hosts": {
-      "charlie-ohm-full-26-uv": {
-        "name": "charlie-ohm-full-26-uv",
-        "boot": "6b0f869f-f6c0-461b-8d95-71093a2f20db",
-        "machine_id": "e2bdbaaaf6b844329527cbaea9b10a4f",
-        "logical_cpus": 32,
-        "cpu_models": ["AMD EPYC-Genoa Processor"]
-      },
-      "charlie-ohm-full-26-ty": {
-        "name": "charlie-ohm-full-26-ty",
-        "boot": "c7950b12-f6be-4595-b9a8-dd7486743424",
-        "machine_id": "0fcf547fe7694020812a7d39fff5ccb9",
-        "logical_cpus": 32,
-        "cpu_models": ["AMD EPYC-Genoa Processor"]
-      },
       "charlie-ohm-32-llvm": {
         "name": "charlie-ohm-32-llvm",
-        "boot": "476743ef-25d6-4b1a-8253-6161d377d428",
+        "boot": "19fac317-5648-4a56-8cb4-3b6964b71d9e",
         "machine_id": "2bff0bb46895436c92199ac202b955ca",
         "logical_cpus": 32,
         "cpu_models": ["AMD EPYC-Genoa Processor"]
       },
       "charlie-ohm-full-26-ruff": {
         "name": "charlie-ohm-full-26-ruff",
-        "boot": "97ac4cfd-8a1f-49ae-8959-ea7fe3269a47",
+        "boot": "4ab12669-37fb-46e9-af6c-59fdc5bcc365",
         "machine_id": "9161800b530f4bc1bb5c9e2c2fe9940f",
+        "logical_cpus": 32,
+        "cpu_models": ["AMD EPYC-Genoa Processor"]
+      },
+      "charlie-ohm-full-26-uv": {
+        "name": "charlie-ohm-full-26-uv",
+        "boot": "8b9e46cc-a251-4672-b5d8-798c1b1adc9f",
+        "machine_id": "e2bdbaaaf6b844329527cbaea9b10a4f",
+        "logical_cpus": 32,
+        "cpu_models": ["AMD EPYC-Genoa Processor"]
+      },
+      "charlie-ohm-full-26-ty": {
+        "name": "charlie-ohm-full-26-ty",
+        "boot": "10f25b48-fd07-4206-aec1-7c733d7c75f6",
+        "machine_id": "0fcf547fe7694020812a7d39fff5ccb9",
         "logical_cpus": 32,
         "cpu_models": ["AMD EPYC-Genoa Processor"]
       },
       "charlie-ohm-full-27-uv": {
         "name": "charlie-ohm-full-27-uv",
-        "boot": "89de48f8-9cb3-4a43-a282-0e2bc0a804f7",
+        "boot": "7c1365c4-2491-417e-aeaa-a634bb61cb31",
         "machine_id": "7f139406beb14b809d8b34d61b8707a5",
-        "logical_cpus": 32,
-        "cpu_models": ["AMD EPYC-Genoa Processor"]
-      },
-      "charlie-ohm-full-25-codex": {
-        "name": "charlie-ohm-full-25-codex",
-        "boot": "c541ec2f-0bb6-4e9f-a5e7-7a1783dab8cc",
-        "machine_id": "53d91a379e53438b8c645c8e9c813f6a",
-        "logical_cpus": 32,
-        "cpu_models": ["AMD EPYC-Genoa Processor"]
-      },
-      "charlie-ohm-full-26-codex": {
-        "name": "charlie-ohm-full-26-codex",
-        "boot": "4914fd1b-d814-4585-b355-d4a05b6a02e1",
-        "machine_id": "16fc3e13bb0f4c34a615873539d67796",
         "logical_cpus": 32,
         "cpu_models": ["AMD EPYC-Genoa Processor"]
       },
       "charlie-ohm-full-27-ruff": {
         "name": "charlie-ohm-full-27-ruff",
-        "boot": "e65d2503-2993-4d00-be40-99efd16fcef4",
+        "boot": "c6ffb9e7-cf9e-4595-a0c5-734ab695d34e",
         "machine_id": "fa3ec12000544abd9643858a80c3e53c",
+        "logical_cpus": 32,
+        "cpu_models": ["AMD EPYC-Genoa Processor"]
+      },
+      "charlie-ohm-full-27-codex": {
+        "name": "charlie-ohm-full-27-codex",
+        "boot": "e617c0ae-95d6-4a4e-88f9-75450953fea5",
+        "machine_id": "1b731b88faf54517bef76f057adcbbe0",
+        "logical_cpus": 32,
+        "cpu_models": ["AMD EPYC-Genoa Processor"]
+      },
+      "charlie-ohm-full-27-ty": {
+        "name": "charlie-ohm-full-27-ty",
+        "boot": "5acb5a56-9f26-4722-9101-3add78059d15",
+        "machine_id": "2ca4097c29af49efbee19213737dd1dd",
+        "logical_cpus": 32,
+        "cpu_models": ["AMD EPYC-Genoa Processor"]
+      },
+      "charlie-ohm-full-26-codex": {
+        "name": "charlie-ohm-full-26-codex",
+        "boot": "b4055d29-e8c7-4e0a-ab53-0330a27b88bf",
+        "machine_id": "16fc3e13bb0f4c34a615873539d67796",
         "logical_cpus": 32,
         "cpu_models": ["AMD EPYC-Genoa Processor"]
       }
     },
     "linux_hosts": [
       "charlie-ohm-32-llvm",
-      "charlie-ohm-full-25-codex",
       "charlie-ohm-full-26-codex",
       "charlie-ohm-full-26-ruff",
       "charlie-ohm-full-26-ty",
       "charlie-ohm-full-26-uv",
+      "charlie-ohm-full-27-codex",
       "charlie-ohm-full-27-ruff",
+      "charlie-ohm-full-27-ty",
       "charlie-ohm-full-27-uv"
     ],
     "measured_components": {
-      "rustc": {
-        "version": "rustc 1.100.0-dev (af392995e 2026-11-20) (ohm-1.100.0-3)",
-        "sha256": "d2683ab1c4ef571e052dc7e73bdf5ab81b1c0f6570532b7a70170bd47f61511f"
-      },
       "cargo": {
-        "version": "cargo 1.100.0-dev (4193b7226 2026-11-19) (ohm-1.100.0-3)",
-        "sha256": "5ea04c3f771c033bc071cd3e5ca9de7dfbe5888733bf15986f334f80ff9aadf8"
+        "version": "cargo 1.100.0-dev (01450c1e5 2026-11-20) (ohm-1.100.0-4)",
+        "sha256": "a2cb9829c58a757e16c7155d4b9d08da698bdedae1100213ee521630e133e535"
       },
       "clippy-driver": {
         "version": "clippy 0.1.100 (8b452cfcbe 2026-11-17)",
-        "sha256": "0b11a8fd85175ef188a2d3b722072d6da35c17036351fa15b4fbaaee3b19adb9"
+        "sha256": "a8e8bac96c2a079698ef4054c4f8cdf4f01a3bda59d7005fae933da8f3d22c01"
+      },
+      "rustc": {
+        "version": "rustc 1.100.0-dev (47d83992e 2026-11-21) (ohm-1.100.0-4)",
+        "sha256": "88dff9856d5e1a90fae4b95a48c60a1ce7eb42b50ab5f5806c30129c241358e1"
       },
       "rustfmt": {
-        "version": "rustfmt 1.11.0-dev (92cc15aac5 2026-11-19)",
-        "sha256": "2257fbc1ecda4ca6ad0ac16275904b59ccb46cad32e6fcec137f0eb93aacf316"
+        "version": "rustfmt 1.11.0-dev (cd3f7fc323 2026-11-20)",
+        "sha256": "b3e56b3dff6f4e3da4f2f903b87540427504b53667e5514ea201da6f02f433b5"
       }
     },
     "stock_components": {
@@ -199,114 +215,106 @@
     },
     "measured_sdk": {
       "source_kind": "published release",
-      "release": "https://github.com/astral-experiments/ohm/releases/tag/ohm-1.100.0-3",
-      "release_run": "https://github.com/astral-experiments/ohm/actions/runs/44754589323",
-      "coordinator_revision": "3b39a0eea279a0ac249928719cae2f34618f8650",
-      "manifest_sha256": "7fb0cc34bfbb8a2200b8391c12cfa9151d671a7d4d2f1f8be879cf6c6f3bb7b9",
+      "release": "https://github.com/astral-experiments/ohm/releases/tag/ohm-1.100.0-4",
+      "release_run": "https://github.com/astral-experiments/ohm/actions/runs/44877876902",
+      "coordinator_revision": "0e9062bb4559f3caaa65067ed0382ddeb0ccc0de",
+      "manifest_sha256": "ae2e3bd75d910f2aaccc1f2f8ad199cc98d0728bd4a7237f2c3a7c0f6244e808",
       "source_revisions": {
-        "rust": "af392995e5ca93b70fc487b45dfdf6604dbbbc84",
-        "cargo": "4193b7226ed980a4947848e979cd72444cc3bc22",
+        "rust": "47d83992e42cba3797d917abea34f5a527603480",
+        "cargo": "01450c1e58ff11a116b40ea835aeb70fd60c473d",
         "clippy": "8b452cfcbe11a705b7202554c7655dd9209d2e04",
-        "rustfmt": "92cc15aac56ea2cc72f72d7c3cdc08ba737af030",
-        "llvm": "bb335fde37c28311ce5db7203a2bfbb10db1853c"
+        "rustfmt": "cd3f7fc323dcce7ec70284c3cc3f673a48ecd26f",
+        "llvm": "71b1be2373b29792c2544b7e5a6d2ceb6dd7ce27"
       },
-      "linux_archive_sha256": "7fc3d21a5efad6bff7be654b14e0e60aa2fbbfd11db198582788f3cc4bcf7591"
+      "linux_archive_sha256": "6948ffc7d33b245bf48fdf770b5913cd536e71aec40a0ea280bd0eb33d4524b8"
     },
     "runner_revision": "04c83d53483607aec4f93fd2bb55b412f101d677",
     "raw_archives": {
-      "uv": [
-        {
-          "archive": "linux-uv-1.100.0-3-raw.zip",
-          "sha256": "44c6735859b25ca163ddf7e3f67cbce845b90c00e966447332c80d667330c226",
-          "bytes": 3898335,
-          "verified_entries": 468,
-          "host": "charlie-ohm-full-26-uv",
-          "suites": ["workflow", "sessions", "ablation"]
-        },
-        {
-          "archive": "linux-uv-developer-1.100.0-3-raw.zip",
-          "sha256": "8ba856251508a3b8801d13cf6a664a9d38198f3a99b5a8cb04da2824c66eadf1",
-          "bytes": 3539399,
-          "verified_entries": 357,
-          "host": "charlie-ohm-full-26-ty",
-          "suites": ["developer"]
-        }
-      ],
       "ruff": [
         {
-          "archive": "linux-ruff-1.100.0-3-raw.zip",
-          "sha256": "8725169be8ce3881539b4f834f34b09fefb18fcdc4a7e351af4b5cdff1390a7e",
-          "bytes": 8866286,
-          "verified_entries": 328,
-          "host": "charlie-ohm-32-llvm",
-          "suites": ["sessions", "historical"]
+          "archive": "linux-ruff-1.100.0-4-raw.zip",
+          "sha256": "553f2294c9e6697bfdd59bb3f718b6d56d3e0913f5242dbe4b25a479f9eae085",
+          "bytes": 9215586,
+          "verified_entries": 360,
+          "host": "charlie-ohm-32-llvm"
         },
         {
-          "archive": "linux-ruff-developer-1.100.0-3-raw.zip",
-          "sha256": "9407237815a4882839f61782fdbca133c7ef402840be25a539c8aa7e9a780192",
-          "bytes": 3098774,
-          "verified_entries": 389,
-          "host": "charlie-ohm-full-26-ruff",
-          "suites": ["developer"]
+          "archive": "linux-ruff-1.100.0-4-raw.zip",
+          "sha256": "3be7e00b7218165dbfec14530f9cc2050133449c47c8c69a56e20ad43b7c8fb0",
+          "bytes": 2153168,
+          "verified_entries": 305,
+          "host": "charlie-ohm-full-26-ruff"
         }
       ],
       "ruff_doctests": [
         {
           "archive": "raw.zip",
-          "sha256": "bb2f015c06acca22562bba97c9c782a154d32daf0dd2b9a844a605b3b63e7ad0",
-          "bytes": 105046,
-          "verified_entries": 21
+          "sha256": "111934caef1b70fc962ae8040a32c896db548f12fc639c1caf0972c5583ce8ab",
+          "bytes": 105897,
+          "verified_entries": 21,
+          "host": "charlie-ohm-32-llvm"
+        }
+      ],
+      "uv": [
+        {
+          "archive": "linux-uv-1.100.0-4-raw.zip",
+          "sha256": "7e7194f6090da3dd5774cf2b82356c9ee653e3faae0a551ae719d360be438d15",
+          "bytes": 5029623,
+          "verified_entries": 552,
+          "host": "charlie-ohm-full-26-uv"
+        },
+        {
+          "archive": "linux-uv-1.100.0-4-raw.zip",
+          "sha256": "70169747f3b202f79f9cf1c6bbf9369cf896666ee00ee3a29e109a92482120b8",
+          "bytes": 2800903,
+          "verified_entries": 294,
+          "host": "charlie-ohm-full-26-ty"
         }
       ],
       "ty": [
         {
           "archive": "ty-29327-evidence.zip",
-          "sha256": "da177e873fd4e5c4d19381a9fbc5a8babb4caeba305a8be79997df974556ab57",
-          "bytes": 8689402,
-          "verified_entries": 283
+          "sha256": "0ef690aef9dd5a34ed9a4f182ed5db37f5351c0f83b0cfeb038046602d393609",
+          "bytes": 8777291,
+          "verified_entries": 285,
+          "host": "charlie-ohm-full-27-uv"
         },
         {
           "archive": "ty-29327-copy-on-write-evidence.zip",
-          "sha256": "c41e238961a934a6b9d7afe60884d132f7e54aa375ab918986b8e9f8ba5739da",
-          "bytes": 1991133,
-          "verified_entries": 134
+          "sha256": "d7e1d3d01eb75545f1d7d4e47682b505c1d1471e879d945be4c7433dae4a3f2d",
+          "bytes": 2024209,
+          "verified_entries": 137,
+          "host": "charlie-ohm-full-27-uv"
         }
       ],
       "codex": [
         {
-          "name": "linux-codex-1.100.0-3-raw.zip",
-          "host": "charlie-ohm-full-25-codex",
-          "sha256": "27d71726b056ded82b03b9dbfa817027d9330168fbca0d797f387db0bb624b6f",
-          "bytes": 1318090,
-          "verified_entries": 156
+          "archive": "linux-codex-1.100.0-4-raw.zip",
+          "sha256": "3c23cbd94a44524841809d24b888e92da8582a37ca83fbe1383f22e5431861cd",
+          "bytes": 3433364,
+          "verified_entries": 333,
+          "host": "charlie-ohm-full-27-ruff"
         },
         {
-          "name": "linux-codex-1.100.0-3-raw.zip",
-          "host": "charlie-ohm-full-26-codex",
-          "sha256": "9dd23eb9deb85ee09fe319368d0dc8ce5d96c60a76afbd38d53a2a136571d57a",
-          "bytes": 1795382,
-          "verified_entries": 165
+          "archive": "linux-codex-1.100.0-4-raw.zip",
+          "sha256": "97e4ab2f29eb1c77576ab26779bb5af63e5b27da365a21809c650cda253324a8",
+          "bytes": 5546014,
+          "verified_entries": 240,
+          "host": "charlie-ohm-full-27-codex"
         },
         {
-          "name": "linux-codex-1.100.0-3-raw.zip",
-          "host": "charlie-ohm-full-26-uv",
-          "sha256": "6e56b780e1b1d3df6031256915167ab372bda206cd3d2d23299f1cb1f0c92292",
-          "bytes": 4600634,
-          "verified_entries": 198
+          "archive": "linux-codex-1.100.0-4-raw.zip",
+          "sha256": "1f1035921920127675f17c3cd4bc860a7dd876ffeafa174ee1660394f97dbd67",
+          "bytes": 2466346,
+          "verified_entries": 201,
+          "host": "charlie-ohm-full-27-ty"
         },
         {
-          "name": "linux-codex-1.100.0-3-raw.zip",
-          "host": "charlie-ohm-full-27-ruff",
-          "sha256": "af9d7337c2345ed97cba2aa9ebe7eacf2179635bceb9907c5dfe20a7de8afb44",
-          "bytes": 2296566,
-          "verified_entries": 294
-        },
-        {
-          "name": "linux-codex-1.100.0-3-raw.zip",
-          "host": "charlie-ohm-full-27-uv",
-          "sha256": "3138487f5f331f4dc2466bcabac19041601c5213156f6f745d651f86a90df8df",
-          "bytes": 1401164,
-          "verified_entries": 157
+          "archive": "linux-codex-1.100.0-4-raw.zip",
+          "sha256": "5fc4c42d023e4dfae609e8559189192bc3884296ec7d62287285c73bc1cdebb3",
+          "bytes": 1652715,
+          "verified_entries": 164,
+          "host": "charlie-ohm-full-26-codex"
         }
       ]
     },
@@ -392,68 +400,154 @@
         }
       },
       "project_receipts": {
-        "uv": {
-          "capsule_sha256": "ef46ef455bd1f6c6543d5b47b43b355caf68d89315070cff4108e2d2f8c17825",
-          "measured_fixtures": {
-            "sessions": {
-              "uv-rust-1.100.json": "c170332ff7f94e271e16914f03346fe3a61f83f348f2af0906ff97ede7935158"
-            },
-            "ablation": {
-              "uv-feature-ablation.json": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b"
+        "ruff": {
+          "charlie-ohm-32-llvm": {
+            "capsule_sha256": "ef46ef455bd1f6c6543d5b47b43b355caf68d89315070cff4108e2d2f8c17825",
+            "measured_fixtures": {
+              "sessions": {
+                "ruff-rust-1.100.json": "4ecd53006b63e0fd2615c18a1b4db13349fef64e0f674707eb4d8805fbe1c31f"
+              },
+              "historical": {
+                "ruff-historical-rust-1.100.json": "86ab0e113839ec4490d944ddf13874b3dc1fdae30a44f42ff20019dc0a93a7d3"
+              }
             }
+          },
+          "charlie-ohm-full-26-ruff": {
+            "capsule_sha256": "ef46ef455bd1f6c6543d5b47b43b355caf68d89315070cff4108e2d2f8c17825",
+            "measured_fixtures": {}
           }
         },
-        "ruff": {
-          "capsule_sha256": "ef46ef455bd1f6c6543d5b47b43b355caf68d89315070cff4108e2d2f8c17825",
-          "measured_fixtures": {
-            "sessions": {
-              "ruff-rust-1.100.json": "4ecd53006b63e0fd2615c18a1b4db13349fef64e0f674707eb4d8805fbe1c31f"
-            },
-            "historical": {
-              "ruff-historical-rust-1.100.json": "86ab0e113839ec4490d944ddf13874b3dc1fdae30a44f42ff20019dc0a93a7d3"
+        "uv": {
+          "charlie-ohm-full-26-uv": {
+            "capsule_sha256": "ef46ef455bd1f6c6543d5b47b43b355caf68d89315070cff4108e2d2f8c17825",
+            "measured_fixtures": {
+              "sessions": {
+                "uv-rust-1.100.json": "c170332ff7f94e271e16914f03346fe3a61f83f348f2af0906ff97ede7935158"
+              }
             }
+          },
+          "charlie-ohm-full-26-ty": {
+            "capsule_sha256": "ef46ef455bd1f6c6543d5b47b43b355caf68d89315070cff4108e2d2f8c17825",
+            "measured_fixtures": {}
           }
         },
         "ty": {
-          "capsule_sha256": "ef46ef455bd1f6c6543d5b47b43b355caf68d89315070cff4108e2d2f8c17825",
-          "measured_fixtures": {
-            "ext4": {
-              "ty-29327-rust-1.100.json": "f094d897662405f9f707818ef2940ce77b20689ddff53d11e220a8c40fe60efb"
-            },
-            "copy-on-write": {
-              "ty-29327-rust-1.100.json": "f094d897662405f9f707818ef2940ce77b20689ddff53d11e220a8c40fe60efb"
+          "charlie-ohm-full-27-uv": {
+            "capsule_sha256": "ef46ef455bd1f6c6543d5b47b43b355caf68d89315070cff4108e2d2f8c17825",
+            "measured_fixtures": {
+              "ext4": {
+                "ty-29327-rust-1.100.json": "f094d897662405f9f707818ef2940ce77b20689ddff53d11e220a8c40fe60efb"
+              },
+              "copy-on-write": {
+                "ty-29327-rust-1.100.json": "f094d897662405f9f707818ef2940ce77b20689ddff53d11e220a8c40fe60efb"
+              }
             }
           }
         },
         "codex": {
-          "capsule_sha256": "20be1dd3e39b6b710aed4f2e29ed69eb87cf0cdb80049d60e6d7eac8d146e12d",
-          "measured_fixtures": {
-            "sessions": {
-              "codex-rust-1.100.json": "f2d9c9b29ca5e81f39a3683aefe8e541c50e1100a0b43c32c9f8ac157e276084"
+          "charlie-ohm-full-27-ruff": {
+            "capsule_sha256": "20be1dd3e39b6b710aed4f2e29ed69eb87cf0cdb80049d60e6d7eac8d146e12d",
+            "measured_fixtures": {},
+            "dependency": {
+              "allocative_crate_sha256": "d8cf9afc79c83d514444b55df3935d317da54b1ce3b17a133c646889cc260de8",
+              "allocative_fix": "https://github.com/meta/buck2/commit/9711293c6de502d50583cafb12e4a7b764094d3a",
+              "allocative_patch_sha256": "f4ab786c2d9d743f2ecc5214fbe3e838ac7adf7987751804f3073f5e11173612",
+              "allocative_updated_files": {
+                "src/impls/std/unsorted.rs": "0a8323b891c54017b3827b59b7722e588268a5c6b1f28aede7976779bfe05983",
+                "src/lib.rs": "51ce256338801dad0d50e664ff1ce182715cd208dfe6a99133147ea1f4dd2c16"
+              },
+              "codex_base_tree": "3b119a87c67fe6fbdcd682a86ff33257cb0562a6",
+              "codex_command_commit": "b2159a7308ea2380e3a9d2ca2a7a79218820d21e",
+              "codex_command_tree": "64a64b3b1bc522746cce19b83a4b125cb90e5235",
+              "codex_lock_sha256": "1fbc62ee7ddf28744e336d8d4aaa18fee54bc898d9ee97e3282148100b6cb36c",
+              "codex_patch_sha256": "10c051ed437a98157afbf73ba93025b3d34ac32fb82fc68df7d2a1ed96e80359",
+              "codex_revision": "5157493c23713ac12034cf250ffb0a8ce0670277"
+            },
+            "session_lock_sha256": "1fe5151bfcba81b0becadd1a98b40fdff11c1f3795ee87f43520ee827a7db29d",
+            "receipt_sha256": "31c48d60b7fc5ceb1ec38cdd2fd1d2f8fb56b1b29fec7329ca802ca0e4a43f79",
+            "cargo_sha256": {
+              "1.100.0": "84d55d77232a921da96bcf2e1f78532ef5c5221803aae4448d9e220d48ebd808",
+              "ohm-1.100.0-4": "a2cb9829c58a757e16c7155d4b9d08da698bdedae1100213ee521630e133e535"
             }
           },
-          "dependency": {
-            "allocative_crate_sha256": "d8cf9afc79c83d514444b55df3935d317da54b1ce3b17a133c646889cc260de8",
-            "allocative_fix": "https://github.com/meta/buck2/commit/9711293c6de502d50583cafb12e4a7b764094d3a",
-            "allocative_patch_sha256": "f4ab786c2d9d743f2ecc5214fbe3e838ac7adf7987751804f3073f5e11173612",
-            "allocative_updated_files": {
-              "src/impls/std/unsorted.rs": "0a8323b891c54017b3827b59b7722e588268a5c6b1f28aede7976779bfe05983",
-              "src/lib.rs": "51ce256338801dad0d50e664ff1ce182715cd208dfe6a99133147ea1f4dd2c16"
+          "charlie-ohm-full-27-codex": {
+            "capsule_sha256": "20be1dd3e39b6b710aed4f2e29ed69eb87cf0cdb80049d60e6d7eac8d146e12d",
+            "measured_fixtures": {
+              "sessions": {
+                "codex-rust-1.100.json": "f2d9c9b29ca5e81f39a3683aefe8e541c50e1100a0b43c32c9f8ac157e276084"
+              }
             },
-            "codex_base_tree": "3b119a87c67fe6fbdcd682a86ff33257cb0562a6",
-            "codex_command_commit": "b2159a7308ea2380e3a9d2ca2a7a79218820d21e",
-            "codex_command_tree": "64a64b3b1bc522746cce19b83a4b125cb90e5235",
-            "codex_lock_sha256": "1fbc62ee7ddf28744e336d8d4aaa18fee54bc898d9ee97e3282148100b6cb36c",
-            "codex_patch_sha256": "10c051ed437a98157afbf73ba93025b3d34ac32fb82fc68df7d2a1ed96e80359",
-            "codex_revision": "5157493c23713ac12034cf250ffb0a8ce0670277"
+            "dependency": {
+              "allocative_crate_sha256": "d8cf9afc79c83d514444b55df3935d317da54b1ce3b17a133c646889cc260de8",
+              "allocative_fix": "https://github.com/meta/buck2/commit/9711293c6de502d50583cafb12e4a7b764094d3a",
+              "allocative_patch_sha256": "f4ab786c2d9d743f2ecc5214fbe3e838ac7adf7987751804f3073f5e11173612",
+              "allocative_updated_files": {
+                "src/impls/std/unsorted.rs": "0a8323b891c54017b3827b59b7722e588268a5c6b1f28aede7976779bfe05983",
+                "src/lib.rs": "51ce256338801dad0d50e664ff1ce182715cd208dfe6a99133147ea1f4dd2c16"
+              },
+              "codex_base_tree": "3b119a87c67fe6fbdcd682a86ff33257cb0562a6",
+              "codex_command_commit": "b2159a7308ea2380e3a9d2ca2a7a79218820d21e",
+              "codex_command_tree": "64a64b3b1bc522746cce19b83a4b125cb90e5235",
+              "codex_lock_sha256": "1fbc62ee7ddf28744e336d8d4aaa18fee54bc898d9ee97e3282148100b6cb36c",
+              "codex_patch_sha256": "10c051ed437a98157afbf73ba93025b3d34ac32fb82fc68df7d2a1ed96e80359",
+              "codex_revision": "5157493c23713ac12034cf250ffb0a8ce0670277"
+            },
+            "session_lock_sha256": "1fe5151bfcba81b0becadd1a98b40fdff11c1f3795ee87f43520ee827a7db29d",
+            "receipt_sha256": "31c48d60b7fc5ceb1ec38cdd2fd1d2f8fb56b1b29fec7329ca802ca0e4a43f79",
+            "cargo_sha256": {
+              "1.100.0": "84d55d77232a921da96bcf2e1f78532ef5c5221803aae4448d9e220d48ebd808",
+              "ohm-1.100.0-4": "a2cb9829c58a757e16c7155d4b9d08da698bdedae1100213ee521630e133e535"
+            }
           },
-          "session_lock_sha256": "1fe5151bfcba81b0becadd1a98b40fdff11c1f3795ee87f43520ee827a7db29d",
-          "receipts_by_host": {
-            "charlie-ohm-full-25-codex": "11d253b34a1df72f3bc72e6a7bc365cb4074f1f16fa3a064ee87452d331f3130",
-            "charlie-ohm-full-26-codex": "11d253b34a1df72f3bc72e6a7bc365cb4074f1f16fa3a064ee87452d331f3130",
-            "charlie-ohm-full-26-uv": "11d253b34a1df72f3bc72e6a7bc365cb4074f1f16fa3a064ee87452d331f3130",
-            "charlie-ohm-full-27-ruff": "11d253b34a1df72f3bc72e6a7bc365cb4074f1f16fa3a064ee87452d331f3130",
-            "charlie-ohm-full-27-uv": "11d253b34a1df72f3bc72e6a7bc365cb4074f1f16fa3a064ee87452d331f3130"
+          "charlie-ohm-full-27-ty": {
+            "capsule_sha256": "20be1dd3e39b6b710aed4f2e29ed69eb87cf0cdb80049d60e6d7eac8d146e12d",
+            "measured_fixtures": {},
+            "dependency": {
+              "allocative_crate_sha256": "d8cf9afc79c83d514444b55df3935d317da54b1ce3b17a133c646889cc260de8",
+              "allocative_fix": "https://github.com/meta/buck2/commit/9711293c6de502d50583cafb12e4a7b764094d3a",
+              "allocative_patch_sha256": "f4ab786c2d9d743f2ecc5214fbe3e838ac7adf7987751804f3073f5e11173612",
+              "allocative_updated_files": {
+                "src/impls/std/unsorted.rs": "0a8323b891c54017b3827b59b7722e588268a5c6b1f28aede7976779bfe05983",
+                "src/lib.rs": "51ce256338801dad0d50e664ff1ce182715cd208dfe6a99133147ea1f4dd2c16"
+              },
+              "codex_base_tree": "3b119a87c67fe6fbdcd682a86ff33257cb0562a6",
+              "codex_command_commit": "b2159a7308ea2380e3a9d2ca2a7a79218820d21e",
+              "codex_command_tree": "64a64b3b1bc522746cce19b83a4b125cb90e5235",
+              "codex_lock_sha256": "1fbc62ee7ddf28744e336d8d4aaa18fee54bc898d9ee97e3282148100b6cb36c",
+              "codex_patch_sha256": "10c051ed437a98157afbf73ba93025b3d34ac32fb82fc68df7d2a1ed96e80359",
+              "codex_revision": "5157493c23713ac12034cf250ffb0a8ce0670277"
+            },
+            "session_lock_sha256": "1fe5151bfcba81b0becadd1a98b40fdff11c1f3795ee87f43520ee827a7db29d",
+            "receipt_sha256": "31c48d60b7fc5ceb1ec38cdd2fd1d2f8fb56b1b29fec7329ca802ca0e4a43f79",
+            "cargo_sha256": {
+              "1.100.0": "84d55d77232a921da96bcf2e1f78532ef5c5221803aae4448d9e220d48ebd808",
+              "ohm-1.100.0-4": "a2cb9829c58a757e16c7155d4b9d08da698bdedae1100213ee521630e133e535"
+            }
+          },
+          "charlie-ohm-full-26-codex": {
+            "capsule_sha256": "20be1dd3e39b6b710aed4f2e29ed69eb87cf0cdb80049d60e6d7eac8d146e12d",
+            "measured_fixtures": {},
+            "dependency": {
+              "allocative_crate_sha256": "d8cf9afc79c83d514444b55df3935d317da54b1ce3b17a133c646889cc260de8",
+              "allocative_fix": "https://github.com/meta/buck2/commit/9711293c6de502d50583cafb12e4a7b764094d3a",
+              "allocative_patch_sha256": "f4ab786c2d9d743f2ecc5214fbe3e838ac7adf7987751804f3073f5e11173612",
+              "allocative_updated_files": {
+                "src/impls/std/unsorted.rs": "0a8323b891c54017b3827b59b7722e588268a5c6b1f28aede7976779bfe05983",
+                "src/lib.rs": "51ce256338801dad0d50e664ff1ce182715cd208dfe6a99133147ea1f4dd2c16"
+              },
+              "codex_base_tree": "3b119a87c67fe6fbdcd682a86ff33257cb0562a6",
+              "codex_command_commit": "b2159a7308ea2380e3a9d2ca2a7a79218820d21e",
+              "codex_command_tree": "64a64b3b1bc522746cce19b83a4b125cb90e5235",
+              "codex_lock_sha256": "1fbc62ee7ddf28744e336d8d4aaa18fee54bc898d9ee97e3282148100b6cb36c",
+              "codex_patch_sha256": "10c051ed437a98157afbf73ba93025b3d34ac32fb82fc68df7d2a1ed96e80359",
+              "codex_revision": "5157493c23713ac12034cf250ffb0a8ce0670277"
+            },
+            "session_lock_sha256": "1fe5151bfcba81b0becadd1a98b40fdff11c1f3795ee87f43520ee827a7db29d",
+            "receipt_sha256": "31c48d60b7fc5ceb1ec38cdd2fd1d2f8fb56b1b29fec7329ca802ca0e4a43f79",
+            "cargo_sha256": {
+              "1.100.0": "84d55d77232a921da96bcf2e1f78532ef5c5221803aae4448d9e220d48ebd808",
+              "ohm-1.100.0-4": "a2cb9829c58a757e16c7155d4b9d08da698bdedae1100213ee521630e133e535"
+            }
           }
         }
       },
@@ -487,17 +581,24 @@
   },
   "provenance_inputs": {
     "project_archive_sha256": {
-      "uv": "5104e1ff02fff3ae2f72d1b987c190efd1b70cb373a1660d300ba36ecdc92a89",
-      "ruff": "801ead3060108b77589cea9b13bca48c8df8cd9a0de1c886ddc9c6ec81bcb96e",
-      "ty": "2e4827719d754c8f4c7c6a231441414c24cd00515ca68322794cddbe8541562e",
+      "ruff": {
+        "charlie-ohm-32-llvm": "4f2d19dbb91493b9f29e28a0eee9647f5d808838e1768c71590cd20f8aec8d4b",
+        "charlie-ohm-full-26-ruff": "f70920a1682cf06b08809ead253b08ef64cf5c236edc4a5723eb2fd38a68a828"
+      },
+      "uv": {
+        "charlie-ohm-full-26-uv": "8cc1a6cef4270444d4ac4641f2ce0b4eb258055b47f77f117d300eb53eaa56c6",
+        "charlie-ohm-full-26-ty": "416f7f502bb63c0b3888d0ca7db915fe9a65124a3e0089e617d09e7ccc591c81"
+      },
+      "ty": {
+        "charlie-ohm-full-27-uv": "b7d5a0a39e9667aa46ab5aa9b26f43609d9c4f45526fc61cf7ef0f52b346505f"
+      },
       "codex": {
-        "charlie-ohm-full-25-codex": "a06b16b79cfdb838aa07ba75e740ae2847d05db2cfa0ad5f34fa0005b9b6920e",
-        "charlie-ohm-full-26-codex": "2b71cbe37497bfba53a68b402f6f1a01cb5ba97b9df3201b915645f5fdb7c87c",
-        "charlie-ohm-full-26-uv": "798126d37e05f2b56cfe409cc5d6482c15f5c8fe079540e15c6fa1242b301bc1",
-        "charlie-ohm-full-27-ruff": "9f23f250851d7c35fd6b39345cb013da70502ff9b0dc5b6320e3e5a2377aceb0",
-        "charlie-ohm-full-27-uv": "7164a52e8dddcfbca9a1e710cf5e8553bd21034485576b41d5315a25b6da6fef"
+        "charlie-ohm-full-27-ruff": "6c9973fb5aec00500e0d7daf47e52cd8c6b54d877c61d7aa762cfa5e7d3bca70",
+        "charlie-ohm-full-27-codex": "67b8583fd084569eef0a038cdfeb2a79872a7118463abbb56e93e9fb6f418fa8",
+        "charlie-ohm-full-27-ty": "5b267e0d3f646d4a74bc44a90ca82ed3d0d6e09ef7771e8b149b3f4b6ac4e135",
+        "charlie-ohm-full-26-codex": "2be6d21972d24f30b36dc8b3a9e2d43233729e412cbebbeb50ddae81bf1743d6"
       }
     },
-    "published_verification_sha256": "306bceac9807d060d695956aed6357bf31f327e478d1a51119789174fee6f0c0"
+    "published_verification_sha256": "2ad0386ef3362bceedaf7fa25d5ddf74acf4a5f62a807b2fd811fce2e398fec9"
   }
 }
