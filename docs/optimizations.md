@@ -890,15 +890,12 @@ the allocation indices in the exported metadata. [Query
 reuse](https://github.com/astral-experiments/ohm-rust/pull/451) · [Cached
 literals](https://github.com/astral-experiments/ohm-rust/pull/318)
 
-A package version bump also changes the identifiers that rustc assigns to imported definitions and
-source files. For example, a query about `globset::GlobSet` can miss the cache when only the
-version of `globset` changed. Ohm gives definitions and files additional identifiers for looking
-up previous checks. It validates the crate and source path and tracks queries that depend on the
-current version or linkage. This lets rustc reuse the type check and reevaluate expressions such
-as `env!("CARGO_PKG_VERSION")`. The extra identifiers occupy space in library metadata.
-[Package versions](https://github.com/astral-experiments/ohm-rust/pull/470) ·
-[Imported definitions](https://github.com/astral-experiments/ohm-rust/pull/502) ·
-[Source files](https://github.com/astral-experiments/ohm-rust/pull/503)
+Releasing serc 0.1.10 changed its package version and the identifier Cargo passed to rustc. The
+new identifier caused a cache miss when looking for previous local queries, even when the Rust sources were identical.
+Ohm uses the package name to find the previous check and validates the input path, crate name,
+configuration, and tracked options. Queries that read the version, such as the expansion of
+`env!("CARGO_PKG_VERSION")`, depend on its current value.
+[Package versions](https://github.com/astral-experiments/ohm-rust/pull/470)
 
 Adding an implementation of one trait to a dependency can invalidate cached lookups for other
 traits. For a lookup of `Display`, rustc records a fingerprint of the crates that supply
@@ -912,7 +909,6 @@ during the search. Callers can reuse their type checks if the search selects the
 and the types they depend on still agree. Ohm also derives the identities of handwritten
 impls from their headers, so inserting `impl A` before `impl B` can preserve the identity of `B`’s
 methods. [Trait selection](https://github.com/astral-experiments/ohm-rust/pull/493) ·
-[Cached lookups](https://github.com/astral-experiments/ohm-rust/pull/505) ·
 [Impl headers](https://github.com/astral-experiments/ohm-rust/pull/467)
 
 When a module lives in its own file, editing its caller often leaves the file unchanged. Ohm can
