@@ -201,16 +201,18 @@ def run(args, commits, role):
         previous_lock = lock
         receipt = folder / ("units.tsv" if i else "prime.tsv")
         log = folder / ("check.log" if i else "prime.log")
-        command([args.scratch / "meter", rustc, receipt, cargo, *CHECK], src, env, log)
+        build_seed = not i and args.window == "post-build"
+        invocation = ("build", "--locked", "--offline") if build_seed else CHECK
+        command([args.scratch / "meter", rustc, receipt, cargo, *invocation], src, env, log)
         units = read_counts(receipt)
         if i == 0:
             assert units
             units = []
         noop = folder / "noop.tsv"
-        command([args.scratch / "meter", rustc, noop, cargo, *CHECK],
+        command([args.scratch / "meter", rustc, noop, cargo, *invocation],
                 src, env, folder / "noop.log")
         assert not read_counts(noop), (i, "unexpected recompilation")
-        if args.audit:
+        if args.audit and not build_seed:
             compare_fresh(cargo, src, env, folder)
         total = sum(x["instructions"] for x in units)
         title = git(src, "log", "-1", "--format=%s", commit).decode().strip()
@@ -226,7 +228,7 @@ def run(args, commits, role):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--window", choices=["recent", "preceding", "shared", "revisit",
-                                            "from-tip", "moves", "preceding-tip", "detour", "next"],
+                                            "from-tip", "moves", "preceding-tip", "detour", "next", "post-build"],
                         default="recent")
     parser.add_argument("--project", choices=PROJECTS.keys(), required=True)
     for arg in ("source", "control", "candidate", "cargo", "candidate-cargo", "current-cargo", "intermediate-cargo", "second-cargo", "scratch", "output"):

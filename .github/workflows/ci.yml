@@ -32,6 +32,10 @@ on:
         description: Use Ohm 1.100.0-4 for the common Cargo and the release arm
         type: boolean
         default: false
+      distribution:
+        description: Optional override of the Linux candidate artifact (workflow ID and SHA-256 separated by a slash)
+        type: string
+        required: false
       release_llvm:
         description: Load the verified Ohm -4 LLVM 23.1.5 shared library in every compiler
         type: boolean
@@ -40,7 +44,7 @@ on:
         description: Select a history and any commits to check before the replay
         type: choice
         default: recent
-        options: [recent, preceding, shared, revisit, from-tip, moves, preceding-tip, detour, next]
+        options: [recent, preceding, shared, revisit, from-tip, moves, preceding-tip, detour, next, post-build]
       intermediate:
         description: Optional kit for the first PR of a stack
         required: false
@@ -206,13 +210,19 @@ jobs:
         if: inputs.release4
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          DISTRIBUTION: ${{ inputs.distribution }}
         run: |
+          set -euo pipefail
           base=ohm-1.100.0-4-x86_64-unknown-linux-gnu
           packed="$RUNNER_TEMP/kits/$base.tar.gz"
           mkdir -p "$RUNNER_TEMP/kits"
-          if ! curl -fsSL --retry 3 "https://github.com/astral-experiments/ohm/releases/download/ohm-1.100.0-4/$base.tar.gz" -o "$packed"; then
-            bash scripts/project-check-instructions/download.sh 44863671852 "$base" "$base.tar.gz" "$packed"
+          spec=${DISTRIBUTION:-44863671852/09c701b4a1f6b196d51164e8392adafc2304f7e2c759d2aa524d5c42d2178943}
+          [[ "$spec" =~ ^[0-9]+/[a-f0-9]{64}$ ]]
+          if ! bash scripts/project-check-instructions/download.sh "${spec%/*}" "$base" "$base.tar.gz" "$packed"; then
+            curl -fsSL --retry 3 "https://github.com/astral-experiments/ohm/releases/download/ohm-1.100.0-4/$base.tar.gz" -o "$packed"
           fi
+          echo "${spec#*/}  $packed" | sha256sum -c -
+          echo "LINUX_SHA=${spec#*/}" >> "$GITHUB_ENV"
       - name: Measure the first root check after each edit
         env:
           RELEASE4: ${{ inputs.release4 }}

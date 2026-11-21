@@ -11,7 +11,7 @@ tag=ohm-1.100.0-3
 digest=7fc3d21a5efad6bff7be654b14e0e60aa2fbbfd11db198582788f3cc4bcf7591
 if [[ "${RELEASE4:-}" == true ]]; then
   tag=ohm-1.100.0-4
-  digest=09c701b4a1f6b196d51164e8392adafc2304f7e2c759d2aa524d5c42d2178943
+  digest=${LINUX_SHA:-09c701b4a1f6b196d51164e8392adafc2304f7e2c759d2aa524d5c42d2178943}
 fi
 name="$tag-$host.tar.gz"
 packed="$kits/$name"
