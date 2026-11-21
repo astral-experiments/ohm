@@ -303,9 +303,21 @@ if case.startswith("exp-dev"):
         folder.mkdir()
         history.command([cargo,'fetch','--locked'],source,env,folder/'fetch.log')
         rows={}
-        for phase in (['build','warmup'] if kind=='forward' else ['warmup','first','build','last']):
+        phases=['build','warmup'] if kind=='forward' else ['warmup','first','build','last']
+        if kind=='warm':
+            orig=cfg['edits']['direct']
+            path=source/orig['path'].removeprefix('codex-rs/')
+            original=path.read_text()
+            history.command([cargo,*cfg['commands']['build'],'--offline'],source,env|{'CARGO_TARGET_DIR':str(work/'prime')},folder/'prime.log')
+            shutil.rmtree(work/'prime')
+            phases+=['editcheck','editbuild']
+        for phase in phases:
             if kind=='nocheck' and phase=='first':continue
-            command='build' if phase=='build' else 'check'
+            command='build' if phase in ('build','editbuild') else 'check'
+            if phase=='editcheck':
+                assert original.count(orig['before'])==1
+                path=source/orig['path'].removeprefix('codex-rs/')
+                path.write_text(original.replace(orig['before'],orig['after']))
             receipt=folder/(phase+'.tsv')
             start_cmd=['cargo','+ohm']if kind=='proxy'else [cargo]
             cmd=[*start_cmd,*cfg['commands'][command],'--offline']
@@ -318,7 +330,7 @@ if case.startswith("exp-dev"):
             history.command(base,source,env,folder/(phase+'.log'))
             duration=time.perf_counter()-start
             post=resource.getrusage(resource.RUSAGE_CHILDREN)
-            if phase in ('build','warmup'):entries=history.read_counts(receipt)
+            if phase in ('build','warmup','editcheck','editbuild'):entries=history.read_counts(receipt)
             else:entries=[]
             n,en,ru=map(int,Path(str(receipt)+".tree").read_text().split())
             assert n and en*.995<=ru<=en
@@ -342,6 +354,27 @@ if case.startswith("exp-dev"):
                         graphs[str(path.relative_to(work))]=[buf[pos:pos+8].hex(),buf[pos+8:pos+16].hex(),path.stat().st_size]
                 rows[phase]['graphs']=graphs
             print(role,phase,len(entries),n,duration,flush=True)
+        if kind=='warm':
+            import shlex
+            editpath=source/orig['path'].removeprefix('codex-rs/')
+            editpath.write_text(original)
+            hashed={}
+            suppressed=set()
+            for phase in ('prime','warmup','build'):
+                text=(folder/(phase+'.log')).read_text()
+                suppressed.update(re.findall(r'-Zpublic-api-hash=no --crate-name ([a-zA-Z0-9_]+)',text))
+                if phase=='prime':continue
+                lib=project.replace('-','_')
+                lines=[s for s in text.splitlines() if (' --crate-name '+lib+' ') in s and 'Running 'in s]
+                if not lines:continue
+                args=shlex.split(lines[-1].split(chr(96))[1])
+                files=[b.split('=',1) for a,b in zip(args,args[1:])if a=='--extern' and '=' in b]
+                hashed[phase]={}
+                for dep,artifact in files:
+                    if dep in suppressed and artifact.endswith(('.rmeta','.rlib')) and Path(artifact).is_file():
+                        info=subprocess.check_output([rustc,'-Zls=root',artifact],env=env,text=True)
+                        hashed[phase][dep]=next((s for s in info.splitlines()if s.startswith(('private hash ','hash '))),None)
+            history.save(folder/'hashes.json',dict(suppressed=sorted(suppressed),hashes=hashed))
         result[role]=rows
         history.save(out/"result.json",result)
         sdk.rename(root/role)
