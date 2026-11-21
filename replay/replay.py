@@ -430,6 +430,63 @@ def tui_session():
         history.save(out/'result.json',result)
         shutil.rmtree(where)
         sdk.rename(root/role)
+
+def session_time():
+    import replay_sessions as r
+    import resource
+    fetch()
+    git("checkout","-q","--detach",record["head"])
+    for i,revision in enumerate(record['revs']):
+        git("update-ref","refs/heads/charlie/fixture-"+str(i),revision)
+    fixture=wd/"scripts/session_replays"/(record["fixture"]+".json")
+    result["fixture"]=history.sha(fixture)
+    app=record["app"]
+    (_,hard)=resource.getrlimit(resource.RLIMIT_NOFILE)
+    resource.setrlimit(resource.RLIMIT_NOFILE,(min(hard,65536),hard))
+    tmp=Path('/tmp/o100p4')
+    tmp.mkdir(mode=0o700)
+    os.environ.update(env)
+    os.environ.update(TMPDIR=str(tmp),CARGO_HOME=str(root/'disk/registry'),MEASURE_CLIPPY=str(sdk/"bin/clippy-driver"))
+    where=root/"disk/sessions"
+    for role in order:
+        (root/role).rename(sdk)
+        number='3' if role=='control' else '4'
+        selector="ohm-1.100.0-"+number
+        (toolchain.parent/selector).symlink_to(sdk)
+        folder=out/role
+        folder.mkdir()
+        os.environ['RUSTUP_TOOLCHAIN']=selector
+        history.command([cargo,"fetch","--locked"],src,os.environ,folder/"fetch.log")
+        args=['--upstream','1.100.0','--ohm',selector,'--jobs','8','--minimum-free-gb','1',
+                '--output-dir',str(where),'--project',app,'--repetitions','1','--offline',
+                '--scenario',str(fixture),'--source-path',app+'='+str(src)]
+        args+=['--require-idle']
+        if case=='session-ty':args+=['--compiler-accounting','verbose','--native-tool-trust','all']
+        study=r.Replay(r.parser().parse_args(args))
+        scenario=study.scenarios[0]
+        study.toolchains=(('ohm',selector),)
+        dest=study.prepare_source(scenario)
+        run('git','-C',dest,'config','--local','user.email','benchmark@users.noreply.github.com')
+        run('git','-C',dest,'config','--local','user.name','Ohm benchmark fixture')
+        study.sources[app]=dest
+        study.persist()
+        try:
+            sample=study.run_session(scenario,'ohm',selector,0)
+        finally:
+            if (where/'logs').exists():shutil.copytree(where/'logs',folder/'logs')
+        co=Path(sample['worktree'])
+        run('git','-C',co,'add','-A')
+        tree=subprocess.check_output(['git','-C',co,'write-tree'],text=True).strip()
+        assert tree==record['expected'],tree
+        result[role]=dict(sample=sample,tree=tree)
+        history.save(out/'result.json',result)
+        shutil.rmtree(where)
+        sdk.rename(root/role)
+
+if case.startswith('session-'):
+    sys.path.insert(0,str(wd/"scripts"))
+    session_time()
+    raise SystemExit(0)
 if case in ("codex-tui","codex-tui-time"):
     sys.path.insert(0,str(wd/"scripts"))
     tui_session()
