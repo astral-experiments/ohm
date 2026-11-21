@@ -215,7 +215,7 @@ if os.environ.get("REPLAY_MODE") == "llvm-only":
                                candidate=history.sha(produced/so),identical_files=unchanged)
 
 history.save(out / "inputs.json", result)
-if os.environ.get('REPLAY_MODE')=='subset':
+if os.environ.get('REPLAY_MODE')=='subset' or os.environ.get('REPLAY_MODE','').startswith('dev-keys'):
     shutil.rmtree(root/'control')
     shutil.copytree(root/'candidate',root/'control',symlinks=True)
     for role in order:
@@ -253,6 +253,8 @@ if case.startswith("exp-dev"):
     work=root/'disk/artifacts'
     env.update(CARGO_TARGET_DIR=str(work/'target'),CARGO_BUILD_BUILD_DIR=str(work/'shared-build'),
                CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST='all',CARGO_HOME=str(root/'disk/registry'))
+    if kind in ('noshared','neither'):env.pop('CARGO_BUILD_BUILD_DIR')
+    if kind in ('notrust','neither'):env.pop('CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST')
     # Normalize source once before comparing the two builds.
     (root/'candidate').rename(sdk)
     history.command([cargo,*cfg['commands']['fmt']],src,env,out/'fmt.log')
@@ -266,9 +268,11 @@ if case.startswith("exp-dev"):
         history.command([cargo,'fetch','--locked'],source,env,folder/'fetch.log')
         rows={}
         for phase in ['warmup','first','build','last']:
+            if kind=='nocheck' and phase=='first':continue
             command='build' if phase=='build' else 'check'
             receipt=folder/(phase+'.tsv')
-            cmd=[cargo,*cfg['commands'][command],'--offline']
+            start_cmd=['cargo','+ohm']if kind=='proxy'else [cargo]
+            cmd=[*start_cmd,*cfg['commands'][command],'--offline']
             prior=resource.getrusage(resource.RUSAGE_CHILDREN)
             start=time.perf_counter()
             history.command([meter,rustc,receipt,*cmd],source,env,folder/(phase+'.log'))

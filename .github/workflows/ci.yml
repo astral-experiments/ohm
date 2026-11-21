@@ -12,6 +12,9 @@ on:
       candidate:
         type: string
         default: '4'
+      kits:
+        type: string
+        default: '{}'
       cases:
         type: string
         required: true
@@ -88,6 +91,20 @@ jobs:
         with:
           github-token: ${{ github.token }}
           run-id: 44877598697
+          name: sdk-candidate
+          path: trial/candidate
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        if: startsWith(inputs.label, 'dev-keys')
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ fromJSON(inputs.kits)[matrix.scenario][0] }}
+          name: sdk-candidate
+          path: trial/control
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        if: startsWith(inputs.label, 'dev-keys')
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ fromJSON(inputs.kits)[matrix.scenario][1] }}
           name: sdk-candidate
           path: trial/candidate
       - name: Set up the Codex dependencies
