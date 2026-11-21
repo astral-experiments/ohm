@@ -38,7 +38,14 @@ if [[ "${RELEASE_LLVM:-}" == true ]]; then
   test "$tag" = ohm-1.100.0-4
   lib=libLLVM.so.23.1-rust-dev
   tar -C "$kits" -xzf "$packed" --strip-components=3 "rust-1.100.0-dev-$host/rustc/lib/$lib"
-  echo "19327450340ce3aac82e30a57a2e028a86ea77d9974e9dc168bf0fa882225f02  $kits/$lib" | sha256sum -c -
+  case "$digest" in
+    09c701b4a1f6b196d51164e8392adafc2304f7e2c759d2aa524d5c42d2178943)
+      expected_llvm=19327450340ce3aac82e30a57a2e028a86ea77d9974e9dc168bf0fa882225f02 ;;
+    6948ffc7d33b245bf48fdf770b5913cd536e71aec40a0ea280bd0eb33d4524b8)
+      expected_llvm=714780e0f92a97b9ad9fe2c3b178e8be11e1629661a2964c001140c829bc21db ;;
+    *) echo "Unverified LLVM archive" >&2; exit 1 ;;
+  esac
+  echo "$expected_llvm  $kits/$lib" | sha256sum -c -
   sha256sum "$kits/$lib" > "$out/release-llvm.sha256"
 fi
 
