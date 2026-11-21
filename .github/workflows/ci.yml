@@ -169,7 +169,7 @@ jobs:
         with:
           repository: ${{ matrix.project == 'ripgrep' && 'BurntSushi/ripgrep' || 'astral-experiments/serc' }}
           ref: ${{ matrix.project == 'ripgrep' && '43fc97d43a4c61d65e7d74d4110c8480fe42ea5b' || inputs.window == 'moves' && 'c09203c60af828b1a5981f205b0c574dd5a5973e' || '1b15ce1cba1d5a0045ac7303b8797102f807e57c' }}
-          fetch-depth: ${{ inputs.window == 'preceding' && 41 || 21 }}
+          fetch-depth: ${{ startsWith(inputs.window, 'preceding') && 41 || 21 }}
           persist-credentials: false
           path: workload
       - name: Download compiler kits and verify their digests
