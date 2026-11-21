@@ -226,7 +226,7 @@ if os.environ.get('REPLAY_MODE')=='subset' or os.environ.get('REPLAY_MODE','').s
         kit=path/'candidate'
         run('sha256sum','-c','manifest.sha256','--quiet',cwd=kit)
         dest=root/role
-        # The production rustfmt still loads the original compiler library.
+        for binary in (dest/'lib').glob('librustc_driver-*.so'):binary.unlink()
         shutil.rmtree(dest/'lib/rustlib/x86_64-unknown-linux-gnu/lib')
         shutil.copytree(kit,dest,dirs_exist_ok=True)
         result['kit-'+role]=history.sha(file)
@@ -243,6 +243,18 @@ if case.startswith("exp-dev"):
     git('checkout','-q','--detach',cfg['revision'])
     history.calibrate(root,out)
     components={'llvm':'lib/libLLVM.so.23.1-rust-dev','cargo':'bin/cargo'}
+    env['CARGO_TERM_VERBOSE']='true'
+    if kind=='compiler':
+        a=root/'control'; b=root/'candidate'
+        for file in (a/'bin').iterdir():
+            if file.name!='rustc' and (b/'bin'/file.name).exists():shutil.copyfile(b/'bin'/file.name,file)
+        file=Path('lib/libLLVM.so.23.1-rust-dev')
+        shutil.copyfile(b/file,a/file)
+    if kind=='two':
+        for role in order:
+            (root/role/'lib/librustc_driver-extra.so').touch()
+    if kind=='nomono':
+        env['RUSTFLAGS']='-Zohm-incremental-mono-partitions=no'
     if kind in components:
         a=root/'control'; b=root/'candidate'; name=components[kind]
         (a/name).rename(root/'kept')
@@ -270,7 +282,8 @@ if case.startswith("exp-dev"):
     result['settings']={k:v for k,v in env.items() if k in ['RUSTC_FORCE_RUSTC_VERSION','CARGO_BUILD_BUILD_DIR','CARGO_TARGET_DIR']}
     # Normalize source once before comparing the two builds.
     (root/'candidate').rename(sdk)
-    history.command([cargo,*cfg['commands']['fmt']],src,env,out/'fmt.log')
+    if not kind.startswith('kit') and kind!='compiler':
+        history.command([cargo,*cfg['commands']['fmt']],src,env,out/'fmt.log')
     result['baseline_diff_sha256']=hashlib.sha256(git('diff','--binary').encode()).hexdigest()
     sdk.rename(root/'candidate')
     for role in order:
@@ -310,6 +323,14 @@ if case.startswith("exp-dev"):
                              user=post.ru_utime-prior.ru_utime,kernel=post.ru_stime-prior.ru_stime,
                              outblock=post.ru_oublock-prior.ru_oublock,minor=post.ru_minflt-prior.ru_minflt,
                              allocated=allocated)
+            if phase in ('warmup','build'):
+                graphs={}
+                for path in work.glob('target/debug/incremental/**/uv-*/s-*/*'):
+                    if path.name.endswith('dep-graph.bin'):
+                        with path.open('rb') as inp:buf=inp.read(512)
+                        pos=7+buf[6]
+                        graphs[str(path.relative_to(work))]=[buf[pos:pos+8].hex(),buf[pos+8:pos+16].hex(),path.stat().st_size]
+                rows[phase]['graphs']=graphs
             print(role,phase,len(entries),n,duration,flush=True)
         result[role]=rows
         history.save(out/"result.json",result)
