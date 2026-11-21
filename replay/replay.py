@@ -208,34 +208,21 @@ if os.environ.get("REPLAY_MODE") == "llvm-only":
                                candidate=history.sha(produced/so),identical_files=unchanged)
 
 history.save(out / "inputs.json", result)
-def fixture(env):
-    import shutil
-    temp=root/'example'
-    if temp.exists():shutil.rmtree(temp)
-    temp.mkdir()
-    (temp/'supplier.rs').write_text('pub struct Packet { pub value: u8 }')
-    (temp/'consumer.rs').write_text('''#![feature(rustc_attrs)]
-#![allow(internal_features)]
-#[rustc_clean(cfg = "from_build", loaded_from_disk = "fn_sig,typeck_root,mir_borrowck")]
-pub fn value(packet: supplier::Packet) -> u8 { packet.value }
-#[cfg(from_build)]
-pub fn extra() -> u8 { value(supplier::Packet { value: 3 }) }
-''')
-    flags=['-Zohm-shared-stages','-Zpublic-api-hash','-Zincremental-verify-ich',
-           '--crate-type=lib','--edition=2024','-Cmetadata=fixed']
-    env=dict(env,RUSTC_BOOTSTRAP='1')
-    steps=[]
-    for emit,variant in [('metadata,link','build'),('metadata','from_build')]:
-        for name in ['supplier','consumer']:
-            additional=[]
-            if name=='consumer':
-                additional=['-Cincremental=consumer-incr','--extern','supplier=libsupplier.rmeta',
-                            '-Zquery-dep-graph','--cfg',variant]
-            cmd=[rustc,name+'.rs','--emit='+emit,*flags,*additional]
-            p=subprocess.run(cmd,env=dict(env,CARGO_PKG_NAME=name),cwd=temp,capture_output=True,text=True)
-            steps.append([emit,name,p.returncode,p.stderr])
-    return steps
-
+if os.environ.get('REPLAY_MODE')=='subset':
+    shutil.rmtree(root/'control')
+    shutil.copytree(root/'candidate',root/'control',symlinks=True)
+    for role in order:
+        file=wd/'trial'/role/'candidate.tar.zst'
+        path=root/('kit-'+role)
+        path.mkdir()
+        run('tar','xf',file,'-C',path)
+        kit=path/'candidate'
+        run('sha256sum','-c','manifest.sha256','--quiet',cwd=kit)
+        dest=root/role
+        for binary in (dest/'lib').glob('librustc_driver-*.so'):binary.unlink()
+        shutil.rmtree(dest/'lib/rustlib/x86_64-unknown-linux-gnu/lib')
+        shutil.copytree(kit,dest,dirs_exist_ok=True)
+        result['kit-'+role]=history.sha(file)
 if case.startswith("exp-"):
     import resource
     _, project, mode = case.split("-")

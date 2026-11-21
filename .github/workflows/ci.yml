@@ -1,5 +1,5 @@
 name: Replay Ohm edits
-run-name: Measure build then check (${{ inputs.label }})
+run-name: Qualify corrected Ohm −4 (${{ inputs.label }})
 on:
   workflow_dispatch:
     inputs:
@@ -8,7 +8,7 @@ on:
         required: true
       run:
         type: string
-        default: '44863671852'
+        default: '44877876902'
       candidate:
         type: string
         default: '4'
@@ -54,12 +54,19 @@ jobs:
           name: ohm-1.100.0-${{ inputs.candidate }}-x86_64-unknown-linux-gnu
           path: kits/4
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        if: endsWith(matrix.scenario, '-policy')
+        if: inputs.label == 'subset'
         with:
           github-token: ${{ github.token }}
-          run-id: 44876521857
+          run-id: 44875612642
           name: sdk-candidate
-          path: keys
+          path: trial/control
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        if: inputs.label == 'subset'
+        with:
+          github-token: ${{ github.token }}
+          run-id: 44877598697
+          name: sdk-candidate
+          path: trial/candidate
       - name: Set up the Codex dependencies
         if: contains(matrix.scenario, 'codex-')
         run: |
