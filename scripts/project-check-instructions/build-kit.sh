@@ -2,7 +2,7 @@
 set -euo pipefail
 
 role=$1
-base=af392995e5ca93b70fc487b45dfdf6604dbbbc84
+base=ef7389dc8c738056d546e00f6b574df03e783472
 host=x86_64-unknown-linux-gnu
 test "$(git rev-parse HEAD)" = "$base"
 if [[ -n "${COMPILER_REF:-}" && "$COMPILER_REF" != "$base" ]]; then
@@ -31,7 +31,7 @@ change-id = "ignore"
 [build]
 allocator = "jemalloc"
 submodules = false
-description = "ohm-1.100.0-3"
+description = "ohm-1.100.0-4"
 locked-deps = true
 docs = false
 extended = false
