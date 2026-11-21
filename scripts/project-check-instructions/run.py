@@ -155,6 +155,21 @@ def run(args, commits, role):
     out.mkdir()
     driver, = (kit / "lib").glob("librustc_driver-*.so")
     save(out / "sdk.json", dict(rustc=sha(rustc), driver=sha(driver), cargo=sha(cargo)))
+    if args.window == "shared":
+        # A second checkout has already built the registry dependencies.
+        # Give the measured checkout a fresh private target and keep both
+        # dependency trust opt-ins off. Neither checkout edits the workload.
+        env["CARGO_BUILD_BUILD_DIR"] = str(fixed / "build")
+        other = fixed / "other"
+        subprocess.run(["git", "clone", "--quiet", "--no-checkout", args.source, other], check=True)
+        git(other, "checkout", "--quiet", "--detach", commits[4])
+        other_env = dict(env, CARGO_TARGET_DIR=str(fixed / "other-target"))
+        if not args.offline:
+            command([cargo, "fetch", "--locked", "--target", "x86_64-unknown-linux-gnu"],
+                    other, other_env, out / "other-fetch.log")
+        command([cargo, *CHECK], other, other_env, out / "other.log")
+        assert not Path(env["CARGO_TARGET_DIR"]).exists()
+        save(out / "other.json", {"commit": commits[4], "lock": sha(other / "Cargo.lock")})
     rows = []
     previous_lock = None
     for i, commit in enumerate(commits):
@@ -194,7 +209,7 @@ def run(args, commits, role):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--window", choices=["recent", "preceding", "revisit"], default="recent")
+    parser.add_argument("--window", choices=["recent", "preceding", "shared", "revisit"], default="recent")
     parser.add_argument("--project", choices=PROJECTS.keys(), required=True)
     for arg in ("source", "control", "candidate", "cargo", "candidate-cargo", "current-cargo", "intermediate-cargo", "second-cargo", "scratch", "output"):
         parser.add_argument("--" + arg, type=lambda p: Path(p).resolve(), required=not arg.endswith("-cargo"))

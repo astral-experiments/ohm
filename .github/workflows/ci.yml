@@ -33,10 +33,10 @@ on:
         type: boolean
         default: false
       window:
-        description: Use either 20-edit history, or return twice to serc PR 2299
+        description: Use a 20-edit history, a warm shared build directory, or two returns to serc PR 2299
         type: choice
         default: recent
-        options: [recent, preceding, revisit]
+        options: [recent, preceding, shared, revisit]
       intermediate:
         description: Optional kit for the first PR of a stack
         required: false
