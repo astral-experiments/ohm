@@ -16,7 +16,7 @@ def verify(root,log,cargo,settings):
     parent.mkdir(exist_ok=True)
     rustc=cargo.parent/'rustc'
     tests=['C609-check','C609-build','C609-relink','C609-test','Y88','Y90','R569','R558','R552','R546','C582','C601','C597','L50','L53','L56']
-    tests+=['Y'+str(n)+'-'+x for n in [88,90] for x in ['many','one-thread','four-threads','replay']]
+    tests+=['Y'+str(n)+'-'+x for n in [88,90] for x in ['many','one-thread','four-threads','replay','clippy-fix']]
     results={}
     for key in tests:
         path=parent/key
@@ -70,7 +70,8 @@ def verify(root,log,cargo,settings):
                 write('src/main.rs',src)
                 assert ok(cargo,'run','--quiet').stdout.strip()=='true'
                 if key.endswith('replay'):ok(cargo,'clippy')
-                code=run(cargo,'fixit','--clippy','--Zdangerous-parallel-fixes','--allow-no-vcs').returncode
+                args=['clippy','--fix'] if key.endswith('clippy-fix') else ['fixit','--clippy','--Zdangerous-parallel-fixes']
+                code=run(cargo,*args,'--allow-no-vcs').returncode
                 actual=(path/'src/main.rs').read_text()
                 events[-1]['replacement']=[s for s in actual.splitlines() if 'let result'in s]
                 out=ok(cargo,'run','--quiet').stdout.strip()
@@ -126,7 +127,7 @@ def verify(root,log,cargo,settings):
                     ok(*flags,'--emit=llvm-ir,obj','safe.rs')
                     ir=(path/'safe.ll').read_text()
                     block=re.search(r'^define [^\n]*f00[^\n]*\n.*?^\}',ir,re.S|re.M)
-                    n=block[0].count(' call ')
+                    n=sum(' call ' in line for line in block[0].splitlines() if not line.lstrip().startswith(';'))
                     events[-1].update(calls=n,object_bytes=(path/'safe.o').stat().st_size)
                     assert n<=32
                 else:
