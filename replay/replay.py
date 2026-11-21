@@ -96,6 +96,7 @@ def run_history():
                 "--candidate-cargo", str(candidate / "bin/cargo"),
                 "--first", order[0], "--scratch", str(root / "study")]
     os.environ["CARGO_HOME"] = str(registry)
+    if case=='uv-shared':os.environ['BENCH_SHARED_ROOT']=str(root/'study-shared')
     history.main()
     result["history"] = json.loads((out / "summary.json").read_text())
 
@@ -241,6 +242,15 @@ if case.startswith("exp-dev"):
     resource.setrlimit(resource.RLIMIT_NOFILE,(min(hard,65536),hard))
     fetch()
     git('checkout','-q','--detach',cfg['revision'])
+    if part=="devcodex":
+        tar=root/"allocative-0.3.6.crate"
+        run("curl","-fsSL","--retry","4","https://static.crates.io/crates/allocative/allocative-0.3.6.crate","-o",tar)
+        helper=wd/"scripts/session_replays/helpers/codex-1.100/prepare.py"
+        prep=json.loads(subprocess.check_output(["python3",helper,"--benchmark-root",root,"--codex-source",src,"--archive",tar]))
+        assert prep["codex_command_commit"]=="b2159a7308ea2380e3a9d2ca2a7a79218820d21e"
+        source=Path(prep["codex_command_source"])/"codex-rs"
+        project="codex-core"
+        result["prepare"]=prep
     history.calibrate(root,out)
     components={'llvm':'lib/libLLVM.so.23.1-rust-dev','cargo':'bin/cargo'}
     env['CARGO_TERM_VERBOSE']='true'
@@ -283,7 +293,7 @@ if case.startswith("exp-dev"):
     # Normalize source once before comparing the two builds.
     (root/'candidate').rename(sdk)
     if not kind.startswith('kit') and kind!='compiler':
-        history.command([cargo,*cfg['commands']['fmt']],src,env,out/'fmt.log')
+        history.command([cargo,*cfg['commands']['fmt']],source,env,out/'fmt.log')
     result['baseline_diff_sha256']=hashlib.sha256(git('diff','--binary').encode()).hexdigest()
     sdk.rename(root/'candidate')
     for role in order:
