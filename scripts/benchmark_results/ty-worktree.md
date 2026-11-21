@@ -1,12 +1,12 @@
 # ty session and worktree startup
 
-We measured stock Rust 1.100.0 and published Ohm 1.100.0-4 on Linux. The session replays a fix to ty’s override diagnostics. Worktree startup covers creation and the first test run after the parent has built that test. [Replayed change](https://github.com/astral-sh/ruff/pull/29327)
+We measured stock Rust 1.100.0 and published Ohm 1.100.0-5 on Linux. The session replays a fix to ty’s override diagnostics. Worktree startup covers creation and the first test run after the parent has built that test. [Replayed change](https://github.com/astral-sh/ruff/pull/29327)
 
-| Workload                 | Rust 1.100.0 | Ohm 1.100.0-4 | Time saved |
+| Workload                 | Rust 1.100.0 | Ohm 1.100.0-5 | Time saved |
 | ------------------------ | ------------ | ------------- | ---------- |
-| ty session               | 306.21 s     | 169.57 s      | 44.62%     |
-| Worktree startup (ext4)  | 100.27 s     | 55.65 s       | 44.50%     |
-| Worktree startup (Btrfs) | 119.86 s     | 60.60 s       | 49.44%     |
+| ty session               | 287.84 s     | 159.31 s      | 44.65%     |
+| Worktree startup (ext4)  | 99.53 s      | 53.44 s       | 46.31%     |
+| Worktree startup (Btrfs) | 100.84 s     | 58.77 s       | 41.73%     |
 
 The session result is the mean of four replays; startup results are medians of three runs per configuration. Ohm uses a shared build directory and both trust opt-ins. Btrfs runs on a loopback filesystem backed by ext4.
 
@@ -16,19 +16,19 @@ The replay adds a failing Markdown test, expands it, applies the Rust fix, runs 
 
 | Command                                  | Rust    | Ohm     | Time saved | Compiler launches (Rust / Ohm) |
 | ---------------------------------------- | ------- | ------- | ---------- | ------------------------------ |
-| Build unchanged baseline CLI             | 0.54 s  | 0.48 s  | 10.84%     | 0 / 0                          |
-| Verify original diagnostics and save CLI | 0.36 s  | 0.29 s  | 17.62%     | 0 / 0                          |
-| First failing focused mdtest             | 89.61 s | 59.69 s | 33.39%     | 116 / 116                      |
-| Repeat after Markdown-only edit          | 1.54 s  | 1.46 s  | 5.45%      | 0 / 0                          |
-| Focused mdtest after Rust fix            | 27.24 s | 15.31 s | 43.82%     | 3 / 3                          |
-| Full semantic package tests              | 84.54 s | 47.10 s | 44.29%     | 2 / 2                          |
-| Rebuild CLI with its original features   | 27.85 s | 15.88 s | 42.97%     | 6 / 6                          |
-| Compare 24 diagnostic results            | 2.45 s  | 2.27 s  | 7.41%      | 0 / 0                          |
-| Clippy with all targets and features     | 71.18 s | 25.92 s | 63.58%     | 209 / 41                       |
+| Build unchanged baseline CLI             | 0.39 s  | 0.44 s  | -11.78%    | 0 / 0                          |
+| Verify original diagnostics and save CLI | 0.31 s  | 0.29 s  | 7.67%      | 0 / 0                          |
+| First failing focused mdtest             | 83.19 s | 57.58 s | 30.78%     | 116 / 117                      |
+| Repeat after Markdown-only edit          | 1.41 s  | 1.26 s  | 10.76%     | 0 / 0                          |
+| Focused mdtest after Rust fix            | 26.14 s | 13.37 s | 48.85%     | 3 / 3                          |
+| Full semantic package tests              | 81.57 s | 45.05 s | 44.77%     | 2 / 2                          |
+| Rebuild CLI with its original features   | 25.11 s | 13.21 s | 47.39%     | 6 / 6                          |
+| Compare 24 diagnostic results            | 2.24 s  | 2.11 s  | 5.87%      | 0 / 0                          |
+| Clippy with all targets and features     | 66.12 s | 24.12 s | 63.51%     | 209 / 41                       |
 
 Command timings are medians. Each compiler count records a driver launch; the amount of work per launch can differ. We compute each complete session total before taking its mean.
 
-Session ranges are 299.58–313.70 s for Rust and 160.59–178.30 s for Ohm. Initial CLI build medians are 119.78 s and 93.47 s.
+Session ranges are 281.82–296.15 s for Rust and 155.10–163.58 s for Ohm. Initial CLI build medians are 115.57 s and 92.49 s.
 
 ## Worktree startup
 
@@ -36,21 +36,21 @@ We build the focused `liskov.md` test in a parent checkout, then time worktree c
 
 ### ext4
 
-| Configuration                      | Creation | First validation | Total    | Total range    | Compiler launches | Untimed parent preparation |
-| ---------------------------------- | -------- | ---------------- | -------- | -------------- | ----------------- | -------------------------- |
-| Rust                               | 1.82 s   | 98.44 s          | 100.27 s | 95.34–106.73 s | 304               | 101.18 s                   |
-| Ohm + shared build                 | 1.92 s   | 56.27 s          | 58.06 s  | 56.79–58.78 s  | 80                | 73.53 s                    |
-| Ohm + shared build + trust opt-ins | 1.97 s   | 53.68 s          | 55.65 s  | 54.97–57.11 s  | 36                | 72.97 s                    |
+| Configuration                      | Creation | First validation | Total   | Total range    | Compiler launches | Untimed parent preparation |
+| ---------------------------------- | -------- | ---------------- | ------- | -------------- | ----------------- | -------------------------- |
+| Rust                               | 1.72 s   | 97.81 s          | 99.53 s | 98.26–100.33 s | 304               | 94.49 s                    |
+| Ohm + shared build                 | 1.74 s   | 57.02 s          | 58.76 s | 53.67–60.02 s  | 80                | 67.42 s                    |
+| Ohm + shared build + trust opt-ins | 1.77 s   | 51.63 s          | 53.44 s | 52.20–59.06 s  | 36                | 69.05 s                    |
 
 ### Btrfs loopback
 
-| Configuration                      | Creation | First validation | Total    | Total range     | Compiler launches | Untimed parent preparation |
-| ---------------------------------- | -------- | ---------------- | -------- | --------------- | ----------------- | -------------------------- |
-| Rust                               | 2.21 s   | 117.79 s         | 119.86 s | 114.95–124.79 s | 304               | 113.41 s                   |
-| Ohm + shared build                 | 2.11 s   | 56.93 s          | 59.12 s  | 55.81–62.04 s   | 80                | 74.24 s                    |
-| Ohm + shared build + trust opt-ins | 4.80 s   | 55.80 s          | 60.60 s  | 58.51–67.93 s   | 15                | 75.00 s                    |
+| Configuration                      | Creation | First validation | Total    | Total range    | Compiler launches | Untimed parent preparation |
+| ---------------------------------- | -------- | ---------------- | -------- | -------------- | ----------------- | -------------------------- |
+| Rust                               | 1.93 s   | 98.79 s          | 100.84 s | 98.35–107.81 s | 304               | 107.51 s                   |
+| Ohm + shared build                 | 2.00 s   | 61.93 s          | 63.73 s  | 61.22–70.66 s  | 80                | 72.12 s                    |
+| Ohm + shared build + trust opt-ins | 4.35 s   | 54.41 s          | 58.77 s  | 57.23–60.68 s  | 15                | 71.42 s                    |
 
-The trusted Btrfs runs seed 4382 files, including 4344 reflinked files. Each filesystem has its own stock comparison.
+The trusted Btrfs runs seed 5179 files, including 5141 reflinked files. Each filesystem has its own stock comparison.
 
 After timing, we change only each child’s Markdown regression and run its original test executable directly. All 18 children fail with the changed test data and pass after restoration. The parent sources and executable hashes remain unchanged.
 
