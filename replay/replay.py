@@ -223,11 +223,17 @@ def codex_clippy():
     history.calibrate(root,out)
     workload = benchmark.WORKLOADS["codex-core"]
     cmd = ["just","clippy","-p","codex-core","--locked","--offline"]
+    driver=sdk/"bin/clippy-driver"
+    if case=="codex-test":
+        driver=rustc
+        cmd=["just","test","-p","codex-core","--lib","--locked","--offline","--no-tests","fail",workload.selected_test]
+        env.update(CARGO_TARGET_DIR=str(root/"disk/target"),CARGO_HOME=str(root/"disk/registry"))
     result["command"]=cmd
     for role in order:
         (root / role).rename(sdk)
         env.pop('CARGO_NET_OFFLINE',None)
-        if target.exists():shutil.rmtree(target)
+        work=Path(env["CARGO_TARGET_DIR"])
+        if work.exists():shutil.rmtree(work)
         folder=out/role
         folder.mkdir()
         history.command([cargo,"fetch","--locked"],source/"codex-rs",env,folder/"fetch.log")
@@ -236,7 +242,7 @@ def codex_clippy():
         def capture(phase,iteration):
             label=f"{phase}-{iteration}"
             receipt=folder/(label+".tsv")
-            proc=subprocess.run([meter,sdk/"bin/clippy-driver",receipt,*cmd],cwd=source,capture_output=True,env=env)
+            proc=subprocess.run([meter,driver,receipt,*cmd],cwd=source,capture_output=True,env=env)
             log=proc.stdout+proc.stderr
             (folder/(label+".log")).write_bytes(log)
             if proc.returncode:print(log[-2900:].decode(errors="replace"),flush=True)
@@ -258,7 +264,7 @@ def codex_clippy():
         result[role]=entries
         sdk.rename(root/role)
     history.save(out/"result.json",result)
-if case=="codex-clippy":
+if case in ("codex-clippy","codex-test"):
     sys.path.insert(0,str(wd/"scripts"))
     codex_clippy()
     raise SystemExit(0)
@@ -292,7 +298,7 @@ def tui_session():
     class Study(r.Replay):
         def command(self,step,selector,directory):
             cmd=super().command(step,selector,directory)
-            if step['program']=='cargo':
+            if step['program']=='cargo' and case=='codex-tui':
                 receipt=folder/(step['args'][0]+".tsv")
                 return [str(wd/'meter'),str(rustc),str(receipt),*cmd]
             return cmd
@@ -308,10 +314,11 @@ def tui_session():
         args=['--upstream','1.100.0','--ohm',selector,'--jobs','8','--minimum-free-gb','1',
                 '--output-dir',str(where),'--project','codex','--repetitions','1','--offline',
                 '--scenario',str(fixture),'--source-path','codex='+str(src)]
+        if case=='codex-tui-time':args+=['--require-idle']
         study=Study(r.parser().parse_args(args))
         scenario=study.scenarios[0]
         assert scenario.steps[-2]['args'][0]=='clippy'
-        scenario=dataclasses.replace(scenario,steps=scenario.steps[:-1])
+        if case=="codex-tui":scenario=dataclasses.replace(scenario,steps=scenario.steps[:-1])
         study.toolchains=(('ohm',selector),)
         dest=study.prepare_source(scenario)
         run('git','-C',dest,'config','--local','user.email','benchmark@users.noreply.github.com')
@@ -330,7 +337,7 @@ def tui_session():
         history.save(out/'result.json',result)
         shutil.rmtree(where)
         sdk.rename(root/role)
-if case=="codex-tui":
+if case in ("codex-tui","codex-tui-time"):
     sys.path.insert(0,str(wd/"scripts"))
     tui_session()
     raise SystemExit(0)
