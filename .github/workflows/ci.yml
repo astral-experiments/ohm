@@ -54,10 +54,10 @@ jobs:
           name: ohm-1.100.0-${{ inputs.candidate }}-x86_64-unknown-linux-gnu
           path: kits/4
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        if: endsWith(matrix.scenario, '-keys')
+        if: endsWith(matrix.scenario, '-policy')
         with:
           github-token: ${{ github.token }}
-          run-id: 44875612642
+          run-id: 44876521857
           name: sdk-candidate
           path: keys
       - name: Set up the Codex dependencies

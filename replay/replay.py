@@ -208,6 +208,34 @@ if os.environ.get("REPLAY_MODE") == "llvm-only":
                                candidate=history.sha(produced/so),identical_files=unchanged)
 
 history.save(out / "inputs.json", result)
+def fixture(env):
+    import shutil
+    temp=root/'example'
+    if temp.exists():shutil.rmtree(temp)
+    temp.mkdir()
+    (temp/'supplier.rs').write_text('pub struct Packet { pub value: u8 }')
+    (temp/'consumer.rs').write_text('''#![feature(rustc_attrs)]
+#![allow(internal_features)]
+#[rustc_clean(cfg = "from_build", loaded_from_disk = "fn_sig,typeck_root,mir_borrowck")]
+pub fn value(packet: supplier::Packet) -> u8 { packet.value }
+#[cfg(from_build)]
+pub fn extra() -> u8 { value(supplier::Packet { value: 3 }) }
+''')
+    flags=['-Zohm-shared-stages','-Zpublic-api-hash','-Zincremental-verify-ich',
+           '--crate-type=lib','--edition=2024','-Cmetadata=fixed']
+    env=dict(env,RUSTC_BOOTSTRAP='1')
+    steps=[]
+    for emit,variant in [('metadata,link','build'),('metadata','from_build')]:
+        for name in ['supplier','consumer']:
+            additional=[]
+            if name=='consumer':
+                additional=['-Cincremental=consumer-incr','--extern','supplier=libsupplier.rmeta',
+                            '-Zquery-dep-graph','--cfg',variant]
+            cmd=[rustc,name+'.rs','--emit='+emit,*flags,*additional]
+            p=subprocess.run(cmd,env=dict(env,CARGO_PKG_NAME=name),cwd=temp,capture_output=True,text=True)
+            steps.append([emit,name,p.returncode,p.stderr])
+    return steps
+
 if case.startswith("exp-"):
     import resource
     _, project, mode = case.split("-")
@@ -227,7 +255,7 @@ if case.startswith("exp-"):
     else:
         git("checkout","-q","--detach",record["revs"][0])
     history.calibrate(root,out)
-    if mode=="keys":
+    if mode=="policy":
         file=wd/"keys"/"candidate.tar.zst"
         path=root/"keys"
         path.mkdir()
@@ -240,23 +268,24 @@ if case.startswith("exp-"):
         shutil.copytree(desktop,dest,dirs_exist_ok=True)
         result["kit"]=history.sha(file)
         result["patch"]=history.sha(dest/"compiler.patch")
-        result["order"]=order=["default","off","both"] if int(pair)%2 else ["both","off","default"]
-    else:assert mode=="shipped"
+    else:assert mode in ("shipped", "reverse")
     work=root/"disk/target"
     env.update(CARGO_TARGET_DIR=str(work),CARGO_HOME=str(root/"disk/registry"))
     for role in order:
-        start=root/("candidate" if mode=="keys" else role)
+        start=root/("candidate" if mode=="policy" else role)
         start.rename(sdk)
         if work.exists():shutil.rmtree(work)
         folder=out/role
         folder.mkdir()
-        for key in ("OHM_SKIP_IMPORTED_KEYS","OHM_CODEGEN_KEYS"):
-            env.pop(key,None)
-        if role=="off":env['OHM_SKIP_IMPORTED_KEYS']="1"
-        if role=="both":env['OHM_CODEGEN_KEYS']="1"
+        if mode=='policy':
+            env.pop('OHM_ALWAYS_CHECK_KEYS',None)
+            if role=='control':env['OHM_ALWAYS_CHECK_KEYS']='1'
+            example=fixture(env)
+            print(json.dumps(example),flush=True)
+            history.save(folder/'fixture.json',example)
         history.command([cargo,"fetch","--locked"],source,env,folder/"fetch.log")
         rows={}
-        for phase in ("build","check"):
+        for phase in (("check","build") if mode=="reverse" else ("build","check")):
             receipt=folder/(phase+".tsv")
             cmd=["cargo","+ohm",phase,"-p",project,"--lib","--locked","--offline"]
             history.command([meter,rustc,receipt,*cmd],source,env,folder/(phase+".log"))
