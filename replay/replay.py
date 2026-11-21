@@ -230,6 +230,66 @@ if os.environ.get('REPLAY_MODE')=='subset':
         shutil.rmtree(dest/'lib/rustlib/x86_64-unknown-linux-gnu/lib')
         shutil.copytree(kit,dest,dirs_exist_ok=True)
         result['kit-'+role]=history.sha(file)
+if case.startswith("exp-dev"):
+    import resource,time
+    _,part,kind=case.split('-')
+    cfg=record['dev']
+    env.update(cfg['environment'])
+    project=cfg['package']
+    source=src
+    _,hard=resource.getrlimit(resource.RLIMIT_NOFILE)
+    resource.setrlimit(resource.RLIMIT_NOFILE,(min(hard,65536),hard))
+    fetch()
+    git('checkout','-q','--detach',cfg['revision'])
+    history.calibrate(root,out)
+    components={'llvm':'lib/libLLVM.so.23.1-rust-dev','cargo':'bin/cargo'}
+    if kind in components:
+        a=root/'control'; b=root/'candidate'; name=components[kind]
+        (a/name).rename(root/'kept')
+        shutil.rmtree(a)
+        shutil.copytree(b,a,symlinks=True,copy_function=os.link)
+        (root/'kept').replace(a/name)
+        result["swapped"]=name
+    work=root/'disk/artifacts'
+    env.update(CARGO_TARGET_DIR=str(work/'target'),CARGO_BUILD_BUILD_DIR=str(work/'shared-build'),
+               CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST='all',CARGO_HOME=str(root/'disk/registry'))
+    # Normalize source once before comparing the two builds.
+    (root/'candidate').rename(sdk)
+    history.command([cargo,*cfg['commands']['fmt']],src,env,out/'fmt.log')
+    result['baseline_diff_sha256']=hashlib.sha256(git('diff','--binary').encode()).hexdigest()
+    sdk.rename(root/'candidate')
+    for role in order:
+        (root/role).rename(sdk)
+        if work.exists():shutil.rmtree(work)
+        folder=out/role
+        folder.mkdir()
+        history.command([cargo,'fetch','--locked'],source,env,folder/'fetch.log')
+        rows={}
+        for phase in ['warmup','first','build','last']:
+            command='build' if phase=='build' else 'check'
+            receipt=folder/(phase+'.tsv')
+            cmd=[cargo,*cfg['commands'][command],'--offline']
+            prior=resource.getrusage(resource.RUSAGE_CHILDREN)
+            start=time.perf_counter()
+            history.command([meter,rustc,receipt,*cmd],source,env,folder/(phase+'.log'))
+            duration=time.perf_counter()-start
+            post=resource.getrusage(resource.RUSAGE_CHILDREN)
+            if phase in ('build','warmup'):entries=history.read_counts(receipt)
+            else:entries=[]
+            n,en,ru=map(int,Path(str(receipt)+".tree").read_text().split())
+            assert n and en*.995<=ru<=en
+            allocated=int(subprocess.check_output(['du','-sB1',work]).split()[0])
+            rows[phase]=dict(total=n,en=en,ru=ru,units=entries,wall=duration,
+                             user=post.ru_utime-prior.ru_utime,kernel=post.ru_stime-prior.ru_stime,
+                             outblock=post.ru_oublock-prior.ru_oublock,minor=post.ru_minflt-prior.ru_minflt,
+                             allocated=allocated)
+            print(role,phase,len(entries),n,duration,flush=True)
+        result[role]=rows
+        history.save(out/"result.json",result)
+        sdk.rename(root/role)
+    raise SystemExit(0)
+
+
 if case.startswith("exp-"):
     import resource
     _, project, mode = case.split("-")
