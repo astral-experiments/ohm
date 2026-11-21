@@ -62,10 +62,10 @@ jobs:
           path: source
           persist-credentials: false
       - name: Install the official stock SDK
-        if: inputs.label == 'stock-codex'
+        if: inputs.label == 'stock-codex' || inputs.label == 'startup-stock'
         run: rustup toolchain install 1.100.0 --profile minimal --component clippy,rustfmt
       - name: Fetch the published −3 SDK
-        if: inputs.label != 'stock-codex'
+        if: inputs.label != 'stock-codex' && !startsWith(inputs.label, 'startup-')
         run: |
           mkdir -p kits/3
           name=ohm-1.100.0-3

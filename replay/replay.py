@@ -46,14 +46,14 @@ def run(*args, **kw):
 
 
 def install(role):
-    if role=="control" and os.environ.get("REPLAY_MODE")=="stock-codex":
+    if role=="control" and os.environ.get("REPLAY_MODE")in ("stock-codex", "startup-stock"):
         # Use an isolated copy of the official pinned distribution.
         original=Path(subprocess.check_output(["rustup","which","--toolchain","1.100.0","rustc"],text=True).strip()).parent.parent
         shutil.copytree(original,root / role,symlinks=True)
         result["stock"]={tool:history.sha(original/"bin"/tool) for tool in ["rustc","cargo","clippy-driver","rustfmt"]}
         result["stock"]["version"]=subprocess.check_output([original/"bin/rustc","-vV"],text=True)
         return
-    tag = "3" if role == "control" else "4"
+    tag = "3" if role == "control" and os.environ.get("REPLAY_MODE") != "startup-linker" else "4"
     kit = wd / "kits" / tag
     archive, = kit.rglob("*.tar.gz")
     h = history.sha(archive)
@@ -395,7 +395,13 @@ def tui_session():
     os.environ.update(env)
     os.environ.update(TMPDIR=str(tmp),CARGO_HOME=str(root/'disk/registry'),MEASURE_CLIPPY=str(sdk/"bin/clippy-driver"))
     where=root/"disk/sessions"
+    mode=os.environ.get("REPLAY_MODE")
     class Study(r.Replay):
+        def environment(self,scenario,label,selector,repetition):
+            e=super().environment(scenario,label,selector,repetition)
+            if mode=="startup-linker":
+                e["CARGO_UNSTABLE_OHM_LINKER"]="lld" if role=="control" else "wild"
+            return e
         def command(self,step,selector,directory):
             cmd=super().command(step,selector,directory)
             if step['program']=='cargo' and case=='codex-tui':
@@ -405,9 +411,10 @@ def tui_session():
     for role in order:
         (root/role).rename(sdk)
         number='3' if role=='control' else '4'
-        upstream=role=="control" and os.environ.get("REPLAY_MODE")=="stock-codex"
+        upstream=role=="control" and os.environ.get("REPLAY_MODE")in ("stock-codex", "startup-stock")
         lane="stock" if upstream else "ohm"
         selector="1.100.0" if upstream else "ohm-1.100.0-"+number
+        if mode=="startup-linker":selector="ohm-1.100.0-4-"+role
         (toolchain.parent/selector).symlink_to(sdk)
         folder=out/role
         folder.mkdir()
@@ -437,8 +444,15 @@ def tui_session():
         assert tree=='110e0e8c2bcbab10e2429262c697d071d50fdfe5',tree
         result[role]=dict(sample=sample,tree=tree)
         history.save(out/'result.json',result)
+        if mode.startswith('startup-'):
+            import elfprobe
+            result[role]["binary"]=elfprobe.capture(where,role,root)
+            history.save(out/'result.json',result)
         shutil.rmtree(where)
         sdk.rename(root/role)
+    if mode.startswith('startup-'):
+        result['process']=elfprobe.times(root)
+        history.save(out/'result.json',result)
 
 def session_time():
     import replay_sessions as r
