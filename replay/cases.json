@@ -2505,5 +2505,419 @@
         ]
       }
     }
+  },
+  "exp-devuv-force3": {
+    "kind": "transition",
+    "repo": "astral-sh/uv",
+    "revs": [
+      "c22e6b71933443e9cd299d4b6ac8de035ed4825b"
+    ],
+    "dev": {
+      "label": "uv",
+      "repository": "https://github.com/astral-sh/uv.git",
+      "revision": "c22e6b71933443e9cd299d4b6ac8de035ed4825b",
+      "workspace": ".",
+      "package": "uv",
+      "environment": {},
+      "edits": {
+        "direct": {
+          "path": "crates/uv/src/install_source.rs",
+          "before": "component == cellar && next == formula",
+          "after": "{\n                component == cellar && (next == formula || next == OsStr::new(\"uv-preview\"))\n            }",
+          "crate": "uv"
+        },
+        "dependency": {
+          "path": "crates/uv-normalize/src/lib.rs",
+          "before": "b'a'..=b'z' | b'0'..=b'9' => {\n                normalized.push",
+          "after": "b'0'..=b'9' | b'a'..=b'z' => {\n                normalized.push",
+          "crate": "uv-normalize"
+        }
+      },
+      "commands": {
+        "check": [
+          "check",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "build": [
+          "build",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "test": [
+          "test",
+          "-p",
+          "uv",
+          "--test",
+          "it",
+          "--locked",
+          "help::help",
+          "--",
+          "--exact"
+        ],
+        "clippy": [
+          "clippy",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "fmt": [
+          "fmt",
+          "-p",
+          "uv",
+          "--"
+        ]
+      }
+    }
+  },
+  "exp-devuv-force4": {
+    "kind": "transition",
+    "repo": "astral-sh/uv",
+    "revs": [
+      "c22e6b71933443e9cd299d4b6ac8de035ed4825b"
+    ],
+    "dev": {
+      "label": "uv",
+      "repository": "https://github.com/astral-sh/uv.git",
+      "revision": "c22e6b71933443e9cd299d4b6ac8de035ed4825b",
+      "workspace": ".",
+      "package": "uv",
+      "environment": {},
+      "edits": {
+        "direct": {
+          "path": "crates/uv/src/install_source.rs",
+          "before": "component == cellar && next == formula",
+          "after": "{\n                component == cellar && (next == formula || next == OsStr::new(\"uv-preview\"))\n            }",
+          "crate": "uv"
+        },
+        "dependency": {
+          "path": "crates/uv-normalize/src/lib.rs",
+          "before": "b'a'..=b'z' | b'0'..=b'9' => {\n                normalized.push",
+          "after": "b'0'..=b'9' | b'a'..=b'z' => {\n                normalized.push",
+          "crate": "uv-normalize"
+        }
+      },
+      "commands": {
+        "check": [
+          "check",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "build": [
+          "build",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "test": [
+          "test",
+          "-p",
+          "uv",
+          "--test",
+          "it",
+          "--locked",
+          "help::help",
+          "--",
+          "--exact"
+        ],
+        "clippy": [
+          "clippy",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "fmt": [
+          "fmt",
+          "-p",
+          "uv",
+          "--"
+        ]
+      }
+    }
+  },
+  "exp-devuv-random": {
+    "kind": "transition",
+    "repo": "astral-sh/uv",
+    "revs": [
+      "c22e6b71933443e9cd299d4b6ac8de035ed4825b"
+    ],
+    "dev": {
+      "label": "uv",
+      "repository": "https://github.com/astral-sh/uv.git",
+      "revision": "c22e6b71933443e9cd299d4b6ac8de035ed4825b",
+      "workspace": ".",
+      "package": "uv",
+      "environment": {},
+      "edits": {
+        "direct": {
+          "path": "crates/uv/src/install_source.rs",
+          "before": "component == cellar && next == formula",
+          "after": "{\n                component == cellar && (next == formula || next == OsStr::new(\"uv-preview\"))\n            }",
+          "crate": "uv"
+        },
+        "dependency": {
+          "path": "crates/uv-normalize/src/lib.rs",
+          "before": "b'a'..=b'z' | b'0'..=b'9' => {\n                normalized.push",
+          "after": "b'0'..=b'9' | b'a'..=b'z' => {\n                normalized.push",
+          "crate": "uv-normalize"
+        }
+      },
+      "commands": {
+        "check": [
+          "check",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "build": [
+          "build",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "test": [
+          "test",
+          "-p",
+          "uv",
+          "--test",
+          "it",
+          "--locked",
+          "help::help",
+          "--",
+          "--exact"
+        ],
+        "clippy": [
+          "clippy",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "fmt": [
+          "fmt",
+          "-p",
+          "uv",
+          "--"
+        ]
+      }
+    }
+  },
+  "exp-devuv-profile": {
+    "kind": "transition",
+    "repo": "astral-sh/uv",
+    "revs": [
+      "c22e6b71933443e9cd299d4b6ac8de035ed4825b"
+    ],
+    "dev": {
+      "label": "uv",
+      "repository": "https://github.com/astral-sh/uv.git",
+      "revision": "c22e6b71933443e9cd299d4b6ac8de035ed4825b",
+      "workspace": ".",
+      "package": "uv",
+      "environment": {},
+      "edits": {
+        "direct": {
+          "path": "crates/uv/src/install_source.rs",
+          "before": "component == cellar && next == formula",
+          "after": "{\n                component == cellar && (next == formula || next == OsStr::new(\"uv-preview\"))\n            }",
+          "crate": "uv"
+        },
+        "dependency": {
+          "path": "crates/uv-normalize/src/lib.rs",
+          "before": "b'a'..=b'z' | b'0'..=b'9' => {\n                normalized.push",
+          "after": "b'0'..=b'9' | b'a'..=b'z' => {\n                normalized.push",
+          "crate": "uv-normalize"
+        }
+      },
+      "commands": {
+        "check": [
+          "check",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "build": [
+          "build",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "test": [
+          "test",
+          "-p",
+          "uv",
+          "--test",
+          "it",
+          "--locked",
+          "help::help",
+          "--",
+          "--exact"
+        ],
+        "clippy": [
+          "clippy",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "fmt": [
+          "fmt",
+          "-p",
+          "uv",
+          "--"
+        ]
+      }
+    }
+  },
+  "exp-devuv-untrust": {
+    "kind": "transition",
+    "repo": "astral-sh/uv",
+    "revs": [
+      "c22e6b71933443e9cd299d4b6ac8de035ed4825b"
+    ],
+    "dev": {
+      "label": "uv",
+      "repository": "https://github.com/astral-sh/uv.git",
+      "revision": "c22e6b71933443e9cd299d4b6ac8de035ed4825b",
+      "workspace": ".",
+      "package": "uv",
+      "environment": {},
+      "edits": {
+        "direct": {
+          "path": "crates/uv/src/install_source.rs",
+          "before": "component == cellar && next == formula",
+          "after": "{\n                component == cellar && (next == formula || next == OsStr::new(\"uv-preview\"))\n            }",
+          "crate": "uv"
+        },
+        "dependency": {
+          "path": "crates/uv-normalize/src/lib.rs",
+          "before": "b'a'..=b'z' | b'0'..=b'9' => {\n                normalized.push",
+          "after": "b'0'..=b'9' | b'a'..=b'z' => {\n                normalized.push",
+          "crate": "uv-normalize"
+        }
+      },
+      "commands": {
+        "check": [
+          "check",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "build": [
+          "build",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "test": [
+          "test",
+          "-p",
+          "uv",
+          "--test",
+          "it",
+          "--locked",
+          "help::help",
+          "--",
+          "--exact"
+        ],
+        "clippy": [
+          "clippy",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "fmt": [
+          "fmt",
+          "-p",
+          "uv",
+          "--"
+        ]
+      }
+    }
+  },
+  "exp-devuv-clone": {
+    "kind": "transition",
+    "repo": "astral-sh/uv",
+    "revs": [
+      "c22e6b71933443e9cd299d4b6ac8de035ed4825b"
+    ],
+    "dev": {
+      "label": "uv",
+      "repository": "https://github.com/astral-sh/uv.git",
+      "revision": "c22e6b71933443e9cd299d4b6ac8de035ed4825b",
+      "workspace": ".",
+      "package": "uv",
+      "environment": {},
+      "edits": {
+        "direct": {
+          "path": "crates/uv/src/install_source.rs",
+          "before": "component == cellar && next == formula",
+          "after": "{\n                component == cellar && (next == formula || next == OsStr::new(\"uv-preview\"))\n            }",
+          "crate": "uv"
+        },
+        "dependency": {
+          "path": "crates/uv-normalize/src/lib.rs",
+          "before": "b'a'..=b'z' | b'0'..=b'9' => {\n                normalized.push",
+          "after": "b'0'..=b'9' | b'a'..=b'z' => {\n                normalized.push",
+          "crate": "uv-normalize"
+        }
+      },
+      "commands": {
+        "check": [
+          "check",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "build": [
+          "build",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "test": [
+          "test",
+          "-p",
+          "uv",
+          "--test",
+          "it",
+          "--locked",
+          "help::help",
+          "--",
+          "--exact"
+        ],
+        "clippy": [
+          "clippy",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "fmt": [
+          "fmt",
+          "-p",
+          "uv",
+          "--"
+        ]
+      }
+    }
   }
 }

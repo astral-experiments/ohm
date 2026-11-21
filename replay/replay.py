@@ -255,6 +255,19 @@ if case.startswith("exp-dev"):
                CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST='all',CARGO_HOME=str(root/'disk/registry'))
     if kind in ('noshared','neither'):env.pop('CARGO_BUILD_BUILD_DIR')
     if kind in ('notrust','neither'):env.pop('CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST')
+    if kind in ('force3','force4'):
+        v=root/('control' if kind=='force3' else 'candidate')/'bin/rustc'
+        env['RUSTC_FORCE_RUSTC_VERSION']=subprocess.check_output([v,'--version'],text=True).strip().removeprefix('rustc ')
+    if kind=='random':env['RUSTC_FORCE_RUSTC_VERSION']='probe'
+    if kind=='untrust':env['CARGO_BUILD_BUILD_DIR']=str(work/'cache')
+    if kind=='clone':
+        # Both roles use the candidate version but normal Cargo metadata still
+        # refers to the compiler's version output. Change only the output path.
+        env['CARGO_TARGET_DIR']=str(work/'results')
+    if kind=='profile':
+        env['CARGO_TERM_VERBOSE']='true'
+        perf=next(p for p in [shutil.which('perf'),*Path('/usr/lib/linux-tools').glob('*/perf')]if p and subprocess.run([p,'--version'],capture_output=True).returncode==0)
+    result['settings']={k:v for k,v in env.items() if k in ['RUSTC_FORCE_RUSTC_VERSION','CARGO_BUILD_BUILD_DIR','CARGO_TARGET_DIR']}
     # Normalize source once before comparing the two builds.
     (root/'candidate').rename(sdk)
     history.command([cargo,*cfg['commands']['fmt']],src,env,out/'fmt.log')
@@ -275,13 +288,23 @@ if case.startswith("exp-dev"):
             cmd=[*start_cmd,*cfg['commands'][command],'--offline']
             prior=resource.getrusage(resource.RUSAGE_CHILDREN)
             start=time.perf_counter()
-            history.command([meter,rustc,receipt,*cmd],source,env,folder/(phase+'.log'))
+            base=[meter,rustc,receipt,*cmd]
+            trace=work/'perf.data'
+            if kind=='profile' and phase=='build':
+                base=[perf,'record','-e','instructions:u','-c','1000003','-m','128','-o',trace,'--',*base]
+            history.command(base,source,env,folder/(phase+'.log'))
             duration=time.perf_counter()-start
             post=resource.getrusage(resource.RUSAGE_CHILDREN)
             if phase in ('build','warmup'):entries=history.read_counts(receipt)
             else:entries=[]
             n,en,ru=map(int,Path(str(receipt)+".tree").read_text().split())
             assert n and en*.995<=ru<=en
+            if kind=='profile' and phase=='build':
+                file=folder/'samples'
+                with file.open('w')as f:
+                    run(perf,'script','-i',trace,'-F','comm,pid,ip,sym,dso',stdout=f)
+                run('gzip',file)
+                trace.unlink()
             allocated=int(subprocess.check_output(['du','-sB1',work]).split()[0])
             rows[phase]=dict(total=n,en=en,ru=ru,units=entries,wall=duration,
                              user=post.ru_utime-prior.ru_utime,kernel=post.ru_stime-prior.ru_stime,
