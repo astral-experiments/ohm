@@ -1,0 +1,1100 @@
+{
+  "uv-default": {
+    "kind": "history",
+    "repo": "astral-sh/uv",
+    "app": "uv",
+    "window": "recent",
+    "revs": [
+      "c99faeeeeb8318d874007b4c48635d009838c1a0"
+    ]
+  },
+  "uv-shared": {
+    "kind": "history",
+    "repo": "astral-sh/uv",
+    "app": "uv",
+    "window": "recent",
+    "revs": [
+      "c99faeeeeb8318d874007b4c48635d009838c1a0"
+    ]
+  },
+  "serc-recent": {
+    "kind": "history",
+    "repo": "astral-experiments/serc",
+    "app": "serc",
+    "window": "recent",
+    "revs": [
+      "1b15ce1cba1d5a0045ac7303b8797102f807e57c"
+    ]
+  },
+  "ripgrep-recent": {
+    "kind": "history",
+    "repo": "BurntSushi/ripgrep",
+    "app": "ripgrep",
+    "window": "recent",
+    "revs": [
+      "43fc97d43a4c61d65e7d74d4110c8480fe42ea5b"
+    ]
+  },
+  "serc-preceding": {
+    "kind": "history",
+    "repo": "astral-experiments/serc",
+    "app": "serc",
+    "window": "preceding",
+    "revs": [
+      "1b15ce1cba1d5a0045ac7303b8797102f807e57c"
+    ]
+  },
+  "ripgrep-preceding": {
+    "kind": "history",
+    "repo": "BurntSushi/ripgrep",
+    "app": "ripgrep",
+    "window": "preceding",
+    "revs": [
+      "43fc97d43a4c61d65e7d74d4110c8480fe42ea5b"
+    ]
+  },
+  "serc-1239-1240": {
+    "app": "serc",
+    "kind": "check",
+    "repo": "astral-experiments/serc",
+    "revs": [
+      "932f07ced7de082977de7b2d0a6658eb9a7a5298^^",
+      "932f07ced7de082977de7b2d0a6658eb9a7a5298^",
+      "932f07ced7de082977de7b2d0a6658eb9a7a5298"
+    ]
+  },
+  "correctness": {
+    "kind": "probe"
+  },
+  "regression": {
+    "kind": "probe"
+  },
+  "exp-devuv-cold": {
+    "kind": "transition",
+    "repo": "astral-sh/uv",
+    "revs": [
+      "c22e6b71933443e9cd299d4b6ac8de035ed4825b"
+    ],
+    "dev": {
+      "label": "uv",
+      "repository": "https://github.com/astral-sh/uv.git",
+      "revision": "c22e6b71933443e9cd299d4b6ac8de035ed4825b",
+      "workspace": ".",
+      "package": "uv",
+      "environment": {},
+      "edits": {
+        "direct": {
+          "path": "crates/uv/src/install_source.rs",
+          "before": "component == cellar && next == formula",
+          "after": "{\n                component == cellar && (next == formula || next == OsStr::new(\"uv-preview\"))\n            }",
+          "crate": "uv"
+        },
+        "dependency": {
+          "path": "crates/uv-normalize/src/lib.rs",
+          "before": "b'a'..=b'z' | b'0'..=b'9' => {\n                normalized.push",
+          "after": "b'0'..=b'9' | b'a'..=b'z' => {\n                normalized.push",
+          "crate": "uv-normalize"
+        }
+      },
+      "commands": {
+        "check": [
+          "check",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "build": [
+          "build",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "test": [
+          "test",
+          "-p",
+          "uv",
+          "--test",
+          "it",
+          "--locked",
+          "help::help",
+          "--",
+          "--exact"
+        ],
+        "clippy": [
+          "clippy",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "fmt": [
+          "fmt",
+          "-p",
+          "uv",
+          "--"
+        ]
+      }
+    }
+  },
+  "exp-devuv-warm": {
+    "kind": "transition",
+    "repo": "astral-sh/uv",
+    "revs": [
+      "c22e6b71933443e9cd299d4b6ac8de035ed4825b"
+    ],
+    "dev": {
+      "label": "uv",
+      "repository": "https://github.com/astral-sh/uv.git",
+      "revision": "c22e6b71933443e9cd299d4b6ac8de035ed4825b",
+      "workspace": ".",
+      "package": "uv",
+      "environment": {},
+      "edits": {
+        "direct": {
+          "path": "crates/uv/src/install_source.rs",
+          "before": "component == cellar && next == formula",
+          "after": "{\n                component == cellar && (next == formula || next == OsStr::new(\"uv-preview\"))\n            }",
+          "crate": "uv"
+        },
+        "dependency": {
+          "path": "crates/uv-normalize/src/lib.rs",
+          "before": "b'a'..=b'z' | b'0'..=b'9' => {\n                normalized.push",
+          "after": "b'0'..=b'9' | b'a'..=b'z' => {\n                normalized.push",
+          "crate": "uv-normalize"
+        }
+      },
+      "commands": {
+        "check": [
+          "check",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "build": [
+          "build",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "test": [
+          "test",
+          "-p",
+          "uv",
+          "--test",
+          "it",
+          "--locked",
+          "help::help",
+          "--",
+          "--exact"
+        ],
+        "clippy": [
+          "clippy",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "fmt": [
+          "fmt",
+          "-p",
+          "uv",
+          "--"
+        ]
+      }
+    }
+  },
+  "exp-devuv-forward": {
+    "kind": "transition",
+    "repo": "astral-sh/uv",
+    "revs": [
+      "c22e6b71933443e9cd299d4b6ac8de035ed4825b"
+    ],
+    "dev": {
+      "label": "uv",
+      "repository": "https://github.com/astral-sh/uv.git",
+      "revision": "c22e6b71933443e9cd299d4b6ac8de035ed4825b",
+      "workspace": ".",
+      "package": "uv",
+      "environment": {},
+      "edits": {
+        "direct": {
+          "path": "crates/uv/src/install_source.rs",
+          "before": "component == cellar && next == formula",
+          "after": "{\n                component == cellar && (next == formula || next == OsStr::new(\"uv-preview\"))\n            }",
+          "crate": "uv"
+        },
+        "dependency": {
+          "path": "crates/uv-normalize/src/lib.rs",
+          "before": "b'a'..=b'z' | b'0'..=b'9' => {\n                normalized.push",
+          "after": "b'0'..=b'9' | b'a'..=b'z' => {\n                normalized.push",
+          "crate": "uv-normalize"
+        }
+      },
+      "commands": {
+        "check": [
+          "check",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "build": [
+          "build",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "test": [
+          "test",
+          "-p",
+          "uv",
+          "--test",
+          "it",
+          "--locked",
+          "help::help",
+          "--",
+          "--exact"
+        ],
+        "clippy": [
+          "clippy",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "fmt": [
+          "fmt",
+          "-p",
+          "uv",
+          "--"
+        ]
+      }
+    }
+  },
+  "exp-devuv-primeforward": {
+    "kind": "transition",
+    "repo": "astral-sh/uv",
+    "revs": [
+      "c22e6b71933443e9cd299d4b6ac8de035ed4825b"
+    ],
+    "dev": {
+      "label": "uv",
+      "repository": "https://github.com/astral-sh/uv.git",
+      "revision": "c22e6b71933443e9cd299d4b6ac8de035ed4825b",
+      "workspace": ".",
+      "package": "uv",
+      "environment": {},
+      "edits": {
+        "direct": {
+          "path": "crates/uv/src/install_source.rs",
+          "before": "component == cellar && next == formula",
+          "after": "{\n                component == cellar && (next == formula || next == OsStr::new(\"uv-preview\"))\n            }",
+          "crate": "uv"
+        },
+        "dependency": {
+          "path": "crates/uv-normalize/src/lib.rs",
+          "before": "b'a'..=b'z' | b'0'..=b'9' => {\n                normalized.push",
+          "after": "b'0'..=b'9' | b'a'..=b'z' => {\n                normalized.push",
+          "crate": "uv-normalize"
+        }
+      },
+      "commands": {
+        "check": [
+          "check",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "build": [
+          "build",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "test": [
+          "test",
+          "-p",
+          "uv",
+          "--test",
+          "it",
+          "--locked",
+          "help::help",
+          "--",
+          "--exact"
+        ],
+        "clippy": [
+          "clippy",
+          "-p",
+          "uv",
+          "--lib",
+          "--locked"
+        ],
+        "fmt": [
+          "fmt",
+          "-p",
+          "uv",
+          "--"
+        ]
+      }
+    }
+  },
+  "exp-devcodex-cold": {
+    "kind": "transition",
+    "repo": "openai/codex",
+    "revs": [
+      "5157493c23713ac12034cf250ffb0a8ce0670277"
+    ],
+    "dev": {
+      "label": "Codex",
+      "repository": "https://github.com/openai/codex.git",
+      "revision": "b2159a7308ea2380e3a9d2ca2a7a79218820d21e",
+      "workspace": "codex-rs",
+      "package": "codex-core",
+      "environment": {},
+      "edits": {
+        "direct": {
+          "path": "codex-rs/core/src/audio_preparation.rs",
+          "before": "if mime.eq_ignore_ascii_case(\"audio/wav\")\n        || mime.eq_ignore_ascii_case(\"audio/x-wav\")",
+          "after": "if mime.eq_ignore_ascii_case(\"audio/x-wav\")\n        || mime.eq_ignore_ascii_case(\"audio/wav\")",
+          "crate": "codex-core"
+        },
+        "dependency": {
+          "path": "codex-rs/utils/string/src/lib.rs",
+          "before": "matches!(ch, '.' | '_' | '-' | '/')",
+          "after": "matches!(ch, '_' | '.' | '-' | '/')",
+          "crate": "codex-utils-string"
+        }
+      },
+      "commands": {
+        "check": [
+          "check",
+          "-p",
+          "codex-core",
+          "--lib",
+          "--locked"
+        ],
+        "build": [
+          "build",
+          "-p",
+          "codex-core",
+          "--lib",
+          "--locked"
+        ],
+        "test": [
+          "nextest",
+          "run",
+          "-p",
+          "codex-core",
+          "--lib",
+          "--locked",
+          "-E",
+          "test(preparation_canonicalizes_data_urls_and_rejects_remote_urls)"
+        ],
+        "clippy": [
+          "clippy",
+          "-p",
+          "codex-core",
+          "--lib",
+          "--locked"
+        ],
+        "fmt": [
+          "fmt",
+          "-p",
+          "codex-core",
+          "--",
+          "--config",
+          "imports_granularity=Item"
+        ]
+      }
+    }
+  },
+  "exp-devcodex-warm": {
+    "kind": "transition",
+    "repo": "openai/codex",
+    "revs": [
+      "5157493c23713ac12034cf250ffb0a8ce0670277"
+    ],
+    "dev": {
+      "label": "Codex",
+      "repository": "https://github.com/openai/codex.git",
+      "revision": "b2159a7308ea2380e3a9d2ca2a7a79218820d21e",
+      "workspace": "codex-rs",
+      "package": "codex-core",
+      "environment": {},
+      "edits": {
+        "direct": {
+          "path": "codex-rs/core/src/audio_preparation.rs",
+          "before": "if mime.eq_ignore_ascii_case(\"audio/wav\")\n        || mime.eq_ignore_ascii_case(\"audio/x-wav\")",
+          "after": "if mime.eq_ignore_ascii_case(\"audio/x-wav\")\n        || mime.eq_ignore_ascii_case(\"audio/wav\")",
+          "crate": "codex-core"
+        },
+        "dependency": {
+          "path": "codex-rs/utils/string/src/lib.rs",
+          "before": "matches!(ch, '.' | '_' | '-' | '/')",
+          "after": "matches!(ch, '_' | '.' | '-' | '/')",
+          "crate": "codex-utils-string"
+        }
+      },
+      "commands": {
+        "check": [
+          "check",
+          "-p",
+          "codex-core",
+          "--lib",
+          "--locked"
+        ],
+        "build": [
+          "build",
+          "-p",
+          "codex-core",
+          "--lib",
+          "--locked"
+        ],
+        "test": [
+          "nextest",
+          "run",
+          "-p",
+          "codex-core",
+          "--lib",
+          "--locked",
+          "-E",
+          "test(preparation_canonicalizes_data_urls_and_rejects_remote_urls)"
+        ],
+        "clippy": [
+          "clippy",
+          "-p",
+          "codex-core",
+          "--lib",
+          "--locked"
+        ],
+        "fmt": [
+          "fmt",
+          "-p",
+          "codex-core",
+          "--",
+          "--config",
+          "imports_granularity=Item"
+        ]
+      }
+    }
+  },
+  "exp-devcodex-forward": {
+    "kind": "transition",
+    "repo": "openai/codex",
+    "revs": [
+      "5157493c23713ac12034cf250ffb0a8ce0670277"
+    ],
+    "dev": {
+      "label": "Codex",
+      "repository": "https://github.com/openai/codex.git",
+      "revision": "b2159a7308ea2380e3a9d2ca2a7a79218820d21e",
+      "workspace": "codex-rs",
+      "package": "codex-core",
+      "environment": {},
+      "edits": {
+        "direct": {
+          "path": "codex-rs/core/src/audio_preparation.rs",
+          "before": "if mime.eq_ignore_ascii_case(\"audio/wav\")\n        || mime.eq_ignore_ascii_case(\"audio/x-wav\")",
+          "after": "if mime.eq_ignore_ascii_case(\"audio/x-wav\")\n        || mime.eq_ignore_ascii_case(\"audio/wav\")",
+          "crate": "codex-core"
+        },
+        "dependency": {
+          "path": "codex-rs/utils/string/src/lib.rs",
+          "before": "matches!(ch, '.' | '_' | '-' | '/')",
+          "after": "matches!(ch, '_' | '.' | '-' | '/')",
+          "crate": "codex-utils-string"
+        }
+      },
+      "commands": {
+        "check": [
+          "check",
+          "-p",
+          "codex-core",
+          "--lib",
+          "--locked"
+        ],
+        "build": [
+          "build",
+          "-p",
+          "codex-core",
+          "--lib",
+          "--locked"
+        ],
+        "test": [
+          "nextest",
+          "run",
+          "-p",
+          "codex-core",
+          "--lib",
+          "--locked",
+          "-E",
+          "test(preparation_canonicalizes_data_urls_and_rejects_remote_urls)"
+        ],
+        "clippy": [
+          "clippy",
+          "-p",
+          "codex-core",
+          "--lib",
+          "--locked"
+        ],
+        "fmt": [
+          "fmt",
+          "-p",
+          "codex-core",
+          "--",
+          "--config",
+          "imports_granularity=Item"
+        ]
+      }
+    }
+  },
+  "exp-devcodex-primeforward": {
+    "kind": "transition",
+    "repo": "openai/codex",
+    "revs": [
+      "5157493c23713ac12034cf250ffb0a8ce0670277"
+    ],
+    "dev": {
+      "label": "Codex",
+      "repository": "https://github.com/openai/codex.git",
+      "revision": "b2159a7308ea2380e3a9d2ca2a7a79218820d21e",
+      "workspace": "codex-rs",
+      "package": "codex-core",
+      "environment": {},
+      "edits": {
+        "direct": {
+          "path": "codex-rs/core/src/audio_preparation.rs",
+          "before": "if mime.eq_ignore_ascii_case(\"audio/wav\")\n        || mime.eq_ignore_ascii_case(\"audio/x-wav\")",
+          "after": "if mime.eq_ignore_ascii_case(\"audio/x-wav\")\n        || mime.eq_ignore_ascii_case(\"audio/wav\")",
+          "crate": "codex-core"
+        },
+        "dependency": {
+          "path": "codex-rs/utils/string/src/lib.rs",
+          "before": "matches!(ch, '.' | '_' | '-' | '/')",
+          "after": "matches!(ch, '_' | '.' | '-' | '/')",
+          "crate": "codex-utils-string"
+        }
+      },
+      "commands": {
+        "check": [
+          "check",
+          "-p",
+          "codex-core",
+          "--lib",
+          "--locked"
+        ],
+        "build": [
+          "build",
+          "-p",
+          "codex-core",
+          "--lib",
+          "--locked"
+        ],
+        "test": [
+          "nextest",
+          "run",
+          "-p",
+          "codex-core",
+          "--lib",
+          "--locked",
+          "-E",
+          "test(preparation_canonicalizes_data_urls_and_rejects_remote_urls)"
+        ],
+        "clippy": [
+          "clippy",
+          "-p",
+          "codex-core",
+          "--lib",
+          "--locked"
+        ],
+        "fmt": [
+          "fmt",
+          "-p",
+          "codex-core",
+          "--",
+          "--config",
+          "imports_granularity=Item"
+        ]
+      }
+    }
+  },
+  "exp-devruff-cold": {
+    "kind": "transition",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "4d6a7db787130c5a4a95bd835369babd78e4a1f6"
+    ],
+    "dev": {
+      "label": "Ruff/ty",
+      "repository": "https://github.com/astral-sh/ruff.git",
+      "revision": "4d6a7db787130c5a4a95bd835369babd78e4a1f6",
+      "workspace": ".",
+      "package": "ty_python_semantic",
+      "environment": {
+        "CARGO_PROFILE_DEV_OPT_LEVEL": "1",
+        "CARGO_PROFILE_DEV_LTO": "off",
+        "CARGO_PROFILE_DEV_DEBUG": "line-tables-only"
+      },
+      "edits": {
+        "direct": {
+          "path": "crates/ty_python_semantic/src/types.rs",
+          "before": "DynamicType::Unknown\n                    | DynamicType::UnknownGeneric(_)",
+          "after": "DynamicType::UnknownGeneric(_)\n                    | DynamicType::Unknown",
+          "crate": "ty_python_semantic"
+        },
+        "dependency": {
+          "path": "crates/ty_python_core/src/platform.rs",
+          "before": "_ => PythonPlatform::Identifier(platform.clone()),",
+          "after": "_ => PythonPlatform::Identifier(platform),",
+          "crate": "ty_python_core"
+        }
+      },
+      "commands": {
+        "check": [
+          "check",
+          "-p",
+          "ty_python_semantic",
+          "--lib",
+          "--locked"
+        ],
+        "build": [
+          "build",
+          "-p",
+          "ty_python_semantic",
+          "--lib",
+          "--locked"
+        ],
+        "clippy": [
+          "clippy",
+          "-p",
+          "ty_python_semantic",
+          "--lib",
+          "--locked"
+        ],
+        "test": [
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "--locked",
+          "-E",
+          "test(=mdtest::liskov.md)"
+        ],
+        "fmt": [
+          "fmt",
+          "-p",
+          "ty_python_semantic",
+          "--"
+        ]
+      }
+    }
+  },
+  "exp-devruff-warm": {
+    "kind": "transition",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "4d6a7db787130c5a4a95bd835369babd78e4a1f6"
+    ],
+    "dev": {
+      "label": "Ruff/ty",
+      "repository": "https://github.com/astral-sh/ruff.git",
+      "revision": "4d6a7db787130c5a4a95bd835369babd78e4a1f6",
+      "workspace": ".",
+      "package": "ty_python_semantic",
+      "environment": {
+        "CARGO_PROFILE_DEV_OPT_LEVEL": "1",
+        "CARGO_PROFILE_DEV_LTO": "off",
+        "CARGO_PROFILE_DEV_DEBUG": "line-tables-only"
+      },
+      "edits": {
+        "direct": {
+          "path": "crates/ty_python_semantic/src/types.rs",
+          "before": "DynamicType::Unknown\n                    | DynamicType::UnknownGeneric(_)",
+          "after": "DynamicType::UnknownGeneric(_)\n                    | DynamicType::Unknown",
+          "crate": "ty_python_semantic"
+        },
+        "dependency": {
+          "path": "crates/ty_python_core/src/platform.rs",
+          "before": "_ => PythonPlatform::Identifier(platform.clone()),",
+          "after": "_ => PythonPlatform::Identifier(platform),",
+          "crate": "ty_python_core"
+        }
+      },
+      "commands": {
+        "check": [
+          "check",
+          "-p",
+          "ty_python_semantic",
+          "--lib",
+          "--locked"
+        ],
+        "build": [
+          "build",
+          "-p",
+          "ty_python_semantic",
+          "--lib",
+          "--locked"
+        ],
+        "clippy": [
+          "clippy",
+          "-p",
+          "ty_python_semantic",
+          "--lib",
+          "--locked"
+        ],
+        "test": [
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "--locked",
+          "-E",
+          "test(=mdtest::liskov.md)"
+        ],
+        "fmt": [
+          "fmt",
+          "-p",
+          "ty_python_semantic",
+          "--"
+        ]
+      }
+    }
+  },
+  "exp-devruff-forward": {
+    "kind": "transition",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "4d6a7db787130c5a4a95bd835369babd78e4a1f6"
+    ],
+    "dev": {
+      "label": "Ruff/ty",
+      "repository": "https://github.com/astral-sh/ruff.git",
+      "revision": "4d6a7db787130c5a4a95bd835369babd78e4a1f6",
+      "workspace": ".",
+      "package": "ty_python_semantic",
+      "environment": {
+        "CARGO_PROFILE_DEV_OPT_LEVEL": "1",
+        "CARGO_PROFILE_DEV_LTO": "off",
+        "CARGO_PROFILE_DEV_DEBUG": "line-tables-only"
+      },
+      "edits": {
+        "direct": {
+          "path": "crates/ty_python_semantic/src/types.rs",
+          "before": "DynamicType::Unknown\n                    | DynamicType::UnknownGeneric(_)",
+          "after": "DynamicType::UnknownGeneric(_)\n                    | DynamicType::Unknown",
+          "crate": "ty_python_semantic"
+        },
+        "dependency": {
+          "path": "crates/ty_python_core/src/platform.rs",
+          "before": "_ => PythonPlatform::Identifier(platform.clone()),",
+          "after": "_ => PythonPlatform::Identifier(platform),",
+          "crate": "ty_python_core"
+        }
+      },
+      "commands": {
+        "check": [
+          "check",
+          "-p",
+          "ty_python_semantic",
+          "--lib",
+          "--locked"
+        ],
+        "build": [
+          "build",
+          "-p",
+          "ty_python_semantic",
+          "--lib",
+          "--locked"
+        ],
+        "clippy": [
+          "clippy",
+          "-p",
+          "ty_python_semantic",
+          "--lib",
+          "--locked"
+        ],
+        "test": [
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "--locked",
+          "-E",
+          "test(=mdtest::liskov.md)"
+        ],
+        "fmt": [
+          "fmt",
+          "-p",
+          "ty_python_semantic",
+          "--"
+        ]
+      }
+    }
+  },
+  "exp-devruff-primeforward": {
+    "kind": "transition",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "4d6a7db787130c5a4a95bd835369babd78e4a1f6"
+    ],
+    "dev": {
+      "label": "Ruff/ty",
+      "repository": "https://github.com/astral-sh/ruff.git",
+      "revision": "4d6a7db787130c5a4a95bd835369babd78e4a1f6",
+      "workspace": ".",
+      "package": "ty_python_semantic",
+      "environment": {
+        "CARGO_PROFILE_DEV_OPT_LEVEL": "1",
+        "CARGO_PROFILE_DEV_LTO": "off",
+        "CARGO_PROFILE_DEV_DEBUG": "line-tables-only"
+      },
+      "edits": {
+        "direct": {
+          "path": "crates/ty_python_semantic/src/types.rs",
+          "before": "DynamicType::Unknown\n                    | DynamicType::UnknownGeneric(_)",
+          "after": "DynamicType::UnknownGeneric(_)\n                    | DynamicType::Unknown",
+          "crate": "ty_python_semantic"
+        },
+        "dependency": {
+          "path": "crates/ty_python_core/src/platform.rs",
+          "before": "_ => PythonPlatform::Identifier(platform.clone()),",
+          "after": "_ => PythonPlatform::Identifier(platform),",
+          "crate": "ty_python_core"
+        }
+      },
+      "commands": {
+        "check": [
+          "check",
+          "-p",
+          "ty_python_semantic",
+          "--lib",
+          "--locked"
+        ],
+        "build": [
+          "build",
+          "-p",
+          "ty_python_semantic",
+          "--lib",
+          "--locked"
+        ],
+        "clippy": [
+          "clippy",
+          "-p",
+          "ty_python_semantic",
+          "--lib",
+          "--locked"
+        ],
+        "test": [
+          "nextest",
+          "run",
+          "-p",
+          "ty_python_semantic",
+          "--test",
+          "mdtest",
+          "--locked",
+          "-E",
+          "test(=mdtest::liskov.md)"
+        ],
+        "fmt": [
+          "fmt",
+          "-p",
+          "ty_python_semantic",
+          "--"
+        ]
+      }
+    }
+  },
+  "ruff-build-29910": {
+    "app": "ruff",
+    "kind": "build",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "91375d8550d54d9da44639e5d7154b7fd9591bb8^",
+      "91375d8550d54d9da44639e5d7154b7fd9591bb8"
+    ]
+  },
+  "ruff-build-30328": {
+    "app": "ruff",
+    "kind": "build",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "7a1284565f88f8a85ba1791e5666962bba35e6d1^",
+      "7a1284565f88f8a85ba1791e5666962bba35e6d1"
+    ]
+  },
+  "ruff-build-30260": {
+    "app": "ruff",
+    "kind": "build",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "7aae7a53128d5600a6720d11a2d6ce6bd623cfe1^",
+      "7aae7a53128d5600a6720d11a2d6ce6bd623cfe1"
+    ]
+  },
+  "ty-build-30127": {
+    "app": "ty",
+    "kind": "build",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "b6692a4d165078af460ab0079c634d45b5e4e7eb^",
+      "b6692a4d165078af460ab0079c634d45b5e4e7eb"
+    ]
+  },
+  "ty-build-30438": {
+    "app": "ty",
+    "kind": "build",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "8e61f26585df5c6eb48681a2a6425bb40fa380ca^",
+      "8e61f26585df5c6eb48681a2a6425bb40fa380ca"
+    ]
+  },
+  "ty-build-30287": {
+    "app": "ty",
+    "kind": "build",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "8b1c6f06f3f3e056dbc747c91c095578e9fe42c4^",
+      "8b1c6f06f3f3e056dbc747c91c095578e9fe42c4"
+    ]
+  },
+  "ty-build-28556": {
+    "app": "ty",
+    "kind": "build",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "002095b37dc7e4f05c6f06cf5d440d151b1c2bad^",
+      "002095b37dc7e4f05c6f06cf5d440d151b1c2bad"
+    ]
+  },
+  "ty-build-29578": {
+    "app": "ty",
+    "kind": "build",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "3bf4988cf062dc76895ff2f8421acf766172392b^",
+      "3bf4988cf062dc76895ff2f8421acf766172392b"
+    ]
+  },
+  "ty-build-28826": {
+    "app": "ty",
+    "kind": "build",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "130e430f16e3cb2586a184db9930e126342cbdd3^",
+      "130e430f16e3cb2586a184db9930e126342cbdd3"
+    ]
+  },
+  "ruff-test-29910": {
+    "app": "ruff",
+    "kind": "test",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "91375d8550d54d9da44639e5d7154b7fd9591bb8^",
+      "91375d8550d54d9da44639e5d7154b7fd9591bb8"
+    ]
+  },
+  "ruff-test-30260": {
+    "app": "ruff",
+    "kind": "test",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "7aae7a53128d5600a6720d11a2d6ce6bd623cfe1^",
+      "7aae7a53128d5600a6720d11a2d6ce6bd623cfe1"
+    ]
+  },
+  "ty-test-30127": {
+    "app": "ty",
+    "kind": "test",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "b6692a4d165078af460ab0079c634d45b5e4e7eb^",
+      "b6692a4d165078af460ab0079c634d45b5e4e7eb"
+    ]
+  },
+  "ty-test-30438": {
+    "app": "ty",
+    "kind": "test",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "8e61f26585df5c6eb48681a2a6425bb40fa380ca^",
+      "8e61f26585df5c6eb48681a2a6425bb40fa380ca"
+    ]
+  },
+  "ruff_macros-macro-30328": {
+    "app": "ruff_macros",
+    "kind": "macro",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "7a1284565f88f8a85ba1791e5666962bba35e6d1^",
+      "7a1284565f88f8a85ba1791e5666962bba35e6d1"
+    ]
+  },
+  "ruff_linter-check-30328": {
+    "app": "ruff_linter",
+    "kind": "check",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "7a1284565f88f8a85ba1791e5666962bba35e6d1^",
+      "7a1284565f88f8a85ba1791e5666962bba35e6d1"
+    ]
+  },
+  "ty_python_semantic-check-30438": {
+    "app": "ty_python_semantic",
+    "kind": "check",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "8e61f26585df5c6eb48681a2a6425bb40fa380ca^",
+      "8e61f26585df5c6eb48681a2a6425bb40fa380ca"
+    ]
+  },
+  "ruff-recent-27cc1bb8": {
+    "app": "ruff",
+    "kind": "llvm",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "27cc1bb84b0400b6bd2fecc2764fff625334e9bb^",
+      "27cc1bb84b0400b6bd2fecc2764fff625334e9bb"
+    ]
+  },
+  "ruff-recent-7d1b1355": {
+    "app": "ruff",
+    "kind": "llvm",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "7d1b1355ef43bc9169ec5743667ca2a6cdbde2dc^",
+      "7d1b1355ef43bc9169ec5743667ca2a6cdbde2dc"
+    ]
+  },
+  "ty-recent-cd2d9732": {
+    "app": "ty",
+    "kind": "llvm",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "cd2d973241d7f5bcba588e94cc686d9e356a4621^",
+      "cd2d973241d7f5bcba588e94cc686d9e356a4621"
+    ]
+  },
+  "ty-recent-9ca2a80e": {
+    "app": "ty",
+    "kind": "llvm",
+    "repo": "astral-sh/ruff",
+    "revs": [
+      "9ca2a80e78ed2e4538ab3444606c7d560e0b9a82^",
+      "9ca2a80e78ed2e4538ab3444606c7d560e0b9a82"
+    ]
+  }
+}

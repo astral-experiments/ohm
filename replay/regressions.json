@@ -1,0 +1,51 @@
+{
+  "457": {
+    "Cargo.toml": "[workspace]\nmembers=[\"origin\",\"client\"]\nresolver=\"3\"\n",
+    "origin/Cargo.toml": "[package]\nname=\"origin\"\nversion=\"0.1.0\"\nedition=\"2024\"\n[features]\nhello=[]\n",
+    "client/Cargo.toml": "[package]\nname=\"client\"\nversion=\"0.1.0\"\nedition=\"2024\"\n[dependencies]\norigin={path=\"../origin\"}\n",
+    "origin/src/lib.rs": "#[cfg(feature = \"hello\")]\npub fn hello() {}\n",
+    "client/src/lib.rs": "pub use origin::hello;\n"
+  },
+  "474": {
+    "Cargo.toml": "[workspace]\nmembers=[\"origin\",\"client\"]\nresolver=\"3\"\n",
+    "origin/Cargo.toml": "[package]\nname=\"origin\"\nversion=\"0.1.0\"\nedition=\"2024\"\n[features]\nhello=[]\n",
+    "client/Cargo.toml": "[package]\nname=\"client\"\nversion=\"0.1.0\"\nedition=\"2024\"\n[dependencies]\norigin={path=\"../origin\"}\n",
+    "origin/src/lib.rs": "// origin/src/lib.rs\n#![feature(decl_macro)]\nuse std::sync::Arc as Ptr;\npub macro make() { Ptr::new(1) }\n",
+    "client/src/lib.rs": "// client/src/lib.rs, depending on origin by path\npub fn probe() { let _ = origin::make!(); }\n"
+  },
+  "476": {
+    "Cargo.toml": "[workspace]\nmembers=[\"origin\",\"client\"]\nresolver=\"3\"\n",
+    "origin/Cargo.toml": "[package]\nname=\"dep\"\nversion=\"0.1.0\"\nedition=\"2024\"\n[features]\nhello=[]\n",
+    "client/Cargo.toml": "[package]\nname=\"client\"\nversion=\"0.1.0\"\nedition=\"2024\"\n[dependencies]\ndep={path=\"../origin\"}\n",
+    "origin/src/lib.rs": "// dep/src/lib.rs\nmod first {\n    pub trait Ext {\n        fn len(&self) -> usize { 1 }\n    }\n    impl Ext for Box<str> {}\n}\nmod second {\n    pub trait Ext {}\n}\npub use first::*;\npub use second::*;\n",
+    "client/src/main.rs": "// client/src/main.rs\nuse dep::*;\n\nfn main() {\n    let text: Box<str> = \"ok\".into();\n    println!(\"{}\", text.len());\n}\n"
+  },
+  "480": {
+    "Cargo.toml": "[workspace]\nmembers=[\"origin\",\"client\"]\nresolver=\"3\"\n",
+    "origin/Cargo.toml": "[package]\nname=\"origin\"\nversion=\"0.1.0\"\nedition=\"2024\"\n[features]\nhello=[]\n",
+    "client/Cargo.toml": "[package]\nname=\"client\"\nversion=\"0.1.0\"\nedition=\"2024\"\n[dependencies]\norigin={path=\"../origin\"}\n",
+    "origin/src/lib.rs": "// origin/src/lib.rs\nfn send() {}\n",
+    "client/src/lib.rs": "// client/src/lib.rs\npub fn probe() { origin::send() }\n"
+  },
+  "572": {
+    "Cargo.toml": "[package]\nname=\"foo\"\nversion=\"0.1.0\"\nedition=\"2024\"\n",
+    "build.rs": "fn main() {\n    println!(\"cargo::rustc-env=CARGO_PKG_NAME=script\");\n}\n",
+    "src/lib.rs": "/// ```\n/// assert_eq!(env!(\"CARGO_PKG_NAME\"), \"script\");\n/// ```\npub fn example() {}\n"
+  },
+  "94": {
+    "Cargo.toml": "[package]\nname=\"foo\"\nversion=\"0.1.0\"\nedition=\"2024\"\n",
+    "src/lib.rs": "pub fn empty() {}\n"
+  },
+  "495": {
+    "Cargo.toml": "[package]\nname=\"foo\"\nversion=\"0.1.0\"\nedition=\"2024\"\n",
+    "src/lib.rs": "#![feature(final_associated_functions)]\ntrait T {\n    final fn f() -> impl Send {}\n}\nimpl T for () {}\n"
+  },
+  "497": {
+    "Cargo.toml": "[package]\nname=\"foo\"\nversion=\"0.1.0\"\nedition=\"2024\"\n",
+    "src/lib.rs": "#![feature(rustc_attrs)]\n#![allow(internal_features)]\n\n#[rustc_force_inline]\n#[target_feature(enable = \"avx\")]\npub unsafe fn callee() {}\n\npub async fn run() {\n    unsafe { callee() }\n}\n"
+  },
+  "499": {
+    "Cargo.toml": "[package]\nname=\"foo\"\nversion=\"0.1.0\"\nedition=\"2024\"\n",
+    "src/lib.rs": "pub trait Pair {\n    type A;\n    type B;\n}\n\npub fn accept(_: &dyn Pair<A = u8, B = u16>) {}\n"
+  }
+}
