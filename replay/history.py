@@ -144,7 +144,7 @@ def run(args, commits, role):
     tool = fixed / "rustup/toolchains/ohm"
     tool.parent.mkdir(parents=True)
     tool.symlink_to(kit)
-    env = dict(**({"CARGO_BUILD_BUILD_DIR": os.environ["BENCH_SHARED_ROOT"],"CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST":"all"} if "BENCH_SHARED_ROOT" in os.environ else {}),HOME=os.environ["HOME"], LANG="C.UTF-8",
+    env = dict(**({"CARGO_BUILD_BUILD_DIR": str(fixed/"shared-build"),"CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST":"all"} if "BENCH_SHARED_ROOT" in os.environ else {}),HOME=os.environ["HOME"], LANG="C.UTF-8",
                PATH=str(kit / "bin") + ":" + os.environ["PATH"],
                CARGO_HOME=os.getenv("CARGO_HOME", str(Path.home() / ".cargo")),
                CARGO_BUILD_JOBS=str(args.jobs), CARGO_TARGET_DIR=str(fixed / "target"),

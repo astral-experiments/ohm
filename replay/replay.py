@@ -241,7 +241,7 @@ if case.startswith("exp-dev"):
     _,hard=resource.getrlimit(resource.RLIMIT_NOFILE)
     resource.setrlimit(resource.RLIMIT_NOFILE,(min(hard,65536),hard))
     fetch()
-    git('checkout','-q','--detach',cfg['revision'])
+    if part!='devcodex':git('checkout','-q','--detach',cfg['revision'])
     if part=="devcodex":
         tar=root/"allocative-0.3.6.crate"
         run("curl","-fsSL","--retry","4","https://static.crates.io/crates/allocative/allocative-0.3.6.crate","-o",tar)
