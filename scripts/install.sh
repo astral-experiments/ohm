@@ -321,7 +321,7 @@ else
         CDPATH='' cd "$temporary_directory" &&
             mkdir "$staged_prefix" &&
             ln -s "$staged_prefix" toolchain &&
-            sh "$inner_installer" --prefix=toolchain --disable-ldconfig
+            OHM_STAGED_INSTALL=1 sh "$inner_installer" --prefix=toolchain --disable-ldconfig
     ) || fail 'the Rust distribution installer failed'
     verify_installation "$staged_prefix"
     printf '%s\n' "$version" > "$staged_prefix/.ohm-version"
