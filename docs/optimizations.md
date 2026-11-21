@@ -15,6 +15,14 @@ interface changes, Cargo starts downstream compilation once the new metadata is 
 waiting for the rest of the dependency's build. Ohm also uses a compact metadata graph to reduce the
 work needed to compute the interface hash.
 
+A private import can affect a caller through a public re-export or a macro. Suppose two glob
+imports each supply a trait named `Ext` and one trait defines `len()` for strings. Dropping that
+trait from the metadata can make `s.len()` call the inherent method on `str`. Ohm tracks the
+bindings that downstream name resolution can reach, including aliases used by exported macros.
+[Glob imports](https://github.com/astral-experiments/ohm-rust/pull/476) ·
+[Re-exports](https://github.com/astral-experiments/ohm-rust/pull/483) ·
+[Macro aliases](https://github.com/astral-experiments/ohm-rust/pull/486)
+
 For a public function returning `impl Trait`, downstream code can depend on properties of its hidden
 type, including whether it implements `Send`. Ohm follows those reachable types when hashing the
 public interface. A change to an unrelated private impl can then leave downstream crates fresh. The
@@ -879,11 +887,30 @@ the allocation indices in the exported metadata. [Query
 reuse](https://github.com/astral-experiments/ohm-rust/pull/451) · [Cached
 literals](https://github.com/astral-experiments/ohm-rust/pull/318)
 
+A package version bump also changes the identifiers that rustc assigns to imported definitions and
+source files. For example, a query about `globset::GlobSet` can miss the cache when only the
+version of `globset` changed. Ohm gives definitions and files additional identifiers for looking
+up previous checks. It validates the crate and source path and tracks queries that depend on the
+current version or linkage. This lets rustc reuse the type check and reevaluate expressions such
+as `env!("CARGO_PKG_VERSION")`. The extra identifiers occupy space in library metadata.
+[Package versions](https://github.com/astral-experiments/ohm-rust/pull/470) ·
+[Imported definitions](https://github.com/astral-experiments/ohm-rust/pull/502) ·
+[Source files](https://github.com/astral-experiments/ohm-rust/pull/503)
+
 Adding an implementation of one trait to a dependency can invalidate cached lookups for other
 traits. For a lookup of `Display`, rustc records a fingerprint of the crates that supply
 implementations of `Display`. Adding a supplier changes the fingerprint. Changing a crate that only
 implements other traits can leave this lookup reusable. [Trait
 lookup](https://github.com/astral-experiments/ohm-rust/pull/452)
+
+If an edit adds another implementation of `Display`, rustc may have to repeat the search for
+the one that applies to `T`. Ohm records the answer separately from the candidates examined
+during the search. Callers can reuse their type checks if the search selects the same impl
+and the types they depend on still agree. Ohm also derives the identities of handwritten
+impls from their headers, so inserting `impl A` before `impl B` can preserve the identity of `B`’s
+methods. [Trait selection](https://github.com/astral-experiments/ohm-rust/pull/493) ·
+[Cached lookups](https://github.com/astral-experiments/ohm-rust/pull/505) ·
+[Impl headers](https://github.com/astral-experiments/ohm-rust/pull/467)
 
 When a module lives in its own file, editing its caller often leaves the file unchanged. Ohm can
 restore the parsed syntax of such a file if it is at least 1 KiB and its contents, edition and
@@ -897,6 +924,24 @@ with line tables and LTO disabled, LLVM can copy a previous object and patch tha
 compares the optimized IR just before instruction selection and checks the encoding, section and
 references for each changed function. If any check fails, it regenerates the object. [Enum
 returns](https://github.com/astral-experiments/ohm-llvm/pull/37)
+
+When you switch between branches, the best object to reuse may come from their common parent.
+Ohm keeps that earlier object and checks its LLVM input against the new one. If an imported
+method moved because another impl was inserted, LLVM verifies the call sites and updates the
+reference to the current symbol. It can also reuse an object in a test harness that Cargo
+relinks separately. Keeping an earlier object for more units increases disk usage.
+[Branch switches](https://github.com/astral-experiments/ohm-llvm/pull/43) ·
+[Imported methods](https://github.com/astral-experiments/ohm-llvm/pull/42) ·
+[Test harnesses](https://github.com/astral-experiments/ohm-llvm/pull/45)
+
+When a unit needs to be compiled again, LLVM can often share code within it. For example,
+130 instances of the same hash table loop in ty call different hash functions. Sharing the
+loop and passing the hash function as an argument saves LLVM from optimizing each copy.
+At optimization level 1 on x86-64 Linux, LLVM can also replace long chains of string comparisons
+with a table. For Ruff’s rule names, the string length and three bytes select a candidate, and
+the lookup verifies the full name. This reduces the cost of finding names late in the chain.
+Finding the first name takes more instructions. [Shared loops](https://github.com/astral-experiments/ohm-llvm/pull/39) ·
+[String lookups](https://github.com/astral-experiments/ohm-llvm/pull/48)
 
 Adding a method to an impl can invalidate hundreds of callers of its existing methods. Ohm records
 the item each name selected and can repeat the lookup directly. If it still finds the same method,
@@ -1415,6 +1460,11 @@ For host tests of libraries using the Rust 2024 edition, Ohm can cache supported
 and their compiled object files. It still runs every selected example and repeats the final link to
 pick up changes to native archives. An edit to an example or its included Markdown invalidates the
 cache.
+
+Cargo prepares the commands for cached examples after the build scripts finish. It applies the
+same package environment and native library search order as rustdoc. For example, if a build
+script overrides `CARGO_PKG_NAME`, a cached doctest sees the package name rustdoc supplies.
+[Doctest environment](https://github.com/astral-experiments/ohm-cargo/pull/572)
 
 A merged example that returns `Err` must fail even if it installs a panic hook that exits
 successfully. The generated entry point now returns the result and lets the test harness handle
