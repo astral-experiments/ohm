@@ -75,6 +75,12 @@ jobs:
       - name: Install the automatic fix tool
         if: matrix.scenario == 'regression'
         run: rustup toolchain install 1.100.0 --profile minimal && cargo +1.100.0 install --locked cargo-fixit --version 0.1.12
+      - name: Install nextest
+        if: contains(matrix.scenario, 'codex-') || startsWith(matrix.scenario, 'session-')
+        run: |
+          curl -fsSL --retry 4 https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.140/cargo-nextest-0.9.140-x86_64-unknown-linux-musl.tar.gz -o next.tar.gz
+          echo 'bc2a998567816eef7b087b920036f49fb89aa2a8a603f6a3d84098be160b62c5  next.tar.gz' | sha256sum -c
+          tar xzf next.tar.gz
       - name: Replay both SDKs
         env:
           REPLAY_MODE: ${{ inputs.label }}
