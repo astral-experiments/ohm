@@ -40,7 +40,7 @@ on:
         description: Select a history and any commits to check before the replay
         type: choice
         default: recent
-        options: [recent, preceding, shared, revisit, from-tip]
+        options: [recent, preceding, shared, revisit, from-tip, moves]
       intermediate:
         description: Optional kit for the first PR of a stack
         required: false
@@ -168,7 +168,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: ${{ matrix.project == 'ripgrep' && 'BurntSushi/ripgrep' || 'astral-experiments/serc' }}
-          ref: ${{ matrix.project == 'ripgrep' && '43fc97d43a4c61d65e7d74d4110c8480fe42ea5b' || '1b15ce1cba1d5a0045ac7303b8797102f807e57c' }}
+          ref: ${{ matrix.project == 'ripgrep' && '43fc97d43a4c61d65e7d74d4110c8480fe42ea5b' || inputs.window == 'moves' && 'c09203c60af828b1a5981f205b0c574dd5a5973e' || '1b15ce1cba1d5a0045ac7303b8797102f807e57c' }}
           fetch-depth: ${{ inputs.window == 'preceding' && 41 || 21 }}
           persist-credentials: false
           path: workload

@@ -225,7 +225,7 @@ def run(args, commits, role):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--window", choices=["recent", "preceding", "shared", "revisit", "from-tip"], default="recent")
+    parser.add_argument("--window", choices=["recent", "preceding", "shared", "revisit", "from-tip", "moves"], default="recent")
     parser.add_argument("--project", choices=PROJECTS.keys(), required=True)
     for arg in ("source", "control", "candidate", "cargo", "candidate-cargo", "current-cargo", "intermediate-cargo", "second-cargo", "scratch", "output"):
         parser.add_argument("--" + arg, type=lambda p: Path(p).resolve(), required=not arg.endswith("-cargo"))
@@ -247,6 +247,9 @@ def main():
     calibrate(args.scratch, args.output)
     spec = PROJECTS[args.project]
     seed, tip = (spec["earlier_seed"], spec["seed"]) if args.window == "preceding" else (spec["seed"], spec["tip"])
+    if args.window == "moves":
+        assert args.project == "serc"
+        seed, tip = spec["moves_seed"], spec["moves_tip"]
     commits = git(args.source, "rev-list", "--first-parent", "--max-count=21", tip).decode().splitlines()[::-1]
     assert len(commits) == 21 and commits[0] == seed and commits[-1] == tip
     if args.window == "revisit":
