@@ -46,6 +46,13 @@ def run(*args, **kw):
 
 
 def install(role):
+    if role=="control" and os.environ.get("REPLAY_MODE")=="stock-codex":
+        # Use an isolated copy of the official pinned distribution.
+        original=Path(subprocess.check_output(["rustup","which","--toolchain","1.100.0","rustc"],text=True).strip()).parent.parent
+        shutil.copytree(original,root / role,symlinks=True)
+        result["stock"]={tool:history.sha(original/"bin"/tool) for tool in ["rustc","cargo","clippy-driver","rustfmt"]}
+        result["stock"]["version"]=subprocess.check_output([original/"bin/rustc","-vV"],text=True)
+        return
     tag = "3" if role == "control" else "4"
     kit = wd / "kits" / tag
     archive, = kit.rglob("*.tar.gz")
@@ -398,7 +405,9 @@ def tui_session():
     for role in order:
         (root/role).rename(sdk)
         number='3' if role=='control' else '4'
-        selector="ohm-1.100.0-"+number
+        upstream=role=="control" and os.environ.get("REPLAY_MODE")=="stock-codex"
+        lane="stock" if upstream else "ohm"
+        selector="1.100.0" if upstream else "ohm-1.100.0-"+number
         (toolchain.parent/selector).symlink_to(sdk)
         folder=out/role
         folder.mkdir()
@@ -412,14 +421,14 @@ def tui_session():
         scenario=study.scenarios[0]
         assert scenario.steps[-2]['args'][0]=='clippy'
         if case=="codex-tui":scenario=dataclasses.replace(scenario,steps=scenario.steps[:-1])
-        study.toolchains=(('ohm',selector),)
+        study.toolchains=((lane,selector),)
         dest=study.prepare_source(scenario)
         run('git','-C',dest,'config','--local','user.email','benchmark@users.noreply.github.com')
         run('git','-C',dest,'config','--local','user.name','Ohm benchmark fixture')
         study.sources['codex']=dest
         study.persist()
         try:
-            sample=study.run_session(scenario,'ohm',selector,0)
+            sample=study.run_session(scenario,lane,selector,0)
         finally:
             if (where/'logs').exists():shutil.copytree(where/'logs',folder/'logs')
         co=Path(sample['worktree'])

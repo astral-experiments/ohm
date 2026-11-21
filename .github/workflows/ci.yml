@@ -22,7 +22,26 @@ permissions:
   contents: read
   actions: read
 jobs:
+  loader:
+    if: inputs.label == 'loader'
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Probe the published Clippy driver in the macOS bootstrap layout
+        run: |
+          ver=ohm-1.100.0-3
+          sdk="$ver-aarch64-apple-darwin.tar.gz"
+          curl -fsSL --retry 5 "https://github.com/astral-experiments/ohm/releases/download/$ver/$sdk" -o "$sdk"
+          echo "080ce1624728d3fde8afd1c8567793f8d214d930c69fba96905dcdc39a8efa77  $sdk" | shasum -a 256 -c
+          python3 replay/loader-clippy.py "$sdk" | tee loader.json
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: macos
+          path: loader.json
   replay:
+    if: inputs.label != 'loader'
     runs-on: namespace-profile-ubuntu-24-04-16
     timeout-minutes: 35
     strategy:
@@ -42,7 +61,11 @@ jobs:
           fetch-depth: 4
           path: source
           persist-credentials: false
+      - name: Install the official stock SDK
+        if: inputs.label == 'stock-codex'
+        run: rustup toolchain install 1.100.0 --profile minimal --component clippy,rustfmt
       - name: Fetch the published −3 SDK
+        if: inputs.label != 'stock-codex'
         run: |
           mkdir -p kits/3
           name=ohm-1.100.0-3
