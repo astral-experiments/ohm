@@ -211,6 +211,9 @@ history.save(out / "inputs.json", result)
 # Additional matched PMU run of the exact Codex Clippy edit sequence.
 def codex_clippy():
     import benchmark
+    import resource
+    (_,hard)=resource.getrlimit(resource.RLIMIT_NOFILE)
+    resource.setrlimit(resource.RLIMIT_NOFILE,(min(hard,65536),hard))
     fetch()
     archive = root/"allocative-0.3.6.crate"
     run("curl","-fsSL","--retry","4","https://static.crates.io/crates/allocative/allocative-0.3.6.crate","-o", archive)
