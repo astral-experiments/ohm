@@ -304,12 +304,14 @@ if case.startswith("exp-dev"):
         history.command([cargo,'fetch','--locked'],source,env,folder/'fetch.log')
         rows={}
         phases=['build','warmup'] if kind=='forward' else ['warmup','first','build','last']
-        if kind=='warm':
+        if kind in ('cold','warm'):
             orig=cfg['edits']['direct']
             path=source/orig['path'].removeprefix('codex-rs/')
             original=path.read_text()
-            history.command([cargo,*cfg['commands']['build'],'--offline'],source,env|{'CARGO_TARGET_DIR':str(work/'prime')},folder/'prime.log')
-            shutil.rmtree(work/'prime')
+            if kind=='warm':
+                history.command([cargo,*cfg['commands']['build'],'--offline'],source,env|{'CARGO_TARGET_DIR':str(work/'prime')},folder/'prime.log')
+                shutil.rmtree(work/'prime')
+            else:(folder/'prime.log').touch()
             phases+=['editcheck','editbuild']
         for phase in phases:
             if kind=='nocheck' and phase=='first':continue
@@ -354,7 +356,7 @@ if case.startswith("exp-dev"):
                         graphs[str(path.relative_to(work))]=[buf[pos:pos+8].hex(),buf[pos+8:pos+16].hex(),path.stat().st_size]
                 rows[phase]['graphs']=graphs
             print(role,phase,len(entries),n,duration,flush=True)
-        if kind=='warm':
+        if kind in ('cold','warm'):
             import shlex
             editpath=source/orig['path'].removeprefix('codex-rs/')
             editpath.write_text(original)
