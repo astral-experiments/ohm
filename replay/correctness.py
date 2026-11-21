@@ -83,6 +83,7 @@ pub use inner::*;
     files["src/lib.rs"] = files.pop("src/main.rs")
     init(487,files)
     run("check")
+    run("build")
     init(495,fixtures["495"])
     run("check")
     init(497,fixtures["497"])
