@@ -313,9 +313,18 @@ env -u RUST_SRC_PATH RUSTUP_TOOLCHAIN="$OHM_TOOLCHAIN" \
 
 if jq -e '.release | ((.upstream_rust_version | split(".") | map(tonumber)) + [.ohm_revision]) >= [1, 99, 0, 23]' \
     "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN.json" >/dev/null; then
-  cat > "$smoke_crate/src/lib.rs" <<'EOF'
+  # The local proc macro in the main smoke crate prevents doctest caching.
+  doctest_crate="$smoke_root/doctests"
+  mkdir -p "$doctest_crate/src"
+  cat > "$doctest_crate/Cargo.toml" <<'EOF'
+[package]
+name = "ohm-doctests"
+version = "0.0.0"
+edition = "2024"
+EOF
+  cat > "$doctest_crate/src/lib.rs" <<'EOF'
 /// ```
-/// assert_eq!(ohm_smoke::answer(), 42);
+/// assert_eq!(ohm_doctests::answer(), 42);
 /// ```
 pub fn answer() -> u32 {
     42
@@ -323,7 +332,7 @@ pub fn answer() -> u32 {
 EOF
   for pass in cold warm; do
     log="$smoke_root/doctests-$pass.log"
-    cargo +"$OHM_TOOLCHAIN" test --doc --offline --manifest-path "$smoke_crate/Cargo.toml" -v \
+    cargo +"$OHM_TOOLCHAIN" test --doc --offline --manifest-path "$doctest_crate/Cargo.toml" -v \
       2>&1 | tee "$log"
     grep -F 'test result: ok. 1 passed' "$log" >/dev/null
   done
@@ -333,7 +342,7 @@ EOF
     exit 1
   fi
   cargo +"$OHM_TOOLCHAIN" -Zohm-cached-doctests=no test --doc --offline \
-    --manifest-path "$smoke_crate/Cargo.toml" -v 2>&1 | tee "$smoke_root/doctests-disabled.log"
+    --manifest-path "$doctest_crate/Cargo.toml" -v 2>&1 | tee "$smoke_root/doctests-disabled.log"
   grep -F -- '--test-run-directory' "$smoke_root/doctests-disabled.log" >/dev/null
 fi
 
