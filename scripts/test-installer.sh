@@ -573,6 +573,20 @@ assert_not_contains "$temporary_directory/cases/local-install/curl.log" 'https:/
 run_case local-install success
 assert_no_links local-install
 
+# Both rustup names must survive a change to a symlink in the installation path.
+linked_prefix="$temporary_directory/cases/linked-prefix"
+mkdir -p "$linked_prefix/first" "$linked_prefix/second"
+ln -s first "$linked_prefix/current"
+sdk_name=$'sdk\n'
+OHM_TEST_INSTALL_DIR="$linked_prefix/current/$sdk_name" run_case linked-prefix success
+ln -sfn second "$linked_prefix/current"
+for name in "$version" ohm; do
+  if [ ! "$linked_prefix/rustup-home/toolchains/$name" -ef "$linked_prefix/first/$sdk_name" ]; then
+    echo "changing the installation parent redirected the $name toolchain" >&2
+    exit 1
+  fi
+done
+
 incomplete_prefix="$temporary_directory/cases/incomplete-prefix/toolchain"
 mkdir -p "$incomplete_prefix"
 run_case incomplete-prefix failure
