@@ -14,7 +14,7 @@
     }
   },
   "candidate": {
-    "revision": "a0f3a642c9dcd0f29fe9ecd74a6bc74ab52b8745",
+    "revision": "9f23753819582f3366fdfb3c32902ef1ec0a827f",
     "cases": {
       "caller-local-codegen": {
         "main.rs": "extern crate upstream;\n\nstruct Receiver;\n\nmod tasks {\n    pub fn wrapper() -> upstream::Wrapper<impl Fn()> {\n        upstream::Wrapper(|| print!(\"dropped:\"))\n    }\n\n    pub async fn pending(message: String) {\n        std::future::pending::<()>().await;\n        drop(message);\n    }\n}\n\nmod first {\n    impl super::Receiver {\n        pub fn evaluate_first(value: u32) -> bool {\n            let _future = super::tasks::pending(String::new());\n            upstream::apply(value, |number| number >= 3)\n        }\n    }\n}\n\nmod second {\n    pub fn number() -> u64 {\n        upstream::identity(7_u64)\n    }\n\n    pub fn evaluate(value: u32) -> bool {\n        let _future = super::tasks::pending(String::new());\n        upstream::apply(value, |number| number % 2 == 0)\n    }\n}\n\nfn main() {\n    let wrapper = tasks::wrapper();\n    drop(wrapper);\n    println!(\n        \"{}:{}:{}:{}\",\n        Receiver::evaluate_first(2),\n        second::evaluate(2),\n        second::number(),\n        upstream::shared_identity(),\n    );\n}\n",
