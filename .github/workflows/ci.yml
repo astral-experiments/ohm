@@ -20,7 +20,7 @@ on:
       driver:
         description: Optional stage-two driver build experiment, never passed to the measured crates
         type: choice
-        options: [standard, fat, v3, protected, inline, import, native]
+        options: [standard, fat, v3, protected, inline, import, native, post, post-native]
         default: standard
       kits:
         description: Workflow run with compiler kits, or empty for shipped -6 on both sides
@@ -98,7 +98,7 @@ jobs:
           PROFILE: ${{ inputs.profdata }}
         run: bash coordinator/scripts/project-check-instructions/download.sh "$PROFILE" rustc-profile rustc.profdata "$RUNNER_TEMP/profile/rustc.profdata"
       - name: Read a previous compiler patch
-        if: inputs.kits != '' && inputs.mode == 'build-kit'
+        if: inputs.kits != ''
         env:
           GITHUB_TOKEN: ${{ github.token }}
           KIT: ${{ inputs.kits }}

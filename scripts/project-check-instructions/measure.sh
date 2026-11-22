@@ -51,6 +51,9 @@ load_role() {
   if [[ -f "$sdk/profile.sha256" ]]; then
     cp "$sdk/profile.sha256" "$out/sdk-$role/"
   fi
+  if [[ -f "$sdk/bolt.sha256" ]]; then
+    cp "$sdk/bolt.sha256" "$out/sdk-$role/"
+  fi
   if [[ -f "$sdk/stage1.sha256" ]]; then
     cp "$sdk"/{stage1.sha256,relocations.txt} "$out/sdk-$role/"
   fi

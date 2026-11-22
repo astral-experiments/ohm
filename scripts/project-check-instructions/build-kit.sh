@@ -2,6 +2,11 @@
 set -euo pipefail
 
 role=$1
+postlink=false
+case "${DRIVER_MODE:-standard}" in
+  post) postlink=true; DRIVER_MODE=standard ;;
+  post-native) postlink=true; DRIVER_MODE=native ;;
+esac
 base=9f23753819582f3366fdfb3c32902ef1ec0a827f
 host=x86_64-unknown-linux-gnu
 test "$(git rev-parse HEAD)" = "$base"
@@ -165,14 +170,22 @@ PY
 else
   env -u GITHUB_ACTIONS python3 x.py --ci false build --stage 1 library
 fi
-if [[ "${PROFILED:-}" == train ]]; then
+if [[ "${PROFILED:-}" == train || "$postlink" == true ]]; then
   git submodule update --init --depth 1 src/tools/rustc-perf
   patch -d src/tools/rustc-perf -t -N -F 0 -p1 -i "$GITHUB_WORKSPACE/coordinator/release/rustc-perf-relocated-dependencies.patch"
   exe="$PWD/$stage/bin/rustc"
-  LLVM_PROFILE_FILE="$RUNNER_TEMP/pgo-smoke.profraw" "$exe" -vV
-  test -s "$RUNNER_TEMP/pgo-smoke.profraw"
-  mv "$RUNNER_TEMP/profiles" "$RUNNER_TEMP/bootstrap-profiles"
-  mkdir "$RUNNER_TEMP/profiles"
+  if [[ "$postlink" == true ]]; then
+    test "$STAGE_TWO" = true
+    test -n "$PROFILED"
+    test "$PROFILED" != train
+    . "$GITHUB_WORKSPACE/coordinator/scripts/project-check-instructions/bolt.sh"
+    bolt_instrument
+  else
+    LLVM_PROFILE_FILE="$RUNNER_TEMP/pgo-smoke.profraw" "$exe" -vV
+    test -s "$RUNNER_TEMP/pgo-smoke.profraw"
+    mv "$RUNNER_TEMP/profiles" "$RUNNER_TEMP/bootstrap-profiles"
+    mkdir "$RUNNER_TEMP/profiles"
+  fi
   stage0="$PWD/build/$host/stage0"
   cargo6="$RUNNER_TEMP/cargo"
   name="ohm-1.100.0-6-$host.tar.gz"
@@ -186,10 +199,14 @@ if [[ "${PROFILED:-}" == train ]]; then
     "$stage0/bin/cargo" build -p collector --bins
     "$stage0/bin/cargo" run -p collector --bin collector -- profile_local eprintln "$exe" --id Test --cargo "$cargo6" --profiles Check,Debug,Opt --scenarios All --exact-match externs,ctfe-stress-5,cargo-0.87.1,token-stream-stress,match-stress,tuple-stress,diesel-2.2.10,bitmaps-3.2.1,serde-1.0.219-new-solver --frontend-threads 1 --jobs 4
   )
-  profdata="$(find build -name llvm-profdata -type f | head -1)"
-  "$profdata" merge -o "$RUNNER_TEMP/packages/rustc.profdata" "$RUNNER_TEMP/profiles"
-  sha256sum "$RUNNER_TEMP/packages/rustc.profdata"
-  exit
+  if [[ "$postlink" == true ]]; then
+    bolt_optimize
+  else
+    profdata="$(find build -name llvm-profdata -type f | head -1)"
+    "$profdata" merge -o "$RUNNER_TEMP/packages/rustc.profdata" "$RUNNER_TEMP/profiles"
+    sha256sum "$RUNNER_TEMP/packages/rustc.profdata"
+    exit
+  fi
 fi
 cp -L "$stage/bin/rustc" "$kit/bin/"
 cp -L "$stage/lib"/librustc_driver-*.so "$kit/lib/"
