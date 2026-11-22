@@ -61,6 +61,16 @@ load_role() {
     cp -al "$control/lib/rustlib/$host/lib" "$sdk/lib/rustlib/$host/lib"
     cp "$control/bin/rustc" "$sdk/bin/rustc"
     cmp "$control/bin/rustc" "$sdk/bin/rustc"
+    # Some driver build flags change the shared object's filename. Keep the
+    # same launcher, then verify the loaded driver's bytes against its receipt.
+    local expected driver
+    expected=$(basename "$control"/lib/librustc_driver-*.so)
+    if [[ ! -f "$sdk/lib/$expected" ]]; then
+      test -s "$sdk/bootstrap.patch" || test -s "$control/bootstrap.patch"
+      driver=$(basename "$sdk"/lib/librustc_driver-*.so)
+      echo "$driver $expected" > "$out/sdk-$role/driver-name"
+      mv "$sdk/lib/$driver" "$sdk/lib/$expected"
+    fi
     echo "$role consumes the control std" >> "$out/stdlib"
   fi
   if [[ "${RELEASE_LLVM:-}" == true ]]; then
