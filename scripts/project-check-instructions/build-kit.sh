@@ -2,7 +2,7 @@
 set -euo pipefail
 
 role=$1
-base=ef7389dc8c738056d546e00f6b574df03e783472
+base=9f23753819582f3366fdfb3c32902ef1ec0a827f
 host=x86_64-unknown-linux-gnu
 test "$(git rev-parse HEAD)" = "$base"
 if [[ -n "${COMPILER_REF:-}" && "$COMPILER_REF" != "$base" ]]; then
@@ -31,7 +31,7 @@ change-id = "ignore"
 [build]
 allocator = "jemalloc"
 submodules = false
-description = "ohm-1.100.0-4"
+description = "ohm-1.100.0-6"
 locked-deps = true
 docs = false
 extended = false
@@ -126,17 +126,17 @@ if [[ "${PROFILED:-}" == train ]]; then
   mv "$RUNNER_TEMP/profiles" "$RUNNER_TEMP/bootstrap-profiles"
   mkdir "$RUNNER_TEMP/profiles"
   stage0="$PWD/build/$host/stage0"
-  cargo3="$RUNNER_TEMP/cargo"
-  name="ohm-1.100.0-3-$host.tar.gz"
-  curl -fsSL --retry 4 "https://github.com/astral-experiments/ohm/releases/download/ohm-1.100.0-3/$name" -o "$RUNNER_TEMP/$name"
-  echo "7fc3d21a5efad6bff7be654b14e0e60aa2fbbfd11db198582788f3cc4bcf7591  $RUNNER_TEMP/$name" | sha256sum -c -
+  cargo6="$RUNNER_TEMP/cargo"
+  name="ohm-1.100.0-6-$host.tar.gz"
+  curl -fsSL --retry 4 "https://github.com/astral-experiments/ohm/releases/download/ohm-1.100.0-6/$name" -o "$RUNNER_TEMP/$name"
+  echo "edf11cc5fb3448edc2bcf4a530c46b539d0a3a83c0fac2482cfa8639bdedae66  $RUNNER_TEMP/$name" | sha256sum -c -
   tar -C "$RUNNER_TEMP" -xzf "$RUNNER_TEMP/$name" --strip-components=3 "rust-1.100.0-dev-$host/cargo/bin/cargo"
   (
     cd src/tools/rustc-perf
     export LLVM_PROFILE_FILE="$RUNNER_TEMP/profiles/default_%m_%p.profraw"
     export RUSTC="$stage0/bin/rustc" RUSTC_BOOTSTRAP=1 CARGO_UNSTABLE_OHM_LINKER=lld
     "$stage0/bin/cargo" build -p collector --bins
-    "$stage0/bin/cargo" run -p collector --bin collector -- profile_local eprintln "$exe" --id Test --cargo "$cargo3" --profiles Check,Debug,Opt --scenarios All --exact-match externs,ctfe-stress-5,cargo-0.87.1,token-stream-stress,match-stress,tuple-stress,diesel-2.2.10,bitmaps-3.2.1,serde-1.0.219-new-solver --frontend-threads 1 --jobs 4
+    "$stage0/bin/cargo" run -p collector --bin collector -- profile_local eprintln "$exe" --id Test --cargo "$cargo6" --profiles Check,Debug,Opt --scenarios All --exact-match externs,ctfe-stress-5,cargo-0.87.1,token-stream-stress,match-stress,tuple-stress,diesel-2.2.10,bitmaps-3.2.1,serde-1.0.219-new-solver --frontend-threads 1 --jobs 4
   )
   profdata="$(find build -name llvm-profdata -type f | head -1)"
   "$profdata" merge -o "$RUNNER_TEMP/packages/rustc.profdata" "$RUNNER_TEMP/profiles"

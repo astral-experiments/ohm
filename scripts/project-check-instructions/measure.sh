@@ -7,12 +7,8 @@ out="$RUNNER_TEMP/out"
 mkdir "$out"
 mkdir -p "$kits"
 host=x86_64-unknown-linux-gnu
-tag=ohm-1.100.0-3
-digest=7fc3d21a5efad6bff7be654b14e0e60aa2fbbfd11db198582788f3cc4bcf7591
-if [[ "${RELEASE4:-}" == true ]]; then
-  tag=ohm-1.100.0-4
-  digest=${LINUX_SHA:-09c701b4a1f6b196d51164e8392adafc2304f7e2c759d2aa524d5c42d2178943}
-fi
+tag=ohm-1.100.0-6
+digest=edf11cc5fb3448edc2bcf4a530c46b539d0a3a83c0fac2482cfa8639bdedae66
 name="$tag-$host.tar.gz"
 packed="$kits/$name"
 release="https://github.com/astral-experiments/ohm/releases/download/$tag/$name"
@@ -35,16 +31,10 @@ if [[ -z "${RUSTC_KITS:-}" || "${SHIPPED:-}" == true ]]; then
 fi
 
 if [[ "${RELEASE_LLVM:-}" == true ]]; then
-  test "$tag" = ohm-1.100.0-4
+  test "$tag" = ohm-1.100.0-6
   lib=libLLVM.so.23.1-rust-dev
   tar -C "$kits" -xzf "$packed" --strip-components=3 "rust-1.100.0-dev-$host/rustc/lib/$lib"
-  case "$digest" in
-    09c701b4a1f6b196d51164e8392adafc2304f7e2c759d2aa524d5c42d2178943)
-      expected_llvm=19327450340ce3aac82e30a57a2e028a86ea77d9974e9dc168bf0fa882225f02 ;;
-    6948ffc7d33b245bf48fdf770b5913cd536e71aec40a0ea280bd0eb33d4524b8)
-      expected_llvm=714780e0f92a97b9ad9fe2c3b178e8be11e1629661a2964c001140c829bc21db ;;
-    *) echo "Unverified LLVM archive" >&2; exit 1 ;;
-  esac
+  expected_llvm=482a9b050615f87a49479de09ea2818f9d25f636b4c3bc6d4aef7ef2a075428a
   echo "$expected_llvm  $kits/$lib" | sha256sum -c -
   sha256sum "$kits/$lib" > "$out/release-llvm.sha256"
 fi
@@ -106,24 +96,7 @@ if [[ -n "${RUSTC_KITS:-}" ]]; then
     extra+=(--pair "$pair")
   fi
 fi
-for variant in PARENT CANDIDATE; do
-  dir="$kits/cargo-$variant"
-  if [[ -f "$dir.tar.zst" ]]; then
-    mkdir -p "$dir" "$out/cargo-$variant"
-    tar -C "$dir" --zstd -xf "$dir.tar.zst"
-    (cd "$dir" && sha256sum -c manifest.sha256)
-    cp "$dir"/{manifest.sha256,revision,source.patch,source.tree,version.txt} "$out/cargo-$variant/"
-    if [[ "$variant" == PARENT ]]; then
-      if [[ -n "${INTERMEDIATE_KIT:-}" ]]; then
-        cp -a "$out/sdk-control" "$out/sdk-current"
-        extra+=(--current "$control" --current-cargo "$dir/cargo")
-      fi
-      extra+=(--intermediate-cargo "$dir/cargo")
-    else
-      extra+=(--second-cargo "$dir/cargo" --candidate-cargo "$dir/cargo")
-    fi
-  fi
-done
+echo "f0664eb8e2ce89667c11e7ffd9044650a9c70cfdb70653e4c2ac7530fb98797f  $kits/cargo" | sha256sum -c -
 sha256sum "$control/bin/rustc" | cut -d' ' -f1 > "$out/common-launcher"
 if [[ "$(cat /proc/sys/kernel/perf_event_paranoid)" -gt 2 ]]; then
   sudo sysctl kernel.perf_event_paranoid=2
