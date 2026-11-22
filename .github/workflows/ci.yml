@@ -20,7 +20,7 @@ on:
       driver:
         description: Optional stage-two driver build experiment, never passed to the measured crates
         type: choice
-        options: [standard, fat, v3, protected, inline, import]
+        options: [standard, fat, v3, protected, inline, import, native]
         default: standard
       kits:
         description: Workflow run with compiler kits, or empty for shipped -6 on both sides
@@ -97,6 +97,15 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           PROFILE: ${{ inputs.profdata }}
         run: bash coordinator/scripts/project-check-instructions/download.sh "$PROFILE" rustc-profile rustc.profdata "$RUNNER_TEMP/profile/rustc.profdata"
+      - name: Read a previous compiler patch
+        if: inputs.kits != '' && inputs.mode == 'build-kit'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          KIT: ${{ inputs.kits }}
+        run: |
+          bash coordinator/scripts/project-check-instructions/download.sh "$KIT" sdk-candidate candidate.tar.zst "$RUNNER_TEMP/parent.tar.zst"
+          tar --zstd -xOf "$RUNNER_TEMP/parent.tar.zst" candidate/compiler.patch > "$RUNNER_TEMP/parent.patch"
+          sha256sum "$RUNNER_TEMP/parent.patch"
       - name: Build and smoke-test the compiler SDK
         working-directory: rust
         env:

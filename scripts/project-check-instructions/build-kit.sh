@@ -5,6 +5,9 @@ role=$1
 base=9f23753819582f3366fdfb3c32902ef1ec0a827f
 host=x86_64-unknown-linux-gnu
 test "$(git rev-parse HEAD)" = "$base"
+if [[ -s "$RUNNER_TEMP/parent.patch" ]]; then
+  git apply --include='compiler/*' "$RUNNER_TEMP/parent.patch"
+fi
 if [[ -n "${COMPILER_REF:-}" && "$COMPILER_REF" != "$base" ]]; then
   [[ "$COMPILER_REF" =~ ^[0-9a-f]{40}$ ]]
   git cat-file -e "$COMPILER_REF^{commit}" || git fetch --no-tags origin "$COMPILER_REF"
@@ -127,6 +130,17 @@ if mode == "fat":
     old = "let lto_type = match builder.config.rust_lto {"
     assert src.count(old) == 1
     new = "let lto_type = match RustcLto::Fat {"
+elif mode == "native":
+    old = '    if builder.sess.config.bootstrap_override_lld.is_used() {\n        cargo.rustflag("-Zdefault-visibility=protected");'
+    assert src.count(old) == 1
+    new = '''    let native_bolt_lld = builder.sess.config.enable_bolt_settings
+        && build_compiler.stage == 1
+        && target == build_compiler.host
+        && target == "x86_64-unknown-linux-gnu"
+        && builder.sess.config.lld_enabled
+        && builder.sess.linker(target).is_none();
+    if builder.sess.config.bootstrap_override_lld.is_used() || native_bolt_lld {
+        cargo.rustflag("-Zdefault-visibility=protected");'''
 else:
     flags = {
         "v3": ["-Ctarget-cpu=x86-64-v3"],
