@@ -20,7 +20,7 @@ on:
       driver:
         description: Optional stage-two driver build experiment, never passed to the measured crates
         type: choice
-        options: [standard, fat, v3, protected]
+        options: [standard, fat, v3, protected, inline, import]
         default: standard
       kits:
         description: Workflow run with compiler kits, or empty for shipped -6 on both sides

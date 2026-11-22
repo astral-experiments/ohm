@@ -128,8 +128,15 @@ if mode == "fat":
     assert src.count(old) == 1
     new = "let lto_type = match RustcLto::Fat {"
 else:
-    flag = {"v3": "-Ctarget-cpu=x86-64-v3", "protected": "-Zdefault-visibility=protected"}[mode]
-    new = old.replace("        match ", f'        cargo.rustflag("{flag}");\n        match ')
+    flags = {
+        "v3": ["-Ctarget-cpu=x86-64-v3"],
+        "protected": ["-Zdefault-visibility=protected"],
+        "inline": ["-Cllvm-args=-inline-threshold=525"],
+        "import": ["-Cllvm-args=-inline-threshold=750", "-Cllvm-args=-import-instr-limit=300",
+                   "-Cllvm-args=-hot-callsite-threshold=6000"],
+    }[mode]
+    call = "".join(f'        cargo.rustflag("{flag}");\n' for flag in flags)
+    new = old.replace("        match ", call + "        match ")
 path.write_text(src.replace(old, new))
 PY
     git diff -- "$bootstrap" >> "$kit/bootstrap.patch"
