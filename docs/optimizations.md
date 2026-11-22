@@ -1,6 +1,6 @@
 # Optimizations
 
-Ohm 1.100.0-5 builds on Rust 1.100.0 and LLVM 23.1.5. It speeds up development with changes to
+Ohm 1.100.0-6 builds on Rust 1.100.0 and LLVM 23.1.5. It speeds up development with changes to
 Cargo, rustc, LLVM, Clippy, and rustfmt.
 
 ## Cargo and builds
@@ -50,6 +50,23 @@ public API stays the same. Cargo checks which Rust libraries a script’s search
 before it skips a dependent build or reuses a previous link.
 [Generated libraries](https://github.com/astral-experiments/ohm-cargo/pull/609) ·
 [Library paths](https://github.com/astral-experiments/ohm-cargo/pull/607)
+
+Adding a private method to ripgrep’s `ignore` library can move every public declaration below it.
+Rustc still writes the new locations to the library’s metadata. If the library feeds only binary
+checks, Cargo can use a hash that ignores moves of ordinary declarations, built-in derives and
+tuple constructors within a file. A warning in a binary might point back to an old line, so Cargo
+requires a readable record of a successful check without diagnostics before reusing that result.
+[Binary checks](https://github.com/astral-experiments/ohm-cargo/pull/577) ·
+[Locations](https://github.com/astral-experiments/ohm-rust/pull/482) ·
+[Derives](https://github.com/astral-experiments/ohm-rust/pull/509) ·
+[Constructors](https://github.com/astral-experiments/ohm-rust/pull/526)
+
+The schema generator in `codex-core` does not use the library Cargo makes available to it. If
+every consumer is a binary in the same package and rustc reported that none used the library,
+Cargo can ask rustc to hash the whole library once. A new consumer can still read the metadata,
+but changing a private item may invalidate more of that consumer’s work.
+[Unused dependencies](https://github.com/astral-experiments/ohm-cargo/pull/575) ·
+[Library metadata](https://github.com/astral-experiments/ohm-rust/pull/468)
 
 Ohm can leave private implementation details out of the interface hash while retaining the trait
 headers and source locations that downstream crates need. This also applies when a crate exports a
@@ -929,6 +946,15 @@ that inspect the whole struct depend on all the fields.
 [Source files](https://github.com/astral-experiments/ohm-rust/pull/503) ·
 [Field lookups](https://github.com/astral-experiments/ohm-rust/pull/519)
 
+Rustc can lower a large table of string literals, such as ripgrep’s file type globs, to one
+constant operand. That avoids creating and borrow-checking a temporary for each nested array. For
+an ordinary borrow, the compiler can focus conflict checks on the live loans for that local
+variable. When a dependency adds an unrelated integer operator implementation, the compiler can
+keep the checks that still select the same implementation.
+[Literal tables](https://github.com/astral-experiments/ohm-rust/pull/528) ·
+[Borrow checking](https://github.com/astral-experiments/ohm-rust/pull/560) ·
+[Integer operations](https://github.com/astral-experiments/ohm-rust/pull/566)
+
 Adding an implementation of one trait to a dependency can invalidate cached lookups for other
 traits. For a lookup of `Display`, rustc records a fingerprint of the crates that supply
 implementations of `Display`. Adding a supplier changes the fingerprint. Changing a crate that only
@@ -1004,6 +1030,17 @@ empty. [Symbol uses](https://github.com/astral-experiments/ohm-rust/pull/435) ·
 reuse](https://github.com/astral-experiments/ohm-rust/pull/441) · [Edge
 encoding](https://github.com/astral-experiments/ohm-rust/pull/440)
 
+Editing a module used to leave several copies of its parsed source in the incremental query cache.
+Ohm stores that syntax separately, replaces small batches of saved results and keeps a bitmap of
+the indices it reuses. When it compacts the cache, it also preserves the information that decides
+which generic functions to compile together. This can make the compacted cache larger. In one
+Codex example it grew from 132 to 190 MB.
+[Retained results](https://github.com/astral-experiments/ohm-rust/pull/516) ·
+[Indices](https://github.com/astral-experiments/ohm-rust/pull/518) ·
+[Parsed modules](https://github.com/astral-experiments/ohm-rust/pull/527) ·
+[Spans](https://github.com/astral-experiments/ohm-rust/pull/540) ·
+[Code generation](https://github.com/astral-experiments/ohm-rust/pull/461)
+
 A new call to a generic function can force rustc to search every dependency for a compiled instance
 that it can reuse. Ohm stores pages of that table in the incremental cache so nearby lookups can
 share a page. This can increase disk usage. On a Codex TUI build, filling the cache used an extra
@@ -1019,6 +1056,16 @@ callers changes. In optimized builds, placing instances in their defining module
 copies of helper functions across codegen units. [Single-user
 instances](https://github.com/astral-experiments/ohm-rust/pull/448) · [Optimized
 builds](https://github.com/astral-experiments/ohm-rust/pull/455)
+
+An edit to an async Codex function moved the source lines in its cleanup code. LLVM regenerated a
+20.81 MB object to change 122 bytes in the debug line table. In unoptimized incremental builds,
+Ohm groups that cleanup code with the module that defines the future. It also keeps related
+instances together when splitting a large codegen unit and gives upstream specializations in
+binaries a stable home when the set of callers changes.
+[Coroutine cleanup](https://github.com/astral-experiments/ohm-rust/pull/458) ·
+[Local instances](https://github.com/astral-experiments/ohm-rust/pull/466) ·
+[Large units](https://github.com/astral-experiments/ohm-rust/pull/479) ·
+[Binaries](https://github.com/astral-experiments/ohm-rust/pull/488)
 
 Starting in 1.99.0-24, rustc tracks which crate provides each group of generic instantiations.
 For example, moving the provider of `width::<u16>` can rebuild its callers while reusing compiled
@@ -1390,6 +1437,15 @@ See:
 ### 25. Reuse compiler work generated by derive macros
 
 **Status:** New optimization.
+
+A debug build can run a macro from `ruff_macros` on every edit. On x86-64 Linux, Ohm optimizes
+eligible registry helpers that import `proc_macro` at LLVM level 1 and asks LLVM to keep their
+functions small. When Ruff’s own macros use `syn` 3, a second version used only by registry macros
+keeps its ordinary profile. The first build does more work so later expansions can run faster. The
+helper retains its original overflow checks and debug assertions.
+[Host code generation](https://github.com/astral-experiments/ohm-rust/pull/556) ·
+[Function size](https://github.com/astral-experiments/ohm-rust/pull/571) ·
+[Version selection](https://github.com/astral-experiments/ohm-cargo/pull/610)
 
 Ohm can reuse type and borrow checking for methods generated by a derive when the derive moves but
 its inputs remain unchanged. It identifies source-written expansions relative to nearby
