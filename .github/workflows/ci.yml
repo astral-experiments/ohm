@@ -14,9 +14,14 @@ on:
         type: choice
         options: [train, build-kit, pilot, marginal, confirm, profile, audit, audit-control]
       patch:
-        description: Optional gzipped, base64-encoded compiler diff for an ephemeral benchmark
+        description: Optional base64-encoded compiler diff compressed with gzip or xz
         type: string
         required: false
+      driver:
+        description: Optional stage-two driver build experiment, never passed to the measured crates
+        type: choice
+        options: [standard, fat, v3, protected]
+        default: standard
       kits:
         description: Workflow run with compiler kits, or empty for shipped -6 on both sides
         type: string
@@ -96,6 +101,7 @@ jobs:
         working-directory: rust
         env:
           EXPERIMENT_PATCH: ${{ inputs.patch }}
+          DRIVER_MODE: ${{ inputs.driver }}
           OPTIMIZED: 1
           STAGE_TWO: ${{ inputs.stage2 }}
           PROFILED: ${{ inputs.mode == 'train' && 'train' || inputs.profdata }}

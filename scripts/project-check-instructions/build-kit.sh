@@ -14,7 +14,11 @@ if [[ -n "${COMPILER_REF:-}" && "$COMPILER_REF" != "$base" ]]; then
   fi
 fi
 if [[ -n "${EXPERIMENT_PATCH:-}" ]]; then
-  printf '%s' "$EXPERIMENT_PATCH" | base64 -d | gzip -dc > "$RUNNER_TEMP/experiment.patch"
+  if [[ "$EXPERIMENT_PATCH" == xz:* ]]; then
+    printf '%s' "${EXPERIMENT_PATCH#xz:}" | base64 -d | xz -dc > "$RUNNER_TEMP/experiment.patch"
+  else
+    printf '%s' "$EXPERIMENT_PATCH" | base64 -d | gzip -dc > "$RUNNER_TEMP/experiment.patch"
+  fi
   sha256sum "$RUNNER_TEMP/experiment.patch"
   git apply --include='compiler/*' "$RUNNER_TEMP/experiment.patch"
 fi
@@ -106,6 +110,29 @@ if [[ "${STAGE_TWO:-}" == true ]]; then
   sha256sum "$stage/bin/rustc" "$stage/lib"/librustc_driver-*.so | tee "$kit/stage1.sha256"
   if [[ -s "$kit/compiler.patch" ]]; then
     git apply "$kit/compiler.patch"
+  fi
+  # These optional screenings affect the bootstrap invocation for the driver
+  # only. Always record the exact change, separately from the compiler sources.
+  if [[ ${DRIVER_MODE:-standard} != standard ]]; then
+    bootstrap=src/bootstrap/src/core/build_steps/compile.rs
+    python3 - "$bootstrap" <<'PY'
+import os, sys
+from pathlib import Path
+path = Path(sys.argv[1])
+src = path.read_text()
+old = "    if is_lto_stage(build_compiler) {\n        match builder.config.rust_lto {"
+assert src.count(old) == 1
+mode = os.environ["DRIVER_MODE"]
+if mode == "fat":
+    old = "let lto_type = match builder.config.rust_lto {"
+    assert src.count(old) == 1
+    new = "let lto_type = match RustcLto::Fat {"
+else:
+    flag = {"v3": "-Ctarget-cpu=x86-64-v3", "protected": "-Zdefault-visibility=protected"}[mode]
+    new = old.replace("        match ", f'        cargo.rustflag("{flag}");\n        match ')
+path.write_text(src.replace(old, new))
+PY
+    git diff -- "$bootstrap" >> "$kit/bootstrap.patch"
   fi
   env -u GITHUB_ACTIONS python3 x.py --ci false build --keep-stage 0 --enable-bolt-settings --stage 2 library
   stage="build/$host/stage2"
