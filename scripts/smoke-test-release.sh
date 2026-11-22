@@ -311,9 +311,12 @@ env -u RUST_SRC_PATH RUSTUP_TOOLCHAIN="$OHM_TOOLCHAIN" \
 
 if jq -e '.release | ((.upstream_rust_version | split(".") | map(tonumber)) + [.ohm_revision]) >= [1, 99, 0, 23]' \
     "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN.json" >/dev/null; then
-  cat > "$smoke_crate/src/lib.rs" <<'EOF'
+  doc_crate="$smoke_root/docs"
+  mkdir -p "$doc_crate/src"
+  printf '[package]\nname = "ohm-docs"\nversion = "0.0.0"\nedition = "2024"\n' > "$doc_crate/Cargo.toml"
+  cat > "$doc_crate/src/lib.rs" <<'EOF'
 /// ```
-/// assert_eq!(ohm_smoke::answer(), 42);
+/// assert_eq!(ohm_docs::answer(), 42);
 /// ```
 pub fn answer() -> u32 {
     42
@@ -321,7 +324,7 @@ pub fn answer() -> u32 {
 EOF
   for pass in cold warm; do
     log="$smoke_root/doctests-$pass.log"
-    cargo +"$OHM_TOOLCHAIN" test --doc --offline --manifest-path "$smoke_crate/Cargo.toml" -v \
+    cargo +"$OHM_TOOLCHAIN" test --doc --offline --manifest-path "$doc_crate/Cargo.toml" -v \
       2>&1 | tee "$log"
     grep -F 'test result: ok. 1 passed' "$log" >/dev/null
   done
@@ -331,8 +334,26 @@ EOF
     exit 1
   fi
   cargo +"$OHM_TOOLCHAIN" -Zohm-cached-doctests=no test --doc --offline \
-    --manifest-path "$smoke_crate/Cargo.toml" -v 2>&1 | tee "$smoke_root/doctests-disabled.log"
+    --manifest-path "$doc_crate/Cargo.toml" -v 2>&1 | tee "$smoke_root/doctests-disabled.log"
   grep -F -- '--test-run-directory' "$smoke_root/doctests-disabled.log" >/dev/null
+
+  # A local procedural macro can read files that the cached harness does not track.
+  if jq -e '.release | ((.upstream_rust_version | split(".") | map(tonumber)) + [.ohm_revision]) >= [1, 100, 0, 7]' \
+      "$RELEASE_DIRECTORY/$OHM_TOOLCHAIN.json" >/dev/null; then
+    cat > "$smoke_crate/src/lib.rs" <<'EOF'
+//! ```
+//! ohm_smoke_macros::make_answer!();
+//! assert_eq!(answer(), 42);
+//! ```
+EOF
+    for pass in cold warm; do
+      log="$smoke_root/doctests-macros-$pass.log"
+      cargo +"$OHM_TOOLCHAIN" test --doc --offline --manifest-path "$smoke_crate/Cargo.toml" -v \
+        2>&1 | tee "$log"
+      grep -F -- '--test-run-directory' "$log" >/dev/null
+      grep -F 'test result: ok. 1 passed' "$log" >/dev/null
+    done
+  fi
 fi
 
 # Exercise cache admission with the installed compiler, without a wrapper.
