@@ -290,8 +290,12 @@ def clippy_fix(t, name):
     def order(**kw):
         msgs = t.diagnostics("clippy --lib",**kw)
         require(not msgs[0], msgs)
-        return [m["code"]["code"] for m in msgs[1] if m["code"] and m["code"]["code"].startswith("clippy::")]
-    actual_order = order()
+        lints = [m for m in msgs[1] if m["code"] and m["code"]["code"].startswith("clippy::")]
+        edits = [(m["code"]["code"], span["byte_start"], span["byte_end"], span["suggested_replacement"])
+                 for m in lints for suggestion in [m, *m["children"]]
+                 for span in suggestion["spans"] if span.get("suggestion_applicability") == "MachineApplicable"]
+        return [m["code"]["code"] for m in lints], edits
+    actual_order, edits = order()
     t.cargo("clippy --lib")
     warm = t.cargo("clippy --lib --fix --allow-no-vcs",check=False)
     fixed = (t.dir/"src/lib.rs").read_text()
@@ -305,16 +309,19 @@ def clippy_fix(t, name):
     # Nonincremental Clippy always uses its whole-crate traversal.
     t.write("src/lib.rs",source)
     clean = dict(env={"CARGO_INCREMENTAL":"0"},target="fresh")
-    expected_order = order(**clean)
+    expected_order, clean_edits = order(**clean)
     t.cargo("clippy --lib --fix --allow-no-vcs",**clean)
     expected = (t.dir/"src/lib.rs").read_text()
     require(expected != source and len(expected_order) >= 2, (expected,expected_order))
     t.cargo("test --test cases",**clean)
     require("1 passed" in t.log,t.log)
     require(sorted(actual_order)==sorted(expected_order),(actual_order,expected_order))
-    t.notes.update(fixed=fixed,order=actual_order,values_ok=not values.returncode)
-    t.known_bug = fixed!=expected or actual_order!=expected_order or bool(warm.returncode or values.returncode)
-    return dict(source=expected, order=expected_order)
+    t.notes.update(fixed=fixed,order=actual_order,clean_order=expected_order,edits=edits,values_ok=not values.returncode)
+    t.known_bug = fixed!=expected or actual_order!=expected_order or edits!=clean_edits or bool(warm.returncode or values.returncode)
+    # #95 moves the MaybeIncorrect matches! suggestion relative to a machine-applicable
+    # suggestion. Compare every automatic edit in order across SDKs and all suggestions
+    # in order between warm and clean checks of the same SDK.
+    return dict(source=expected, lints=sorted(expected_order) if name=="clippy95" else expected_order, edits=clean_edits)
 
 
 for name in FIXES:
