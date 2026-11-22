@@ -3,9 +3,11 @@ set -euo pipefail
 
 role=$1
 postlink=false
+tools=()
 case "${DRIVER_MODE:-standard}" in
   post) postlink=true; DRIVER_MODE=standard ;;
   post-native) postlink=true; DRIVER_MODE=native ;;
+  post-tools) postlink=true; DRIVER_MODE=native; tools=(src/tools/clippy src/tools/rustdoc) ;;
 esac
 base=9f23753819582f3366fdfb3c32902ef1ec0a827f
 host=x86_64-unknown-linux-gnu
@@ -160,7 +162,7 @@ path.write_text(src.replace(old, new))
 PY
     git diff -- "$bootstrap" >> "$kit/bootstrap.patch"
   fi
-  env -u GITHUB_ACTIONS python3 x.py --ci false build --keep-stage 0 --enable-bolt-settings --stage 2 library
+  env -u GITHUB_ACTIONS python3 x.py --ci false build --keep-stage 0 --enable-bolt-settings --stage 2 library "${tools[@]}"
   stage="build/$host/stage2"
   readelf --relocs --wide "$stage/lib"/librustc_driver-*.so | awk '
     /^Relocation section/ { count = ($3 ~ /\.rela\.(dyn|plt)/) }
@@ -201,6 +203,21 @@ if [[ "${PROFILED:-}" == train || "$postlink" == true ]]; then
   )
   if [[ "$postlink" == true ]]; then
     bolt_optimize
+    if (( ${#tools[@]} )); then
+      export LD_LIBRARY_PATH="$PWD/$stage/lib"
+      printf '/// Adds one.\npub fn plus_one(x: usize) -> usize { return x + 1; }\n' > "$RUNNER_TEMP/demo.rs"
+      for name in clippy-driver rustdoc; do
+        ldd "$stage/bin/$name" | grep librustc_driver
+        "$stage/bin/$name" -V
+      done
+      "$stage/bin/rustdoc" --sysroot "$stage" "$RUNNER_TEMP/demo.rs" -o "$RUNNER_TEMP/docs"
+      grep -q 'Adds one' "$RUNNER_TEMP/docs/demo/fn.plus_one.html"
+      "$stage/bin/clippy-driver" --sysroot "$stage" --crate-type lib --emit=metadata \
+        -Wclippy::needless_return "$RUNNER_TEMP/demo.rs" -o "$RUNNER_TEMP/demo.rmeta" 2>&1 | tee "$RUNNER_TEMP/clippy.log"
+      grep -q 'unneeded.*return\|needless_return' "$RUNNER_TEMP/clippy.log"
+      unset LD_LIBRARY_PATH
+      echo 'Clippy and rustdoc smoke tests passed after BOLT'
+    fi
   else
     profdata="$(find build -name llvm-profdata -type f | head -1)"
     "$profdata" merge -o "$RUNNER_TEMP/packages/rustc.profdata" "$RUNNER_TEMP/profiles"
