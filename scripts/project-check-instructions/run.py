@@ -306,14 +306,18 @@ def main():
     summary["order"] = roles
     for role in roles:
         summary[role] = run(args, commits, role)
-        assert summary[role]["total"] > 0
+        # A completed native build can satisfy an unedited check in full.
+        assert summary[role]["total"] > 0 or args.window == "to-check"
     if args.audit:
         save(args.output / "audit-summary.json", summary)
         return
     if args.probe:
         save(args.output / "probe-summary.json", summary)
         return
-    summary["reduction_pct"] = 100 * (1 - summary["candidate"]["total"] / summary["control"]["total"])
+    summary["reduction_pct"] = (
+        100 * (1 - summary["candidate"]["total"] / summary["control"]["total"])
+        if summary["control"]["total"] else None
+    )
     print(summary["reduction_pct"], flush=True)
     save(args.output / "summary.json", summary)
 
