@@ -12,6 +12,10 @@ on:
         required: true
         default: false
         type: boolean
+      retry_run:
+        description: Retry both smoke tests using the distributions from a failed main release run
+        type: string
+        default: ""
       require_replay:
         description: Require a successful replay status for the Linux archive before tagging
         default: false
@@ -28,8 +32,10 @@ jobs:
     environment: release
     runs-on: ubuntu-24.04
     permissions:
+      actions: read
       contents: read
     outputs:
+      coordinator: ${{ steps.retry.outputs.revision || github.sha }}
       llvm-revision: ${{ steps.llvm.outputs.revision }}
       rust-revision: ${{ steps.manifest.outputs.rust-revision }}
       cargo-revision: ${{ steps.manifest.outputs.cargo-revision }}
@@ -41,6 +47,7 @@ jobs:
       - name: Check out release coordinator
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: ${{ inputs.retry_run == '' && 1 || 0 }}
           persist-credentials: false
 
       - name: Require protected main branch
@@ -136,6 +143,31 @@ jobs:
             source/clippy \
             source/rustfmt
 
+      - name: Verify the previous protected build
+        if: inputs.retry_run != ''
+        id: retry
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RETRY_RUN: ${{ inputs.retry_run }}
+          REQUIRE_REPLAY: ${{ inputs.require_replay }}
+        run: |
+          [[ "$REQUIRE_REPLAY" == true && "$RETRY_RUN" =~ ^[1-9][0-9]*$ ]]
+          run="repos/$GITHUB_REPOSITORY/actions/runs/$RETRY_RUN"
+          revision="$(gh api "$run" | jq -er --arg repo "$GITHUB_REPOSITORY" '
+            select(.head_repository.full_name == $repo and .head_branch == "main" and
+                   .path == ".github/workflows/release.yml" and .event == "workflow_dispatch" and
+                   .status == "completed" and .conclusion == "failure") | .head_sha')"
+          [[ "$revision" =~ ^[a-f0-9]{40}$ ]]
+          git merge-base --is-ancestor "$revision" HEAD
+          git diff --exit-code "$revision" HEAD -- . \
+            ':(exclude).github/workflows/release.yml' \
+            ':(exclude)scripts/restore-release.py' \
+            ':(exclude)scripts/smoke-test-release.sh'
+          gh api "$run/jobs?per_page=100" | jq -e '
+            [.jobs[] | select(.name | startswith("build ("))] |
+            length == 2 and all(.[]; .conclusion == "success")'
+          echo "revision=$revision" >> "$GITHUB_OUTPUT"
+
       - name: Read the compiler's LLVM gitlink
         id: llvm
         run: |
@@ -157,6 +189,7 @@ jobs:
             runner: ${{ vars.OHM_RELEASE_LINUX_RUNNER || 'namespace-profile-ubuntu-24-04-16' }}
     runs-on: ${{ matrix.runner }}
     permissions:
+      actions: read
       contents: read
     env:
       OHM_TARGET: ${{ matrix.target }}
@@ -310,6 +343,7 @@ jobs:
 
       - name: Build optimized extended Rust distribution
         id: distribution
+        if: inputs.retry_run == ''
         env:
           OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
         run: |
@@ -343,7 +377,20 @@ jobs:
               --one-line-on-crash 'image list' \
               -- "$rustc" -vV
 
+      - name: Restore verified distribution assets
+        if: inputs.retry_run != ''
+        id: restore
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RETRY_RUN: ${{ inputs.retry_run }}
+          RETRY_REVISION: ${{ needs.plan.outputs.coordinator }}
+          LLVM_REVISION: ${{ needs.plan.outputs.llvm-revision }}
+          MANIFEST_PATH: ${{ needs.plan.outputs.manifest }}
+          OHM_TOOLCHAIN: ${{ needs.plan.outputs.toolchain }}
+        run: python3 scripts/restore-release.py
+
       - name: Stage versioned distribution assets
+        if: inputs.retry_run == ''
         id: assets
         env:
           CARGO_REVISION: ${{ needs.plan.outputs.cargo-revision }}
@@ -359,10 +406,10 @@ jobs:
         with:
           name: ${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}
           path: |
-            ${{ steps.assets.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}.tar.gz
-            ${{ steps.assets.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}.tar.gz.sha256
-            ${{ steps.assets.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}-provenance.json
-            ${{ steps.assets.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}-provenance.json.sha256
+            ${{ steps.assets.outputs.directory || steps.restore.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}.tar.gz
+            ${{ steps.assets.outputs.directory || steps.restore.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}.tar.gz.sha256
+            ${{ steps.assets.outputs.directory || steps.restore.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}-provenance.json
+            ${{ steps.assets.outputs.directory || steps.restore.outputs.directory }}/${{ needs.plan.outputs.toolchain }}-${{ matrix.target }}-provenance.json.sha256
           if-no-files-found: error
           retention-days: 7
 
@@ -480,17 +527,21 @@ jobs:
 
       - name: Check targeted replays for the Linux archive
         if: inputs.require_replay
+        env:
+          COORDINATOR: ${{ needs.plan.outputs.coordinator }}
         shell: bash
         working-directory: release
         run: |
           archive="$OHM_TOOLCHAIN-x86_64-unknown-linux-gnu.tar.gz"
           checksum="$(sha256sum "$archive")"
           context="ohm/replay/${checksum%% *}"
-          if ! gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/status" |
-            jq -e --arg context "$context" 'any(.[].statuses[]; .context == $context and .state == "success")'; then
-            echo "::error::Expected a successful $context status on $GITHUB_SHA before publishing"
-            exit 1
-          fi
+          for revision in $(printf '%s\n' "$COORDINATOR" "$GITHUB_SHA" | sort -u); do
+            if ! gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/commits/$revision/status" |
+              jq -e --arg context "$context" 'any(.[].statuses[]; .context == $context and .state == "success")'; then
+              echo "::error::Expected a successful $context status on $revision before publishing"
+              exit 1
+            fi
+          done
 
       - name: Create source repository tagging token
         id: source-token
@@ -554,7 +605,7 @@ jobs:
       - name: Publish GitHub Release
         working-directory: release
         env:
-          RELEASE_COMMIT: ${{ github.sha }}
+          RELEASE_COMMIT: ${{ needs.plan.outputs.coordinator }}
           RELEASE_REF: ${{ github.ref }}
         run: |
           if [[ "$RELEASE_REF" != "refs/heads/main" ]]; then
