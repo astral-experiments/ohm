@@ -81,6 +81,63 @@ def disk_versions(report):
     return rust, f"{rust}-{revision}"
 
 
+def validate_workflow(workflow):
+    """Check each comparison against its two complete sets of retained timings."""
+    if (
+        workflow["valid_samples"] != workflow["planned_samples"]
+        or workflow["unmeasured_cells"]
+    ):
+        raise ValueError("Workflow measurements are incomplete")
+    if len(workflow["samples"]) != workflow["valid_samples"]:
+        raise ValueError("Workflow sample count differs")
+
+    groups = {}
+    for sample in workflow["samples"]:
+        key = (
+            sample["project"],
+            sample["workflow"],
+            sample["phase"],
+            sample["toolchain"],
+        )
+        seconds = sample["wall_seconds"]
+        if (
+            sample["valid"] is not True
+            or sample["returncode"] != 0
+            or sample["external_compilation"]
+            or not math.isfinite(seconds)
+            or seconds <= 0
+        ):
+            raise ValueError(f"Invalid workflow sample for {key}")
+        times = groups.setdefault(key, {})
+        repetition = sample["repetition"]
+        if repetition in times:
+            raise ValueError(f"Repeated workflow sample {repetition} for {key}")
+        times[repetition] = seconds
+
+    for row in workflow["comparisons"]:
+        cell = (row["project"], row["workflow"], row["phase"])
+        count = workflow["repetitions"].get(row["phase"])
+        if row["workflow"] in workflow["methodology"]["single_sample_cases"]:
+            count = 1
+        if not count or count != row["samples"]:
+            raise ValueError(f"Workflow repetition count differs for {cell}")
+        for lane in ("stock", "ohm"):
+            key = (*cell, lane)
+            times = groups.pop(key, {})
+            if len(times) != count or times.keys() != set(range(count)):
+                raise ValueError(f"Missing workflow repetitions for {key}")
+            median = statistics.median(times.values())
+            if not math.isfinite(median) or not math.isclose(
+                median, row[f"{lane}_seconds"]
+            ):
+                raise ValueError(f"Workflow median differs for {key}")
+        speedup = row["stock_seconds"] / row["ohm_seconds"]
+        if not math.isfinite(speedup) or not math.isclose(speedup, row["speedup"]):
+            raise ValueError(f"Invalid workflow speedup for {cell}")
+    if groups:
+        raise ValueError(f"Missing workflow comparison for {next(iter(groups))}")
+
+
 def validate(reports):
     release = reports["sessions"]["ohm_release"]
     if not re.fullmatch(r"ohm-\d+\.\d+\.\d+-[1-9]\d*", release):
@@ -114,20 +171,7 @@ def validate(reports):
                             raise ValueError(f"{kind}: invalid command duration")
                         if not math.isclose(sum(values), total):
                             raise ValueError(f"{kind}: inconsistent command total")
-    workflow = reports["workflow"]
-    if (
-        workflow["valid_samples"] != workflow["planned_samples"]
-        or workflow["unmeasured_cells"]
-    ):
-        raise ValueError("Workflow measurements are incomplete")
-    if len(workflow["samples"]) != workflow["valid_samples"]:
-        raise ValueError("Workflow sample count differs")
-    for row in workflow["comparisons"]:
-        stock, ohm = row["stock_seconds"], row["ohm_seconds"]
-        if not all(
-            math.isfinite(v) and v > 0 for v in (stock, ohm)
-        ) or not math.isclose(stock / ohm, row["speedup"]):
-            raise ValueError("Invalid workflow comparison")
+    validate_workflow(reports["workflow"])
     disk = reports["disk"]
     disk_rust, disk_version = disk_versions(disk)
     if disk["validation"]["status"] != "pass" or set(disk["toolchains"]) != {
