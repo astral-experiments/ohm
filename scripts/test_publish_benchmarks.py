@@ -147,6 +147,21 @@ class PublicationTests(unittest.TestCase):
                         self.reports, study, self.ty_scenario, self.ruff_doctests
                     )
 
+    def test_worktree_startup_includes_first_validation(self):
+        ohm = self.ty_worktree["worktree_copy_on_write"]["ohm-trusted"]
+        ohm["total"] = ohm["creation"]
+        with self.assertRaisesRegex(ValueError, "invalid startup duration"):
+            publish.render_tables(
+                self.reports, self.ty_worktree, self.ty_scenario, self.ruff_doctests
+            )
+
+    def test_worktree_startup_requires_all_repetitions(self):
+        self.ty_worktree["methodology"]["worktree_repetitions_per_filesystem"] += 1
+        with self.assertRaisesRegex(ValueError, "startup sample counts"):
+            publish.render_tables(
+                self.reports, self.ty_worktree, self.ty_scenario, self.ruff_doctests
+            )
+
     def test_rejects_mismatched_or_incomplete_measurements(self):
         changes = [
             lambda r: r["workflow"].update(ohm_release="ohm-0.0.0-1"),
