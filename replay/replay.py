@@ -69,7 +69,8 @@ def git(*args):
 
 def count(name, command, directory, allowed=(0,)):
     receipt = directory / (name + ".tsv")
-    p = subprocess.run([meter, rustc, receipt, *command],
+    timecmd = ["/usr/bin/time","-f","%M","-o",receipt.with_suffix(".rss")] if Path("/usr/bin/time").exists() else []
+    p = subprocess.run([*timecmd, meter, rustc, receipt, *command],
                        cwd=src, capture_output=True, env=env)
     if p.returncode not in allowed:
         print(p.stdout[-800:].decode(errors="replace"), p.stderr[-2800:].decode(errors="replace"), flush=True)
@@ -150,7 +151,7 @@ def replay(role):
         assert fresh and warm
         changed=sorted(k for k in fresh if warm.get(k)!=fresh[k])
         print("final workspace metadata differs at",changed,flush=True)
-        history.save(folder/"metadata.json",dict(warm=warm,fresh=fresh,changed=changed))
+        history.save(folder/"metadata.json",dict(warm=warm,fresh=fresh,changed=changed,clean_workspace=True))
         assert warnings(p)==rows[-1]["warnings"]
     sdk.rename(root / role)
     return rows

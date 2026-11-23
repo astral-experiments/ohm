@@ -455,6 +455,12 @@ fn truth() {
     fix=t.cargo("fixit --clippy --Zdangerous-parallel-fixes --allow-no-vcs --all-targets",check=False)
     fixed=(t.dir/"tests/check.rs").read_text()
     (t.logs/"fixed.rs").write_text(fixed)
+    if fix.returncode and expr=="!(Some(a | b).unwrap())":
+        require("reverting" in t.log and fixed==src and "delimiter" in t.log,t.log)
+        t.known_bug=True
+        t.notes["reverted"]=True
+        t.cargo("test --test check")
+        return oracle
     require(fixed!=src and ".unwrap()" not in fixed, (fixed,t.log))
     t.notes["expression"]=fixed.splitlines()[3].strip()
     p=t.cargo("test --test check",check=False)
@@ -476,6 +482,162 @@ def binary(t):
 @case("clippy_parens")
 def parens(t):
     return clippy(t,"!(Some(a | b).unwrap())","!(a | b)")
+
+@case("rustc616")
+def unsized(t):
+    t.write("dep.rs","pub fn repeated(_a: str, _b: str) {}")
+    p=rust(t,"dep.rs","--crate-type=lib","--emit=metadata","--error-format=json",check=False)
+    require(p.returncode and "E0277" in t.log,t.log)
+    suggestions=sorted({s["column_start"] for d in decoded(p.stderr) for c in d.get("children",[])
+                        for s in c.get("spans",[]) if s.get("suggested_replacement")=="&"})
+    t.notes["columns"]=suggestions
+    require(suggestions in ([21],[21,30]),t.log)
+    t.known_bug=len(suggestions)!=2
+    return "both borrowed"
+
+@case("rustc_paths")
+def paths(t):
+    src='include!(concat!(env!("CARGO_MANIFEST_DIR"), "/src/included.rs"));'
+    t.package("app",src,"[dependencies]\nhelper.path='helper'",binary=True)
+    t.package("helper",r'''extern crate proc_macro;
+        #[proc_macro]
+        pub fn path(name:proc_macro::TokenStream) -> proc_macro::TokenStream {
+            format!("{:?}", name.into_iter().next().unwrap().span().file()).parse().unwrap()
+        }''',"[lib]\nproc-macro=true")
+    t.write("src/included.rs","""/// See [Missing].
+pub struct Test;
+fn main() {
+    println!("{}", helper::path!(a));
+    println!("{}", file!());
+}
+#[test]
+#[should_panic]
+fn does_not_panic() {}
+""")
+    path=str(t.dir/"src/included.rs")
+    a,b=t.cargo("run -q").stdout.strip().splitlines()
+    require(b==path,(a,b))
+    t.notes["macro_filename"]=a==b
+    p=t.cargo("test -q",check=False)
+    require(p.returncode and "test did not panic as expected" in t.log,t.log)
+    t.notes["libtest_filename"]=path+":9:4" in t.log
+    t.cargo("doc -q --no-deps")
+    require("unresolved link" in t.log,t.log)
+    t.notes["rustdoc_filename"]=path+":1:10" in t.log
+    t.known_bug=not all(t.notes.values())
+    return "original checkout paths"
+
+@case("rustc614")
+def rows(t):
+    src='''/// Repeated rows
+#[rustfmt::skip]
+pub const TABLE: &[(&[&str], &[&str])] = &[''' + '(&["key"], &["value"]), '*63 + '(&[], &["", LAST])];'
+    t.package("app",'fn main(){ println!("{}", dep::TABLE[63].1[1]); }', DEP, binary=True)
+    t.package("dep","")
+    for arg in ["alpha","omega","αβγ"]:
+        t.write("dep/src/lib.rs",src.replace("LAST",'"'+arg+'"'))
+        require(t.cargo("run -q").stdout.strip()==arg,t.log)
+    t.write("dep/src/lib.rs",src.replace("LAST","42u8"))
+    return invalid(t,"app","E0308","fresh")
+
+@case("cargo632")
+def hardlink(t):
+    t.package("app","#[test] fn example() {}", "[dev-dependencies]\nhelper.path='helper'")
+    t.package("helper","pub fn value() -> u32 { 42 }")
+    t.cargo("test --lib")
+    artifact, = (t.dir/"target").rglob("helper-*.d")
+    os.link(artifact,t.dir/"src/current.bin")
+    (t.dir/"src/old.bin").write_bytes(artifact.read_bytes())
+    t.write("helper/src/value.rs","pub fn value() -> u32 { 42 }")
+    t.write("helper/src/lib.rs","mod value; pub use value::value;")
+    t.write("src/lib.rs",'''#[test] fn example() {
+        assert!(include_bytes!("old.bin")[..] != include_bytes!("current.bin")[..], "stale depfile");
+    }''')
+    p=t.cargo("test --lib",check=False)
+    if p.returncode:
+        require("stale depfile" in t.log,t.log)
+        t.known_bug=True
+    t.cargo("test --lib",env={"CARGO_UNSTABLE_OHM_DEFER_DEV_DEPS":"false"})
+    return "depfile was rebuilt"
+
+def mir(t,wrapped):
+    env={}
+    t.package("app","#[test] fn example() {}", "[dev-dependencies]\nhelper.path='helper'")
+    t.package("helper","pub fn value()->u32{12345}")
+    if wrapped:
+        t.write("wrap",'''#!/bin/sh
+case " $* " in
+    *" --crate-name helper "*) exec "$@" --emit=mir=wrapped.mir ;;
+    *) exec "$@" ;;
+esac
+''')
+        wrapper=t.dir/"wrap"
+        wrapper.chmod(0o700)
+        env["RUSTC_WRAPPER"]=str(wrapper)
+    else:
+        t.write(".cargo/config.toml","[build]\nrustflags=['--emit=mir']\n")
+    t.cargo("test --lib",env=env)
+    path, = t.dir.rglob("wrapped.mir" if wrapped else "helper-*.mir")
+    require("12345" in path.read_text(),path)
+    t.write("helper/src/lib.rs","pub fn value()->u32{67890}")
+    t.write("src/lib.rs","#[test] fn example() { assert_eq!(1,1); }")
+    t.cargo("test --lib",env=env)
+    t.known_bug="67890" not in path.read_text()
+    t.cargo("test --lib",env=env|{"CARGO_UNSTABLE_OHM_DEFER_DEV_DEPS":"false"})
+    require("67890" in path.read_text(),path)
+    return "67890"
+
+case("cargo633")(lambda t: mir(t,False))
+case("cargo636")(lambda t: mir(t,True))
+
+@case("rustc631")
+def derive_helper(t):
+    t.write("derive.rs",'''extern crate proc_macro;
+use proc_macro::TokenStream;
+#[proc_macro_derive(Describe, attributes(helper))]
+pub fn describe(input: TokenStream) -> TokenStream {
+    let example = input.to_string().contains("example");
+    format!("impl crate::Marker for Rule {{}} pub const EXAMPLE: bool = {example};").parse().unwrap()
+}''')
+    rust(t,"derive.rs","--edition=2021","--crate-type=proc-macro")
+    lib=next(t.dir.glob("libderive.*"))
+    t.write("dep.rs",'''#![allow(dead_code)]
+#[macro_export] macro_rules! exported { () => {} }
+pub trait Marker {}
+pub mod items;
+''')
+    items="""#[derive(Debug)] struct Earlier;
+impl Earlier { fn method(&self) {} }
+/// An example.
+#[derive(derive::Describe)]
+#[helper(first)]
+struct Rule;
+"""
+    def check(src,cache="warm"):
+        t.write("items.rs",src)
+        rust(t,"dep.rs","--crate-type=rlib","--edition=2021","--extern=derive="+lib.name,
+             "-Zpublic-api-hash","-Zincremental-verify-ich","-Cincremental="+cache,"--emit=metadata")
+        return rust(t,"libdep.rmeta","-Zls=public_hash").stdout
+    before=check(items)
+    wider=items.replace("An example","An  example")
+    changed=check(wider)
+    t.notes["stable_helper_hash"]=before==changed
+    require(before==changed or not candidate(t),t.notes)
+    require(changed==check(wider,"fresh"),t.log)
+    require(changed!=check(wider.replace("#[helper","  #[helper")),t.log)
+    require(changed!=check(wider.replace("first","later")),t.log)
+    require(before!=check(items.replace("example","account")),t.log)
+    require(before==check(items),t.log)
+    return "changed attribute and expansion"
+
+@case("rustc636")
+def glob(t):
+    src="pub mod inner { pub const VALUE:u16 = 500; }"
+    deps(t,src,"pub use dep::inner::*;","fn main(){ let _: u16 = middle::VALUE; }")
+    t.cargo("check -v --bin app")
+    t.write("dep/src/lib.rs",src.replace("u16","u32"))
+    t.cargo("check -p dep")
+    return invalid(t,"app","E0308","fresh")
 
 def fingerprint(value):
     return hashlib.sha256(json.dumps(value,sort_keys=True).encode()).hexdigest()
