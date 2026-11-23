@@ -96,8 +96,15 @@ def competing_processes(owner: int | None = None) -> list[str]:
     ]
 
 
-def compiler_invocations(output: str) -> list[dict[str, str | None]]:
+def compiler_invocations(
+    output: str, environment: dict[str, str] | None = None
+) -> list[dict[str, str | None]]:
     """Extract real compiler executions from Cargo's verbose command stream."""
+    env = environment or {}
+    wrappers = {
+        env.get(key, env.get(f"CARGO_BUILD_{key}"))
+        for key in ("RUSTC_WRAPPER", "RUSTC_WORKSPACE_WRAPPER")
+    }
     invocations: list[dict[str, str | None]] = []
     for match in VERBOSE_COMMAND.finditer(output):
         try:
@@ -105,15 +112,27 @@ def compiler_invocations(output: str) -> list[dict[str, str | None]]:
         except ValueError as error:
             raise BenchmarkError("cannot parse a verbose Cargo command") from error
 
-        compiler = next(
-            (
-                Path(argument).name.removesuffix(".exe")
-                for argument in arguments
-                if Path(argument).name.removesuffix(".exe")
-                in ("rustc", "clippy-driver")
-            ),
-            None,
-        )
+        # With -vv, Cargo prints environment assignments before the executable.
+        program = ""
+        compiler = None
+        for word in arguments:
+            if not program and re.match(r"[^/=]+=", word):
+                continue
+            if word.startswith("-"):
+                break
+            # Cargo quotes arguments but prints the executable itself unquoted.
+            # Accept a path spanning several words only if it identifies a file.
+            program = f"{program} {word}" if program else word
+            name = Path(program).name.removesuffix(".exe")
+            if name in ("rustc", "clippy-driver") and (
+                program == word or os.path.isfile(program)
+            ):
+                compiler = name
+                break
+            if program in wrappers:
+                program = ""
+            elif os.path.isfile(program):
+                break
         if compiler is None:
             continue
 
@@ -1017,7 +1036,7 @@ class Replay:
             match.group("crate") for match in CARGO_STATUS.finditer(result.stdout)
         ]
         invocations = (
-            compiler_invocations(result.stdout)
+            compiler_invocations(result.stdout, environment)
             if self.options.compiler_accounting == "verbose"
             else None
         )

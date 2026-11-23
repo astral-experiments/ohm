@@ -2017,6 +2017,37 @@ class CommandResultTests(ReplayTestCase):
             ["skipped-dependency"],
         )
 
+    def test_compiler_accounting_ignores_env_and_program_arguments(self) -> None:
+        output = (
+            "     Running `RUSTC=/bin/rustc /target/build-script-build`\n"
+            "     Running `/target/tests rustc`\n"
+            "     Running `/target/app '/tool chain/clippy-driver' --crate-name fake`\n"
+            "     Running `RUSTC=/bin/rustc '/tool chain/clippy-driver' /bin/rustc --crate-name real`\n"
+        )
+        self.assertEqual(
+            replay.compiler_invocations(output),
+            [{"compiler": "clippy-driver", "crate": "real"}],
+        )
+
+    def test_compiler_accounting_handles_an_unquoted_executable_path(self) -> None:
+        compiler = self.directory / "tool chain" / "rustc"
+        compiler.parent.mkdir()
+        compiler.touch()
+        self.assertEqual(
+            replay.compiler_invocations(f"     Running `{compiler} --crate-name real`"),
+            [{"compiler": "rustc", "crate": "real"}],
+        )
+
+    def test_compiler_accounting_skips_configured_wrappers(self) -> None:
+        invocations = replay.compiler_invocations(
+            "     Running `/tool cache/cache '/tool chain/wrapper' /bin/rustc --crate-name real`",
+            {
+                "RUSTC_WRAPPER": "/tool cache/cache",
+                "CARGO_BUILD_RUSTC_WORKSPACE_WRAPPER": "/tool chain/wrapper",
+            },
+        )
+        self.assertEqual(invocations, [{"compiler": "rustc", "crate": "real"}])
+
     def test_compiler_accounting_distinguishes_repeated_package_statuses(self) -> None:
         invocations = replay.compiler_invocations(
             "     Running `/toolchain/bin/rustc.exe --crate-name shared_package`\n"
