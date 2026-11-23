@@ -10,11 +10,20 @@ import tempfile
 
 
 def dependencies(info):
-    return re.findall(r"\(NEEDED\).*?\[([^]]+)\]", info)
+    """Require library names so the loader can search for them after installation."""
+    names = []
+    for line in info.splitlines():
+        if "(NEEDED)" not in line:
+            continue
+        match = re.search(r"\[(.+)\]\s*$", line)
+        if not match or "/" in match[1]:
+            raise SystemExit(f"expected a library name in DT_NEEDED: {line.strip()}")
+        names.append(match[1])
+    return names
 
 
 def required_library(needed, prefix):
-    names = [name for name in needed if name.startswith(prefix) and "/" not in name]
+    names = [name for name in needed if name.startswith(prefix)]
     if len(names) != 1:
         raise SystemExit(f"expected one {prefix} dependency, found {names}")
     return names[0]
