@@ -520,17 +520,42 @@ case("cargo658")(lambda t:short(t,True))
 
 @case("cargo670")
 def artifact(t):
-    t.package("app","pub fn value()->u8{dep::value()}",DEP)
-    t.package("dep","pub fn value()->u8{19}\nfn unused(){}")
-    t.cargo("build -p dep --message-format=json")
-    cmd="check --workspace --message-format=json"
-    for i in [0,1]:
-        events=[e for e in decoded(t.cargo(cmd).stdout) if e.get("target",{}).get("name")=="dep"]
-        reasons=sorted(e["reason"] for e in events)
-        require(all(r in reasons for r in ("compiler-message","compiler-artifact")),t.log)
-        t.notes[str(i)]=reasons
-        if len(reasons)>2:t.known_bug=True
-    return ["compiler-artifact","compiler-message"]
+    t.package("app","pub fn value()->dep::Value{dep::value()}",DEP)
+    t.package("dep","pub struct Value; pub fn value()->Value{Value}\nfn unused(){}")
+    t.write("dep/src/main.rs","fn main(){dep::value();}")
+    t.write("reader.rs","pub fn read() -> dep::Value { app::value() }")
+    def events(p,name):
+        return [e for e in decoded(p.stdout) if e.get("target",{}).get("name")==name
+                and e["target"]["kind"]==["lib"]]
+    def metadata(items):
+        return [Path(f) for e in items if e["reason"]=="compiler-artifact"
+                for f in e["filenames"] if f.endswith(".rmeta")]
+    for profile in ("--release",""):
+        build=t.cargo(f"build -p dep --lib {profile} --message-format=json")
+        native,=metadata(events(build,"dep"))
+        rows=t.notes[profile or "debug"]=[]
+        for selection in ("--workspace --lib","--workspace","--workspace","-p app"):
+            p=t.cargo(f"check {selection} {profile} --message-format=json")
+            app,=metadata(events(p,"app"))
+            dep=events(p,"dep")
+            warnings=[e for e in dep if e["reason"]=="compiler-message"]
+            paths=metadata(dep)
+            require(paths and warnings and warnings[0]["message"]["code"]["code"]=="dead_code",t.log)
+            # A separate check can produce metadata incompatible with the native dep
+            # referenced by app. Compile using ONLY paths in Cargo's JSON receipt.
+            checks=[]
+            for path in paths:
+                consumer=rust(t,"reader.rs","--crate-type=lib","--edition=2024","--emit=metadata",
+                              "--extern","app="+str(app),"--extern","dep="+str(path),
+                              "-L","dependency="+str(path.parent),check=False)
+                errors=re.findall(r"error\[(E[0-9]+)\]",consumer.stderr)
+                if consumer.returncode:require("E0460" in errors or "E0308" in errors,t.log)
+                checks.append(dict(native=(path==native),status=consumer.returncode,codes=errors))
+            rows.append(dict(selection=selection,warnings=len(warnings),consumers=checks))
+            require(any(c["status"]==0 for c in checks),rows)
+            if paths!=[native] or len(dep)!=2 or len(warnings)!=1 or checks[0]["status"]:
+                t.known_bug=True
+    return "each consumer can read its one reported dependency"
 
 @case("cargo668")
 def debugger(t):
