@@ -34,6 +34,8 @@ smoke_root="$(mktemp -d "${RUNNER_TEMP:-${TMPDIR:-/tmp}}/ohm-smoke.XXXXXX")"
 trap 'rm -rf "$smoke_root"' EXIT
 
 toolchain_root="$smoke_root/toolchain"
+# Native probes run target/debug binaries and all build artifacts belong under smoke_root.
+unset CARGO_BUILD_TARGET CARGO_TARGET_DIR CARGO_BUILD_TARGET_DIR CARGO_BUILD_BUILD_DIR
 export CARGO_HOME="$smoke_root/cargo-home"
 export RUSTUP_HOME="$smoke_root/rustup-home"
 mkdir -p "$CARGO_HOME" "$RUSTUP_HOME"
