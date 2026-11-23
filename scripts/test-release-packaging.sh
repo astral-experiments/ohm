@@ -140,18 +140,29 @@ for asset in "$toolchain-aarch64-apple-darwin.tar.gz" "$toolchain.json" ohm-inst
   mv "$temporary_directory/original" "$valid/$asset"
 done
 
-# Check which directory the smoke test hands to the installer.
+# Check the release directory and Cargo settings passed to the smoke test subprocesses.
 candidate="$temporary_directory/candidate%20assets"
 cp -R "$valid" "$candidate"
 cat > "$candidate/ohm-installer.sh" <<'EOF'
+for key in CARGO_BUILD_TARGET CARGO_TARGET_DIR CARGO_BUILD_TARGET_DIR CARGO_BUILD_BUILD_DIR; do
+  if printenv "$key" >/dev/null; then
+    echo "smoke test inherited $key" >&2
+    exit 1
+  fi
+done
 printf '%s\n' "$OHM_DOWNLOAD_URL"
 exit 42
 EOF
 (cd "$candidate" && sha256sum ohm-installer.sh "$toolchain.json" > SHA256SUMS)
 status=0
-bash "$script_directory/smoke-test-release.sh" "$paths/assets/../candidate%20assets" "$toolchain" \
-  aarch64-apple-darwin aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa \
-  > "$temporary_directory/smoke.log" 2>&1 || status=$?
-[[ "$status" == 42 ]]
+CARGO_BUILD_TARGET=aarch64-apple-darwin CARGO_TARGET_DIR=target \
+  CARGO_BUILD_TARGET_DIR=artifacts CARGO_BUILD_BUILD_DIR=build \
+  bash "$script_directory/smoke-test-release.sh" "$paths/assets/../candidate%20assets" "$toolchain" \
+    aarch64-apple-darwin aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa \
+    > "$temporary_directory/smoke.log" 2>&1 || status=$?
+if [[ "$status" != 42 ]]; then
+  cat "$temporary_directory/smoke.log" >&2
+  exit 1
+fi
 grep -E '^file://.*/candidate%2520assets$' "$temporary_directory/smoke.log"
 echo 'release packaging tests passed'
