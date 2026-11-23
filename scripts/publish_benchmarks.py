@@ -237,6 +237,25 @@ def table(headers, rows):
     )
 
 
+def validate_worktree_times(group, lane, timing, repetitions):
+    """Check startup time before taking the median across repetitions."""
+    creation = timing["creation"]["samples"]
+    validation = timing["validation"]["samples"]
+    totals = timing["total"]["samples"]
+    if not repetitions or not (
+        len(creation) == len(validation) == len(totals) == repetitions
+    ):
+        raise ValueError(f"ty {group}/{lane}: inconsistent startup sample counts")
+    for create, test, total in zip(creation, validation, totals, strict=True):
+        if not (
+            create > 0
+            and test > 0
+            and math.isfinite(total)
+            and math.isclose(create + test, total)
+        ):
+            raise ValueError(f"ty {group}/{lane}: invalid startup duration")
+
+
 def render_tables(reports, ty_worktree, ty_scenario, ruff_doctests):
     release, rust = validate(reports)
     version = release.removeprefix("ohm-")
@@ -474,6 +493,9 @@ def render_tables(reports, ty_worktree, ty_scenario, ruff_doctests):
         ("worktree", "ext4"),
         ("worktree_copy_on_write", "Btrfs"),
     ):
+        repetitions = ty_worktree["methodology"]["worktree_repetitions_per_filesystem"]
+        for lane, timing in ty_worktree[group].items():
+            validate_worktree_times(group, lane, timing, repetitions)
         stock = ty_total(group, "stock")
         ohm = ty_total(group, "ohm-trusted")
         feature_rows.append(
