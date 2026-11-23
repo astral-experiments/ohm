@@ -153,6 +153,40 @@ class PublicationTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     publish.validate(reports)
 
+    def test_workflow_comparisons_must_match_the_retained_samples(self):
+        workflow = self.reports["workflow"]
+        workflow["samples"].reverse()
+        publish.validate(self.reports)
+
+        def change_medians(report):
+            # Preserve the reported speedup while changing both medians.
+            row = report["comparisons"][0]
+            row["stock_seconds"] *= 2
+            row["ohm_seconds"] *= 2
+
+        def repeat_sample(report):
+            sample = next(s for s in report["samples"] if s["repetition"] == 1)
+            sample["repetition"] = 0
+
+        for change in (
+            change_medians,
+            repeat_sample,
+            lambda r: r["samples"][0].update(returncode=101),
+            lambda r: r["samples"][0].update(valid=False),
+            lambda r: r["samples"][0].update(external_compilation=["rustc"]),
+            lambda r: r["samples"][0].update(wall_seconds=float("nan")),
+            lambda r: r["samples"][0].update(toolchain="other"),
+            lambda r: r["repetitions"].update(noop=r["repetitions"]["noop"] + 1),
+            lambda r: r["comparisons"][0].update(samples=0),
+            lambda r: r["comparisons"].append(r["comparisons"][0]),
+            lambda r: r["comparisons"].pop(),
+        ):
+            with self.subTest(change=change):
+                report = copy.deepcopy(workflow)
+                change(report)
+                with self.assertRaises(ValueError):
+                    publish.validate({**self.reports, "workflow": report})
+
     def test_compaction_preserves_measurements_and_input(self):
         report = self.reports["sessions"]
         report["provenance"]["rejected_host_evidence"] = {"log": "old attempt"}
