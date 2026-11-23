@@ -24,6 +24,7 @@ import sys
 import threading
 import time
 from collections import Counter
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 
@@ -40,7 +41,7 @@ PROJECTS = ("ruff", "uv", "codex")
 CARGO_STATUS = re.compile(
     r"^\s*(?P<action>Compiling|Checking)\s+(?P<crate>[^\s]+)", re.MULTILINE
 )
-VERBOSE_COMMAND = re.compile(r"^\s*Running\s+`(?P<command>.+)`\s*$", re.MULTILINE)
+VERBOSE_COMMAND_START = re.compile(r"[ \t]*Running[ \t]+`")
 TEST_COUNT = re.compile(r"(?mi)^\s*(?:running|Starting)\s+(\d+)\s+tests?\b")
 SAFE_REVISION = re.compile(r"^[0-9a-f]{40}$")
 SAFE_SHA256 = re.compile(r"^[0-9a-f]{64}$")
@@ -96,6 +97,28 @@ def competing_processes(owner: int | None = None) -> list[str]:
     ]
 
 
+def verbose_commands(output: str) -> Iterator[list[str]]:
+    """Read Cargo's delimited commands, including newlines in quoted values."""
+    parts: list[str] = []
+    for line in output.splitlines(keepends=True):
+        if not parts:
+            start = VERBOSE_COMMAND_START.match(line)
+            if start is None:
+                continue
+            line = line[start.end() :]
+        parts.append(line)
+        if line.rstrip().endswith("`"):
+            try:
+                arguments = shlex.split("".join(parts).rstrip()[:-1])
+            except ValueError:
+                # A line inside a quoted description can itself end in a backtick.
+                continue
+            yield arguments
+            parts.clear()
+    if parts:
+        raise BenchmarkError("cannot parse a verbose Cargo command")
+
+
 def compiler_invocations(
     output: str, environment: dict[str, str] | None = None
 ) -> list[dict[str, str | None]]:
@@ -106,12 +129,7 @@ def compiler_invocations(
         for key in ("RUSTC_WRAPPER", "RUSTC_WORKSPACE_WRAPPER")
     }
     invocations: list[dict[str, str | None]] = []
-    for match in VERBOSE_COMMAND.finditer(output):
-        try:
-            arguments = shlex.split(match.group("command"))
-        except ValueError as error:
-            raise BenchmarkError("cannot parse a verbose Cargo command") from error
-
+    for arguments in verbose_commands(output):
         # With -vv, Cargo prints environment assignments before the executable.
         program = ""
         compiler = None
