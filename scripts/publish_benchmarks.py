@@ -138,6 +138,57 @@ def validate_workflow(workflow):
         raise ValueError(f"Missing workflow comparison for {next(iter(groups))}")
 
 
+def validate_session_totals(label, repetitions, sessions, commands, edits):
+    """Allow runner overhead, but require each session to cover its timed work."""
+    if not repetitions or not (
+        len(sessions) == len(commands) == len(edits) == repetitions
+    ):
+        raise ValueError(f"{label}: inconsistent session sample counts")
+    for session, command, edit in zip(sessions, commands, edits, strict=True):
+        if not (
+            math.isfinite(session)
+            and command > 0
+            and edit >= 0
+            and session >= command + edit
+        ):
+            raise ValueError(f"{label}: invalid session duration")
+
+
+def validate_sessions(kind, report):
+    """Check session and command measurements for every toolchain and repetition."""
+    repetitions = report["repetitions"]
+    for project, commands in report["commands"].items():
+        totals = report["timed_command_seconds"][project]
+        sessions = report["timed_session_seconds"][project]
+        edits = report["timed_edit_seconds"][project]
+        if not totals or not (totals.keys() == sessions.keys() == edits.keys()):
+            raise ValueError(f"{kind}: mismatched session toolchains for {project}")
+        for command in commands:
+            for field in ("wall_seconds", "tests_started"):
+                samples = command[field]
+                if samples.keys() != totals.keys() or any(
+                    len(values) != repetitions for values in samples.values()
+                ):
+                    raise ValueError(f"{kind}: incomplete {field} for {project}")
+            counts = list(command["tests_started"].values())
+            if any(value != counts[0] for value in counts):
+                raise ValueError(f"{kind}: mismatched command test counts")
+        for lane, times in totals.items():
+            validate_session_totals(
+                f"{kind}/{project}/{lane}",
+                repetitions,
+                sessions[lane],
+                times,
+                edits[lane],
+            )
+            for repetition, total in enumerate(times):
+                values = [c["wall_seconds"][lane][repetition] for c in commands]
+                if not all(math.isfinite(v) and v > 0 for v in values):
+                    raise ValueError(f"{kind}: invalid command duration")
+                if not math.isclose(sum(values), total):
+                    raise ValueError(f"{kind}: inconsistent command total")
+
+
 def validate(reports):
     release = reports["sessions"]["ohm_release"]
     if not re.fullmatch(r"ohm-\d+\.\d+\.\d+-[1-9]\d*", release):
@@ -157,20 +208,7 @@ def validate(reports):
         if kind != "workflow":
             if not methodology["matching_test_counts_within_pairs"]:
                 raise ValueError(f"{kind}: mismatched test counts")
-            for project, commands in report["commands"].items():
-                for command in commands:
-                    counts = list(command["tests_started"].values())
-                    if any(value != counts[0] for value in counts):
-                        raise ValueError(f"{kind}: mismatched command test counts")
-                for lane, totals in report["timed_command_seconds"][project].items():
-                    if len(totals) != report["repetitions"]:
-                        raise ValueError(f"{kind}: missing repetitions")
-                    for repetition, total in enumerate(totals):
-                        values = [c["wall_seconds"][lane][repetition] for c in commands]
-                        if not all(math.isfinite(v) and v > 0 for v in values):
-                            raise ValueError(f"{kind}: invalid command duration")
-                        if not math.isclose(sum(values), total):
-                            raise ValueError(f"{kind}: inconsistent command total")
+            validate_sessions(kind, report)
     validate_workflow(reports["workflow"])
     disk = reports["disk"]
     disk_rust, disk_version = disk_versions(disk)
@@ -257,10 +295,17 @@ def render_tables(reports, ty_worktree, ty_scenario, ruff_doctests):
             samples_by_lane[lane].append(samples)
             ty_categories[category][index] += mean(samples)
     for lane in lanes:
-        totals = ty_worktree["session"][lane]["commands"]["samples"]
-        if not totals or any(
-            len(samples) != len(totals) for samples in samples_by_lane[lane]
-        ):
+        session = ty_worktree["session"][lane]
+        totals = session["commands"]["samples"]
+        # The ty study includes edits in the session but doesn't time them separately.
+        validate_session_totals(
+            f"ty/{lane}",
+            ty_worktree["methodology"]["session_repetitions"],
+            session["total"]["samples"],
+            totals,
+            [0] * len(totals),
+        )
+        if any(len(samples) != len(totals) for samples in samples_by_lane[lane]):
             raise ValueError("ty command sample counts differ")
         if any(
             not math.isclose(sum(samples[i] for samples in samples_by_lane[lane]), total)

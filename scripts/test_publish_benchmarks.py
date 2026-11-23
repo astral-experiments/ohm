@@ -152,6 +152,10 @@ class PublicationTests(unittest.TestCase):
             lambda r: r["workflow"].update(ohm_release="ohm-0.0.0-1"),
             lambda r: r["workflow"].update(valid_samples=0),
             lambda r: r["sessions"]["methodology"].update(all_commands_succeeded=False),
+            lambda r: r["sessions"]["timed_session_seconds"]["ruff"]["ohm"].pop(),
+            lambda r: r["sessions"]["commands"]["ruff"][0]["wall_seconds"][
+                "ohm"
+            ].append(1),
             lambda r: r["sessions"]["methodology"].update(
                 external_compilations_observed=1
             ),
@@ -173,6 +177,34 @@ class PublicationTests(unittest.TestCase):
                 change(reports)
                 with self.assertRaises(ValueError):
                     publish.validate(reports)
+
+    def test_session_samples_cover_the_commands_and_edits(self):
+        session = self.reports["sessions"]
+        commands = session["timed_command_seconds"]["ruff"]["ohm"]
+        edits = session["timed_edit_seconds"]["ruff"]["ohm"]
+        totals = session["timed_session_seconds"]["ruff"]["ohm"]
+
+        totals[0] = commands[0] + edits[0]
+        publish.validate(self.reports)
+        for total in (commands[0] / 2, float("inf"), float("nan")):
+            with self.subTest(total=total), self.assertRaises(ValueError):
+                totals[0] = total
+                publish.validate(self.reports)
+
+        totals[0] = commands[0] + edits[0]
+        edits[0] += 1
+        with self.assertRaises(ValueError):
+            publish.validate(self.reports)
+
+    def test_ty_session_cannot_be_shorter_than_its_commands(self):
+        lane = self.ty_worktree["session"]["ohm"]
+        samples = lane["total"]["samples"]
+        samples[0] = lane["commands"]["samples"][0] / 2
+        lane["total"]["median"] = statistics.median(samples)
+        with self.assertRaises(ValueError):
+            publish.render_tables(
+                self.reports, self.ty_worktree, self.ty_scenario, self.ruff_doctests
+            )
 
     def test_workflow_comparisons_must_match_the_retained_samples(self):
         workflow = self.reports["workflow"]
