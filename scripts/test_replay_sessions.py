@@ -1373,6 +1373,7 @@ class SetupPatchTests(ReplayTestCase):
         runner = self.runner("--repetitions", "2")
         clock = 0.0
         phases = []
+        expected_mode = f"{(self.source / 'README.md').stat().st_mode:06o}"
         apply_patch = runner.apply_patch
 
         def prepare(*args: object) -> float:
@@ -1421,11 +1422,11 @@ class SetupPatchTests(ReplayTestCase):
                 {
                     "before": {
                         "sha256": hashlib.sha256(self.before).hexdigest(),
-                        "mode": "100644",
+                        "mode": expected_mode,
                     },
                     "after": {
                         "sha256": hashlib.sha256(self.after).hexdigest(),
-                        "mode": "100644",
+                        "mode": expected_mode,
                     },
                 },
             )
