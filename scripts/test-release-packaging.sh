@@ -58,7 +58,17 @@ mkdir -p "$inputs" "$temporary_directory/empty"
 for target in aarch64-apple-darwin x86_64-unknown-linux-gnu; do
   archive="$toolchain-$target.tar.gz"
   provenance="$toolchain-$target-provenance.json"
-  tar -czf "$inputs/$archive" -C "$temporary_directory/empty" .
+  if [[ "$target" == x86_64-unknown-linux-gnu ]]; then
+    mkdir -p "$llvm_fixture/sdk/cargo/bin"
+    printf 'Name: GLIBC_2.9  Flags: none\n' > "$llvm_fixture/sdk/cargo/bin/cargo"
+    printf 'Name: GLIBC_2.38  Flags: none\nName: GLIBC_2.39  Flags: WEAK\n' \
+      >> "$llvm_fixture/sdk/rustc/lib/librustc_driver-test.so"
+    printf 'Name: GLIBC_2.17  Flags: none\n' > "$llvm_fixture/sdk/rustc/lib/libLLVM.so.active"
+    printf 'Name: GLIBC_2.42  Flags: none\n' > "$llvm_fixture/sdk/rustc/lib/libLLVM.so.stale"
+    tar -czf "$inputs/$archive" -C "$llvm_fixture" sdk
+  else
+    tar -czf "$inputs/$archive" -C "$temporary_directory/empty" .
+  fi
   printf '{}\n' > "$inputs/$provenance"
   (
     cd "$inputs"
@@ -67,6 +77,7 @@ for target in aarch64-apple-darwin x86_64-unknown-linux-gnu; do
   )
 done
 
+export PATH="$llvm_fixture:$PATH"
 valid="$temporary_directory/valid"
 cp -R "$inputs" "$valid"
 mkdir "$temporary_directory/search"
@@ -81,6 +92,7 @@ test ! -e "$temporary_directory/search/valid/SHA256SUMS"
   sha256sum --check --strict SHA256SUMS
 )
 grep -Fx "embedded_version=$toolchain" "$valid/ohm-installer.sh"
+grep -Fx "embedded_minimum_glibc=2.38" "$valid/ohm-installer.sh"
 grep -Fx 'embedded_wild_version=0.10.0' "$valid/ohm-installer.sh"
 for target in aarch64-apple-darwin x86_64-unknown-linux-gnu; do
   checksum="$(cut -d ' ' -f 1 "$valid/$toolchain-$target.tar.gz.sha256")"

@@ -62,14 +62,21 @@ done
 staging="$(mktemp -d .ohm-release.XXXXXXXX)"
 trap 'rm -rf -- "$staging"' EXIT
 installer="$staging/ohm-installer.sh"
+minimum_glibc="$(LC_ALL=C python3 "$script_directory/verify-linux-llvm.py" --minimum-glibc "$linux_archive" readelf)"
 
 awk -v version="$OHM_TOOLCHAIN" \
   -v macos_sha256="$macos_sha256" \
   -v linux_sha256="$linux_sha256" \
+  -v minimum_glibc="$minimum_glibc" \
   -v wild_version="$wild_version" '
   $0 == "embedded_wild_version=" {
     print "embedded_wild_version=" wild_version
     ++wild_count
+    next
+  }
+  $0 == "embedded_minimum_glibc=" {
+    print "embedded_minimum_glibc=" minimum_glibc
+    ++glibc_count
     next
   }
   $0 == "embedded_version=" {
@@ -89,7 +96,7 @@ awk -v version="$OHM_TOOLCHAIN" \
   }
   { print }
   END {
-    if (version_count != 1 || macos_count != 1 || linux_count != 1 || wild_count != 1) {
+    if (version_count != 1 || glibc_count != 1 || macos_count != 1 || linux_count != 1 || wild_count != 1) {
       exit 1
     }
   }

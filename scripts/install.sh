@@ -2,6 +2,7 @@
 set -eu
 
 embedded_version=
+embedded_minimum_glibc=
 embedded_wild_version=
 embedded_archive_sha256_aarch64_apple_darwin=
 embedded_archive_sha256_x86_64_unknown_linux_gnu=
@@ -27,6 +28,9 @@ usage() {
         '' \
         'Install the embedded, checksum-pinned Ohm toolchain for this platform.' \
         'Set OHM_INSTALL_DIR to override its installation directory.'
+    if [ -n "$embedded_minimum_glibc" ]; then
+        printf 'On Linux, this release requires glibc %s or newer.\n' "$embedded_minimum_glibc"
+    fi
 }
 
 cleanup() {
@@ -122,6 +126,16 @@ case "$(uname -s)" in
         esac
         if command -v ldd >/dev/null 2>&1 && ldd --version 2>&1 | grep -qi musl; then
             fail 'musl-based Linux distributions are not currently supported'
+        fi
+        # If getconf is unavailable or unrecognized, let the installed binaries decide.
+        if [ -n "$embedded_minimum_glibc" ] && libc=$(getconf GNU_LIBC_VERSION 2>/dev/null); then
+            printf '%s\n' "$libc" | awk -v required="$embedded_minimum_glibc" '
+                /^glibc [0-9]+\.[0-9]+(\.[0-9]+)*$/ {
+                    split($2, host, ".")
+                    split(required, need, ".")
+                    if (host[1] < need[1] || (host[1] == need[1] && host[2] < need[2])) exit 1
+                }
+            ' || fail "$embedded_version requires glibc $embedded_minimum_glibc or newer (found $libc)"
         fi
         embedded_archive_sha256=$embedded_archive_sha256_x86_64_unknown_linux_gnu
         ;;

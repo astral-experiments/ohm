@@ -80,6 +80,7 @@ source_installer=$installer
 installer="$temporary_directory/release-installer.sh"
 sed \
   -e "s/^embedded_version=$/embedded_version=$version/" \
+  -e "s/^embedded_minimum_glibc=$/embedded_minimum_glibc=2.38/" \
   -e "s/^embedded_archive_sha256_aarch64_apple_darwin=$/embedded_archive_sha256_aarch64_apple_darwin=$archive_checksum/" \
   -e "s/^embedded_archive_sha256_x86_64_unknown_linux_gnu=$/embedded_archive_sha256_x86_64_unknown_linux_gnu=$linux_archive_checksum/" \
   "$source_installer" > "$installer"
@@ -116,6 +117,13 @@ case "${OHM_TEST_LIBC:-glibc}" in
   musl) printf '%s\n' 'musl libc (x86_64)' ;;
   *) echo "unsupported libc fixture: $OHM_TEST_LIBC" >&2; exit 1 ;;
 esac
+EOF
+
+cat > "$mock_directory/getconf" <<'EOF'
+#!/bin/sh
+[ "$1" = GNU_LIBC_VERSION ] || exit 1
+[ "${OHM_TEST_GLIBC:-}" != unknown ] || exit 1
+printf 'glibc %s\n' "${OHM_TEST_GLIBC:-2.39}"
 EOF
 
 cat > "$mock_directory/rustup" <<'EOF'
@@ -205,7 +213,7 @@ exec /bin/mkdir "$@"
 EOF
 
 chmod +x "$mock_directory/uname" "$mock_directory/sysctl" "$mock_directory/ldd" \
-  "$mock_directory/rustup" \
+  "$mock_directory/rustup" "$mock_directory/getconf" \
   "$mock_directory/curl" "$mock_directory/mkdir"
 
 run_case() {
@@ -232,6 +240,7 @@ run_case() {
     OHM_TEST_ARCHITECTURE="${OHM_TEST_ARCHITECTURE:-arm64}" \
     OHM_TEST_APPLE_SILICON="${OHM_TEST_APPLE_SILICON:-0}" \
     OHM_TEST_LIBC="${OHM_TEST_LIBC:-glibc}" \
+    OHM_TEST_GLIBC="${OHM_TEST_GLIBC:-2.39}" \
     OHM_TEST_CURL_FAILURE="${OHM_TEST_CURL_FAILURE:-}" \
     OHM_TEST_VERSION="${OHM_TEST_VERSION:-$version}" \
     OHM_TEST_RUSTC_BRAND="${OHM_TEST_RUSTC_BRAND:-$version}" \
@@ -374,7 +383,19 @@ assert_contains "$temporary_directory/cases/rosetta-apple-silicon/rustup.log" \
 
 OHM_TEST_SYSTEM=Linux
 OHM_TEST_ARCHITECTURE=x86_64
+OHM_TEST_GLIBC=2.35
+OHM_TEST_DOWNLOAD_URL=
+run_case old-linux-glibc failure
+unset OHM_TEST_DOWNLOAD_URL
+assert_no_links old-linux-glibc
+assert_contains "$temporary_directory/cases/old-linux-glibc/output.log" \
+  "requires glibc 2.38 or newer (found glibc 2.35)"
+test ! -s "$temporary_directory/cases/old-linux-glibc/curl.log"
+OHM_TEST_GLIBC=unknown
+run_case unknown-linux-glibc success
+OHM_TEST_GLIBC=2.38
 run_case linux-x86_64 success
+unset OHM_TEST_GLIBC
 unset OHM_TEST_SYSTEM OHM_TEST_ARCHITECTURE
 assert_contains "$temporary_directory/cases/linux-x86_64/rustup.log" \
   "toolchain link $version "
