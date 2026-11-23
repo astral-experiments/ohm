@@ -166,9 +166,13 @@ if case=="probes":
     run("cargo","+ohm","install","--locked","--debug","--version","=0.1.17",
         "--root",helpers,"cargo-fixit",env=env,cwd=root)
     result["fixit_sha256"]=history.sha(helpers/"bin/cargo-fixit")
+    run("rustup","toolchain","install","1.100.0","--profile","minimal","--no-self-update",env=env,cwd=root)
+    stock=Path(subprocess.check_output(["rustup","which","--toolchain","1.100.0","rustc"],
+                                       env=env,cwd=root,text=True).strip())
+    result["stock_rustc_sha256"]=history.sha(stock)
     sdk.rename(root/"control")
     run(sys.executable,wd/"replay/probes8.py",pair,root/"control",root/"candidate",out,
-        env=dict(os.environ,PATH=str(helpers/"bin")+":"+os.environ["PATH"],TMPDIR=str(root)))
+        env=dict(os.environ,PROBE_STOCK=str(stock),PATH=str(helpers/"bin")+":"+os.environ["PATH"],TMPDIR=str(root)))
 else:
     run("git","init","-q",src)
     remote="https://github.com/"+record["repo"]+".git"

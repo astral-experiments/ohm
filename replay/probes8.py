@@ -246,19 +246,37 @@ fn example(){
 
 @case("rustc622")
 def cycle(t):
+    stock=Path(os.environ["PROBE_STOCK"])
+    version=t.run(stock,"-vV").stdout
+    require("commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a" in version
+            and "host: x86_64-unknown-linux-gnu" in version and "release: 1.100.0" in version,version)
+    t.notes["stock_version"]=version.strip()
     bad="<&'static Cycle as std::ops::Deref>::Target"
+    accepted=dict(status=0,codes=[])
+    rejected=dict(status=1,codes=["E0391"])
+    expected={}
     for label,src in [("valid","pub struct Value(u32);"),("struct",f"pub struct Cycle({bad});"),
                       ("enum",f"pub enum Cycle {{ C({bad}) }}")]:
         t.write("dep.rs",src)
-        results=[]
-        for cap in ("allow","warn"):
-            p=rust(t,"dep.rs","--emit=metadata","--crate-type=lib","--cap-lints="+cap,check=False)
-            if label=="valid":require(not p.returncode,t.log)
-            elif not p.returncode and cap=="allow":t.known_bug=True
-            else:require(p.returncode and re.search("E0391|E0072",p.stderr),t.log)
-            results.append(p.returncode)
-        t.notes[label]=results
-    return "recursive shape rejected"
+        expected[label]={}
+        t.notes[label]={}
+        for cap in ("allow","warn","default"):
+            cmd=["dep.rs","--emit=metadata","--crate-type=lib"]
+            if cap!="default":cmd.append("--cap-lints="+cap)
+            results={}
+            for name,compiler in [("stock",stock),("ohm",t.kit/"bin/rustc")]:
+                p=t.run(compiler,*cmd,check=False)
+                results[name]=dict(status=p.returncode,codes=re.findall(r"error\[(E[0-9]+)\]",p.stderr))
+            t.notes[label][cap]=results
+            # With capped lints, stock only needs the layout of the unread private field.
+            target=accepted if label=="valid" or (label=="enum" and cap=="allow") else rejected
+            require(results["stock"]==target,(label,cap,results))
+            expected[label][cap]=results["stock"]
+            if label=="struct" and cap=="allow" and results["ohm"]==accepted:
+                t.known_bug=True
+            else:
+                require(results["ohm"]==results["stock"],(label,cap,results))
+    return expected
 
 MATCHES = r'''
 #![feature(allow_internal_unstable)]
