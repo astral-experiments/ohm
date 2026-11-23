@@ -31,6 +31,19 @@ for active in 2.34 2.17; do
   fi
 done
 
+# A loader can use a build path on the runner even when the SDK won't work elsewhere.
+for dependency in /build/libzstd.so.1 build/libhelper.so; do
+  printf 'Name: GLIBC_2.17\n(NEEDED) Shared library: [%s]\n' "$dependency" \
+    > "$llvm_fixture/sdk/rustc/lib/libLLVM.so.active"
+  tar -czf "$llvm_fixture/sdk.tar.gz" -C "$llvm_fixture" sdk
+  if python3 "$script_directory/verify-linux-llvm.py" "$llvm_fixture/sdk.tar.gz" "$llvm_fixture/readelf" \
+    > "$llvm_fixture/result" 2>&1; then
+    echo "accepted a path in DT_NEEDED: $dependency" >&2
+    exit 1
+  fi
+  grep -Fq "$dependency" "$llvm_fixture/result"
+done
+
 toolchain=ohm-9.9.9-1
 manifest="$temporary_directory/manifest.json"$'\n'
 cat > "$manifest" <<EOF
