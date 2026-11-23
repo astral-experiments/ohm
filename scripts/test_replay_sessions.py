@@ -395,6 +395,27 @@ class ToolchainIsolationTests(ReplayTestCase):
             ["just", "test", "-p", "codex-tui"],
         )
 
+    def test_compiler_overrides_must_come_from_the_scenario(self) -> None:
+        scenario = self.scenario(environment={"RUSTC_WRAPPER": "scenario-wrapper"})
+        runner = self.runner()
+        inherited = {
+            "RUSTC": "other-rustc",
+            "RUSTDOC": "other-rustdoc",
+            "RUSTC_WRAPPER": "other-wrapper",
+            "RUSTC_WORKSPACE_WRAPPER": "other-workspace-wrapper",
+            "CARGO_BUILD_RUSTC": "other-rustc",
+            "CARGO_BUILD_RUSTDOC": "other-rustdoc",
+            "CARGO_BUILD_RUSTC_WRAPPER": "other-wrapper",
+            "CARGO_BUILD_RUSTC_WORKSPACE_WRAPPER": "other-workspace-wrapper",
+        }
+        with mock.patch.dict(os.environ, inherited):
+            for label, selector in runner.toolchains:
+                environment = runner.environment(scenario, label, selector, 0)
+                self.assertEqual(environment["RUSTC_WRAPPER"], "scenario-wrapper")
+                self.assertEqual(
+                    inherited.keys() & environment.keys(), {"RUSTC_WRAPPER"}
+                )
+
     def test_stock_and_ohm_have_private_targets_and_trust_settings(self) -> None:
         scenario = self.scenario(environment={"CARGO_PROFILE_DEV_OPT_LEVEL": "1"})
         runner = self.runner("--jobs", "4")

@@ -690,6 +690,8 @@ class FeatureWorkflowTests(unittest.TestCase):
         (self.study.output / "logs").mkdir(parents=True)
         ambient = {
             "CARGO_BUILD_BUILD_DIR": str(self.directory / "unowned-cache"),
+            "RUSTC": "/unowned/rustc",
+            "CARGO_BUILD_RUSTC": "/unowned/cargo-rustc",
             "RUSTFMT": "/unowned/ohm-rustfmt",
             "RUSTFMT_WRAPPER": "/unowned/formatter-wrapper",
         }
@@ -719,6 +721,9 @@ class FeatureWorkflowTests(unittest.TestCase):
 
                 environment = command.call_args.kwargs["env"]
                 self.assertNotIn("CARGO_BUILD_BUILD_DIR", environment)
+                self.assertFalse(
+                    {"RUSTC", "CARGO_BUILD_RUSTC"}.intersection(environment)
+                )
                 if workflow == "fmt":
                     self.assertNotIn("RUSTFMT", environment)
                     self.assertNotIn("RUSTFMT_WRAPPER", environment)

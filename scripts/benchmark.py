@@ -153,6 +153,15 @@ COMPILER_PROCESSES = {
 }
 
 
+def compiler_environment() -> dict[str, str]:
+    """Let the selected toolchain supply rustc and rustdoc without inherited wrappers."""
+    environment = os.environ.copy()
+    for key in ("RUSTC", "RUSTDOC", "RUSTC_WRAPPER", "RUSTC_WORKSPACE_WRAPPER"):
+        environment.pop(key, None)
+        environment.pop(f"CARGO_BUILD_{key}", None)
+    return environment
+
+
 def command_output(arguments: list[str], *, cwd: Path | None = None) -> str:
     rendered = re.sub(r"(https?://)[^/\s@]+@", r"\1<redacted>@", shlex.join(arguments))
     try:
@@ -673,7 +682,7 @@ class Study:
             arguments = self.command(workload, workflow, selector)
         workspace = worktree / workload.workspace
         cwd = worktree if arguments[0] == "just" else workspace
-        environment = os.environ.copy()
+        environment = compiler_environment()
         environment.pop("CARGO_BUILD_BUILD_DIR", None)
         if workflow == "fmt":
             environment.pop("RUSTFMT", None)
