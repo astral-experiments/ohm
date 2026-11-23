@@ -487,7 +487,7 @@ def diamond(t):
 @case("rustc647")
 def focused(t):
     t.package("app","#[cfg(test)] mod tests { #[test]fn first(){} #[test]fn second(){} }")
-    cmd="test --lib tests::first -- --exact"
+    cmd="test -p app --lib tests::first -- --exact"
     t.cargo(cmd)
     require("1 passed" in t.log,t.log)
     env=dict(CARGO_UNSTABLE_OHM_FOCUSED_TESTS="true")
@@ -495,10 +495,11 @@ def focused(t):
     if p.returncode:
         require("E0716" in t.log,t.log)
         t.known_bug=True
-    else:require("tests::first ... ok" in t.log and "1 passed" in t.log,t.log)
+    else:require("tests::first ... ok" in t.log and "1 passed" in t.log and "0 filtered out" in t.log,t.log)
     t.write("Cargo.toml",(t.dir/"Cargo.toml").read_text().replace("2024","2021"))
     t.cargo(cmd,env=env)
     require("1 passed" in t.log,t.log)
+    require("0 filtered out" in t.log,t.log)
     return "one selected"
 
 def short(t,dep):
@@ -683,6 +684,50 @@ case("clippy104_argument")(lambda t:autofix(t,False,False))
 case("clippy104_struct")(lambda t:autofix(t,True,False))
 case("clippy104_fixit")(lambda t:autofix(t,True,True))
 
+MINICORE=r'''#![feature(lang_items,no_core,abi_gpu_kernel,linkage)]
+#![allow(internal_features)]
+#![no_core]
+#[lang = "pointee_sized"] pub trait PointeeSized {}
+#[lang = "meta_sized"] pub trait MetaSized: PointeeSized {}
+#[lang = "sized"] pub trait Sized: MetaSized {}
+#[lang = "copy"] pub trait Copy {}
+'''
+
+@case("rustc649")
+def kernels(t):
+    t.write("gpu.rs",MINICORE+'''#[no_mangle] pub extern "gpu-kernel" fn first(_:i32) {}
+#[no_mangle] pub extern "gpu-kernel" fn second(_:i32) {}
+''')
+    rust(t,"--crate-type=rlib","-Copt-level=2","--target=amdgcn-amd-amdhsa","-Ctarget-cpu=gfx900","--emit=asm","gpu.rs")
+    asm=(t.dir/"gpu.s").read_text()
+    (t.logs/"gpu.s").write_text(asm)
+    kernels=sorted(re.findall(r"\.amdhsa_kernel\s+(first|second)",asm))
+    require(kernels,asm)
+    t.notes["kernels"]=kernels
+    t.known_bug=kernels!=["first","second"]
+    return ["first","second"]
+
+@case("rustc651")
+def weak(t):
+    source=MINICORE+'''#[no_mangle] pub extern "C" fn regular(_: u32) -> u32 { 45 }
+#[linkage = "weak"]
+#[no_mangle] pub extern "C" fn fallback(_: u32) -> u32 { 45 }
+'''
+    for name in ("weak","linkonce"):
+        extra='#[no_mangle] pub extern "C" fn getter() -> extern "C" fn(u32) -> u32 { fallback }'
+        t.write("weak.rs",source.replace('linkage = "weak"',f'linkage = "{name}"')+(extra if name=="linkonce" else ""))
+        rust(t,"--crate-type=rlib","-Copt-level=2","-Clto=thin","--target=aarch64-apple-darwin","--emit=asm","weak.rs")
+        asm=(t.dir/"weak.s").read_text()
+        (t.logs/(name+".s")).write_text(asm)
+        require(re.search(r"\.globl\s+_regular",asm),asm)
+        visible=bool(re.search(r"\.globl\s+_fallback",asm) and re.search(r"\.weak_definition\s+_fallback",asm))
+        t.notes[name]=visible
+        if not visible:t.known_bug=True
+    return "both visible"
+
+BASELINE_BUGS={"cargo644","cargo646","rustc653","rustc647","cargo650","cargo658","cargo670","cargo668",
+                "clippy104_argument","clippy104_struct","clippy104_fixit","rustc649","rustc651"}
+
 def fingerprint(value):
     return hashlib.sha256(json.dumps(value,sort_keys=True).encode()).hexdigest()
 
@@ -710,7 +755,9 @@ def main():
                 result[role] = dict(error=traceback.format_exc()[-4200:])
                 print(name,role,result[role]["error"],flush=True)
         a,b = result["control"],result["candidate"]
-        result["passed"] = "oracle" in a and a["oracle"]==b.get("oracle") and (pilot or not b["known_bug"])
+        result["passed"] = ("oracle" in a and a["oracle"]==b.get("oracle")
+                            and a["known_bug"]==(name in BASELINE_BUGS)
+                            and b["known_bug"]==(pilot and name in BASELINE_BUGS))
         print(name,"PASS" if result["passed"] else "FAIL",
               "baseline bug" if a.get("known_bug") else "",b.get("observed",{}),flush=True)
         save()
