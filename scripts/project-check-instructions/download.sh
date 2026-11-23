@@ -10,7 +10,7 @@ tmp=$(mktemp)
 trap 'rm -f "$tmp"' EXIT
 download() {
   curl -fsSL --connect-timeout 10 --speed-time 15 --speed-limit 8192 \
-    --max-time 90 --retry 5 --retry-all-errors \
+    --max-time 360 --retry 3 --retry-all-errors \
     -H "Authorization: Bearer $GITHUB_TOKEN" "$@"
 }
 info=$(download "$url/runs/$run/artifacts?name=$name")
