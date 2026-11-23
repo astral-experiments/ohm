@@ -12,6 +12,7 @@ import time
 from pathlib import Path
 
 RUFF_REVISION = "23a16fa018cf3b219c2edc7a2b739881e023a874"
+PROC_MACRO_TRUST = "CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST"
 PACKAGES = (
     "ruff_annotate_snippets",
     "ruff_cache",
@@ -59,6 +60,19 @@ def test_inventory(log):
     return sorted(tests)
 
 
+def lane_environment(lane, output):
+    env = {
+        k: os.environ[k]
+        for k in ("PATH", "HOME", "CARGO_HOME", "RUSTUP_HOME", "LANG")
+        if k in os.environ
+    }
+    env["CARGO_TERM_COLOR"] = "never"
+    env["CARGO_TARGET_DIR"] = str(output / lane)
+    if lane == "ohm":
+        env[PROC_MACRO_TRUST] = "all"
+    return env
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -79,15 +93,11 @@ def main():
     if output.is_relative_to(source) or args.jobs < 1:
         parser.error("use a separate output directory and a positive job count")
     output.mkdir(parents=True)
-    env = {
-        k: os.environ[k]
-        for k in ("PATH", "HOME", "CARGO_HOME", "RUSTUP_HOME", "LANG")
-        if k in os.environ
-    }
-    env["CARGO_TERM_COLOR"] = "never"
     lanes = {"stock": args.upstream, "ohm": args.ohm}
+    environments = {lane: lane_environment(lane, output) for lane in lanes}
     tools = {}
     for lane, selector in lanes.items():
+        env = environments[lane]
         tools[lane] = {}
         for name in ("cargo", "rustc", "rustdoc"):
             binary = checked_output(
@@ -122,7 +132,7 @@ def main():
                 run = subprocess.run(
                     ["cargo", "+" + lanes[lane], *cargo_args],
                     cwd=source,
-                    env={**env, "CARGO_TARGET_DIR": str(output / lane)},
+                    env=environments[lane],
                     stdout=stream,
                     stderr=subprocess.STDOUT,
                     check=False,
@@ -165,6 +175,9 @@ def main():
         "ohm": args.ohm,
         "cargo_args": cargo_args,
         "toolchains": tools,
+        "proc_macro_trust": {
+            lane: env.get(PROC_MACRO_TRUST) for lane, env in environments.items()
+        },
         "passed": 207,
         "ignored": 9,
         "tests_sha256": hashlib.sha256(

@@ -459,6 +459,14 @@ def render_tables(reports, ty_worktree, ty_scenario, ruff_doctests):
 
 
 def ruff_doctest_row(report):
+    # Reports through 1.100.0-7 predate the explicit macro trust setting.
+    release = re.fullmatch(r"ohm-(\d+)\.(\d+)\.(\d+)-([1-9]\d*)", report["ohm"])
+    if not release:
+        raise ValueError("Invalid Ruff doctest release")
+    if "proc_macro_trust" in report or tuple(map(int, release.groups())) >= (1, 100, 0, 8):
+        if report.get("proc_macro_trust") != {"stock": None, "ohm": "all"}:
+            raise ValueError("Unexpected Ruff doctest macro trust settings")
+
     medians = {}
     for lane in ("stock", "ohm"):
         samples = [s for s in report["samples"] if s["toolchain"] == lane]

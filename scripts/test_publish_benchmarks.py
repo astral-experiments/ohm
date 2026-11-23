@@ -8,6 +8,7 @@ import tempfile
 import unittest
 from unittest import mock
 
+import benchmark_ruff_doctests as doctests
 import publish_benchmarks as publish
 
 
@@ -27,6 +28,26 @@ class PublicationTests(unittest.TestCase):
         publish.write_json(fixture, self.ty_scenario)
         for name in (publish.DEVELOPER_WORKFLOW_REPORT, publish.RUFF_DOCTEST_REPORT):
             shutil.copyfile(publish.RESULTS / name, root / "scripts/benchmark_results" / name)
+
+    def test_ruff_doctest_trust(self):
+        key = doctests.PROC_MACRO_TRUST
+        with mock.patch.dict("os.environ", {key: "audited"}):
+            stock = doctests.lane_environment("stock", Path("out"))
+            ohm = doctests.lane_environment("ohm", Path("out"))
+        self.assertNotIn(key, stock)
+        self.assertEqual(ohm[key], "all")
+
+        report = dict(self.ruff_doctests, ohm="ohm-1.100.0-7")
+        report.pop("proc_macro_trust", None)
+        expected = publish.ruff_doctest_row(report)
+        report["ohm"] = "ohm-1.100.0-8"
+        with self.assertRaisesRegex(ValueError, "macro trust"):
+            publish.ruff_doctest_row(report)
+        report["proc_macro_trust"] = {"stock": stock.get(key), "ohm": ohm[key]}
+        self.assertEqual(publish.ruff_doctest_row(report), expected)
+        report["proc_macro_trust"]["stock"] = "all"
+        with self.assertRaisesRegex(ValueError, "macro trust"):
+            publish.ruff_doctest_row(report)
 
     def test_ruff_doctests_exclude_cold_runs(self):
         samples = [
