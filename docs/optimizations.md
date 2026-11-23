@@ -1,6 +1,6 @@
 # Optimizations
 
-Ohm 1.100.0-7 builds on Rust 1.100.0 and LLVM 23.1.5. It speeds up development with changes to
+Ohm 1.100.0-8 builds on Rust 1.100.0 and LLVM 23.1.5. It speeds up development with changes to
 Cargo, rustc, LLVM, Clippy, and rustfmt.
 
 ## Cargo and builds
@@ -66,6 +66,22 @@ to the deprecation message requires a new check.
 [Constructors](https://github.com/astral-experiments/ohm-rust/pull/526) ·
 [Doc comments](https://github.com/astral-experiments/ohm-rust/pull/555)
 
+If a method grows, rustc measures the gap to a following derive from the end of the method. For
+exported derive helpers it uses the source coordinates stored in metadata. For binary checks, it
+can also record where `unix` occurs inside `#[cfg(unix)]` instead of where the predicate occurs in
+the file. An edit inside the attribute still changes the hash.
+[Derive locations](https://github.com/astral-experiments/ohm-rust/pull/630) ·
+[Helper attributes](https://github.com/astral-experiments/ohm-rust/pull/631) ·
+[Conditional compilation](https://github.com/astral-experiments/ohm-rust/pull/644)
+
+Editing `globset::escape` can require a new check of `ignore` without changing anything `rg` uses
+through it. Cargo can skip the binary check if rustc supplies a hash that also covers implicit
+dependencies, such as implementations of foreign traits and names a re-exported macro can reach
+through `$crate`. Cargo falls back if a dependency is still building or was rebuilt in a separate
+invocation.
+[Transitive dependencies](https://github.com/astral-experiments/ohm-cargo/pull/629) ·
+[Implicit dependencies](https://github.com/astral-experiments/ohm-rust/pull/638)
+
 Changing `/*abc*/` to `/*汉*/` preserves the byte offsets on that line but moves the next token two
 characters to the left. A downstream constant can observe the column through `Location::caller()`.
 Rustc includes character columns in the public hash. If it reads a dependency’s source to display
@@ -84,12 +100,15 @@ but changing a private item may invalidate more of that consumer’s work.
 When Cargo checks a registry library, it normally disables incremental compilation and caps lints
 at `allow`. For a metadata-only `rlib` check with those settings, Ohm can hash the metadata,
 source files and tracked environment inputs without hashing every function body. It can also skip
-lint passes that cannot emit a diagnostic. Forced warnings and lint expectations still apply.
+lint passes that cannot emit a diagnostic. Forced warnings and lint expectations still apply. For
+modules with tuple fields, rustc retains the check for unread fields because computing their
+layout can reveal a hard error.
 [Capped checks](https://github.com/astral-experiments/ohm-rust/pull/578) ·
 [Inputs](https://github.com/astral-experiments/ohm-rust/pull/586) ·
 [Checksums](https://github.com/astral-experiments/ohm-rust/pull/593) ·
 [Lint passes](https://github.com/astral-experiments/ohm-rust/pull/580) ·
-[Expectations](https://github.com/astral-experiments/ohm-rust/pull/592)
+[Expectations](https://github.com/astral-experiments/ohm-rust/pull/592) ·
+[Field layout](https://github.com/astral-experiments/ohm-rust/pull/622)
 
 Ohm can leave private implementation details out of the interface hash while retaining the trait
 headers and source locations that downstream crates need. This also applies when a crate exports a
@@ -347,6 +366,13 @@ Cargo resolves a new worktree’s manifest and registry aliases in the selected 
 can keep its manifest behind a symlink or inside a nested Git repository. Nextest archives retain
 both native build-script libraries and Rust dynamic libraries when extracted into another checkout. [Cargo #493–498](https://github.com/astral-experiments/ohm-cargo/compare/518b910bd66870a1ce96e8b11191a8aaf5dfa937...7b7738fb5734f9cef13b88f5368327e1289e258b)
 
+If you include a source file by absolute path, a procedural macro, a failing test and a rustdoc
+warning can all point back to that file in the active checkout. Rustc tracks the checkout when it
+embeds the local filename. Explicit path remaps still apply.
+[Macro spans](https://github.com/astral-experiments/ohm-rust/pull/629) ·
+[Test filenames](https://github.com/astral-experiments/ohm-rust/pull/640) ·
+[Rustdoc paths](https://github.com/astral-experiments/ohm-rust/pull/642)
+
 Cargo records UTF-8 compiler and driver paths as text and other Unix paths as bytes. In the Linux
 release replay, a shared build of `itoa` stayed warm after garbage collection with either of two
 distinct non-UTF-8 driver paths. Removing the driver made the next collection remove the artifact.
@@ -503,6 +529,17 @@ rebuilding an unused test helper. Cargo still builds dependencies used elsewhere
 scripts, and falls back to the full dependency graph for unsupported native inputs. Initial builds
 and unsupported targets follow Cargo's usual behavior.
 
+A test can read a file through a hard link or embed its path with `env!`. Cargo checks these
+inputs and honors requests to emit extra files such as MIR. For a wrapped library it checks the
+outputs in rustc’s depfile. That record cannot predict new wrapper flags or files the wrapper
+writes itself. When a test needs a dependency Cargo skipped, Cargo retries without reporting
+unchanged artifacts and warnings twice.
+[Hard links](https://github.com/astral-experiments/ohm-cargo/pull/632) ·
+[Extra outputs](https://github.com/astral-experiments/ohm-cargo/pull/633) ·
+[Compiler wrappers](https://github.com/astral-experiments/ohm-cargo/pull/636) ·
+[Environment values](https://github.com/astral-experiments/ohm-cargo/pull/637) ·
+[Retries](https://github.com/astral-experiments/ohm-cargo/pull/641)
+
 Skipped dependencies are not compiled, so their errors and warnings won't appear. Use
 `-Zohm-defer-dev-deps=no` to build all declared dev dependencies.
 
@@ -517,10 +554,12 @@ See:
 
 **Status:** New experiment, opt-in.
 
-Run `cargo +ohm -Zohm-ready-tests test` to start tests while Cargo is still compiling. Test binaries
-run one at a time, with their ordinary arguments and environment. Build scripts, application
-executables, and dynamic libraries must finish before tests start. Unsupported platforms, custom
-runners, and incompatible terminal configurations retain ordinary execution.
+Run `cargo +ohm -Zohm-ready-tests test` to start tests while Cargo is still compiling. Test
+binaries run one at a time, with their ordinary arguments and environment. Build scripts,
+application executables and all `staticlib`, `cdylib` and `dylib` outputs must finish first. A
+test may load one of these libraries at runtime even if Rust never links it. Unsupported
+platforms, custom runners and incompatible terminal configurations retain ordinary execution.
+[Library outputs](https://github.com/astral-experiments/ohm-cargo/pull/639)
 
 Running tests alongside compilation can shorten the command, but it can also slow it down if they
 compete for CPU, memory, or disk bandwidth. Tests may run in a different order and can make changes
@@ -1002,6 +1041,18 @@ keep the checks that still select the same implementation.
 [Borrow checking](https://github.com/astral-experiments/ohm-rust/pull/560) ·
 [Integer operations](https://github.com/astral-experiments/ohm-rust/pull/566)
 
+In a large constant with rows such as `(&["rust"], &["*.rs"])`, rustc can check one row for each
+combination of array lengths and copy the types and coercions to the other rows. It inspects every
+field and checks the remaining rows individually if a representative raises an error.
+[String tables](https://github.com/astral-experiments/ohm-rust/pull/614)
+
+Adding `|s: &str| s.trim().len()` inside a method introduces a new lifetime. Rustc assigns the
+lifetimes in the method signature first, so adding the closure does not renumber them and
+invalidate checks of the callers. For parameters whose type might be unsized, it keeps separate
+type variables so that each missing borrow gets its own suggestion.
+[Signature lifetimes](https://github.com/astral-experiments/ohm-rust/pull/634) ·
+[Parameter diagnostics](https://github.com/astral-experiments/ohm-rust/pull/616)
+
 Adding an implementation of one trait to a dependency can invalidate cached lookups for other
 traits. For a lookup of `Display`, rustc records a fingerprint of the crates that supply
 implementations of `Display`. Adding a supplier changes the fingerprint. Changing a crate that only
@@ -1335,6 +1386,24 @@ code for development builds. For example, it can omit cleanup paths that have be
 constructing intermediate lists while checking type constraints. Other changes avoid repeated
 lookups, reuse LLVM target machines, and reduce the size of compiler data structures.
 
+When reading the previous dependency graph, rustc builds the reverse index as it decodes each row.
+When writing metadata, it indexes local definitions and hashes reachable source text once for both
+the public interface and the cached metadata prefix. During name resolution, it can decode the
+bindings for `use dep::*` directly into the resolver’s table.
+[Dependency graph](https://github.com/astral-experiments/ohm-rust/pull/637) ·
+[Metadata](https://github.com/astral-experiments/ohm-rust/pull/632) ·
+[Module bindings](https://github.com/astral-experiments/ohm-rust/pull/636)
+
+For `matches!(value, Some(n) if n > 0)`, rustc verifies the standard macro’s complete rule once
+and builds the match from the parsed arguments. A shadowed or modified rule takes the ordinary
+path. Rustc also skips computing which tokens may follow an unrestricted macro fragment, resolves
+simple macro paths without a temporary vector and copies runs of plain text together in string
+literals.
+[Standard match rule](https://github.com/astral-experiments/ohm-rust/pull/619) ·
+[Macro matchers](https://github.com/astral-experiments/ohm-rust/pull/633) ·
+[Macro paths](https://github.com/astral-experiments/ohm-rust/pull/643) ·
+[String literals](https://github.com/astral-experiments/ohm-rust/pull/641)
+
 When laying out async state, Ohm skips redundant work when tracking which values are live at the
 same time. This backports a change from
 [rust-lang/rust #163126](https://github.com/rust-lang/rust/pull/163126). On Unix, Ohm also reduces
@@ -1556,12 +1625,14 @@ cache. Average Clippy time fell from 40.55 to 38.85 seconds, about 4.2%. In a se
 that invoked Clippy's compiler driver directly on a small crate, the time increased from 52.99 to
 60.92 milliseconds.
 
-The order of overlapping suggestions can change the program. For `Some(a & b).unwrap() == false`,
-applying the inner edit first gives `!(a & b)`. Applying the outer edit first can give `!a & b`.
-For automatic fixes and Cargo’s JSON diagnostics, Clippy uses its usual whole-crate traversal to
-preserve suggestion order. During a cached module traversal it also tracks source text used to
-decide whether a procedural macro generated the code.
+The order and grouping of overlapping suggestions can change the program. For `Some(a &
+b).unwrap() == false`, the fixes should produce `!(a & b)`. Removing the parentheses would give
+`!a & b`. Clippy preserves the grouping when it removes a literal unwrap or swaps conditional
+branches. For automatic fixes and Cargo’s JSON diagnostics, it uses its usual whole-crate
+traversal to preserve suggestion order. During a cached module traversal it also tracks source
+text used to decide whether a procedural macro generated the code.
 [Fix order](https://github.com/astral-experiments/ohm-rust-clippy/pull/100) ·
+[Grouping](https://github.com/astral-experiments/ohm-rust-clippy/pull/102) ·
 [Macro input](https://github.com/astral-experiments/ohm-rust-clippy/pull/96)
 
 Clippy can reuse results from boolean, comparison-chain, documentation, and unit-expression lint
@@ -1641,12 +1712,27 @@ and their compiled object files. It still runs every selected example and repeat
 pick up changes to native archives. An edit to an example or its included Markdown invalidates the
 cache.
 
-Ohm runs rustdoc again if a build-script search path can supply Rust crates or an example can
-reach a procedural macro outside the trusted registry cache. It also checks for ambiguous module
-paths. Adding `extra/mod.rs` alongside `extra.rs` makes `mod extra;` ambiguous even though the
-original file is unchanged.
+With the default `audited` policy, Cargo reruns rustdoc if the library or its examples can use a
+procedural macro outside the trusted shared registry cache. This includes macros re-exported by
+another package. Set `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` only if you trust the macros and
+their helpers to track all their inputs. Otherwise, changing an untracked file or environment
+variable can leave a failing example marked as passing.
+[Untracked inputs](https://github.com/astral-experiments/ohm-cargo/pull/615)
+
+The `all` policy lets Cargo cache examples that use eligible workspace macros, even in a private
+target directory. Cargo verifies crates.io macros and helpers against the lockfile. A workspace
+build script in the macro’s dependency chain, a nonmember path dependency or a local patch to a
+registry helper still requires rustdoc. The Ruff doctest benchmark opts into `all`. Pass
+`-Zohm-proc-macro-trust=audited` to restore the default for one command and invalidate the
+affected examples.
+[Macro eligibility](https://github.com/astral-experiments/ohm-cargo/pull/642)
+
+Moving a package changes its manifest path, so Cargo extracts and builds the examples again. This
+prevents a test from reading a fixture from the previous checkout. Cargo also reruns rustdoc if a
+build-script search path can supply Rust crates or if adding `extra/mod.rs` alongside `extra.rs`
+makes `mod extra;` ambiguous.
+[Manifest paths](https://github.com/astral-experiments/ohm-cargo/pull/628) ·
 [Search paths](https://github.com/astral-experiments/ohm-cargo/pull/613) ·
-[Procedural macros](https://github.com/astral-experiments/ohm-cargo/pull/615) ·
 [Module paths](https://github.com/astral-experiments/ohm-cargo/pull/623)
 
 If another process runs `cargo clean` while the examples are running, Cargo keeps their
