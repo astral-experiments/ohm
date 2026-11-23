@@ -137,7 +137,13 @@ def replay(role):
     assert not counts["jobs"],counts
     if app=="ripgrep":
         warm=metadata()
-        shutil.rmtree(target)
+        # Keep precisely the same registry inputs, including proc-macro build
+        # outputs. Rebuild every local package from scratch at the same path.
+        args=["cargo","+ohm"]
+        pkgs=json.loads(subprocess.check_output(
+            args+["metadata","--locked","--offline","--no-deps","--format-version=1"],cwd=src,env=env))["packages"]
+        run(*args,"clean","--locked","--offline",*(k for pkg in pkgs for k in ("-p",pkg["name"])),cwd=src,env=env)
+        assert not metadata(), list(metadata())
         counts,p=count("fresh",command,folder)
         (folder/"fresh.log").write_bytes(p.stderr)
         fresh=metadata()
