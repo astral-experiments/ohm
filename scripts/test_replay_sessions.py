@@ -2059,6 +2059,22 @@ class CommandResultTests(ReplayTestCase):
             ["shared-package"],
         )
 
+    def test_compiler_accounting_handles_multiline_package_descriptions(self) -> None:
+        output = (
+            "     Running `CARGO_PKG_DESCRIPTION='See `the docs`\n"
+            "and the examples' /bin/rustc --crate-name first`\n"
+            "     Running `/target/tests first`\n"
+            "     Running `CARGO_PKG_DESCRIPTION='Two\n"
+            "lines' /bin/clippy-driver /bin/rustc --crate-name second`\n"
+        )
+        self.assertEqual(
+            replay.compiler_invocations(output),
+            [
+                {"compiler": "rustc", "crate": "first"},
+                {"compiler": "clippy-driver", "crate": "second"},
+            ],
+        )
+
     def test_malformed_verbose_commands_fail_accounting_closed(self) -> None:
         with self.assertRaisesRegex(replay.BenchmarkError, "verbose Cargo command"):
             replay.compiler_invocations("     Running `rustc 'unterminated`\n")
