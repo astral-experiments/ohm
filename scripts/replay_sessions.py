@@ -27,7 +27,13 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from benchmark import COMPILER_PROCESSES, DEFAULT_UPSTREAM, BenchmarkError, command_output
+from benchmark import (
+    COMPILER_PROCESSES,
+    DEFAULT_UPSTREAM,
+    BenchmarkError,
+    command_output,
+    compiler_environment,
+)
 
 SCENARIO_DIRECTORY = Path(__file__).with_name("session_replays")
 PROJECTS = ("ruff", "uv", "codex")
@@ -765,7 +771,7 @@ class Replay:
     def environment(
         self, scenario: Scenario, label: str, selector: str, repetition: int
     ) -> dict[str, str]:
-        environment = dict(os.environ)
+        environment = compiler_environment()
         environment.update(scenario.environment)
         environment["RUSTUP_TOOLCHAIN"] = selector
         environment["CARGO_BUILD_JOBS"] = str(self.options.jobs)
