@@ -341,6 +341,12 @@ else
     staging_directory=
 fi
 
+# Pin both rustup names to the installed directory even if a parent symlink moves.
+# The trailing slash preserves final newlines through command substitution.
+physical_prefix=$(CDPATH='' cd -P "$installation_prefix" && printf '%s/' "$PWD") ||
+    fail 'could not resolve the installed toolchain directory'
+installation_prefix=${physical_prefix%/}
+
 rustup_home=${RUSTUP_HOME:-"$HOME/.rustup"}
 toolchains_directory=$rustup_home/toolchains
 mkdir -p "$toolchains_directory" || fail 'could not create the rustup toolchains directory'
