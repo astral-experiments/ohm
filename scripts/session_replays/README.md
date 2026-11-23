@@ -46,7 +46,7 @@ Choose an installed Ohm release and its corresponding stock Rust version before 
 
 ```sh
 stock=1.100.0
-ohm=ohm-1.100.0-7
+ohm=ohm-1.100.0-8
 ```
 
 ```sh
@@ -109,7 +109,7 @@ The build record calls this fixture `ty-29327-rust-1.100.json`. The final Clippy
 ```sh
 python3 scripts/replay_sessions.py \
   --project ruff --scenario scripts/session_replays/ty-29327.json \
-  --upstream 1.100.0 --ohm ohm-1.100.0-7 \
+  --upstream 1.100.0 --ohm ohm-1.100.0-8 \
   --source-path ruff=/path/to/ruff --output-dir /path/to/new-ty-results \
   --jobs 8 --repetitions 4 --native-tool-trust all \
   --minimum-free-gb 60 --compiler-accounting verbose --offline --require-idle
@@ -124,7 +124,7 @@ This enables both Ohm trust opt-ins. Expected failures must match the fixture's 
 ```sh
 python3 scripts/benchmark_worktree_start.py \
   --scenario scripts/session_replays/ty-29327.json \
-  --upstream 1.100.0 --ohm ohm-1.100.0-7 \
+  --upstream 1.100.0 --ohm ohm-1.100.0-8 \
   --source-path /path/to/ruff --output-dir /path/to/new-worktree-results \
   --jobs 8 --repetitions 3 --minimum-free-gb 60 --compiler-accounting verbose --offline --require-idle
 ```

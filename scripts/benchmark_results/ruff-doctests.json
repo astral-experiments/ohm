@@ -4,7 +4,7 @@
   "platform": "Linux",
   "arch": "x86_64",
   "upstream": "1.100.0",
-  "ohm": "ohm-1.100.0-7",
+  "ohm": "ohm-1.100.0-8",
   "cargo_args": [
     "test",
     "--doc",
@@ -63,18 +63,22 @@
     },
     "ohm": {
       "cargo": {
-        "version": "cargo 1.100.0-dev (6ac764f0a 2026-11-22) (ohm-1.100.0-7)",
-        "sha256": "e25f4523e00b8a82a79aa7ef87f52282de1c064cd674d9e6c74663904b5b6aa0"
+        "version": "cargo 1.100.0-dev (33a802fbd 2026-11-22) (ohm-1.100.0-8)",
+        "sha256": "ad60b1c9e6a928234909a06b610892893fd93bd2e72a4914304376d915ae9091"
       },
       "rustc": {
-        "version": "rustc 1.100.0-dev (440e94eb5 2026-11-22) (ohm-1.100.0-7)",
-        "sha256": "01758a4bbffb48bd8b99d92daf4b8f51244af21f56400369f5a5bd055320decc"
+        "version": "rustc 1.100.0-dev (4669b8b5c 2026-11-22) (ohm-1.100.0-8)",
+        "sha256": "7561bb0c12867542c0e0856b2307740442692e5ac38427f1c10d5634e3faed0a"
       },
       "rustdoc": {
-        "version": "rustdoc 1.100.0-dev (440e94eb5 2026-11-22) (ohm-1.100.0-7)",
-        "sha256": "fa4e5fd02dc8d094d4c49500ee13358a5a6ce13b5946bc82a51432452dd6758e"
+        "version": "rustdoc 1.100.0-dev (4669b8b5c 2026-11-22) (ohm-1.100.0-8)",
+        "sha256": "62ac6b213635fea3d34defbcd31ba8001da062ab92125c0a226ab5ce3d83d62b"
       }
     }
+  },
+  "proc_macro_trust": {
+    "stock": null,
+    "ohm": "all"
   },
   "passed": 207,
   "ignored": 9,
@@ -83,105 +87,105 @@
     {
       "pair": 0,
       "toolchain": "stock",
-      "seconds": 97.8992224700014,
-      "log_sha256": "f01808e72a693e5ea1c961d6a99faffbac808c73056cc02eb0b0252c3f71a1b4"
+      "seconds": 100.78345126899967,
+      "log_sha256": "5d6a49691849ece9a97b2bf48ed0bbed5603aca71faa6b76c53dd679d6774383"
     },
     {
       "pair": 0,
       "toolchain": "ohm",
-      "seconds": 61.347232483998596,
-      "log_sha256": "476c6bc53fe73946a0ec0761ef037c0f57f2f13bc5d77ba19d028adbab1e25b4"
+      "seconds": 61.81223586000033,
+      "log_sha256": "e9cd244c1e6719861e219d6d46bab3ed785ec8ae836279bdc9ffc16b244d79e5"
     },
     {
       "pair": 1,
       "toolchain": "stock",
-      "seconds": 15.464715891999731,
-      "log_sha256": "14731310d353f933a489f3462cacfdfc4e25b0469689ffbc053e90b7e7fdd13c"
+      "seconds": 17.195171493999624,
+      "log_sha256": "321a578eae7eb161658520b267f627e4ae0236495f0476c45d38ebc44509bbdf"
     },
     {
       "pair": 1,
       "toolchain": "ohm",
-      "seconds": 13.063371325000844,
-      "log_sha256": "0a9e03ba23e8ae3d08ad0a67ec683a28c96e92f7d30e4bb9fb111d3e0b14cf19"
+      "seconds": 1.7958508640003856,
+      "log_sha256": "cc7b8fc0deb75e45398b26e8554a57c682cbc3797291357eab032fdfbd36e286"
     },
     {
       "pair": 2,
       "toolchain": "ohm",
-      "seconds": 13.1874165370009,
-      "log_sha256": "2223174e83fcd4488d506f1460fa2c443984e0b837cf4cb76991a096623d57a0"
+      "seconds": 1.611940044000221,
+      "log_sha256": "103153bf0d54050026dd79078ad52dace2730c728f00e3df1a795fb0e0d5b8fe"
     },
     {
       "pair": 2,
       "toolchain": "stock",
-      "seconds": 15.227477362999707,
-      "log_sha256": "4626cfb2b899d8161718c04acf36cb17b601d890cef2ddebd3de5e58117f4549"
+      "seconds": 16.10881590899953,
+      "log_sha256": "d869353b51f5bdbe002f0a5a984e90615552fc6b7875cf8ec80e1bf154d083fa"
     },
     {
       "pair": 3,
       "toolchain": "stock",
-      "seconds": 15.283854388999316,
-      "log_sha256": "379bc7d07772f3c00a62920c9f99f2e93dbb320b8dd59db12bf88a54be87e475"
+      "seconds": 15.706875589999981,
+      "log_sha256": "cdefa9e07a15eb5449c87d81de09d838caa35603158ca8138f27b625a96a4e87"
     },
     {
       "pair": 3,
       "toolchain": "ohm",
-      "seconds": 13.393950817000587,
-      "log_sha256": "63c3972084e03c30d13e6100644ca959ed0c0914e0e45d8687df046fc6d5edaa"
+      "seconds": 1.6230861379999624,
+      "log_sha256": "f8a4639bcaebb0578b8a3dd09e714e7abb01e65b44614f22006291d48c131c6a"
     },
     {
       "pair": 4,
       "toolchain": "ohm",
-      "seconds": 12.900397032999535,
-      "log_sha256": "789c427a5c085c860b34266d0b4512db36c31eec9a3b5c76abb20b52f630c027"
+      "seconds": 1.702081096999791,
+      "log_sha256": "65111e1078d4d1d2e9f9d7ec1daabe3418678628dd931d122f58d96405d661e6"
     },
     {
       "pair": 4,
       "toolchain": "stock",
-      "seconds": 15.239154884000527,
-      "log_sha256": "e1fc46fb5baea0cb987599eb3bfe1ad84ec22e4b0f6d29c9c088b1f25577d70d"
+      "seconds": 15.13880726699972,
+      "log_sha256": "12c1a0158163af7104245f00941c973ebbb76575899b0f01f8aa5ada1bd3012d"
     },
     {
       "pair": 5,
       "toolchain": "stock",
-      "seconds": 15.021949431000394,
-      "log_sha256": "1bbd0c53e17b96de658e997b2b402c20d5c032f6a0f7a68369dc16ad10636133"
+      "seconds": 16.143722965999586,
+      "log_sha256": "784bc716fd2387eb63a91e09b89df78ade1e253c1fc9d081b07ebd442ab04cf7"
     },
     {
       "pair": 5,
       "toolchain": "ohm",
-      "seconds": 12.863051319000078,
-      "log_sha256": "557459bb3e6ea799880c36727a39a46c07659c5c9e4d0f778534d4adfddff914"
+      "seconds": 1.7416535990005286,
+      "log_sha256": "1baaa53a5ce408f1b14ec5339e777e3bc1d8869846bb8eda1420113c8743efbc"
     }
   ],
   "warm_median_seconds": {
-    "stock": 15.239154884000527,
-    "ohm": 13.063371325000844
+    "stock": 16.10881590899953,
+    "ohm": 1.702081096999791
   },
   "measured_sdk": {
     "source_kind": "published release",
-    "release": "https://github.com/astral-experiments/ohm/releases/tag/ohm-1.100.0-7",
-    "release_run": "https://github.com/astral-experiments/ohm/actions/runs/45082301284",
-    "coordinator_revision": "1bd277112e633210202fe799a504a89a08ce3078",
-    "manifest_sha256": "3e25a0ed67df19a2d96fe9586f0b97a70c4d018e93d59bbb8a31fb05ac3e31e8",
+    "release": "https://github.com/astral-experiments/ohm/releases/tag/ohm-1.100.0-8",
+    "release_run": "https://github.com/astral-experiments/ohm/actions/runs/45105701755",
+    "coordinator_revision": "31ab6d4e1fe109e1bd00280b8e103e66cc87b319",
+    "manifest_sha256": "3de8ff841c965e9173547fc06878cf446465d05d22e9e7603c32468ff7a87735",
     "source_revisions": {
-      "rust": "440e94eb5044ea11ac974c71926295bdd96f7b20",
-      "cargo": "6ac764f0a8639f582e536181f67820f36097702e",
-      "clippy": "9caaab023b159e942d337b4f4c94852e7e4e70ee",
+      "rust": "4669b8b5c7e53bbf426ca4c985692c68d0924fd8",
+      "cargo": "33a802fbda0726f96873b03b104eac002ed4e3e7",
+      "clippy": "fb590f98043ceec39f8908ba436cce51e56c28e3",
       "rustfmt": "f63d4c44ba9dec69a4e97fd718f4152eae1f515a",
       "llvm": "2f69322070d903946a94c06e0103676ee77dad8b"
     },
-    "linux_archive_sha256": "154ac544e2b0e3f6d6a123d786f9d72e114a3453b077eccaad62ae03737abac1"
+    "linux_archive_sha256": "155923f4708be098e45aab96b44739aca8b0fd66420d2609bf9920ec6908e2d2"
   },
   "provenance": {
-    "build_run": "https://github.com/astral-experiments/ohm/actions/runs/45082301284",
-    "manifest_sha256": "3e25a0ed67df19a2d96fe9586f0b97a70c4d018e93d59bbb8a31fb05ac3e31e8",
-    "linux_archive_sha256": "154ac544e2b0e3f6d6a123d786f9d72e114a3453b077eccaad62ae03737abac1",
+    "build_run": "https://github.com/astral-experiments/ohm/actions/runs/45105701755",
+    "manifest_sha256": "3de8ff841c965e9173547fc06878cf446465d05d22e9e7603c32468ff7a87735",
+    "linux_archive_sha256": "155923f4708be098e45aab96b44739aca8b0fd66420d2609bf9920ec6908e2d2",
     "ruff_lock_sha256": "422c71899e747052bd420702ac7d969a333f2cb36cf117ee5c0ff845c9775251",
     "linux_cpus": 32,
-    "reproduction_runner_sha256": "3792677ac637ade96666cea8c6a0db827943bae3a18d09ed296f8db17edce9de",
-    "cpu_intervals": 147,
-    "cpu_trace_sha256": "de4f84f4e5903ea54fcf0d130994a7fc58d357c6db00de2e2e7c839e6b07c86e",
-    "raw_evidence_sha256": "f9905de3935d6d2914fc975724405f624ff64880c885a06ac750b0da115decc7",
+    "reproduction_runner_sha256": "9f0804b7748c94981df8e501ad12003ba977017e24d40d68b1745d4125662d68",
+    "cpu_intervals": 122,
+    "cpu_trace_sha256": "a75f04f1371b47f0fbce547b7760856bffade6b1dfb3ebf55e18dd19feafb9e2",
+    "raw_evidence_sha256": "929624a0eef400f3fa8c24bbe81ea576841de545feb37b1f40cda9668f2adb23",
     "raw_evidence_files": 21,
     "host": "charlie-ohm-32-llvm"
   }
