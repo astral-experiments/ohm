@@ -617,7 +617,11 @@ existing_alias_directory="$temporary_directory/cases/replace-alias/rustup-home/t
 existing_alias_target="$temporary_directory/cases/replace-alias/toolchain"$'\n'
 mkdir -p "$existing_alias_directory" "$existing_alias_target"
 ln -s "$existing_alias_target" "$existing_alias_directory/ohm"
-run_case replace-alias success
+TMPDIR="$existing_alias_directory/ohm" run_case replace-alias success
+if [ -n "$(find "$existing_alias_target" -mindepth 1 -print)" ]; then
+  echo 'installer left temporary files in the previous toolchain' >&2
+  exit 1
+fi
 assert_contains "$temporary_directory/cases/replace-alias/rustup.log" \
   'toolchain link ohm '
 if [ ! "$existing_alias_directory/ohm" -ef "$temporary_directory/cases/replace-alias/toolchain" ]; then
@@ -637,7 +641,7 @@ failing_alias_target="$temporary_directory/cases/failed-alias/previous-toolchain
 mkdir -p "$failing_alias_directory" "$failing_alias_target"
 ln -s "$failing_alias_target" "$failing_alias_directory/ohm"
 OHM_TEST_RUSTUP_ALIAS_FAILURE=1
-run_case failed-alias failure
+TMPDIR="$failing_alias_directory/ohm" run_case failed-alias failure
 unset OHM_TEST_RUSTUP_ALIAS_FAILURE
 if [ ! -L "$failing_alias_directory/ohm" ] || \
    [ "$(readlink "$failing_alias_directory/ohm")" != "$failing_alias_target" ]; then

@@ -148,8 +148,10 @@ case "$download_url" in
     *) fail 'OHM_DOWNLOAD_URL must use an HTTPS URL or an absolute file URL' ;;
 esac
 
-temporary_directory=$(mktemp -d "${TMPDIR:-/tmp}/ohm-installer.XXXXXXXX") ||
-    fail 'could not create a temporary directory'
+# Keep the archive and alias backup reachable if TMPDIR traverses the old rustup link.
+temporary_directory=$(
+    CDPATH='' cd -P "${TMPDIR:-/tmp}" && mktemp -d "$PWD/ohm-installer.XXXXXXXX"
+) || fail 'could not create a temporary directory'
 
 archive_name=$version-$host_target.tar.gz
 archive_path=$temporary_directory/$archive_name
