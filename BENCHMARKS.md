@@ -124,6 +124,10 @@ Each toolchain starts with its own empty target directory. The first run primes 
 five pairs, alternating which toolchain runs first, and report each toolchain’s median. The
 runner checks every example’s crate, name, and outcome against the first run.
 
+The runner sets `CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST=all` for Ohm only. This can reuse stale
+examples if a macro reads inputs Cargo cannot track. Reports without `proc_macro_trust` used
+the default settings.
+
 On a quiet x86-64 Linux host, install both toolchains and run the following from the Ohm checkout.
 `--source` must point to a clean checkout of the pinned Ruff revision.
 
