@@ -565,11 +565,19 @@ def render_tables(reports, ty_worktree, ty_scenario, ruff_doctests):
         ["Project", "Workflow", "Package", f"Rust {rust}", "Ohm", "Speedup"],
         feature_rows,
     )
+    disk_savings = 5 * round(mean(savings) / 5)
+    if disk_savings > 0:
+        disk_change = f"decreases by around {disk_savings}%"
+    elif disk_savings < 0:
+        disk_change = f"increases by around {-disk_savings}%"
+    else:
+        disk_change = "is about the same"
     headlines = {
         r"Comparing Ohm [\d.]+-\d+ to upstream Rust": f"Comparing Ohm {version} to upstream Rust",
         r"around [\d.]+× faster": f"around {totals[0] / totals[1]:.2f}× faster",
-        r"disk usage \(on APFS\) decreases by around \d+%": (
-            f"disk usage (on APFS) decreases by around {5 * round(mean(savings) / 5)}%"
+        # Older versions could write a negative decrease.
+        r"disk usage \(on APFS\) (?:(?:decreases|increases) by around -?\d+%|is about the same)": (
+            f"disk usage (on APFS) {disk_change}"
         ),
     }
     return rendered, headlines
