@@ -609,6 +609,17 @@ for binary in cargo rustdoc; do
   assert_no_links "mixed-$binary"
 done
 
+# An older rust-std component doesn't change any of the version banners.
+mixed="$temporary_directory/cases/mixed-std"
+mkdir -p "$mixed"
+cp -R "$temporary_directory/cases/local-install/toolchain" "$mixed/toolchain"
+cat >> "$mixed/toolchain/bin/rustc" <<'EOF'
+[ "$1" = --version ] || exit 1
+EOF
+run_case mixed-std failure
+assert_contains "$mixed/output.log" 'could not load the installed host standard library'
+assert_no_links mixed-std
+
 # Both rustup names must survive a change to a symlink in the installation path.
 linked_prefix="$temporary_directory/cases/linked-prefix"
 mkdir -p "$linked_prefix/first" "$linked_prefix/second"

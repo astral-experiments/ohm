@@ -317,6 +317,12 @@ if [ -e "$installation_prefix" ] || [ -L "$installation_prefix" ]; then
     [ "$installed_version" = "$version" ] ||
         fail 'the installation prefix contains a different Ohm version'
     verify_installation "$installation_prefix"
+    # Reinstalling rust-std can leave all the version banners intact. Check that
+    # rustc can load std and libtest without requiring a native linker.
+    (
+        CDPATH='' cd "$temporary_directory" &&
+            "$installation_prefix/bin/rustc" --sysroot "$installation_prefix" --test --emit=metadata - </dev/null
+    ) || fail 'could not load the installed host standard library'
 else
     prefix_parent=${installation_prefix%/*}
     [ -n "$prefix_parent" ] && [ "$prefix_parent" != / ] ||
