@@ -38,7 +38,14 @@ def synthetic_runs():
                 "finished_at": 2,
                 "toolchains": {
                     lane: {
-                        name: {"sha256": "b" * 64, "version": f"synthetic {selector}"}
+                        name: {
+                            "sha256": "b" * 64,
+                            "version": (
+                                f"{name} 1.99.0-dev ({selector})"
+                                if lane == "ohm"
+                                else f"{name} {selector}"
+                            ),
+                        }
                         | (
                             {
                                 "libraries": {
@@ -188,6 +195,20 @@ class WorkflowReportTests(unittest.TestCase):
         ):
             with self.subTest(omissions=omissions), self.assertRaises(ValueError):
                 workflow_results.build_report(runs, omitted_projects=omissions)
+
+    def test_tool_versions_must_match_the_workflow_labels(self):
+        for lane, tool, version in (
+            ("ohm", "cargo", "cargo 1.99.0-dev (ohm-1.99.0-4)"),
+            ("ohm", "rustc", "rustc 1.99.0-dev (ohm-1.99.0-50)"),
+            ("stock", "rustc", "rustc 1.99.0-dev (ohm-1.99.0-5)"),
+            ("stock", "cargo", "cargo 1.98.0"),
+        ):
+            with self.subTest(lane=lane, tool=tool):
+                report = copy.deepcopy(self.report)
+                for run in report["runs"]:
+                    run["metadata"]["toolchains"][lane][tool]["version"] = version
+                with self.assertRaises(ValueError):
+                    workflow_results.validate(report)
 
     def test_unreleased_build_must_match_its_source_revision(self):
         for cargo_revision in (None, "3" * 40):
