@@ -1,6 +1,6 @@
 # Optimizations
 
-Ohm 1.100.0-8 builds on Rust 1.100.0 and LLVM 23.1.5. It speeds up development with changes to
+Ohm 1.100.0-9 builds on Rust 1.100.0 and LLVM 23.1.5. It speeds up development with changes to
 Cargo, rustc, LLVM, Clippy, and rustfmt.
 
 ## Cargo and builds
@@ -66,11 +66,13 @@ to the deprecation message requires a new check.
 [Constructors](https://github.com/astral-experiments/ohm-rust/pull/526) ·
 [Doc comments](https://github.com/astral-experiments/ohm-rust/pull/555)
 
-If a method grows, rustc measures the gap to a following derive from the end of the method. For
-exported derive helpers it uses the source coordinates stored in metadata. For binary checks, it
-can also record where `unix` occurs inside `#[cfg(unix)]` instead of where the predicate occurs in
-the file. An edit inside the attribute still changes the hash.
+When the last method in an inherent or trait implementation grows, a following derive can move
+with it. Rustc measures the gap from the end of that method. The trait method must appear in the
+source. For exported derive helpers, rustc uses the coordinates stored in metadata. For binary
+checks it can also record where `unix` occurs inside `#[cfg(unix)]`. Editing the attribute still
+changes the hash.
 [Derive locations](https://github.com/astral-experiments/ohm-rust/pull/630) ·
+[Trait methods](https://github.com/astral-experiments/ohm-rust/pull/655) ·
 [Helper attributes](https://github.com/astral-experiments/ohm-rust/pull/631) ·
 [Conditional compilation](https://github.com/astral-experiments/ohm-rust/pull/644)
 
@@ -81,6 +83,11 @@ through `$crate`. Cargo falls back if a dependency is still building or was rebu
 invocation.
 [Transitive dependencies](https://github.com/astral-experiments/ohm-cargo/pull/629) ·
 [Implicit dependencies](https://github.com/astral-experiments/ohm-rust/pull/638)
+
+An exported type can reach the same field through many intermediate types. Rustc hashes the sum at
+each branch so that repeated doubling cannot erase the field’s contribution to the public API
+hash.
+[Shared descendants](https://github.com/astral-experiments/ohm-rust/pull/653)
 
 Changing `/*abc*/` to `/*汉*/` preserves the byte offsets on that line but moves the next token two
 characters to the left. A downstream constant can observe the column through `Location::caller()`.
@@ -237,6 +244,23 @@ results from compatible builds of libraries, binaries, and tests after checking 
 build inputs, and saved files are compatible. Ohm also replays cached warnings and keeps earlier
 check results when you build tests, so switching between testing and checking can reuse work from
 both.
+
+Suppose rustc read `data.rs` for `mod data;`. Adding `data/mod.rs` makes the declaration ambiguous
+even if the first file is unchanged. Cargo checks for the other path before reusing a native build
+for a check, skipping a dependent crate or accepting a worktree snapshot. If both files exist,
+rustc decides whether an explicit `#[path]` resolves the ambiguity.
+[Native builds](https://github.com/astral-experiments/ohm-cargo/pull/644) ·
+[Dependents](https://github.com/astral-experiments/ohm-cargo/pull/646) ·
+[Worktrees](https://github.com/astral-experiments/ohm-cargo/pull/648)
+
+Before reusing a native build or skipping a dependent crate, Cargo checks that cached warnings
+match the requested format. A new worktree regenerates those warnings once, even if the format
+matches. When a workspace check selects a library and another member reuses its build, Cargo
+reports the warnings once and names the metadata file the dependent used.
+[Build warnings](https://github.com/astral-experiments/ohm-cargo/pull/650) ·
+[Dependent warnings](https://github.com/astral-experiments/ohm-cargo/pull/658) ·
+[Imported diagnostics](https://github.com/astral-experiments/ohm-cargo/pull/654) ·
+[Workspace checks](https://github.com/astral-experiments/ohm-cargo/pull/670)
 
 For example, suppose you run `cargo +ohm build`, then `cargo +ohm check` in the same workspace. The
 build has already checked and compiled a dependency such as `memchr`. If its inputs still match, Ohm
@@ -643,6 +667,11 @@ settings take precedence over Ohm's default.
 
 For example, a panic backtrace can still point to `parser.rs:42`. If you stop there in a debugger
 and want to inspect a local variable such as `tokens`, rebuild with full debug information.
+
+With full debug information, Cargo keeps the original compilation directory so a debugger finds
+the right checkout. It skips automatic worktree seeding for those units. Explicitly setting
+`-Zohm-worktree-seeds=yes` overrides this safeguard.
+[Debug paths](https://github.com/astral-experiments/ohm-cargo/pull/668)
 
 For large incremental `-O1` libraries with DWARF 4 line tables, LLVM on x86-64 Linux can reuse a
 machine object after an insertion moves source lines. It checks the optimized IR, rewrites the
@@ -1073,6 +1102,18 @@ parsing context match. Rustc adjusts source locations and attribute IDs, then ex
 resolves names in the current crate. It reparses files that produced diagnostics and skips snapshots
 that grow too large. [Parsed modules](https://github.com/astral-experiments/ohm-rust/pull/450)
 
+When tests are disabled, rustc can leave a free function’s body out of the saved syntax if the
+only attributes are `#[cfg(test)]` and an optional `#[test]`. It still parses the entire file,
+keeps the declaration for cfg checks and saves the body if a lint needs it before expansion.
+[Disabled tests](https://github.com/astral-experiments/ohm-rust/pull/654)
+
+Editing one function need not rerun built-in late lints, privacy checks or stability checks on
+every large function in the same module. Rustc tracks these checks separately for module-level
+functions and methods with at least 128 nodes in its high-level representation. This takes extra
+dependency nodes and space for the nested definitions. Custom lint passes and rustdoc keep their
+usual lint traversal.
+[Large functions](https://github.com/astral-experiments/ohm-rust/pull/656)
+
 A Ruff edit to support `CLICOLOR=0` changed a dependency hash stored in nine libraries. In
 `ruff_linter`, that meant encoding 16.3 MB of metadata to update a 16-byte field. During a native
 rebuild, rustc checks the saved item data against the current queries and refreshes the dependency
@@ -1486,6 +1527,18 @@ instructions with the combined −31 SDK than with signed −30. The measurement
 order-balanced pairs. [rustc #399](https://github.com/astral-experiments/ohm-rust/pull/399) ·
 [rustc #400](https://github.com/astral-experiments/ohm-rust/pull/400)
 
+Ohm can merge identical functions before ThinLTO. It skips this extra pass on AMDGPU so each
+kernel keeps its exported descriptor. It also skips Mach-O units with weak or link-once functions
+so a stronger definition supplied at link time can override the fallback.
+[AMDGPU kernels](https://github.com/astral-experiments/ohm-rust/pull/649) ·
+[Mach-O definitions](https://github.com/astral-experiments/ohm-rust/pull/651)
+
+With `CARGO_UNSTABLE_OHM_FOCUSED_TESTS=true`, `cargo test -p parser --lib tests::first -- --exact`
+can produce a runner for just the selected test. The runner references the other tests separately
+for dead code analysis. This keeps the selected test descriptors alive under Rust 2024’s temporary
+lifetime rules.
+[Focused tests](https://github.com/astral-experiments/ohm-rust/pull/647)
+
 At optimization level 1, rustc gives eligible test harnesses a smaller LLVM inlining budget. LLVM
 spends fewer instructions duplicating callees while preparing the test executable. Crates that
 supply their own LLVM inlining settings keep those settings.
@@ -1634,6 +1687,11 @@ text used to decide whether a procedural macro generated the code.
 [Fix order](https://github.com/astral-experiments/ohm-rust-clippy/pull/100) ·
 [Grouping](https://github.com/astral-experiments/ohm-rust-clippy/pull/102) ·
 [Macro input](https://github.com/astral-experiments/ohm-rust-clippy/pull/96)
+
+Clippy rewrites `Some(a ^ b).unwrap().wrapping_add(Some(x & b).unwrap())` as `(a ^
+b).wrapping_add(x & b)`. Only the receiver needs parentheses. The result keeps its meaning and
+compiles with `#![deny(unused_parens)]`.
+[Literal unwraps](https://github.com/astral-experiments/ohm-rust-clippy/pull/104)
 
 Clippy can reuse results from boolean, comparison-chain, documentation, and unit-expression lint
 passes. It still checks the documentation inputs before reusing a warning. Editing included
