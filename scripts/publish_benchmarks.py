@@ -7,8 +7,10 @@ import json
 import math
 from pathlib import Path
 import re
+import shutil
 import statistics
 import subprocess
+import tempfile
 
 import workflow_results
 
@@ -656,6 +658,30 @@ def normalized_markdown(text):
     return re.sub(r"\s+", " ", text).strip()
 
 
+def write_formatted(updated, reports):
+    """Leave the checked-in files intact if Prettier fails."""
+    prettier = ROOT / "node_modules/.bin/prettier"
+    if not prettier.is_file():
+        raise ValueError("Run npm ci --ignore-scripts before formatting benchmarks")
+    with tempfile.TemporaryDirectory(dir=ROOT) as directory:
+        stage = Path(directory)
+        paths = list(updated)
+        for name, text in updated.items():
+            (stage / name).write_text(text)
+        # Install sessions.json last. Its release is what prevents a second publication.
+        for kind in sorted(reports, key=lambda kind: kind == "sessions"):
+            name = f"scripts/benchmark_results/{kind}.json"
+            (stage / name).parent.mkdir(parents=True, exist_ok=True)
+            write_json(stage / name, compact(reports[kind]))
+            paths.append(name)
+        subprocess.run([str(prettier), "--write", *paths], cwd=stage, check=True)
+        for name in paths:
+            destination = ROOT / name
+            if destination.exists():
+                shutil.copymode(destination, stage / name)
+            (stage / name).replace(destination)
+
+
 def publish(directory):
     kinds = KINDS if (directory / "disk.json").exists() else TIMING_KINDS
     reports = {kind: load(directory / f"{kind}.json") for kind in kinds}
@@ -664,30 +690,12 @@ def publish(directory):
     release, _ = validate(reports)
     if "disk" in kinds and release not in reports["disk"]["toolchains"]:
         raise ValueError("New disk measurements must match the timing release")
-    updated = documents(reports)
-    prettier = ROOT / "node_modules/.bin/prettier"
-    if not prettier.is_file():
-        raise ValueError("Run npm ci --ignore-scripts before publishing benchmarks")
-    paths = {kind: f"scripts/benchmark_results/{kind}.json" for kind in kinds}
     current = RESULTS / "sessions.json"
     if current.exists() and load(current)["ohm_release"] == release:
         raise ValueError(
             "Results already exist for this release; refusing to replace them"
         )
-    for kind, path in paths.items():
-        write_json(ROOT / path, compact(reports[kind]))
-    for name, text in updated.items():
-        (ROOT / name).write_text(text)
-    subprocess.run(
-        [
-            str(prettier),
-            "--write",
-            *paths.values(),
-            *updated,
-        ],
-        cwd=ROOT,
-        check=True,
-    )
+    write_formatted(documents(reports), {kind: reports[kind] for kind in kinds})
 
 
 def main():
@@ -720,13 +728,7 @@ def main():
                 raise ValueError(f"{name}: benchmark tables are stale")
         print("Benchmark reports and tables match")
     elif args.render:
-        prettier = ROOT / "node_modules/.bin/prettier"
-        if not prettier.is_file():
-            raise ValueError("Run npm ci --ignore-scripts before rendering benchmarks")
-        updated = documents(latest_reports())
-        for name, text in updated.items():
-            (ROOT / name).write_text(text)
-        subprocess.run([str(prettier), "--write", *updated], cwd=ROOT, check=True)
+        write_formatted(documents(latest_reports()), {})
         print("Benchmark tables refreshed")
     else:
         publish(args.reports)

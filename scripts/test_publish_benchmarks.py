@@ -4,6 +4,7 @@ import copy
 from pathlib import Path
 import shutil
 import statistics
+import subprocess
 import tempfile
 import unittest
 from unittest import mock
@@ -438,6 +439,47 @@ class PublicationTests(unittest.TestCase):
                     Path(publish.RUFF_DOCTEST_REPORT).stem,
                 },
             )
+
+    def test_failed_format_preserves_reports_and_allows_retry(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.prepare_publication(root)
+            results = root / "scripts/benchmark_results"
+            shutil.copyfile(publish.RESULTS / "disk.json", results / "disk.json")
+            publish.write_json(
+                results / "sessions.json", {"ohm_release": "ohm-0.0.0-1"}
+            )
+            for kind in publish.TIMING_KINDS:
+                publish.write_json(root / "inputs" / f"{kind}.json", self.reports[kind])
+
+            def snapshot():
+                return {
+                    p: p.read_bytes()
+                    for p in [*root.glob("*.md"), *results.glob("*.json")]
+                }
+
+            def fail(command, *, cwd, check):
+                (cwd / "README.md").write_text("partially formatted")
+                raise subprocess.CalledProcessError(1, command)
+
+            with (
+                mock.patch.object(publish, "ROOT", root),
+                mock.patch.object(publish, "RESULTS", results),
+                mock.patch.object(publish.subprocess, "run", side_effect=fail) as run,
+            ):
+                before = snapshot()
+                with self.assertRaises(subprocess.CalledProcessError):
+                    publish.publish(root / "inputs")
+                after = snapshot()
+                self.assertEqual(after.keys(), before.keys())
+                for path in before:
+                    self.assertEqual(after[path], before[path], path.name)
+                run.side_effect = None
+                publish.publish(root / "inputs")
+                self.assertEqual(
+                    publish.load(results / "sessions.json")["ohm_release"],
+                    self.reports["sessions"]["ohm_release"],
+                )
 
     def test_publish_timing_release_preserves_disk_measurements_and_labels(self):
         with tempfile.TemporaryDirectory() as directory:
