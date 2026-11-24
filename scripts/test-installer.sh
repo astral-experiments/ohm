@@ -56,6 +56,9 @@ for binary in rustc rustdoc cargo cargo-clippy clippy-driver rustfmt cargo-fmt; 
       > "$prefix/bin/$binary"
   elif [ "$binary" = rustdoc ] && [ "${OHM_TEST_RUSTDOC:-present}" = broken ]; then
     printf '#!/bin/sh\nexit 1\n' > "$prefix/bin/$binary"
+  elif [ "$binary" = cargo ] || [ "$binary" = rustdoc ]; then
+    printf '#!/bin/sh\nprintf "%s 1.97.1-dev (ohm installer fixture) (%s)\\n"\n' \
+      "$binary" "$OHM_TEST_VERSION" > "$prefix/bin/$binary"
   else
     printf '#!/bin/sh\nprintf "%s 1.97.1\\n"\n' "$binary" \
       > "$prefix/bin/$binary"
@@ -593,6 +596,18 @@ assert_not_contains "$temporary_directory/cases/local-install/curl.log" 'https:/
 
 run_case local-install success
 assert_no_links local-install
+
+# A component installed over the existing prefix can leave .ohm-version intact.
+for binary in cargo rustdoc; do
+  mixed="$temporary_directory/cases/mixed-$binary"
+  mkdir -p "$mixed"
+  cp -R "$temporary_directory/cases/local-install/toolchain" "$mixed/toolchain"
+  printf '#!/bin/sh\nprintf "%s 1.97.1-dev (ohm-1.97.1-1)\\n"\n' "$binary" \
+    > "$mixed/toolchain/bin/$binary"
+  run_case "mixed-$binary" failure
+  assert_contains "$mixed/output.log" "the installed $binary has an unexpected Ohm release version"
+  assert_no_links "mixed-$binary"
+done
 
 # Both rustup names must survive a change to a symlink in the installation path.
 linked_prefix="$temporary_directory/cases/linked-prefix"
