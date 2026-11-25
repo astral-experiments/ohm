@@ -96,8 +96,10 @@ def write(file,contents):
     p.parent.mkdir(parents=True,exist_ok=True);p.write_text(contents)
 def probes(folder,role):
     base='[package]\nname="%s"\nversion="1.0.0"\nedition="2024"\n'
-    write("Cargo.toml",base%"facade"+'[workspace]\n[dependencies]\nleaf.path="leaf"\nmiddle.path="middle"\n')
+    write("Cargo.toml",base%"facade"+'[workspace]\nmembers=["reader"]\n[dependencies]\nleaf.path="leaf"\nmiddle.path="middle"\n')
     write("middle/Cargo.toml",base%"middle"+'[dependencies]\nleaf.path="../leaf"\n')
+    write("reader/Cargo.toml",base%"reader"+'[dependencies]\nmiddle.path="../middle"\n')
+    write("reader/src/lib.rs",'#[doc(inline)] pub use middle::read;\n')
     write("leaf/Cargo.toml",base%"leaf")
     write("middle/src/lib.rs",'pub use leaf::read;\n')
     write("src/lib.rs",'#[doc(inline)] pub use leaf::read;\n#[doc(inline)] pub use middle::read as via;\n')
@@ -110,9 +112,9 @@ def probes(folder,role):
         assert p.returncode==allowed,(phase,p.stderr[-1000:])
         return p
     def doc(phase,dest=target):
-        p=action(phase,'doc --no-deps',dest)
-        if phase=='doc3':assert 'Documenting facade' not in p.stderr
-        return [re.findall('src/leaf/lib.rs.html#([0-9-]+)',(dest/'doc'/'facade'/('fn.'+name+'.html')).read_text())[0]for name in ('read','via')]
+        p=action(phase,'doc -p facade -p reader --no-deps',dest)
+        if phase=='doc3':assert 'Documenting' not in p.stderr
+        return [re.findall('src/leaf/lib.rs.html#([0-9-]+)',(dest/'doc'/pkg/'fn.read.html').read_text())[0]for pkg in ('facade','reader')]
     proof={}
     proof["initial"]=doc("doc1"); assert proof["initial"]==["2-3"]*2
     leaf(7)
@@ -192,6 +194,7 @@ def sequence(variant):
     git('checkout','-q','-f','--detach',record["revs"][0])
     run(cargo,"fetch","--locked",cwd=src,env=env,stderr=subprocess.DEVNULL)
     def metas():
+        launch('metadata-prime',['metadata','--format-version=1'])
         for i in range(3):launch('metadata'+str(i),['metadata','--format-version=1'])
     if case=='ruff':
         args=['check','-p','ruff_linter','-v']
