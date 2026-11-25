@@ -19,6 +19,13 @@ if [[ ! "$OHM_TOOLCHAIN" =~ ^ohm-[0-9]+\.[0-9]+\.[0-9]+-[1-9][0-9]*$ ]]; then
   exit 1
 fi
 jq -e --arg toolchain "$OHM_TOOLCHAIN" '.release.toolchain_name == $toolchain' "$manifest" >/dev/null
+rustfmt_revision="$(jq -r '.sources.rustfmt.revision' "$manifest")"
+if [[ ! "$rustfmt_revision" =~ ^[0-9a-f]{40}$ ]]; then
+  echo "expected a pinned rustfmt revision" >&2
+  exit 1
+fi
+# rustfmt prints the first ten digits of its commit in --version.
+rustfmt_revision=${rustfmt_revision:0:10}
 cd -P -- "$2"
 
 targets=(aarch64-apple-darwin x86_64-unknown-linux-gnu)
@@ -67,11 +74,17 @@ minimum_glibc="$(LC_ALL=C python3 "$script_directory/verify-linux-llvm.py" --min
 awk -v version="$OHM_TOOLCHAIN" \
   -v macos_sha256="$macos_sha256" \
   -v linux_sha256="$linux_sha256" \
+  -v rustfmt_revision="$rustfmt_revision" \
   -v minimum_glibc="$minimum_glibc" \
   -v wild_version="$wild_version" '
   $0 == "embedded_wild_version=" {
     print "embedded_wild_version=" wild_version
     ++wild_count
+    next
+  }
+  $0 == "embedded_rustfmt_revision=" {
+    print "embedded_rustfmt_revision=" rustfmt_revision
+    ++rustfmt_count
     next
   }
   $0 == "embedded_minimum_glibc=" {
@@ -96,7 +109,8 @@ awk -v version="$OHM_TOOLCHAIN" \
   }
   { print }
   END {
-    if (version_count != 1 || glibc_count != 1 || macos_count != 1 || linux_count != 1 || wild_count != 1) {
+    if (version_count != 1 || glibc_count != 1 || rustfmt_count != 1 ||
+        macos_count != 1 || linux_count != 1 || wild_count != 1) {
       exit 1
     }
   }

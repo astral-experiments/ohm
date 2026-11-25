@@ -2,6 +2,7 @@
 set -eu
 
 embedded_version=
+embedded_rustfmt_revision=
 embedded_minimum_glibc=
 embedded_wild_version=
 embedded_archive_sha256_aarch64_apple_darwin=
@@ -304,6 +305,13 @@ verify_installation() {
                 if [ "$executable" = rustc ]; then
                     rustc_version=$tool_version
                 fi
+                ;;
+            rustfmt|cargo-fmt)
+                # cargo-fmt reports the version of the formatter it will run.
+                case "$tool_version" in
+                    "rustfmt "*" ($embedded_rustfmt_revision "*) ;;
+                    *) fail "the installed $executable does not use rustfmt revision $embedded_rustfmt_revision" ;;
+                esac
                 ;;
             cargo-clippy)
                 clippy_version=$tool_version
