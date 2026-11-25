@@ -431,14 +431,8 @@ class WorkflowStudy(replay.Replay):
 
     def environment(self, scenario, label, selector, repetition):
         environment = super().environment(scenario, label, selector, repetition)
-        for key in list(environment):
-            if key.startswith("CARGO_PROFILE_") or key in {
-                "CARGO_BUILD_TARGET",
-                "CARGO_BUILD_RUSTFLAGS",
-                "LD_LIBRARY_PATH",
-                "LIBRARY_PATH",
-            }:
-                environment.pop(key)
+        for key in ("CARGO_BUILD_TARGET", "LD_LIBRARY_PATH", "LIBRARY_PATH"):
+            environment.pop(key, None)
         environment.update(scenario.environment)
         return environment
 

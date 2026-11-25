@@ -428,6 +428,23 @@ class ToolchainIsolationTests(ReplayTestCase):
                     inherited.keys() & environment.keys(), {"RUSTC_WRAPPER"}
                 )
 
+    def test_cargo_flags_and_profiles_must_come_from_the_scenario(self) -> None:
+        runner = self.runner()
+        inherited = {
+            "CARGO_BUILD_RUSTFLAGS": "-Cdebug-assertions=no",
+            "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS": "-Cdebug-assertions=no",
+            "CARGO_PROFILE_TEST_DEBUG_ASSERTIONS": "false",
+        }
+        linker = "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER"
+        with mock.patch.dict(os.environ, {**inherited, linker: "cc"}):
+            for overrides in ({}, inherited):
+                scenario = self.scenario(environment=overrides)
+                for label, selector in runner.toolchains:
+                    environment = runner.environment(scenario, label, selector, 0)
+                    for key in inherited:
+                        self.assertEqual(environment.get(key), overrides.get(key))
+                    self.assertEqual(environment[linker], "cc")
+
     def test_stock_and_ohm_have_private_targets_and_trust_settings(self) -> None:
         scenario = self.scenario(environment={"CARGO_PROFILE_DEV_OPT_LEVEL": "1"})
         runner = self.runner("--jobs", "4")

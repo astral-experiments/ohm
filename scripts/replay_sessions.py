@@ -811,6 +811,14 @@ class Replay:
         environment = compiler_environment()
         environment.pop("RUSTFMT", None)
         environment.pop("RUSTFMT_WRAPPER", None)
+        # Cargo also reads compiler flags and profile settings from the environment.
+        for key in list(environment):
+            if (
+                key == "CARGO_BUILD_RUSTFLAGS"
+                or key.startswith("CARGO_PROFILE_")
+                or (key.startswith("CARGO_TARGET_") and key.endswith("_RUSTFLAGS"))
+            ):
+                environment.pop(key)
         environment.update(scenario.environment)
         environment["RUSTUP_TOOLCHAIN"] = selector
         environment["CARGO_BUILD_JOBS"] = str(self.options.jobs)
