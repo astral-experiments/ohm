@@ -56,6 +56,8 @@ for binary in rustc rustdoc cargo cargo-clippy clippy-driver rustfmt cargo-fmt; 
       > "$prefix/bin/$binary"
   elif [ "$binary" = rustdoc ] && [ "${OHM_TEST_RUSTDOC:-present}" = broken ]; then
     printf '#!/bin/sh\nexit 1\n' > "$prefix/bin/$binary"
+  elif [ "$binary" = cargo-fmt ]; then
+    printf '%s\n' '#!/bin/sh' 'exec "${RUSTFMT-${0%/*}/rustfmt}" "$@"' > "$prefix/bin/$binary"
   elif [ "$binary" = cargo ] || [ "$binary" = rustdoc ]; then
     printf '#!/bin/sh\nprintf "%s 1.97.1-dev (ohm installer fixture) (%s)\\n"\n' \
       "$binary" "$OHM_TEST_VERSION" > "$prefix/bin/$binary"
@@ -596,7 +598,9 @@ if [ ! -x "$temporary_directory/cases/trailing-slash-prefix/toolchain/bin/rustc"
   exit 1
 fi
 
-run_case local-install success
+# A configured formatter may only exist after the staged installation is activated.
+RUSTFMT="$temporary_directory/cases/local-install/toolchain/bin/rustfmt" \
+  run_case local-install success
 assert_contains "$temporary_directory/cases/local-install/output.log" \
   "ohm: copying $version for aarch64-apple-darwin"
 if [ ! -x "$temporary_directory/cases/local-install/toolchain/bin/rustdoc" ]; then
@@ -609,7 +613,7 @@ assert_contains "$temporary_directory/cases/local-install/rustup.log" \
 assert_contains "$temporary_directory/cases/local-install/rustup.log" 'toolchain link ohm '
 assert_not_contains "$temporary_directory/cases/local-install/curl.log" 'https://'
 
-run_case local-install success
+RUSTFMT=false run_case local-install success
 assert_no_links local-install
 
 # A component installed over the existing prefix can leave .ohm-version intact.

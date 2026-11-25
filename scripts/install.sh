@@ -271,6 +271,8 @@ awk '
 
 verify_installation() {
     installation_directory=$1
+    # Let cargo-fmt check the rustfmt beside it, including in the staging directory.
+    unset RUSTFMT
     for executable in rustc rustdoc cargo cargo-clippy clippy-driver rustfmt cargo-fmt; do
         executable_path=$installation_directory/bin/$executable
         [ -f "$executable_path" ] && [ -x "$executable_path" ] ||
