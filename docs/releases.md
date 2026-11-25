@@ -9,8 +9,9 @@ python3 scripts/list_patches.py toolchains/1.99.0/21.json
 ```
 
 The command uses `gh-auto` to compare each component's pinned revision with the corresponding
-upstream Rust release. It prints commit links in source-history order, including setup and CI
-changes.
+upstream Rust release. When a release uses Ohm LLVM, the command also compares the commits pinned by
+the `src/llvm-project` submodule in each Rust revision. It prints commit links in source-history
+order, including setup and CI changes.
 
 ## Bundled WebAssembly target
 
@@ -102,7 +103,8 @@ Component-PGO-capable Rust source revisions additionally optimize rustdoc, Cargo
 and cargo-fmt on both platforms; historical source revisions retain rustc-only PGO. Cargo shares
 the compiler's training profile, rustfmt shares its profile with cargo-fmt, and rustdoc and Clippy
 each train on their own workloads. Release builds reject missing, invalid, or misattributed merged
-profiles, reuse Rust's optimized CI LLVM, and additionally optimize the compiler with BOLT on Linux.
+profiles and optimize the compiler with BOLT on Linux. They build LLVM from source when the Rust
+revision pins Ohm LLVM. Otherwise they reuse Rust's optimized CI LLVM.
 
 ## Build and publish
 
