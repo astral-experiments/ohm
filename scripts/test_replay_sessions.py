@@ -395,6 +395,18 @@ class ToolchainIsolationTests(ReplayTestCase):
             ["just", "test", "-p", "codex-tui"],
         )
 
+    def test_formatter_overrides_must_come_from_the_scenario(self) -> None:
+        runner = self.runner()
+        inherited = {"RUSTFMT": "other-rustfmt", "RUSTFMT_WRAPPER": "other-wrapper"}
+        explicit = {"RUSTFMT": "session-rustfmt", "RUSTFMT_WRAPPER": "session-wrapper"}
+        with mock.patch.dict(os.environ, inherited):
+            for overrides in ({}, explicit):
+                scenario = self.scenario(environment=overrides)
+                for label, selector in runner.toolchains:
+                    environment = runner.environment(scenario, label, selector, 0)
+                    for key in inherited:
+                        self.assertEqual(environment.get(key), overrides.get(key))
+
     def test_compiler_overrides_must_come_from_the_scenario(self) -> None:
         scenario = self.scenario(environment={"RUSTC_WRAPPER": "scenario-wrapper"})
         runner = self.runner()
