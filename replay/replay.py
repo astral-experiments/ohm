@@ -160,7 +160,7 @@ def sequence(role,variant):
         if i and record["request"]and (record["request"]=="repeat"or i==2):
             launch("request"+str(i),["rustc","--profile","check","--lib","-v","-p",app])
             launch("noop"+str(i),["check","-v","-p",app])
-    if app=="ruff_linter":
+    if case=='ruff-dep':
         for i in range(3):
             launch("metadata"+str(i),["metadata","--format-version=1"])
     launch("final",["check","--lib","-p",app,"--message-format=json"])

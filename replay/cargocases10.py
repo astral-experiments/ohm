@@ -312,6 +312,31 @@ def cutoff(t):
         require("E0308" in t.cargo(cmd,check=False).stderr,t.log)
     return jobs
 
+@case("rustc667")
+def compiler(t):
+    opt=mode(t) and not fallback
+    hint=["-Zohm-check-only"] if opt else []
+    cmd=[t.kit/"bin/rustc","--crate-type=rlib","leaf.rs","-Zohm-early-metadata",
+        "-Zohm-shared-stages","-Zpublic-api-hash","-Cincremental=state"]
+    output="--emit=dep-info"if opt else "--emit=dep-info,metadata"
+    t.write("leaf.rs","pub fn value()->u8{false}")
+    t.run(*cmd,"--emit=dep-info")
+    require("E0308"in t.run(*cmd,output,*hint,check=False).stderr,t.log)
+    t.write("leaf.rs","pub fn value()->u8{1}")
+    t.run(*cmd,output,*hint)
+    assert (t.dir/"leaf.d").exists()
+    if opt:assert not (t.dir/"libleaf.rmeta").exists()
+    t.run(*cmd,"--emit=metadata,dep-info",*hint,"-Zassert-incr-state=loaded")
+    t.write("reader.rs","fn main(){let _:u8=leaf::value();}")
+    assert not read(t,{"leaf":t.dir/'libleaf.rmeta'}).returncode
+    t.write("leaf.rs","pub fn value()->u16{256}")
+    t.run(*cmd,output,*hint,"-Zassert-incr-state=loaded")
+    t.run(*cmd,"--emit=metadata,link","-Zassert-incr-state=loaded")
+    t.write("caller.rs","extern crate leaf; fn main(){assert_eq!(256u16,leaf::value());}")
+    t.run(t.kit/"bin/rustc","caller.rs","--extern","leaf=libleaf.rlib")
+    t.run(t.dir/"caller")
+    return dict(hint=opt,checked_type=True,linked=True)
+
 pilot=os.environ.get('PILOT')=='1'
 fallback=os.environ.get('LOCAL_FALLBACK')=='1'
 report={}
