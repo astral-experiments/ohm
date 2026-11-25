@@ -1,6 +1,6 @@
 # Optimizations
 
-Ohm 1.100.0-9 builds on Rust 1.100.0 and LLVM 23.1.5. It speeds up development with changes to
+Ohm 1.100.0-10 builds on Rust 1.100.0 and LLVM 23.1.5. It speeds up development with changes to
 Cargo, rustc, LLVM, Clippy, and rustfmt.
 
 ## Cargo and builds
@@ -23,6 +23,14 @@ bindings that downstream name resolution can reach, including aliases used by ex
 [Glob imports](https://github.com/astral-experiments/ohm-rust/pull/476) ·
 [Re-exports](https://github.com/astral-experiments/ohm-rust/pull/483) ·
 [Macro aliases](https://github.com/astral-experiments/ohm-rust/pull/486)
+
+A private alias can also determine where a documentation link points. If a downstream crate
+inlines a public function whose docs say `[Chosen]`, changing what `Chosen` names must update that
+link. Rustc includes the resolved links and traits in scope in the public hash. In a library that
+re-exports another crate’s types, it also keeps stable references to that crate in check and
+Clippy metadata. The two libraries remain usable together after a private edit.
+[Documentation links](https://github.com/astral-experiments/ohm-rust/pull/676) ·
+[Dependency references](https://github.com/astral-experiments/ohm-cargo/pull/672)
 
 For a public function returning `impl Trait`, downstream code can depend on properties of its hidden
 type, including whether it implements `Send`. Ohm follows those reachable types when hashing the
@@ -269,6 +277,14 @@ can use the metadata from that build instead of checking `memchr` again. Similar
 results if the inputs still match. If you check, build, and then check again, Ohm can also reuse
 the first check's results.
 
+Rustc can hard-link a check’s metadata into its incremental cache. Cargo replaces a shared file
+when it imports metadata from a build, so undoing an edit still restores the original result.
+Cargo also checks a target again if it read an executable path or the path to a software bill of
+materials. Those values can differ between a build and a check.
+[Hard links](https://github.com/astral-experiments/ohm-cargo/pull/674) ·
+[Executable paths](https://github.com/astral-experiments/ohm-cargo/pull/681) ·
+[Build-only inputs](https://github.com/astral-experiments/ohm-cargo/pull/685)
+
 If one compiler invocation would see both a native and a checked copy of the same library, Cargo
 checks the dependencies that would introduce the conflicting copy. Other roots and host procedural
 macros can still reuse their native artifacts. Cargo also reruns a check when its saved outputs are
@@ -279,6 +295,17 @@ with published Ohm 1.99.0-31. Checking `codex-core` took 102.36 and 26.75 second
 
 In a Linux uv experiment, reusing native dependencies reduced the median time for the first check
 after `cargo test --no-run` from 36.1 to 22.2 seconds.
+
+With `cargo +ohm -Zohm-terminal-checks check -p mylib`, rustc can check every function without
+writing library metadata if no other target needs it. Leave this option off if another tool reads
+the file directly. A JSON check requests metadata explicitly. If you next check a dependent crate,
+Cargo may have to compile the library again. After such a request it anticipates the same need on
+the next edit. Cargo can still skip a check and replay its warnings after a private dependency
+edit.
+[Opt-in checks](https://github.com/astral-experiments/ohm-cargo/pull/690) ·
+[Compiler analysis](https://github.com/astral-experiments/ohm-rust/pull/667) ·
+[Repeated requests](https://github.com/astral-experiments/ohm-cargo/pull/693) ·
+[Dependency edits](https://github.com/astral-experiments/ohm-cargo/pull/694)
 
 If a selected CLI loses its `.rmeta` file, Cargo rebuilds the missing output and keeps the
 dependency graph it already verified. After `cargo clean -p`, it validates the surviving
@@ -367,6 +394,12 @@ See:
 Set `CARGO_BUILD_BUILD_DIR` to the same directory across projects or worktrees to let Ohm share
 their compiled registry dependencies. Cargo verifies that the package, compiler, configuration, and
 build inputs match before it reuses a dependency, and uses locks to coordinate concurrent builds.
+
+A second worktree that needs `adler2` can use it while the first worktree is still compiling
+`jemalloc`. Cargo admits readers once every unit writing to the same output directory has finished
+successfully. On Linux and macOS this costs an extra file descriptor per reserved writer. A
+separate cache namespace isolates older writers.
+[Concurrent builds](https://github.com/astral-experiments/ohm-cargo/pull/695)
 
 Each worktree keeps its incremental compiler state, documentation, scratch files, and final
 outputs in its own target directory. The shared build directory holds eligible registry artifacts
@@ -723,6 +756,13 @@ Cargo can reuse the selected versions after edits confined to trailing profile t
 Rust and Clippy lint tables, while still applying the new settings. It still resolves the packages
 and features needed by the current command.
 
+Nextest reads metadata and build messages even when every artifact is fresh. Cargo formats each
+package ID once and copies it where it recurs in the dependency graph. When color is off and the
+output stream has no escape sequence in progress, Cargo can write plain lines without parsing
+terminal escapes.
+[Package IDs](https://github.com/astral-experiments/ohm-cargo/pull/691) ·
+[Piped output](https://github.com/astral-experiments/ohm-cargo/pull/692)
+
 When a branch switch changes the lockfile, Cargo remembers the last two workspace resolutions.
 Returning to the previous branch can reuse its resolution after Cargo checks its lockfile and
 manifests. In a resolver-1 workspace, running `cargo check --workspace --no-default-features` from a
@@ -890,6 +930,21 @@ clean.
 [Configuration](https://github.com/astral-experiments/ohm-rustfmt/pull/96) ·
 [Opened files](https://github.com/astral-experiments/ohm-rustfmt/pull/102) ·
 [Rewritten modules](https://github.com/astral-experiments/ohm-rustfmt/pull/104)
+
+Two targets using different Rust editions can refer to the same file through hard links. If
+writing one target changes a file that another target skipped, cargo-fmt repeats the full
+selection in edition order, even when rustfmt reports a warning after the write.
+[Shared files](https://github.com/astral-experiments/ohm-rustfmt/pull/106)
+
+Cargo-fmt indexes workspace manifests and checks for shared modules only among skipped targets. It
+borrows paths and sorts distinct configuration directories once. Rustfmt can borrow many
+comment-free snippets and search for ASCII punctuation up to the first slash. In isolation, the
+snippet change saved 12.7% of instructions across cargo-fmt, Cargo metadata and rustfmt on uv’s
+final formatting check.
+[Manifests](https://github.com/astral-experiments/ohm-rustfmt/pull/107) ·
+[Skipped targets](https://github.com/astral-experiments/ohm-rustfmt/pull/108) ·
+[Configuration paths](https://github.com/astral-experiments/ohm-rustfmt/pull/110) ·
+[Text scans](https://github.com/astral-experiments/ohm-rustfmt/pull/113)
 
 An editor can save `child.rs` while rustfmt is checking another crate. Ohm records the module’s
 modification time and permissions before reading it. If those differ when the check finishes, the
@@ -1161,6 +1216,21 @@ items](https://github.com/astral-experiments/ohm-rust/pull/437) · [Import
 identities](https://github.com/astral-experiments/ohm-rust/pull/434) ·
 [Closures](https://github.com/astral-experiments/ohm-rust/pull/433)
 
+When a string in a function body changes, the declaration and body can still refer to exactly the
+same names. Rustc tracks them together for free functions, handwritten impl methods and ordinary
+free constants. If those names stay the same, the crate-wide dead-code check can reuse its result.
+[Dead-code analysis](https://github.com/astral-experiments/ohm-rust/pull/672)
+
+Rustc looks up strings by index in its symbol table. When reading the dependency graph it uses a
+small table to decode common row headers. For a dense first generation of the incremental query
+cache, it records offsets in graph order and uses a bitmap to find occupied slots. Sparse or large
+offsets keep their previous representation. When saving results for a future build, rustc merges
+the already ordered type-checking and borrow-checking entries with the new ones.
+[Symbols](https://github.com/astral-experiments/ohm-rust/pull/666) ·
+[Query offsets](https://github.com/astral-experiments/ohm-rust/pull/668) ·
+[Graph rows](https://github.com/astral-experiments/ohm-rust/pull/669) ·
+[Retained results](https://github.com/astral-experiments/ohm-rust/pull/671)
+
 Rustc stores the symbols each typed function references, so the dead-code lint can follow them
 without loading the whole type-check result. For queries with unchanged dependencies, rustc keeps
 their indices and copies their encoded dependencies into the next graph. Queries that run again
@@ -1377,6 +1447,21 @@ edits after eviction used 9.87% more instructions and 9.21% more instructions, r
 checked objects occupied 16.4 MiB for Ruff and 17.0 MiB for ty. Preparing the corresponding library
 tests after an edit used 0.03% fewer instructions for Ruff and 0.18% more instructions for ty. [LLVM #25](https://github.com/astral-experiments/ohm-llvm/pull/25) · [LLVM #26](https://github.com/astral-experiments/ohm-llvm/pull/26) · [rustc #406](https://github.com/astral-experiments/ohm-rust/pull/406) · [rustc #409](https://github.com/astral-experiments/ohm-rust/pull/409) · [rustc #414](https://github.com/astral-experiments/ohm-rust/pull/414) · [rustc #407](https://github.com/astral-experiments/ohm-rust/pull/407)
 
+After a dependency changes, a library may need new public hashes even though its own item metadata
+is unchanged. Rustc saves the inputs to those hashes and refreshes them from current dependencies.
+It re-encodes the metadata if validation fails. It also keeps the ordered calls collected for
+generic instantiations. These saved inputs can take several MiB per library.
+[Library metadata](https://github.com/astral-experiments/ohm-rust/pull/660) ·
+[Imported sources](https://github.com/astral-experiments/ohm-rust/pull/670)
+
+Growing a private field can change the LLVM hint for the number of bytes safe to read through a
+shared reference. For upstream structs of at least 64 bytes with only private fields and no
+generic parameters, rustc rounds this hint down to a multiple of 16 on calls and declarations. A
+change from 96 to 104 bytes can then leave a caller’s object reusable. Function definitions keep
+the full size. This applies to incremental x86-64 Linux builds at optimization level 1 with line
+tables, relink checks and LTO off.
+[Borrowed structs](https://github.com/astral-experiments/ohm-rust/pull/665)
+
 A source edit can also move a Rust caller location embedded in the native object. Rustc retains the
 original source, LLVM input and object, and LLVM records the names it emits for the location and its
 filename. When rustc can verify their correspondence, it updates the caller location and the DWARF
@@ -1394,6 +1479,14 @@ in 620 caller-location records.
 [LLVM #29](https://github.com/astral-experiments/ohm-llvm/pull/29) ·
 [LLVM #28](https://github.com/astral-experiments/ohm-llvm/pull/28) ·
 [LLVM #31](https://github.com/astral-experiments/ohm-llvm/pull/31)
+
+Moving a bounds check in a dependency can change the panic line embedded in its caller. Rustc can
+pair old and new locations for one changed imported file using debug records and checksums,
+without opening the source path. LLVM can follow the location through two local calls if each
+forwards it once without inspecting it. Rustc verifies the object and LLVM input before updating
+runtime and debug locations together. Ambiguous mappings require recompilation.
+[Imported locations](https://github.com/astral-experiments/ohm-rust/pull/673) ·
+[Forwarded locations](https://github.com/astral-experiments/ohm-llvm/pull/69)
 
 ### 21. Reuse async code after it moves
 
@@ -1724,6 +1817,17 @@ workspace crates. It also caches compiler capability checks when switching betwe
 For example, after checking a workspace, running Clippy can reuse unchanged registry dependencies
 instead of checking them again. Workspace crates still run through Clippy, including after an edit
 that introduces a lint.
+
+A Clippy rule can ban `keys::raw::Token` even if the client only sees its public alias,
+`keys::Handle`. Clippy consults private metadata to resolve these paths and tracks the metadata
+file when a private binding or missing name could change the result. An unrelated edit to that
+file can also trigger a check. For `allow-unwrap-types`, Clippy expands a configured alias once
+per lint pass and reads its current definition after an edit.
+[Private modules](https://github.com/astral-experiments/ohm-rust-clippy/pull/112) ·
+[Re-exports](https://github.com/astral-experiments/ohm-rust-clippy/pull/114) ·
+[Private items](https://github.com/astral-experiments/ohm-rust-clippy/pull/120) ·
+[Changed bindings](https://github.com/astral-experiments/ohm-rust-clippy/pull/122) ·
+[Type aliases](https://github.com/astral-experiments/ohm-rust-clippy/pull/124)
 
 When switching between a build and Clippy, Cargo keeps a resolution record for each workspace
 compiler wrapper. It shares one resolution across attempts to reuse registry artifacts and records
