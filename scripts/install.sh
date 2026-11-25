@@ -323,6 +323,16 @@ if [ -e "$installation_prefix" ] || [ -L "$installation_prefix" ]; then
         CDPATH='' cd "$temporary_directory" &&
             "$installation_prefix/bin/rustc" --sysroot "$installation_prefix" --test --emit=metadata - </dev/null
     ) || fail 'could not load the installed host standard library'
+
+    # Rustup cannot add targets to a linked toolchain. If the release bundles
+    # WebAssembly, check the target libraries and linker together.
+    wasm_target=wasm32-unknown-unknown
+    if grep -Fxq "$archive_root/rust-std-$wasm_target/manifest.in" "$temporary_directory/members"; then
+        printf 'fn main() {}\n' | "$installation_prefix/bin/rustc" --sysroot "$installation_prefix" \
+            --target "$wasm_target" -C "linker=$installation_prefix/lib/rustlib/$host_target/bin/rust-lld" \
+            -o "$temporary_directory/probe.wasm" - ||
+            fail "could not link for the installed $wasm_target target"
+    fi
 else
     prefix_parent=${installation_prefix%/*}
     [ -n "$prefix_parent" ] && [ "$prefix_parent" != / ] ||
