@@ -433,8 +433,6 @@ class WorkflowStudy(replay.Replay):
         environment = super().environment(scenario, label, selector, repetition)
         for key in list(environment):
             if key.startswith("CARGO_PROFILE_") or key in {
-                "RUSTFMT",
-                "RUSTFMT_WRAPPER",
                 "CARGO_BUILD_TARGET",
                 "CARGO_BUILD_RUSTFLAGS",
                 "LD_LIBRARY_PATH",

@@ -809,6 +809,8 @@ class Replay:
         self, scenario: Scenario, label: str, selector: str, repetition: int
     ) -> dict[str, str]:
         environment = compiler_environment()
+        environment.pop("RUSTFMT", None)
+        environment.pop("RUSTFMT_WRAPPER", None)
         environment.update(scenario.environment)
         environment["RUSTUP_TOOLCHAIN"] = selector
         environment["CARGO_BUILD_JOBS"] = str(self.options.jobs)
