@@ -204,7 +204,7 @@ def tui_session():
     run("cc","-O2","replay/pmuv.c","-o",wd/"meter")
     (_,hard)=resource.getrlimit(resource.RLIMIT_NOFILE)
     resource.setrlimit(resource.RLIMIT_NOFILE,(min(hard,65536),hard))
-    tmp=Path('/tmp/o100p10')
+    tmp=Path('/tmp/o100pa')
     tmp.mkdir(mode=0o700)
     os.environ.update(env)
     os.environ.update(TMPDIR=str(tmp),CARGO_HOME=str(root/'disk/registry'),MEASURE_CLIPPY=str(sdk/"bin/clippy-driver"))
@@ -305,7 +305,7 @@ def session_time():
     app=record["app"]
     (_,hard)=resource.getrlimit(resource.RLIMIT_NOFILE)
     resource.setrlimit(resource.RLIMIT_NOFILE,(min(hard,65536),hard))
-    tmp=Path('/tmp/o100p10')
+    tmp=Path('/tmp/o100pa')
     tmp.mkdir(mode=0o700)
     os.environ.update(env)
     os.environ.update(TMPDIR=str(tmp),CARGO_HOME=str(root/'disk/registry'),MEASURE_CLIPPY=str(sdk/"bin/clippy-driver"))
