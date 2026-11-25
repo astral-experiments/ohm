@@ -1,6 +1,6 @@
 # Optimizations
 
-Ohm 1.100.0-10 builds on Rust 1.100.0 and LLVM 23.1.5. It speeds up development with changes to
+Ohm 1.100.0-11 builds on Rust 1.100.0 and LLVM 23.1.5. It speeds up development with changes to
 Cargo, rustc, LLVM, Clippy, and rustfmt.
 
 ## Cargo and builds
@@ -31,6 +31,14 @@ re-exports another crate’s types, it also keeps stable references to that crat
 Clippy metadata. The two libraries remain usable together after a private edit.
 [Documentation links](https://github.com/astral-experiments/ohm-rust/pull/676) ·
 [Dependency references](https://github.com/astral-experiments/ohm-cargo/pull/672)
+
+Formatting a library can move the end of a signature without changing the public API. Cargo still
+skips an unchanged client during a check. If the client also changes, rustc uses the full
+dependency hash to recheck imported source locations. For documentation, Cargo tracks when it last
+checked each dependency, including indirect ones. A private edit can rerun rustdoc once so the
+Source link for an inlined item points to the current lines.
+[Source locations](https://github.com/astral-experiments/ohm-rust/pull/679) ·
+[Documentation links](https://github.com/astral-experiments/ohm-cargo/pull/703)
 
 For a public function returning `impl Trait`, downstream code can depend on properties of its hidden
 type, including whether it implements `Send`. Ohm follows those reachable types when hashing the
@@ -138,6 +146,15 @@ seconds with it.
 
 In a separate experiment, the compact metadata graph reduced the time to check Ruff after an edit by
 3.0%.
+
+Repeated edits can spend much of their time running procedural macros. With Ohm defaults enabled,
+set `CARGO_UNSTABLE_OHM_OPTIMIZE_MACRO_DEPS=true` to build eligible registry libraries at
+optimization level 1 for host macros. A workspace macro must declare a matching dependency and the
+library’s `proc-macro` feature must be active. Profile overrides take precedence. A build script
+or the application may need a second copy. In a Ruff replay on −11, the initial check used 9.93%
+more instructions. An edit and its reversal together used 3.80% fewer. The setting is off by
+default.
+[Macro dependencies](https://github.com/astral-experiments/ohm-cargo/pull/696)
 
 Cargo remembers when a registry macro reads a source span from another crate during a check. It can
 then enable incremental compilation on the first private native build of that dependency. When a
@@ -756,6 +773,17 @@ Cargo can reuse the selected versions after edits confined to trailing profile t
 Rust and Clippy lint tables, while still applying the new settings. It still resolves the packages
 and features needed by the current command.
 
+Even if every artifact is fresh, Cargo still checks the manifests, lockfile and outputs. It
+prepares inherited lint flags once, skips member paths it has already checked and can reuse a
+decoded lockfile after reopening it and comparing its contents. It also reuses a buffer for
+checksums and the last parsed diagnostic record when the bytes match. Each crate’s messages are
+still verified.
+[Manifests](https://github.com/astral-experiments/ohm-cargo/pull/697) ·
+[Metadata](https://github.com/astral-experiments/ohm-cargo/pull/698) ·
+[Lockfiles](https://github.com/astral-experiments/ohm-cargo/pull/699) ·
+[Diagnostics](https://github.com/astral-experiments/ohm-cargo/pull/700) ·
+[Checksums](https://github.com/astral-experiments/ohm-cargo/pull/701)
+
 Nextest reads metadata and build messages even when every artifact is fresh. Cargo formats each
 package ID once and copies it where it recurs in the dependency graph. When color is off and the
 output stream has no escape sequence in progress, Cargo can write plain lines without parsing
@@ -931,10 +959,12 @@ clean.
 [Opened files](https://github.com/astral-experiments/ohm-rustfmt/pull/102) ·
 [Rewritten modules](https://github.com/astral-experiments/ohm-rustfmt/pull/104)
 
-Two targets using different Rust editions can refer to the same file through hard links. If
-writing one target changes a file that another target skipped, cargo-fmt repeats the full
-selection in edition order, even when rustfmt reports a warning after the write.
-[Shared files](https://github.com/astral-experiments/ohm-rustfmt/pull/106)
+Two targets using different Rust editions can refer to the same file, even through hard links. If
+formatting one changes a file that the other skipped, cargo-fmt repeats the full selection in
+edition order. When a skipped example or a warning leaves cargo-fmt without a complete list of
+modules, it checks the skipped targets’ files directly.
+[Shared files](https://github.com/astral-experiments/ohm-rustfmt/pull/106) ·
+[Partial writes](https://github.com/astral-experiments/ohm-rustfmt/pull/115)
 
 Cargo-fmt indexes workspace manifests and checks for shared modules only among skipped targets. It
 borrows paths and sorts distinct configuration directories once. Rustfmt can borrow many
@@ -1181,6 +1211,14 @@ with line tables and LTO disabled, LLVM can copy a previous object and patch tha
 compares the optimized IR just before instruction selection and checks the encoding, section and
 references for each changed function. If any check fails, it regenerates the object. [Enum
 returns](https://github.com/astral-experiments/ohm-llvm/pull/37)
+
+LLVM can sometimes skip optimization too. For example, adding a rule may leave the possible word
+indices and bit positions in a bitset unchanged. LLVM can use the same wider bound for both
+versions. It tracks which functions return equal values so it can run the optimizer again if two
+function bodies could merge or split. A failed lookup adds work, and if only one version qualifies
+it can also prevent reuse after optimization.
+[Optimizer input](https://github.com/astral-experiments/ohm-llvm/pull/72) ·
+[Equal returns](https://github.com/astral-experiments/ohm-llvm/pull/74)
 
 The `compact_str` crate uses an assembly comment to make LLVM keep a value in a register. After an
 edit moves the comment, LLVM can reuse the object on x86-64 if the register input and the rest of
@@ -1479,6 +1517,11 @@ in 620 caller-location records.
 [LLVM #29](https://github.com/astral-experiments/ohm-llvm/pull/29) ·
 [LLVM #28](https://github.com/astral-experiments/ohm-llvm/pull/28) ·
 [LLVM #31](https://github.com/astral-experiments/ohm-llvm/pull/31)
+
+Moving an inline call from line 256 to 255 changes the number of bytes LLVM writes for its line
+number. Reusing the wider field would report the right line but change the build ID. LLVM requires
+the same field width as a clean build, including at the 65,536 boundary.
+[Debug line numbers](https://github.com/astral-experiments/ohm-llvm/pull/71)
 
 Moving a bounds check in a dependency can change the panic line embedded in its caller. Rustc can
 pair old and new locations for one changed imported file using debug records and checksums,
@@ -1828,6 +1871,11 @@ per lint pass and reads its current definition after an edit.
 [Private items](https://github.com/astral-experiments/ohm-rust-clippy/pull/120) ·
 [Changed bindings](https://github.com/astral-experiments/ohm-rust-clippy/pull/122) ·
 [Type aliases](https://github.com/astral-experiments/ohm-rust-clippy/pull/124)
+
+Suppose `keys::Key` contains a private `Counter` with a `Cell`. Clippy can honor
+`ignore-interior-mutability = ["keys::Counter"]` in a client of the library. The declaration is in
+the metadata that Clippy already tracks, so renaming the counter brings the warning back.
+[Private field types](https://github.com/astral-experiments/ohm-rust-clippy/pull/126)
 
 When switching between a build and Clippy, Cargo keeps a resolution record for each workspace
 compiler wrapper. It shares one resolution across attempts to reuse registry artifacts and records
