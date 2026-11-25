@@ -106,9 +106,6 @@ def comparisons(report):
                 for tool in tools.values()
             ):
                 raise ValueError("Workflow compiler hashes are incomplete")
-            compiler_release = report["ohm_release"].partition("-cargo-")[0]
-            if lane == "ohm" and compiler_release not in tools["rustc"]["version"]:
-                raise ValueError("Ohm compiler does not identify the measured release")
             libraries = tools["rustc"].get("libraries", {})
             if (
                 not any("rustc_driver" in name for name in libraries)
@@ -374,6 +371,26 @@ def validate(report):
         raise ValueError("Invalid workflow sampling settings")
     if report["comparisons"] != comparisons(report):
         raise ValueError("Workflow table differs from its measurements")
+    rust_version = report["rust_version"]
+    compiler_release = report["ohm_release"]
+    if identity[2]:
+        compiler_release = compiler_release.removesuffix(f"-cargo-{identity[2]}")
+    for run in report["runs"]:
+        tools = run["metadata"]["toolchains"]
+        for tool in ("rustc", "cargo"):
+            stock = tools["stock"][tool]["version"].partition("\n")[0]
+            if stock.split()[:2] != [tool, rust_version] or "(ohm-" in stock:
+                raise ValueError(f"Expected {tool} {rust_version}, got {stock!r}")
+            # An unreleased compiler can be paired with a separately built Cargo.
+            if tool == "cargo" and identity[1]:
+                continue
+            ohm = tools["ohm"][tool]["version"].partition("\n")[0]
+            if not (
+                ohm.startswith(f"{tool} ") and ohm.endswith(f" ({compiler_release})")
+            ):
+                raise ValueError(
+                    f"Expected {tool} from {compiler_release}, got {ohm!r}"
+                )
 
 
 def build_report(runs, *, omitted_projects=None):
