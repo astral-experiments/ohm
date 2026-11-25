@@ -12,6 +12,7 @@ import statistics
 import subprocess
 import tempfile
 
+import benchmark_ruff_doctests as doctests
 import workflow_results
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -589,6 +590,26 @@ def render_tables(reports, ty_worktree, ty_scenario, ruff_doctests):
 
 
 def ruff_doctest_row(report):
+    if report.get("project") != "Ruff" or report.get("revision") != doctests.RUFF_REVISION:
+        raise ValueError("Unexpected Ruff doctest source")
+    for field, expected in (("passed", doctests.PASSED), ("ignored", doctests.IGNORED)):
+        if type(report.get(field)) is not int or report[field] != expected:
+            raise ValueError(f"Expected {field}={expected} in the Ruff doctest report")
+    if report.get("tests_sha256") != doctests.TESTS_SHA256:
+        raise ValueError("Unexpected Ruff doctest inventory")
+
+    # The runner allows different job counts for the same selection.
+    args = report.get("cargo_args")
+    jobs = None
+    if isinstance(args, list) and "--jobs" in args[:-1]:
+        jobs = args[args.index("--jobs") + 1]
+    if (
+        not isinstance(jobs, str)
+        or not re.fullmatch(r"[1-9][0-9]*", jobs)
+        or args != doctests.cargo_arguments(jobs)
+    ):
+        raise ValueError("Unexpected Ruff doctest Cargo arguments")
+
     release = re.fullmatch(r"ohm-(\d+)\.(\d+)\.(\d+)-([1-9]\d*)", report["ohm"])
     if not release or ".".join(release.groups()[:3]) != report["upstream"]:
         raise ValueError("Invalid Ruff doctest release")

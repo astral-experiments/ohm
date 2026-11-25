@@ -79,6 +79,28 @@ class PublicationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "macro trust"):
             publish.ruff_doctest_row(report)
 
+    def test_ruff_doctests_require_the_pinned_examples(self):
+        report = self.ruff_doctests
+        for changes in (
+            {"project": "uv"},
+            {"revision": "0" * 40},
+            {"passed": 0, "ignored": 216},
+            {"passed": 207.0},
+            {"ignored": 0},
+            {"tests_sha256": "0" * 64},
+            {"cargo_args": report["cargo_args"][:-2]},
+            {"cargo_args": [*report["cargo_args"], "--", "--list"]},
+        ):
+            with self.subTest(changes=changes), self.assertRaisesRegex(ValueError, "Ruff doctest"):
+                publish.ruff_doctest_row(report | changes)
+
+        args = report["cargo_args"].copy()
+        args[args.index("--jobs") + 1] = "1"
+        self.assertEqual(
+            publish.ruff_doctest_row(report | {"cargo_args": args}),
+            publish.ruff_doctest_row(report),
+        )
+
     def test_ruff_doctests_exclude_cold_runs(self):
         samples = [
             {"pair": pair, "toolchain": lane, "seconds": 1000 if not pair else base + pair}

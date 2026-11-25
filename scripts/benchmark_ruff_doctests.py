@@ -12,6 +12,10 @@ import time
 from pathlib import Path
 
 RUFF_REVISION = "23a16fa018cf3b219c2edc7a2b739881e023a874"
+# SHA-256 of tests.json at this revision, including each crate, example and outcome.
+TESTS_SHA256 = "bfca3b70273c3dce6142698a4128c055a3a93d119c3db46e4765203e0d88ef9f"
+PASSED = 207
+IGNORED = 9
 PROC_MACRO_TRUST = "CARGO_UNSTABLE_OHM_PROC_MACRO_TRUST"
 PACKAGES = (
     "ruff_annotate_snippets",
@@ -58,6 +62,13 @@ def test_inventory(log):
     if packages != {library_names.get(name, name) for name in PACKAGES}:
         raise ValueError("Doctest output did not cover all 16 Ruff crates")
     return sorted(tests)
+
+
+def cargo_arguments(jobs):
+    args = ["test", "--doc", "--all-features", "--locked", "--offline", "--jobs", str(jobs)]
+    for name in PACKAGES:
+        args.extend(["-p", name])
+    return args
 
 
 def lane_environment(lane, output):
@@ -109,17 +120,7 @@ def main():
                     "sha256": hashlib.file_digest(f, "sha256").hexdigest(),
                 }
 
-    cargo_args = [
-        "test",
-        "--doc",
-        "--all-features",
-        "--locked",
-        "--offline",
-        "--jobs",
-        str(args.jobs),
-    ]
-    for name in PACKAGES:
-        cargo_args.extend(["-p", name])
+    cargo_args = cargo_arguments(args.jobs)
     expected = None
     samples = []
     for pair in range(6):
@@ -147,8 +148,8 @@ def main():
             if expected is None:
                 expected = tests
                 if (
-                    sum(t[2] == "ok" for t in tests) != 207
-                    or sum(t[2] == "ignored" for t in tests) != 9
+                    sum(t[2] == "ok" for t in tests) != PASSED
+                    or sum(t[2] == "ignored" for t in tests) != IGNORED
                 ):
                     raise ValueError(f"Unexpected doctest selection. See {log}")
                 (output / "tests.json").write_text(
@@ -178,8 +179,8 @@ def main():
         "proc_macro_trust": {
             lane: env.get(PROC_MACRO_TRUST) for lane, env in environments.items()
         },
-        "passed": 207,
-        "ignored": 9,
+        "passed": PASSED,
+        "ignored": IGNORED,
         "tests_sha256": hashlib.sha256(
             (output / "tests.json").read_bytes()
         ).hexdigest(),
