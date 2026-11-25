@@ -49,7 +49,8 @@ def subtree_base(repository, head, tree):
         page += 1
 
 
-def inventory(manifest):
+def component_revisions(manifest):
+    """Yield each repository and the upstream and Ohm commits to compare."""
     version = manifest["release"]["upstream_rust_version"]
     if not re.fullmatch(r"\d+\.\d+\.\d+", version):
         raise ValueError("Invalid upstream Rust version")
@@ -57,7 +58,6 @@ def inventory(manifest):
     tools = api(f"repos/rust-lang/rust/contents/src/tools?ref={rust}")
     bases = {item["name"]: item for item in tools}
     bases["rust"] = {"sha": rust, "type": "file"}
-    sections = [f"# Patches in {manifest['release']['toolchain_name']}"]
     for component, source in manifest["sources"].items():
         repository = source["repository"].removeprefix("https://github.com/")
         if not re.fullmatch(r"[\w.-]+/[\w.-]+", repository) or not re.fullmatch(
@@ -68,6 +68,22 @@ def inventory(manifest):
         base = upstream["sha"]
         if upstream["type"] == "dir":
             base = subtree_base(repository, head, base)
+        yield repository, base, head
+        if component == "rust":
+            # Match the source-build opt-in in ohm-llvm-revision.sh.
+            llvm = api(f"repos/{repository}/contents/src/llvm-project?ref={head}")
+            fork = "astral-experiments/ohm-llvm"
+            url = llvm["submodule_git_url"].removesuffix(".git")
+            if url == f"https://github.com/{fork}":
+                base_pin = api(
+                    f"repos/rust-lang/rust/contents/src/llvm-project?ref={rust}"
+                )
+                yield fork, base_pin["sha"], llvm["sha"]
+
+
+def inventory(manifest):
+    sections = [f"# Patches in {manifest['release']['toolchain_name']}"]
+    for repository, base, head in component_revisions(manifest):
         patches = commits(repository, base, head)
         sections.append(
             f"## {repository}\n\n[{base[:12]}…{head[:12]}](https://github.com/{repository}/compare/{base}...{head}) — {len(patches)} commits\n"
