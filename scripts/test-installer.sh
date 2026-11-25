@@ -75,7 +75,8 @@ EOF
 chmod +x "$fixture_directory/$archive_root/install.sh"
 tar -czf "$release_directory/$archive_name" -C "$fixture_directory" "$archive_root"
 archive_checksum="$(shasum -a 256 "$release_directory/$archive_name" | awk '{ print $1 }')"
-mkdir -p "$fixture_directory/$linux_archive_root"
+mkdir -p "$fixture_directory/$linux_archive_root/rust-std-wasm32-unknown-unknown"
+: > "$fixture_directory/$linux_archive_root/rust-std-wasm32-unknown-unknown/manifest.in"
 cp "$fixture_directory/$archive_root/install.sh" "$fixture_directory/$linux_archive_root/install.sh"
 tar -czf "$release_directory/$linux_archive_name" -C "$fixture_directory" "$linux_archive_root"
 linux_archive_checksum="$(shasum -a 256 "$release_directory/$linux_archive_name" | awk '{ print $1 }')"
@@ -398,6 +399,20 @@ OHM_TEST_GLIBC=unknown
 run_case unknown-linux-glibc success
 OHM_TEST_GLIBC=2.38
 run_case linux-x86_64 success
+
+# A broken bundled target can still pass the host and metadata checks.
+mixed="$temporary_directory/cases/mixed-wasm"
+mkdir -p "$mixed"
+cp -R "$temporary_directory/cases/linux-x86_64/toolchain" "$mixed/toolchain"
+cat >> "$mixed/toolchain/bin/rustc" <<'EOF'
+case "$*" in
+  *--emit=metadata*) ;;
+  *wasm32-unknown-unknown*) exit 1 ;;
+esac
+EOF
+run_case mixed-wasm failure
+assert_contains "$mixed/output.log" 'could not link for the installed wasm32-unknown-unknown target'
+assert_no_links mixed-wasm
 unset OHM_TEST_GLIBC
 unset OHM_TEST_SYSTEM OHM_TEST_ARCHITECTURE
 assert_contains "$temporary_directory/cases/linux-x86_64/rustup.log" \
