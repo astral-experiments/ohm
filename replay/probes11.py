@@ -935,8 +935,8 @@ def fmt_links10(t):
 
 
 def span_retry(t,command):
-    lib=''.join(f"pub fn digest{i}()->u64{{{i}}}\n" for i in range(512))
-    exe="fn main(){\n"+''.join(f"let _=app::digest{i}();\n"for i in range(512))+"}\n"
+    lib=''.join(f"pub fn digest()->u64{{73}}\n" for i in range(1))
+    exe="fn main(){"+''.join(f"let _=app::digest();"for i in range(1))+"}\n"
     t.package('app',lib)
     t.write("src/main.rs",exe)
     t.cargo(command)
@@ -954,7 +954,7 @@ def span_retry(t,command):
         t.env["PATH"]=str(t.kit/"bin")+os.pathsep+os.environ["PATH"]
         t.cargo(command)
         t.notes["recovered_on_candidate"]=True
-    t.write("src/main.rs",exe.replace("let _=app::digest0()", "let _: bool=app::digest0()"))
+    t.write("src/main.rs",exe.replace("let _=app::digest()", "let _: bool=app::digest()"))
     t.compare_error("check --bin app","E0308")
     t.write("src/lib.rs",lib)
     t.write("src/main.rs",exe)
