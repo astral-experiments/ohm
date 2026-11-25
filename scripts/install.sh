@@ -269,6 +269,17 @@ awk '
 ' "$temporary_directory/member-details" ||
     fail 'the archive contains symbolic links, hard links, or unsupported member types'
 
+# Linux rustup puts the selected toolchain's libraries first. Two Ohm
+# revisions can ship incompatible compiler drivers with the same filename.
+probe_tool() (
+    if [ "$host_target" = x86_64-unknown-linux-gnu ]; then
+        # A relative entry also works when the prefix contains a path separator.
+        CDPATH='' cd -P "${1%/bin/*}" || exit 1
+        export LD_LIBRARY_PATH="./lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+    fi
+    exec "$@"
+)
+
 verify_installation() {
     installation_directory=$1
     # Let cargo-fmt check the rustfmt beside it, including in the staging directory.
@@ -280,7 +291,7 @@ verify_installation() {
 
         case "$executable" in
             rustc|rustdoc|cargo)
-                tool_version=$("$executable_path" --version) ||
+                tool_version=$(probe_tool "$executable_path" --version) ||
                     fail "installed tool did not start successfully: $executable"
                 case "$tool_version" in
                     "$executable $upstream_version "*|"$executable $upstream_version-"*) ;;
@@ -292,7 +303,7 @@ verify_installation() {
                 esac
                 ;;
             *)
-                "$executable_path" --version >/dev/null 2>&1 ||
+                probe_tool "$executable_path" --version >/dev/null 2>&1 ||
                     fail "installed tool did not start successfully: $executable"
                 ;;
         esac
@@ -321,16 +332,15 @@ if [ -e "$installation_prefix" ] || [ -L "$installation_prefix" ]; then
     verify_installation "$installation_prefix"
     # Reinstalling rust-std can leave all the version banners intact. Check that
     # rustc can load std and libtest without requiring a native linker.
-    (
-        CDPATH='' cd "$temporary_directory" &&
-            "$installation_prefix/bin/rustc" --sysroot "$installation_prefix" --test --emit=metadata - </dev/null
-    ) || fail 'could not load the installed host standard library'
+    probe_tool "$installation_prefix/bin/rustc" --sysroot "$installation_prefix" --test \
+        --emit=metadata -o "$temporary_directory/probe.rmeta" - </dev/null ||
+        fail 'could not load the installed host standard library'
 
     # Rustup cannot add targets to a linked toolchain. If the release bundles
     # WebAssembly, check the target libraries and linker together.
     wasm_target=wasm32-unknown-unknown
     if grep -Fxq "$archive_root/rust-std-$wasm_target/manifest.in" "$temporary_directory/members"; then
-        printf 'fn main() {}\n' | "$installation_prefix/bin/rustc" --sysroot "$installation_prefix" \
+        printf 'fn main() {}\n' | probe_tool "$installation_prefix/bin/rustc" --sysroot "$installation_prefix" \
             --target "$wasm_target" -C "linker=$installation_prefix/lib/rustlib/$host_target/bin/rust-lld" \
             -o "$temporary_directory/probe.wasm" - ||
             fail "could not link for the installed $wasm_target target"

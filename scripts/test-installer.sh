@@ -65,6 +65,13 @@ for binary in rustc rustdoc cargo cargo-clippy clippy-driver rustfmt cargo-fmt; 
     printf '#!/bin/sh\nprintf "%s 1.97.1\\n"\n' "$binary" \
       > "$prefix/bin/$binary"
   fi
+  if [ "$binary" = rustc ] && [ -n "${OHM_TEST_PREVIOUS_LIB:-}" ]; then
+    mkdir -p "$prefix/lib"
+    cat >> "$prefix/bin/$binary" <<'RUSTC'
+test "${LD_LIBRARY_PATH%%:*}" -ef "${0%/bin/*}/lib" &&
+    test "${LD_LIBRARY_PATH#*:}" = "$OHM_TEST_PREVIOUS_LIB"
+RUSTC
+  fi
   chmod +x "$prefix/bin/$binary"
 done
 if [ "${OHM_TEST_WILD:-missing}" != missing ]; then
@@ -401,6 +408,16 @@ OHM_TEST_GLIBC=unknown
 run_case unknown-linux-glibc success
 OHM_TEST_GLIBC=2.38
 run_case linux-x86_64 success
+
+# rustup run supplies a library path for the previous toolchain. Check both
+# the staged version probes and the host and target probes on a reinstall.
+(
+  export OHM_TEST_PREVIOUS_LIB="$temporary_directory/previous/lib"
+  export LD_LIBRARY_PATH="$OHM_TEST_PREVIOUS_LIB"
+  export OHM_TEST_INSTALL_DIR="$temporary_directory/sdk:linux/toolchain"
+  run_case linux-under-rustup success
+  run_case linux-under-rustup success
+)
 
 # A broken bundled target can still pass the host and metadata checks.
 mixed="$temporary_directory/cases/mixed-wasm"
