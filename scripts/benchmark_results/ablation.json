@@ -1,12 +1,12 @@
 {
   "rust_version": "1.100.0",
-  "ohm_release": "ohm-1.100.0-10",
+  "ohm_release": "ohm-1.100.0-11",
   "jobs": 8,
   "host": {
     "platform": "linux-x86_64",
     "id": "charlie-ohm-full-26-uv",
     "logical_cpus": 32,
-    "cpu_model": "AMD EPYC-Genoa Processor"
+    "cpu_model": "AMD EPYC-Rome Processor"
   },
   "provenance": {
     "runner_sha256": {
@@ -21,14 +21,14 @@
         "--upstream",
         "1.100.0",
         "--ohm",
-        "ohm-1.100.0-10",
+        "ohm-1.100.0-11",
         "--jobs",
         "8",
         "--minimum-free-gb",
         "60",
         "--require-idle",
         "--output-dir",
-        "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation",
+        "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation",
         "--project",
         "uv",
         "--repetitions",
@@ -36,42 +36,42 @@
         "--offline",
         "--feature-matrix",
         "--scenario",
-        "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/frozen-harness/scripts/session_replays/uv-feature-ablation.json",
+        "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/frozen-harness/scripts/session_replays/uv-feature-ablation.json",
         "--source-path",
-        "uv=/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/data/sources/uv"
+        "uv=/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/data/sources/uv"
       ],
-      "started_at": 1795594667.4291308,
-      "wrapper_sha256": "39f707b527a065fadde783df4c155f9088f1e800733be68fdd7fe9e91837e2e4",
+      "started_at": 1795632062.7644517,
+      "wrapper_sha256": "a1df25ddf675c428013e3f4bdc2b93a1c5923280534214ba4621ed58653aff91",
       "runner_sha256": {
         "benchmark.py": "b8b137e10eccea11c2bdd3ee8600a337b1efd857576291d630bb39761f813a7e",
         "replay_sessions.py": "015d02607858da8acf93768e714f28603a920a4ad61b5976b862548328f168a8",
         "benchmark_workflows.py": "a31ecbb300c3f83fbb38c41fea8678d097c2e45c93887d7b03de20e8c0a22a84",
         "workflow_results.py": "fabc3ce1ea82ee0dc517c2381e4c82490a3529b4ea9a75814c5f988492fe6e58"
       },
-      "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/usr/local/libexec/applied-devbox-oaiproxy:/usr/local/bin:/home/dev-user/.local/bin:/home/dev-user/.openai/bin:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin",
-      "tmpdir": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/tmp",
+      "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/usr/local/libexec/applied-devbox-oaiproxy:/usr/local/bin:/home/dev-user/.local/bin:/home/dev-user/.openai/bin:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin",
+      "tmpdir": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/tmp",
       "toolchains": [
-        ["ohm-all", "ohm-1.100.0-10"],
-        ["ohm-no-public-api-hash", "ohm-1.100.0-10"],
-        ["ohm-no-proc-macro-cache", "ohm-1.100.0-10"],
-        ["ohm-neither", "ohm-1.100.0-10"]
+        ["ohm-all", "ohm-1.100.0-11"],
+        ["ohm-no-public-api-hash", "ohm-1.100.0-11"],
+        ["ohm-no-proc-macro-cache", "ohm-1.100.0-11"],
+        ["ohm-neither", "ohm-1.100.0-11"]
       ],
       "sanitized_environment": {
-        "CARGO_HOME": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/cargo-home",
+        "CARGO_HOME": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/cargo-home",
         "CARGO_NET_OFFLINE": "true",
         "GIT_CONFIG_COUNT": "2",
         "GIT_CONFIG_KEY_0": "maintenance.auto",
         "GIT_CONFIG_KEY_1": "gc.auto",
         "GIT_CONFIG_VALUE_0": "false",
         "GIT_CONFIG_VALUE_1": "0",
-        "PATH": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/usr/local/libexec/applied-devbox-oaiproxy:/usr/local/bin:/home/dev-user/.local/bin:/home/dev-user/.openai/bin:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin",
-        "RUSTUP_HOME": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/rustup",
-        "TMPDIR": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/tmp",
-        "UV_CACHE_DIR": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/uv-cache",
-        "UV_PYTHON": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/tools/bin/python3.12",
+        "PATH": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/tools/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/tools/bin:/home/dev-user/.cargo/bin:/home/dev-user/.local/bin:/home/dev-user/.cargo/bin:/usr/local/libexec/applied-devbox-oaiproxy:/usr/local/bin:/home/dev-user/.local/bin:/home/dev-user/.openai/bin:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "RUSTUP_HOME": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/rustup",
+        "TMPDIR": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/tmp",
+        "UV_CACHE_DIR": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/uv-cache",
+        "UV_PYTHON": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/tools/bin/python3.12",
         "UV_PYTHON_DOWNLOADS": "never",
-        "UV_TOOL_BIN_DIR": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/tools/uv-bin",
-        "UV_TOOL_DIR": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/tools/uv-tools"
+        "UV_TOOL_BIN_DIR": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/tools/uv-bin",
+        "UV_TOOL_DIR": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/tools/uv-tools"
       },
       "terminal": {
         "controlling_tty": false,
@@ -85,14 +85,14 @@
         "scope": "benchmark process environment only"
       },
       "coordinator_commit": "04c83d53483607aec4f93fd2bb55b412f101d677",
-      "manifest_sha256": "ac4b40295b0066cca50643e4a3090f59584eeba435efc96d38844e47eedf5c99",
+      "manifest_sha256": "968c230223ed7a92b8b0e61de9520e3d87124f6b05ff414402d0d1c3fe8285c8",
       "fixtures": {
-        "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/frozen-harness/scripts/session_replays/uv-feature-ablation.json": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b"
+        "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/frozen-harness/scripts/session_replays/uv-feature-ablation.json": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b"
       },
       "post_cell_audit": {
         "helper_sha256": "8e1ba94744f09a491f39c981bbbf59f38417afccf801f01c7fe77e9ddf4d5934",
         "endpoint_helper_sha256": "fecc0d4facabbbe048dc6d9fb0ea80e447ab01d9135dd34a6f47d0ad434f81c1",
-        "process_inspector_sha256": "6a0e923e93ea59fca4e46745cccf948c4b9dea0247261608a4bb5f5acaf9dcae",
+        "process_inspector_sha256": "f61d24e1afe08c939663110a7f70f99af0f788b29dcb7b5d7c56492a09d884dc",
         "timing_boundary": "after persisted run_session, before next cell",
         "retirement": "exclusive per-cell target and shared-build leaves only",
         "quiet_seconds_after_retirement": 30
@@ -102,45 +102,45 @@
       "1.100.0": {
         "cargo": {
           "version": "cargo 1.100.0 (3acc79c0c 2026-11-05)",
-          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
           "sha256": "84d55d77232a921da96bcf2e1f78532ef5c5221803aae4448d9e220d48ebd808"
         },
         "rustc": {
           "version": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
-          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/rustc",
+          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/rustc",
           "sha256": "5073422953727c9427a76b7fce03aa9404da46315e5a1e4965389512a41e8db0"
         },
         "clippy-driver": {
           "version": "clippy 0.1.100 (0ef1bc3860 2026-11-09)",
-          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/clippy-driver",
+          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/clippy-driver",
           "sha256": "b20543523b921c8c57b14fb80e04209a6d9e7290c935e0bb5d50f622c45b9160"
         },
         "rustfmt": {
           "version": "rustfmt 1.11.0-stable (0ef1bc3860 2026-11-09)",
-          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/rustfmt",
+          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/rustfmt",
           "sha256": "6e2d5b048877b33b14d5da5670381516b7ec3ee22572b8aff933d090fe6cb664"
         }
       },
-      "ohm-1.100.0-10": {
+      "ohm-1.100.0-11": {
         "cargo": {
-          "version": "cargo 1.100.0-dev (50539ca90 2026-11-24) (ohm-1.100.0-10)",
-          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/rustup/toolchains/ohm-1.100.0-10/bin/cargo",
-          "sha256": "0b3eb06d3d084360930c8d032fea8223482e9078f4312526e40a9acbcb1785d7"
+          "version": "cargo 1.100.0-dev (9f340fd00 2026-11-25) (ohm-1.100.0-11)",
+          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/rustup/toolchains/ohm-1.100.0-11/bin/cargo",
+          "sha256": "189bb531a90cf35b31e72c4c808534873e26906573574fa8aafc26e9e67efde7"
         },
         "rustc": {
-          "version": "rustc 1.100.0-dev (820ec98de 2026-11-24) (ohm-1.100.0-10)",
-          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/rustup/toolchains/ohm-1.100.0-10/bin/rustc",
-          "sha256": "0bff2da5a44de7025731bd1dd73489f734afdb446eb36c6a48b02cfeb17f0a12"
+          "version": "rustc 1.100.0-dev (3234a712e 2026-11-25) (ohm-1.100.0-11)",
+          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/rustup/toolchains/ohm-1.100.0-11/bin/rustc",
+          "sha256": "6246347cc133b50db4c2ef52cfe72412dc4f477202a7e289a461eb398f342ff0"
         },
         "clippy-driver": {
-          "version": "clippy 0.1.100 (2ea8b0ef1e 2026-11-24)",
-          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/rustup/toolchains/ohm-1.100.0-10/bin/clippy-driver",
-          "sha256": "fa471e610baffeb8d19b282036417dd35092a206113714449c21b3d7c1d43bbf"
+          "version": "clippy 0.1.100 (046de4416c 2026-11-25)",
+          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/rustup/toolchains/ohm-1.100.0-11/bin/clippy-driver",
+          "sha256": "8b534c79472d0612a5055103129f222297da3f140fdd178f4c3651065a513eac"
         },
         "rustfmt": {
-          "version": "rustfmt 1.11.0-dev (a5e2605059 2026-11-24)",
-          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/rustup/toolchains/ohm-1.100.0-10/bin/rustfmt",
-          "sha256": "1fb7bae370ae4f667e70b51c27ea7ede87dd7402792952d4cd462db281f0d078"
+          "version": "rustfmt 1.11.0-dev (dd7704bb7c 2026-11-24)",
+          "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/rustup/toolchains/ohm-1.100.0-11/bin/rustfmt",
+          "sha256": "7c8680d71424376350518f9910aa6f66804cfe184ff1e3fa8b781b67f6d2fd38"
         }
       }
     },
@@ -150,32 +150,32 @@
         "binary_sha256": "c1630f9a8c447391325a6732a114f9b1c537fbc3e10156ddedbf6e3b8ff11f1a",
         "url": "https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.140/cargo-nextest-0.9.140-x86_64-unknown-linux-gnu.tar.gz",
         "version": "cargo-nextest 0.9.140 (a9fef2964 2026-07-05)\nrelease: 0.9.140\ncommit-hash: a9fef2964e34f64ed4fceeee7c0c3559ce560920\ncommit-date: 2026-07-05\nhost: x86_64-unknown-linux-gnu",
-        "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/tools/bin/cargo-nextest"
+        "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/tools/bin/cargo-nextest"
       },
       "just": {
         "archive_sha256": "4a5cc2f53e6f0f8c59092a6cc38291eb729d46a7dd95d3ae582008881b84931d",
         "binary_sha256": "3ad66571feae522db2cad31b9613bf21035b8a06d2738d6fc8fe6089856f2042",
         "url": "https://github.com/casey/just/releases/download/1.58.0/just-1.58.0-x86_64-unknown-linux-musl.tar.gz",
         "version": "just 1.58.0",
-        "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/tools/bin/just"
+        "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/tools/bin/just"
       },
       "uv": {
         "archive_sha256": "2e2b37e9811e17675a9e70bed5e1a58fc8c0388be63d751d72cc735188c149ff",
         "binary_sha256": "fe60af3d6b1771ecea15fdfd3821959912009e1612b3767a4988f135bc3cdd9d",
         "url": "https://github.com/astral-sh/uv/releases/download/0.12.8/uv-x86_64-unknown-linux-gnu.tar.gz",
         "version": "uv 0.12.8 (x86_64-unknown-linux-gnu)",
-        "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/tools/bin/uv"
+        "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/tools/bin/uv"
       },
       "python3.12": {
-        "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/tools/bin/python3.12",
+        "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/tools/bin/python3.12",
         "resolved_path": "/home/dev-user/ohm-benchmarks-1.99.0-27/tools/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
         "sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
         "version": "Python 3.12.13"
       }
     },
     "python": {
-      "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/tools/bin/python3.12",
-      "resolved_path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/python/bin/python3.12",
+      "path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/tools/bin/python3.12",
+      "resolved_path": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/python/bin/python3.12",
       "sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
       "version": "Python 3.12.13"
     },
@@ -183,29 +183,29 @@
       "proof": {
         "passed": true,
         "violations": [],
-        "samples": 328,
+        "samples": 289,
         "returncode": 0,
-        "monitor_sha256": "08ce7afd393ede0cd0b5a0d213d7de0328dae6a4a0a75743a8f02881856513ce",
-        "trace_sha256": "41f123bfd893ca252b7d7748cf3a4a60b3811da43a95f7605841426acc175c43"
+        "monitor_sha256": "36c86524ad38f329a490cb3b51f36350f97e179e98150a46fb998bf91c1f0772",
+        "trace_sha256": "a5651060e64ad4e32e9ad8c8f0322dc72fad30a8efdbd4b830b6ef19b107c8cc"
       },
-      "preflight_sha256": "ca7aeee60320ab3d3f3193b69f840d83f10d2d0c888d0b6121f9624b878bb635",
+      "preflight_sha256": "8ad8e3b32f90d9e49ca4cbec99de12188d3b87e2fc4c5703ed6bc46858bb437b",
       "accepted_prefix_only": false,
-      "accepted_samples": 328,
-      "interval_start": 1795594667.1292043,
-      "interval_end": 1795595344.3870919,
-      "maximum_gap_seconds": 2.18222328200045,
-      "minimum_free_bytes": 311463772160,
-      "weighted_steal_fraction": 0.0001566759045011546,
-      "peak_steal_fraction": 0.0026097635861221983,
-      "peak_external_user_cpu_fraction": 0.0013700773146438463
+      "accepted_samples": 289,
+      "interval_start": 1795632062.5760813,
+      "interval_end": 1795632650.00734,
+      "maximum_gap_seconds": 2.1055845399996542,
+      "minimum_free_bytes": 311374602240,
+      "weighted_steal_fraction": 3.630531488453842e-5,
+      "peak_steal_fraction": 0.0006202512017367033,
+      "peak_external_user_cpu_fraction": 0.0006154714301105059
     },
-    "raw_results_sha256": "fe18d245e75ebf8fb9c84242ff20817c4cb5de65741a4a2e61d34af28bf72cee",
-    "exporter_sha256": "8fb7203a5b02966a7b1dfd5a45f6ea4cd3b21767b64d1e2894081840816a2cdd",
+    "raw_results_sha256": "4c69b6a5aae8222872dac170e25e5faf32bf56fc4e55f7de5d26e7994fecde1a",
+    "exporter_sha256": "fee7e9d0d93221014ca1e07b4925f854b0a2ab5edd6024790e666788b9ad3483",
     "fixtures": {
-      "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/frozen-harness/scripts/session_replays/uv-feature-ablation.json": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b"
+      "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/frozen-harness/scripts/session_replays/uv-feature-ablation.json": "9825cab73967348814524bd1a1072054c600160896a9ee347c3f9fcfc3d1d06b"
     }
   },
-  "completed_at": "2026-11-25T08:29:08.850718+00:00",
+  "completed_at": "2026-11-25T18:50:51.874454+00:00",
   "repetitions": 2,
   "sessions": [
     {
@@ -228,10 +228,10 @@
         "category": "check",
         "command": ["cargo", "check", "-p", "uv-client", "--locked"],
         "wall_seconds": {
-          "ohm-all": [0.9207124869999461, 0.9323333169995749],
-          "ohm-no-public-api-hash": [2.2396954890000416, 1.9855595409999296],
-          "ohm-no-proc-macro-cache": [0.8092054529997768, 1.0331858019999345],
-          "ohm-neither": [2.455101836999347, 2.1478334229996108]
+          "ohm-all": [0.43254760099989653, 0.4745726820001437],
+          "ohm-no-public-api-hash": [1.1774121789994751, 1.2226028429995495],
+          "ohm-no-proc-macro-cache": [0.45873056599975826, 0.43927402699955564],
+          "ohm-neither": [1.1632121499997083, 1.186582659999658]
         },
         "tests_started": {
           "ohm-all": [0, 0],
@@ -260,10 +260,10 @@
           "--locked"
         ],
         "wall_seconds": {
-          "ohm-all": [1.0074024670002473, 1.001567526999679],
-          "ohm-no-public-api-hash": [1.0741936479998913, 0.8771660740003426],
-          "ohm-no-proc-macro-cache": [0.938009807000526, 1.0964495069993063],
-          "ohm-neither": [1.1289619499993933, 0.9885939420000796]
+          "ohm-all": [0.5634765390000211, 0.5787898509997831],
+          "ohm-no-public-api-hash": [0.5425044159992467, 0.5454224450004403],
+          "ohm-no-proc-macro-cache": [0.5523033449999275, 0.5596661689996836],
+          "ohm-neither": [0.7496786179999617, 0.5212643349996142]
         },
         "tests_started": {
           "ohm-all": [9, 9],
@@ -288,10 +288,10 @@
         "category": "check",
         "command": ["cargo", "check", "-p", "uv-client", "--locked"],
         "wall_seconds": {
-          "ohm-all": [32.14061319600023, 31.63789543999974],
-          "ohm-no-public-api-hash": [32.48968499199964, 29.204732895000234],
-          "ohm-no-proc-macro-cache": [30.983381250999628, 31.3393320389996],
-          "ohm-neither": [30.53889615799926, 30.563950873000067]
+          "ohm-all": [19.53886817700004, 20.079466580999906],
+          "ohm-no-public-api-hash": [19.94843153399961, 19.927024718999746],
+          "ohm-no-proc-macro-cache": [20.01112898500014, 19.830242940000062],
+          "ohm-neither": [19.715942331000406, 19.800327615999777]
         },
         "tests_started": {
           "ohm-all": [0, 0],
@@ -320,10 +320,10 @@
           "--locked"
         ],
         "wall_seconds": {
-          "ohm-all": [11.716331792000346, 12.201410785999542],
-          "ohm-no-public-api-hash": [12.300196549000248, 11.774413838999862],
-          "ohm-no-proc-macro-cache": [11.637343157000032, 11.764887806999468],
-          "ohm-neither": [12.016669847999765, 11.614171555999746]
+          "ohm-all": [7.654837744999895, 7.726643953999883],
+          "ohm-no-public-api-hash": [7.863688252999964, 7.493504131000009],
+          "ohm-no-proc-macro-cache": [7.698902745999476, 7.64874092700029],
+          "ohm-neither": [7.664472745000239, 7.461451914999998]
         },
         "tests_started": {
           "ohm-all": [9, 9],
@@ -342,40 +342,40 @@
   },
   "timed_session_seconds": {
     "uv": {
-      "ohm-all": [2.0205159329998423, 2.0512174349996712],
-      "ohm-no-public-api-hash": [3.43518336499983, 2.954820762000054],
-      "ohm-no-proc-macro-cache": [1.836847108999791, 2.252679287000319],
-      "ohm-neither": [3.6942908629998783, 3.226984662999712]
+      "ohm-all": [1.0370888860002196, 1.0964999100006025],
+      "ohm-no-public-api-hash": [1.762756351000462, 1.8098958770005993],
+      "ohm-no-proc-macro-cache": [1.0529859690004741, 1.0436607170004208],
+      "ohm-neither": [1.9540359689999605, 1.748750485000528]
     }
   },
   "timed_command_seconds": {
     "uv": {
-      "ohm-all": [1.9281149540001934, 1.933900843999254],
-      "ohm-no-public-api-hash": [3.313889136999933, 2.8627256150002722],
-      "ohm-no-proc-macro-cache": [1.7472152600003028, 2.129635308999241],
-      "ohm-neither": [3.5840637869987404, 3.1364273649996903]
+      "ohm-all": [0.9960241399999177, 1.0533625329999268],
+      "ohm-no-public-api-hash": [1.7199165949987218, 1.7680252879999898],
+      "ohm-no-proc-macro-cache": [1.0110339109996858, 0.9989401959992392],
+      "ohm-neither": [1.91289076799967, 1.7078469949992723]
     }
   },
   "timed_edit_seconds": {
     "uv": {
-      "ohm-all": [0.009402783999576059, 0.010255860000143002],
-      "ohm-no-public-api-hash": [0.013420242999927723, 0.010066499000458862],
-      "ohm-no-proc-macro-cache": [0.00873113400029979, 0.010416840000289085],
-      "ohm-neither": [0.018544853000094008, 0.008725511000193364]
+      "ohm-all": [0.004832291000184341, 0.005932143999416439],
+      "ohm-no-public-api-hash": [0.0053129469997657, 0.005185703999813995],
+      "ohm-no-proc-macro-cache": [0.00467988200034597, 0.00504976499996701],
+      "ohm-neither": [0.00452128899996751, 0.005495569999766303]
     }
   },
   "untimed_warmup_seconds": {
     "uv": {
-      "ohm-all": [43.85694498800058, 43.83930622599928],
-      "ohm-no-public-api-hash": [44.789881540999886, 40.979146734000096],
-      "ohm-no-proc-macro-cache": [42.62072440799966, 43.10421984599907],
-      "ohm-neither": [42.555566005999026, 42.178122428999814]
+      "ohm-all": [27.193705921999936, 27.80611053499979],
+      "ohm-no-public-api-hash": [27.812119786999574, 27.420528849999755],
+      "ohm-no-proc-macro-cache": [27.710031730999617, 27.478983867000352],
+      "ohm-neither": [27.380415076000645, 27.261779530999775]
     }
   },
   "command_audits": [
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-all/0/02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-all/0/02.log",
       "toolchain": "ohm-all",
       "project": "uv",
       "repetition": 0,
@@ -392,7 +392,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-all/0/03.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-all/0/03.log",
       "toolchain": "ohm-all",
       "project": "uv",
       "repetition": 0,
@@ -401,7 +401,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-all/0/warmup-01.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-all/0/warmup-01.log",
       "toolchain": "ohm-all",
       "project": "uv",
       "repetition": 0,
@@ -418,7 +418,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-all/0/warmup-02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-all/0/warmup-02.log",
       "toolchain": "ohm-all",
       "project": "uv",
       "repetition": 0,
@@ -427,7 +427,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-no-public-api-hash/0/02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-no-public-api-hash/0/02.log",
       "toolchain": "ohm-no-public-api-hash",
       "project": "uv",
       "repetition": 0,
@@ -444,7 +444,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-no-public-api-hash/0/03.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-no-public-api-hash/0/03.log",
       "toolchain": "ohm-no-public-api-hash",
       "project": "uv",
       "repetition": 0,
@@ -453,7 +453,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-no-public-api-hash/0/warmup-01.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-no-public-api-hash/0/warmup-01.log",
       "toolchain": "ohm-no-public-api-hash",
       "project": "uv",
       "repetition": 0,
@@ -470,7 +470,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-no-public-api-hash/0/warmup-02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-no-public-api-hash/0/warmup-02.log",
       "toolchain": "ohm-no-public-api-hash",
       "project": "uv",
       "repetition": 0,
@@ -479,7 +479,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-neither/0/02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-neither/0/02.log",
       "toolchain": "ohm-neither",
       "project": "uv",
       "repetition": 0,
@@ -496,7 +496,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-neither/0/03.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-neither/0/03.log",
       "toolchain": "ohm-neither",
       "project": "uv",
       "repetition": 0,
@@ -505,7 +505,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-neither/0/warmup-01.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-neither/0/warmup-01.log",
       "toolchain": "ohm-neither",
       "project": "uv",
       "repetition": 0,
@@ -522,7 +522,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-neither/0/warmup-02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-neither/0/warmup-02.log",
       "toolchain": "ohm-neither",
       "project": "uv",
       "repetition": 0,
@@ -531,7 +531,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-no-proc-macro-cache/0/02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-no-proc-macro-cache/0/02.log",
       "toolchain": "ohm-no-proc-macro-cache",
       "project": "uv",
       "repetition": 0,
@@ -548,7 +548,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-no-proc-macro-cache/0/03.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-no-proc-macro-cache/0/03.log",
       "toolchain": "ohm-no-proc-macro-cache",
       "project": "uv",
       "repetition": 0,
@@ -557,7 +557,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-no-proc-macro-cache/0/warmup-01.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-no-proc-macro-cache/0/warmup-01.log",
       "toolchain": "ohm-no-proc-macro-cache",
       "project": "uv",
       "repetition": 0,
@@ -574,7 +574,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-no-proc-macro-cache/0/warmup-02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-no-proc-macro-cache/0/warmup-02.log",
       "toolchain": "ohm-no-proc-macro-cache",
       "project": "uv",
       "repetition": 0,
@@ -583,7 +583,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-no-public-api-hash/1/02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-no-public-api-hash/1/02.log",
       "toolchain": "ohm-no-public-api-hash",
       "project": "uv",
       "repetition": 1,
@@ -600,7 +600,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-no-public-api-hash/1/03.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-no-public-api-hash/1/03.log",
       "toolchain": "ohm-no-public-api-hash",
       "project": "uv",
       "repetition": 1,
@@ -609,7 +609,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-no-public-api-hash/1/warmup-01.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-no-public-api-hash/1/warmup-01.log",
       "toolchain": "ohm-no-public-api-hash",
       "project": "uv",
       "repetition": 1,
@@ -626,7 +626,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-no-public-api-hash/1/warmup-02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-no-public-api-hash/1/warmup-02.log",
       "toolchain": "ohm-no-public-api-hash",
       "project": "uv",
       "repetition": 1,
@@ -635,7 +635,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-no-proc-macro-cache/1/02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-no-proc-macro-cache/1/02.log",
       "toolchain": "ohm-no-proc-macro-cache",
       "project": "uv",
       "repetition": 1,
@@ -652,7 +652,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-no-proc-macro-cache/1/03.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-no-proc-macro-cache/1/03.log",
       "toolchain": "ohm-no-proc-macro-cache",
       "project": "uv",
       "repetition": 1,
@@ -661,7 +661,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-no-proc-macro-cache/1/warmup-01.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-no-proc-macro-cache/1/warmup-01.log",
       "toolchain": "ohm-no-proc-macro-cache",
       "project": "uv",
       "repetition": 1,
@@ -678,7 +678,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-no-proc-macro-cache/1/warmup-02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-no-proc-macro-cache/1/warmup-02.log",
       "toolchain": "ohm-no-proc-macro-cache",
       "project": "uv",
       "repetition": 1,
@@ -687,7 +687,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-all/1/02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-all/1/02.log",
       "toolchain": "ohm-all",
       "project": "uv",
       "repetition": 1,
@@ -704,7 +704,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-all/1/03.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-all/1/03.log",
       "toolchain": "ohm-all",
       "project": "uv",
       "repetition": 1,
@@ -713,7 +713,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-all/1/warmup-01.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-all/1/warmup-01.log",
       "toolchain": "ohm-all",
       "project": "uv",
       "repetition": 1,
@@ -730,7 +730,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-all/1/warmup-02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-all/1/warmup-02.log",
       "toolchain": "ohm-all",
       "project": "uv",
       "repetition": 1,
@@ -739,7 +739,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-neither/1/02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-neither/1/02.log",
       "toolchain": "ohm-neither",
       "project": "uv",
       "repetition": 1,
@@ -756,7 +756,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-neither/1/03.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-neither/1/03.log",
       "toolchain": "ohm-neither",
       "project": "uv",
       "repetition": 1,
@@ -765,7 +765,7 @@
     },
     {
       "command": ["cargo", "check", "-p", "uv-client", "--locked"],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-neither/1/warmup-01.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-neither/1/warmup-01.log",
       "toolchain": "ohm-neither",
       "project": "uv",
       "repetition": 1,
@@ -782,7 +782,7 @@
         "simple_json::",
         "--locked"
       ],
-      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-10/published/campaign-uv/output/ablation/logs/uv/ohm-neither/1/warmup-02.log",
+      "log": "/mnt/devbox-scratch/dev-user/ohm-benchmarks-1.100.0-11/published/campaign-uv/output/ablation/logs/uv/ohm-neither/1/warmup-02.log",
       "toolchain": "ohm-neither",
       "project": "uv",
       "repetition": 1,
@@ -819,17 +819,17 @@
   ],
   "measured_sdk": {
     "source_kind": "published release",
-    "release": "https://github.com/astral-experiments/ohm/releases/tag/ohm-1.100.0-10",
-    "release_run": "https://github.com/astral-experiments/ohm/actions/runs/45540683462",
-    "coordinator_revision": "96ba1c9eb178cb2c6779404b771bd5a55fe041d6",
-    "manifest_sha256": "ac4b40295b0066cca50643e4a3090f59584eeba435efc96d38844e47eedf5c99",
+    "release": "https://github.com/astral-experiments/ohm/releases/tag/ohm-1.100.0-11",
+    "release_run": "https://github.com/astral-experiments/ohm/actions/runs/45627305335",
+    "coordinator_revision": "b6f00b105a3cbbb8e52c5b26221c1cfa8fd00838",
+    "manifest_sha256": "968c230223ed7a92b8b0e61de9520e3d87124f6b05ff414402d0d1c3fe8285c8",
     "source_revisions": {
-      "rust": "820ec98ded61578168beddcb417e98625e7f5795",
-      "cargo": "50539ca906db3a38f0ed12e37d2c013797478e8a",
-      "clippy": "2ea8b0ef1e89ddbd6a17e866886bae7e2c201c7f",
-      "rustfmt": "a5e26050597317f24817650ff58d6a1032e0411a",
-      "llvm": "f0b144d0b40a5233b8b257459855d89a9ddf3979"
+      "rust": "3234a712ec47c8eb6eff465508ec4e45db2b11fc",
+      "cargo": "9f340fd00c2b428a9eced205183e042ecb0bf646",
+      "clippy": "046de4416c3649decb1a7a0989fa808910417758",
+      "rustfmt": "dd7704bb7c10b67ce0e1ce4174e332bbb5caa96b",
+      "llvm": "202b5e031ad69762eaae3cb2c68227af24c49dd1"
     },
-    "linux_archive_sha256": "a7478c768cb329d97dca35bc1fd8cd463780d0ed7432ef6310383ed383625079"
+    "linux_archive_sha256": "1a76ab85a726f215ca3a1de0ca0de99ba0fc30625ee6c42e63023922c3c2fd79"
   }
 }
