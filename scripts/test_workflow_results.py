@@ -222,7 +222,7 @@ class WorkflowReportTests(unittest.TestCase):
                 for run in runs:
                     run["configuration"]["toolchains"]["ohm"] = selector
                     run["metadata"]["toolchains"]["ohm"]["rustc"]["version"] = (
-                        f"rustc ({compiler_release})\ncommit-hash: {revision}"
+                        f"rustc 1.99.0-dev ({compiler_release})\ncommit-hash: {revision}"
                     )
                     if cargo_revision:
                         run["metadata"]["toolchains"]["ohm"]["cargo"]["version"] = (

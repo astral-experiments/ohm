@@ -348,6 +348,21 @@ def comparisons(report):
     )
 
 
+def validate_tool_versions(tools, names, rust_version, ohm_release, *, separate_cargo=False):
+    for tool in names:
+        stock = tools["stock"][tool]["version"].partition("\n")[0]
+        if stock.split()[:2] != [tool, rust_version] or "(ohm-" in stock:
+            raise ValueError(f"Expected {tool} {rust_version}, got {stock!r}")
+        if tool == "cargo" and separate_cargo:
+            continue
+        ohm = tools["ohm"][tool]["version"].partition("\n")[0]
+        if not (
+            ohm.startswith((f"{tool} {rust_version} ", f"{tool} {rust_version}-"))
+            and ohm.endswith(f" ({ohm_release})")
+        ):
+            raise ValueError(f"Expected {tool} from {ohm_release}, got {ohm!r}")
+
+
 def validate(report):
     identity = re.fullmatch(
         rf"ohm-{re.escape(report['rust_version'])}-[1-9]\d*"
@@ -376,21 +391,14 @@ def validate(report):
     if identity[2]:
         compiler_release = compiler_release.removesuffix(f"-cargo-{identity[2]}")
     for run in report["runs"]:
-        tools = run["metadata"]["toolchains"]
-        for tool in ("rustc", "cargo"):
-            stock = tools["stock"][tool]["version"].partition("\n")[0]
-            if stock.split()[:2] != [tool, rust_version] or "(ohm-" in stock:
-                raise ValueError(f"Expected {tool} {rust_version}, got {stock!r}")
+        validate_tool_versions(
+            run["metadata"]["toolchains"],
+            ("rustc", "cargo"),
+            rust_version,
+            compiler_release,
             # An unreleased compiler can be paired with a separately built Cargo.
-            if tool == "cargo" and identity[1]:
-                continue
-            ohm = tools["ohm"][tool]["version"].partition("\n")[0]
-            if not (
-                ohm.startswith(f"{tool} ") and ohm.endswith(f" ({compiler_release})")
-            ):
-                raise ValueError(
-                    f"Expected {tool} from {compiler_release}, got {ohm!r}"
-                )
+            separate_cargo=bool(identity[1]),
+        )
 
 
 def build_report(runs, *, omitted_projects=None):
