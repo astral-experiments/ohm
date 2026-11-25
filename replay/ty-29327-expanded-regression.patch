@@ -1,0 +1,63 @@
+diff --git a/crates/ty_python_semantic/resources/mdtest/liskov.md b/crates/ty_python_semantic/resources/mdtest/liskov.md
+--- a/crates/ty_python_semantic/resources/mdtest/liskov.md
++++ b/crates/ty_python_semantic/resources/mdtest/liskov.md
+@@ -3074,4 +3074,4 @@
+ A cached class method exposes attributes in addition to its call signature. Replacing it with an
+-ordinary class method is an attribute override; suppressing that diagnostic also suppresses the
+-incompatible call signature.
++ordinary class method is an attribute override; suppressing that diagnostic does not expose a method
++override diagnostic.
+ 
+@@ -3092,2 +3092,52 @@
+ 
++## Disabling attribute override rules
++
++Disabling attribute and property override rules does not move their diagnostics to the method
++override rule. Incompatible overrides of ordinary methods are still rejected.
++
++```toml
++[rules]
++invalid-attribute-override = "ignore"
++invalid-property-type-override = "ignore"
++invalid-mutable-override = "ignore"
++```
++
++```pyi
++from collections.abc import Callable
++
++class Base:
++    attribute: Callable[[int], int]
++    @property
++    def property(self) -> Callable[[int], int]: ...
++    def method(self, x: int) -> int: ...
++
++class Child(Base):
++    def attribute(self) -> int: ...  # no diagnostic
++    def property(self) -> int: ...  # no diagnostic
++    def method(self) -> int: ...  # error: [invalid-method-override]
++```
++
++## Disabled overrides do not hide other rules
++
++An override can violate different contracts from multiple bases. Disabling the rule for the first
++conflict does not suppress an enabled rule for a later conflict.
++
++```toml
++[rules]
++invalid-property-type-override = "ignore"
++invalid-mutable-override = "ignore"
++```
++
++```pyi
++class PropertyBase:
++    @property
++    def value(self) -> int: ...
++
++class AttributeBase:
++    value: str
++
++class Child(PropertyBase, AttributeBase):
++    value: bytes  # error: [invalid-attribute-override]
++```
++
+ ## Class variables replacing properties
