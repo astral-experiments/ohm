@@ -34,6 +34,7 @@ from benchmark import (
     BenchmarkError,
     command_output,
     compiler_environment,
+    runner_test_counts,
 )
 
 SCENARIO_DIRECTORY = Path(__file__).with_name("session_replays")
@@ -42,7 +43,6 @@ CARGO_STATUS = re.compile(
     r"^\s*(?P<action>Compiling|Checking)\s+(?P<crate>[^\s]+)", re.MULTILINE
 )
 VERBOSE_COMMAND_START = re.compile(r"[ \t]*Running[ \t]+`")
-TEST_COUNT = re.compile(r"(?mi)^\s*(?:running|Starting)\s+(\d+)\s+tests?\b")
 SAFE_REVISION = re.compile(r"^[0-9a-f]{40}$")
 SAFE_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 FEATURE_MATRIX: tuple[tuple[str, tuple[str, ...]], ...] = (
@@ -1068,6 +1068,7 @@ class Replay:
             if self.options.compiler_accounting == "verbose"
             else None
         )
+        counts, ignored = runner_test_counts(result.stdout)
         sample = {
             "kind": "command",
             "wall_seconds": duration,
@@ -1080,9 +1081,7 @@ class Replay:
                 if invocations is not None
                 else None
             ),
-            "tests_started": sum(
-                int(match.group(1)) for match in TEST_COUNT.finditer(result.stdout)
-            ),
+            "tests_started": max(0, sum(counts) - ignored),
             "external_compilation": sorted(monitor.observed),
             "log": str(log),
         }
@@ -1106,9 +1105,7 @@ class Replay:
             and (step["args"][0] == "test" or step["args"][:2] == ["nextest", "run"])
         )
         if is_test and sample["tests_started"] == 0:
-            raise BenchmarkError(
-                f"session test command selected zero tests; inspect {log}"
-            )
+            raise BenchmarkError(f"session test command ran zero tests; inspect {log}")
         if monitor.failure:
             raise BenchmarkError(
                 f"compiler interference monitor failed: {monitor.failure}"

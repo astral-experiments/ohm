@@ -1983,6 +1983,33 @@ class CommandResultTests(ReplayTestCase):
                             scenario, worktree, step, "stock", "1.97.1", 0, 1
                         )
 
+    def test_ignored_libtest_cases_do_not_count_as_started(self) -> None:
+        runner = self.runner()
+        scenario = self.scenario()
+        worktree = self.directory / "worktree"
+        worktree.mkdir()
+        step = {"program": "cargo", "args": ["test"]}
+        ignored = (
+            "running 1 test\ntest one ... ignored\n"
+            "test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out\n"
+        )
+        mixed = (
+            "running 3 tests\n.ii\n"
+            "test result: ok. 1 passed; 0 failed; 2 ignored; 0 measured; 5 filtered out\n"
+        )
+        with mock.patch.object(replay.subprocess, "run") as command:
+            command.return_value = subprocess.CompletedProcess([], 0, stdout=ignored)
+            with self.assertRaisesRegex(replay.BenchmarkError, "zero tests"):
+                runner.run_command(scenario, worktree, step, "stock", "1.100.0", 0, 1)
+
+            command.return_value = subprocess.CompletedProcess(
+                [], 0, stdout=ignored + mixed
+            )
+            sample = runner.run_command(
+                scenario, worktree, step, "stock", "1.100.0", 0, 2
+            )
+            self.assertEqual(sample["tests_started"], 1)
+
     def test_non_test_commands_need_not_select_tests(self) -> None:
         runner = self.runner()
         scenario = self.scenario()
