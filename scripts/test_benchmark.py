@@ -1333,6 +1333,7 @@ class OutputValidationTests(unittest.TestCase):
             ),
             "running 1 test\ntest another_test ... ok\n",
             f"running 1 test\ntest {selected}_variant ... ok\n",
+            f"Starting 1 test across 1 binary\nPASS [0.001s] codex-core other::{selected}\n",
         ):
             with self.subTest(output=output):
                 with self.assertRaises(benchmark.BenchmarkError):
@@ -1698,6 +1699,18 @@ class RepositoryCloneTests(unittest.TestCase):
 
 
 class CommandLineTests(unittest.TestCase):
+    def test_codex_recipe_selects_the_exact_library_test(self) -> None:
+        study = object.__new__(benchmark.Study)
+        command = study.command(benchmark.WORKLOADS["codex-core"], "test", "ohm")
+        self.assertEqual(command[:2], ["just", "test"])
+        self.assertEqual(
+            command[-2:],
+            [
+                "-E",
+                "test(=audio_preparation::tests::preparation_canonicalizes_data_urls_and_rejects_remote_urls)",
+            ],
+        )
+
     def test_uv_test_workflow_runs_a_real_integration_test(self) -> None:
         study = object.__new__(benchmark.Study)
         workload = benchmark.WORKLOADS["uv"]

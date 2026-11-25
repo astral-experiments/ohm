@@ -113,7 +113,7 @@ WORKLOADS = {
             '        || mime.eq_ignore_ascii_case("audio/wav")',
             "codex-core",
         ),
-        "preparation_canonicalizes_data_urls_and_rejects_remote_urls",
+        "audio_preparation::tests::preparation_canonicalizes_data_urls_and_rejects_remote_urls",
     ),
 }
 WORKFLOWS = ("check", "clippy", "test")
@@ -280,7 +280,7 @@ def validate_output(
         counts, ignored = runner_test_counts(output)
         if not counts or ignored or any(count != 1 for count in counts):
             raise BenchmarkError("benchmark must execute exactly one existing test")
-        test_name = rf"(?<![A-Za-z0-9_]){re.escape(selected_test)}(?![A-Za-z0-9_])"
+        test_name = rf"(?<![\w:]){re.escape(selected_test)}(?![\w:])"
         if re.search(test_name, output) is None:
             raise BenchmarkError(f"selected test {selected_test!r} was not executed")
 
@@ -617,7 +617,8 @@ class Study:
             *arguments,
             "--no-tests",
             "fail",
-            workload.selected_test,
+            "-E",
+            f"test(={workload.selected_test})",
         ]
 
     def target(self, workload: Workload, workflow: str, label: str) -> Path:

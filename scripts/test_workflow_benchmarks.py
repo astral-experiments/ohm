@@ -103,6 +103,11 @@ class WorkflowTests(unittest.TestCase):
             "log": str(log),
         }
 
+    def test_codex_workflow_selects_the_exact_library_test(self):
+        command = workflows.project_definitions()["codex"]["commands"]["test"]
+        selected = workflows.WORKLOADS["codex-core"].selected_test
+        self.assertEqual(command[-2:], ["-E", f"test(={selected})"])
+
     def test_codex_revision_selects_and_records_the_requested_commit(self):
         revision = self.git("rev-parse", "HEAD")
         options = workflows.parser().parse_args(
