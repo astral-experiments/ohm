@@ -94,7 +94,7 @@ def tui_session():
     assert history.sha(fixture)=="f2d9c9b29ca5e81f39a3683aefe8e541c50e1100a0b43c32c9f8ac157e276084"
     (_,hard)=resource.getrlimit(resource.RLIMIT_NOFILE)
     resource.setrlimit(resource.RLIMIT_NOFILE,(min(hard,65536),hard))
-    tmp=Path('/tmp/o100p10')
+    tmp=Path('/tmp/o100pa')
     tmp.mkdir(mode=0o700)
     os.environ.update(env)
     os.environ.update(TMPDIR=str(tmp),CARGO_HOME=str(root/'disk/registry'))
@@ -169,7 +169,7 @@ def session_time():
     app=record["app"]
     (_,hard)=resource.getrlimit(resource.RLIMIT_NOFILE)
     resource.setrlimit(resource.RLIMIT_NOFILE,(min(hard,65536),hard))
-    tmp=Path('/tmp/o100p10')
+    tmp=Path('/tmp/o100pa')
     tmp.mkdir(mode=0o700)
     os.environ.update(env)
     os.environ.update(TMPDIR=str(tmp),CARGO_HOME=str(root/'disk/registry'))
