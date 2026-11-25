@@ -204,6 +204,32 @@ class PublicationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Repeated disk comparison"):
             publish.validate(self.reports)
 
+    def test_disk_headline_can_be_rendered_after_a_regression(self):
+        disk = self.reports["disk"]
+        cohorts = {sample["cell"]: sample for sample in disk["cohorts"]}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.prepare_publication(root)
+            with mock.patch.object(publish, "ROOT", root):
+                for change, expected in (
+                    (10, "increases by around 10%"),
+                    (0, "is about the same"),
+                    (-10, "decreases by around 10%"),
+                ):
+                    for item in disk["readme_comparisons"]:
+                        row = item["comparison"]
+                        if row["worktrees"] != 10:
+                            continue
+                        stock = row["stock_retained_bytes"]
+                        retained = stock + stock * change // 100
+                        row["ohm_retained_bytes"] = retained
+                        row["percent_less_disk"] = 100 * (stock - retained) / stock
+                        cohorts[f"{item['project']}-ohm-forks"]["idle_bytes"] = retained
+                    readme = publish.documents(self.reports)["README.md"]
+                    (root / "README.md").write_text(readme)
+                    self.assertEqual(publish.documents(self.reports)["README.md"], readme)
+                    self.assertIn(f"disk usage (on APFS) {expected}", readme)
+
     def test_disk_comparisons_match_valid_idle_measurements(self):
         disk = self.reports["disk"]
         row = next(
@@ -449,7 +475,12 @@ class PublicationTests(unittest.TestCase):
             self.assertIn(
                 f"| Scope | Rust {disk_rust} | Ohm {disk_version} | Space saved |", readme
             )
-            self.assertRegex(readme, r"And disk usage \(on APFS\) decreases by around \d+%")
+            headline = next(
+                line
+                for line in (publish.ROOT / "README.md").read_text().splitlines()
+                if "disk usage (on APFS)" in line
+            )
+            self.assertIn(headline, readme)
             self.assertIn(f"Comparing Ohm {version} to upstream Rust", readme)
             self.assertIn(f"| Rust {rust} | Ohm {version} | Speedup |", readme)
 
