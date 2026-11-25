@@ -586,10 +586,14 @@ def render_tables(reports, ty_worktree, ty_scenario, ruff_doctests):
 
 
 def ruff_doctest_row(report):
-    # Reports through 1.100.0-7 predate the explicit macro trust setting.
     release = re.fullmatch(r"ohm-(\d+)\.(\d+)\.(\d+)-([1-9]\d*)", report["ohm"])
-    if not release:
+    if not release or ".".join(release.groups()[:3]) != report["upstream"]:
         raise ValueError("Invalid Ruff doctest release")
+    workflow_results.validate_tool_versions(
+        report["toolchains"], ("cargo", "rustc", "rustdoc"), report["upstream"], report["ohm"]
+    )
+
+    # Reports through 1.100.0-7 predate the explicit macro trust setting.
     if "proc_macro_trust" in report or tuple(map(int, release.groups())) >= (1, 100, 0, 8):
         if report.get("proc_macro_trust") != {"stock": None, "ohm": "all"}:
             raise ValueError("Unexpected Ruff doctest macro trust settings")

@@ -30,6 +30,34 @@ class PublicationTests(unittest.TestCase):
         for name in (publish.DEVELOPER_WORKFLOW_REPORT, publish.RUFF_DOCTEST_REPORT):
             shutil.copyfile(publish.RESULTS / name, root / "scripts/benchmark_results" / name)
 
+    def doctests_for(self, release):
+        rust = release.removeprefix("ohm-").rsplit("-", 1)[0]
+        report = copy.deepcopy(self.ruff_doctests)
+        report.update(upstream=rust, ohm=release)
+        for tool in ("cargo", "rustc", "rustdoc"):
+            report["toolchains"]["stock"][tool]["version"] = f"{tool} {rust}"
+            report["toolchains"]["ohm"][tool]["version"] = f"{tool} {rust}-dev ({release})"
+        return report
+
+    def test_ruff_doctest_tool_versions(self):
+        report = self.doctests_for("ohm-1.100.0-10")
+        report["upstream"] = "1.99.0"
+        with self.assertRaisesRegex(ValueError, "Ruff doctest release"):
+            publish.ruff_doctest_row(report)
+
+        for tool in ("cargo", "rustc", "rustdoc"):
+            for lane, version in (
+                ("ohm", f"{tool} 1.100.0-dev (ohm-1.100.0-9)"),
+                ("ohm", f"{tool} 1.99.0-dev (ohm-1.100.0-10)"),
+                ("stock", f"{tool} 1.99.0"),
+                ("stock", f"{tool} 1.100.0 (ohm-1.100.0-10)"),
+            ):
+                with self.subTest(lane=lane, version=version):
+                    report = self.doctests_for("ohm-1.100.0-10")
+                    report["toolchains"][lane][tool]["version"] = version
+                    with self.assertRaisesRegex(ValueError, tool):
+                        publish.ruff_doctest_row(report)
+
     def test_ruff_doctest_trust(self):
         key = doctests.PROC_MACRO_TRUST
         with mock.patch.dict("os.environ", {key: "audited"}):
@@ -38,10 +66,11 @@ class PublicationTests(unittest.TestCase):
         self.assertNotIn(key, stock)
         self.assertEqual(ohm[key], "all")
 
-        report = dict(self.ruff_doctests, ohm="ohm-1.100.0-7")
+        report = self.doctests_for("ohm-1.100.0-7")
         report.pop("proc_macro_trust", None)
         expected = publish.ruff_doctest_row(report)
-        report["ohm"] = "ohm-1.100.0-8"
+        report = self.doctests_for("ohm-1.100.0-8")
+        report.pop("proc_macro_trust", None)
         with self.assertRaisesRegex(ValueError, "macro trust"):
             publish.ruff_doctest_row(report)
         report["proc_macro_trust"] = {"stock": stock.get(key), "ohm": ohm[key]}
@@ -55,7 +84,7 @@ class PublicationTests(unittest.TestCase):
             {"pair": pair, "toolchain": lane, "seconds": 1000 if not pair else base + pair}
             for pair in range(6) for lane, base in (("stock", 10), ("ohm", 0))
         ]
-        report = {"upstream": "1.99.0", "ohm": "ohm-1.99.0-23", "samples": samples}
+        report = dict(self.ruff_doctests, samples=samples)
         self.assertEqual(
             publish.ruff_doctest_row(report),
             ["Ruff", "Doctests", "Selected crates", "13.000 s", "3.000 s", "4.33×"],
@@ -384,12 +413,12 @@ class PublicationTests(unittest.TestCase):
             disk_rust, disk_version = publish.disk_versions(self.reports["disk"])
             # The combined timing table needs ty and Ruff inputs for this Rust version.
             release = f"ohm-{disk_version}"
-            for name, versions in (
-                (publish.TY_WORKTREE_REPORT, {"rust": disk_rust, "ohm": release}),
-                (publish.RUFF_DOCTEST_REPORT, {"upstream": disk_rust, "ohm": release}),
-            ):
-                path = root / "scripts/benchmark_results" / name
-                publish.write_json(path, {**publish.load(path), **versions})
+            results = root / "scripts/benchmark_results"
+            publish.write_json(
+                results / publish.TY_WORKTREE_REPORT,
+                dict(self.ty_worktree, rust=disk_rust, ohm=release),
+            )
+            publish.write_json(results / publish.RUFF_DOCTEST_REPORT, self.doctests_for(release))
             for kind, report in self.reports.items():
                 if kind in publish.TIMING_KINDS:
                     report = dict(
