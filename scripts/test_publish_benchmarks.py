@@ -199,6 +199,16 @@ class PublicationTests(unittest.TestCase):
                         self.reports, study, self.ty_scenario, self.ruff_doctests
                     )
 
+    def test_combined_tables_require_the_same_ohm_revision(self):
+        base, revision = self.reports["sessions"]["ohm_release"].rsplit("-", 1)
+        other = f"{base}-{int(revision) + 1}"
+        for name, ty, ruff in (
+            ("ty-worktree", dict(self.ty_worktree, ohm=other), self.ruff_doctests),
+            ("ruff-doctests", self.ty_worktree, self.doctests_for(other)),
+        ):
+            with self.subTest(report=name), self.assertRaisesRegex(ValueError, name):
+                publish.render_tables(self.reports, ty, self.ty_scenario, ruff)
+
     def test_worktree_startup_includes_first_validation(self):
         ohm = self.ty_worktree["worktree_copy_on_write"]["ohm-trusted"]
         ohm["total"] = ohm["creation"]
@@ -557,8 +567,13 @@ class PublicationTests(unittest.TestCase):
             current = self.reports["sessions"]["ohm_release"].removeprefix("ohm-")
             rust, revision = current.rsplit("-", 1)
             version = f"{rust}-{int(revision) + 1}"
+            release = f"ohm-{version}"
+            publish.write_json(
+                results / publish.TY_WORKTREE_REPORT, dict(self.ty_worktree, ohm=release)
+            )
+            publish.write_json(results / publish.RUFF_DOCTEST_REPORT, self.doctests_for(release))
             for kind in publish.TIMING_KINDS:
-                report = dict(self.reports[kind], ohm_release=f"ohm-{version}")
+                report = dict(self.reports[kind], ohm_release=release)
                 publish.write_json(root / "inputs" / f"{kind}.json", report)
 
             with (

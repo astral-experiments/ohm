@@ -315,10 +315,11 @@ def validate_worktree_times(group, lane, timing, repetitions):
 def render_tables(reports, ty_worktree, ty_scenario, ruff_doctests):
     release, rust = validate(reports)
     version = release.removeprefix("ohm-")
-    if ty_worktree["rust"] != rust or not re.fullmatch(
-        rf"ohm-{re.escape(rust)}-[1-9]\d*", ty_worktree["ohm"]
-    ):
-        raise ValueError("ty study and table toolchain identities differ")
+    # These studies share timing tables with the session reports.
+    if (ty_worktree["ohm"], ty_worktree["rust"]) != (release, rust):
+        raise ValueError(f"{TY_WORKTREE_REPORT} must use {release} and Rust {rust}")
+    if (ruff_doctests["ohm"], ruff_doctests["upstream"]) != (release, rust):
+        raise ValueError(f"{RUFF_DOCTEST_REPORT} must use {release} and Rust {rust}")
     sessions = reports["sessions"]
     mean = statistics.fmean
     projects = ("ruff", "uv", "codex")
@@ -564,8 +565,6 @@ def render_tables(reports, ty_worktree, ty_scenario, ruff_doctests):
                 f"{stock / ohm:.2f}×",
             ]
         )
-    if ruff_doctests["upstream"] != rust:
-        raise ValueError("Ruff doctest and table Rust versions differ")
     feature_rows.append(ruff_doctest_row(ruff_doctests))
     rendered["features"] = table(
         ["Project", "Workflow", "Package", f"Rust {rust}", "Ohm", "Speedup"],
