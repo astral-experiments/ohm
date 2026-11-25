@@ -193,6 +193,35 @@ class PublicationTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     publish.validate(reports)
 
+    def test_disk_headline_requires_both_ten_worktree_comparisons(self):
+        rows = self.reports["disk"]["readme_comparisons"]
+        item = next(row for row in rows if row["comparison"]["worktrees"] == 10)
+        rows.remove(item)
+        with self.assertRaisesRegex(ValueError, "Missing disk comparison"):
+            publish.validate(self.reports)
+
+        rows.extend([item, item])
+        with self.assertRaisesRegex(ValueError, "Repeated disk comparison"):
+            publish.validate(self.reports)
+
+    def test_disk_comparisons_match_valid_idle_measurements(self):
+        disk = self.reports["disk"]
+        row = next(
+            item["comparison"]
+            for item in disk["readme_comparisons"]
+            if item["comparison"]["worktrees"] == 10
+        )
+        row["valid_pair"] = False
+        with self.assertRaisesRegex(ValueError, "Invalid disk comparison"):
+            publish.validate(self.reports)
+
+        row["valid_pair"] = True
+        # Scaling both numbers preserves the reported percentage.
+        row["stock_retained_bytes"] *= 2
+        row["ohm_retained_bytes"] *= 2
+        with self.assertRaisesRegex(ValueError, "idle measurement"):
+            publish.validate(self.reports)
+
     def test_session_samples_cover_the_commands_and_edits(self):
         session = self.reports["sessions"]
         commands = session["timed_command_seconds"]["ruff"]["ohm"]

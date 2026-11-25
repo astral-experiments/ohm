@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parent.parent
 RESULTS = ROOT / "scripts/benchmark_results"
 TIMING_KINDS = ("workflow", "sessions", "historical", "ablation")
 KINDS = (*TIMING_KINDS, "disk")
+DISK_PROJECTS = {"ruff": "Ruff/ty", "uv": "uv"}
 TY_WORKTREE_REPORT = "ty-worktree.json"
 TY_SCENARIO = "scripts/session_replays/ty-29327.json"
 RUFF_DOCTEST_REPORT = "ruff-doctests.json"
@@ -189,6 +190,68 @@ def validate_sessions(kind, report):
                     raise ValueError(f"{kind}: inconsistent command total")
 
 
+def validate_disk(disk):
+    """Check the APFS table and headline against the retained measurements."""
+    rust, version = disk_versions(disk)
+    audit = disk["validation"]
+    if (
+        audit["status"] != "pass"
+        or audit["paired_sources_explicit_settings_commands_and_test_counts_match"] is not True
+        or set(disk["toolchains"]) != {f"ohm-{version}", f"stock-{rust}"}
+    ):
+        raise ValueError("Disk audit or toolchain identity differs")
+
+    cohorts = {c["cell"]: c for c in disk["cohorts"]}
+    if len(cohorts) != len(disk["cohorts"]):
+        raise ValueError("Repeated disk cohort")
+    expected = {(project, n) for project in DISK_PROJECTS for n in (1, 2, 10)}
+    seen = set()
+    for item in disk["readme_comparisons"]:
+        row = item["comparison"]
+        project, count = item["project"], row["worktrees"]
+        key = (project, count)
+        if key in seen:
+            raise ValueError(f"Repeated disk comparison for {key}")
+        seen.add(key)
+        cohort = "single" if count == 1 else "forks"
+        timing = (
+            "immediate_worktree_completion_checkpoint"
+            if count == 2
+            else "completed_cohort_idle_at_least_30_seconds"
+        )
+        stock, ohm = row["stock_retained_bytes"], row["ohm_retained_bytes"]
+        if (
+            key not in expected
+            or type(count) is not int
+            or row["project"] != project
+            or row["cohort"] != cohort
+            or item["measurement_timing"] != timing
+            or row["measurement_timing"] != timing
+            or row["valid_pair"] is not True
+            or row["mismatched_fields"]
+            or any(type(n) is not int or n <= 0 for n in (stock, ohm))
+            or not math.isclose(100 * (stock - ohm) / stock, row["percent_less_disk"])
+        ):
+            raise ValueError(f"Invalid disk comparison for {key}")
+
+        # The two-worktree row is a checkpoint of the ten-worktree run.
+        if count == 2:
+            continue
+        for lane, retained in (("stock", stock), ("ohm", ohm)):
+            cell = f"{project}-{lane}-{cohort}"
+            sample = cohorts.get(cell)
+            if (
+                sample is None
+                or sample["worktrees"] != count
+                or sample["idle_bytes"] != retained
+                or not 30 <= sample["idle_seconds"] < math.inf
+            ):
+                raise ValueError(f"Disk comparison differs from idle measurement for {cell}")
+
+    if seen != expected:
+        raise ValueError(f"Missing disk comparisons: {sorted(expected - seen)}")
+
+
 def validate(reports):
     release = reports["sessions"]["ohm_release"]
     if not re.fullmatch(r"ohm-\d+\.\d+\.\d+-[1-9]\d*", release):
@@ -210,20 +273,7 @@ def validate(reports):
                 raise ValueError(f"{kind}: mismatched test counts")
             validate_sessions(kind, report)
     validate_workflow(reports["workflow"])
-    disk = reports["disk"]
-    disk_rust, disk_version = disk_versions(disk)
-    if disk["validation"]["status"] != "pass" or set(disk["toolchains"]) != {
-        f"ohm-{disk_version}",
-        f"stock-{disk_rust}",
-    }:
-        raise ValueError("Disk audit or toolchain identity differs")
-    for item in disk["readme_comparisons"]:
-        row = item["comparison"]
-        stock, ohm = row["stock_retained_bytes"], row["ohm_retained_bytes"]
-        if min(stock, ohm) <= 0 or not math.isclose(
-            100 * (stock - ohm) / stock, row["percent_less_disk"]
-        ):
-            raise ValueError("Invalid disk comparison")
+    validate_disk(reports["disk"])
     return release, rust
 
 
@@ -390,7 +440,7 @@ def render_tables(reports, ty_worktree, ty_scenario, ruff_doctests):
     disk_rust, disk_version = disk_versions(reports["disk"])
     for item in reports["disk"]["readme_comparisons"]:
         row = item["comparison"]
-        project = "Ruff/ty" if item["project"] == "ruff" else "uv"
+        project = DISK_PROJECTS[item["project"]]
         label = project + (
             " session" if row["worktrees"] == 1 else f", {row['worktrees']} worktrees"
         )
