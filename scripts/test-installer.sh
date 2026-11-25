@@ -56,6 +56,15 @@ for binary in rustc rustdoc cargo cargo-clippy clippy-driver rustfmt cargo-fmt; 
       > "$prefix/bin/$binary"
   elif [ "$binary" = rustdoc ] && [ "${OHM_TEST_RUSTDOC:-present}" = broken ]; then
     printf '#!/bin/sh\nexit 1\n' > "$prefix/bin/$binary"
+  elif [ "$binary" = cargo-clippy ] || [ "$binary" = clippy-driver ]; then
+    cat > "$prefix/bin/$binary" <<'CLIPPY'
+#!/bin/sh
+if [ "$1" = --rustc ]; then
+  shift
+  exec "${0%/*}/rustc" "$@"
+fi
+echo 'clippy 0.1.97 (ohm installer fixture)'
+CLIPPY
   elif [ "$binary" = cargo-fmt ]; then
     printf '%s\n' '#!/bin/sh' 'exec "${RUSTFMT-${0%/*}/rustfmt}" "$@"' > "$prefix/bin/$binary"
   elif [ "$binary" = cargo ] || [ "$binary" = rustdoc ]; then
@@ -644,6 +653,27 @@ for binary in cargo rustdoc; do
   assert_contains "$mixed/output.log" "the installed $binary has an unexpected Ohm release version"
   assert_no_links "mixed-$binary"
 done
+
+# Both Clippy components can start even if they come from a different toolchain.
+mixed="$temporary_directory/cases/mixed-clippy"
+mkdir -p "$mixed"
+cp -R "$temporary_directory/cases/local-install/toolchain" "$mixed/toolchain"
+cat > "$mixed/toolchain/bin/cargo-clippy" <<'EOF'
+#!/bin/sh
+if [ "$1" = --rustc ]; then
+  echo 'rustc 1.97.1 (upstream fixture)'
+else
+  echo 'clippy 0.1.97 (upstream fixture)'
+fi
+EOF
+run_case mixed-clippy failure
+assert_contains "$mixed/output.log" 'cargo-clippy and clippy-driver report different versions'
+assert_no_links mixed-clippy
+
+cp "$mixed/toolchain/bin/cargo-clippy" "$mixed/toolchain/bin/clippy-driver"
+run_case mixed-clippy failure
+assert_contains "$mixed/output.log" 'clippy-driver and rustc report different compiler versions'
+assert_no_links mixed-clippy
 
 # An older rust-std component doesn't change any of the version banners.
 mixed="$temporary_directory/cases/mixed-std"
