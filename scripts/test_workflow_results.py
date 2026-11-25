@@ -138,6 +138,23 @@ class WorkflowReportTests(unittest.TestCase):
     def setUp(self):
         self.report = workflow_results.build_report(synthetic_runs())
 
+    def test_log_paths_are_relative_to_the_workflow_output(self):
+        directory = "/tmp/logs/nightly/logs/uv/ohm/check-build-check-0-0"
+        failure = {
+            "failed_command": {"log": f"{directory}/01.log"},
+            "cpu": {"path": f"{directory}/cpu.jsonl"},
+            "diagnostics": [{"path": f"{directory}/rustc-ice-1.txt"}],
+            "preflight": [],
+        }
+        run = workflow_results.compact_run({"samples": [], "failures": [failure]})
+        recorded = run["failures"][0]
+        relative = "logs/uv/ohm/check-build-check-0-0"
+        self.assertEqual(recorded["failed_command"]["log"], f"{relative}/01.log")
+        self.assertEqual(recorded["cpu"]["path"], f"{relative}/cpu.jsonl")
+        self.assertEqual(
+            recorded["diagnostics"][0]["path"], f"{relative}/rustc-ice-1.txt"
+        )
+
     def test_uses_median_of_complete_sequences(self):
         row = next(
             row

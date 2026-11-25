@@ -12,6 +12,12 @@ import statistics
 from benchmark_workflows import WORKFLOWS
 
 
+def relative_log_path(path):
+    # The runner writes under logs/<project>/<lane>/<cell>. Its output directory
+    # can itself be inside a directory named logs.
+    return "logs/" + path.rsplit("/logs/", 1)[1]
+
+
 def compact_run(run):
     result = copy.deepcopy(run)
     for sample in [*result["samples"], *result.get("failures", [])]:
@@ -31,10 +37,10 @@ def compact_run(run):
                 "kind",
             ):
                 command.pop(key, None)
-            command["log"] = "logs/" + command["log"].split("/logs/", 1)[1]
-        sample["cpu"]["path"] = "logs/" + sample["cpu"]["path"].split("/logs/", 1)[1]
+            command["log"] = relative_log_path(command["log"])
+        sample["cpu"]["path"] = relative_log_path(sample["cpu"]["path"])
         for diagnostic in sample.get("diagnostics", []):
-            diagnostic["path"] = "logs/" + diagnostic["path"].split("/logs/", 1)[1]
+            diagnostic["path"] = relative_log_path(diagnostic["path"])
         preflight = sample["preflight"]
         if preflight:
             sample["preflight"] = {
