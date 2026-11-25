@@ -752,7 +752,7 @@ def weak(t):
 
 @case("rustc675")
 def restricted(t):
-    src="#![feature(mut_restriction)]\n#![allow(dead_code)]\n"+''.join(f'pub enum E{i} {{ Var {{ mut(crate) x: i32 }} }}\n' for i in range(100))
+    src="#![feature(mut_restriction)]\n#![allow(dead_code)]\n"+''.join(f'pub enum E{i} {{ Var {{ mut(crate) x: i32 }} }}\n' for i in range(1024))
     t.package('app','pub use entity::*;\n',"[dependencies]\nentity={path='entity'}")
     t.package('entity',src)
     t.cargo("clippy --lib")
@@ -799,6 +799,47 @@ def body_lints(t):
     t.write("src/lib.rs",template.replace("CALL","private()"))
     t.cargo("check --lib")
     return "nested call edit and revert"
+
+@case("clippy106_108_118")
+def literal_unwrap10(t):
+    src="""#![deny(unused_parens)]
+#![allow(unreachable_code, irrefutable_let_patterns, clippy::all)]
+#![warn(clippy::unnecessary_literal_unwrap)]
+fn closure() -> impl Fn() -> i32 {
+    return Some(move || 1).unwrap();
+}
+fn let_case() -> i32 {
+    if let f = Some(|| 2).unwrap() { f() } else { 0 }
+}
+fn exit_case() -> i32 {
+    'value: {
+        if Some(break 'value 3).unwrap() { return 0 }
+        0
+    }
+}
+fn main() { assert_eq!((closure()(), let_case(), exit_case()), (1,2,3)); }
+"""
+    t.package("app",src,binary=True)
+    status,msgs=t.diagnostics("clippy")
+    require(status==0,t.log)
+    edits=[]
+    for m in msgs:
+        if (m.get("code") or {}).get("code")!="clippy::unnecessary_literal_unwrap":continue
+        for child in m["children"]:
+            for span in child["spans"]:
+                if span.get("suggestion_applicability")=="MachineApplicable":
+                    edits.append((span["byte_start"],span["byte_end"],span["suggested_replacement"]))
+    require(edits,msgs)
+    text=src
+    for a,b,c in sorted(edits,reverse=True):text=text[:a]+c+text[b:]
+    t.write("src/main.rs",text)
+    t.notes["edits"]=edits
+    t.known_bug=(text.count(".unwrap()")!=1 or "Some(break 'value 3).unwrap()" not in text)
+    res=t.cargo("run",check=False)
+    if res.returncode:
+        require("unused_parens" in t.log,t.log)
+        t.known_bug=True
+    return "two closures unwrapped, break unchanged, values 1/2/3"
 
 
 def clippy_probe10(t,args,lint,expected,target="target",allow_ice=False):
@@ -893,7 +934,7 @@ def fmt_links10(t):
     return expected
 
 
-BASELINE_BUGS={'clippy122', 'rustfmt106', 'clippy112', 'rustc676', 'clippy124', 'rustc675', 'clippy110'}
+BASELINE_BUGS={'clippy122', 'rustc676', 'rustc675', 'clippy112', 'rustfmt106', 'clippy110', 'clippy106_108_118', 'clippy124'}
 
 def fingerprint(value):
     return hashlib.sha256(json.dumps(value,sort_keys=True).encode()).hexdigest()
