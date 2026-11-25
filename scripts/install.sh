@@ -276,21 +276,24 @@ verify_installation() {
         [ -f "$executable_path" ] && [ -x "$executable_path" ] ||
             fail "installed tool is missing or not executable: $executable"
 
-        if [ "$executable" = rustc ]; then
-            compiler_version=$("$executable_path" --version) ||
-                fail 'the installed Rust compiler did not start successfully'
-            case "$compiler_version" in
-                "rustc $upstream_version "*|"rustc $upstream_version-"*) ;;
-                *) fail 'the installed Rust compiler has an unexpected upstream version' ;;
-            esac
-            case "$compiler_version" in
-                *"($version)"*) ;;
-                *) fail 'the installed Rust compiler has an unexpected Ohm release version' ;;
-            esac
-        else
-            "$executable_path" --version >/dev/null 2>&1 ||
-                fail "installed tool did not start successfully: $executable"
-        fi
+        case "$executable" in
+            rustc|rustdoc|cargo)
+                tool_version=$("$executable_path" --version) ||
+                    fail "installed tool did not start successfully: $executable"
+                case "$tool_version" in
+                    "$executable $upstream_version "*|"$executable $upstream_version-"*) ;;
+                    *) fail "the installed $executable has an unexpected upstream version" ;;
+                esac
+                case "$tool_version" in
+                    *"($version)"*) ;;
+                    *) fail "the installed $executable has an unexpected Ohm release version" ;;
+                esac
+                ;;
+            *)
+                "$executable_path" --version >/dev/null 2>&1 ||
+                    fail "installed tool did not start successfully: $executable"
+                ;;
+        esac
     done
     if [ "$host_target" = x86_64-unknown-linux-gnu ] && [ -n "$embedded_wild_version" ]; then
         wild_path=$installation_directory/lib/rustlib/$host_target/bin/wild-ld/ld.bfd
