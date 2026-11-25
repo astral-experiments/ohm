@@ -17,9 +17,9 @@ if [[ ! -f "$packed" ]]; then
 fi
 echo "$digest  $packed" | sha256sum -c -
 # Keep the compiler baseline and LLVM fixed while changing only stock Cargo.
-cargo_tag=ohm-1.100.0-8
+cargo_tag=ohm-1.100.0-9
 cargo_name="$cargo_tag-$host.tar.gz"
-cargo_digest=155923f4708be098e45aab96b44739aca8b0fd66420d2609bf9920ec6908e2d2
+cargo_digest=46b6bd8ccc4a776b348832ee6b5ecf04c38886719efbe1a5dafb100744cf7c88
 cargo_archive="$kits/$cargo_name"
 curl -fsSL --retry 4 "https://github.com/astral-experiments/ohm/releases/download/$cargo_tag/$cargo_name" -o "$cargo_archive"
 echo "$cargo_digest  $cargo_archive" | sha256sum -c -
@@ -117,7 +117,7 @@ if [[ -n "${RUSTC_KITS:-}" ]]; then
     extra+=(--pair "$pair")
   fi
 fi
-echo "ad60b1c9e6a928234909a06b610892893fd93bd2e72a4914304376d915ae9091  $kits/cargo" | sha256sum -c -
+echo "d55066cee65880415f0b12cdff0f177340e58feab3e487ae36423bb5fe402e2f  $kits/cargo" | sha256sum -c -
 sha256sum "$control/bin/rustc" | cut -d' ' -f1 > "$out/common-launcher"
 if [[ "$(cat /proc/sys/kernel/perf_event_paranoid)" -gt 2 ]]; then
   sudo sysctl kernel.perf_event_paranoid=2
