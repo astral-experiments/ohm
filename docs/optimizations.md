@@ -1,6 +1,6 @@
 # Optimizations
 
-Ohm 1.100.0-11 builds on Rust 1.100.0 and LLVM 23.1.5. It speeds up development with changes to
+Ohm 1.100.0-12 builds on Rust 1.100.0 and LLVM 23.1.5. It speeds up development with changes to
 Cargo, rustc, LLVM, Clippy, and rustfmt.
 
 ## Cargo and builds
@@ -192,6 +192,12 @@ dependency. Before relinking, Cargo verifies the list of link inputs and the con
 saved object file. If an input is missing or a checksum fails, Cargo recompiles the target.
 Changes involving procedural macros, build scripts, or native libraries may also require
 recompilation.
+
+With unpacked debug information, each cached object refers to a file by name. After an incremental
+rebuild, rustc restores that file under the original name. If the build fails, Cargo keeps the
+debug files for the last working executable so that the debugger can still show inlined frames.
+[Restoring split files](https://github.com/astral-experiments/ohm-rust/pull/682) ·
+[Failed builds](https://github.com/astral-experiments/ohm-cargo/pull/705)
 
 Ohm keeps saved link objects separate from the incremental cache. If inline assembly can read a
 file, the compiler rebuilds the affected code; it can reuse code containing supported register-only
@@ -773,6 +779,12 @@ Cargo can reuse the selected versions after edits confined to trailing profile t
 Rust and Clippy lint tables, while still applying the new settings. It still resolves the packages
 and features needed by the current command.
 
+A CLI build and a metadata query can resolve different features. If the two selections collide in
+the cache for a locked workspace, Cargo tries a second slot and verifies the full key and sources
+before reuse. Cargo also collects environment keys once for each configuration table.
+[Locked selections](https://github.com/astral-experiments/ohm-cargo/pull/708) ·
+[Configuration keys](https://github.com/astral-experiments/ohm-cargo/pull/707)
+
 Even if every artifact is fresh, Cargo still checks the manifests, lockfile and outputs. It
 prepares inherited lint flags once, skips member paths it has already checked and can reuse a
 decoded lockfile after reopening it and comparing its contents. It also reuses a buffer for
@@ -950,6 +962,16 @@ skip those packages on the next run if their sources, configuration, and formatt
 When a module changes, Ohm can format or verify just that module if it can determine which crate
 owns it and how the modules connect. Otherwise, it formats the whole crate. Set `OHM_INCREMENTAL_FMT=0`
 to disable the cache.
+
+Editing both a manifest and a source file can leave most targets unchanged. After a full check,
+cargo-fmt keeps digests of the files rustfmt read. When Cargo metadata changes, it can check just
+the affected targets if it verifies the other inputs before and after the check. Missing evidence
+triggers a full pass. On Unix, the snapshot includes file identity and change time so that
+replacing a file with one of the same size and modification time invalidates the check. A
+filesystem that preserves all the recorded attributes can still hide an in-place edit.
+[Affected targets](https://github.com/astral-experiments/ohm-rustfmt/pull/116) ·
+[Formatter traversal](https://github.com/astral-experiments/ohm-rustfmt/pull/117) ·
+[Unix file identity](https://github.com/astral-experiments/ohm-rustfmt/pull/118)
 
 If an editor replaces a module while rustfmt reads it, a later check must inspect the version now
 on disk. Ohm compares the source and configuration that rustfmt opened with the files the cache
@@ -1563,6 +1585,21 @@ code for development builds. For example, it can omit cleanup paths that have be
 constructing intermediate lists while checking type constraints. Other changes avoid repeated
 lookups, reuse LLVM target machines, and reduce the size of compiler data structures.
 
+When another crate already exports a specialization of a generic function, rustc can look it up in
+the dependency’s metadata. The incremental cache stores a compact index and checks whether the
+export changed. Large metadata tables also store byte offsets. An older dependency without an
+index can be slower to read. Switching to or from revision 11 requires a fresh incremental graph.
+[Generic exports](https://github.com/astral-experiments/ohm-rust/pull/688)
+
+Within a compiler query, reading one of eight recently recorded dependencies can skip a lock.
+Macro expansion can reuse encoded spans, and adjacent LLVM debug locations can share a source line
+lookup. LLVM packs small fields when writing bitcode and buffers the bytes it hashes for optimizer
+reuse. These caches trade some memory for fewer repeated lookups.
+[Query reads](https://github.com/astral-experiments/ohm-rust/pull/684) ·
+[Source lines](https://github.com/astral-experiments/ohm-rust/pull/685) ·
+[Macro spans](https://github.com/astral-experiments/ohm-rust/pull/686) ·
+[Bitcode and hashing](https://github.com/astral-experiments/ohm-llvm/pull/75)
+
 When reading the previous dependency graph, rustc builds the reverse index as it decodes each row.
 When writing metadata, it indexes local definitions and hashes reachable source text once for both
 the public interface and the cached metadata prefix. During name resolution, it can decode the
@@ -1876,6 +1913,14 @@ Suppose `keys::Key` contains a private `Counter` with a `Cell`. Clippy can honor
 `ignore-interior-mutability = ["keys::Counter"]` in a client of the library. The declaration is in
 the metadata that Clippy already tracks, so renaming the counter brings the warning back.
 [Private field types](https://github.com/astral-experiments/ohm-rust-clippy/pull/126)
+
+On x86-64 Linux, Cargo can retain up to 32 MiB of driver bytes during a build. Each recheck still
+reads the executable. If the bytes match, Cargo reuses the checksum. Clippy also skips work in
+five lints and resolves associated items on the type it already knows, including re-exports from
+private modules.
+[Driver checks](https://github.com/astral-experiments/ohm-cargo/pull/706) ·
+[Lint passes](https://github.com/astral-experiments/ohm-rust-clippy/pull/127) ·
+[Re-exported types](https://github.com/astral-experiments/ohm-rust-clippy/pull/129)
 
 When switching between a build and Clippy, Cargo keeps a resolution record for each workspace
 compiler wrapper. It shares one resolution across attempts to reuse registry artifacts and records
