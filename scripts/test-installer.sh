@@ -71,7 +71,7 @@ CLIPPY
     printf '#!/bin/sh\nprintf "%s 1.97.1-dev (ohm installer fixture) (%s)\\n"\n' \
       "$binary" "$OHM_TEST_VERSION" > "$prefix/bin/$binary"
   else
-    printf '#!/bin/sh\nprintf "%s 1.97.1\\n"\n' "$binary" \
+    printf '%s\n' '#!/bin/sh' 'echo "rustfmt 1.9.0-dev (0123456789 2026-01-01)"' \
       > "$prefix/bin/$binary"
   fi
   if [ "$binary" = rustc ] && [ -n "${OHM_TEST_PREVIOUS_LIB:-}" ]; then
@@ -102,6 +102,7 @@ source_installer=$installer
 installer="$temporary_directory/release-installer.sh"
 sed \
   -e "s/^embedded_version=$/embedded_version=$version/" \
+  -e 's/^embedded_rustfmt_revision=$/embedded_rustfmt_revision=0123456789/' \
   -e "s/^embedded_minimum_glibc=$/embedded_minimum_glibc=2.38/" \
   -e "s/^embedded_archive_sha256_aarch64_apple_darwin=$/embedded_archive_sha256_aarch64_apple_darwin=$archive_checksum/" \
   -e "s/^embedded_archive_sha256_x86_64_unknown_linux_gnu=$/embedded_archive_sha256_x86_64_unknown_linux_gnu=$linux_archive_checksum/" \
@@ -674,6 +675,18 @@ cp "$mixed/toolchain/bin/cargo-clippy" "$mixed/toolchain/bin/clippy-driver"
 run_case mixed-clippy failure
 assert_contains "$mixed/output.log" 'clippy-driver and rustc report different compiler versions'
 assert_no_links mixed-clippy
+
+# cargo-fmt may find a different sibling, or both commands may report the same wrong revision.
+for binary in cargo-fmt rustfmt; do
+  mixed="$temporary_directory/cases/mixed-$binary"
+  mkdir -p "$mixed"
+  cp -R "$temporary_directory/cases/local-install/toolchain" "$mixed/toolchain"
+  printf '%s\n' '#!/bin/sh' 'echo "rustfmt 1.9.0-dev (abcdef0123 2026-01-01)"' \
+    > "$mixed/toolchain/bin/$binary"
+  run_case "mixed-$binary" failure
+  assert_contains "$mixed/output.log" "the installed $binary does not use rustfmt revision 0123456789"
+  assert_no_links "mixed-$binary"
+done
 
 # An older rust-std component doesn't change any of the version banners.
 mixed="$temporary_directory/cases/mixed-std"

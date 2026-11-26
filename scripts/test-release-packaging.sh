@@ -47,7 +47,8 @@ done
 toolchain=ohm-9.9.9-1
 manifest="$temporary_directory/manifest.json"$'\n'
 cat > "$manifest" <<EOF
-{"release":{"toolchain_name":"$toolchain"},"bundled_tools":{"wild":{"version":"0.10.0"}}}
+{"sources":{"rustfmt":{"revision":"0123456789abcdef0123456789abcdef01234567"}},
+ "release":{"toolchain_name":"$toolchain"},"bundled_tools":{"wild":{"version":"0.10.0"}}}
 EOF
 
 cp "$manifest" "${manifest%$'\n'}"
@@ -92,6 +93,7 @@ test ! -e "$temporary_directory/search/valid/SHA256SUMS"
   sha256sum --check --strict SHA256SUMS
 )
 grep -Fx "embedded_version=$toolchain" "$valid/ohm-installer.sh"
+grep -Fx 'embedded_rustfmt_revision=0123456789' "$valid/ohm-installer.sh"
 grep -Fx "embedded_minimum_glibc=2.38" "$valid/ohm-installer.sh"
 grep -Fx 'embedded_wild_version=0.10.0' "$valid/ohm-installer.sh"
 for target in aarch64-apple-darwin x86_64-unknown-linux-gnu; do
@@ -122,10 +124,11 @@ for output in ohm-installer.sh "$toolchain.json" SHA256SUMS; do
   cmp "$valid/$output" "$linked/$output"
 done
 
-for failure in checksum wrong-archive wrong-provenance symlink identity; do
+for failure in checksum wrong-archive wrong-provenance symlink identity rustfmt; do
   broken="$temporary_directory/$failure"
   cp -R "$inputs" "$broken"
   selected_toolchain=$toolchain
+  selected_manifest=$manifest
   case "$failure" in
     checksum) printf 'corrupt\n' >> "$broken/$toolchain-aarch64-apple-darwin.tar.gz" ;;
     wrong-archive)
@@ -142,8 +145,12 @@ for failure in checksum wrong-archive wrong-provenance symlink identity; do
         "$broken/$toolchain-aarch64-apple-darwin-provenance.json"
       ;;
     identity) selected_toolchain=ohm-9.9.9-2 ;;
+    rustfmt)
+      selected_manifest="$broken/manifest.json"
+      jq '.sources.rustfmt.revision = "invalid"' "$manifest" > "$selected_manifest"
+      ;;
   esac
-  if bash "$script_directory/assemble-release.sh" "$manifest" "$broken" "$selected_toolchain" \
+  if bash "$script_directory/assemble-release.sh" "$selected_manifest" "$broken" "$selected_toolchain" \
     > "$temporary_directory/$failure.log" 2>&1; then
     echo "assembly accepted invalid $failure input" >&2
     exit 1
