@@ -1323,10 +1323,14 @@ class OutputValidationTests(unittest.TestCase):
                     output, expected_crate=None, selected_test=selected
                 )
 
-    def test_rejects_zero_missing_and_prefix_matched_tests(self) -> None:
+    def test_rejects_zero_ignored_missing_and_prefix_matched_tests(self) -> None:
         selected = "audio_preparation::tests::selected_test"
         for output in (
             "running 0 tests\n",
+            (
+                f"running 1 test\ntest {selected} ... ignored, needs setup\n"
+                "test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out\n"
+            ),
             "running 1 test\ntest another_test ... ok\n",
             f"running 1 test\ntest {selected}_variant ... ok\n",
         ):

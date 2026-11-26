@@ -126,6 +126,9 @@ WORKFLOW_PHASES = {
 }
 COMPILATION = re.compile(r"^\s*(?:Checking|Compiling)\s+([^\s]+)", re.MULTILINE)
 TEST_COUNT = re.compile(r"(?mi)^\s*(?:running|Starting)\s+(\d+)\s+tests?\b")
+LIBTEST_IGNORED = re.compile(
+    r"(?m)^\s*test result: (?:ok|FAILED)\. \d+ passed; \d+ failed; (\d+) ignored;"
+)
 FAILURE_DIAGNOSTIC = re.compile(
     r"(?im)^\s*(?:error(?:\[[^\]]+\])?:|fatal(?: error)?:|diff in\b|"
     r"error writing files\b|thread .* panicked at\b|aborting due to\b)"
@@ -256,6 +259,14 @@ def reversible_edit(worktree: Path, edit: Edit) -> Iterator[Callable[[bool], Non
             os.utime(path, None)
 
 
+def runner_test_counts(output: str) -> tuple[list[int], int]:
+    """Return the counts announced by each run and the total ignored by libtest."""
+    counts = [int(match.group(1)) for match in TEST_COUNT.finditer(output)]
+    # Libtest includes ignored tests in `running`. Nextest excludes skips from `Starting`.
+    ignored = sum(map(int, LIBTEST_IGNORED.findall(output))) if counts else 0
+    return counts, ignored
+
+
 def validate_output(
     output: str, *, expected_crate: str | None, selected_test: str | None
 ) -> None:
@@ -266,8 +277,8 @@ def validate_output(
     if expected_crate is not None and expected_crate not in COMPILATION.findall(output):
         raise BenchmarkError(f"edited crate {expected_crate!r} was not rebuilt")
     if selected_test is not None:
-        counts = [int(match.group(1)) for match in TEST_COUNT.finditer(output)]
-        if not counts or any(count != 1 for count in counts):
+        counts, ignored = runner_test_counts(output)
+        if not counts or ignored or any(count != 1 for count in counts):
             raise BenchmarkError("benchmark must execute exactly one existing test")
         test_name = rf"(?<![A-Za-z0-9_]){re.escape(selected_test)}(?![A-Za-z0-9_])"
         if re.search(test_name, output) is None:
