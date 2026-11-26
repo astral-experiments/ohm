@@ -1,6 +1,6 @@
 # Published benchmarks
 
-Fourteen Linux benchmark suites compare published Ohm 1.100.0-11 with stock Rust 1.100.0. [Benchmark tables](../../README.md) · [Recorded sessions](sessions.json) · [ty worktrees](ty-worktree.md)
+Fourteen Linux benchmark suites compare published Ohm 1.100.0-12 with stock Rust 1.100.0. [Benchmark tables](../../README.md) · [Recorded sessions](sessions.json) · [ty worktrees](ty-worktree.md)
 
 The individual-command study covers 216 samples across uv and Codex. The developer study covers five workflows per project for Ruff, uv, and Codex, with four repetitions per toolchain. [Individual commands](workflow.json) · [Developer workflows](developer-workflows.json) · [Historical Ruff replay](historical.json) · [uv feature ablation](ablation.json)
 
