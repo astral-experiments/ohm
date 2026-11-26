@@ -289,10 +289,10 @@ verify_installation() {
         [ -f "$executable_path" ] && [ -x "$executable_path" ] ||
             fail "installed tool is missing or not executable: $executable"
 
+        tool_version=$(probe_tool "$executable_path" --version) ||
+            fail "installed tool did not start successfully: $executable"
         case "$executable" in
             rustc|rustdoc|cargo)
-                tool_version=$(probe_tool "$executable_path" --version) ||
-                    fail "installed tool did not start successfully: $executable"
                 case "$tool_version" in
                     "$executable $upstream_version "*|"$executable $upstream_version-"*) ;;
                     *) fail "the installed $executable has an unexpected upstream version" ;;
@@ -301,10 +301,22 @@ verify_installation() {
                     *"($version)"*) ;;
                     *) fail "the installed $executable has an unexpected Ohm release version" ;;
                 esac
+                if [ "$executable" = rustc ]; then
+                    rustc_version=$tool_version
+                fi
                 ;;
-            *)
-                probe_tool "$executable_path" --version >/dev/null 2>&1 ||
-                    fail "installed tool did not start successfully: $executable"
+            cargo-clippy)
+                clippy_version=$tool_version
+                ;;
+            clippy-driver)
+                # The launcher selects its sibling driver. A matched pair can
+                # still run a different rustc that rejects Ohm's compiler flags.
+                [ "$tool_version" = "$clippy_version" ] ||
+                    fail 'cargo-clippy and clippy-driver report different versions'
+                compiler_version=$(probe_tool "$executable_path" --rustc --version) ||
+                    fail 'could not check the compiler used by clippy-driver'
+                [ "$compiler_version" = "$rustc_version" ] ||
+                    fail 'clippy-driver and rustc report different compiler versions'
                 ;;
         esac
     done
