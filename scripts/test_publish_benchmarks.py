@@ -223,6 +223,19 @@ class PublicationTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     publish.validate(reports)
 
+    def test_matching_test_counts_must_still_be_valid(self):
+        command = next(
+            c
+            for c in self.reports["sessions"]["commands"]["uv"]
+            if c["category"] == "test"
+        )
+        for invalid in (0, -1, 1.5, True):
+            with self.subTest(count=invalid):
+                for counts in command["tests_started"].values():
+                    counts[0] = invalid
+                with self.assertRaisesRegex(ValueError, "invalid command test count"):
+                    publish.validate(self.reports)
+
     def test_disk_headline_requires_both_ten_worktree_comparisons(self):
         rows = self.reports["disk"]["readme_comparisons"]
         item = next(row for row in rows if row["comparison"]["worktrees"] == 10)

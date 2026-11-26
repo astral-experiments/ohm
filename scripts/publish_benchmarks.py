@@ -174,6 +174,9 @@ def validate_sessions(kind, report):
                 ):
                     raise ValueError(f"{kind}: incomplete {field} for {project}")
             counts = list(command["tests_started"].values())
+            minimum = 1 if command["category"] == "test" else 0
+            if any(type(n) is not int or n < minimum for lane in counts for n in lane):
+                raise ValueError(f"{kind}: invalid command test count for {project}")
             if any(value != counts[0] for value in counts):
                 raise ValueError(f"{kind}: mismatched command test counts")
         for lane, times in totals.items():
