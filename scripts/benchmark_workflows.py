@@ -77,7 +77,7 @@ def project_definitions():
                 "--exact",
             ]
             if project == "uv"
-            else ["nextest", "run", *common, "-E", f"test({workload.selected_test})"]
+            else ["nextest", "run", *common, "-E", f"test(={workload.selected_test})"]
         )
         projects[project] = {
             "label": "uv" if project == "uv" else "Codex",
