@@ -1,6 +1,6 @@
 # Optimizations
 
-Ohm 1.100.0-12 builds on Rust 1.100.0 and LLVM 23.1.5. It speeds up development with changes to
+Ohm 1.100.0-13 builds on Rust 1.100.0 and LLVM 23.1.5. It speeds up development with changes to
 Cargo, rustc, LLVM, Clippy, and rustfmt.
 
 ## Cargo and builds
@@ -120,6 +120,11 @@ but changing a private item may invalidate more of that consumer’s work.
 [Unused dependencies](https://github.com/astral-experiments/ohm-cargo/pull/575) ·
 [Library metadata](https://github.com/astral-experiments/ohm-rust/pull/468)
 
+Cargo also uses one hash when you repeatedly check an incremental workspace library on its own.
+Checking a consumer restores per-item hashes on the next edit. If you make several private edits
+before returning to the workspace, Cargo may check extra consumers.
+[Standalone library checks](https://github.com/astral-experiments/ohm-cargo/pull/709)
+
 When Cargo checks a registry library, it normally disables incremental compilation and caps lints
 at `allow`. For a metadata-only `rlib` check with those settings, Ohm can hash the metadata,
 source files and tracked environment inputs without hashing every function body. It can also skip
@@ -146,6 +151,14 @@ seconds with it.
 
 In a separate experiment, the compact metadata graph reduced the time to check Ruff after an edit by
 3.0%.
+
+To reuse a particular derive or attribute macro’s expansion across edits, list the exports in
+`RUSTC_OHM_PURE_MACROS`, for example `ruff_macros::ViolationMetadata,ruff_macros::map_codes`. This
+opt-in covers every source and version with those names. Rustc hashes the macro library and reruns
+macros that request source text, track external inputs or expand nested expressions. A macro that
+relies on an untracked input, another dynamic library or a side effect can silently produce stale
+results. The list is empty by default.
+[Named macro expansions](https://github.com/astral-experiments/ohm-rust/pull/690)
 
 Repeated edits can spend much of their time running procedural macros. With Ohm defaults enabled,
 set `CARGO_UNSTABLE_OHM_OPTIMIZE_MACRO_DEPS=true` to build eligible registry libraries at
@@ -192,6 +205,20 @@ dependency. Before relinking, Cargo verifies the list of link inputs and the con
 saved object file. If an input is missing or a checksum fails, Cargo recompiles the target.
 Changes involving procedural macros, build scripts, or native libraries may also require
 recompilation.
+
+When the only change is to a library its own binary never used, Cargo can skip the link too. For
+example, editing `codex-core` leaves the schema generator’s executable reusable. Cargo checks the
+native inputs, search paths and executable, which costs extra reads. This applies to native x86-64
+GNU/Linux workspace builds with the bundled linker and system GCC or Clang. Pass
+`-Zrelink-only=no` to disable it.
+[Unused package libraries](https://github.com/astral-experiments/ohm-cargo/pull/567)
+
+On x86-64 GNU/Linux, pass `-Zohm-split-limited-debuginfo` to keep library debug records out of
+repeated links. It applies to unoptimized development builds with `debug = "limited"` and an
+external build directory on a filesystem where Cargo cannot clone files for worktrees. The
+debugger needs the matching `.dwo` files at their original paths. Cleaning or rebuilding can
+remove or replace them. This option is off by default.
+[Separate debug files](https://github.com/astral-experiments/ohm-cargo/pull/574)
 
 With unpacked debug information, each cached object refers to a file by name. After an incremental
 rebuild, rustc restores that file under the original name. If the build fails, Cargo keeps the
@@ -1203,11 +1230,21 @@ impls from their headers, so inserting `impl A` before `impl B` can preserve the
 methods. [Trait selection](https://github.com/astral-experiments/ohm-rust/pull/493) ·
 [Impl headers](https://github.com/astral-experiments/ohm-rust/pull/467)
 
+Editing a doc comment inside a trait used to move the end of the source span for its implicit
+bounds. Rustc now uses the span of the trait declaration. Callers can reuse their type checks and
+diagnostics highlight the declaration. Switching between revisions 12 and 13 requires a fresh
+incremental graph.
+[Implicit trait bounds](https://github.com/astral-experiments/ohm-rust/pull/691)
+
 When a module lives in its own file, editing its caller often leaves the file unchanged. Ohm can
 restore the parsed syntax of such a file if it is at least 1 KiB and its contents, edition and
 parsing context match. Rustc adjusts source locations and attribute IDs, then expands macros and
 resolves names in the current crate. It reparses files that produced diagnostics and skips snapshots
 that grow too large. [Parsed modules](https://github.com/astral-experiments/ohm-rust/pull/450)
+
+To generate a coroutine body that takes ownership of an async closure’s captures, rustc only has
+to visit nested bodies. It visits them in the same order to preserve their definition IDs.
+[Coroutine checks](https://github.com/astral-experiments/ohm-rust/pull/692)
 
 When tests are disabled, rustc can leave a free function’s body out of the saved syntax if the
 only attributes are `#[cfg(test)]` and an optional `#[test]`. It still parses the entire file,
@@ -1216,10 +1253,11 @@ keeps the declaration for cfg checks and saves the body if a lint needs it befor
 
 Editing one function need not rerun built-in late lints, privacy checks or stability checks on
 every large function in the same module. Rustc tracks these checks separately for module-level
-functions and methods with at least 128 nodes in its high-level representation. This takes extra
+functions and methods with at least 32 nodes in its high-level representation. This takes extra
 dependency nodes and space for the nested definitions. Custom lint passes and rustdoc keep their
 usual lint traversal.
-[Large functions](https://github.com/astral-experiments/ohm-rust/pull/656)
+[Large functions](https://github.com/astral-experiments/ohm-rust/pull/656) ·
+[Function size cutoff](https://github.com/astral-experiments/ohm-rust/pull/693)
 
 A Ruff edit to support `CLICOLOR=0` changed a dependency hash stored in nine libraries. In
 `ruff_linter`, that meant encoding 16.3 MB of metadata to update a 16-byte field. During a native
