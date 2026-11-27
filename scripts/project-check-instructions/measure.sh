@@ -66,7 +66,14 @@ load_role() {
     cp "$sdk"/{stage1.sha256,relocations.txt} "$out/sdk-$role/"
   fi
   if [[ "$role" != control ]]; then
-    cmp "$control/epoch" "$sdk/epoch"
+    # The epoch-7 reader accepts epoch-6 libraries from the shared sysroot.
+    # Require the compile-and-run probe below for this pairing.
+    if ! cmp -s "$control/epoch" "$sdk/epoch"; then
+      test "$role" = candidate
+      test "$RELEASE_LLVM" = true
+      grep -qx 6 "$control/epoch"
+      grep -qx 7 "$sdk/epoch"
+    fi
     # Share the complete set of standard libraries and the allocator.
     mv "$sdk/lib/rustlib/$host/lib" "$kits/unused-$role-std"
     cp -al "$control/lib/rustlib/$host/lib" "$sdk/lib/rustlib/$host/lib"
